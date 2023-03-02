@@ -49,15 +49,4 @@ jobs:
           GPG_FINGERPRINT: ${{ steps.import_gpg.outputs.fingerprint }}
           # GitHub sets this automatically
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      -
-        name: Slack notification for releases
-        uses: ravsamhq/notify-slack-action@v2
-        if: github.event_name == 'push' && contains(github.ref, 'refs/tags/')
-        with:
-          status: ${{ job.status }}
-          token: ${{ secrets.GITHUB_TOKEN }}
-          notification_title: "*{workflow}* {status_message} in <{repo_url}|{repo}>"
-          message_format: "{emoji} Build ${{ github.ref_name }} has {status_message}"
-          footer: "Linked Repo <{repo_url}|{repo}> | <{workflow_url}|View Workflow>"
-        env:
-          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+
