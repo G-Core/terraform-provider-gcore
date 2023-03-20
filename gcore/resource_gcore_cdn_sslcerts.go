@@ -25,14 +25,14 @@ func resourceCDNCert() *schema.Resource {
 			},
 			"cert": {
 				Type:        schema.TypeString,
-				Required:    true,
+				Optional:    true,
 				Sensitive:   true,
 				ForceNew:    true,
 				Description: "The public part of the SSL certificate. All chain of the SSL certificate should be added.",
 			},
 			"private_key": {
 				Type:        schema.TypeString,
-				Required:    true,
+				Optional:    true,
 				Sensitive:   true,
 				ForceNew:    true,
 				Description: "The private key of the SSL certificate.",
