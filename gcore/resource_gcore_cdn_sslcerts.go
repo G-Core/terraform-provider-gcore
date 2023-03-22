@@ -25,14 +25,14 @@ func resourceCDNCert() *schema.Resource {
 			},
 			"cert": {
 				Type:        schema.TypeString,
-				Required:    true,
+				Optional:    true,
 				Sensitive:   true,
 				ForceNew:    true,
 				Description: "The public part of the SSL certificate. All chain of the SSL certificate should be added.",
 			},
 			"private_key": {
 				Type:        schema.TypeString,
-				Required:    true,
+				Optional:    true,
 				Sensitive:   true,
 				ForceNew:    true,
 				Description: "The private key of the SSL certificate.",
@@ -44,7 +44,8 @@ func resourceCDNCert() *schema.Resource {
 			},
 			"automated": {
 				Type:        schema.TypeBool,
-				Computed:    true,
+				Optional:    true,
+				ForceNew:    true,
 				Description: "The way SSL certificate was issued.",
 			},
 		},
@@ -63,6 +64,10 @@ func resourceCDNCertCreate(ctx context.Context, d *schema.ResourceData, m interf
 	req.Name = d.Get("name").(string)
 	req.Cert = d.Get("cert").(string)
 	req.PrivateKey = d.Get("private_key").(string)
+
+	if d.Get("automated") != nil {
+		req.Automated = d.Get("automated").(bool)
+	}
 
 	result, err := client.SSLCerts().Create(ctx, &req)
 	if err != nil {

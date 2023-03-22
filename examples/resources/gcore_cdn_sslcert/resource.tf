@@ -18,3 +18,7 @@ resource "gcore_cdn_sslcert" "cdnopt_cert" {
   private_key = var.private_key
 }
 
+resource "gcore_cdn_sslcert" "cdnopt_lets_encrypt_cert" {
+  name        = "Test LE certificate"
+  automated   = true
+}
