@@ -54,7 +54,7 @@ func Provider() *schema.Provider {
 				// commented because it's broke all tests
 				//AtLeastOneOf: []string{ProviderOptPermanentToken, "user_name"},
 				Sensitive:   true,
-				Description: "A permanent [API-token](https://support.gcore.com/hc/en-us/articles/360018625617-API-tokens)",
+				Description: "A permanent [API-token](https://gcore.com/support/articles/360018625617/)",
 				DefaultFunc: schema.EnvDefaultFunc("GCORE_PERMANENT_TOKEN", nil),
 			},
 			ProviderOptSingleApiEndpoint: {

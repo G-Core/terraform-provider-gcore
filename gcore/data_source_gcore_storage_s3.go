@@ -63,6 +63,6 @@ func dataSourceStorageS3() *schema.Resource {
 			},
 		},
 		ReadContext: resourceStorageS3Read,
-		Description: "Represent s3 storage resource. https://storage.gcorelabs.com/storage/list",
+		Description: "Represent s3 storage resource. https://storage.gcore.com/storage/list",
 	}
 }

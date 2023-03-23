@@ -1,4 +1,4 @@
-module github.com/terraform-providers/terraform-provider-gcorelabs
+module github.com/terraform-providers/terraform-provider-gcore
 
 go 1.17
 

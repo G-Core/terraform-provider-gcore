@@ -30,6 +30,6 @@ func dataSourceStorageSFTPKey() *schema.Resource {
 			},
 		},
 		ReadContext: resourceStorageSFTPKeyRead,
-		Description: "Represent storage key resource. https://storage.gcorelabs.com/ssh-key/list",
+		Description: "Represent storage key resource. https://storage.gcore.com/ssh-key/list",
 	}
 }
