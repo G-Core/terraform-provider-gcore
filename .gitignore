@@ -1,4 +1,4 @@
-
+bin/
 terraform.tfplan
 terraform.tfstate
 dist/

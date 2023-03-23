@@ -62,7 +62,7 @@ func dataSourceStorageSFTP() *schema.Resource {
 					Type: schema.TypeInt,
 				},
 				Computed:    true,
-				Description: "An ssh keys IDs to link with new sftp storage resource only. https://storage.gcorelabs.com/ssh-key/list",
+				Description: "An ssh keys IDs to link with new sftp storage resource only. https://storage.gcore.com/ssh-key/list",
 			},
 			StorageSchemaGenerateHTTPEndpoint: {
 				Type:        schema.TypeString,
@@ -76,6 +76,6 @@ func dataSourceStorageSFTP() *schema.Resource {
 			},
 		},
 		ReadContext: resourceStorageSFTPRead,
-		Description: "Represent sftp storage resource. https://storage.gcorelabs.com/storage/list",
+		Description: "Represent sftp storage resource. https://storage.gcore.com/storage/list",
 	}
 }

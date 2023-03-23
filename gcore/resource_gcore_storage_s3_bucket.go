@@ -47,7 +47,7 @@ func resourceStorageS3Bucket() *schema.Resource {
 		CreateContext: resourceStorageS3BucketCreate,
 		ReadContext:   resourceStorageS3BucketRead,
 		DeleteContext: resourceStorageS3BucketDelete,
-		Description:   "Represent s3 storage bucket resource. https://storage.gcorelabs.com/storage/list",
+		Description:   "Represent s3 storage bucket resource. https://storage.gcore.com/storage/list",
 		Importer: &schema.ResourceImporter{
 			StateContext: schema.ImportStatePassthroughContext,
 		},

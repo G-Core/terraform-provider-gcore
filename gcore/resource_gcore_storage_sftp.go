@@ -120,7 +120,7 @@ func resourceStorageSFTP() *schema.Resource {
 					Type: schema.TypeInt,
 				},
 				Optional:    true,
-				Description: "An ssh keys IDs to link with new sftp storage resource only. https://storage.gcorelabs.com/ssh-key/list",
+				Description: "An ssh keys IDs to link with new sftp storage resource only. https://storage.gcore.com/ssh-key/list",
 			},
 			StorageSchemaGenerateHTTPEndpoint: {
 				Type:        schema.TypeString,
@@ -139,7 +139,7 @@ func resourceStorageSFTP() *schema.Resource {
 		ReadContext:   resourceStorageSFTPRead,
 		UpdateContext: resourceStorageSFTPUpdate,
 		DeleteContext: resourceStorageSFTPDelete,
-		Description:   "Represent sftp storage resource. https://storage.gcorelabs.com/storage/list",
+		Description:   "Represent sftp storage resource. https://storage.gcore.com/storage/list",
 		Importer: &schema.ResourceImporter{
 			StateContext: schema.ImportStatePassthroughContext,
 		},

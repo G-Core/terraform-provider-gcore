@@ -54,7 +54,7 @@ func resourceStorageSFTPKey() *schema.Resource {
 		CreateContext: resourceStorageSFTPKeyCreate,
 		ReadContext:   resourceStorageSFTPKeyRead,
 		DeleteContext: resourceStorageSFTPKeyDelete,
-		Description:   "Represent storage key resource. https://storage.gcorelabs.com/ssh-key/list",
+		Description:   "Represent storage key resource. https://storage.gcore.com/ssh-key/list",
 		Importer: &schema.ResourceImporter{
 			StateContext: schema.ImportStatePassthroughContext,
 		},
