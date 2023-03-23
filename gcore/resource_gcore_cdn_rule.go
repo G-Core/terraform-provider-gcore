@@ -45,11 +45,13 @@ func resourceCDNRule() *schema.Resource {
 			"origin_protocol": {
 				Type:        schema.TypeString,
 				Optional:    true,
+				Computed:    true,
 				Description: "This option defines the protocol that will be used by CDN servers to request content from an origin source. If not specified, it will be inherit from resource. Possible values are: HTTPS, HTTP, MATCH.",
 			},
 			"weight": {
 				Type:        schema.TypeInt,
 				Optional:    true,
+				Computed:    true,
 				Description: "Rule weight that determines rule execution order: from the smallest (0) to the highest.",
 			},
 			"options": optionsSchema,
@@ -71,7 +73,10 @@ func resourceCDNRuleCreate(ctx context.Context, d *schema.ResourceData, m interf
 	req.Name = d.Get("name").(string)
 	req.Rule = d.Get("rule").(string)
 	req.RuleType = d.Get("rule_type").(int)
-	req.Weight = d.Get("weight").(int)
+
+	if d.Get("weight") != nil {
+	    req.Weight = d.Get("weight").(int)
+	}
 
 	if d.Get("origin_group") != nil && d.Get("origin_group").(int) > 0 {
 		req.OriginGroup = pointer.ToInt(d.Get("origin_group").(int))
@@ -144,7 +149,10 @@ func resourceCDNRuleUpdate(ctx context.Context, d *schema.ResourceData, m interf
 	req.Name = d.Get("name").(string)
 	req.Rule = d.Get("rule").(string)
 	req.RuleType = d.Get("rule_type").(int)
-	req.Weight = d.Get("weight").(int)
+
+    if d.Get("weight") != nil {
+	    req.Weight = d.Get("weight").(int)
+	}
 
 	if d.Get("origin_group") != nil && d.Get("origin_group").(int) > 0 {
 		req.OriginGroup = pointer.ToInt(d.Get("origin_group").(int))
