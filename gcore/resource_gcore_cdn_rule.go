@@ -75,7 +75,7 @@ func resourceCDNRuleCreate(ctx context.Context, d *schema.ResourceData, m interf
 	req.RuleType = d.Get("rule_type").(int)
 
 	if d.Get("weight") != nil {
-	    req.Weight = d.Get("weight").(int)
+		req.Weight = d.Get("weight").(int)
 	}
 
 	if d.Get("origin_group") != nil && d.Get("origin_group").(int) > 0 {
@@ -150,8 +150,8 @@ func resourceCDNRuleUpdate(ctx context.Context, d *schema.ResourceData, m interf
 	req.Rule = d.Get("rule").(string)
 	req.RuleType = d.Get("rule_type").(int)
 
-    if d.Get("weight") != nil {
-	    req.Weight = d.Get("weight").(int)
+	if d.Get("weight") != nil {
+		req.Weight = d.Get("weight").(int)
 	}
 
 	if d.Get("origin_group") != nil && d.Get("origin_group").(int) > 0 {

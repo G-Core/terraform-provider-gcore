@@ -71,7 +71,6 @@ resource "gcore_cdn_resource" "cdn_example_com" {
 
 - `active` (Boolean) The setting allows to enable or disable a CDN Resource
 - `description` (String) Custom client description of the resource.
-- `issue_le_cert` (Boolean) Generate LE certificate.
 - `options` (Block List, Max: 1) Each option in CDN resource settings. Each option added to CDN resource settings should have the following mandatory request fields: enabled, value. (see [below for nested schema](#nestedblock--options))
 - `origin` (String) A domain name or IP of your origin source. Specify a port if custom. You can use either 'origin' parameter or 'originGroup' in the resource definition.
 - `origin_group` (Number) ID of the Origins Group. Use one of your Origins Group or create a new one. You can use either 'origin' parameter or 'originGroup' in the resource definition.

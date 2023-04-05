@@ -446,12 +446,6 @@ func resourceCDNResource() *schema.Resource {
 				Optional:    true,
 				Description: "generate LE certificate automatically.",
 			},
-			"issue_le_cert": {
-				Type:        schema.TypeBool,
-				Optional:    true,
-				Computed:    true,
-				Description: "Generate LE certificate.",
-			},
 			"active": {
 				Type:        schema.TypeBool,
 				Optional:    true,
@@ -487,10 +481,6 @@ func resourceCDNResourceCreate(ctx context.Context, d *schema.ResourceData, m in
 	req.SSlEnabled = d.Get("ssl_enabled").(bool)
 	req.SSLData = d.Get("ssl_data").(int)
 	req.SSLAutomated = d.Get("ssl_automated").(bool)
-
-	if d.Get("issue_le_cert") != nil {
-		req.IssueLECert = d.Get("issue_le_cert").(bool)
-	}
 
 	req.Options = listToOptions(d.Get("options").([]interface{}))
 
