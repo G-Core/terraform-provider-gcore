@@ -23,6 +23,9 @@ resource "gcore_cdn_resource" "cdn_example_com" {
   origin_group        = gcore_cdn_origingroup.origin_group_1.id
   origin_protocol     = "MATCH"
   secondary_hostnames = ["cdn2.example.com"]
+  
+  ssl_enabled         = true
+  ssl_data            = gcore_cdn_sslcert.lets_encrypt_cert.id
 
   options {
     edge_cache_settings {
