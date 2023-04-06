@@ -441,17 +441,6 @@ func resourceCDNResource() *schema.Resource {
 				RequiredWith: []string{"ssl_enabled"},
 				Description:  "Specify the SSL Certificate ID which should be used for the CDN Resource.",
 			},
-			"ssl_automated": {
-				Type:        schema.TypeBool,
-				Optional:    true,
-				Description: "generate LE certificate automatically.",
-			},
-			"issue_le_cert": {
-				Type:        schema.TypeBool,
-				Optional:    true,
-				Computed:    true,
-				Description: "Generate LE certificate.",
-			},
 			"active": {
 				Type:        schema.TypeBool,
 				Optional:    true,
@@ -486,11 +475,6 @@ func resourceCDNResourceCreate(ctx context.Context, d *schema.ResourceData, m in
 	req.OriginProtocol = resources.Protocol(d.Get("origin_protocol").(string))
 	req.SSlEnabled = d.Get("ssl_enabled").(bool)
 	req.SSLData = d.Get("ssl_data").(int)
-	req.SSLAutomated = d.Get("ssl_automated").(bool)
-
-	if d.Get("issue_le_cert") != nil {
-		req.IssueLECert = d.Get("issue_le_cert").(bool)
-	}
 
 	req.Options = listToOptions(d.Get("options").([]interface{}))
 
@@ -533,7 +517,6 @@ func resourceCDNResourceRead(ctx context.Context, d *schema.ResourceData, m inte
 	d.Set("secondary_hostnames", result.SecondaryHostnames)
 	d.Set("ssl_enabled", result.SSlEnabled)
 	d.Set("ssl_data", result.SSLData)
-	d.Set("ssl_automated", result.SSLAutomated)
 	d.Set("status", result.Status)
 	d.Set("active", result.Active)
 	if err := d.Set("options", optionsToList(result.Options)); err != nil {

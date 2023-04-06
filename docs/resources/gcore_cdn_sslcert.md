@@ -49,4 +49,31 @@ resource "gcore_cdn_sslcert" "cdnopt_cert" {
 - `has_related_resources` (Boolean) It shows if the SSL certificate is used by a CDN resource.
 - `id` (String) The ID of this resource.
 
+---
+
+## Example Usage (Let's Encrypt certificate)
+
+```terraform
+provider gcore {
+  permanent_api_token = "251$d3361.............1b35f26d8"
+}
+
+resource "gcore_cdn_sslcert" "lets_encrypt_cert" {
+  name        = "Test Let's Encrypt certificate"
+  automated   = true
+}
+```
+
+## Schema
+
+### Required
+
+- `name` (String) Name of the SSL certificate. Must be unique.
+- `automated` (Boolean) The way SSL certificate was issued.
+
+### Read-Only
+
+- `has_related_resources` (Boolean) It shows if the SSL certificate is used by a CDN resource.
+- `id` (String) The ID of this resource.
+
 
