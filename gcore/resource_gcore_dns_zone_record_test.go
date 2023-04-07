@@ -12,7 +12,6 @@ import (
 )
 
 func TestAccDnsZoneRecord(t *testing.T) {
-
 	random := time.Now().Nanosecond()
 	domain := "terraformtest"
 	subDomain := fmt.Sprintf("key%d", random)
@@ -32,8 +31,13 @@ resource "%s" "%s" {
 
   filter {
     type = "geodistance"
-    limit = 1
     strict = true
+  }
+  
+  filter {
+    type = "first_n"
+    limit = 1
+    strict = false
   }
 
   resource_record {
@@ -45,8 +49,8 @@ resource "%s" "%s" {
 	  asn = [12345]
 	  ip = ["1.1.1.1"]
 	  notes = ["notes"]
-	  continents = ["asia"]
-	  countries = ["russia"]
+	  continents = ["europe"]
+	  countries = ["pl"]
 	  default = true
   	}
   }
@@ -68,8 +72,8 @@ resource "%s" "%s" {
       latlong = [52.367,4.9041]
 	  ip = ["1.1.2.2"]
 	  notes = ["notes"]
-	  continents = ["america"]
-	  countries = ["usa"]
+	  continents = ["na"]
+	  countries = ["us"]
 	  default = false
   	}
   }
@@ -92,12 +96,18 @@ resource "%s" "%s" {
 					resource.TestCheckResourceAttr(resourceName, DNSZoneRecordSchemaTTL, "10"),
 					resource.TestCheckResourceAttr(resourceName,
 						fmt.Sprintf("%s.0.%s", DNSZoneRecordSchemaFilter, DNSZoneRecordSchemaFilterType),
-						"geodistance"),
+						"first_n"),
 					resource.TestCheckResourceAttr(resourceName,
 						fmt.Sprintf("%s.0.%s", DNSZoneRecordSchemaFilter, DNSZoneRecordSchemaFilterLimit),
 						"1"),
 					resource.TestCheckResourceAttr(resourceName,
 						fmt.Sprintf("%s.0.%s", DNSZoneRecordSchemaFilter, DNSZoneRecordSchemaFilterStrict),
+						"false"),
+					resource.TestCheckResourceAttr(resourceName,
+						fmt.Sprintf("%s.1.%s", DNSZoneRecordSchemaFilter, DNSZoneRecordSchemaFilterType),
+						"geodistance"),
+					resource.TestCheckResourceAttr(resourceName,
+						fmt.Sprintf("%s.1.%s", DNSZoneRecordSchemaFilter, DNSZoneRecordSchemaFilterStrict),
 						"true"),
 					resource.TestCheckResourceAttr(resourceName,
 						fmt.Sprintf("%s.0.%s", DNSZoneRecordSchemaResourceRecord, DNSZoneRecordSchemaContent),
@@ -128,11 +138,11 @@ resource "%s" "%s" {
 					resource.TestCheckResourceAttr(resourceName,
 						fmt.Sprintf("%s.0.%s.0.%s.0",
 							DNSZoneRecordSchemaResourceRecord, DNSZoneRecordSchemaMeta, DNSZoneRecordSchemaMetaContinents),
-						"asia"),
+						"europe"),
 					resource.TestCheckResourceAttr(resourceName,
 						fmt.Sprintf("%s.0.%s.0.%s.0",
 							DNSZoneRecordSchemaResourceRecord, DNSZoneRecordSchemaMeta, DNSZoneRecordSchemaMetaCountries),
-						"russia"),
+						"pl"),
 					resource.TestCheckResourceAttr(resourceName,
 						fmt.Sprintf("%s.0.%s.0.%s",
 							DNSZoneRecordSchemaResourceRecord, DNSZoneRecordSchemaMeta, DNSZoneRecordSchemaMetaDefault),
@@ -170,11 +180,11 @@ resource "%s" "%s" {
 					resource.TestCheckResourceAttr(resourceName,
 						fmt.Sprintf("%s.0.%s.0.%s.0",
 							DNSZoneRecordSchemaResourceRecord, DNSZoneRecordSchemaMeta, DNSZoneRecordSchemaMetaContinents),
-						"america"),
+						"na"),
 					resource.TestCheckResourceAttr(resourceName,
 						fmt.Sprintf("%s.0.%s.0.%s.0",
 							DNSZoneRecordSchemaResourceRecord, DNSZoneRecordSchemaMeta, DNSZoneRecordSchemaMetaCountries),
-						"usa"),
+						"us"),
 					resource.TestCheckResourceAttr(resourceName,
 						fmt.Sprintf("%s.0.%s.0.%s",
 							DNSZoneRecordSchemaResourceRecord, DNSZoneRecordSchemaMeta, DNSZoneRecordSchemaMetaDefault),
