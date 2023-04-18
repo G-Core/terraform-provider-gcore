@@ -372,6 +372,25 @@ var (
 						},
 					},
 				},
+				"use_rsa_le_cert": {
+					Type:        schema.TypeList,
+					MaxItems:    1,
+					Optional:    true,
+					Description: "",
+					Elem: &schema.Resource{
+						Schema: map[string]*schema.Schema{
+							"enabled": {
+								Type:     schema.TypeBool,
+								Optional: true,
+								Default:  true,
+							},
+							"value": {
+								Type:     schema.TypeBool,
+								Required: true,
+							},
+						},
+					},
+				},
 			},
 		},
 	}
@@ -763,6 +782,16 @@ func listToOptions(l []interface{}) *gcdn.Options {
 			opts.TLSVersions.Value = append(opts.TLSVersions.Value, v.(string))
 		}
 	}
+	if opt, ok := getOptByName(fields, "use_rsa_le_cert"); ok {
+		enabled := true
+		if _, ok := opt["enabled"]; ok {
+			enabled = opt["enabled"].(bool)
+		}
+		opts.UseRSALECert = &gcdn.UseRSALECert{
+			Enabled: enabled,
+			Value:   opt["value"].(bool),
+		}
+	}
 	return &opts
 }
 
@@ -853,6 +882,10 @@ func optionsToList(options *gcdn.Options) []interface{} {
 	if options.TLSVersions != nil {
 		m := structToMap(options.TLSVersions)
 		result["tls_versions"] = []interface{}{m}
+	}
+	if options.UseRSALECert != nil {
+		m := structToMap(options.UseRSALECert)
+		result["use_rsa_le_cert"] = []interface{}{m}
 	}
 	return []interface{}{result}
 }
