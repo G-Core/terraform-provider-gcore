@@ -37,6 +37,11 @@ resource "gcore_cdn_resource" "cdn_example_com" {
     redirect_http_to_https {
       value = true
     }
+    request_limiter {
+      rate_unit = "r/s"
+      rate = 5
+      burst = 1
+    }
     gzip_on {
       value = true
     }
@@ -101,6 +106,7 @@ Optional:
 - `query_params_blacklist` (Block List, Max: 1) (see [below for nested schema](#nestedblock--options--query_params_blacklist))
 - `query_params_whitelist` (Block List, Max: 1) (see [below for nested schema](#nestedblock--options--query_params_whitelist))
 - `redirect_http_to_https` (Block List, Max: 1) Sets redirect from HTTP protocol to HTTPS for all resource requests. (see [below for nested schema](#nestedblock--options--redirect_http_to_https))
+- `request_limiter` (Block List, Max: 1) It allows to limit the amount of HTTP requests. (see [below for nested schema](#nestedblock--options--request_limiter))
 - `rewrite` (Block List, Max: 1) (see [below for nested schema](#nestedblock--options--rewrite))
 - `sni` (Block List, Max: 1) (see [below for nested schema](#nestedblock--options--sni))
 - `static_headers` (Block List, Max: 1) (see [below for nested schema](#nestedblock--options--static_headers))
@@ -211,6 +217,21 @@ Required:
 Optional:
 
 - `enabled` (Boolean)
+
+
+<a id="nestedblock--options--request_limiter"></a>
+### Nested Schema for `options.request_limiter`
+
+Required:
+
+- `rate` (Number)
+- `burst` (Number)
+
+Optional:
+
+- `enabled` (Boolean)
+- `rate_unit` (String) Available values 'r/s' or 'r/m'
+- `delay` (Number)
 
 
 <a id="nestedblock--options--rewrite"></a>
