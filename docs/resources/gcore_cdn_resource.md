@@ -112,6 +112,7 @@ Optional:
 - `static_headers` (Block List, Max: 1) (see [below for nested schema](#nestedblock--options--static_headers))
 - `static_request_headers` (Block List, Max: 1) (see [below for nested schema](#nestedblock--options--static_request_headers))
 - `tls_versions` (Block List, Max: 1) (see [below for nested schema](#nestedblock--options--tls_versions))
+- `use_rsa_le_cert` (Block List, Max: 1) It allows to issue RSA Let's Encrypt certificate instead of ECDSA. (see [below for nested schema](#nestedblock--options--use_rsa_le_cert))
 - `webp` (Block List, Max: 1) (see [below for nested schema](#nestedblock--options--webp))
 - `websockets` (Block List, Max: 1) (see [below for nested schema](#nestedblock--options--websockets))
 
@@ -287,6 +288,18 @@ Optional:
 Required:
 
 - `value` (Set of String)
+
+Optional:
+
+- `enabled` (Boolean)
+
+
+<a id="nestedblock--options--use_rsa_le_cert"></a>
+### Nested Schema for `options.use_rsa_le_cert`
+
+Required:
+
+- `value` (Boolean)
 
 Optional:
 
