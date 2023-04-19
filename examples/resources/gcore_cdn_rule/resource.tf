@@ -19,6 +19,11 @@ resource "gcore_cdn_rule" "cdn_example_com_rule_1" {
     redirect_http_to_https {
       value = true
     }
+    request_limiter {
+      rate_unit = "r/s"
+      rate = 5
+      burst = 1
+    }
     gzip_on {
       value = true
     }

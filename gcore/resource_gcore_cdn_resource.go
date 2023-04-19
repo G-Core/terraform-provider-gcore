@@ -117,6 +117,39 @@ var (
 						},
 					},
 				},
+				"request_limiter": {
+					Type:        schema.TypeList,
+					MaxItems:    1,
+					Optional:    true,
+					Description: "It allows to limit the amount of HTTP requests",
+					Elem: &schema.Resource{
+						Schema: map[string]*schema.Schema{
+							"enabled": {
+								Type:     schema.TypeBool,
+								Optional: true,
+								Default:  true,
+							},
+							"rate": {
+								Type:     schema.TypeInt,
+								Required: true,
+							},
+							"burst": {
+								Type:     schema.TypeInt,
+								Required: true,
+							},
+							"rate_unit": {
+								Type:     schema.TypeInt,
+								Optional: true,
+								Default:  "r/s",
+							},
+							"delay": {
+								Type:     schema.TypeInt,
+								Optional: true,
+								Default:  0,
+							},
+						},
+					},
+				},
 				"gzip_on": {
 					Type:        schema.TypeList,
 					MaxItems:    1,
@@ -644,6 +677,19 @@ func listToOptions(l []interface{}) *gcdn.Options {
 			Value:   opt["value"].(bool),
 		}
 	}
+	if opt, ok := getOptByName(fields, "request_limiter"); ok {
+		enabled := true
+		if _, ok := opt["enabled"]; ok {
+			enabled = opt["enabled"].(bool)
+		}
+		opts.RequestLimiter = &gcdn.RequestLimiter{
+			Enabled:  enabled,
+			Rate:     opt["rate"].(int),
+			Burst:    opt["burst"].(int),
+			RateUnit: opt["rate_unit"].(string),
+			Delay:    opt["delay"].(int),
+		}
+	}
 	if opt, ok := getOptByName(fields, "gzip_on"); ok {
 		enabled := true
 		if _, ok := opt["enabled"]; ok {
@@ -834,6 +880,10 @@ func optionsToList(options *gcdn.Options) []interface{} {
 	if options.RedirectHttpToHttps != nil {
 		m := structToMap(options.RedirectHttpToHttps)
 		result["redirect_http_to_https"] = []interface{}{m}
+	}
+	if options.RequestLimiter != nil {
+		m := structToMap(options.RequestLimiter)
+		result["request_limiter"] = []interface{}{m}
 	}
 	if options.GzipOn != nil {
 		m := structToMap(options.GzipOn)
