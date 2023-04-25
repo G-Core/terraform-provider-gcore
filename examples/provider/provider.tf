@@ -2,8 +2,8 @@ terraform {
   required_version = ">= 0.13.0"
   required_providers {
     gcore = {
-      source  = "G-Core/gcorelabs"
-      version = "0.3.18"
+      source  = "G-Core/gcore"
+      version = "0.3.69"
     }
   }
 }
@@ -12,170 +12,156 @@ provider gcore {
   permanent_api_token = "251$d3361.............1b35f26d8"
 }
 
+variable "project_id" {
+  type    = number
+  default = 1
+}
+
+variable "region_id" {
+  type    = number
+  default = 76
+}
+
 resource "gcore_keypair" "kp" {
-  project_id = 1
-  public_key = "your oub key"
-  sshkey_name = "testkey"
+  project_id  = var.project_id
+  public_key  = "ssh-ed25519 AAAA...CjZ user@example.com"
+  sshkey_name = "test_key"
 }
 
 resource "gcore_network" "network" {
-  name = "network_example"
-  mtu = 1450
-  type = "vxlan"
-  region_id = 1
-  project_id = 1
+  name       = "test_network"
+  type       = "vxlan"
+  region_id  = var.region_id
+  project_id = var.project_id
 }
 
 resource "gcore_subnet" "subnet" {
-  name = "subnet_example"
-  cidr = "192.168.10.0/24"
-  network_id = gcore_network.network.id
+  name            = "test_subnet"
+  cidr            = "192.168.10.0/24"
+  network_id      = gcore_network.network.id
   dns_nameservers = ["8.8.4.4", "1.1.1.1"]
 
-  host_routes {
-    destination = "10.0.3.0/24"
-    nexthop = "10.0.0.13"
-  }
-
-  gateway_ip = "192.168.10.1"
-  region_id = 1
-  project_id = 1
+  region_id  = var.region_id
+  project_id = var.project_id
 }
 
 resource "gcore_subnet" "subnet2" {
-  name = "subnet2_example"
-  cidr = "192.168.20.0/24"
-  network_id = gcore_network.network.id
+  name            = "test_subnet_2"
+  cidr            = "192.168.20.0/24"
+  network_id      = gcore_network.network.id
   dns_nameservers = ["8.8.4.4", "1.1.1.1"]
-
-  host_routes {
-    destination = "10.0.3.0/24"
-    nexthop = "10.0.0.13"
-  }
-
-  gateway_ip = "192.168.20.1"
-  region_id = 1
-  project_id = 1
+  region_id       = var.region_id
+  project_id      = var.project_id
 }
 
 resource "gcore_volume" "first_volume" {
-  name = "boot volume"
-  type_name = "ssd_hiiops"
-  size = 6
-  image_id = "f4ce3d30-e29c-4cfd-811f-46f383b6081f"
-  region_id = 1
-  project_id = 1
+  name       = "test_boot_volume_1"
+  type_name  = "ssd_hiiops"
+  image_id   = "8f0900ba-2002-4f79-b866-390444caa19e"
+  size       = 10
+  region_id  = var.region_id
+  project_id = var.project_id
 }
 
 resource "gcore_volume" "second_volume" {
-  name = "second volume"
-  type_name = "ssd_hiiops"
-  image_id = "f4ce3d30-e29c-4cfd-811f-46f383b6081f"
-  size = 6
-  region_id = 1
-  project_id = 1
+  name       = "test_boot_volume_2"
+  type_name  = "ssd_hiiops"
+  image_id   = "8f0900ba-2002-4f79-b866-390444caa19e"
+  size       = 10
+  region_id  = var.region_id
+  project_id = var.project_id
 }
 
 resource "gcore_volume" "third_volume" {
-  name = "third volume"
+  name = "test_data_volume"
   type_name = "ssd_hiiops"
   size = 6
-  region_id = 1
-  project_id = 1
+  region_id = var.region_id
+  project_id = var.project_id
 }
 
 resource "gcore_instance" "instance" {
-  flavor_id = "g1-standard-2-4"
-  name = "test"
+  flavor_id    = "g1-standard-2-4"
+  name         = "test_instance_1"
   keypair_name = gcore_keypair.kp.sshkey_name
 
   volume {
-    source = "existing-volume"
-    volume_id = gcore_volume.first_volume.id
+    source     = "existing-volume"
+    volume_id  = gcore_volume.first_volume.id
     boot_index = 0
   }
 
   interface {
-    type = "subnet"
+    type       = "subnet"
     network_id = gcore_network.network.id
-    subnet_id = gcore_subnet.subnet.id
+    subnet_id  = gcore_subnet.subnet.id
+    security_groups = ["11384ae2-2677-439c-8618-f350da006163"]
   }
 
   interface {
-    type = "subnet"
-     network_id = gcore_network.network.id
-     subnet_id = gcore_subnet.subnet2.id
+    type            = "subnet"
+    network_id      = gcore_network.network.id
+    subnet_id       = gcore_subnet.subnet2.id
+    security_groups = ["11384ae2-2677-439c-8618-f350da006163"]
   }
 
-  security_group {
-    id = "66988147-f1b9-43b2-aaef-dee6d009b5b7"
-    name = "default"
+  metadata_map = {
+    owner = "username"
   }
 
-  metadata {
-    key = "some_key"
-    value = "some_data"
-  }
-
-  configuration {
-    key = "some_key"
-    value = "some_data"
-  }
-
-  region_id = 1
-  project_id = 1
+  region_id  = var.region_id
+  project_id = var.project_id
 }
 
-resource "gcore_loadbalancer" "lb" {
-  project_id = 1
-  region_id = 1
-  name = "test1"
-  flavor = "lb1-1-2"
-  listener {
-    name = "test"
-    protocol = "HTTP"
-    protocol_port = 80
-  }
+resource "gcore_loadbalancerv2" "lb" {
+  project_id = var.project_id
+  region_id  = var.region_id
+  name       = "test_loadbalancer"
+  flavor     = "lb1-1-2"
+}
+
+resource "gcore_lblistener" "listener" {
+  project_id      = var.project_id
+  region_id       = var.region_id
+  name            = "test_listener"
+  protocol        = "HTTP"
+  protocol_port   = 80
+  loadbalancer_id = gcore_loadbalancerv2.lb.id
 }
 
 resource "gcore_lbpool" "pl" {
-  project_id = 1
-  region_id = 1
-  name = "test_pool1"
-  protocol = "HTTP"
-  lb_algorithm = "LEAST_CONNECTIONS"
-  loadbalancer_id = gcore_loadbalancer.lb.id
-  listener_id = gcore_loadbalancer.lb.listener.0.id
+  project_id      = var.project_id
+  region_id       = var.region_id
+  name            = "test_pool"
+  protocol        = "HTTP"
+  lb_algorithm    = "LEAST_CONNECTIONS"
+  loadbalancer_id = gcore_loadbalancerv2.lb.id
+  listener_id     = gcore_lblistener.listener.id
   health_monitor {
-    type = "PING"
-    delay = 60
+    type        = "PING"
+    delay       = 60
     max_retries = 5
-    timeout = 10
-  }
-  session_persistence {
-    type = "APP_COOKIE"
-    cookie_name = "test_new_cookie"
+    timeout     = 10
   }
 }
 
 resource "gcore_lbmember" "lbm" {
-  project_id = 1
-  region_id = 1
-  pool_id = gcore_lbpool.pl.id
-  instance_id = gcore_instance.instance.id
-  address = tolist(gcore_instance.instance.interface).0.ip_address
+  project_id    = var.project_id
+  region_id     = var.region_id
+  pool_id       = gcore_lbpool.pl.id
+  instance_id   = gcore_instance.instance.id
+  address       = tolist(gcore_instance.instance.interface).0.ip_address
   protocol_port = 8081
-  weight = 5
 }
 
 resource "gcore_instance" "instance2" {
-  flavor_id = "g1-standard-2-4"
-  name = "test2"
+  flavor_id    = "g1-standard-2-4"
+  name         = "test_instance_2"
   keypair_name = gcore_keypair.kp.sshkey_name
 
   volume {
-    source = "existing-volume"
-    volume_id = gcore_volume.second_volume.id
+    source     = "existing-volume"
+    volume_id  = gcore_volume.second_volume.id
     boot_index = 0
   }
 
@@ -186,36 +172,26 @@ resource "gcore_instance" "instance2" {
   }
 
   interface {
-    type = "subnet"
-    network_id = gcore_network.network.id
-    subnet_id = gcore_subnet.subnet.id
+    type            = "subnet"
+    network_id      = gcore_network.network.id
+    subnet_id       = gcore_subnet.subnet.id
+    security_groups = ["11384ae2-2677-439c-8618-f350da006163"]
   }
 
-  security_group {
-    id = "66988147-f1b9-43b2-aaef-dee6d009b5b7"
-    name = "default"
+  metadata_map = {
+    owner = "username"
   }
 
-  metadata {
-    key = "some_key"
-    value = "some_data"
-  }
-
-  configuration {
-    key = "some_key"
-    value = "some_data"
-  }
-
-  region_id = 1
-  project_id = 1
+  region_id  = var.region_id
+  project_id = var.project_id
 }
 
 resource "gcore_lbmember" "lbm2" {
-  project_id = 1
-  region_id = 1
-  pool_id = gcore_lbpool.pl.id
-  instance_id = gcore_instance.instance2.id
-  address = tolist(gcore_instance.instance2.interface).0.ip_address
+  project_id    = var.project_id
+  region_id     = var.region_id
+  pool_id       = gcore_lbpool.pl.id
+  instance_id   = gcore_instance.instance2.id
+  address       = tolist(gcore_instance.instance2.interface).0.ip_address
   protocol_port = 8081
-  weight = 5
+  weight        = 5
 }
