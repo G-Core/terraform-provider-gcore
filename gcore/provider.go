@@ -60,7 +60,7 @@ func Provider() *schema.Provider {
 				Type:        schema.TypeString,
 				Optional:    true,
 				Description: "A single API endpoint for all products. Will be used when specific product API url is not defined.",
-				DefaultFunc: schema.EnvDefaultFunc("GCORE_API_ENDPOINT", "https://api.gcorelabs.com"),
+				DefaultFunc: schema.EnvDefaultFunc("GCORE_API_ENDPOINT", "https://api.gcore.com"),
 			},
 			ProviderOptSkipCredsAuthErr: {
 				Type:        schema.TypeBool,
