@@ -226,7 +226,7 @@ func providerConfigure(_ context.Context, d *schema.ResourceData) (interface{}, 
 		platform = d.Get("gcore_platform").(string)
 	}
 	if platform == "" {
-		platform = apiEndpoint
+		platform = apiEndpoint + "/iam"
 	}
 
 	clientID := d.Get("gcore_client_id").(string)
