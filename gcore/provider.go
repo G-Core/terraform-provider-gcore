@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"net/url"
 	"os"
+	"strings"
 
 	dnssdk "github.com/G-Core/gcore-dns-sdk-go"
 	storageSDK "github.com/G-Core/gcore-storage-sdk-go"
@@ -232,6 +233,17 @@ func providerConfigure(_ context.Context, d *schema.ResourceData) (interface{}, 
 	clientID := d.Get("gcore_client_id").(string)
 
 	var diags diag.Diagnostics
+
+	// Check API Endpoint url for deprecations
+	if strings.Contains(apiEndpoint, "api.gcorelabs.com") || strings.Contains(apiEndpoint, "api.gcdn.co") {
+		diags = append(diags,
+			diag.Diagnostic{
+				Severity: diag.Warning,
+				Summary:  fmt.Sprintf("API endpoint %s is deprecated", apiEndpoint),
+				Detail:   "Please find more information about addressing on https://api.gcore.com/",
+			},
+		)
+	}
 
 	var err error
 	var provider *gcorecloud.ProviderClient
