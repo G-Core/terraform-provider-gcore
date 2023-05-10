@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"net/url"
 	"os"
+	"strings"
 
 	dnssdk "github.com/G-Core/gcore-dns-sdk-go"
 	storageSDK "github.com/G-Core/gcore-storage-sdk-go"
@@ -53,14 +54,14 @@ func Provider() *schema.Provider {
 				// commented because it's broke all tests
 				//AtLeastOneOf: []string{ProviderOptPermanentToken, "user_name"},
 				Sensitive:   true,
-				Description: "A permanent [API-token](https://support.gcorelabs.com/hc/en-us/articles/360018625617-API-tokens)",
+				Description: "A permanent [API-token](https://support.gcore.com/hc/en-us/articles/360018625617-API-tokens)",
 				DefaultFunc: schema.EnvDefaultFunc("GCORE_PERMANENT_TOKEN", nil),
 			},
 			ProviderOptSingleApiEndpoint: {
 				Type:        schema.TypeString,
 				Optional:    true,
 				Description: "A single API endpoint for all products. Will be used when specific product API url is not defined.",
-				DefaultFunc: schema.EnvDefaultFunc("GCORE_API_ENDPOINT", "https://api.gcorelabs.com"),
+				DefaultFunc: schema.EnvDefaultFunc("GCORE_API_ENDPOINT", "https://api.gcore.com"),
 			},
 			ProviderOptSkipCredsAuthErr: {
 				Type:        schema.TypeBool,
@@ -226,12 +227,23 @@ func providerConfigure(_ context.Context, d *schema.ResourceData) (interface{}, 
 		platform = d.Get("gcore_platform").(string)
 	}
 	if platform == "" {
-		platform = apiEndpoint
+		platform = apiEndpoint + "/iam"
 	}
 
 	clientID := d.Get("gcore_client_id").(string)
 
 	var diags diag.Diagnostics
+
+	// Check API Endpoint url for deprecations
+	if strings.Contains(apiEndpoint, "api.gcorelabs.com") || strings.Contains(apiEndpoint, "api.gcdn.co") {
+		diags = append(diags,
+			diag.Diagnostic{
+				Severity: diag.Warning,
+				Summary:  fmt.Sprintf("API endpoint %s is deprecated", apiEndpoint),
+				Detail:   "Please find more information about addressing on https://api.gcore.com/",
+			},
+		)
+	}
 
 	var err error
 	var provider *gcorecloud.ProviderClient
