@@ -194,3 +194,51 @@ resource "%s" "%s" {
 		},
 	})
 }
+
+func TestAccDnsZoneRecord2(t *testing.T) {
+	random := time.Now().Nanosecond()
+	domain := "terraformtest2"
+	subDomain := fmt.Sprintf("key%d", random)
+	name := fmt.Sprintf("%s_%s", subDomain, domain)
+	zone := domain + ".com"
+	fullDomain := subDomain + "." + zone
+
+	resourceName := fmt.Sprintf("%s.%s", DNSZoneRecordResource, name)
+
+	content := `1 . alpn="h3,h2" port=1443 ipv4hint=10.0.0.1 ech=AEn+DQBFKwAgACABWIHUGj4u+PIggYXcR5JF0gYk3dCRioBW8uJq9H4mKAAIAAEAAQABAANAEnB1YmxpYy50bHMtZWNoLmRldgAA`
+
+	templateCreate := func() string {
+		return fmt.Sprintf(`
+resource "%s" "%s" {
+  zone = "%s"
+  domain = "%s"
+  type = "HTTPS"
+  ttl = 10
+
+  resource_record {
+    content  = "%s"
+    enabled = true
+  }
+}
+		`, DNSZoneRecordResource, name, zone, fullDomain, content)
+	}
+
+	resource.Test(t, resource.TestCase{
+		PreCheck: func() {
+			testAccPreCheckVars(t, GCORE_USERNAME_VAR, GCORE_PASSWORD_VAR, GCORE_DNS_URL_VAR)
+		},
+		ProviderFactories: testAccProviders,
+		Steps: []resource.TestStep{
+			{
+				Config: templateCreate(),
+				Check: resource.ComposeTestCheckFunc(
+					testAccCheckResourceExists(resourceName),
+					resource.TestCheckResourceAttr(resourceName, DNSZoneRecordSchemaDomain, fullDomain),
+					resource.TestCheckResourceAttr(resourceName, DNSZoneRecordSchemaType, "HTTPS"),
+					resource.TestCheckResourceAttr(resourceName, DNSZoneRecordSchemaTTL, "10"),
+					resource.TestCheckResourceAttr(resourceName, DNSZoneRecordSchemaContent, content),
+				),
+			},
+		},
+	})
+}
