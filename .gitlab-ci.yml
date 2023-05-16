@@ -33,6 +33,6 @@ get_project_id:
 
 terraform_test:
   stage: test
-  image: golang:1.17
+  image: golang:1.20
   script:
     - go test -v -count=1 -tags=cloud ./... -timeout=120m -short
