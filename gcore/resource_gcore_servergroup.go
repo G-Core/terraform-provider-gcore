@@ -43,6 +43,7 @@ func resourceServerGroup() *schema.Resource {
 					"project_id",
 					"project_name",
 				},
+				DiffSuppressFunc: suppressDiffProjectID,
 			},
 			"region_id": &schema.Schema{
 				Type:     schema.TypeInt,
@@ -52,6 +53,7 @@ func resourceServerGroup() *schema.Resource {
 					"region_id",
 					"region_name",
 				},
+				DiffSuppressFunc: suppressDiffRegionID,
 			},
 			"project_name": &schema.Schema{
 				Type:     schema.TypeString,
