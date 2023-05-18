@@ -21,6 +21,7 @@ func dataSourceLaaSHosts() *schema.Resource {
 					"project_id",
 					"project_name",
 				},
+				DiffSuppressFunc: suppressDiffProjectID,
 			},
 			"region_id": &schema.Schema{
 				Type:     schema.TypeInt,
@@ -29,6 +30,7 @@ func dataSourceLaaSHosts() *schema.Resource {
 					"region_id",
 					"region_name",
 				},
+				DiffSuppressFunc: suppressDiffRegionID,
 			},
 			"project_name": &schema.Schema{
 				Type:     schema.TypeString,

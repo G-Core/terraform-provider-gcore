@@ -48,14 +48,18 @@ func resourceLifecyclePolicy() *schema.Resource {
 
 		Schema: map[string]*schema.Schema{
 			"project_id": {
-				Type:     schema.TypeInt,
-				Optional: true,
-				ForceNew: true,
+				Type:             schema.TypeInt,
+				Optional:         true,
+				ForceNew:         true,
+				ExactlyOneOf:     []string{"project_id", "project_name"},
+				DiffSuppressFunc: suppressDiffProjectID,
 			},
 			"region_id": {
-				Type:     schema.TypeInt,
-				Optional: true,
-				ForceNew: true,
+				Type:             schema.TypeInt,
+				Optional:         true,
+				ForceNew:         true,
+				ExactlyOneOf:     []string{"region_id", "region_name"},
+				DiffSuppressFunc: suppressDiffRegionID,
 			},
 			"project_name": {
 				Type:         schema.TypeString,

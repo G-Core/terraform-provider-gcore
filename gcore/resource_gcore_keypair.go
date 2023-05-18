@@ -26,6 +26,7 @@ func resourceKeypair() *schema.Resource {
 					"project_id",
 					"project_name",
 				},
+				DiffSuppressFunc: suppressDiffProjectID,
 			},
 			"project_name": &schema.Schema{
 				Type:     schema.TypeString,

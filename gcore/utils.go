@@ -785,3 +785,21 @@ func getUniqueID(d *schema.ResourceData) string {
 		d.Get("project_name").(string),
 	)
 }
+
+func suppressDiffProjectID(k, old, new string, d *schema.ResourceData) bool {
+	_, exist := d.GetOk("project_name")
+	if exist {
+		return true
+	}
+
+	return false
+}
+
+func suppressDiffRegionID(k, old, new string, d *schema.ResourceData) bool {
+	_, exist := d.GetOk("region_name")
+	if exist {
+		return true
+	}
+
+	return false
+}
