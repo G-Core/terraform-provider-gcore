@@ -27,7 +27,7 @@ resource "%s" "%s" {
   zone = "%s"
   domain = "%s"
   type = "TXT"
-  ttl = 10
+  ttl = 210
 
   filter {
     type = "geodistance"
@@ -63,7 +63,7 @@ resource "%s" "%s" {
   zone = "%s"
   domain = "%s"
   type = "TXT"
-  ttl = 20
+  ttl = 120
 
   resource_record {
     content  = "12345"
@@ -93,7 +93,7 @@ resource "%s" "%s" {
 					testAccCheckResourceExists(resourceName),
 					resource.TestCheckResourceAttr(resourceName, DNSZoneRecordSchemaDomain, fullDomain),
 					resource.TestCheckResourceAttr(resourceName, DNSZoneRecordSchemaType, "TXT"),
-					resource.TestCheckResourceAttr(resourceName, DNSZoneRecordSchemaTTL, "10"),
+					resource.TestCheckResourceAttr(resourceName, DNSZoneRecordSchemaTTL, "210"),
 					resource.TestCheckResourceAttr(resourceName,
 						fmt.Sprintf("%s.0.%s", DNSZoneRecordSchemaFilter, DNSZoneRecordSchemaFilterType),
 						"first_n"),
@@ -155,7 +155,7 @@ resource "%s" "%s" {
 					testAccCheckResourceExists(resourceName),
 					resource.TestCheckResourceAttr(resourceName, DNSZoneRecordSchemaDomain, fullDomain),
 					resource.TestCheckResourceAttr(resourceName, DNSZoneRecordSchemaType, "TXT"),
-					resource.TestCheckResourceAttr(resourceName, DNSZoneRecordSchemaTTL, "20"),
+					resource.TestCheckResourceAttr(resourceName, DNSZoneRecordSchemaTTL, "120"),
 					resource.TestCheckResourceAttr(resourceName,
 						fmt.Sprintf("%s.0.%s", DNSZoneRecordSchemaResourceRecord, DNSZoneRecordSchemaContent),
 						"12345"),
@@ -195,12 +195,13 @@ resource "%s" "%s" {
 	})
 }
 
-func TestAccDnsZoneRecord2(t *testing.T) {
+// note: when testing, set GCORE_DNS_API=https://api.gcore.com/dns
+func TestAccDnsZoneRecordSvcbHttps(t *testing.T) {
 	random := time.Now().Nanosecond()
-	domain := "terraformtest2"
+	domain := "benalu"
 	subDomain := fmt.Sprintf("key%d", random)
 	name := fmt.Sprintf("%s_%s", subDomain, domain)
-	zone := domain + ".com"
+	zone := domain + ".dev"
 	fullDomain := subDomain + "." + zone
 
 	resourceName := fmt.Sprintf("%s.%s", DNSZoneRecordResource, name)
@@ -213,10 +214,12 @@ resource "%s" "%s" {
   zone = "%s"
   domain = "%s"
   type = "HTTPS"
-  ttl = 10
+  ttl = 120
 
   resource_record {
-    content  = "%s"
+    content = <<EOT
+%s
+EOT
     enabled = true
   }
 }
@@ -235,8 +238,8 @@ resource "%s" "%s" {
 					testAccCheckResourceExists(resourceName),
 					resource.TestCheckResourceAttr(resourceName, DNSZoneRecordSchemaDomain, fullDomain),
 					resource.TestCheckResourceAttr(resourceName, DNSZoneRecordSchemaType, "HTTPS"),
-					resource.TestCheckResourceAttr(resourceName, DNSZoneRecordSchemaTTL, "10"),
-					resource.TestCheckResourceAttr(resourceName, DNSZoneRecordSchemaContent, content),
+					resource.TestCheckResourceAttr(resourceName, DNSZoneRecordSchemaTTL, "120"),
+					resource.TestCheckResourceAttr(resourceName, fmt.Sprintf("%s.0.%s", DNSZoneRecordSchemaResourceRecord, DNSZoneRecordSchemaContent), content+"\n"),
 				),
 			},
 		},

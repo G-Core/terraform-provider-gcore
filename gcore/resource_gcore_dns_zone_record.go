@@ -77,7 +77,7 @@ func resourceDNSZoneRecord() *schema.Resource {
 				ForceNew: true,
 				ValidateDiagFunc: func(i interface{}, path cty.Path) diag.Diagnostics {
 					val := strings.TrimSpace(i.(string))
-					types := []string{"A", "AAAA", "MX", "CNAME", "TXT", "CAA", "NS", "SRV"}
+					types := []string{"A", "AAAA", "MX", "CNAME", "TXT", "CAA", "NS", "SRV", "HTTPS", "SVCB"}
 					for _, t := range types {
 						if strings.EqualFold(t, val) {
 							return nil
