@@ -49,7 +49,7 @@ resource "gcore_cdn_resource" "cdn_example_com" {
 
     force_return {
       code = 200
-      body = 'OK'
+      body = "OK"
     }
   }
 }
