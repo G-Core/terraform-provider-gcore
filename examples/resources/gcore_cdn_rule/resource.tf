@@ -70,6 +70,22 @@ resource "gcore_cdn_rule" "cdn_example_com_rule_2" {
   }
 }
 
+resource "gcore_cdn_rule" "cdn_example_com_rule_3" {
+  resource_id     = gcore_cdn_resource.cdn_example_com.id
+  name            = "Block all png images"
+  rule            = "*.png"
+  rule_type       = 0
+  weight          = 0
+  origin_protocol = "HTTP"
+
+  options {
+    force_return {
+      code = 404
+      body = "Not found."
+    }
+  }
+}
+
 resource "gcore_cdn_origingroup" "origin_group_1" {
   name     = "origin_group_1"
   use_next = true

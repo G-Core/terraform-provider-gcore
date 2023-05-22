@@ -424,6 +424,32 @@ var (
 						},
 					},
 				},
+				"force_return": {
+					Type:        schema.TypeList,
+					MaxItems:    1,
+					Optional:    true,
+					Description: "Allows to apply custom HTTP code to the CDN content.",
+					Elem: &schema.Resource{
+						Schema: map[string]*schema.Schema{
+							"enabled": {
+								Type:     schema.TypeBool,
+								Optional: true,
+								Default:  true,
+							},
+							"code": {
+								Type:        schema.TypeInt,
+								Required:    true,
+								Description: "HTTP response status code. Available codes: 100 <= value <= 599. Reserved codes: 408, 444, 477, 494, 495, 496, 497, 499",
+							},
+							"body": {
+								Type:        schema.TypeString,
+								Optional:    true,
+								Default:     "",
+								Description: "Response text or URL if you're going to set up redirection. Max length = 100.",
+							},
+						},
+					},
+				},
 			},
 		},
 	}
@@ -838,6 +864,17 @@ func listToOptions(l []interface{}) *gcdn.Options {
 			Value:   opt["value"].(bool),
 		}
 	}
+	if opt, ok := getOptByName(fields, "force_return"); ok {
+		enabled := true
+		if _, ok := opt["enabled"]; ok {
+			enabled = opt["enabled"].(bool)
+		}
+		opts.ForceReturn = &gcdn.ForceReturn{
+			Enabled: enabled,
+			Code:    opt["code"].(int),
+			Body:    opt["body"].(string),
+		}
+	}
 	return &opts
 }
 
@@ -936,6 +973,10 @@ func optionsToList(options *gcdn.Options) []interface{} {
 	if options.UseRSALECert != nil {
 		m := structToMap(options.UseRSALECert)
 		result["use_rsa_le_cert"] = []interface{}{m}
+	}
+	if options.ForceReturn != nil {
+		m := structToMap(options.ForceReturn)
+		result["force_return"] = []interface{}{m}
 	}
 	return []interface{}{result}
 }

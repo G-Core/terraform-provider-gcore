@@ -131,6 +131,7 @@ Optional:
 - `browser_cache_settings` (Block List, Max: 1) (see [below for nested schema](#nestedblock--options--browser_cache_settings))
 - `cors` (Block List, Max: 1) (see [below for nested schema](#nestedblock--options--cors))
 - `edge_cache_settings` (Block List, Max: 1) The cache expiration time for CDN servers. (see [below for nested schema](#nestedblock--options--edge_cache_settings))
+- `force_return` (Block List, Max: 1) (see [below for nested schema](#nestedblock--options--force_return))
 - `gzip_on` (Block List, Max: 1) (see [below for nested schema](#nestedblock--options--gzip_on))
 - `host_header` (Block List, Max: 1) Specify the Host header that CDN servers use when request content from an origin server. Your server must be able to process requests with the chosen header. If the option is in NULL state Host Header value is taken from the CNAME field. (see [below for nested schema](#nestedblock--options--host_header))
 - `ignore_query_string` (Block List, Max: 1) (see [below for nested schema](#nestedblock--options--ignore_query_string))
@@ -176,6 +177,18 @@ Optional:
 - `default` (String) Content will be cached according to origin cache settings. The value applies for a response with codes 200, 201, 204, 206, 301, 302, 303, 304, 307, 308 if an origin server does not have caching HTTP headers. Responses with other codes will not be cached.
 - `enabled` (Boolean)
 - `value` (String) Caching time for a response with codes 200, 206, 301, 302. Responses with codes 4xx, 5xx will not be cached. Use '0s' disable to caching. Use custom_values field to specify a custom caching time for a response with specific codes.
+
+
+<a id="nestedblock--options--force_return"></a>
+### Nested Schema for `options.force_return`
+
+Required:
+- `code` (Number) HTTP response status code. Available codes: 100 <= value <= 599. Reserved codes: 408, 444, 477, 494, 495, 496, 497, 499
+
+Optional:
+
+- `enabled` (Boolean)
+- `body` (String) Response text or URL if you're going to set up redirection. Max length = 100.
 
 
 <a id="nestedblock--options--gzip_on"></a>
