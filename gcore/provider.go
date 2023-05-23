@@ -199,6 +199,16 @@ func providerConfigure(_ context.Context, d *schema.ResourceData) (interface{}, 
 	permanentToken := d.Get(ProviderOptPermanentToken).(string)
 	apiEndpoint := d.Get(ProviderOptSingleApiEndpoint).(string)
 
+	var diags diag.Diagnostics
+	if permanentToken == "" &&
+		(username == "" || password == "") {
+		diags = append(diags, diag.Diagnostic{
+			Severity: diag.Error,
+			Summary:  fmt.Sprintf("Field 'permanent_api_token' or 'username' and 'password' are required."),
+			Detail:   "To use provider your should fill field 'permanent_api_token' or 'username' and 'password'.",
+		})
+	}
+
 	cloudApi := d.Get("gcore_cloud_api").(string)
 	if cloudApi == "" {
 		cloudApi = d.Get("gcore_api").(string)
@@ -231,8 +241,6 @@ func providerConfigure(_ context.Context, d *schema.ResourceData) (interface{}, 
 	}
 
 	clientID := d.Get("gcore_client_id").(string)
-
-	var diags diag.Diagnostics
 
 	// Check API Endpoint url for deprecations
 	if strings.Contains(apiEndpoint, "api.gcorelabs.com") || strings.Contains(apiEndpoint, "api.gcdn.co") {
