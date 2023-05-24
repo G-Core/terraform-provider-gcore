@@ -138,7 +138,7 @@ var (
 								Required: true,
 							},
 							"rate_unit": {
-								Type:     schema.TypeInt,
+								Type:     schema.TypeString,
 								Optional: true,
 								Default:  "r/s",
 							},
