@@ -46,5 +46,10 @@ resource "gcore_cdn_resource" "cdn_example_com" {
         "TLSv1.2",
       ]
     }
+
+    force_return {
+      code = 200
+      body = "OK"
+    }
   }
 }
