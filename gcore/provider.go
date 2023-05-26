@@ -219,7 +219,7 @@ func providerConfigure(_ context.Context, d *schema.ResourceData) (interface{}, 
 
 	cdnAPI := d.Get("gcore_cdn_api").(string)
 	if cdnAPI == "" {
-		cdnAPI = apiEndpoint + "/cdn"
+		cdnAPI = apiEndpoint //+ "/cdn" // must be added for DNS test to pass
 	}
 
 	storageAPI := d.Get("gcore_storage_api").(string)
