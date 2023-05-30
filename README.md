@@ -79,4 +79,13 @@ $ cp ./examples/... .
 $ terraform init # not needed when override is in use
 ```
 
+Updating docs
+-------------
+Don't forget to add docs and examples to support your contribution. Update tfplugion docs when needed.
+```sh
+$ tfplugindocs
+$ git add .
+```
+
+
 Thank You
