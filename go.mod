@@ -1,10 +1,10 @@
 module github.com/terraform-providers/terraform-provider-gcore
 
-go 1.17
+go 1.20
 
 require (
 	github.com/AlekSi/pointer v1.2.0
-	github.com/G-Core/gcore-dns-sdk-go v0.2.3
+	github.com/G-Core/gcore-dns-sdk-go v0.2.6
 	github.com/G-Core/gcore-storage-sdk-go v0.1.34
 	github.com/G-Core/gcorelabscdn-go v0.1.30
 	github.com/G-Core/gcorelabscloud-go v0.5.39
@@ -70,7 +70,7 @@ require (
 	github.com/vmihailenco/msgpack v4.0.4+incompatible // indirect
 	github.com/zclconf/go-cty v1.10.0 // indirect
 	golang.org/x/crypto v0.0.0-20220622213112-05595931fe9d // indirect
-	golang.org/x/sync v0.0.0-20210220032951-036812b2e83c // indirect
+	golang.org/x/sync v0.2.0 // indirect
 	golang.org/x/sys v0.0.0-20220808155132-1c4a2a72c664 // indirect
 	golang.org/x/text v0.3.7 // indirect
 	google.golang.org/appengine v1.6.7 // indirect

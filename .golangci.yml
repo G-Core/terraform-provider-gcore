@@ -1,6 +1,6 @@
 run:
   timeout: 60m
-  go: 1.17
+  go: 1.20
 
 issues:
   exclude-rules:

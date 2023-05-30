@@ -83,3 +83,14 @@ resource "gcore_dns_zone_record" "subdomain_examplezone_caa" {
     enabled = true
   }
 }
+
+resource "gcore_dns_zone_record" "sobdomain_examplezone_https" {
+  zone   = "examplezone.com"
+  domain = "subdomain.examplezone.com"
+  type   = "HTTPS"
+
+  // alpn quoted, from output of dig
+  resource_record {
+   content = "1 . alpn=\"h3,h2\" port=1443 ipv4hint=10.0.0.1 ech=AEn+DQBFKwAgACABWIHUGj4u+PIggYXcR5JF0gYk3dCRioBW8uJq9H4mKAAIAAEAAQABAANAEnB1YmxpYy50bHMtZWNoLmRldgAA"
+  }
+}

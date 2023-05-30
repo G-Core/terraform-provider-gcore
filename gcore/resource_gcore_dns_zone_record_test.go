@@ -27,7 +27,7 @@ resource "%s" "%s" {
   zone = "%s"
   domain = "%s"
   type = "TXT"
-  ttl = 10
+  ttl = 210
 
   filter {
     type = "geodistance"
@@ -63,7 +63,7 @@ resource "%s" "%s" {
   zone = "%s"
   domain = "%s"
   type = "TXT"
-  ttl = 20
+  ttl = 120
 
   resource_record {
     content  = "12345"
@@ -93,7 +93,7 @@ resource "%s" "%s" {
 					testAccCheckResourceExists(resourceName),
 					resource.TestCheckResourceAttr(resourceName, DNSZoneRecordSchemaDomain, fullDomain),
 					resource.TestCheckResourceAttr(resourceName, DNSZoneRecordSchemaType, "TXT"),
-					resource.TestCheckResourceAttr(resourceName, DNSZoneRecordSchemaTTL, "10"),
+					resource.TestCheckResourceAttr(resourceName, DNSZoneRecordSchemaTTL, "210"),
 					resource.TestCheckResourceAttr(resourceName,
 						fmt.Sprintf("%s.0.%s", DNSZoneRecordSchemaFilter, DNSZoneRecordSchemaFilterType),
 						"first_n"),
@@ -155,7 +155,7 @@ resource "%s" "%s" {
 					testAccCheckResourceExists(resourceName),
 					resource.TestCheckResourceAttr(resourceName, DNSZoneRecordSchemaDomain, fullDomain),
 					resource.TestCheckResourceAttr(resourceName, DNSZoneRecordSchemaType, "TXT"),
-					resource.TestCheckResourceAttr(resourceName, DNSZoneRecordSchemaTTL, "20"),
+					resource.TestCheckResourceAttr(resourceName, DNSZoneRecordSchemaTTL, "120"),
 					resource.TestCheckResourceAttr(resourceName,
 						fmt.Sprintf("%s.0.%s", DNSZoneRecordSchemaResourceRecord, DNSZoneRecordSchemaContent),
 						"12345"),
@@ -189,6 +189,57 @@ resource "%s" "%s" {
 						fmt.Sprintf("%s.0.%s.0.%s",
 							DNSZoneRecordSchemaResourceRecord, DNSZoneRecordSchemaMeta, DNSZoneRecordSchemaMetaDefault),
 						"false"),
+				),
+			},
+		},
+	})
+}
+
+// note: when testing, set GCORE_DNS_API=https://api.gcore.com/dns
+func TestAccDnsZoneRecordSvcbHttps(t *testing.T) {
+	random := time.Now().Nanosecond()
+	domain := "benalu"
+	subDomain := fmt.Sprintf("key%d", random)
+	name := fmt.Sprintf("%s_%s", subDomain, domain)
+	zone := domain + ".dev"
+	fullDomain := subDomain + "." + zone
+
+	resourceName := fmt.Sprintf("%s.%s", DNSZoneRecordResource, name)
+
+	content := `1 . alpn="h3,h2" port=1443 ipv4hint=10.0.0.1 ech=AEn+DQBFKwAgACABWIHUGj4u+PIggYXcR5JF0gYk3dCRioBW8uJq9H4mKAAIAAEAAQABAANAEnB1YmxpYy50bHMtZWNoLmRldgAA`
+
+	templateCreate := func() string {
+		return fmt.Sprintf(`
+resource "%s" "%s" {
+  zone = "%s"
+  domain = "%s"
+  type = "HTTPS"
+  ttl = 120
+
+  resource_record {
+    content = <<EOT
+%s
+EOT
+    enabled = true
+  }
+}
+		`, DNSZoneRecordResource, name, zone, fullDomain, content)
+	}
+
+	resource.Test(t, resource.TestCase{
+		PreCheck: func() {
+			testAccPreCheckVars(t, GCORE_USERNAME_VAR, GCORE_PASSWORD_VAR, GCORE_DNS_URL_VAR)
+		},
+		ProviderFactories: testAccProviders,
+		Steps: []resource.TestStep{
+			{
+				Config: templateCreate(),
+				Check: resource.ComposeTestCheckFunc(
+					testAccCheckResourceExists(resourceName),
+					resource.TestCheckResourceAttr(resourceName, DNSZoneRecordSchemaDomain, fullDomain),
+					resource.TestCheckResourceAttr(resourceName, DNSZoneRecordSchemaType, "HTTPS"),
+					resource.TestCheckResourceAttr(resourceName, DNSZoneRecordSchemaTTL, "120"),
+					resource.TestCheckResourceAttr(resourceName, fmt.Sprintf("%s.0.%s", DNSZoneRecordSchemaResourceRecord, DNSZoneRecordSchemaContent), content+"\n"),
 				),
 			},
 		},
