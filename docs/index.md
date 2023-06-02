@@ -228,5 +228,5 @@ resource "gcore_lbmember" "lbm2" {
 - **gcore_storage_api** (String) Storage API (define only if you want to override Storage API endpoint)
 - **ignore_creds_auth_error** (Boolean, Deprecated) Should be set to true when you are gonna to use storage resource with permanent API-token only.
 - **password** (String, Deprecated)
-- **permanent_api_token** (String, Sensitive) A permanent [API-token](https://gcore.com/support/articles/360018625617/)
+- **permanent_api_token** (String, Sensitive) A permanent [API-token](https://gcore.com/docs/account-settings/create-use-or-delete-a-permanent-api-token)
 - **user_name** (String, Deprecated)
