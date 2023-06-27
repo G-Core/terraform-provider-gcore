@@ -27,7 +27,7 @@ var (
 					MaxItems:    1,
 					Optional:    true,
 					Computed:    true,
-					Description: "",
+					Description: "The cache expiration time for customers' browsers in seconds.",
 					Elem: &schema.Resource{
 						Schema: map[string]*schema.Schema{
 							"enabled": {
@@ -38,7 +38,7 @@ var (
 							"value": {
 								Type:        schema.TypeString,
 								Optional:    true,
-								Description: "",
+								Description: "Use '0s' to disable caching.",
 							},
 						},
 					},
@@ -47,7 +47,7 @@ var (
 					Type:        schema.TypeList,
 					MaxItems:    1,
 					Optional:    true,
-					Description: "",
+					Description: "The option adds the Access-Control-Allow-Origin header to responses from CDN servers.",
 					Elem: &schema.Resource{
 						Schema: map[string]*schema.Schema{
 							"enabled": {
@@ -56,9 +56,10 @@ var (
 								Default:  true,
 							},
 							"value": {
-								Type:     schema.TypeSet,
-								Elem:     &schema.Schema{Type: schema.TypeString},
-								Required: true,
+								Type:        schema.TypeSet,
+								Elem:        &schema.Schema{Type: schema.TypeString},
+								Required:    true,
+								Description: "Specifies a value of the Access-Control-Allow-Origin header.",
 							},
 						},
 					},
@@ -129,7 +130,7 @@ var (
 					Type:        schema.TypeList,
 					MaxItems:    1,
 					Optional:    true,
-					Description: "",
+					Description: "The option allows to compress content with gzip on the CDN`s end. CDN servers will request only uncompressed content from the origin.",
 					Elem: &schema.Resource{
 						Schema: map[string]*schema.Schema{
 							"enabled": {
@@ -167,7 +168,7 @@ var (
 					Type:        schema.TypeList,
 					MaxItems:    1,
 					Optional:    true,
-					Description: "",
+					Description: "This option determines how files with different query strings will be cached: either as one object (when this option is enabled) or as different objects (when this option is disabled).",
 					Elem: &schema.Resource{
 						Schema: map[string]*schema.Schema{
 							"enabled": {
@@ -186,7 +187,7 @@ var (
 					Type:        schema.TypeList,
 					MaxItems:    1,
 					Optional:    true,
-					Description: "",
+					Description: "Specify list of query strings. Files with those query strings will be cached as one object.",
 					Elem: &schema.Resource{
 						Schema: map[string]*schema.Schema{
 							"enabled": {
@@ -206,7 +207,7 @@ var (
 					Type:        schema.TypeList,
 					MaxItems:    1,
 					Optional:    true,
-					Description: "",
+					Description: "Specify list of query strings. Files with those query strings will be cached as different objects.",
 					Elem: &schema.Resource{
 						Schema: map[string]*schema.Schema{
 							"enabled": {
@@ -278,7 +279,7 @@ var (
 					Type:        schema.TypeList,
 					MaxItems:    1,
 					Optional:    true,
-					Description: "",
+					Description: "The option allows changing or redirecting query paths.",
 					Elem: &schema.Resource{
 						Schema: map[string]*schema.Schema{
 							"enabled": {
@@ -287,13 +288,15 @@ var (
 								Default:  true,
 							},
 							"body": {
-								Type:     schema.TypeString,
-								Required: true,
+								Type:        schema.TypeString,
+								Required:    true,
+								Description: "The pattern for Rewrite.",
 							},
 							"flag": {
-								Type:     schema.TypeString,
-								Optional: true,
-								Default:  "break",
+								Type:        schema.TypeString,
+								Optional:    true,
+								Default:     "break",
+								Description: "Defines flag for the Rewrite option.",
 							},
 						},
 					},
@@ -303,7 +306,7 @@ var (
 					MaxItems:    1,
 					Optional:    true,
 					Computed:    true,
-					Description: "",
+					Description: "Specify the SNI.",
 					Elem: &schema.Resource{
 						Schema: map[string]*schema.Schema{
 							"enabled": {
@@ -314,21 +317,21 @@ var (
 							"sni_type": {
 								Type:        schema.TypeString,
 								Optional:    true,
-								Description: "Available values 'dynamic' or 'custom'",
+								Description: "Available values 'dynamic' or 'custom'.",
 							},
 							"custom_hostname": {
 								Type:        schema.TypeString,
 								Optional:    true,
-								Description: "Required to set custom hostname in case sni-type='custom'",
+								Description: "Required to set custom hostname in case sni-type='custom'.",
 							},
 						},
 					},
 				},
-				"static_headers": {
+				"static_headers": { // deprecated in favor of static_response_headers
 					Type:        schema.TypeList,
 					MaxItems:    1,
 					Optional:    true,
-					Description: "",
+					Description: "Legacy option. Use the static_response_headers option instead.",
 					Elem: &schema.Resource{
 						Schema: map[string]*schema.Schema{
 							"enabled": {
@@ -348,7 +351,7 @@ var (
 					Type:        schema.TypeList,
 					MaxItems:    1,
 					Optional:    true,
-					Description: "",
+					Description: "Specify custom HTTP Headers for a CDN server to add to request.",
 					Elem: &schema.Resource{
 						Schema: map[string]*schema.Schema{
 							"enabled": {
@@ -368,7 +371,7 @@ var (
 					Type:        schema.TypeList,
 					MaxItems:    1,
 					Optional:    true,
-					Description: "",
+					Description: "The option specifies a list of allowed SSL/TLS protocol versions.",
 					Elem: &schema.Resource{
 						Schema: map[string]*schema.Schema{
 							"enabled": {
@@ -388,7 +391,7 @@ var (
 					Type:        schema.TypeList,
 					MaxItems:    1,
 					Optional:    true,
-					Description: "",
+					Description: "The option allows choosing the RSA Let's Encrypt certificate type for the resource.",
 					Elem: &schema.Resource{
 						Schema: map[string]*schema.Schema{
 							"enabled": {
@@ -403,11 +406,11 @@ var (
 						},
 					},
 				},
-				"webp": {
+				"webp": { // deprecated in favor of image_stack
 					Type:        schema.TypeList,
 					MaxItems:    1,
 					Optional:    true,
-					Description: "",
+					Description: "Legacy option. Use the image_stack option instead.",
 					Elem: &schema.Resource{
 						Schema: map[string]*schema.Schema{
 							"enabled": {
@@ -435,7 +438,7 @@ var (
 					Type:        schema.TypeList,
 					MaxItems:    1,
 					Optional:    true,
-					Description: "",
+					Description: "The option allows WebSockets connections to an origin server.",
 					Elem: &schema.Resource{
 						Schema: map[string]*schema.Schema{
 							"enabled": {
