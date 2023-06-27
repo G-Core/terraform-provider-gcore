@@ -681,12 +681,8 @@ func listToOptions(l []interface{}) *gcdn.Options {
 		}
 	}
 	if opt, ok := getOptByName(fields, "browser_cache_settings"); ok {
-		enabled := true
-		if _, ok := opt["enabled"]; ok {
-			enabled = opt["enabled"].(bool)
-		}
 		opts.BrowserCacheSettings = &gcdn.BrowserCacheSettings{
-			Enabled: enabled,
+			Enabled: opt["enabled"].(bool),
 			Value:   opt["value"].(string),
 		}
 	}
@@ -697,22 +693,14 @@ func listToOptions(l []interface{}) *gcdn.Options {
 		}
 	}
 	if opt, ok := getOptByName(fields, "redirect_http_to_https"); ok {
-		enabled := true
-		if _, ok := opt["enabled"]; ok {
-			enabled = opt["enabled"].(bool)
-		}
 		opts.RedirectHttpToHttps = &gcdn.RedirectHttpToHttps{
-			Enabled: enabled,
+			Enabled: opt["enabled"].(bool),
 			Value:   opt["value"].(bool),
 		}
 	}
 	if opt, ok := getOptByName(fields, "request_limiter"); ok {
-		enabled := true
-		if _, ok := opt["enabled"]; ok {
-			enabled = opt["enabled"].(bool)
-		}
 		opts.RequestLimiter = &gcdn.RequestLimiter{
-			Enabled:  enabled,
+			Enabled:  opt["enabled"].(bool),
 			Rate:     opt["rate"].(int),
 			Burst:    opt["burst"].(int),
 			RateUnit: opt["rate_unit"].(string),
@@ -720,102 +708,66 @@ func listToOptions(l []interface{}) *gcdn.Options {
 		}
 	}
 	if opt, ok := getOptByName(fields, "gzip_on"); ok {
-		enabled := true
-		if _, ok := opt["enabled"]; ok {
-			enabled = opt["enabled"].(bool)
-		}
 		opts.GzipOn = &gcdn.GzipOn{
-			Enabled: enabled,
+			Enabled: opt["enabled"].(bool),
 			Value:   opt["value"].(bool),
 		}
 	}
 	if opt, ok := getOptByName(fields, "cors"); ok {
-		enabled := true
-		if _, ok := opt["enabled"]; ok {
-			enabled = opt["enabled"].(bool)
-		}
 		opts.Cors = &gcdn.Cors{
-			Enabled: enabled,
+			Enabled: opt["enabled"].(bool),
 		}
 		for _, v := range opt["value"].(*schema.Set).List() {
 			opts.Cors.Value = append(opts.Cors.Value, v.(string))
 		}
 	}
 	if opt, ok := getOptByName(fields, "rewrite"); ok {
-		enabled := true
-		if _, ok := opt["enabled"]; ok {
-			enabled = opt["enabled"].(bool)
-		}
 		opts.Rewrite = &gcdn.Rewrite{
-			Enabled: enabled,
+			Enabled: opt["enabled"].(bool),
 			Body:    opt["body"].(string),
 			Flag:    opt["flag"].(string),
 		}
 	}
 	if opt, ok := getOptByName(fields, "webp"); ok {
-		enabled := true
-		if _, ok := opt["enabled"]; ok {
-			enabled = opt["enabled"].(bool)
-		}
 		opts.Webp = &gcdn.Webp{
-			Enabled:     enabled,
+			Enabled:     opt["enabled"].(bool),
 			JPGQuality:  opt["jpg_quality"].(int),
 			PNGQuality:  opt["png_quality"].(int),
 			PNGLossless: opt["png_lossless"].(bool),
 		}
 	}
 	if opt, ok := getOptByName(fields, "sni"); ok {
-		enabled := true
-		if _, ok := opt["enabled"]; ok {
-			enabled = opt["enabled"].(bool)
-		}
 		opts.SNI = &gcdn.SNIOption{
-			Enabled:        enabled,
+			Enabled:        opt["enabled"].(bool),
 			SNIType:        opt["sni_type"].(string),
 			CustomHostname: opt["custom_hostname"].(string),
 		}
 	}
 	if opt, ok := getOptByName(fields, "ignore_query_string"); ok {
-		enabled := true
-		if _, ok := opt["enabled"]; ok {
-			enabled = opt["enabled"].(bool)
-		}
 		opts.IgnoreQueryString = &gcdn.IgnoreQueryString{
-			Enabled: enabled,
+			Enabled: opt["enabled"].(bool),
 			Value:   opt["value"].(bool),
 		}
 	}
 	if opt, ok := getOptByName(fields, "query_params_whitelist"); ok {
-		enabled := true
-		if _, ok := opt["enabled"]; ok {
-			enabled = opt["enabled"].(bool)
-		}
 		opts.QueryParamsWhitelist = &gcdn.QueryParamsWhitelist{
-			Enabled: enabled,
+			Enabled: opt["enabled"].(bool),
 		}
 		for _, v := range opt["value"].(*schema.Set).List() {
 			opts.QueryParamsWhitelist.Value = append(opts.QueryParamsWhitelist.Value, v.(string))
 		}
 	}
 	if opt, ok := getOptByName(fields, "query_params_blacklist"); ok {
-		enabled := true
-		if _, ok := opt["enabled"]; ok {
-			enabled = opt["enabled"].(bool)
-		}
 		opts.QueryParamsBlacklist = &gcdn.QueryParamsBlacklist{
-			Enabled: enabled,
+			Enabled: opt["enabled"].(bool),
 		}
 		for _, v := range opt["value"].(*schema.Set).List() {
 			opts.QueryParamsBlacklist.Value = append(opts.QueryParamsBlacklist.Value, v.(string))
 		}
 	}
 	if opt, ok := getOptByName(fields, "static_request_headers"); ok {
-		enabled := true
-		if _, ok := opt["enabled"]; ok {
-			enabled = opt["enabled"].(bool)
-		}
 		opts.StaticRequestHeaders = &gcdn.StaticRequestHeaders{
-			Enabled: enabled,
+			Enabled: opt["enabled"].(bool),
 			Value:   map[string]string{},
 		}
 		for k, v := range opt["value"].(map[string]interface{}) {
@@ -823,12 +775,8 @@ func listToOptions(l []interface{}) *gcdn.Options {
 		}
 	}
 	if opt, ok := getOptByName(fields, "static_headers"); ok {
-		enabled := true
-		if _, ok := opt["enabled"]; ok {
-			enabled = opt["enabled"].(bool)
-		}
 		opts.StaticHeaders = &gcdn.StaticHeaders{
-			Enabled: enabled,
+			Enabled: opt["enabled"].(bool),
 			Value:   map[string]string{},
 		}
 		for k, v := range opt["value"].(map[string]interface{}) {
@@ -836,44 +784,28 @@ func listToOptions(l []interface{}) *gcdn.Options {
 		}
 	}
 	if opt, ok := getOptByName(fields, "websockets"); ok {
-		enabled := true
-		if _, ok := opt["enabled"]; ok {
-			enabled = opt["enabled"].(bool)
-		}
 		opts.WebSockets = &gcdn.WebSockets{
-			Enabled: enabled,
+			Enabled: opt["enabled"].(bool),
 			Value:   opt["value"].(bool),
 		}
 	}
 	if opt, ok := getOptByName(fields, "tls_versions"); ok {
-		enabled := true
-		if _, ok := opt["enabled"]; ok {
-			enabled = opt["enabled"].(bool)
-		}
 		opts.TLSVersions = &gcdn.TLSVersions{
-			Enabled: enabled,
+			Enabled: opt["enabled"].(bool),
 		}
 		for _, v := range opt["value"].(*schema.Set).List() {
 			opts.TLSVersions.Value = append(opts.TLSVersions.Value, v.(string))
 		}
 	}
 	if opt, ok := getOptByName(fields, "use_rsa_le_cert"); ok {
-		enabled := true
-		if _, ok := opt["enabled"]; ok {
-			enabled = opt["enabled"].(bool)
-		}
 		opts.UseRSALECert = &gcdn.UseRSALECert{
-			Enabled: enabled,
+			Enabled: opt["enabled"].(bool),
 			Value:   opt["value"].(bool),
 		}
 	}
 	if opt, ok := getOptByName(fields, "force_return"); ok {
-		enabled := true
-		if _, ok := opt["enabled"]; ok {
-			enabled = opt["enabled"].(bool)
-		}
 		opts.ForceReturn = &gcdn.ForceReturn{
-			Enabled: enabled,
+			Enabled: opt["enabled"].(bool),
 			Code:    opt["code"].(int),
 			Body:    opt["body"].(string),
 		}
