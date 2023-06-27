@@ -22,6 +22,47 @@ var (
 		Description: "Each option in CDN resource settings. Each option added to CDN resource settings should have the following mandatory request fields: enabled, value.",
 		Elem: &schema.Resource{
 			Schema: map[string]*schema.Schema{
+				"browser_cache_settings": {
+					Type:        schema.TypeList,
+					MaxItems:    1,
+					Optional:    true,
+					Computed:    true,
+					Description: "",
+					Elem: &schema.Resource{
+						Schema: map[string]*schema.Schema{
+							"enabled": {
+								Type:     schema.TypeBool,
+								Optional: true,
+								Default:  true,
+							},
+							"value": {
+								Type:        schema.TypeString,
+								Optional:    true,
+								Description: "",
+							},
+						},
+					},
+				},
+				"cors": {
+					Type:        schema.TypeList,
+					MaxItems:    1,
+					Optional:    true,
+					Description: "",
+					Elem: &schema.Resource{
+						Schema: map[string]*schema.Schema{
+							"enabled": {
+								Type:     schema.TypeBool,
+								Optional: true,
+								Default:  true,
+							},
+							"value": {
+								Type:     schema.TypeSet,
+								Elem:     &schema.Schema{Type: schema.TypeString},
+								Required: true,
+							},
+						},
+					},
+				},
 				"edge_cache_settings": {
 					Type:        schema.TypeList,
 					MaxItems:    1,
@@ -58,11 +99,36 @@ var (
 						},
 					},
 				},
-				"browser_cache_settings": {
+				"force_return": {
 					Type:        schema.TypeList,
 					MaxItems:    1,
 					Optional:    true,
-					Computed:    true,
+					Description: "Allows to apply custom HTTP code to the CDN content.",
+					Elem: &schema.Resource{
+						Schema: map[string]*schema.Schema{
+							"enabled": {
+								Type:     schema.TypeBool,
+								Optional: true,
+								Default:  true,
+							},
+							"code": {
+								Type:        schema.TypeInt,
+								Required:    true,
+								Description: "HTTP response status code. Available codes: 100 <= value <= 599. Reserved codes: 408, 444, 477, 494, 495, 496, 497, 499",
+							},
+							"body": {
+								Type:        schema.TypeString,
+								Optional:    true,
+								Default:     "",
+								Description: "Response text or URL if you're going to set up redirection. Max length = 100.",
+							},
+						},
+					},
+				},
+				"gzip_on": {
+					Type:        schema.TypeList,
+					MaxItems:    1,
+					Optional:    true,
 					Description: "",
 					Elem: &schema.Resource{
 						Schema: map[string]*schema.Schema{
@@ -72,9 +138,8 @@ var (
 								Default:  true,
 							},
 							"value": {
-								Type:        schema.TypeString,
-								Optional:    true,
-								Description: "",
+								Type:     schema.TypeBool,
+								Required: true,
 							},
 						},
 					},
@@ -93,6 +158,65 @@ var (
 							},
 							"value": {
 								Type:     schema.TypeString,
+								Required: true,
+							},
+						},
+					},
+				},
+				"ignore_query_string": {
+					Type:        schema.TypeList,
+					MaxItems:    1,
+					Optional:    true,
+					Description: "",
+					Elem: &schema.Resource{
+						Schema: map[string]*schema.Schema{
+							"enabled": {
+								Type:     schema.TypeBool,
+								Optional: true,
+								Default:  true,
+							},
+							"value": {
+								Type:     schema.TypeBool,
+								Required: true,
+							},
+						},
+					},
+				},
+				"query_params_blacklist": {
+					Type:        schema.TypeList,
+					MaxItems:    1,
+					Optional:    true,
+					Description: "",
+					Elem: &schema.Resource{
+						Schema: map[string]*schema.Schema{
+							"enabled": {
+								Type:     schema.TypeBool,
+								Optional: true,
+								Default:  true,
+							},
+							"value": {
+								Type:     schema.TypeSet,
+								Elem:     &schema.Schema{Type: schema.TypeString},
+								Required: true,
+							},
+						},
+					},
+				},
+				"query_params_whitelist": {
+					Type:        schema.TypeList,
+					MaxItems:    1,
+					Optional:    true,
+					Description: "",
+					Elem: &schema.Resource{
+						Schema: map[string]*schema.Schema{
+							"enabled": {
+								Type:     schema.TypeBool,
+								Optional: true,
+								Default:  true,
+							},
+							"value": {
+								Type:     schema.TypeSet,
+								Elem:     &schema.Schema{Type: schema.TypeString},
 								Required: true,
 							},
 						},
@@ -150,45 +274,6 @@ var (
 						},
 					},
 				},
-				"gzip_on": {
-					Type:        schema.TypeList,
-					MaxItems:    1,
-					Optional:    true,
-					Description: "",
-					Elem: &schema.Resource{
-						Schema: map[string]*schema.Schema{
-							"enabled": {
-								Type:     schema.TypeBool,
-								Optional: true,
-								Default:  true,
-							},
-							"value": {
-								Type:     schema.TypeBool,
-								Required: true,
-							},
-						},
-					},
-				},
-				"cors": {
-					Type:        schema.TypeList,
-					MaxItems:    1,
-					Optional:    true,
-					Description: "",
-					Elem: &schema.Resource{
-						Schema: map[string]*schema.Schema{
-							"enabled": {
-								Type:     schema.TypeBool,
-								Optional: true,
-								Default:  true,
-							},
-							"value": {
-								Type:     schema.TypeSet,
-								Elem:     &schema.Schema{Type: schema.TypeString},
-								Required: true,
-							},
-						},
-					},
-				},
 				"rewrite": {
 					Type:        schema.TypeList,
 					MaxItems:    1,
@@ -209,34 +294,6 @@ var (
 								Type:     schema.TypeString,
 								Optional: true,
 								Default:  "break",
-							},
-						},
-					},
-				},
-				"webp": {
-					Type:        schema.TypeList,
-					MaxItems:    1,
-					Optional:    true,
-					Description: "",
-					Elem: &schema.Resource{
-						Schema: map[string]*schema.Schema{
-							"enabled": {
-								Type:     schema.TypeBool,
-								Optional: true,
-								Default:  true,
-							},
-							"jpg_quality": {
-								Type:     schema.TypeInt,
-								Required: true,
-							},
-							"png_quality": {
-								Type:     schema.TypeInt,
-								Required: true,
-							},
-							"png_lossless": {
-								Type:     schema.TypeBool,
-								Optional: true,
-								Default:  false,
 							},
 						},
 					},
@@ -267,7 +324,7 @@ var (
 						},
 					},
 				},
-				"ignore_query_string": {
+				"static_headers": {
 					Type:        schema.TypeList,
 					MaxItems:    1,
 					Optional:    true,
@@ -280,46 +337,7 @@ var (
 								Default:  true,
 							},
 							"value": {
-								Type:     schema.TypeBool,
-								Required: true,
-							},
-						},
-					},
-				},
-				"query_params_whitelist": {
-					Type:        schema.TypeList,
-					MaxItems:    1,
-					Optional:    true,
-					Description: "",
-					Elem: &schema.Resource{
-						Schema: map[string]*schema.Schema{
-							"enabled": {
-								Type:     schema.TypeBool,
-								Optional: true,
-								Default:  true,
-							},
-							"value": {
-								Type:     schema.TypeSet,
-								Elem:     &schema.Schema{Type: schema.TypeString},
-								Required: true,
-							},
-						},
-					},
-				},
-				"query_params_blacklist": {
-					Type:        schema.TypeList,
-					MaxItems:    1,
-					Optional:    true,
-					Description: "",
-					Elem: &schema.Resource{
-						Schema: map[string]*schema.Schema{
-							"enabled": {
-								Type:     schema.TypeBool,
-								Optional: true,
-								Default:  true,
-							},
-							"value": {
-								Type:     schema.TypeSet,
+								Type:     schema.TypeMap,
 								Elem:     &schema.Schema{Type: schema.TypeString},
 								Required: true,
 							},
@@ -341,45 +359,6 @@ var (
 							"value": {
 								Type:     schema.TypeMap,
 								Elem:     &schema.Schema{Type: schema.TypeString},
-								Required: true,
-							},
-						},
-					},
-				},
-				"static_headers": {
-					Type:        schema.TypeList,
-					MaxItems:    1,
-					Optional:    true,
-					Description: "",
-					Elem: &schema.Resource{
-						Schema: map[string]*schema.Schema{
-							"enabled": {
-								Type:     schema.TypeBool,
-								Optional: true,
-								Default:  true,
-							},
-							"value": {
-								Type:     schema.TypeMap,
-								Elem:     &schema.Schema{Type: schema.TypeString},
-								Required: true,
-							},
-						},
-					},
-				},
-				"websockets": {
-					Type:        schema.TypeList,
-					MaxItems:    1,
-					Optional:    true,
-					Description: "",
-					Elem: &schema.Resource{
-						Schema: map[string]*schema.Schema{
-							"enabled": {
-								Type:     schema.TypeBool,
-								Optional: true,
-								Default:  true,
-							},
-							"value": {
-								Type:     schema.TypeBool,
 								Required: true,
 							},
 						},
@@ -424,11 +403,11 @@ var (
 						},
 					},
 				},
-				"force_return": {
+				"webp": {
 					Type:        schema.TypeList,
 					MaxItems:    1,
 					Optional:    true,
-					Description: "Allows to apply custom HTTP code to the CDN content.",
+					Description: "",
 					Elem: &schema.Resource{
 						Schema: map[string]*schema.Schema{
 							"enabled": {
@@ -436,16 +415,37 @@ var (
 								Optional: true,
 								Default:  true,
 							},
-							"code": {
-								Type:        schema.TypeInt,
-								Required:    true,
-								Description: "HTTP response status code. Available codes: 100 <= value <= 599. Reserved codes: 408, 444, 477, 494, 495, 496, 497, 499",
+							"jpg_quality": {
+								Type:     schema.TypeInt,
+								Required: true,
 							},
-							"body": {
-								Type:        schema.TypeString,
-								Optional:    true,
-								Default:     "",
-								Description: "Response text or URL if you're going to set up redirection. Max length = 100.",
+							"png_quality": {
+								Type:     schema.TypeInt,
+								Required: true,
+							},
+							"png_lossless": {
+								Type:     schema.TypeBool,
+								Optional: true,
+								Default:  false,
+							},
+						},
+					},
+				},
+				"websockets": {
+					Type:        schema.TypeList,
+					MaxItems:    1,
+					Optional:    true,
+					Description: "",
+					Elem: &schema.Resource{
+						Schema: map[string]*schema.Schema{
+							"enabled": {
+								Type:     schema.TypeBool,
+								Optional: true,
+								Default:  true,
+							},
+							"value": {
+								Type:     schema.TypeBool,
+								Required: true,
 							},
 						},
 					},
