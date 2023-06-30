@@ -198,6 +198,7 @@ Required:
 Optional:
 
 - **enabled** (Boolean) Manage option state, explicitly disabled option can be used to block option inheritance.
+- **always** (Boolean) Specifies if the Access-Control-Allow-Origin header will be added to a response from CDN regardless of response code.
 
 
 <a id="nestedblock--options--country_acl"></a>

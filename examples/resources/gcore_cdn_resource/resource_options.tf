@@ -44,6 +44,7 @@ resource "gcore_cdn_resource" "cdn_example_com" {
       value = [
         "*",
       ]
+      always = true
     }
     country_acl {
       policy_type = "allow"

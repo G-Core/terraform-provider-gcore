@@ -126,6 +126,12 @@ var (
 								Required:    true,
 								Description: "Specifies a value of the Access-Control-Allow-Origin header.",
 							},
+							"always": {
+								Type:        schema.TypeBool,
+								Optional:    true,
+								Computed:    true,
+								Description: "Specifies if the Access-Control-Allow-Origin header will be added to a response from CDN regardless of response code.",
+							},
 						},
 					},
 				},
@@ -1267,6 +1273,9 @@ func listToOptions(l []interface{}) *gcdn.Options {
 		for _, v := range opt["value"].(*schema.Set).List() {
 			opts.Cors.Value = append(opts.Cors.Value, v.(string))
 		}
+		if _, ok := opt["always"]; ok {
+			opts.Cors.Always = opt["always"].(bool)
+		}
 	}
 	if opt, ok := getOptByName(fields, "country_acl"); ok {
 		opts.CountryACL = &gcdn.CountryACL{
@@ -1519,10 +1528,10 @@ func listToOptions(l []interface{}) *gcdn.Options {
 			item := &gcdn.StaticResponseHeadersItem{
 				Name: item_data["name"].(string),
 			}
-			for _, v := range item_data["value"].(*schema.Set).List() {
-				item.Value = append(item.Value, v.(string))
+			for _, val := range item_data["value"].(*schema.Set).List() {
+				item.Value = append(item.Value, val.(string))
 			}
-			if _, ok := opt["always"]; ok {
+			if _, ok := item_data["always"]; ok {
 				item.Always = item_data["always"].(bool)
 			}
 			opts.StaticResponseHeaders.Value = append(opts.StaticResponseHeaders.Value, *item)
