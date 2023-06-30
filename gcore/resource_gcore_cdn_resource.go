@@ -27,7 +27,7 @@ var (
 					MaxItems:    1,
 					Optional:    true,
 					Computed:    true,
-					Description: "The list of allowed HTTP methods.",
+					Description: "Specify allowed HTTP methods.",
 					Elem: &schema.Resource{
 						Schema: map[string]*schema.Schema{
 							"enabled": {
@@ -48,7 +48,7 @@ var (
 					Type:        schema.TypeList,
 					MaxItems:    1,
 					Optional:    true,
-					Description: "The option allows to compress content with brotli on the CDN's end.",
+					Description: "Brotli compression option allows to compress content with brotli on the CDN's end. CDN servers will request only uncompressed content from the origin.",
 					Elem: &schema.Resource{
 						Schema: map[string]*schema.Schema{
 							"enabled": {
@@ -70,7 +70,7 @@ var (
 					MaxItems:    1,
 					Optional:    true,
 					Computed:    true,
-					Description: "The cache expiration time for customers' browsers in seconds.",
+					Description: "Specify the cache expiration time for customers' browsers in seconds.",
 					Elem: &schema.Resource{
 						Schema: map[string]*schema.Schema{
 							"enabled": {
@@ -81,7 +81,7 @@ var (
 							"value": {
 								Type:        schema.TypeString,
 								Optional:    true,
-								Description: "Use '0s' to disable caching.",
+								Description: "Use '0s' to disable caching. The value applies for a response with codes 200, 201, 204, 206, 301, 302, 303, 304, 307, 308.",
 							},
 						},
 					},
@@ -112,7 +112,7 @@ var (
 					Type:        schema.TypeList,
 					MaxItems:    1,
 					Optional:    true,
-					Description: "The option adds the Access-Control-Allow-Origin header to responses from CDN servers.",
+					Description: "CORS header support option adds the Access-Control-Allow-Origin header to responses from CDN servers.",
 					Elem: &schema.Resource{
 						Schema: map[string]*schema.Schema{
 							"enabled": {
@@ -124,13 +124,13 @@ var (
 								Type:        schema.TypeSet,
 								Elem:        &schema.Schema{Type: schema.TypeString},
 								Required:    true,
-								Description: "Specifies a value of the Access-Control-Allow-Origin header.",
+								Description: "Specify a value of the Access-Control-Allow-Origin header. Possible values: '*', '$http_origin', 'example.com'.",
 							},
 							"always": {
 								Type:        schema.TypeBool,
 								Optional:    true,
 								Computed:    true,
-								Description: "Specifies if the Access-Control-Allow-Origin header will be added to a response from CDN regardless of response code.",
+								Description: "Specify if the Access-Control-Allow-Origin header should be added to a response from CDN regardless of response code.",
 							},
 						},
 					},
@@ -139,7 +139,7 @@ var (
 					Type:        schema.TypeList,
 					MaxItems:    1,
 					Optional:    true,
-					Description: "Control access to the content for specified countries.",
+					Description: "Country access policy enables control access to content for specified countries.",
 					Elem: &schema.Resource{
 						Schema: map[string]*schema.Schema{
 							"enabled": {
@@ -165,7 +165,7 @@ var (
 					Type:        schema.TypeList,
 					MaxItems:    1,
 					Optional:    true,
-					Description: "When enabled the content caching is completely disabled.",
+					Description: "Option enables browser caching. When enabled, content caching is completely disabled.",
 					Elem: &schema.Resource{
 						Schema: map[string]*schema.Schema{
 							"enabled": {
@@ -184,7 +184,7 @@ var (
 					Type:        schema.TypeList,
 					MaxItems:    1,
 					Optional:    true,
-					Description: "It allows getting 206 responses regardless settings of an origin source.",
+					Description: "The option allows getting 206 responses regardless settings of an origin source. Enabled by default.",
 					Elem: &schema.Resource{
 						Schema: map[string]*schema.Schema{
 							"enabled": {
@@ -215,12 +215,12 @@ var (
 							"value": {
 								Type:        schema.TypeString,
 								Optional:    true,
-								Description: "Caching time for a response with codes 200, 206, 301, 302. Responses with codes 4xx, 5xx will not be cached. Use '0s' disable to caching. Use custom_values field to specify a custom caching time for a response with specific codes.",
+								Description: "Specify caching time for the response with codes 200, 206, 301, 302. Responses with codes 4xx, 5xx will not be cached. Use '0s' to disable caching. Use custom_values field to specify a custom caching time for a response with specific codes.",
 							},
 							"default": {
 								Type:        schema.TypeString,
 								Optional:    true,
-								Description: "Content will be cached according to origin cache settings. The value applies for a response with codes 200, 201, 204, 206, 301, 302, 303, 304, 307, 308 if an origin server does not have caching HTTP headers. Responses with other codes will not be cached.",
+								Description: "Content will be cached according to origin cache settings. The value applies for a response with codes 200, 201, 204, 206, 301, 302, 303, 304, 307, 308, if an origin server does not have caching HTTP headers. Responses with other codes will not be cached.",
 							},
 							"custom_values": {
 								Type:     schema.TypeMap,
@@ -230,7 +230,7 @@ var (
 									return map[string]interface{}{}, nil
 								},
 								Elem:        schema.TypeString,
-								Description: "Caching time for a response with specific codes. These settings have a higher priority than the value field. Response code ('304', '404' for example). Use 'any' to specify caching time for all response codes. Caching time in seconds ('0s', '600s' for example). Use '0s' to disable caching for a specific response code.",
+								Description: "Specify caching time in seconds ('0s', '600s' for example) for a response with specific response code ('304', '404' for example). Use 'any' to specify caching time for all response codes. Use '0s' to disable caching for a specific response code. These settings have a higher priority than the value field.",
 							},
 						},
 					},
@@ -239,7 +239,7 @@ var (
 					Type:        schema.TypeList,
 					MaxItems:    1,
 					Optional:    true,
-					Description: "A CDN request and cache already compressed content. Your server should support compression. CDN servers won't ungzip your content even if a user's browser doesn't accept compression (nowadays almost all browsers support it).",
+					Description: "Option allows to enable fetch compressed. CDN request and cache already compressed content. Your server should support compression. CDN servers will not ungzip your content even if a user's browser doesn't accept compression (nowadays almost all browsers support it).",
 					Elem: &schema.Resource{
 						Schema: map[string]*schema.Schema{
 							"enabled": {
@@ -258,7 +258,7 @@ var (
 					Type:        schema.TypeList,
 					MaxItems:    1,
 					Optional:    true,
-					Description: "Redirection from origin. If the origin server returns a redirect, the option allows a CDN to pull the requested content from an origin server that was returned in the redirect.",
+					Description: "Enable redirection from origin. If the origin server returns a redirect, the option allows the CDN to pull the requested content from the origin server that was returned in the redirect.",
 					Elem: &schema.Resource{
 						Schema: map[string]*schema.Schema{
 							"enabled": {
@@ -279,7 +279,7 @@ var (
 					Type:        schema.TypeList,
 					MaxItems:    1,
 					Optional:    true,
-					Description: "Allows to apply custom HTTP code to the CDN content.",
+					Description: "Allows to apply custom HTTP code to the CDN content. Specify HTTP-code you need and text or URL if you are going to set up redirect.",
 					Elem: &schema.Resource{
 						Schema: map[string]*schema.Schema{
 							"enabled": {
@@ -305,7 +305,7 @@ var (
 					Type:        schema.TypeList,
 					MaxItems:    1,
 					Optional:    true,
-					Description: "When a CDN requests content from an origin server the option allows forwarding the Host header used in the request made to a CDN.",
+					Description: "When a CDN requests content from an origin server, the option allows to forward the Host header used in the request made to a CDN.",
 					Elem: &schema.Resource{
 						Schema: map[string]*schema.Schema{
 							"enabled": {
@@ -324,7 +324,7 @@ var (
 					Type:        schema.TypeList,
 					MaxItems:    1,
 					Optional:    true,
-					Description: "The option allows to compress content with gzip on the CDN`s end. CDN servers will request only uncompressed content from the origin.",
+					Description: "GZip compression option allows to compress content with gzip on the CDN`s end. CDN servers will request only uncompressed content from the origin.",
 					Elem: &schema.Resource{
 						Schema: map[string]*schema.Schema{
 							"enabled": {
@@ -343,7 +343,7 @@ var (
 					Type:        schema.TypeList,
 					MaxItems:    1,
 					Optional:    true,
-					Description: "Specify the Host header that CDN servers use when request content from an origin server. Your server must be able to process requests with the chosen header. If the option is in NULL state Host Header value is taken from the CNAME field.",
+					Description: "Option allows to set Host header that CDN servers use when request content from an origin server. Your server must be able to process requests with the chosen header. If the option is NULL, Host Header value is taken from the parent CDN resource's value.",
 					Elem: &schema.Resource{
 						Schema: map[string]*schema.Schema{
 							"enabled": {
@@ -362,7 +362,7 @@ var (
 					Type:        schema.TypeList,
 					MaxItems:    1,
 					Optional:    true,
-					Description: "Use HTTP/3 protocol for content delivery when supported by the end users browser.",
+					Description: "Use HTTP/3 protocol for content delivery if supported by the end users browser.",
 					Elem: &schema.Resource{
 						Schema: map[string]*schema.Schema{
 							"enabled": {
@@ -400,7 +400,7 @@ var (
 					Type:        schema.TypeList,
 					MaxItems:    1,
 					Optional:    true,
-					Description: "This option determines how files with different query strings will be cached: either as one object (when this option is enabled) or as different objects (when this option is disabled).",
+					Description: "Ignore query string option determines how files with different query strings will be cached: either as one object (option is enabled) or as different objects (option is disabled).",
 					Elem: &schema.Resource{
 						Schema: map[string]*schema.Schema{
 							"enabled": {
@@ -419,7 +419,7 @@ var (
 					Type:        schema.TypeList,
 					MaxItems:    1,
 					Optional:    true,
-					Description: "The option allows transforming JPG and PNG images (such as resizing or cropping) and automatically converting them to WebP or AVIF format. It is a paid option.",
+					Description: "Image stack option allows transforming JPG and PNG images (such as resizing or cropping) and automatically converting them to WebP or AVIF format. It is a paid option.",
 					Elem: &schema.Resource{
 						Schema: map[string]*schema.Schema{
 							"enabled": {
@@ -442,7 +442,7 @@ var (
 							"quality": {
 								Type:        schema.TypeInt,
 								Required:    true,
-								Description: "Quality settings for JPG and PNG images. Specify a value from 1 to 100.",
+								Description: "Quality settings for JPG and PNG images. Specify a value from 1 to 100. The higher the value, the better the image quality and the larger the file size after conversion.",
 							},
 							"png_lossless": {
 								Type:        schema.TypeBool,
@@ -457,7 +457,7 @@ var (
 					Type:        schema.TypeList,
 					MaxItems:    1,
 					Optional:    true,
-					Description: "Control access to the CDN Resource content for specified IP addresses.",
+					Description: "IP access policy option allows to control access to the CDN Resource content for specific IP addresses.",
 					Elem: &schema.Resource{
 						Schema: map[string]*schema.Schema{
 							"enabled": {
@@ -474,7 +474,7 @@ var (
 								Type:        schema.TypeSet,
 								Elem:        &schema.Schema{Type: schema.TypeString},
 								Required:    true,
-								Description: "List of IPs.",
+								Description: "Specify list of IP address with a subnet mask.",
 							},
 						},
 					},
@@ -574,7 +574,7 @@ var (
 					Type:        schema.TypeList,
 					MaxItems:    1,
 					Optional:    true,
-					Description: "When enabled redirects HTTPS requests to HTTP.",
+					Description: "When enabled, HTTPS requests are redirected to HTTP.",
 					Elem: &schema.Resource{
 						Schema: map[string]*schema.Schema{
 							"enabled": {
@@ -593,7 +593,7 @@ var (
 					Type:        schema.TypeList,
 					MaxItems:    1,
 					Optional:    true,
-					Description: "Sets redirect from HTTP protocol to HTTPS for all resource requests.",
+					Description: "When enabled, HTTP requests are redirected to HTTPS.",
 					Elem: &schema.Resource{
 						Schema: map[string]*schema.Schema{
 							"enabled": {
@@ -612,7 +612,7 @@ var (
 					Type:        schema.TypeList,
 					MaxItems:    1,
 					Optional:    true,
-					Description: "Control access to the CDN Resource content for specified domain names.",
+					Description: "Referrer access policy option allows to control access to the CDN Resource content for specified domain names.",
 					Elem: &schema.Resource{
 						Schema: map[string]*schema.Schema{
 							"enabled": {
@@ -629,7 +629,7 @@ var (
 								Type:        schema.TypeSet,
 								Elem:        &schema.Schema{Type: schema.TypeString},
 								Required:    true,
-								Description: "List of domain names.",
+								Description: "Specify list of domain names or wildcard domains (without http:// or https://). For example, example.com or *.example.com.",
 							},
 						},
 					},
@@ -682,13 +682,13 @@ var (
 							"mode": {
 								Type:        schema.TypeString,
 								Required:    true,
-								Description: "Specifies a mode of hiding HTTP headers from the response. Possible values are: hide, show.",
+								Description: "Specify a mode of hiding HTTP headers from the response. Possible values are: hide, show.",
 							},
 							"excepted": {
 								Type:        schema.TypeSet,
 								Elem:        &schema.Schema{Type: schema.TypeString},
 								Required:    true,
-								Description: "List of HTTP headers.",
+								Description: "List of HTTP headers. The following required headers cannot be hidden from response: Connection, Content-Length, Content-Type, Date, Server.",
 							},
 						},
 					},
@@ -697,7 +697,7 @@ var (
 					Type:        schema.TypeList,
 					MaxItems:    1,
 					Optional:    true,
-					Description: "The option allows changing or redirecting query paths.",
+					Description: "Rewrite option changes and redirects the requests from the CDN to the origin. It operates according to the Nginx configuration.",
 					Elem: &schema.Resource{
 						Schema: map[string]*schema.Schema{
 							"enabled": {
@@ -708,13 +708,13 @@ var (
 							"body": {
 								Type:        schema.TypeString,
 								Required:    true,
-								Description: "The pattern for Rewrite.",
+								Description: "The pattern for Rewrite. At least one group should be specified. For Example: /rewrite_from/(.*) /rewrite_to/$1",
 							},
 							"flag": {
 								Type:        schema.TypeString,
 								Optional:    true,
 								Default:     "break",
-								Description: "Defines flag for the Rewrite option.",
+								Description: "Define flag for the Rewrite option. Possible values: last, break, redirect, permanent.",
 							},
 						},
 					},
@@ -723,7 +723,7 @@ var (
 					Type:        schema.TypeList,
 					MaxItems:    1,
 					Optional:    true,
-					Description: "The option allows configuring an access with tokenized URLs.",
+					Description: "The option allows configuring an access with tokenized URLs. It makes impossible to access content without a valid (unexpired) hash key. When enabled, you need to specify a key that you use to generate a token.",
 					Elem: &schema.Resource{
 						Schema: map[string]*schema.Schema{
 							"enabled": {
@@ -734,12 +734,12 @@ var (
 							"key": {
 								Type:        schema.TypeString,
 								Required:    true,
-								Description: "The key generated on your side which will be used for URL signing.",
+								Description: "A key generated on your side that will be used for URL signing.",
 							},
 							"type": {
 								Type:        schema.TypeInt,
 								Required:    true,
-								Description: "Specify the type of URL Signing. It can be either 0 or 2.",
+								Description: "Specify the type of URL Signing. It can be either 0 or 2. Type 0 - includes end user's IP to secure token generation. Type 2 - excludes end user's IP from secure token generation.",
 							},
 						},
 					},
@@ -748,7 +748,7 @@ var (
 					Type:        schema.TypeList,
 					MaxItems:    1,
 					Optional:    true,
-					Description: "Files larger than 10 MB will be requested and cached in parts (no larger than 10 MB each part).",
+					Description: "When enabled, files larger than 10 MB are requested and cached in parts (no larger than 10 MB each). It reduces time to first byte. The origin must support HTTP Range requests.",
 					Elem: &schema.Resource{
 						Schema: map[string]*schema.Schema{
 							"enabled": {
@@ -768,7 +768,7 @@ var (
 					MaxItems:    1,
 					Optional:    true,
 					Computed:    true,
-					Description: "Specify the SNI.",
+					Description: "Specify the SNI (Server Name Indication). SNI (Server Name Indication) is generally only required if your origin is using shared hosting or does not have a dedicated IP address. If the origin server presents multiple certificates, SNI allows the origin server to know which certificate to use for the connection. The option works only if originProtocol parameter is HTTPS or MATCH.",
 					Elem: &schema.Resource{
 						Schema: map[string]*schema.Schema{
 							"enabled": {
@@ -779,12 +779,12 @@ var (
 							"sni_type": {
 								Type:        schema.TypeString,
 								Optional:    true,
-								Description: "Available values 'dynamic' or 'custom'.",
+								Description: "Specify SNI type. Possible values: dynamic, custom. dynamic - SNI hostname depends on the hostHeader and the forward_host_header options. custom - custom SNI hostname.",
 							},
 							"custom_hostname": {
 								Type:        schema.TypeString,
 								Optional:    true,
-								Description: "Required to set custom hostname in case sni-type='custom'.",
+								Description: "Custom SNI hostname. Required if sni_type is set to 'custom'.",
 							},
 						},
 					},
@@ -794,7 +794,7 @@ var (
 					MaxItems:    1,
 					Optional:    true,
 					Computed:    true,
-					Description: "The list of errors which the option is applied for.",
+					Description: "The list of errors which Always Online option is applied for.",
 					Elem: &schema.Resource{
 						Schema: map[string]*schema.Schema{
 							"enabled": {
@@ -806,7 +806,7 @@ var (
 								Type:        schema.TypeSet,
 								Elem:        &schema.Schema{Type: schema.TypeString},
 								Required:    true,
-								Description: "The list of errors which the option is applied for.",
+								Description: "Possible values: error, http_403, http_404, http_429, http_500, http_502, http_503, http_504, invalid_header, timeout, updating.",
 							},
 						},
 					},
@@ -844,9 +844,10 @@ var (
 								Default:  true,
 							},
 							"value": {
-								Type:     schema.TypeMap,
-								Elem:     &schema.Schema{Type: schema.TypeString},
-								Required: true,
+								Type:        schema.TypeMap,
+								Elem:        &schema.Schema{Type: schema.TypeString},
+								Required:    true,
+								Description: "Header name is restricted to 255 symbols and can contain latin letters (A-Z, a-z), numbers (0-9), dashes, and underscores. Header value is restricted to 512 symbols and can contain latin letters (a-z), numbers (0-9), spaces, underscores and symbols (-/.:). Space can be used only between words.",
 							},
 						},
 					},
@@ -895,7 +896,7 @@ var (
 					Type:        schema.TypeList,
 					MaxItems:    1,
 					Optional:    true,
-					Description: "The option specifies a list of allowed SSL/TLS protocol versions.",
+					Description: "The option specifies a list of allowed SSL/TLS protocol versions. The list cannot be empty. By default, the option is disabled (all protocols versions are allowed). ",
 					Elem: &schema.Resource{
 						Schema: map[string]*schema.Schema{
 							"enabled": {
@@ -904,9 +905,10 @@ var (
 								Default:  true,
 							},
 							"value": {
-								Type:     schema.TypeSet,
-								Elem:     &schema.Schema{Type: schema.TypeString},
-								Required: true,
+								Type:        schema.TypeSet,
+								Elem:        &schema.Schema{Type: schema.TypeString},
+								Required:    true,
+								Description: "Possible values (case sensitive): SSLv3, TLSv1, TLSv1.1, TLSv1.2, TLSv1.3.",
 							},
 						},
 					},
@@ -915,7 +917,7 @@ var (
 					Type:        schema.TypeList,
 					MaxItems:    1,
 					Optional:    true,
-					Description: "The option allows choosing a Let's Encrypt certificate chain.",
+					Description: "The option allows choosing a Let's Encrypt certificate chain. The specified chain will be used during the next Let's Encrypt certificate issue or renewal. ",
 					Elem: &schema.Resource{
 						Schema: map[string]*schema.Schema{
 							"enabled": {
@@ -934,7 +936,7 @@ var (
 					Type:        schema.TypeList,
 					MaxItems:    1,
 					Optional:    true,
-					Description: "Control access to the content for specified user-agent.",
+					Description: "User agents policy option allows to control access to the content for specified user-agent.",
 					Elem: &schema.Resource{
 						Schema: map[string]*schema.Schema{
 							"enabled": {
@@ -951,7 +953,7 @@ var (
 								Type:        schema.TypeSet,
 								Elem:        &schema.Schema{Type: schema.TypeString},
 								Required:    true,
-								Description: "List of User-Agent.",
+								Description: "List of User-Agents. Use \"\" to allow/deny access when the User-Agent header is empty.",
 							},
 						},
 					},
@@ -1007,7 +1009,7 @@ var (
 					Type:        schema.TypeList,
 					MaxItems:    1,
 					Optional:    true,
-					Description: "The option allows WebSockets connections to an origin server.",
+					Description: "WebSockets option allows WebSockets connections to an origin server.",
 					Elem: &schema.Resource{
 						Schema: map[string]*schema.Schema{
 							"enabled": {
