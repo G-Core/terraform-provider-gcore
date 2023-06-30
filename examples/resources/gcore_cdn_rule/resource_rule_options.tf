@@ -43,6 +43,10 @@ resource "gcore_cdn_rule" "cdn_example_com_rule_1" {
     cache_http_headers {
       enabled = false
       value = [
+        "connection",
+        "content-length",
+        "date",
+        "server",
         "accept-ranges",
         "content-type",
         "content-encoding",
@@ -160,7 +164,12 @@ resource "gcore_cdn_rule" "cdn_example_com_rule_1" {
     response_headers_hiding_policy {
       mode = "hide"
       excepted = [
-        "my-header"
+        "connection",
+        "content-length",
+        "content-type",
+        "date",
+        "server",
+        "my-header",
       ]
     }
     rewrite {
