@@ -44,17 +44,15 @@ resource "gcore_cdn_sslcert" "lets_encrypt_cert" {
 
 ### Required
 
-- **name** (String) Name of the SSL certificate. Must be unique.
+- `name` (String) Name of the SSL certificate. Must be unique.
 
 ### Optional
 
-- **automated** (Boolean) The way SSL certificate was issued.
-- **cert** (String, Sensitive) The public part of the SSL certificate. All chain of the SSL certificate should be added.
-- **id** (String) The ID of this resource.
-- **private_key** (String, Sensitive) The private key of the SSL certificate.
+- `automated` (Boolean) The way SSL certificate was issued.
+- `cert` (String, Sensitive) The public part of the SSL certificate. All chain of the SSL certificate should be added.
+- `private_key` (String, Sensitive) The private key of the SSL certificate.
 
 ### Read-Only
 
-- **has_related_resources** (Boolean) It shows if the SSL certificate is used by a CDN resource.
-
-
+- `has_related_resources` (Boolean) It shows if the SSL certificate is used by a CDN resource.
+- `id` (String) The ID of this resource.

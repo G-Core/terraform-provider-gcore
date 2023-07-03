@@ -75,57 +75,117 @@ resource "gcore_cdn_resource" "cdn_example_com" {
 
 ### Required
 
-- **cname** (String) A CNAME that will be used to deliver content though a CDN. If you update this field new resource will be created.
+- `cname` (String) A CNAME that will be used to deliver content though a CDN. If you update this field new resource will be created.
 
 ### Optional
 
-- **active** (Boolean) The setting allows to enable or disable a CDN Resource
-- **description** (String) Custom client description of the resource.
-- **id** (String) The ID of this resource.
-- **options** (Block List, Max: 1) Each option in CDN resource settings. Each option added to CDN resource settings should have the following mandatory request fields: enabled, value. (see [below for nested schema](#nestedblock--options))
-- **origin** (String) A domain name or IP of your origin source. Specify a port if custom. You can use either 'origin' parameter or 'originGroup' in the resource definition.
-- **origin_group** (Number) ID of the Origins Group. Use one of your Origins Group or create a new one. You can use either 'origin' parameter or 'originGroup' in the resource definition.
-- **origin_protocol** (String) This option defines the protocol that will be used by CDN servers to request content from an origin source. If not specified, we will use HTTP to connect to an origin server. Possible values are: HTTPS, HTTP, MATCH.
-- **secondary_hostnames** (Set of String) List of additional CNAMEs.
-- **ssl_data** (Number) Specify the SSL Certificate ID which should be used for the CDN Resource.
-- **ssl_enabled** (Boolean) Use HTTPS protocol for content delivery.
+- `active` (Boolean) The setting allows to enable or disable a CDN Resource
+- `description` (String) Custom client description of the resource.
+- `options` (Block List, Max: 1) Each option in CDN resource settings. Each option added to CDN resource settings should have the following mandatory request fields: enabled, value. (see [below for nested schema](#nestedblock--options))
+- `origin` (String) A domain name or IP of your origin source. Specify a port if custom. You can use either 'origin' parameter or 'originGroup' in the resource definition.
+- `origin_group` (Number) ID of the Origins Group. Use one of your Origins Group or create a new one. You can use either 'origin' parameter or 'originGroup' in the resource definition.
+- `origin_protocol` (String) This option defines the protocol that will be used by CDN servers to request content from an origin source. If not specified, we will use HTTP to connect to an origin server. Possible values are: HTTPS, HTTP, MATCH.
+- `secondary_hostnames` (Set of String) List of additional CNAMEs.
+- `ssl_data` (Number) Specify the SSL Certificate ID which should be used for the CDN Resource.
+- `ssl_enabled` (Boolean) Use HTTPS protocol for content delivery.
 
 ### Read-Only
 
-- **status** (String) Status of a CDN resource content availability. Possible values are: Active, Suspended, Processed.
+- `id` (String) The ID of this resource.
+- `status` (String) Status of a CDN resource content availability. Possible values are: Active, Suspended, Processed.
 
 <a id="nestedblock--options"></a>
 ### Nested Schema for `options`
 
 Optional:
 
-- **browser_cache_settings** (Block List, Max: 1) (see [below for nested schema](#nestedblock--options--browser_cache_settings))
-- **cors** (Block List, Max: 1) (see [below for nested schema](#nestedblock--options--cors))
-- **edge_cache_settings** (Block List, Max: 1) The cache expiration time for CDN servers. (see [below for nested schema](#nestedblock--options--edge_cache_settings))
-- **force_return** (Block List, Max: 1) Allows to apply custom HTTP code to the CDN content. (see [below for nested schema](#nestedblock--options--force_return))
-- **gzip_on** (Block List, Max: 1) (see [below for nested schema](#nestedblock--options--gzip_on))
-- **host_header** (Block List, Max: 1) Specify the Host header that CDN servers use when request content from an origin server. Your server must be able to process requests with the chosen header. If the option is in NULL state Host Header value is taken from the CNAME field. (see [below for nested schema](#nestedblock--options--host_header))
-- **ignore_query_string** (Block List, Max: 1) (see [below for nested schema](#nestedblock--options--ignore_query_string))
-- **query_params_blacklist** (Block List, Max: 1) (see [below for nested schema](#nestedblock--options--query_params_blacklist))
-- **query_params_whitelist** (Block List, Max: 1) (see [below for nested schema](#nestedblock--options--query_params_whitelist))
-- **redirect_http_to_https** (Block List, Max: 1) Sets redirect from HTTP protocol to HTTPS for all resource requests. (see [below for nested schema](#nestedblock--options--redirect_http_to_https))
-- **request_limiter** (Block List, Max: 1) It allows to limit the amount of HTTP requests (see [below for nested schema](#nestedblock--options--request_limiter))
-- **rewrite** (Block List, Max: 1) (see [below for nested schema](#nestedblock--options--rewrite))
-- **sni** (Block List, Max: 1) (see [below for nested schema](#nestedblock--options--sni))
-- **static_headers** (Block List, Max: 1) (see [below for nested schema](#nestedblock--options--static_headers))
-- **static_request_headers** (Block List, Max: 1) (see [below for nested schema](#nestedblock--options--static_request_headers))
-- **tls_versions** (Block List, Max: 1) (see [below for nested schema](#nestedblock--options--tls_versions))
-- **use_rsa_le_cert** (Block List, Max: 1) (see [below for nested schema](#nestedblock--options--use_rsa_le_cert))
-- **webp** (Block List, Max: 1) (see [below for nested schema](#nestedblock--options--webp))
-- **websockets** (Block List, Max: 1) (see [below for nested schema](#nestedblock--options--websockets))
+- `allowed_http_methods` (Block List, Max: 1) Specify allowed HTTP methods. (see [below for nested schema](#nestedblock--options--allowed_http_methods))
+- `brotli_compression` (Block List, Max: 1) Brotli compression option allows to compress content with brotli on the CDN's end. CDN servers will request only uncompressed content from the origin. (see [below for nested schema](#nestedblock--options--brotli_compression))
+- `browser_cache_settings` (Block List, Max: 1) Specify the cache expiration time for customers' browsers in seconds. (see [below for nested schema](#nestedblock--options--browser_cache_settings))
+- `cache_http_headers` (Block List, Max: 1) Legacy option. Use the response_headers_hiding_policy option instead. (see [below for nested schema](#nestedblock--options--cache_http_headers))
+- `cors` (Block List, Max: 1) CORS header support option adds the Access-Control-Allow-Origin header to responses from CDN servers. (see [below for nested schema](#nestedblock--options--cors))
+- `country_acl` (Block List, Max: 1) Country access policy enables control access to content for specified countries. (see [below for nested schema](#nestedblock--options--country_acl))
+- `disable_cache` (Block List, Max: 1) Option enables browser caching. When enabled, content caching is completely disabled. (see [below for nested schema](#nestedblock--options--disable_cache))
+- `disable_proxy_force_ranges` (Block List, Max: 1) The option allows getting 206 responses regardless settings of an origin source. Enabled by default. (see [below for nested schema](#nestedblock--options--disable_proxy_force_ranges))
+- `edge_cache_settings` (Block List, Max: 1) The cache expiration time for CDN servers. (see [below for nested schema](#nestedblock--options--edge_cache_settings))
+- `fetch_compressed` (Block List, Max: 1) Option allows to enable fetch compressed. CDN request and cache already compressed content. Your server should support compression. CDN servers will not ungzip your content even if a user's browser doesn't accept compression (nowadays almost all browsers support it). (see [below for nested schema](#nestedblock--options--fetch_compressed))
+- `follow_origin_redirect` (Block List, Max: 1) Enable redirection from origin. If the origin server returns a redirect, the option allows the CDN to pull the requested content from the origin server that was returned in the redirect. (see [below for nested schema](#nestedblock--options--follow_origin_redirect))
+- `force_return` (Block List, Max: 1) Allows to apply custom HTTP code to the CDN content. Specify HTTP-code you need and text or URL if you are going to set up redirect. (see [below for nested schema](#nestedblock--options--force_return))
+- `forward_host_header` (Block List, Max: 1) When a CDN requests content from an origin server, the option allows to forward the Host header used in the request made to a CDN. (see [below for nested schema](#nestedblock--options--forward_host_header))
+- `gzip_on` (Block List, Max: 1) GZip compression option allows to compress content with gzip on the CDN`s end. CDN servers will request only uncompressed content from the origin. (see [below for nested schema](#nestedblock--options--gzip_on))
+- `host_header` (Block List, Max: 1) Option allows to set Host header that CDN servers use when request content from an origin server. Your server must be able to process requests with the chosen header. If the option is NULL, Host Header value is taken from the parent CDN resource's value. (see [below for nested schema](#nestedblock--options--host_header))
+- `http3_enabled` (Block List, Max: 1) Use HTTP/3 protocol for content delivery if supported by the end users browser. (see [below for nested schema](#nestedblock--options--http3_enabled))
+- `ignore_cookie` (Block List, Max: 1) By default, files pulled from an origin source with cookies are not cached in a CDN. Enable this option to cache such objects. (see [below for nested schema](#nestedblock--options--ignore_cookie))
+- `ignore_query_string` (Block List, Max: 1) Ignore query string option determines how files with different query strings will be cached: either as one object (option is enabled) or as different objects (option is disabled). (see [below for nested schema](#nestedblock--options--ignore_query_string))
+- `image_stack` (Block List, Max: 1) Image stack option allows transforming JPG and PNG images (such as resizing or cropping) and automatically converting them to WebP or AVIF format. It is a paid option. (see [below for nested schema](#nestedblock--options--image_stack))
+- `ip_address_acl` (Block List, Max: 1) IP access policy option allows to control access to the CDN Resource content for specific IP addresses. (see [below for nested schema](#nestedblock--options--ip_address_acl))
+- `limit_bandwidth` (Block List, Max: 1) The option allows to control the download speed per connection. (see [below for nested schema](#nestedblock--options--limit_bandwidth))
+- `proxy_cache_methods_set` (Block List, Max: 1) Allows caching for GET, HEAD and POST requests. (see [below for nested schema](#nestedblock--options--proxy_cache_methods_set))
+- `query_params_blacklist` (Block List, Max: 1) Specify list of query strings. Files with those query strings will be cached as one object. (see [below for nested schema](#nestedblock--options--query_params_blacklist))
+- `query_params_whitelist` (Block List, Max: 1) Specify list of query strings. Files with those query strings will be cached as different objects. (see [below for nested schema](#nestedblock--options--query_params_whitelist))
+- `redirect_http_to_https` (Block List, Max: 1) When enabled, HTTP requests are redirected to HTTPS. (see [below for nested schema](#nestedblock--options--redirect_http_to_https))
+- `redirect_https_to_http` (Block List, Max: 1) When enabled, HTTPS requests are redirected to HTTP. (see [below for nested schema](#nestedblock--options--redirect_https_to_http))
+- `referrer_acl` (Block List, Max: 1) Referrer access policy option allows to control access to the CDN Resource content for specified domain names. (see [below for nested schema](#nestedblock--options--referrer_acl))
+- `request_limiter` (Block List, Max: 1) It allows to limit the amount of HTTP requests (see [below for nested schema](#nestedblock--options--request_limiter))
+- `response_headers_hiding_policy` (Block List, Max: 1) Define HTTP headers (specified at an origin server) that a CDN server hides from the response. (see [below for nested schema](#nestedblock--options--response_headers_hiding_policy))
+- `rewrite` (Block List, Max: 1) Rewrite option changes and redirects the requests from the CDN to the origin. It operates according to the Nginx configuration. (see [below for nested schema](#nestedblock--options--rewrite))
+- `secure_key` (Block List, Max: 1) The option allows configuring an access with tokenized URLs. It makes impossible to access content without a valid (unexpired) hash key. When enabled, you need to specify a key that you use to generate a token. (see [below for nested schema](#nestedblock--options--secure_key))
+- `slice` (Block List, Max: 1) When enabled, files larger than 10 MB are requested and cached in parts (no larger than 10 MB each). It reduces time to first byte. The origin must support HTTP Range requests. (see [below for nested schema](#nestedblock--options--slice))
+- `sni` (Block List, Max: 1) Specify the SNI (Server Name Indication). SNI (Server Name Indication) is generally only required if your origin is using shared hosting or does not have a dedicated IP address. If the origin server presents multiple certificates, SNI allows the origin server to know which certificate to use for the connection. The option works only if originProtocol parameter is HTTPS or MATCH. (see [below for nested schema](#nestedblock--options--sni))
+- `stale` (Block List, Max: 1) The list of errors which Always Online option is applied for. (see [below for nested schema](#nestedblock--options--stale))
+- `static_headers` (Block List, Max: 1) Legacy option. Use the static_response_headers option instead. (see [below for nested schema](#nestedblock--options--static_headers))
+- `static_request_headers` (Block List, Max: 1) Specify custom HTTP Headers for a CDN server to add to request. (see [below for nested schema](#nestedblock--options--static_request_headers))
+- `static_response_headers` (Block List, Max: 1) Specify custom HTTP Headers that a CDN server adds to a response. (see [below for nested schema](#nestedblock--options--static_response_headers))
+- `tls_versions` (Block List, Max: 1) The option specifies a list of allowed SSL/TLS protocol versions. The list cannot be empty. By default, the option is disabled (all protocols versions are allowed). (see [below for nested schema](#nestedblock--options--tls_versions))
+- `use_default_le_chain` (Block List, Max: 1) The option allows choosing a Let's Encrypt certificate chain. The specified chain will be used during the next Let's Encrypt certificate issue or renewal. (see [below for nested schema](#nestedblock--options--use_default_le_chain))
+- `use_rsa_le_cert` (Block List, Max: 1) The option allows choosing the RSA Let's Encrypt certificate type for the resource. (see [below for nested schema](#nestedblock--options--use_rsa_le_cert))
+- `user_agent_acl` (Block List, Max: 1) User agents policy option allows to control access to the content for specified user-agent. (see [below for nested schema](#nestedblock--options--user_agent_acl))
+- `webp` (Block List, Max: 1) Legacy option. Use the image_stack option instead. (see [below for nested schema](#nestedblock--options--webp))
+- `websockets` (Block List, Max: 1) WebSockets option allows WebSockets connections to an origin server. (see [below for nested schema](#nestedblock--options--websockets))
+
+<a id="nestedblock--options--allowed_http_methods"></a>
+### Nested Schema for `options.allowed_http_methods`
+
+Required:
+
+- `value` (Set of String) Available methods: GET, HEAD, POST, PUT, PATCH, DELETE, OPTIONS.
+
+Optional:
+
+- `enabled` (Boolean)
+
+
+<a id="nestedblock--options--brotli_compression"></a>
+### Nested Schema for `options.brotli_compression`
+
+Required:
+
+- `value` (Set of String) Specify the content-type for each type of content you wish to have compressed.
+
+Optional:
+
+- `enabled` (Boolean)
+
 
 <a id="nestedblock--options--browser_cache_settings"></a>
 ### Nested Schema for `options.browser_cache_settings`
 
 Optional:
 
-- **enabled** (Boolean)
-- **value** (String)
+- `enabled` (Boolean)
+- `value` (String) Use '0s' to disable caching. The value applies for a response with codes 200, 201, 204, 206, 301, 302, 303, 304, 307, 308.
+
+
+<a id="nestedblock--options--cache_http_headers"></a>
+### Nested Schema for `options.cache_http_headers`
+
+Required:
+
+- `value` (Set of String) List HTTP Headers that must be included in the response.
+
+Optional:
+
+- `enabled` (Boolean)
 
 
 <a id="nestedblock--options--cors"></a>
@@ -133,11 +193,49 @@ Optional:
 
 Required:
 
-- **value** (Set of String)
+- `value` (Set of String) Specify a value of the Access-Control-Allow-Origin header. Possible values: '*', '$http_origin', 'example.com'.
 
 Optional:
 
-- **enabled** (Boolean)
+- `always` (Boolean) Specify if the Access-Control-Allow-Origin header should be added to a response from CDN regardless of response code.
+- `enabled` (Boolean)
+
+
+<a id="nestedblock--options--country_acl"></a>
+### Nested Schema for `options.country_acl`
+
+Required:
+
+- `excepted_values` (Set of String) List of countries according to ISO-3166-1.
+- `policy_type` (String) Possible values: allow, deny.
+
+Optional:
+
+- `enabled` (Boolean)
+
+
+<a id="nestedblock--options--disable_cache"></a>
+### Nested Schema for `options.disable_cache`
+
+Required:
+
+- `value` (Boolean)
+
+Optional:
+
+- `enabled` (Boolean)
+
+
+<a id="nestedblock--options--disable_proxy_force_ranges"></a>
+### Nested Schema for `options.disable_proxy_force_ranges`
+
+Required:
+
+- `value` (Boolean)
+
+Optional:
+
+- `enabled` (Boolean)
 
 
 <a id="nestedblock--options--edge_cache_settings"></a>
@@ -145,10 +243,34 @@ Optional:
 
 Optional:
 
-- **custom_values** (Map of String) Caching time for a response with specific codes. These settings have a higher priority than the value field. Response code ('304', '404' for example). Use 'any' to specify caching time for all response codes. Caching time in seconds ('0s', '600s' for example). Use '0s' to disable caching for a specific response code.
-- **default** (String) Content will be cached according to origin cache settings. The value applies for a response with codes 200, 201, 204, 206, 301, 302, 303, 304, 307, 308 if an origin server does not have caching HTTP headers. Responses with other codes will not be cached.
-- **enabled** (Boolean)
-- **value** (String) Caching time for a response with codes 200, 206, 301, 302. Responses with codes 4xx, 5xx will not be cached. Use '0s' disable to caching. Use custom_values field to specify a custom caching time for a response with specific codes.
+- `custom_values` (Map of String) Specify caching time in seconds ('0s', '600s' for example) for a response with specific response code ('304', '404' for example). Use 'any' to specify caching time for all response codes. Use '0s' to disable caching for a specific response code. These settings have a higher priority than the value field.
+- `default` (String) Content will be cached according to origin cache settings. The value applies for a response with codes 200, 201, 204, 206, 301, 302, 303, 304, 307, 308, if an origin server does not have caching HTTP headers. Responses with other codes will not be cached.
+- `enabled` (Boolean)
+- `value` (String) Specify caching time for the response with codes 200, 206, 301, 302. Responses with codes 4xx, 5xx will not be cached. Use '0s' to disable caching. Use custom_values field to specify a custom caching time for a response with specific codes.
+
+
+<a id="nestedblock--options--fetch_compressed"></a>
+### Nested Schema for `options.fetch_compressed`
+
+Required:
+
+- `value` (Boolean)
+
+Optional:
+
+- `enabled` (Boolean)
+
+
+<a id="nestedblock--options--follow_origin_redirect"></a>
+### Nested Schema for `options.follow_origin_redirect`
+
+Required:
+
+- `codes` (Set of Number) Specify the redirect status code that the origin server returns. Possible values: 301, 302, 303, 307, 308.
+
+Optional:
+
+- `enabled` (Boolean)
 
 
 <a id="nestedblock--options--force_return"></a>
@@ -156,12 +278,24 @@ Optional:
 
 Required:
 
-- **code** (Number) HTTP response status code. Available codes: 100 <= value <= 599. Reserved codes: 408, 444, 477, 494, 495, 496, 497, 499
+- `code` (Number) HTTP response status code. Available codes: 100 <= value <= 599. Reserved codes: 408, 444, 477, 494, 495, 496, 497, 499
 
 Optional:
 
-- **body** (String) Response text or URL if you're going to set up redirection. Max length = 100.
-- **enabled** (Boolean)
+- `body` (String) Response text or URL if you're going to set up redirection. Max length = 100.
+- `enabled` (Boolean)
+
+
+<a id="nestedblock--options--forward_host_header"></a>
+### Nested Schema for `options.forward_host_header`
+
+Required:
+
+- `value` (Boolean)
+
+Optional:
+
+- `enabled` (Boolean)
 
 
 <a id="nestedblock--options--gzip_on"></a>
@@ -169,11 +303,11 @@ Optional:
 
 Required:
 
-- **value** (Boolean)
+- `value` (Boolean)
 
 Optional:
 
-- **enabled** (Boolean)
+- `enabled` (Boolean)
 
 
 <a id="nestedblock--options--host_header"></a>
@@ -181,11 +315,35 @@ Optional:
 
 Required:
 
-- **value** (String)
+- `value` (String)
 
 Optional:
 
-- **enabled** (Boolean)
+- `enabled` (Boolean)
+
+
+<a id="nestedblock--options--http3_enabled"></a>
+### Nested Schema for `options.http3_enabled`
+
+Required:
+
+- `value` (Boolean)
+
+Optional:
+
+- `enabled` (Boolean)
+
+
+<a id="nestedblock--options--ignore_cookie"></a>
+### Nested Schema for `options.ignore_cookie`
+
+Required:
+
+- `value` (Boolean)
+
+Optional:
+
+- `enabled` (Boolean)
 
 
 <a id="nestedblock--options--ignore_query_string"></a>
@@ -193,11 +351,65 @@ Optional:
 
 Required:
 
-- **value** (Boolean)
+- `value` (Boolean)
 
 Optional:
 
-- **enabled** (Boolean)
+- `enabled` (Boolean)
+
+
+<a id="nestedblock--options--image_stack"></a>
+### Nested Schema for `options.image_stack`
+
+Required:
+
+- `quality` (Number) Quality settings for JPG and PNG images. Specify a value from 1 to 100. The higher the value, the better the image quality and the larger the file size after conversion.
+
+Optional:
+
+- `avif_enabled` (Boolean) If enabled, JPG and PNG images automatically convert to AVIF format when supported by the end users browser.
+- `enabled` (Boolean)
+- `png_lossless` (Boolean) Represents compression without quality loss for PNG format.
+- `webp_enabled` (Boolean) If enabled, JPG and PNG images automatically convert to WebP format when supported by the end users browser.
+
+
+<a id="nestedblock--options--ip_address_acl"></a>
+### Nested Schema for `options.ip_address_acl`
+
+Required:
+
+- `excepted_values` (Set of String) Specify list of IP address with a subnet mask.
+- `policy_type` (String) Possible values: allow, deny.
+
+Optional:
+
+- `enabled` (Boolean)
+
+
+<a id="nestedblock--options--limit_bandwidth"></a>
+### Nested Schema for `options.limit_bandwidth`
+
+Required:
+
+- `limit_type` (String) The way of controlling the download speed per each connection. Possible values are: static, dynamic.
+
+Optional:
+
+- `buffer` (Number) Amount of downloaded data after which the user will be rate limited.
+- `enabled` (Boolean)
+- `speed` (Number) Maximum download speed per connection. Must be greater than 0.
+
+
+<a id="nestedblock--options--proxy_cache_methods_set"></a>
+### Nested Schema for `options.proxy_cache_methods_set`
+
+Required:
+
+- `value` (Boolean)
+
+Optional:
+
+- `enabled` (Boolean)
 
 
 <a id="nestedblock--options--query_params_blacklist"></a>
@@ -205,11 +417,11 @@ Optional:
 
 Required:
 
-- **value** (Set of String)
+- `value` (Set of String)
 
 Optional:
 
-- **enabled** (Boolean)
+- `enabled` (Boolean)
 
 
 <a id="nestedblock--options--query_params_whitelist"></a>
@@ -217,11 +429,11 @@ Optional:
 
 Required:
 
-- **value** (Set of String)
+- `value` (Set of String)
 
 Optional:
 
-- **enabled** (Boolean)
+- `enabled` (Boolean)
 
 
 <a id="nestedblock--options--redirect_http_to_https"></a>
@@ -229,11 +441,36 @@ Optional:
 
 Required:
 
-- **value** (Boolean)
+- `value` (Boolean)
 
 Optional:
 
-- **enabled** (Boolean)
+- `enabled` (Boolean)
+
+
+<a id="nestedblock--options--redirect_https_to_http"></a>
+### Nested Schema for `options.redirect_https_to_http`
+
+Required:
+
+- `value` (Boolean)
+
+Optional:
+
+- `enabled` (Boolean)
+
+
+<a id="nestedblock--options--referrer_acl"></a>
+### Nested Schema for `options.referrer_acl`
+
+Required:
+
+- `excepted_values` (Set of String) Specify list of domain names or wildcard domains (without http:// or https://). For example, example.com or *.example.com.
+- `policy_type` (String) Possible values: allow, deny.
+
+Optional:
+
+- `enabled` (Boolean)
 
 
 <a id="nestedblock--options--request_limiter"></a>
@@ -241,14 +478,27 @@ Optional:
 
 Required:
 
-- **burst** (Number)
-- **rate** (Number)
+- `burst` (Number)
+- `rate` (Number)
 
 Optional:
 
-- **delay** (Number)
-- **enabled** (Boolean)
-- **rate_unit** (String)
+- `delay` (Number)
+- `enabled` (Boolean)
+- `rate_unit` (String)
+
+
+<a id="nestedblock--options--response_headers_hiding_policy"></a>
+### Nested Schema for `options.response_headers_hiding_policy`
+
+Required:
+
+- `excepted` (Set of String) List of HTTP headers. The following required headers cannot be hidden from response: Connection, Content-Length, Content-Type, Date, Server.
+- `mode` (String) Specify a mode of hiding HTTP headers from the response. Possible values are: hide, show.
+
+Optional:
+
+- `enabled` (Boolean)
 
 
 <a id="nestedblock--options--rewrite"></a>
@@ -256,12 +506,37 @@ Optional:
 
 Required:
 
-- **body** (String)
+- `body` (String) The pattern for Rewrite. At least one group should be specified. For Example: /rewrite_from/(.*) /rewrite_to/$1
 
 Optional:
 
-- **enabled** (Boolean)
-- **flag** (String)
+- `enabled` (Boolean)
+- `flag` (String) Define flag for the Rewrite option. Possible values: last, break, redirect, permanent.
+
+
+<a id="nestedblock--options--secure_key"></a>
+### Nested Schema for `options.secure_key`
+
+Required:
+
+- `key` (String) A key generated on your side that will be used for URL signing.
+- `type` (Number) Specify the type of URL Signing. It can be either 0 or 2. Type 0 - includes end user's IP to secure token generation. Type 2 - excludes end user's IP from secure token generation.
+
+Optional:
+
+- `enabled` (Boolean)
+
+
+<a id="nestedblock--options--slice"></a>
+### Nested Schema for `options.slice`
+
+Required:
+
+- `value` (Boolean)
+
+Optional:
+
+- `enabled` (Boolean)
 
 
 <a id="nestedblock--options--sni"></a>
@@ -269,9 +544,21 @@ Optional:
 
 Optional:
 
-- **custom_hostname** (String) Required to set custom hostname in case sni-type='custom'
-- **enabled** (Boolean)
-- **sni_type** (String) Available values 'dynamic' or 'custom'
+- `custom_hostname` (String) Custom SNI hostname. Required if sni_type is set to 'custom'.
+- `enabled` (Boolean)
+- `sni_type` (String) Specify SNI type. Possible values: dynamic, custom. dynamic - SNI hostname depends on the hostHeader and the forward_host_header options. custom - custom SNI hostname.
+
+
+<a id="nestedblock--options--stale"></a>
+### Nested Schema for `options.stale`
+
+Required:
+
+- `value` (Set of String) Possible values: error, http_403, http_404, http_429, http_500, http_502, http_503, http_504, invalid_header, timeout, updating.
+
+Optional:
+
+- `enabled` (Boolean)
 
 
 <a id="nestedblock--options--static_headers"></a>
@@ -279,11 +566,11 @@ Optional:
 
 Required:
 
-- **value** (Map of String)
+- `value` (Map of String)
 
 Optional:
 
-- **enabled** (Boolean)
+- `enabled` (Boolean)
 
 
 <a id="nestedblock--options--static_request_headers"></a>
@@ -291,11 +578,36 @@ Optional:
 
 Required:
 
-- **value** (Map of String)
+- `value` (Map of String) Header name is restricted to 255 symbols and can contain latin letters (A-Z, a-z), numbers (0-9), dashes, and underscores. Header value is restricted to 512 symbols and can contain latin letters (a-z), numbers (0-9), spaces, underscores and symbols (-/.:). Space can be used only between words.
 
 Optional:
 
-- **enabled** (Boolean)
+- `enabled` (Boolean)
+
+
+<a id="nestedblock--options--static_response_headers"></a>
+### Nested Schema for `options.static_response_headers`
+
+Required:
+
+- `value` (Block List, Min: 1) (see [below for nested schema](#nestedblock--options--static_response_headers--value))
+
+Optional:
+
+- `enabled` (Boolean)
+
+<a id="nestedblock--options--static_response_headers--value"></a>
+### Nested Schema for `options.static_response_headers.value`
+
+Required:
+
+- `name` (String) Header name.
+- `value` (Set of String) Header value.
+
+Optional:
+
+- `always` (Boolean) Specifies if the header will be added to a response from CDN regardless of response code.
+
 
 
 <a id="nestedblock--options--tls_versions"></a>
@@ -303,11 +615,23 @@ Optional:
 
 Required:
 
-- **value** (Set of String)
+- `value` (Set of String) Possible values (case sensitive): SSLv3, TLSv1, TLSv1.1, TLSv1.2, TLSv1.3.
 
 Optional:
 
-- **enabled** (Boolean)
+- `enabled` (Boolean)
+
+
+<a id="nestedblock--options--use_default_le_chain"></a>
+### Nested Schema for `options.use_default_le_chain`
+
+Required:
+
+- `value` (Boolean)
+
+Optional:
+
+- `enabled` (Boolean)
 
 
 <a id="nestedblock--options--use_rsa_le_cert"></a>
@@ -315,11 +639,24 @@ Optional:
 
 Required:
 
-- **value** (Boolean)
+- `value` (Boolean)
 
 Optional:
 
-- **enabled** (Boolean)
+- `enabled` (Boolean)
+
+
+<a id="nestedblock--options--user_agent_acl"></a>
+### Nested Schema for `options.user_agent_acl`
+
+Required:
+
+- `excepted_values` (Set of String) List of User-Agents. Use "" to allow/deny access when the User-Agent header is empty.
+- `policy_type` (String) Possible values: allow, deny.
+
+Optional:
+
+- `enabled` (Boolean)
 
 
 <a id="nestedblock--options--webp"></a>
@@ -327,13 +664,13 @@ Optional:
 
 Required:
 
-- **jpg_quality** (Number)
-- **png_quality** (Number)
+- `jpg_quality` (Number)
+- `png_quality` (Number)
 
 Optional:
 
-- **enabled** (Boolean)
-- **png_lossless** (Boolean)
+- `enabled` (Boolean)
+- `png_lossless` (Boolean)
 
 
 <a id="nestedblock--options--websockets"></a>
@@ -341,10 +678,8 @@ Optional:
 
 Required:
 
-- **value** (Boolean)
+- `value` (Boolean)
 
 Optional:
 
-- **enabled** (Boolean)
-
-
+- `enabled` (Boolean)
