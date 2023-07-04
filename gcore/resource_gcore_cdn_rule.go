@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"strconv"
+	"strings"
 
 	"github.com/AlekSi/pointer"
 	"github.com/G-Core/gcorelabscdn-go/rules"
@@ -12,10 +13,35 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 )
 
+func resourceCDNRuleImportParseId(id string) (string, string, error) {
+	parts := strings.SplitN(id, ":", 2)
+
+	if len(parts) != 2 || parts[0] == "" || parts[1] == "" {
+		return "", "", fmt.Errorf("unexpected format of ID (%s), expected resource_id:rule_id", id)
+	}
+
+	return parts[0], parts[1], nil
+}
+
 func resourceCDNRule() *schema.Resource {
 	return &schema.Resource{
 		Importer: &schema.ResourceImporter{
-			StateContext: schema.ImportStatePassthroughContext,
+			State: func(d *schema.ResourceData, meta any) ([]*schema.ResourceData, error) {
+				resource_id, rule_id, err := resourceCDNRuleImportParseId(d.Id())
+				if err != nil {
+					return nil, err
+				}
+
+				rid, err := strconv.ParseInt(resource_id, 10, 64)
+				if err != nil {
+					return nil, fmt.Errorf("unexpected format of resource_id (%s), expected number", resource_id)
+				}
+
+				d.Set("resource_id", rid)
+				d.SetId(rule_id)
+
+				return []*schema.ResourceData{d}, nil
+			},
 		},
 		Schema: map[string]*schema.Schema{
 			"resource_id": {

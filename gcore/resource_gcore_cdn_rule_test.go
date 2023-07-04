@@ -72,6 +72,11 @@ resource "gcore_cdn_rule" "acctest" {
 					resource.TestCheckResourceAttr(fullName, "options.0.host_header.0.value", "rule-host.com"),
 				),
 			},
+			{
+				ResourceName:      "gcore_cdn_rule.acctest",
+				ImportState:       true,
+				ImportStateVerify: true,
+			},
 		},
 	})
 }
