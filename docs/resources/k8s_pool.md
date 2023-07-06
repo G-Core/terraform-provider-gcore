@@ -35,37 +35,37 @@ resource "gcore_k8s_pool" "v" {
 
 ### Required
 
-- **cluster_id** (String)
-- **flavor_id** (String)
-- **max_node_count** (Number)
-- **min_node_count** (Number)
-- **name** (String)
-- **node_count** (Number)
+- `cluster_id` (String)
+- `flavor_id` (String)
+- `max_node_count` (Number)
+- `min_node_count` (Number)
+- `name` (String)
+- `node_count` (Number)
 
 ### Optional
 
-- **docker_volume_size** (Number)
-- **docker_volume_type** (String) Available value is 'standard', 'ssd_hiiops', 'cold', 'ultra'.
-- **id** (String) The ID of this resource.
-- **last_updated** (String)
-- **project_id** (Number)
-- **project_name** (String)
-- **region_id** (Number)
-- **region_name** (String)
-- **timeouts** (Block, Optional) (see [below for nested schema](#nestedblock--timeouts))
+- `docker_volume_size` (Number)
+- `docker_volume_type` (String) Available value is 'standard', 'ssd_hiiops', 'cold', 'ultra'.
+- `last_updated` (String)
+- `project_id` (Number)
+- `project_name` (String)
+- `region_id` (Number)
+- `region_name` (String)
+- `timeouts` (Block, Optional) (see [below for nested schema](#nestedblock--timeouts))
 
 ### Read-Only
 
-- **created_at** (String)
-- **stack_id** (String)
+- `created_at` (String)
+- `id` (String) The ID of this resource.
+- `stack_id` (String)
 
 <a id="nestedblock--timeouts"></a>
 ### Nested Schema for `timeouts`
 
 Optional:
 
-- **create** (String)
-- **update** (String)
+- `create` (String)
+- `update` (String)
 
 ## Import
 

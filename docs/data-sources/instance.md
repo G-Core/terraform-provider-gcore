@@ -41,42 +41,42 @@ output "view" {
 
 ### Required
 
-- **name** (String)
+- `name` (String)
 
 ### Optional
 
-- **id** (String) The ID of this resource.
-- **project_id** (Number)
-- **project_name** (String)
-- **region_id** (Number)
-- **region_name** (String)
+- `project_id` (Number)
+- `project_name` (String)
+- `region_id` (Number)
+- `region_name` (String)
 
 ### Read-Only
 
-- **addresses** (List of Object) (see [below for nested schema](#nestedatt--addresses))
-- **flavor** (Map of String)
-- **flavor_id** (String)
-- **interface** (List of Object) (see [below for nested schema](#nestedatt--interface))
-- **metadata** (List of Object) (see [below for nested schema](#nestedatt--metadata))
-- **security_group** (List of Object) Firewalls list (see [below for nested schema](#nestedatt--security_group))
-- **status** (String)
-- **vm_state** (String)
-- **volume** (Set of Object) (see [below for nested schema](#nestedatt--volume))
+- `addresses` (List of Object) (see [below for nested schema](#nestedatt--addresses))
+- `flavor` (Map of String)
+- `flavor_id` (String)
+- `id` (String) The ID of this resource.
+- `interface` (List of Object) (see [below for nested schema](#nestedatt--interface))
+- `metadata` (List of Object) (see [below for nested schema](#nestedatt--metadata))
+- `security_group` (List of Object) Firewalls list (see [below for nested schema](#nestedatt--security_group))
+- `status` (String)
+- `vm_state` (String)
+- `volume` (Set of Object) (see [below for nested schema](#nestedatt--volume))
 
 <a id="nestedatt--addresses"></a>
 ### Nested Schema for `addresses`
 
 Read-Only:
 
-- **net** (List of Object) (see [below for nested schema](#nestedobjatt--addresses--net))
+- `net` (List of Object) (see [below for nested schema](#nestedobjatt--addresses--net))
 
 <a id="nestedobjatt--addresses--net"></a>
 ### Nested Schema for `addresses.net`
 
 Read-Only:
 
-- **addr** (String)
-- **type** (String)
+- `addr` (String)
+- `type` (String)
 
 
 
@@ -85,10 +85,10 @@ Read-Only:
 
 Read-Only:
 
-- **ip_address** (String)
-- **network_id** (String)
-- **port_id** (String)
-- **subnet_id** (String)
+- `ip_address` (String)
+- `network_id` (String)
+- `port_id` (String)
+- `subnet_id` (String)
 
 
 <a id="nestedatt--metadata"></a>
@@ -96,8 +96,8 @@ Read-Only:
 
 Read-Only:
 
-- **key** (String)
-- **value** (String)
+- `key` (String)
+- `value` (String)
 
 
 <a id="nestedatt--security_group"></a>
@@ -105,7 +105,7 @@ Read-Only:
 
 Read-Only:
 
-- **name** (String)
+- `name` (String)
 
 
 <a id="nestedatt--volume"></a>
@@ -113,7 +113,5 @@ Read-Only:
 
 Read-Only:
 
-- **delete_on_termination** (Boolean)
-- **volume_id** (String)
-
-
+- `delete_on_termination` (Boolean)
+- `volume_id` (String)

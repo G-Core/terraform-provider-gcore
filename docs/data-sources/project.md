@@ -27,10 +27,8 @@ data "gcore_project" "pr" {
 
 ### Required
 
-- **name** (String) Displayed project name
+- `name` (String) Displayed project name
 
-### Optional
+### Read-Only
 
-- **id** (String) The ID of this resource.
-
-
+- `id` (String) The ID of this resource.

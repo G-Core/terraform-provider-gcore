@@ -17,49 +17,49 @@ Represents DDoS protection profile
 
 ### Required
 
-- **bm_instance_id** (String)
-- **ip_address** (String) IP address
-- **profile_template** (Number) Profile template ID
+- `bm_instance_id` (String)
+- `ip_address` (String) IP address
+- `profile_template` (Number) Profile template ID
 
 ### Optional
 
-- **active** (Boolean) Activate profile
-- **bgp** (Boolean) Activate BGP protocol
-- **fields** (Block List) (see [below for nested schema](#nestedblock--fields))
-- **id** (String) The ID of this resource.
-- **last_updated** (String)
-- **project_id** (Number)
-- **project_name** (String)
-- **region_id** (Number)
-- **region_name** (String)
+- `active` (Boolean) Activate profile
+- `bgp` (Boolean) Activate BGP protocol
+- `fields` (Block List) (see [below for nested schema](#nestedblock--fields))
+- `last_updated` (String)
+- `project_id` (Number)
+- `project_name` (String)
+- `region_id` (Number)
+- `region_name` (String)
 
 ### Read-Only
 
-- **price** (String)
-- **protocols** (List of Object) List of protocols (see [below for nested schema](#nestedatt--protocols))
-- **site** (String)
+- `id` (String) The ID of this resource.
+- `price` (String)
+- `protocols` (List of Object) List of protocols (see [below for nested schema](#nestedatt--protocols))
+- `site` (String)
 
 <a id="nestedblock--fields"></a>
 ### Nested Schema for `fields`
 
 Required:
 
-- **base_field** (Number)
+- `base_field` (Number)
 
 Optional:
 
-- **field_value** (String) Complex value. Only one of 'value' or 'field_value' must be specified.
-- **value** (String) Basic type value. Only one of 'value' or 'field_value' must be specified.
+- `field_value` (String) Complex value. Only one of 'value' or 'field_value' must be specified.
+- `value` (String) Basic type value. Only one of 'value' or 'field_value' must be specified.
 
 Read-Only:
 
-- **default** (String)
-- **description** (String) Field description
-- **field_type** (String)
-- **id** (Number) The ID of this resource.
-- **name** (String)
-- **required** (Boolean)
-- **validation_schema** (String) Json schema to validate field_values
+- `default` (String)
+- `description` (String) Field description
+- `field_type` (String)
+- `id` (Number) The ID of this resource.
+- `name` (String)
+- `required` (Boolean)
+- `validation_schema` (String) Json schema to validate field_values
 
 
 <a id="nestedatt--protocols"></a>
@@ -67,7 +67,5 @@ Read-Only:
 
 Read-Only:
 
-- **port** (String)
-- **protocols** (List of String)
-
-
+- `port` (String)
+- `protocols` (List of String)

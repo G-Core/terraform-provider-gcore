@@ -217,16 +217,16 @@ resource "gcore_lbmember" "lbm2" {
 
 ### Optional
 
-- **api_endpoint** (String) A single API endpoint for all products. Will be used when specific product API url is not defined.
-- **gcore_api** (String, Deprecated) Region API
-- **gcore_cdn_api** (String) CDN API (define only if you want to override CDN API endpoint)
-- **gcore_client_id** (String) Client id
-- **gcore_cloud_api** (String) Region API (define only if you want to override Region API endpoint)
-- **gcore_dns_api** (String) DNS API (define only if you want to override DNS API endpoint)
-- **gcore_platform** (String, Deprecated) Platform URL is used for generate JWT
-- **gcore_platform_api** (String) Platform URL is used for generate JWT (define only if you want to override Platform API endpoint)
-- **gcore_storage_api** (String) Storage API (define only if you want to override Storage API endpoint)
-- **ignore_creds_auth_error** (Boolean, Deprecated) Should be set to true when you are gonna to use storage resource with permanent API-token only.
-- **password** (String, Deprecated)
-- **permanent_api_token** (String, Sensitive) A permanent [API-token](https://gcore.com/docs/account-settings/create-use-or-delete-a-permanent-api-token)
-- **user_name** (String, Deprecated)
+- `api_endpoint` (String) A single API endpoint for all products. Will be used when specific product API url is not defined.
+- `gcore_api` (String, Deprecated) Region API
+- `gcore_cdn_api` (String) CDN API (define only if you want to override CDN API endpoint)
+- `gcore_client_id` (String) Client id
+- `gcore_cloud_api` (String) Region API (define only if you want to override Region API endpoint)
+- `gcore_dns_api` (String) DNS API (define only if you want to override DNS API endpoint)
+- `gcore_platform` (String, Deprecated) Platform URL is used for generate JWT
+- `gcore_platform_api` (String) Platform URL is used for generate JWT (define only if you want to override Platform API endpoint)
+- `gcore_storage_api` (String) Storage API (define only if you want to override Storage API endpoint)
+- `ignore_creds_auth_error` (Boolean, Deprecated) Should be set to true when you are gonna to use storage resource with permanent API-token only.
+- `password` (String, Deprecated)
+- `permanent_api_token` (String, Sensitive) A permanent [API-token](https://gcore.com/docs/account-settings/create-use-or-delete-a-permanent-api-token)
+- `user_name` (String, Deprecated)

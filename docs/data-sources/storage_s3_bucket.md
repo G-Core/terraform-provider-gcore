@@ -28,11 +28,9 @@ data "gcore_storage_s3_bucket" "example_s3_bucket" {
 
 ### Required
 
-- **name** (String) A name of storage bucket resource.
-- **storage_id** (Number) An id of existing storage resource.
+- `name` (String) A name of storage bucket resource.
+- `storage_id` (Number) An id of existing storage resource.
 
-### Optional
+### Read-Only
 
-- **id** (String) The ID of this resource.
-
-
+- `id` (String) The ID of this resource.

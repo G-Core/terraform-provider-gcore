@@ -39,37 +39,37 @@ resource "gcore_lblistener" "listener" {
 
 ### Required
 
-- **loadbalancer_id** (String)
-- **name** (String)
-- **protocol** (String) Available values is 'HTTP', 'HTTPS', 'TCP', 'UDP', 'TERMINATED_HTTPS'
-- **protocol_port** (Number)
+- `loadbalancer_id` (String)
+- `name` (String)
+- `protocol` (String) Available values is 'HTTP', 'HTTPS', 'TCP', 'UDP', 'TERMINATED_HTTPS'
+- `protocol_port` (Number)
 
 ### Optional
 
-- **id** (String) The ID of this resource.
-- **insert_x_forwarded** (Boolean) Insert *-forwarded headers
-- **last_updated** (String)
-- **project_id** (Number)
-- **project_name** (String)
-- **region_id** (Number)
-- **region_name** (String)
-- **secret_id** (String)
-- **sni_secret_id** (List of String)
-- **timeouts** (Block, Optional) (see [below for nested schema](#nestedblock--timeouts))
+- `insert_x_forwarded` (Boolean) Insert *-forwarded headers
+- `last_updated` (String)
+- `project_id` (Number)
+- `project_name` (String)
+- `region_id` (Number)
+- `region_name` (String)
+- `secret_id` (String)
+- `sni_secret_id` (List of String)
+- `timeouts` (Block, Optional) (see [below for nested schema](#nestedblock--timeouts))
 
 ### Read-Only
 
-- **operating_status** (String)
-- **pool_count** (Number)
-- **provisioning_status** (String)
+- `id` (String) The ID of this resource.
+- `operating_status` (String)
+- `pool_count` (Number)
+- `provisioning_status` (String)
 
 <a id="nestedblock--timeouts"></a>
 ### Nested Schema for `timeouts`
 
 Optional:
 
-- **create** (String)
-- **delete** (String)
+- `create` (String)
+- `delete` (String)
 
 ## Import
 

@@ -116,42 +116,45 @@ resource "gcore_dns_zone_record" "sobdomain_examplezone_https" {
 
 ### Required
 
-- **domain** (String) A domain of DNS Zone Record resource.
-- **resource_record** (Block Set, Min: 1) An array of contents with meta of DNS Zone Record resource. (see [below for nested schema](#nestedblock--resource_record))
-- **type** (String) A type of DNS Zone Record resource.
-- **zone** (String) A zone of DNS Zone Record resource.
+- `domain` (String) A domain of DNS Zone Record resource.
+- `resource_record` (Block Set, Min: 1) An array of contents with meta of DNS Zone Record resource. (see [below for nested schema](#nestedblock--resource_record))
+- `type` (String) A type of DNS Zone Record resource.
+- `zone` (String) A zone of DNS Zone Record resource.
 
 ### Optional
 
-- **filter** (Block Set) (see [below for nested schema](#nestedblock--filter))
-- **id** (String) The ID of this resource.
-- **timeouts** (Block, Optional) (see [below for nested schema](#nestedblock--timeouts))
-- **ttl** (Number) A ttl of DNS Zone Record resource.
+- `filter` (Block Set) (see [below for nested schema](#nestedblock--filter))
+- `timeouts` (Block, Optional) (see [below for nested schema](#nestedblock--timeouts))
+- `ttl` (Number) A ttl of DNS Zone Record resource.
+
+### Read-Only
+
+- `id` (String) The ID of this resource.
 
 <a id="nestedblock--resource_record"></a>
 ### Nested Schema for `resource_record`
 
 Required:
 
-- **content** (String) A content of DNS Zone Record resource. (TXT: 'anyString', MX: '50 mail.company.io.', CAA: '0 issue "company.org; account=12345"')
+- `content` (String) A content of DNS Zone Record resource. (TXT: 'anyString', MX: '50 mail.company.io.', CAA: '0 issue "company.org; account=12345"')
 
 Optional:
 
-- **enabled** (Boolean) Manage of public appearing of DNS Zone Record resource.
-- **meta** (Block Set, Max: 1) (see [below for nested schema](#nestedblock--resource_record--meta))
+- `enabled` (Boolean) Manage of public appearing of DNS Zone Record resource.
+- `meta` (Block Set, Max: 1) (see [below for nested schema](#nestedblock--resource_record--meta))
 
 <a id="nestedblock--resource_record--meta"></a>
 ### Nested Schema for `resource_record.meta`
 
 Optional:
 
-- **asn** (List of Number) An asn meta (e.g. 12345) of DNS Zone Record resource.
-- **continents** (List of String) Continents meta (e.g. Asia) of DNS Zone Record resource.
-- **countries** (List of String) Countries meta (e.g. USA) of DNS Zone Record resource.
-- **default** (Boolean) Fallback meta equals true marks records which are used as a default answer (when nothing was selected by specified meta fields).
-- **ip** (List of String) An ip meta (e.g. 127.0.0.0) of DNS Zone Record resource.
-- **latlong** (List of Number) A latlong meta (e.g. 27.988056, 86.925278) of DNS Zone Record resource.
-- **notes** (List of String) A notes meta (e.g. Miami DC) of DNS Zone Record resource.
+- `asn` (List of Number) An asn meta (e.g. 12345) of DNS Zone Record resource.
+- `continents` (List of String) Continents meta (e.g. Asia) of DNS Zone Record resource.
+- `countries` (List of String) Countries meta (e.g. USA) of DNS Zone Record resource.
+- `default` (Boolean) Fallback meta equals true marks records which are used as a default answer (when nothing was selected by specified meta fields).
+- `ip` (List of String) An ip meta (e.g. 127.0.0.0) of DNS Zone Record resource.
+- `latlong` (List of Number) A latlong meta (e.g. 27.988056, 86.925278) of DNS Zone Record resource.
+- `notes` (List of String) A notes meta (e.g. Miami DC) of DNS Zone Record resource.
 
 
 
@@ -160,12 +163,12 @@ Optional:
 
 Required:
 
-- **type** (String) A DNS Zone Record filter option that describe a name of filter.
+- `type` (String) A DNS Zone Record filter option that describe a name of filter.
 
 Optional:
 
-- **limit** (Number) A DNS Zone Record filter option that describe how many records will be percolated.
-- **strict** (Boolean) A DNS Zone Record filter option that describe possibility to return answers if no records were percolated through filter.
+- `limit` (Number) A DNS Zone Record filter option that describe how many records will be percolated.
+- `strict` (Boolean) A DNS Zone Record filter option that describe possibility to return answers if no records were percolated through filter.
 
 
 <a id="nestedblock--timeouts"></a>
@@ -173,8 +176,8 @@ Optional:
 
 Optional:
 
-- **create** (String)
-- **delete** (String)
+- `create` (String)
+- `delete` (String)
 
 ## Import
 

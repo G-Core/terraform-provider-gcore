@@ -30,34 +30,34 @@ resource "gcore_reservedfixedip" "fixed_ip" {
 
 ### Required
 
-- **is_vip** (Boolean)
-- **type** (String) Available values is 'external', 'subnet', 'any_subnet', 'ip_address'
+- `is_vip` (Boolean)
+- `type` (String) Available values is 'external', 'subnet', 'any_subnet', 'ip_address'
 
 ### Optional
 
-- **allowed_address_pairs** (Block List) Group of IP addresses that share the current IP as VIP (see [below for nested schema](#nestedblock--allowed_address_pairs))
-- **fixed_ip_address** (String)
-- **id** (String) The ID of this resource.
-- **last_updated** (String)
-- **network_id** (String)
-- **project_id** (Number)
-- **project_name** (String)
-- **region_id** (Number)
-- **region_name** (String)
-- **subnet_id** (String)
+- `allowed_address_pairs` (Block List) Group of IP addresses that share the current IP as VIP (see [below for nested schema](#nestedblock--allowed_address_pairs))
+- `fixed_ip_address` (String)
+- `last_updated` (String)
+- `network_id` (String)
+- `project_id` (Number)
+- `project_name` (String)
+- `region_id` (Number)
+- `region_name` (String)
+- `subnet_id` (String)
 
 ### Read-Only
 
-- **port_id** (String) ID of the port_id underlying the reserved fixed IP
-- **status** (String)
+- `id` (String) The ID of this resource.
+- `port_id` (String) ID of the port_id underlying the reserved fixed IP
+- `status` (String)
 
 <a id="nestedblock--allowed_address_pairs"></a>
 ### Nested Schema for `allowed_address_pairs`
 
 Optional:
 
-- **ip_address** (String)
-- **mac_address** (String)
+- `ip_address` (String)
+- `mac_address` (String)
 
 ## Import
 

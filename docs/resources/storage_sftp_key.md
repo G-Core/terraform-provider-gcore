@@ -28,12 +28,13 @@ resource "gcore_storage_sftp_key" "terraform_test_key" {
 
 ### Required
 
-- **key** (String) A body of of new storage key resource.
-- **name** (String) A name of new storage key resource.
+- `key` (String) A body of of new storage key resource.
+- `name` (String) A name of new storage key resource.
 
 ### Optional
 
-- **id** (String) The ID of this resource.
-- **key_id** (Number) An id of of new storage key resource.
+- `key_id` (Number) An id of of new storage key resource.
 
+### Read-Only
 
+- `id` (String) The ID of this resource.

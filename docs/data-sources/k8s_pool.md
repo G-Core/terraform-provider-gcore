@@ -30,28 +30,26 @@ data "gcore_k8s_pool" "v" {
 
 ### Required
 
-- **cluster_id** (String)
-- **pool_id** (String)
+- `cluster_id` (String)
+- `pool_id` (String)
 
 ### Optional
 
-- **id** (String) The ID of this resource.
-- **project_id** (Number)
-- **project_name** (String)
-- **region_id** (Number)
-- **region_name** (String)
+- `project_id` (Number)
+- `project_name` (String)
+- `region_id` (Number)
+- `region_name` (String)
 
 ### Read-Only
 
-- **created_at** (String)
-- **docker_volume_size** (Number)
-- **docker_volume_type** (String) Available value is 'standard', 'ssd_hiiops', 'cold', 'ultra'.
-- **flavor_id** (String)
-- **is_default** (Boolean)
-- **max_node_count** (Number)
-- **min_node_count** (Number)
-- **name** (String)
-- **node_count** (Number)
-- **stack_id** (String)
-
-
+- `created_at` (String)
+- `docker_volume_size` (Number)
+- `docker_volume_type` (String) Available value is 'standard', 'ssd_hiiops', 'cold', 'ultra'.
+- `flavor_id` (String)
+- `id` (String) The ID of this resource.
+- `is_default` (Boolean)
+- `max_node_count` (Number)
+- `min_node_count` (Number)
+- `name` (String)
+- `node_count` (Number)
+- `stack_id` (String)

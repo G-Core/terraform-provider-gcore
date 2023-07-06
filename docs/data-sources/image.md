@@ -41,35 +41,33 @@ output "view" {
 
 ### Required
 
-- **name** (String) use 'os-version', for example 'ubuntu-20.04'
+- `name` (String) use 'os-version', for example 'ubuntu-20.04'
 
 ### Optional
 
-- **id** (String) The ID of this resource.
-- **is_baremetal** (Boolean) set to true if need to get baremetal image
-- **metadata_k** (String)
-- **metadata_kv** (Map of String)
-- **project_id** (Number)
-- **project_name** (String)
-- **region_id** (Number)
-- **region_name** (String)
+- `is_baremetal` (Boolean) set to true if need to get baremetal image
+- `metadata_k` (String)
+- `metadata_kv` (Map of String)
+- `project_id` (Number)
+- `project_name` (String)
+- `region_id` (Number)
+- `region_name` (String)
 
 ### Read-Only
 
-- **description** (String)
-- **metadata_read_only** (List of Object) (see [below for nested schema](#nestedatt--metadata_read_only))
-- **min_disk** (Number)
-- **min_ram** (Number)
-- **os_distro** (String)
-- **os_version** (String)
+- `description` (String)
+- `id` (String) The ID of this resource.
+- `metadata_read_only` (List of Object) (see [below for nested schema](#nestedatt--metadata_read_only))
+- `min_disk` (Number)
+- `min_ram` (Number)
+- `os_distro` (String)
+- `os_version` (String)
 
 <a id="nestedatt--metadata_read_only"></a>
 ### Nested Schema for `metadata_read_only`
 
 Read-Only:
 
-- **key** (String)
-- **read_only** (Boolean)
-- **value** (String)
-
-
+- `key` (String)
+- `read_only` (Boolean)
+- `value` (String)

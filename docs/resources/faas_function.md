@@ -51,34 +51,34 @@ EOF
 
 ### Required
 
-- **code_text** (String)
-- **flavor** (String)
-- **main_method** (String) Main startup method name
-- **max_instances** (Number) Autoscaling max number of instances
-- **min_instances** (Number) Autoscaling min number of instances
-- **name** (String)
-- **namespace** (String) Namespace of the function
-- **runtime** (String)
-- **timeout** (Number)
+- `code_text` (String)
+- `flavor` (String)
+- `main_method` (String) Main startup method name
+- `max_instances` (Number) Autoscaling max number of instances
+- `min_instances` (Number) Autoscaling min number of instances
+- `name` (String)
+- `namespace` (String) Namespace of the function
+- `runtime` (String)
+- `timeout` (Number)
 
 ### Optional
 
-- **description** (String)
-- **envs** (Map of String)
-- **id** (String) The ID of this resource.
-- **project_id** (Number)
-- **project_name** (String)
-- **region_id** (Number)
-- **region_name** (String)
+- `description` (String)
+- `envs` (Map of String)
+- `project_id` (Number)
+- `project_name` (String)
+- `region_id` (Number)
+- `region_name` (String)
 
 ### Read-Only
 
-- **build_message** (String)
-- **build_status** (String)
-- **created_at** (String)
-- **deploy_status** (Map of Number)
-- **endpoint** (String)
-- **status** (String)
+- `build_message` (String)
+- `build_status` (String)
+- `created_at` (String)
+- `deploy_status` (Map of Number)
+- `endpoint` (String)
+- `id` (String) The ID of this resource.
+- `status` (String)
 
 ## Import
 

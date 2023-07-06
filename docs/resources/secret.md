@@ -34,28 +34,28 @@ resource "gcore_secret" "lb_https" {
 
 ### Required
 
-- **certificate** (String) SSL certificate in PEM format
-- **certificate_chain** (String) SSL certificate chain of intermediates and root certificates in PEM format
-- **name** (String)
-- **private_key** (String) SSL private key in PEM format
+- `certificate` (String) SSL certificate in PEM format
+- `certificate_chain` (String) SSL certificate chain of intermediates and root certificates in PEM format
+- `name` (String)
+- `private_key` (String) SSL private key in PEM format
 
 ### Optional
 
-- **expiration** (String) Datetime when the secret will expire. The format is 2025-12-28T19:14:44
-- **id** (String) The ID of this resource.
-- **project_id** (Number)
-- **project_name** (String)
-- **region_id** (Number)
-- **region_name** (String)
+- `expiration` (String) Datetime when the secret will expire. The format is 2025-12-28T19:14:44
+- `project_id` (Number)
+- `project_name` (String)
+- `region_id` (Number)
+- `region_name` (String)
 
 ### Read-Only
 
-- **algorithm** (String)
-- **bit_length** (Number)
-- **content_types** (Map of String)
-- **created** (String) Datetime when the secret was created. The format is 2025-12-28T19:14:44.180394
-- **mode** (String)
-- **status** (String)
+- `algorithm` (String)
+- `bit_length` (Number)
+- `content_types` (Map of String)
+- `created` (String) Datetime when the secret was created. The format is 2025-12-28T19:14:44.180394
+- `id` (String) The ID of this resource.
+- `mode` (String)
+- `status` (String)
 
 ## Import
 

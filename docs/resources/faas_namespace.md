@@ -33,22 +33,22 @@ resource "gcore_faas_namespace" "ns" {
 
 ### Required
 
-- **name** (String)
+- `name` (String)
 
 ### Optional
 
-- **description** (String)
-- **envs** (Map of String)
-- **id** (String) The ID of this resource.
-- **project_id** (Number)
-- **project_name** (String)
-- **region_id** (Number)
-- **region_name** (String)
+- `description` (String)
+- `envs` (Map of String)
+- `project_id` (Number)
+- `project_name` (String)
+- `region_id` (Number)
+- `region_name` (String)
 
 ### Read-Only
 
-- **created_at** (String)
-- **status** (String)
+- `created_at` (String)
+- `id` (String) The ID of this resource.
+- `status` (String)
 
 ## Import
 

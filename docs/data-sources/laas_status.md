@@ -40,15 +40,13 @@ output "view" {
 
 ### Optional
 
-- **id** (String) The ID of this resource.
-- **project_id** (Number)
-- **project_name** (String)
-- **region_id** (Number)
-- **region_name** (String)
+- `project_id` (Number)
+- `project_name` (String)
+- `region_id` (Number)
+- `region_name` (String)
 
 ### Read-Only
 
-- **is_initialized** (Boolean)
-- **namespace** (String)
-
-
+- `id` (String) The ID of this resource.
+- `is_initialized` (Boolean)
+- `namespace` (String)

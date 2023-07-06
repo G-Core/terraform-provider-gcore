@@ -29,21 +29,22 @@ resource "gcore_storage_sftp" "example_sftp" {
 
 ### Required
 
-- **location** (String) A location of new storage resource. One of (ams, sin, fra, mia)
-- **name** (String) A name of new storage resource.
+- `location` (String) A location of new storage resource. One of (ams, sin, fra, mia)
+- `name` (String) A name of new storage resource.
 
 ### Optional
 
-- **client_id** (Number) An client id of new storage resource.
-- **generated_http_endpoint** (String) A http sftp entry point for new storage resource.
-- **generated_password** (Boolean) An auto generated sftp password for new storage resource.
-- **generated_sftp_endpoint** (String) A ssh sftp entry point for new storage resource.
-- **http_expires_header_value** (String) A expires date of storage resource.
-- **http_servername_alias** (String) An alias of storage resource.
-- **id** (String) The ID of this resource.
-- **password** (String) A sftp password for new storage resource.
-- **ssh_key_id** (List of Number) An ssh keys IDs to link with new sftp storage resource only. https://storage.gcore.com/ssh-key/list
-- **storage_id** (Number) An id of new storage resource.
-- **update_after_create** (Boolean) A temporary flag. An internal cheat, to skip update ssh keys. Skip it.
+- `client_id` (Number) An client id of new storage resource.
+- `generated_http_endpoint` (String) A http sftp entry point for new storage resource.
+- `generated_password` (Boolean) An auto generated sftp password for new storage resource.
+- `generated_sftp_endpoint` (String) A ssh sftp entry point for new storage resource.
+- `http_expires_header_value` (String) A expires date of storage resource.
+- `http_servername_alias` (String) An alias of storage resource.
+- `password` (String) A sftp password for new storage resource.
+- `ssh_key_id` (List of Number) An ssh keys IDs to link with new sftp storage resource only. https://storage.gcore.com/ssh-key/list
+- `storage_id` (Number) An id of new storage resource.
+- `update_after_create` (Boolean) A temporary flag. An internal cheat, to skip update ssh keys. Skip it.
 
+### Read-Only
 
+- `id` (String) The ID of this resource.

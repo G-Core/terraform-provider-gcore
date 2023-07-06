@@ -41,30 +41,28 @@ output "view" {
 
 ### Optional
 
-- **id** (String) The ID of this resource.
-- **name** (String) Template name
-- **project_id** (Number)
-- **project_name** (String)
-- **region_id** (Number)
-- **region_name** (String)
-- **template_id** (Number) Template id
+- `name` (String) Template name
+- `project_id` (Number)
+- `project_name` (String)
+- `region_id` (Number)
+- `region_name` (String)
+- `template_id` (Number) Template id
 
 ### Read-Only
 
-- **description** (String) Template description
-- **fields** (List of Object) Additional fields (see [below for nested schema](#nestedatt--fields))
+- `description` (String) Template description
+- `fields` (List of Object) Additional fields (see [below for nested schema](#nestedatt--fields))
+- `id` (String) The ID of this resource.
 
 <a id="nestedatt--fields"></a>
 ### Nested Schema for `fields`
 
 Read-Only:
 
-- **default** (String)
-- **description** (String)
-- **field_type** (String)
-- **id** (Number)
-- **name** (String)
-- **required** (Boolean)
-- **validation_schema** (String)
-
-
+- `default` (String)
+- `description` (String)
+- `field_type` (String)
+- `id` (Number)
+- `name` (String)
+- `required` (Boolean)
+- `validation_schema` (String)

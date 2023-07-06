@@ -17,33 +17,31 @@ Represent FaaS function
 
 ### Required
 
-- **name** (String)
-- **namespace** (String) Namespace of the function
+- `name` (String)
+- `namespace` (String) Namespace of the function
 
 ### Optional
 
-- **id** (String) The ID of this resource.
-- **project_id** (Number)
-- **project_name** (String)
-- **region_id** (Number)
-- **region_name** (String)
+- `project_id` (Number)
+- `project_name` (String)
+- `region_id` (Number)
+- `region_name` (String)
 
 ### Read-Only
 
-- **build_message** (String)
-- **build_status** (String)
-- **code_text** (String)
-- **created_at** (String)
-- **deploy_status** (Map of Number)
-- **description** (String)
-- **endpoint** (String)
-- **envs** (Map of String)
-- **flavor** (String)
-- **main_method** (String) Main startup method name
-- **max_instances** (Number) Autoscaling max number of instances
-- **min_instances** (Number) Autoscaling min number of instances
-- **runtime** (String)
-- **status** (String)
-- **timeout** (Number)
-
-
+- `build_message` (String)
+- `build_status` (String)
+- `code_text` (String)
+- `created_at` (String)
+- `deploy_status` (Map of Number)
+- `description` (String)
+- `endpoint` (String)
+- `envs` (Map of String)
+- `flavor` (String)
+- `id` (String) The ID of this resource.
+- `main_method` (String) Main startup method name
+- `max_instances` (Number) Autoscaling max number of instances
+- `min_instances` (Number) Autoscaling min number of instances
+- `runtime` (String)
+- `status` (String)
+- `timeout` (Number)

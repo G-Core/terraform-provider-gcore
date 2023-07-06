@@ -41,36 +41,36 @@ output "view" {
 
 ### Required
 
-- **name** (String)
+- `name` (String)
 
 ### Optional
 
-- **id** (String) The ID of this resource.
-- **metadata_k** (String)
-- **metadata_kv** (Map of String)
-- **network_id** (String)
-- **project_id** (Number)
-- **project_name** (String)
-- **region_id** (Number)
-- **region_name** (String)
+- `metadata_k` (String)
+- `metadata_kv` (Map of String)
+- `network_id` (String)
+- `project_id` (Number)
+- `project_name` (String)
+- `region_id` (Number)
+- `region_name` (String)
 
 ### Read-Only
 
-- **cidr** (String)
-- **connect_to_network_router** (Boolean)
-- **dns_nameservers** (List of String)
-- **enable_dhcp** (Boolean)
-- **gateway_ip** (String)
-- **host_routes** (List of Object) (see [below for nested schema](#nestedatt--host_routes))
-- **metadata_read_only** (List of Object) (see [below for nested schema](#nestedatt--metadata_read_only))
+- `cidr` (String)
+- `connect_to_network_router` (Boolean)
+- `dns_nameservers` (List of String)
+- `enable_dhcp` (Boolean)
+- `gateway_ip` (String)
+- `host_routes` (List of Object) (see [below for nested schema](#nestedatt--host_routes))
+- `id` (String) The ID of this resource.
+- `metadata_read_only` (List of Object) (see [below for nested schema](#nestedatt--metadata_read_only))
 
 <a id="nestedatt--host_routes"></a>
 ### Nested Schema for `host_routes`
 
 Read-Only:
 
-- **destination** (String)
-- **nexthop** (String)
+- `destination` (String)
+- `nexthop` (String)
 
 
 <a id="nestedatt--metadata_read_only"></a>
@@ -78,8 +78,6 @@ Read-Only:
 
 Read-Only:
 
-- **key** (String)
-- **read_only** (Boolean)
-- **value** (String)
-
-
+- `key` (String)
+- `read_only` (Boolean)
+- `value` (String)

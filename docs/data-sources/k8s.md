@@ -29,58 +29,56 @@ data "gcore_k8s" "v" {
 
 ### Required
 
-- **cluster_id** (String)
+- `cluster_id` (String)
 
 ### Optional
 
-- **id** (String) The ID of this resource.
-- **project_id** (Number)
-- **project_name** (String)
-- **region_id** (Number)
-- **region_name** (String)
+- `project_id` (Number)
+- `project_name` (String)
+- `region_id` (Number)
+- `region_name` (String)
 
 ### Read-Only
 
-- **api_address** (String)
-- **auto_healing_enabled** (Boolean)
-- **cluster_template_id** (String)
-- **container_version** (String)
-- **created_at** (String)
-- **discovery_url** (String)
-- **external_dns_enabled** (Boolean)
-- **faults** (Map of String)
-- **fixed_network** (String)
-- **fixed_subnet** (String)
-- **health_status** (String)
-- **health_status_reason** (Map of String)
-- **keypair** (String)
-- **master_addresses** (List of String)
-- **master_flavor_id** (String)
-- **master_lb_floating_ip_enabled** (Boolean)
-- **name** (String)
-- **node_addresses** (List of String)
-- **node_count** (Number)
-- **pool** (List of Object) (see [below for nested schema](#nestedatt--pool))
-- **status** (String)
-- **status_reason** (String)
-- **updated_at** (String)
-- **user_id** (String)
-- **version** (String)
+- `api_address` (String)
+- `auto_healing_enabled` (Boolean)
+- `cluster_template_id` (String)
+- `container_version` (String)
+- `created_at` (String)
+- `discovery_url` (String)
+- `external_dns_enabled` (Boolean)
+- `faults` (Map of String)
+- `fixed_network` (String)
+- `fixed_subnet` (String)
+- `health_status` (String)
+- `health_status_reason` (Map of String)
+- `id` (String) The ID of this resource.
+- `keypair` (String)
+- `master_addresses` (List of String)
+- `master_flavor_id` (String)
+- `master_lb_floating_ip_enabled` (Boolean)
+- `name` (String)
+- `node_addresses` (List of String)
+- `node_count` (Number)
+- `pool` (List of Object) (see [below for nested schema](#nestedatt--pool))
+- `status` (String)
+- `status_reason` (String)
+- `updated_at` (String)
+- `user_id` (String)
+- `version` (String)
 
 <a id="nestedatt--pool"></a>
 ### Nested Schema for `pool`
 
 Read-Only:
 
-- **created_at** (String)
-- **docker_volume_size** (Number)
-- **docker_volume_type** (String)
-- **flavor_id** (String)
-- **max_node_count** (Number)
-- **min_node_count** (Number)
-- **name** (String)
-- **node_count** (Number)
-- **stack_id** (String)
-- **uuid** (String)
-
-
+- `created_at` (String)
+- `docker_volume_size` (Number)
+- `docker_volume_type` (String)
+- `flavor_id` (String)
+- `max_node_count` (Number)
+- `min_node_count` (Number)
+- `name` (String)
+- `node_count` (Number)
+- `stack_id` (String)
+- `uuid` (String)

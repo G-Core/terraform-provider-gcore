@@ -27,16 +27,14 @@ data "gcore_storage_s3" "example_s3" {
 
 ### Optional
 
-- **id** (String) The ID of this resource.
-- **name** (String) A name of new storage resource.
-- **storage_id** (Number) An id of new storage resource.
+- `name` (String) A name of new storage resource.
+- `storage_id` (Number) An id of new storage resource.
 
 ### Read-Only
 
-- **client_id** (Number) An client id of new storage resource.
-- **generated_endpoint** (String) A s3 entry point for new storage resource.
-- **generated_http_endpoint** (String) A http s3 entry point for new storage resource.
-- **generated_s3_endpoint** (String) A s3 endpoint for new storage resource.
-- **location** (String) A location of new storage resource. One of (s-ed1, s-darz1, s-ws1, s-dt2, s-drc2)
-
-
+- `client_id` (Number) An client id of new storage resource.
+- `generated_endpoint` (String) A s3 entry point for new storage resource.
+- `generated_http_endpoint` (String) A http s3 entry point for new storage resource.
+- `generated_s3_endpoint` (String) A s3 endpoint for new storage resource.
+- `id` (String) The ID of this resource.
+- `location` (String) A location of new storage resource. One of (s-ed1, s-darz1, s-ws1, s-dt2, s-drc2)

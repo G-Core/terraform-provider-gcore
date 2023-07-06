@@ -40,15 +40,13 @@ output "view" {
 
 ### Optional
 
-- **id** (String) The ID of this resource.
-- **project_id** (Number)
-- **project_name** (String)
-- **region_id** (Number)
-- **region_name** (String)
+- `project_id` (Number)
+- `project_name` (String)
+- `region_id` (Number)
+- `region_name` (String)
 
 ### Read-Only
 
-- **kafka** (List of String)
-- **opensearch** (List of String)
-
-
+- `id` (String) The ID of this resource.
+- `kafka` (List of String)
+- `opensearch` (List of String)

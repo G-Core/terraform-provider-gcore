@@ -41,33 +41,31 @@ output "view" {
 
 ### Required
 
-- **floating_ip_address** (String)
+- `floating_ip_address` (String)
 
 ### Optional
 
-- **id** (String) The ID of this resource.
-- **metadata_k** (String)
-- **metadata_kv** (Map of String)
-- **port_id** (String)
-- **project_id** (Number)
-- **project_name** (String)
-- **region_id** (Number)
-- **region_name** (String)
+- `metadata_k` (String)
+- `metadata_kv` (Map of String)
+- `port_id` (String)
+- `project_id` (Number)
+- `project_name` (String)
+- `region_id` (Number)
+- `region_name` (String)
 
 ### Read-Only
 
-- **fixed_ip_address** (String)
-- **metadata_read_only** (List of Object) (see [below for nested schema](#nestedatt--metadata_read_only))
-- **router_id** (String)
-- **status** (String)
+- `fixed_ip_address` (String)
+- `id` (String) The ID of this resource.
+- `metadata_read_only` (List of Object) (see [below for nested schema](#nestedatt--metadata_read_only))
+- `router_id` (String)
+- `status` (String)
 
 <a id="nestedatt--metadata_read_only"></a>
 ### Nested Schema for `metadata_read_only`
 
 Read-Only:
 
-- **key** (String)
-- **read_only** (Boolean)
-- **value** (String)
-
-
+- `key` (String)
+- `read_only` (Boolean)
+- `value` (String)

@@ -31,34 +31,34 @@ resource "gcore_volume" "volume" {
 
 ### Required
 
-- **name** (String)
+- `name` (String)
 
 ### Optional
 
-- **id** (String) The ID of this resource.
-- **image_id** (String) Mandatory if volume is created from image
-- **last_updated** (String)
-- **metadata_map** (Map of String)
-- **project_id** (Number)
-- **project_name** (String)
-- **region_id** (Number)
-- **region_name** (String)
-- **size** (Number)
-- **snapshot_id** (String) Mandatory if volume is created from a snapshot
-- **type_name** (String) Available value is 'standard', 'ssd_hiiops', 'cold', 'ultra'. Defaults to standard
+- `image_id` (String) Mandatory if volume is created from image
+- `last_updated` (String)
+- `metadata_map` (Map of String)
+- `project_id` (Number)
+- `project_name` (String)
+- `region_id` (Number)
+- `region_name` (String)
+- `size` (Number)
+- `snapshot_id` (String) Mandatory if volume is created from a snapshot
+- `type_name` (String) Available value is 'standard', 'ssd_hiiops', 'cold', 'ultra'. Defaults to standard
 
 ### Read-Only
 
-- **metadata_read_only** (List of Object) (see [below for nested schema](#nestedatt--metadata_read_only))
+- `id` (String) The ID of this resource.
+- `metadata_read_only` (List of Object) (see [below for nested schema](#nestedatt--metadata_read_only))
 
 <a id="nestedatt--metadata_read_only"></a>
 ### Nested Schema for `metadata_read_only`
 
 Read-Only:
 
-- **key** (String)
-- **read_only** (Boolean)
-- **value** (String)
+- `key` (String)
+- `read_only` (Boolean)
+- `value` (String)
 
 ## Import
 

@@ -30,28 +30,28 @@ resource "gcore_servergroup" "default" {
 
 ### Required
 
-- **name** (String) Displayed server group name
-- **policy** (String) Server group policy. Available value is 'affinity', 'anti-affinity'
+- `name` (String) Displayed server group name
+- `policy` (String) Server group policy. Available value is 'affinity', 'anti-affinity'
 
 ### Optional
 
-- **id** (String) The ID of this resource.
-- **project_id** (Number)
-- **project_name** (String)
-- **region_id** (Number)
-- **region_name** (String)
+- `project_id` (Number)
+- `project_name` (String)
+- `region_id` (Number)
+- `region_name` (String)
 
 ### Read-Only
 
-- **instances** (List of Object) Instances in this server group (see [below for nested schema](#nestedatt--instances))
+- `id` (String) The ID of this resource.
+- `instances` (List of Object) Instances in this server group (see [below for nested schema](#nestedatt--instances))
 
 <a id="nestedatt--instances"></a>
 ### Nested Schema for `instances`
 
 Read-Only:
 
-- **instance_id** (String)
-- **instance_name** (String)
+- `instance_id` (String)
+- `instance_name` (String)
 
 ## Import
 

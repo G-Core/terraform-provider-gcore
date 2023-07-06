@@ -34,24 +34,24 @@ resource "gcore_snapshot" "snapshot" {
 
 ### Required
 
-- **name** (String)
-- **volume_id** (String)
+- `name` (String)
+- `volume_id` (String)
 
 ### Optional
 
-- **description** (String)
-- **id** (String) The ID of this resource.
-- **last_updated** (String)
-- **metadata** (Map of String)
-- **project_id** (Number)
-- **project_name** (String)
-- **region_id** (Number)
-- **region_name** (String)
+- `description` (String)
+- `last_updated` (String)
+- `metadata` (Map of String)
+- `project_id` (Number)
+- `project_name` (String)
+- `region_id` (Number)
+- `region_name` (String)
 
 ### Read-Only
 
-- **size** (Number)
-- **status** (String)
+- `id` (String) The ID of this resource.
+- `size` (Number)
+- `status` (String)
 
 ## Import
 

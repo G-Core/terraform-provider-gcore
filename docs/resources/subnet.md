@@ -51,36 +51,36 @@ resource "gcore_subnet" "subnet" {
 
 ### Required
 
-- **cidr** (String)
-- **name** (String)
-- **network_id** (String)
+- `cidr` (String)
+- `name` (String)
+- `network_id` (String)
 
 ### Optional
 
-- **connect_to_network_router** (Boolean) True if the network's router should get a gateway in this subnet. Must be explicitly 'false' when gateway_ip is null. Default true.
-- **dns_nameservers** (List of String)
-- **enable_dhcp** (Boolean)
-- **gateway_ip** (String)
-- **host_routes** (Block List) (see [below for nested schema](#nestedblock--host_routes))
-- **id** (String) The ID of this resource.
-- **last_updated** (String)
-- **metadata_map** (Map of String)
-- **project_id** (Number)
-- **project_name** (String)
-- **region_id** (Number)
-- **region_name** (String)
+- `connect_to_network_router` (Boolean) True if the network's router should get a gateway in this subnet. Must be explicitly 'false' when gateway_ip is null. Default true.
+- `dns_nameservers` (List of String)
+- `enable_dhcp` (Boolean)
+- `gateway_ip` (String)
+- `host_routes` (Block List) (see [below for nested schema](#nestedblock--host_routes))
+- `last_updated` (String)
+- `metadata_map` (Map of String)
+- `project_id` (Number)
+- `project_name` (String)
+- `region_id` (Number)
+- `region_name` (String)
 
 ### Read-Only
 
-- **metadata_read_only** (List of Object) (see [below for nested schema](#nestedatt--metadata_read_only))
+- `id` (String) The ID of this resource.
+- `metadata_read_only` (List of Object) (see [below for nested schema](#nestedatt--metadata_read_only))
 
 <a id="nestedblock--host_routes"></a>
 ### Nested Schema for `host_routes`
 
 Required:
 
-- **destination** (String)
-- **nexthop** (String) IPv4 address to forward traffic to if it's destination IP matches 'destination' CIDR
+- `destination` (String)
+- `nexthop` (String) IPv4 address to forward traffic to if it's destination IP matches 'destination' CIDR
 
 
 <a id="nestedatt--metadata_read_only"></a>
@@ -88,9 +88,9 @@ Required:
 
 Read-Only:
 
-- **key** (String)
-- **read_only** (Boolean)
-- **value** (String)
+- `key` (String)
+- `read_only` (Boolean)
+- `value` (String)
 
 ## Import
 

@@ -33,18 +33,16 @@ output "kp" {
 
 ### Required
 
-- **public_key** (String)
-- **sshkey_name** (String)
+- `public_key` (String)
+- `sshkey_name` (String)
 
 ### Optional
 
-- **id** (String) The ID of this resource.
-- **project_id** (Number)
-- **project_name** (String)
+- `project_id` (Number)
+- `project_name` (String)
 
 ### Read-Only
 
-- **fingerprint** (String)
-- **sshkey_id** (String)
-
-
+- `fingerprint` (String)
+- `id` (String) The ID of this resource.
+- `sshkey_id` (String)

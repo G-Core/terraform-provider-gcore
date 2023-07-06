@@ -17,21 +17,19 @@ Represent FaaS namespace
 
 ### Required
 
-- **name** (String)
+- `name` (String)
 
 ### Optional
 
-- **id** (String) The ID of this resource.
-- **project_id** (Number)
-- **project_name** (String)
-- **region_id** (Number)
-- **region_name** (String)
+- `project_id` (Number)
+- `project_name` (String)
+- `region_id` (Number)
+- `region_name` (String)
 
 ### Read-Only
 
-- **created_at** (String)
-- **description** (String)
-- **envs** (Map of String)
-- **status** (String)
-
-
+- `created_at` (String)
+- `description` (String)
+- `envs` (Map of String)
+- `id` (String) The ID of this resource.
+- `status` (String)

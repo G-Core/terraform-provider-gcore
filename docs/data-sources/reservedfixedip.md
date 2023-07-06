@@ -41,31 +41,29 @@ output "view" {
 
 ### Required
 
-- **fixed_ip_address** (String)
+- `fixed_ip_address` (String)
 
 ### Optional
 
-- **id** (String) The ID of this resource.
-- **project_id** (Number)
-- **project_name** (String)
-- **region_id** (Number)
-- **region_name** (String)
+- `project_id` (Number)
+- `project_name` (String)
+- `region_id` (Number)
+- `region_name` (String)
 
 ### Read-Only
 
-- **allowed_address_pairs** (List of Object) (see [below for nested schema](#nestedatt--allowed_address_pairs))
-- **is_vip** (Boolean)
-- **network_id** (String)
-- **port_id** (String) ID of the port_id underlying the reserved fixed IP
-- **status** (String)
-- **subnet_id** (String)
+- `allowed_address_pairs` (List of Object) (see [below for nested schema](#nestedatt--allowed_address_pairs))
+- `id` (String) The ID of this resource.
+- `is_vip` (Boolean)
+- `network_id` (String)
+- `port_id` (String) ID of the port_id underlying the reserved fixed IP
+- `status` (String)
+- `subnet_id` (String)
 
 <a id="nestedatt--allowed_address_pairs"></a>
 ### Nested Schema for `allowed_address_pairs`
 
 Read-Only:
 
-- **ip_address** (String)
-- **mac_address** (String)
-
-
+- `ip_address` (String)
+- `mac_address` (String)

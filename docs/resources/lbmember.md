@@ -64,34 +64,34 @@ resource "gcore_lbmember" "lbm" {
 
 ### Required
 
-- **address** (String)
-- **pool_id** (String)
-- **protocol_port** (Number)
+- `address` (String)
+- `pool_id` (String)
+- `protocol_port` (Number)
 
 ### Optional
 
-- **id** (String) The ID of this resource.
-- **instance_id** (String)
-- **last_updated** (String)
-- **project_id** (Number)
-- **project_name** (String)
-- **region_id** (Number)
-- **region_name** (String)
-- **subnet_id** (String)
-- **timeouts** (Block, Optional) (see [below for nested schema](#nestedblock--timeouts))
-- **weight** (Number) Value between 0 and 256
+- `instance_id` (String)
+- `last_updated` (String)
+- `project_id` (Number)
+- `project_name` (String)
+- `region_id` (Number)
+- `region_name` (String)
+- `subnet_id` (String)
+- `timeouts` (Block, Optional) (see [below for nested schema](#nestedblock--timeouts))
+- `weight` (Number) Value between 0 and 256
 
 ### Read-Only
 
-- **operating_status** (String)
+- `id` (String) The ID of this resource.
+- `operating_status` (String)
 
 <a id="nestedblock--timeouts"></a>
 ### Nested Schema for `timeouts`
 
 Optional:
 
-- **create** (String)
-- **delete** (String)
+- `create` (String)
+- `delete` (String)
 
 ## Import
 
