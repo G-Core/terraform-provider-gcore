@@ -30,7 +30,7 @@ resource "gcore_dns_zone_record" "example_rrset0" {
 }
 
 //
-// example1: managing zone outside of TF 
+// example1: managing zone outside of TF
 //
 resource "gcore_dns_zone_record" "subdomain_examplezone" {
   zone   = "examplezone.com"
@@ -92,5 +92,42 @@ resource "gcore_dns_zone_record" "sobdomain_examplezone_https" {
   // alpn quoted, from output of dig
   resource_record {
    content = "1 . alpn=\"h3,h2\" port=1443 ipv4hint=10.0.0.1 ech=AEn+DQBFKwAgACABWIHUGj4u+PIggYXcR5JF0gYk3dCRioBW8uJq9H4mKAAIAAEAAQABAANAEnB1YmxpYy50bHMtZWNoLmRldgAA"
+  }
+}
+
+//
+// example2: healthchecks/failover check
+//
+resource "gcore_dns_zone_record" "examplezone_failover" {
+  zone   = "examplezone.com"
+  domain = "failover.examplezone.com"
+  type   = "A"
+  ttl    = 120
+
+  filter {
+    type   = "is_healthy"
+    limit  = 0
+    strict = true
+  }
+
+  resource_record {
+    content = "127.0.0.1"
+    enabled = true
+  }
+
+  // failover/healthchecks is on rrset meta, not resource record meta
+  meta {
+    healthchecks {
+      frequency = 300
+      host = "failover.examplezone.com"
+      http_status_code = 200
+      method = "GET"
+      port = 80
+      protocol = "HTTP"
+      regexp = ""
+      timeout = 10
+      tls = false
+      url = "/"
+    }
   }
 }

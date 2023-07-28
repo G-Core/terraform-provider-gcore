@@ -9,3 +9,4 @@ modules-dev/
 .terraform/
 *.log
 .idea
+local_debug.tf

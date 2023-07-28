@@ -5,6 +5,7 @@ package gcore
 
 import (
 	"fmt"
+	"strings"
 	"testing"
 	"time"
 
@@ -13,10 +14,10 @@ import (
 
 func TestAccDnsZoneRecord(t *testing.T) {
 	random := time.Now().Nanosecond()
-	domain := "terraformtest"
+	zone := "kokizzu.neuroops.link"
+	rrSetName := strings.ReplaceAll(zone, ".", "_")
 	subDomain := fmt.Sprintf("key%d", random)
-	name := fmt.Sprintf("%s_%s", subDomain, domain)
-	zone := domain + ".com"
+	name := fmt.Sprintf("%s_%s", subDomain, rrSetName)
 	fullDomain := subDomain + "." + zone
 
 	resourceName := fmt.Sprintf("%s.%s", DNSZoneRecordResource, name)
@@ -240,6 +241,106 @@ EOT
 					resource.TestCheckResourceAttr(resourceName, DNSZoneRecordSchemaType, "HTTPS"),
 					resource.TestCheckResourceAttr(resourceName, DNSZoneRecordSchemaTTL, "120"),
 					resource.TestCheckResourceAttr(resourceName, fmt.Sprintf("%s.0.%s", DNSZoneRecordSchemaResourceRecord, DNSZoneRecordSchemaContent), content+"\n"),
+				),
+			},
+		},
+	})
+}
+
+// note: when testing, set GCORE_DNS_API=https://api.gcore.com/dns
+func TestAccDnsZoneRecordFailoverHealthcheck(t *testing.T) {
+	random := time.Now().Nanosecond()
+	domain := `test`
+	subDomain := fmt.Sprintf("key%d", random)
+	name := fmt.Sprintf("%s_%s", subDomain, domain)
+	zone := "kokizzu.neuroops.link"
+	fullDomain := subDomain + "." + zone
+
+	resourceName := fmt.Sprintf("%s.%s", DNSZoneRecordResource, name)
+
+	content := `127.0.0.1`
+
+	templateCreate := func() string {
+		return fmt.Sprintf(`
+resource "%s" "%s" {
+  zone = "%s"
+  domain = "%s"
+  type = "A"
+  ttl = 120
+
+  resource_record {
+    content = "%s"
+    enabled = true
+  }
+
+  filter {
+    type = "is_healthy"
+    limit = 0
+    strict = false
+  }
+
+  meta {
+    healthchecks {
+      frequency = 300
+      host = "%s"
+      http_status_code = 200
+      method = "GET"
+      port = 80
+      protocol = "HTTP"
+      regexp = ""
+      timeout = 10
+      tls = false
+      url = "/"
+    }
+  }
+}
+		`, DNSZoneRecordResource, name, zone, fullDomain, content, zone)
+	}
+
+	resource.Test(t, resource.TestCase{
+		PreCheck: func() {
+			testAccPreCheckVars(t, GCORE_USERNAME_VAR, GCORE_PASSWORD_VAR, GCORE_DNS_URL_VAR)
+		},
+		ProviderFactories: testAccProviders,
+		Steps: []resource.TestStep{
+			{
+				Config: templateCreate(),
+				Check: resource.ComposeTestCheckFunc(
+					testAccCheckResourceExists(resourceName),
+					resource.TestCheckResourceAttr(resourceName, DNSZoneRecordSchemaDomain, fullDomain),
+					resource.TestCheckResourceAttr(resourceName, DNSZoneRecordSchemaType, "A"),
+					resource.TestCheckResourceAttr(resourceName, DNSZoneRecordSchemaTTL, "120"),
+					resource.TestCheckResourceAttr(resourceName, fmt.Sprintf("%s.0.%s", DNSZoneRecordSchemaResourceRecord, DNSZoneRecordSchemaContent), content),
+					resource.TestCheckResourceAttr(resourceName,
+						fmt.Sprintf("%s.0.%s.0.%s",
+							DNSZoneRRSetSchemaMeta, DNSZoneRRSetSchemaMetaFailover, DNSZoneRRSetSchemaMetaFailoverFrequency), "300"),
+					resource.TestCheckResourceAttr(resourceName,
+						fmt.Sprintf("%s.0.%s.0.%s",
+							DNSZoneRRSetSchemaMeta, DNSZoneRRSetSchemaMetaFailover, DNSZoneRRSetSchemaMetaFailoverHost), zone),
+					resource.TestCheckResourceAttr(resourceName,
+						fmt.Sprintf("%s.0.%s.0.%s",
+							DNSZoneRRSetSchemaMeta, DNSZoneRRSetSchemaMetaFailover, DNSZoneRRSetSchemaMetaFailoverHTTPStatusCode), "200"),
+					resource.TestCheckResourceAttr(resourceName,
+						fmt.Sprintf("%s.0.%s.0.%s",
+							DNSZoneRRSetSchemaMeta, DNSZoneRRSetSchemaMetaFailover, DNSZoneRRSetSchemaMetaFailoverMethod), "GET"),
+					resource.TestCheckResourceAttr(resourceName,
+						fmt.Sprintf("%s.0.%s.0.%s",
+							DNSZoneRRSetSchemaMeta, DNSZoneRRSetSchemaMetaFailover, DNSZoneRRSetSchemaMetaFailoverPort), "80"),
+					resource.TestCheckResourceAttr(resourceName,
+						fmt.Sprintf("%s.0.%s.0.%s",
+							DNSZoneRRSetSchemaMeta, DNSZoneRRSetSchemaMetaFailover, DNSZoneRRSetSchemaMetaFailoverProtocol), "HTTP"),
+					resource.TestCheckResourceAttr(resourceName,
+						fmt.Sprintf("%s.0.%s.0.%s",
+							DNSZoneRRSetSchemaMeta, DNSZoneRRSetSchemaMetaFailover, DNSZoneRRSetSchemaMetaFailoverRegexp), ""),
+					resource.TestCheckResourceAttr(resourceName,
+						fmt.Sprintf("%s.0.%s.0.%s",
+							DNSZoneRRSetSchemaMeta, DNSZoneRRSetSchemaMetaFailover, DNSZoneRRSetSchemaMetaFailoverTimeout), "10"),
+					resource.TestCheckResourceAttr(resourceName,
+						fmt.Sprintf("%s.0.%s.0.%s",
+							DNSZoneRRSetSchemaMeta, DNSZoneRRSetSchemaMetaFailover, DNSZoneRRSetSchemaMetaFailoverTLS), "false"),
+					resource.TestCheckResourceAttr(resourceName,
+						fmt.Sprintf("%s.0.%s.0.%s",
+							DNSZoneRRSetSchemaMeta, DNSZoneRRSetSchemaMetaFailover, DNSZoneRRSetSchemaMetaFailoverURL), "/"),
 				),
 			},
 		},

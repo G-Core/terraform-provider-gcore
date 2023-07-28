@@ -803,3 +803,82 @@ func suppressDiffRegionID(k, old, new string, d *schema.ResourceData) bool {
 
 	return false
 }
+
+type dataTypeValidation int
+
+const (
+	dtvInt dataTypeValidation = iota
+	dtvFloat
+	dtvNil
+	dtvNaN // not a number
+	dtvString
+	dtvNotString
+)
+
+func toInt(v any) (i int, typ dataTypeValidation) {
+	if v == nil {
+		return 0, dtvNil
+	}
+	switch v.(type) {
+	case int:
+		return v.(int), dtvInt
+	case uint:
+		i = int(v.(uint))
+		if v.(uint) == uint(i) {
+			return i, dtvInt
+		}
+		return i, dtvFloat // overflow, assume float
+	case int64:
+		i = int(v.(int64))
+		if v.(int64) == int64(i) {
+			return i, dtvInt
+		}
+		return i, dtvFloat // overflow or underflow, assume float
+	case int32:
+		return int(v.(int32)), dtvInt
+	case int16:
+		return int(v.(int16)), dtvInt
+	case int8:
+		return int(v.(int8)), dtvInt
+	case uint64:
+		i = int(v.(uint64))
+		if v.(uint64) == uint64(i) {
+			return i, dtvInt
+		}
+		return i, dtvFloat // overflow, assume float
+	case uint32:
+		i = int(v.(uint32))
+		if v.(uint32) == uint32(i) {
+			return i, dtvInt
+		}
+		return i, dtvFloat // overflow, assume float
+	case uint16:
+		return int(v.(uint16)), dtvInt
+	case uint8:
+		return int(v.(uint8)), dtvInt
+	case float64:
+		i = int(v.(float64))
+		if v.(float64) == float64(i) {
+			return i, dtvInt
+		}
+		return i, dtvFloat
+	case float32:
+		i = int(v.(float32))
+		if v.(float32) == float32(i) {
+			return i, dtvInt
+		}
+		return i, dtvFloat
+	}
+	return 0, dtvNaN
+}
+
+func toString(v any) (s string, typ dataTypeValidation) {
+	if v == nil {
+		return ``, dtvNil
+	}
+	switch v.(type) {
+	case string:
+		return v.(string), dtvString
+	}
+	return ``, dtvNotString
+}
