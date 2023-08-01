@@ -272,7 +272,7 @@ func providerConfigure(_ context.Context, d *schema.ResourceData) (interface{}, 
 	}
 	if err != nil {
 		provider = &gcorecloud.ProviderClient{}
-		log.Printf("[WARN] init auth client: %s\n", err)
+		log.Printf("[ERROR] init auth client: %s\n", err)
 	}
 
 	cdnProvider := gcdnProvider.NewClient(cdnAPI, gcdnProvider.WithSignerFunc(func(req *http.Request) error {

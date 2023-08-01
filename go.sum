@@ -1,8 +1,8 @@
 github.com/AlekSi/pointer v1.2.0 h1:glcy/gc4h8HnG2Z3ZECSzZ1IX1x2JxRVuDzaJwQE0+w=
 github.com/AlekSi/pointer v1.2.0/go.mod h1:gZGfd3dpW4vEc/UlyfKKi1roIqcCgwOIvb0tSNSBle0=
 github.com/BurntSushi/toml v0.3.1/go.mod h1:xHWCNGjB5oqiDr8zfno3MHue2Ht5sIBksp03qcyfWMU=
-github.com/G-Core/gcore-dns-sdk-go v0.2.7-0.20230728100829-b325c9fd49a0 h1:zM1Ce+9gSFbjaWRlJkao6FqvrIgyTeN29dCm9tXNBAI=
-github.com/G-Core/gcore-dns-sdk-go v0.2.7-0.20230728100829-b325c9fd49a0/go.mod h1:KliUjfPonDvXyAGNiuO+MYVG/7lmWHZ+4Hi0sPxgOjg=
+github.com/G-Core/gcore-dns-sdk-go v0.2.7-0.20230801110428-99ef24b50d4d h1:nqduBOj5+xM6Zg2IY3r7LvzpX2fCrKP+Hk+KdagMXao=
+github.com/G-Core/gcore-dns-sdk-go v0.2.7-0.20230801110428-99ef24b50d4d/go.mod h1:KliUjfPonDvXyAGNiuO+MYVG/7lmWHZ+4Hi0sPxgOjg=
 github.com/G-Core/gcore-storage-sdk-go v0.1.34 h1:0GPQfz1kA6mQi6fiisGsh0Um4H9PZeHWIPsc825cDrY=
 github.com/G-Core/gcore-storage-sdk-go v0.1.34/go.mod h1:BUAEZZZJJt/+luRFunqziv3+JnbVMLbQXDWz9kV8Te8=
 github.com/G-Core/gcorelabscdn-go v0.1.32 h1:VGSmNdoW3lZm5lNf5lPpcO4lSdJYZIltxWkwfxlfodA=

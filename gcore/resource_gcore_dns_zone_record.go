@@ -214,7 +214,9 @@ func resourceDNSZoneRecord() *schema.Resource {
 												val := i.(string)
 												_, _, err := net.ParseCIDR(val)
 												if err != nil {
-													return diag.Errorf("dns record meta ip has wrong format: %s: %v", val, err)
+													if ip := net.ParseIP(val); ip == nil {
+														return diag.Errorf("dns record meta ip has wrong format: %s: %v", val, err)
+													}
 												}
 												return nil
 											},
