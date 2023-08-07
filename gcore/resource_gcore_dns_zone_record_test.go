@@ -251,7 +251,9 @@ EOT
 }
 
 // note: when testing, set GCORE_DNS_API=https://api.gcore.com/dns
-func TestAccDnsZoneRecordFailoverHealthcheck(t *testing.T) {
+func TestAccDnsZoneRecordRRSetMeta(t *testing.T) {
+	// checks for rrset.meta failover/healthchecks and geodns_link
+
 	random := time.Now().Nanosecond()
 	const zone = "kokizzu.neuroops.link"
 	subDomain := fmt.Sprintf("key%d", random)
@@ -294,6 +296,7 @@ resource "%s" "%s" {
       tls = false
       url = "/"
     }
+    geodns_link = "test.com"
   }
 }
 		`, DNSZoneRecordResource, name, zone, fullDomain, content, zone)
@@ -343,6 +346,9 @@ resource "%s" "%s" {
 					resource.TestCheckResourceAttr(resourceName,
 						fmt.Sprintf("%s.0.%s.0.%s",
 							DNSZoneRRSetSchemaMeta, DNSZoneRRSetSchemaMetaHealthchecks, DNSZoneRRSetSchemaMetaFailoverURL), "/"),
+					resource.TestCheckResourceAttr(resourceName,
+						fmt.Sprintf("%s.0.%s",
+							DNSZoneRRSetSchemaMeta, DNSZoneRRSetSchemaMetaGeodnsLink), "test.com"),
 				),
 			},
 		},
