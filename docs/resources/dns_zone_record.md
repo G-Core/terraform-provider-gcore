@@ -218,6 +218,7 @@ Optional:
 
 Optional:
 
+- `geodns_link` (String) Geodns link (domain, or cl-) of DNS Zone RRSet resource.
 - `healthchecks` (Block Set) Failover meta (eg. {"frequency": 60,"host": "www.gcore.com","http_status_code": null,"method": "GET","port": 80,"protocol": "HTTP","regexp": "","timeout": 10,"tls": false,"url": "/"}). (see [below for nested schema](#nestedblock--meta--healthchecks))
 
 <a id="nestedblock--meta--healthchecks"></a>
