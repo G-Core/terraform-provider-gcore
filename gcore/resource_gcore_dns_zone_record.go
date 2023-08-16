@@ -300,6 +300,7 @@ func resourceDNSZoneRecord() *schema.Resource {
 						DNSZoneRRSetSchemaMetaGeodnsLink: {
 							Type:        schema.TypeString,
 							Optional:    true,
+							Computed:    true,
 							Description: "Geodns link (domain, or cl-) of DNS Zone RRSet resource.",
 						},
 						// - 1. `meta` (map)
@@ -597,7 +598,7 @@ func resourceDNSZoneRecordRead(ctx context.Context, d *schema.ResourceData, m in
 		}
 		s, ok := val.(string)
 		if ok {
-			if key == DNSZoneRRSetSchemaMetaGeodnsLink {
+			if key == DNSZoneRRSetSchemaMetaGeodnsLink && s != "" {
 				rrMeta[key] = s
 				continue
 			}
@@ -680,10 +681,12 @@ func fillRRSet(d *schema.ResourceData, rType string, rrSet *dnssdk.RRSet) error 
 				rrSet.Meta[DNSZoneRRSetSchemaMetaHealthchecks] = fMap
 				rrSet.Meta[DNSZoneRRSetSchemaMetaFailover] = fMap
 			case DNSZoneRRSetSchemaMetaGeodnsLink:
-				var ok bool
-				rrSet.Meta[k], ok = v.(string)
+				geodnsLink, ok := v.(string)
 				if !ok {
 					return fmt.Errorf("invalid type of rrset meta.geodns_link, expected string, got %T %v", v, v)
+				}
+				if geodnsLink != `` {
+					rrSet.Meta[k] = geodnsLink
 				}
 			default:
 				return fmt.Errorf("unsupported rrset meta key %s with value %v", k, v)
