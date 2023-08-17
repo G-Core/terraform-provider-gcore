@@ -44,6 +44,25 @@ var (
 						},
 					},
 				},
+				"bot_challenge_module": {
+				    Type:        schema.TypeList,
+					MaxItems:    1,
+					Optional:    true,
+					Description: "Customizable cookie-based challenges that incoming HTTP requests must complete before they are passed through to the server.  This will allow legitimate traffic to pass through while blocking or throttling malicious traffic that fails the cookie-based challenge.",
+					Elem: &schema.Resource{
+						Schema: map[string]*schema.Schema{
+							"enabled": {
+								Type:     schema.TypeBool,
+								Optional: true,
+								Default:  true,
+							},
+							"value": {
+								Type:     schema.TypeBool,
+								Required: true,
+							},
+						},
+					},
+				},
 				"brotli_compression": {
 					Type:        schema.TypeList,
 					MaxItems:    1,
@@ -1246,6 +1265,12 @@ func listToOptions(l []interface{}) *gcdn.Options {
 			opts.AllowedHTTPMethods.Value = append(opts.AllowedHTTPMethods.Value, v.(string))
 		}
 	}
+	if opt, ok := getOptByName(fields, "bot_challenge_module"); ok {
+		opts.BotChallengeModule = &gcdn.BotChallengeModule{
+			Enabled: opt["enabled"].(bool),
+			Value:   opt["value"].(bool),
+		}
+	}
 	if opt, ok := getOptByName(fields, "brotli_compression"); ok {
 		opts.BrotliCompression = &gcdn.BrotliCompression{
 			Enabled: opt["enabled"].(bool),
@@ -1613,6 +1638,11 @@ func optionsToList(options *gcdn.Options) []interface{} {
 	if options.AllowedHTTPMethods != nil {
 		m := structToMap(options.AllowedHTTPMethods)
 		result["allowed_http_methods"] = []interface{}{m}
+	}
+	bot_challenge_module
+	if options.BotChallengeModule != nil {
+		m := structToMap(options.BotChallengeModule)
+		result["bot_challenge_module"] = []interface{}{m}
 	}
 	if options.BrotliCompression != nil {
 		m := structToMap(options.BrotliCompression)
