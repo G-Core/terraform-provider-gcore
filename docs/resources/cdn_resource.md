@@ -108,6 +108,7 @@ resource "gcore_cdn_resource" "cdn_example_com" {
 Optional:
 
 - `allowed_http_methods` (Block List, Max: 1) Specify allowed HTTP methods. (see [below for nested schema](#nestedblock--options--allowed_http_methods))
+- `bot_challenge_module` (Block List, Max: 1) Customizable cookie-based challenges that incoming HTTP requests must complete before they are passed through to the server. This will allow legitimate traffic to pass through while blocking or throttling malicious traffic that fails the cookie-based challenge. (see [below for nested schema](#nestedblock--options--bot_challenge_module))
 - `brotli_compression` (Block List, Max: 1) Brotli compression option allows to compress content with brotli on the CDN's end. CDN servers will request only uncompressed content from the origin. (see [below for nested schema](#nestedblock--options--brotli_compression))
 - `browser_cache_settings` (Block List, Max: 1) Specify the cache expiration time for customers' browsers in seconds. (see [below for nested schema](#nestedblock--options--browser_cache_settings))
 - `cache_http_headers` (Block List, Max: 1) Legacy option. Use the response_headers_hiding_policy option instead. (see [below for nested schema](#nestedblock--options--cache_http_headers))
@@ -157,6 +158,18 @@ Optional:
 Required:
 
 - `value` (Set of String) Available methods: GET, HEAD, POST, PUT, PATCH, DELETE, OPTIONS.
+
+Optional:
+
+- `enabled` (Boolean)
+
+
+<a id="nestedblock--options--bot_challenge_module"></a>
+### Nested Schema for `options.bot_challenge_module`
+
+Required:
+
+- `value` (Boolean)
 
 Optional:
 

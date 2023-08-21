@@ -31,6 +31,10 @@ resource "gcore_cdn_rule" "cdn_example_com_rule_1" {
         "POST",
       ]
     }
+    bot_challenge_module {
+      enabled = false
+      value = true
+    }
     brotli_compression {
       value = [
         "text/html", 
