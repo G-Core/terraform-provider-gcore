@@ -24,11 +24,12 @@ var k8sCreateTimeout = time.Second * time.Duration(K8sCreateTimeout)
 
 func resourceK8s() *schema.Resource {
 	return &schema.Resource{
-		CreateContext: resourceK8sCreate,
-		ReadContext:   resourceK8sRead,
-		UpdateContext: resourceK8sUpdate,
-		DeleteContext: resourceK8sDelete,
-		Description:   "Represent k8s cluster with one default pool.",
+		DeprecationMessage: "!> **WARNING:** This resource is deprecated and will be removed in the next major version. Use gcore_k8sv2 resource instead.",
+		CreateContext:      resourceK8sCreate,
+		ReadContext:        resourceK8sRead,
+		UpdateContext:      resourceK8sUpdate,
+		DeleteContext:      resourceK8sDelete,
+		Description:        "Represent k8s cluster with one default pool.",
 		Timeouts: &schema.ResourceTimeout{
 			Create: &k8sCreateTimeout,
 			Update: &k8sCreateTimeout,
