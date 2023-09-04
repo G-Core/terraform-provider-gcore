@@ -9,6 +9,7 @@ import (
 	"time"
 
 	gcorecloud "github.com/G-Core/gcorelabscloud-go"
+	"github.com/G-Core/gcorelabscloud-go/gcore/floatingip/v1/floatingips"
 	"github.com/G-Core/gcorelabscloud-go/gcore/instance/v1/instances"
 	"github.com/G-Core/gcorelabscloud-go/gcore/instance/v1/types"
 	"github.com/G-Core/gcorelabscloud-go/gcore/task/v1/tasks"
@@ -686,6 +687,11 @@ func resourceInstanceUpdate(ctx context.Context, d *schema.ResourceData, m inter
 		return diag.FromErr(err)
 	}
 
+	fipClient, err := CreateClient(provider, d, floatingIPsPoint, versionPointV1)
+	if err != nil {
+		return diag.FromErr(err)
+	}
+
 	if d.HasChange("name") {
 		nameTemplates := d.Get("name_templates").([]interface{})
 		nameTemplate := d.Get("name_template").(string)
@@ -780,6 +786,22 @@ func resourceInstanceUpdate(ctx context.Context, d *schema.ResourceData, m inter
 	}
 
 	if d.HasChange("interface") {
+		iList, err := instances.ListInterfacesAll(client, instanceID)
+		if err != nil {
+			return diag.FromErr(err)
+		}
+
+		var fips []instances.FloatingIP
+		for _, i := range iList {
+			if len(i.FloatingIPDetails) == 0 {
+				continue
+			}
+
+			for _, fip := range i.FloatingIPDetails {
+				fips = append(fips, fip)
+			}
+		}
+
 		ifsOldRaw, ifsNewRaw := d.GetChange("interface")
 
 		ifsOld := ifsOldRaw.([]interface{})
@@ -845,6 +867,24 @@ func resourceInstanceUpdate(ctx context.Context, d *schema.ResourceData, m inter
 			log.Printf("[DEBUG] attach interface taskID: %s", taskID)
 			if err = tasks.WaitForStatus(client, string(taskID), tasks.TaskStateFinished, InstanceCreatingTimeout, true); err != nil {
 				return diag.FromErr(err)
+			}
+		}
+
+		for _, fip := range fips {
+			log.Printf("[DEBUG] Reassign floatin IP %s to fixed IP %s port id %s", fip.FloatingIPAddress, fip.FixedIPAddress, fip.PortID)
+			mm := make(map[string]string)
+			for _, i := range fip.Metadata {
+				mm[i.Key] = i.Value
+			}
+
+			_, err := floatingips.Assign(fipClient, fip.ID, floatingips.CreateOpts{
+				PortID:         fip.PortID,
+				FixedIPAddress: fip.FixedIPAddress,
+				Metadata:       mm,
+			}).Extract()
+
+			if err != nil {
+				return diag.Errorf("cannot reassign floating IP %s to fixed IP %s port id %s. Error: %v", fip.FloatingIPAddress, fip.FixedIPAddress, fip.PortID, err)
 			}
 		}
 	}
