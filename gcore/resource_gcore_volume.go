@@ -8,6 +8,7 @@ import (
 
 	"github.com/G-Core/gcorelabscloud-go/gcore/utils"
 	"github.com/G-Core/gcorelabscloud-go/gcore/utils/metadata"
+	metadatav1 "github.com/G-Core/gcorelabscloud-go/gcore/utils/metadata/v1/metadata"
 
 	gcorecloud "github.com/G-Core/gcorelabscloud-go"
 	"github.com/G-Core/gcorelabscloud-go/gcore/task/v1/tasks"
@@ -326,7 +327,7 @@ func resourceVolumeUpdate(ctx context.Context, d *schema.ResourceData, m interfa
 			return diag.Errorf("cannot get metadata. Error: %s", err)
 		}
 
-		err = metadata.MetadataReplace(client, d.Id(), meta).Err
+		err = metadatav1.MetadataReplace(client, d.Id(), meta).Err
 		if err != nil {
 			return diag.Errorf("cannot update metadata. Error: %s", err)
 		}

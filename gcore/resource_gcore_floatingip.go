@@ -8,7 +8,7 @@ import (
 	"time"
 
 	"github.com/G-Core/gcorelabscloud-go/gcore/utils"
-	"github.com/G-Core/gcorelabscloud-go/gcore/utils/metadata"
+	"github.com/G-Core/gcorelabscloud-go/gcore/utils/metadata/v1/metadata"
 
 	gcorecloud "github.com/G-Core/gcorelabscloud-go"
 	"github.com/G-Core/gcorelabscloud-go/gcore/floatingip/v1/floatingips"

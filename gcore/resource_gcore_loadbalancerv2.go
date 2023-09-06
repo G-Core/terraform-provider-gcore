@@ -3,13 +3,13 @@ package gcore
 import (
 	"context"
 	"fmt"
-	"github.com/G-Core/gcorelabscloud-go/gcore/utils"
-	"github.com/G-Core/gcorelabscloud-go/gcore/utils/metadata"
 	"log"
 	"time"
 
 	"github.com/G-Core/gcorelabscloud-go/gcore/loadbalancer/v1/loadbalancers"
 	"github.com/G-Core/gcorelabscloud-go/gcore/task/v1/tasks"
+	"github.com/G-Core/gcorelabscloud-go/gcore/utils"
+	"github.com/G-Core/gcorelabscloud-go/gcore/utils/metadata/v1/metadata"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 )
