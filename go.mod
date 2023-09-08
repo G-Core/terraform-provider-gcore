@@ -55,6 +55,7 @@ require (
 	github.com/hashicorp/terraform-svchost v0.1.1 // indirect
 	github.com/hashicorp/yamux v0.1.1 // indirect
 	github.com/josharian/intern v1.0.0 // indirect
+	github.com/kr/pretty v0.3.0 // indirect
 	github.com/ladydascalie/currency v1.6.0 // indirect
 	github.com/leodido/go-urn v1.2.4 // indirect
 	github.com/mailru/easyjson v0.7.7 // indirect
@@ -90,7 +91,7 @@ require (
 
 require (
 	github.com/go-openapi/runtime v0.26.0 // indirect
-	github.com/hashicorp/terraform v1.5.2
+	github.com/hashicorp/terraform v1.5.7
 	github.com/hashicorp/terraform-exec v0.18.1 // indirect
 	github.com/mattn/go-colorable v0.1.13 // indirect
 	go.mongodb.org/mongo-driver v1.12.0 // indirect
