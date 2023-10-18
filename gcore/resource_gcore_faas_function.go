@@ -3,6 +3,7 @@ package gcore
 import (
 	"context"
 	"fmt"
+	"github.com/AlekSi/pointer"
 	"log"
 	"time"
 
@@ -187,8 +188,8 @@ func resourceFaaSFunctionCreate(ctx context.Context, d *schema.ResourceData, m i
 		Timeout:     d.Get("timeout").(int),
 		Flavor:      d.Get("flavor").(string),
 		Autoscaling: faas.FunctionAutoscaling{
-			MinInstances: d.Get("min_instances").(int),
-			MaxInstances: d.Get("max_instances").(int),
+			MinInstances: pointer.To(d.Get("min_instances").(int)),
+			MaxInstances: pointer.To(d.Get("max_instances").(int)),
 		},
 		CodeText:   d.Get("code_text").(string),
 		MainMethod: d.Get("main_method").(string),
@@ -307,8 +308,8 @@ func resourceFaaSFunctionUpdate(ctx context.Context, d *schema.ResourceData, m i
 
 	if d.HasChanges("max_instances", "max_instances") {
 		opts.Autoscaling = &faas.FunctionAutoscaling{
-			MinInstances: d.Get("min_instances").(int),
-			MaxInstances: d.Get("max_instances").(int),
+			MinInstances: pointer.To(d.Get("min_instances").(int)),
+			MaxInstances: pointer.To(d.Get("max_instances").(int)),
 		}
 		needUpdate = true
 	}
@@ -398,6 +399,9 @@ func faaSSetState(d *schema.ResourceData, function *faas.Function) error {
 	d.Set("status", function.Status)
 	d.Set("endpoint", function.Endpoint)
 	d.Set("created_at", function.CreatedAt.Format(time.RFC3339))
+	d.Set("dependencies", function.Dependencies)
+	d.Set("disabled", function.Disabled)
+	d.Set("enable_api_key", function.EnableAPIKey)
 
 	if err := d.Set("envs", function.Envs); err != nil {
 		return err
@@ -407,6 +411,17 @@ func faaSSetState(d *schema.ResourceData, function *faas.Function) error {
 		"ready": function.DeployStatus.Ready,
 	}
 	if err := d.Set("deploy_status", ds); err != nil {
+		return err
+	}
+
+	keys := make([]string, 0, len(function.Keys))
+	if len(function.Keys) > 0 {
+		for _, key := range function.Keys {
+			keys = append(keys, key)
+		}
+	}
+
+	if err := d.Set("keys", keys); err != nil {
 		return err
 	}
 

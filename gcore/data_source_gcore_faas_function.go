@@ -130,6 +130,29 @@ func dataSourceFaaSFunction() *schema.Resource {
 				Type:     schema.TypeString,
 				Computed: true,
 			},
+			"dependencies": &schema.Schema{
+				Type:        schema.TypeString,
+				Description: "Function dependencies to install",
+				Computed:    true,
+			},
+			"disabled": &schema.Schema{
+				Type:        schema.TypeBool,
+				Description: "Set to true if function is disabled",
+				Computed:    true,
+			},
+			"enable_api_key": &schema.Schema{
+				Type:        schema.TypeBool,
+				Description: "Enable/Disable api key authorization",
+				Computed:    true,
+			},
+			"keys": &schema.Schema{
+				Type:        schema.TypeList,
+				Description: "List of used api keys",
+				Elem: &schema.Schema{
+					Type: schema.TypeString,
+				},
+				Computed: true,
+			},
 		},
 	}
 }
