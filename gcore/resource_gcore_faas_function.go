@@ -3,10 +3,10 @@ package gcore
 import (
 	"context"
 	"fmt"
-	"github.com/AlekSi/pointer"
 	"log"
 	"time"
 
+	"github.com/AlekSi/pointer"
 	gcorecloud "github.com/G-Core/gcorelabscloud-go"
 	"github.com/G-Core/gcorelabscloud-go/gcore/faas/v1/faas"
 	"github.com/G-Core/gcorelabscloud-go/gcore/task/v1/tasks"
