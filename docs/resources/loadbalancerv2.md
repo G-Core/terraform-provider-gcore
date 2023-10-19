@@ -50,6 +50,7 @@ resource "gcore_loadbalancerv2" "lb" {
 - `id` (String) The ID of this resource.
 - `metadata_read_only` (List of Object) (see [below for nested schema](#nestedatt--metadata_read_only))
 - `vip_address` (String) Load balancer IP address
+- `vip_port_id` (String) Load balancer Port ID
 
 <a id="nestedblock--timeouts"></a>
 ### Nested Schema for `timeouts`
