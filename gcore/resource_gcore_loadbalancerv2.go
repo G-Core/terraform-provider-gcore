@@ -103,6 +103,11 @@ func resourceLoadBalancerV2() *schema.Resource {
 				Description: "Load balancer IP address",
 				Computed:    true,
 			},
+			"vip_port_id": &schema.Schema{
+				Type:        schema.TypeString,
+				Description: "Load balancer Port ID",
+				Computed:    true,
+			},
 			"last_updated": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
@@ -220,6 +225,9 @@ func resourceLoadBalancerV2Read(ctx context.Context, d *schema.ResourceData, m i
 
 	if lb.VipAddress != nil {
 		d.Set("vip_address", lb.VipAddress.String())
+	}
+	if lb.VipPortID != nil {
+		d.Set("vip_port_id", lb.VipPortID.String())
 	}
 
 	fields := []string{"vip_network_id", "vip_subnet_id"}
