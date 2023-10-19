@@ -117,8 +117,10 @@ func dataSourceFaaSKeyRead(ctx context.Context, d *schema.ResourceData, m interf
 	d.Set("name", key.Name)
 	d.Set("description", key.Description)
 	d.Set("status", key.Status)
-	d.Set("created_at", key.CreatedAt)
-	d.Set("expire", key.Expire)
+	d.Set("created_at", key.CreatedAt.String())
+	if !key.Expire.IsZero() {
+		d.Set("expire", key.Expire.String())
+	}
 	fs := make([]map[string]any, len(key.Functions))
 	for idx, f := range key.Functions {
 		fs[idx] = map[string]any{
