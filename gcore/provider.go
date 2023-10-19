@@ -147,6 +147,7 @@ func Provider() *schema.Provider {
 			"gcore_laas_topic":        resourceLaaSTopic(),
 			"gcore_faas_namespace":    resourceFaaSNamespace(),
 			"gcore_faas_function":     resourceFaaSFunction(),
+			"gcore_faas_key":          resourceFaaSKey(),
 			"gcore_storage_s3":        resourceStorageS3(),
 			"gcore_storage_s3_bucket": resourceStorageS3Bucket(),
 			DNSZoneResource:           resourceDNSZone(),

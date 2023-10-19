@@ -164,6 +164,29 @@ func resourceFaaSFunction() *schema.Resource {
 				Type:     schema.TypeString,
 				Computed: true,
 			},
+			"dependencies": &schema.Schema{
+				Type:        schema.TypeString,
+				Description: "Function dependencies to install",
+				Optional:    true,
+			},
+			"disabled": &schema.Schema{
+				Type:        schema.TypeBool,
+				Description: "Set to true if function is disabled",
+				Optional:    true,
+			},
+			"enable_api_key": &schema.Schema{
+				Type:        schema.TypeBool,
+				Description: "Enable/Disable api key authorization",
+				Optional:    true,
+			},
+			"keys": &schema.Schema{
+				Type:        schema.TypeList,
+				Description: "List of used api keys",
+				Elem: &schema.Schema{
+					Type: schema.TypeString,
+				},
+				Optional: true,
+			},
 		},
 	}
 }
@@ -191,9 +214,12 @@ func resourceFaaSFunctionCreate(ctx context.Context, d *schema.ResourceData, m i
 			MinInstances: pointer.To(d.Get("min_instances").(int)),
 			MaxInstances: pointer.To(d.Get("max_instances").(int)),
 		},
-		CodeText:   d.Get("code_text").(string),
-		MainMethod: d.Get("main_method").(string),
-		Envs:       map[string]string{},
+		CodeText:     d.Get("code_text").(string),
+		MainMethod:   d.Get("main_method").(string),
+		Dependencies: d.Get("dependencies").(string),
+		Disabled:     pointer.To(d.Get("disabled").(bool)),
+		EnableApiKey: pointer.To(d.Get("enable_api_key").(bool)),
+		Envs:         map[string]string{},
 	}
 	envsRaw := d.Get("envs").(map[string]interface{})
 	if len(envsRaw) > 0 {
@@ -202,6 +228,15 @@ func resourceFaaSFunctionCreate(ctx context.Context, d *schema.ResourceData, m i
 			envs[k] = v.(string)
 		}
 		opts.Envs = envs
+	}
+
+	keysRaw := d.Get("keys").([]any)
+	if len(keysRaw) > 0 {
+		keys := make([]string, len(keysRaw))
+		for idx, v := range keysRaw {
+			keys[idx] = v.(string)
+		}
+		opts.Keys = keys
 	}
 
 	results, err := faas.CreateFunction(client, nsName, opts).Extract()
@@ -311,6 +346,31 @@ func resourceFaaSFunctionUpdate(ctx context.Context, d *schema.ResourceData, m i
 			MinInstances: pointer.To(d.Get("min_instances").(int)),
 			MaxInstances: pointer.To(d.Get("max_instances").(int)),
 		}
+		needUpdate = true
+	}
+
+	if d.HasChange("dependencies") {
+		opts.Dependencies = d.Get("dependencies").(string)
+		needUpdate = true
+	}
+
+	if d.HasChange("disabled") {
+		opts.Disabled = pointer.To(d.Get("disabled").(bool))
+		needUpdate = true
+	}
+
+	if d.HasChange("enable_api_key") {
+		opts.EnableApiKey = pointer.To(d.Get("enable_api_key").(bool))
+		needUpdate = true
+	}
+
+	if d.HasChange("keys") {
+		keysRaw := d.Get("keys").([]any)
+		keys := make([]string, len(keysRaw))
+		for idx, v := range keysRaw {
+			keys[idx] = v.(string)
+		}
+		opts.Keys = &keys
 		needUpdate = true
 	}
 

@@ -22,6 +22,8 @@ func TestAccFaaSFunction(t *testing.T) {
 		Timeout      int
 		MaxInstances int
 		MinInstances int
+		Key          string
+		EnableAPIKey bool
 	}
 
 	create := Params{
@@ -40,6 +42,8 @@ func Run(evt functions.Event, ctx functions.Context) (string, error) {
 		Timeout:      5,
 		MaxInstances: 2,
 		MinInstances: 1,
+		EnableAPIKey: true,
+		Key:          "\"test-key\"",
 	}
 
 	update := Params{
@@ -58,12 +62,21 @@ func Run(evt functions.Event, ctx functions.Context) (string, error) {
 		Timeout:      6,
 		MaxInstances: 3,
 		MinInstances: 1,
+		EnableAPIKey: false,
+		Key:          "",
 	}
 
 	fullName := "gcore_faas_function.acctest"
 
 	tpl := func(params *Params) string {
 		template := fmt.Sprintf(`
+		resource "gcore_faas_key" "acctestkey" {
+			name = "test-key"
+			description = "test apikey"
+			%s
+			%s
+        }
+
 		resource "gcore_faas_namespace" "acctest1" {
 			name = "test"
 			description = "test"
@@ -86,10 +99,12 @@ EOF
 			%s
 			flavor = "80mCPU-128MB"
 			main_method = "main"
-		}`, regionInfo(), projectInfo(), params.Name,
+			keys = [%s]
+			enable_api_key = %t
+		}`, regionInfo(), projectInfo(), regionInfo(), projectInfo(), params.Name,
 			params.Description, params.CodeText,
 			params.Timeout, params.MaxInstances, params.MinInstances,
-			regionInfo(), projectInfo())
+			regionInfo(), projectInfo(), params.Key, params.EnableAPIKey)
 
 		return template
 	}
@@ -109,6 +124,8 @@ EOF
 					resource.TestCheckResourceAttr(fullName, "timeout", strconv.Itoa(create.Timeout)),
 					resource.TestCheckResourceAttr(fullName, "max_instances", strconv.Itoa(create.MaxInstances)),
 					resource.TestCheckResourceAttr(fullName, "min_instances", strconv.Itoa(create.MinInstances)),
+					resource.TestCheckResourceAttr(fullName, "keys.0", "test-key"),
+					resource.TestCheckResourceAttr(fullName, "enable_api_key", "true"),
 				),
 			},
 			{
@@ -121,6 +138,8 @@ EOF
 					resource.TestCheckResourceAttr(fullName, "timeout", strconv.Itoa(update.Timeout)),
 					resource.TestCheckResourceAttr(fullName, "max_instances", strconv.Itoa(update.MaxInstances)),
 					resource.TestCheckResourceAttr(fullName, "min_instances", strconv.Itoa(update.MinInstances)),
+					resource.TestCheckNoResourceAttr(fullName, "keys.0"),
+					resource.TestCheckResourceAttr(fullName, "enable_api_key", "false"),
 				),
 			},
 		},
