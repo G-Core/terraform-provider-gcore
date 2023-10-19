@@ -188,6 +188,7 @@ func Provider() *schema.Provider {
 			"gcore_laas_hosts":            dataSourceLaaSHosts(),
 			"gcore_laas_status":           dataSourceLaaSStatus(),
 			"gcore_faas_namespace":        dataSourceFaaSNamespace(),
+			"gcore_faas_key":              dataSourceFaaSKey(),
 			"gcore_faas_function":         dataSourceFaaSFunction(),
 			"gcore_ddos_profile_template": dataSourceDDoSProfileTemplate(),
 		},
