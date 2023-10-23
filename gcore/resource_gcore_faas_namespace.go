@@ -26,7 +26,7 @@ func resourceFaaSNamespace() *schema.Resource {
 		ReadContext:   resourceFaaSNamespaceRead,
 		UpdateContext: resourceFaaSNamespaceUpdate,
 		DeleteContext: resourceFaaSNamespaceDelete,
-		Description:   "Represent FaaS namespace",
+		Description:   "Represents FaaS namespace",
 		Importer: &schema.ResourceImporter{
 			StateContext: func(ctx context.Context, d *schema.ResourceData, meta interface{}) ([]*schema.ResourceData, error) {
 				projectID, regionID, nsName, err := ImportStringParser(d.Id())
@@ -176,7 +176,7 @@ func resourceFaaSNamespaceRead(ctx context.Context, d *schema.ResourceData, m in
 	if err != nil {
 		switch err.(type) {
 		case gcorecloud.ErrDefault404:
-			log.Printf("[WARN] Removing namesapce %s because resource doesn't exist anymore", d.Id())
+			log.Printf("[WARN] Removing namespace %s because resource doesn't exist anymore", d.Id())
 			d.SetId("")
 			return nil
 		default:

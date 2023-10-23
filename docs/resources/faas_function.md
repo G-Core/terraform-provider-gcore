@@ -63,8 +63,12 @@ EOF
 
 ### Optional
 
+- `dependencies` (String) Function dependencies to install
 - `description` (String)
+- `disabled` (Boolean) Set to true if function is disabled
+- `enable_api_key` (Boolean) Enable/Disable api key authorization
 - `envs` (Map of String)
+- `keys` (List of String) List of used api keys
 - `project_id` (Number)
 - `project_name` (String)
 - `region_id` (Number)

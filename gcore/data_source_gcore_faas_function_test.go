@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"testing"
 
+	"github.com/AlekSi/pointer"
 	"github.com/G-Core/gcorelabscloud-go/gcore/faas/v1/faas"
 	"github.com/G-Core/gcorelabscloud-go/gcore/task/v1/tasks"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
@@ -36,8 +37,8 @@ func TestAccFaaSFunctionDataSource(t *testing.T) {
 		Timeout: 5,
 		Flavor:  "80mCPU-128MB",
 		Autoscaling: faas.FunctionAutoscaling{
-			MinInstances: 1,
-			MaxInstances: 2,
+			MinInstances: pointer.To(1),
+			MaxInstances: pointer.To(2),
 		},
 		CodeText: `
 		package kubeless
