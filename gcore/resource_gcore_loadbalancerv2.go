@@ -90,6 +90,7 @@ func resourceLoadBalancerV2() *schema.Resource {
 			},
 			"vip_network_id": &schema.Schema{
 				Type:     schema.TypeString,
+				Description: "Note: add all created `gcore_subnet` resources within the network with this id to the `depends_on` to be sure that `gcore_loadbalancerv2` will be destroyed first",
 				Optional: true,
 				ForceNew: true,
 			},
