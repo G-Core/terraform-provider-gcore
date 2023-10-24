@@ -3,12 +3,12 @@
 page_title: "gcore_faas_namespace Resource - terraform-provider-gcore"
 subcategory: ""
 description: |-
-  Represent FaaS namespace
+  Represents FaaS namespace
 ---
 
 # gcore_faas_namespace (Resource)
 
-Represent FaaS namespace
+Represents FaaS namespace
 
 ## Example Usage
 

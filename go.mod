@@ -1,6 +1,6 @@
 module github.com/terraform-providers/terraform-provider-gcore
 
-go 1.20
+go 1.21
 
 require (
 	github.com/AlekSi/pointer v1.2.0

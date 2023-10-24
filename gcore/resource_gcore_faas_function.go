@@ -6,6 +6,7 @@ import (
 	"log"
 	"time"
 
+	"github.com/AlekSi/pointer"
 	gcorecloud "github.com/G-Core/gcorelabscloud-go"
 	"github.com/G-Core/gcorelabscloud-go/gcore/faas/v1/faas"
 	"github.com/G-Core/gcorelabscloud-go/gcore/task/v1/tasks"
@@ -163,6 +164,29 @@ func resourceFaaSFunction() *schema.Resource {
 				Type:     schema.TypeString,
 				Computed: true,
 			},
+			"dependencies": &schema.Schema{
+				Type:        schema.TypeString,
+				Description: "Function dependencies to install",
+				Optional:    true,
+			},
+			"disabled": &schema.Schema{
+				Type:        schema.TypeBool,
+				Description: "Set to true if function is disabled",
+				Optional:    true,
+			},
+			"enable_api_key": &schema.Schema{
+				Type:        schema.TypeBool,
+				Description: "Enable/Disable api key authorization",
+				Optional:    true,
+			},
+			"keys": &schema.Schema{
+				Type:        schema.TypeList,
+				Description: "List of used api keys",
+				Elem: &schema.Schema{
+					Type: schema.TypeString,
+				},
+				Optional: true,
+			},
 		},
 	}
 }
@@ -187,12 +211,15 @@ func resourceFaaSFunctionCreate(ctx context.Context, d *schema.ResourceData, m i
 		Timeout:     d.Get("timeout").(int),
 		Flavor:      d.Get("flavor").(string),
 		Autoscaling: faas.FunctionAutoscaling{
-			MinInstances: d.Get("min_instances").(int),
-			MaxInstances: d.Get("max_instances").(int),
+			MinInstances: pointer.To(d.Get("min_instances").(int)),
+			MaxInstances: pointer.To(d.Get("max_instances").(int)),
 		},
-		CodeText:   d.Get("code_text").(string),
-		MainMethod: d.Get("main_method").(string),
-		Envs:       map[string]string{},
+		CodeText:     d.Get("code_text").(string),
+		MainMethod:   d.Get("main_method").(string),
+		Dependencies: d.Get("dependencies").(string),
+		Disabled:     pointer.To(d.Get("disabled").(bool)),
+		EnableApiKey: pointer.To(d.Get("enable_api_key").(bool)),
+		Envs:         map[string]string{},
 	}
 	envsRaw := d.Get("envs").(map[string]interface{})
 	if len(envsRaw) > 0 {
@@ -201,6 +228,15 @@ func resourceFaaSFunctionCreate(ctx context.Context, d *schema.ResourceData, m i
 			envs[k] = v.(string)
 		}
 		opts.Envs = envs
+	}
+
+	keysRaw := d.Get("keys").([]any)
+	if len(keysRaw) > 0 {
+		keys := make([]string, len(keysRaw))
+		for idx, v := range keysRaw {
+			keys[idx] = v.(string)
+		}
+		opts.Keys = keys
 	}
 
 	results, err := faas.CreateFunction(client, nsName, opts).Extract()
@@ -307,9 +343,34 @@ func resourceFaaSFunctionUpdate(ctx context.Context, d *schema.ResourceData, m i
 
 	if d.HasChanges("max_instances", "max_instances") {
 		opts.Autoscaling = &faas.FunctionAutoscaling{
-			MinInstances: d.Get("min_instances").(int),
-			MaxInstances: d.Get("max_instances").(int),
+			MinInstances: pointer.To(d.Get("min_instances").(int)),
+			MaxInstances: pointer.To(d.Get("max_instances").(int)),
 		}
+		needUpdate = true
+	}
+
+	if d.HasChange("dependencies") {
+		opts.Dependencies = d.Get("dependencies").(string)
+		needUpdate = true
+	}
+
+	if d.HasChange("disabled") {
+		opts.Disabled = pointer.To(d.Get("disabled").(bool))
+		needUpdate = true
+	}
+
+	if d.HasChange("enable_api_key") {
+		opts.EnableApiKey = pointer.To(d.Get("enable_api_key").(bool))
+		needUpdate = true
+	}
+
+	if d.HasChange("keys") {
+		keysRaw := d.Get("keys").([]any)
+		keys := make([]string, len(keysRaw))
+		for idx, v := range keysRaw {
+			keys[idx] = v.(string)
+		}
+		opts.Keys = &keys
 		needUpdate = true
 	}
 
@@ -398,6 +459,9 @@ func faaSSetState(d *schema.ResourceData, function *faas.Function) error {
 	d.Set("status", function.Status)
 	d.Set("endpoint", function.Endpoint)
 	d.Set("created_at", function.CreatedAt.Format(time.RFC3339))
+	d.Set("dependencies", function.Dependencies)
+	d.Set("disabled", function.Disabled)
+	d.Set("enable_api_key", function.EnableAPIKey)
 
 	if err := d.Set("envs", function.Envs); err != nil {
 		return err
@@ -407,6 +471,17 @@ func faaSSetState(d *schema.ResourceData, function *faas.Function) error {
 		"ready": function.DeployStatus.Ready,
 	}
 	if err := d.Set("deploy_status", ds); err != nil {
+		return err
+	}
+
+	keys := make([]string, 0, len(function.Keys))
+	if len(function.Keys) > 0 {
+		for _, key := range function.Keys {
+			keys = append(keys, key)
+		}
+	}
+
+	if err := d.Set("keys", keys); err != nil {
 		return err
 	}
 

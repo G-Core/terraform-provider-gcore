@@ -12,7 +12,7 @@ Requirements
 ------------
 
 -	[Terraform](https://www.terraform.io/downloads.html) 0.13.x
--	[Go](https://golang.org/doc/install) 1.20 (to build the provider plugin)
+-	[Go](https://golang.org/doc/install) 1.21 (to build the provider plugin)
 
 Upgrade state
 -------
@@ -81,7 +81,7 @@ $ terraform init # not needed when override is in use
 
 Updating docs
 -------------
-Don't forget to add docs and examples to support your contribution. Update [tfplugindocs](//github.com/hashicorp/terraform-plugin-docs/releases/) when needed.
+Don't forget to add docs and examples to support your contribution. Update [tfplugindocs](https://github.com/hashicorp/terraform-plugin-docs/releases/) when needed.
 ```sh
 $ tfplugindocs
 $ git add .

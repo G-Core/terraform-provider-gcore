@@ -42,7 +42,7 @@ resource "gcore_loadbalancerv2" "lb" {
 - `region_id` (Number)
 - `region_name` (String)
 - `timeouts` (Block, Optional) (see [below for nested schema](#nestedblock--timeouts))
-- `vip_network_id` (String)
+- `vip_network_id` (String) Note: add all created `gcore_subnet` resources within the network with this id to the `depends_on` to be sure that `gcore_loadbalancerv2` will be destroyed first
 - `vip_subnet_id` (String)
 
 ### Read-Only
@@ -50,6 +50,7 @@ resource "gcore_loadbalancerv2" "lb" {
 - `id` (String) The ID of this resource.
 - `metadata_read_only` (List of Object) (see [below for nested schema](#nestedatt--metadata_read_only))
 - `vip_address` (String) Load balancer IP address
+- `vip_port_id` (String) Load balancer Port ID
 
 <a id="nestedblock--timeouts"></a>
 ### Nested Schema for `timeouts`
