@@ -222,7 +222,7 @@ func resourceLoadBalancerV2Read(ctx context.Context, d *schema.ResourceData, m i
 	d.Set("region_id", lb.RegionID)
 	d.Set("name", lb.Name)
 	d.Set("flavor", lb.Flavor.FlavorName)
-    d.Set("vip_port_id", lb.VipPortID)
+	d.Set("vip_port_id", lb.VipPortID)
 
 	if lb.VipAddress != nil {
 		d.Set("vip_address", lb.VipAddress.String())
