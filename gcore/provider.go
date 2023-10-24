@@ -123,6 +123,7 @@ func Provider() *schema.Provider {
 			},
 		},
 		ResourcesMap: map[string]*schema.Resource{
+			"gcore_ai_cluster":        resourceAICluster(),
 			"gcore_volume":            resourceVolume(),
 			"gcore_network":           resourceNetwork(),
 			"gcore_subnet":            resourceSubnet(),
@@ -162,6 +163,7 @@ func Provider() *schema.Provider {
 			"gcore_ddos_protection":   resourceDDoSProtection(),
 		},
 		DataSourcesMap: map[string]*schema.Resource{
+			"gcore_ai_cluster":            dataSourceAICluster(),
 			"gcore_project":               dataSourceProject(),
 			"gcore_region":                dataSourceRegion(),
 			"gcore_securitygroup":         dataSourceSecurityGroup(),
