@@ -276,6 +276,7 @@ func providerConfigure(_ context.Context, d *schema.ResourceData) (interface{}, 
 			ClientID:    clientID,
 		})
 	}
+	provider.SetDebug(os.Getenv("TF_LOG") == "DEBUG")
 	if err != nil {
 		provider = &gcorecloud.ProviderClient{}
 		log.Printf("[ERROR] init auth client: %s\n", err)
