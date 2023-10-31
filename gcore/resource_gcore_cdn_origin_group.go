@@ -9,7 +9,7 @@ import (
 	"log"
 	"strconv"
 
-	"github.com/G-Core/gcorelabscdn-go/origingroups"
+	"github.com/G-Core/gcorelabscdn-go/origingroupsdeprecated"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 )
@@ -74,12 +74,12 @@ func resourceCDNOriginGroupCreate(ctx context.Context, d *schema.ResourceData, m
 	config := m.(*Config)
 	client := config.CDNClient
 
-	var req origingroups.GroupRequest
+	var req origingroupsdeprecated.GroupRequestDeprecated
 	req.Name = d.Get("name").(string)
 	req.UseNext = d.Get("use_next").(bool)
 	req.Origins = setToOriginRequests(d.Get("origin").(*schema.Set))
 
-	result, err := client.OriginGroups().Create(ctx, &req)
+	result, err := client.OriginGroupsDeprecated().Create(ctx, &req)
 	if err != nil {
 		return diag.FromErr(err)
 	}
@@ -102,7 +102,7 @@ func resourceCDNOriginGroupRead(ctx context.Context, d *schema.ResourceData, m i
 		return diag.FromErr(err)
 	}
 
-	result, err := client.OriginGroups().Get(ctx, id)
+	result, err := client.OriginGroupsDeprecated().Get(ctx, id)
 	if err != nil {
 		return diag.FromErr(err)
 	}
@@ -128,12 +128,12 @@ func resourceCDNOriginGroupUpdate(ctx context.Context, d *schema.ResourceData, m
 		return diag.FromErr(err)
 	}
 
-	var req origingroups.GroupRequest
+	var req origingroupsdeprecated.GroupRequest
 	req.Name = d.Get("name").(string)
 	req.UseNext = d.Get("use_next").(bool)
 	req.Origins = setToOriginRequests(d.Get("origin").(*schema.Set))
 
-	if _, err := client.OriginGroups().Update(ctx, id, &req); err != nil {
+	if _, err := client.OriginGroupsDeprecated().Update(ctx, id, &req); err != nil {
 		return diag.FromErr(err)
 	}
 
@@ -154,7 +154,7 @@ func resourceCDNOriginGroupDelete(ctx context.Context, d *schema.ResourceData, m
 		return diag.FromErr(err)
 	}
 
-	if err := client.OriginGroups().Delete(ctx, id); err != nil {
+	if err := client.OriginGroupsDeprecated().Delete(ctx, id); err != nil {
 		return diag.FromErr(err)
 	}
 
@@ -163,9 +163,9 @@ func resourceCDNOriginGroupDelete(ctx context.Context, d *schema.ResourceData, m
 	return nil
 }
 
-func setToOriginRequests(s *schema.Set) (origins []origingroups.OriginRequest) {
+func setToOriginRequests(s *schema.Set) (origins []origingroupsdeprecated.OriginRequest) {
 	for _, fields := range s.List() {
-		var originReq origingroups.OriginRequest
+		var originReq origingroupsdeprecated.OriginRequest
 
 		for key, val := range fields.(map[string]interface{}) {
 			switch key {
@@ -184,7 +184,7 @@ func setToOriginRequests(s *schema.Set) (origins []origingroups.OriginRequest) {
 	return origins
 }
 
-func originsToSet(origins []origingroups.Origin) *schema.Set {
+func originsToSet(origins []origingroupsdeprecated.Origin) *schema.Set {
 	s := &schema.Set{F: originSetIDFunc}
 
 	for _, origin := range origins {
