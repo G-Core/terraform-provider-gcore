@@ -16,8 +16,12 @@ import (
 )
 
 const (
-	tasksPoint = "tasks"
+	K8sPoint         = "k8s/clusters"
+	tasksPoint       = "tasks"
+	K8sCreateTimeout = 3600
 )
+
+var k8sCreateTimeout = time.Second * time.Duration(K8sCreateTimeout)
 
 func resourceK8sV2() *schema.Resource {
 	return &schema.Resource{

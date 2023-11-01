@@ -153,11 +153,10 @@ Read-Only:
 
 Read-Only:
 
-- `attachments` (List of Object) (see [below for nested schema](#nestedobjatt--volume--attachments))
+- `attachments` (Set of Object) (see [below for nested schema](#nestedobjatt--volume--attachments))
 - `created_at` (String)
 - `creator_task_id` (String)
 - `image_id` (String)
-- `metadata_detailed` (Set of Object) (see [below for nested schema](#nestedobjatt--volume--metadata_detailed))
 - `name` (String)
 - `size` (Number)
 - `source` (String)
@@ -178,12 +177,3 @@ Read-Only:
 - `instance_name` (String)
 - `server_id` (String)
 - `volume_id` (String)
-
-
-<a id="nestedobjatt--volume--metadata_detailed"></a>
-### Nested Schema for `volume.metadata_detailed`
-
-Read-Only:
-
-- `key` (String)
-- `value` (String)

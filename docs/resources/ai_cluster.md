@@ -72,7 +72,6 @@ resource "gcore_ai_cluster" "cluster1" {
 
 ### Read-Only
 
-- `cluster_id` (String) AI Cluster ID
 - `created_at` (String) Datetime when the cluster was created
 - `creator_task_id` (String) Task that created this entity
 - `id` (String) The ID of this resource.
@@ -114,34 +113,24 @@ Optional:
 
 Read-Only:
 
-- `attachments` (Set of Object) Attachment list (see [below for nested schema](#nestedatt--volume--attachments))
+- `attachments` (Block Set) Attachment list (see [below for nested schema](#nestedblock--volume--attachments))
 - `created_at` (String) Datetime when the volume was created
 - `creator_task_id` (String) Task that created this entity
-- `metadata_detailed` (Set of Object) (see [below for nested schema](#nestedatt--volume--metadata_detailed))
 - `status` (String) Volume status
 - `updated_at` (String) Datetime when the volume was last updated
 - `volume_image_metadata` (Map of String) Image information for volumes that were created from image
 
-<a id="nestedatt--volume--attachments"></a>
+<a id="nestedblock--volume--attachments"></a>
 ### Nested Schema for `volume.attachments`
 
 Read-Only:
 
-- `attached_at` (String)
-- `attachment_id` (String)
-- `device` (String)
-- `instance_name` (String)
-- `server_id` (String)
-- `volume_id` (String)
-
-
-<a id="nestedatt--volume--metadata_detailed"></a>
-### Nested Schema for `volume.metadata_detailed`
-
-Read-Only:
-
-- `key` (String)
-- `value` (String)
+- `attached_at` (String) Attachment creation datetime
+- `attachment_id` (String) ID of attachment object
+- `device` (String) Block device name in guest
+- `instance_name` (String) Instance name (if attached and server name is known)
+- `server_id` (String) Instance ID
+- `volume_id` (String) Volume ID
 
 
 
