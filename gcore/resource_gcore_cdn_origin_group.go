@@ -53,10 +53,6 @@ func resourceCDNOriginGroup() *schema.Resource {
 							Computed:    true,
 							Description: "true — The option is active. The origin will not be used until one of active origins become unavailable. false — The option is disabled.",
 						},
-						"id": {
-							Type:     schema.TypeInt,
-							Computed: true,
-						},
 					},
 				},
 			},
@@ -77,7 +73,7 @@ func resourceCDNOriginGroupCreate(ctx context.Context, d *schema.ResourceData, m
 	var req origingroups.GroupRequest
 	req.Name = d.Get("name").(string)
 	req.UseNext = d.Get("use_next").(bool)
-	req.Origins = setToOriginRequests(d.Get("origin").(*schema.Set))
+	req.Sources = setToSourceRequests(d.Get("origin").(*schema.Set))
 
 	result, err := client.OriginGroups().Create(ctx, &req)
 	if err != nil {
@@ -109,7 +105,7 @@ func resourceCDNOriginGroupRead(ctx context.Context, d *schema.ResourceData, m i
 
 	d.Set("name", result.Name)
 	d.Set("use_next", result.UseNext)
-	if err := d.Set("origin", originsToSet(result.Origins)); err != nil {
+	if err := d.Set("origin", originsToSet(result.Sources)); err != nil {
 		return diag.FromErr(err)
 	}
 
@@ -131,7 +127,7 @@ func resourceCDNOriginGroupUpdate(ctx context.Context, d *schema.ResourceData, m
 	var req origingroups.GroupRequest
 	req.Name = d.Get("name").(string)
 	req.UseNext = d.Get("use_next").(bool)
-	req.Origins = setToOriginRequests(d.Get("origin").(*schema.Set))
+	req.Sources = setToSourceRequests(d.Get("origin").(*schema.Set))
 
 	if _, err := client.OriginGroups().Update(ctx, id, &req); err != nil {
 		return diag.FromErr(err)
@@ -163,9 +159,9 @@ func resourceCDNOriginGroupDelete(ctx context.Context, d *schema.ResourceData, m
 	return nil
 }
 
-func setToOriginRequests(s *schema.Set) (origins []origingroups.OriginRequest) {
+func setToSourceRequests(s *schema.Set) (origins []origingroups.SourceRequest) {
 	for _, fields := range s.List() {
-		var originReq origingroups.OriginRequest
+		var originReq origingroups.SourceRequest
 
 		for key, val := range fields.(map[string]interface{}) {
 			switch key {
@@ -184,12 +180,11 @@ func setToOriginRequests(s *schema.Set) (origins []origingroups.OriginRequest) {
 	return origins
 }
 
-func originsToSet(origins []origingroups.Origin) *schema.Set {
+func originsToSet(origins []origingroups.Source) *schema.Set {
 	s := &schema.Set{F: originSetIDFunc}
 
 	for _, origin := range origins {
 		fields := make(map[string]interface{})
-		fields["id"] = origin.ID
 		fields["source"] = origin.Source
 		fields["enabled"] = origin.Enabled
 		fields["backup"] = origin.Backup
@@ -204,7 +199,7 @@ func originSetIDFunc(i interface{}) int {
 	fields := i.(map[string]interface{})
 	h := md5.New()
 
-	key := fmt.Sprintf("%d-%s-%t-%t", fields["id"], fields["source"], fields["enabled"], fields["backup"])
+	key := fmt.Sprintf("%d-%s-%t-%t", fields["source"], fields["enabled"], fields["backup"])
 	log.Printf("[DEBUG] Origin Set ID = %s\n", key)
 
 	io.WriteString(h, key)
