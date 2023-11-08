@@ -57,6 +57,3 @@ Optional:
 - `backup` (Boolean) true — The option is active. The origin will not be used until one of active origins become unavailable. false — The option is disabled.
 - `enabled` (Boolean) The setting allows to enable or disable an Origin source in the Origins group
 
-Read-Only:
-
-- `id` (Number) The ID of this resource.
