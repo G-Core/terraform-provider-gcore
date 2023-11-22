@@ -4,7 +4,6 @@ provider gcore {
 
 resource "gcore_network" "network" {
   name       = "network_example"
-  mtu        = 1450
   type       = "vxlan"
   region_id  = 1
   project_id = 1
