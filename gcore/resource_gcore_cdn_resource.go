@@ -1075,7 +1075,6 @@ func resourceCDNResource() *schema.Resource {
 			"secondary_hostnames": {
 				Type:     schema.TypeSet,
 				Optional: true,
-				Computed: true,
 				DefaultFunc: func() (interface{}, error) {
 					return []string{}, nil
 				},
@@ -1198,6 +1197,7 @@ func resourceCDNResourceUpdate(ctx context.Context, d *schema.ResourceData, m in
 	req.SSLData = d.Get("ssl_data").(int)
 	req.OriginProtocol = resources.Protocol(d.Get("origin_protocol").(string))
 	req.Options = listToOptions(d.Get("options").([]interface{}))
+	req.SecondaryHostnames = make([]string, 0)
 	for _, hostname := range d.Get("secondary_hostnames").(*schema.Set).List() {
 		req.SecondaryHostnames = append(req.SecondaryHostnames, hostname.(string))
 	}
