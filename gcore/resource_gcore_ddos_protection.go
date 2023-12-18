@@ -102,10 +102,6 @@ func resourceDDoSProtection() *schema.Resource {
 				Optional:    true,
 				Default:     true,
 			},
-			"price": {
-				Type:     schema.TypeString,
-				Computed: true,
-			},
 			"fields": {
 				Type:     schema.TypeList,
 				Optional: true,
@@ -318,7 +314,6 @@ func resourceDDoSProtectionRead(ctx context.Context, d *schema.ResourceData, m i
 	d.Set("ip_address", profile.IPAddress)
 	d.Set("profile_template", profile.ProfileTemplate)
 	d.Set("bgp", profile.Options.BGP)
-	d.Set("price", profile.Options.Price)
 	d.Set("active", profile.Options.Active)
 	d.Set("site", profile.Site)
 	fields := make([]map[string]interface{}, len(profile.Fields))
