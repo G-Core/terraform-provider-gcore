@@ -99,14 +99,14 @@ func resourceLbListener() *schema.Resource {
 				Type:        schema.TypeString,
 				Required:    true,
 				ForceNew:    true,
-				Description: "Available values is 'HTTP', 'HTTPS', 'TCP', 'UDP', 'TERMINATED_HTTPS'",
+				Description: "Available values are 'HTTP', 'HTTPS', 'TCP', 'UDP', 'TERMINATED_HTTPS', 'PROMETHEUS'",
 				ValidateDiagFunc: func(val interface{}, key cty.Path) diag.Diagnostics {
 					v := val.(string)
 					switch types.ProtocolType(v) {
-					case types.ProtocolTypeHTTP, types.ProtocolTypeHTTPS, types.ProtocolTypeTCP, types.ProtocolTypeUDP, types.ProtocolTypeTerminatedHTTPS:
+					case types.ProtocolTypeHTTP, types.ProtocolTypeHTTPS, types.ProtocolTypeTCP, types.ProtocolTypeUDP, types.ProtocolTypeTerminatedHTTPS, types.ProtocolTypePrometheus:
 						return diag.Diagnostics{}
 					}
-					return diag.Errorf("wrong protocol %s, available values is 'HTTP', 'HTTPS', 'TCP', 'UDP', 'TERMINATED_HTTPS", v)
+					return diag.Errorf("wrong protocol %s, available values are 'HTTP', 'HTTPS', 'TCP', 'UDP', 'TERMINATED_HTTPS', 'PROMETHEUS'", v)
 				},
 			},
 			"protocol_port": &schema.Schema{
