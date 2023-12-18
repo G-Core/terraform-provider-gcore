@@ -119,10 +119,12 @@ func resourceLBPool() *schema.Resource {
 			"loadbalancer_id": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
+				ForceNew: true,
 			},
 			"listener_id": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
+				ForceNew: true,
 			},
 			"health_monitor": &schema.Schema{
 				Type:     schema.TypeList,
