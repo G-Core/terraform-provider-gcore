@@ -35,7 +35,6 @@ Represents DDoS protection profile
 ### Read-Only
 
 - `id` (String) The ID of this resource.
-- `price` (String)
 - `protocols` (List of Object) List of protocols (see [below for nested schema](#nestedatt--protocols))
 - `site` (String)
 

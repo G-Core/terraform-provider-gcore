@@ -388,7 +388,7 @@ func GetRegion(provider *gcorecloud.ProviderClient, regionID int, regionName str
 		return 0, err
 	}
 
-	rs, err := regions.ListAll(client)
+	rs, err := regions.ListAll(client, nil)
 	if err != nil {
 		return 0, err
 	}
