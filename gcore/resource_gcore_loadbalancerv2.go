@@ -7,9 +7,11 @@ import (
 	"time"
 
 	"github.com/G-Core/gcorelabscloud-go/gcore/loadbalancer/v1/loadbalancers"
+	"github.com/G-Core/gcorelabscloud-go/gcore/loadbalancer/v1/types"
 	"github.com/G-Core/gcorelabscloud-go/gcore/task/v1/tasks"
 	"github.com/G-Core/gcorelabscloud-go/gcore/utils"
 	"github.com/G-Core/gcorelabscloud-go/gcore/utils/metadata/v1/metadata"
+	"github.com/hashicorp/go-cty/cty"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 )
@@ -109,6 +111,19 @@ func resourceLoadBalancerV2() *schema.Resource {
 				Description: "Load balancer Port ID",
 				Computed:    true,
 			},
+			"vip_ip_family": &schema.Schema{
+				Type:        schema.TypeString,
+				Optional:    true,
+				Description: fmt.Sprintf("Available values are '%s', '%s', '%s'", types.IPv4IPFamilyType, types.IPv6IPFamilyType, types.DualStackIPFamilyType),
+				ValidateDiagFunc: func(val interface{}, key cty.Path) diag.Diagnostics {
+					v := val.(string)
+					switch types.IPFamilyType(v) {
+					case types.IPv4IPFamilyType, types.IPv6IPFamilyType, types.DualStackIPFamilyType:
+						return diag.Diagnostics{}
+					}
+					return diag.Errorf("wrong type %s, available values are '%s', '%s', '%s'", v, types.IPv4IPFamilyType, types.IPv6IPFamilyType, types.DualStackIPFamilyType)
+				},
+			},
 			"last_updated": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
@@ -160,6 +175,7 @@ func resourceLoadBalancerV2Create(ctx context.Context, d *schema.ResourceData, m
 		Name:         d.Get("name").(string),
 		VipNetworkID: d.Get("vip_network_id").(string),
 		VipSubnetID:  d.Get("vip_subnet_id").(string),
+		VIPIPFamily:  types.IPFamilyType(d.Get("vip_ip_family").(string)),
 	}
 
 	if metadataRaw, ok := d.GetOk("metadata_map"); ok {
@@ -224,6 +240,7 @@ func resourceLoadBalancerV2Read(ctx context.Context, d *schema.ResourceData, m i
 	d.Set("name", lb.Name)
 	d.Set("flavor", lb.Flavor.FlavorName)
 	d.Set("vip_port_id", lb.VipPortID)
+	d.Set("vrrp_ips", lb.VrrpIPs)
 
 	if lb.VipAddress != nil {
 		d.Set("vip_address", lb.VipAddress.String())

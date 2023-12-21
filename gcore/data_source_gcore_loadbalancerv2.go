@@ -60,6 +60,22 @@ func dataSourceLoadBalancerV2() *schema.Resource {
 				Type:     schema.TypeString,
 				Computed: true,
 			},
+			"vrrp_ips": &schema.Schema{
+				Type:     schema.TypeList,
+				Computed: true,
+				Elem: &schema.Resource{
+					Schema: map[string]*schema.Schema{
+						"ip_address": {
+							Type:     schema.TypeString,
+							Computed: true,
+						},
+						"subnet_id": {
+							Type:     schema.TypeString,
+							Computed: true,
+						},
+					},
+				},
+			},
 			"metadata_k": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
@@ -142,12 +158,21 @@ func dataSourceLoadBalancerV2Read(ctx context.Context, d *schema.ResourceData, m
 		return diag.Errorf("load balancer with name %s not found", name)
 	}
 
+	vrrpIps := make([]map[string]string, len(lb.VrrpIPs))
+	for i, vrrpIp := range lb.VrrpIPs {
+		v := map[string]string{"subnet_id": "", "ip_address": ""}
+		v["subnet_id"] = vrrpIp.SubnetID
+		v["ip_address"] = vrrpIp.IpAddress.String()
+		vrrpIps[i] = v
+	}
+
 	d.SetId(lb.ID)
 	d.Set("project_id", lb.ProjectID)
 	d.Set("region_id", lb.RegionID)
 	d.Set("name", lb.Name)
 	d.Set("vip_address", lb.VipAddress.String())
 	d.Set("vip_port_id", lb.VipPortID)
+	d.Set("vrrp_ips", vrrpIps)
 
 	log.Println("[DEBUG] Finish LoadBalancer reading")
 	return diags
