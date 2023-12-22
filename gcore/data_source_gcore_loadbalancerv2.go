@@ -2,8 +2,9 @@ package gcore
 
 import (
 	"context"
-	"github.com/G-Core/gcorelabscloud-go/gcore/utils"
 	"log"
+
+	"github.com/G-Core/gcorelabscloud-go/gcore/utils"
 
 	"github.com/G-Core/gcorelabscloud-go/gcore/loadbalancer/v1/loadbalancers"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
@@ -75,6 +76,10 @@ func dataSourceLoadBalancerV2() *schema.Resource {
 						},
 					},
 				},
+			},
+			"vip_ip_family": &schema.Schema{
+				Type:     schema.TypeString,
+				Computed: true,
 			},
 			"metadata_k": &schema.Schema{
 				Type:     schema.TypeString,
@@ -173,6 +178,7 @@ func dataSourceLoadBalancerV2Read(ctx context.Context, d *schema.ResourceData, m
 	d.Set("vip_address", lb.VipAddress.String())
 	d.Set("vip_port_id", lb.VipPortID)
 	d.Set("vrrp_ips", vrrpIps)
+	d.Set("vip_ip_family", lb.VipIPFamilyType)
 
 	log.Println("[DEBUG] Finish LoadBalancer reading")
 	return diags

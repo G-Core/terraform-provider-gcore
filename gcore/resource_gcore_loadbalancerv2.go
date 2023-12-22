@@ -241,6 +241,7 @@ func resourceLoadBalancerV2Read(ctx context.Context, d *schema.ResourceData, m i
 	d.Set("flavor", lb.Flavor.FlavorName)
 	d.Set("vip_port_id", lb.VipPortID)
 	d.Set("vrrp_ips", lb.VrrpIPs)
+	d.Set("vip_ip_family", lb.VipIPFamilyType)
 
 	if lb.VipAddress != nil {
 		d.Set("vip_address", lb.VipAddress.String())
