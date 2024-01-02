@@ -7,8 +7,10 @@ import (
 	"github.com/G-Core/gcorelabscloud-go/gcore/utils"
 
 	"github.com/G-Core/gcorelabscloud-go/gcore/loadbalancer/v1/loadbalancers"
+	"github.com/G-Core/gcorelabscloud-go/gcore/loadbalancer/v1/types"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/validation"
 )
 
 func dataSourceLoadBalancerV2() *schema.Resource {
@@ -78,8 +80,10 @@ func dataSourceLoadBalancerV2() *schema.Resource {
 				},
 			},
 			"vip_ip_family": &schema.Schema{
-				Type:     schema.TypeString,
-				Computed: true,
+				Type:         schema.TypeString,
+				Computed:     true,
+				Optional:     true,
+				ValidateFunc: validation.StringInSlice(types.IPFamilyType("").StringList(), false),
 			},
 			"metadata_k": &schema.Schema{
 				Type:     schema.TypeString,
