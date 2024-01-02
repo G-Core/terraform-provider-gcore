@@ -977,6 +977,25 @@ var (
 						},
 					},
 				},
+				"waf": {
+					Type:        schema.TypeList,
+					MaxItems:    1,
+					Optional:    true,
+					Description: "Option allows to enable Basic WAF to protect you against the most common threats.",
+					Elem: &schema.Resource{
+						Schema: map[string]*schema.Schema{
+							"enabled": {
+								Type:     schema.TypeBool,
+								Optional: true,
+								Default:  true,
+							},
+							"value": {
+								Type:     schema.TypeBool,
+								Required: true,
+							},
+						},
+					},
+				},
 				"webp": { // deprecated in favor of image_stack
 					Type:        schema.TypeList,
 					MaxItems:    1,
@@ -1568,6 +1587,12 @@ func listToOptions(l []interface{}) *gcdn.Options {
 			Value:   opt["value"].(bool),
 		}
 	}
+	if opt, ok := getOptByName(fields, "waf"); ok {
+		opts.WAF = &gcdn.WAF{
+			Enabled: opt["enabled"].(bool),
+			Value:   opt["value"].(bool),
+		}
+	}
 	if opt, ok := getOptByName(fields, "webp"); ok {
 		opts.Webp = &gcdn.Webp{
 			Enabled:     opt["enabled"].(bool),
@@ -1778,6 +1803,10 @@ func optionsToList(options *gcdn.Options) []interface{} {
 	if options.UseRSALECert != nil {
 		m := structToMap(options.UseRSALECert)
 		result["use_rsa_le_cert"] = []interface{}{m}
+	}
+	if options.WAF != nil {
+		m := structToMap(options.WAF)
+		result["waf"] = []interface{}{m}
 	}
 	if options.Webp != nil {
 		m := structToMap(options.Webp)
