@@ -53,6 +53,12 @@ func resourceCDNRule() *schema.Resource {
 				Required:    true,
 				Description: "Rule name",
 			},
+			"active": {
+				Type:        schema.TypeBool,
+				Optional:    true,
+				Default:     true,
+				Description: "The setting allows to enable or disable a Rule. If not specified, it will be enabled.",
+			},
 			"rule": {
 				Type:        schema.TypeString,
 				Required:    true,
@@ -96,6 +102,7 @@ func resourceCDNRuleCreate(ctx context.Context, d *schema.ResourceData, m interf
 
 	var req rules.CreateRequest
 	req.Name = d.Get("name").(string)
+	req.Active = d.Get("active").(bool)
 	req.Rule = d.Get("rule").(string)
 	req.RuleType = d.Get("rule_type").(int)
 
@@ -146,6 +153,7 @@ func resourceCDNRuleRead(ctx context.Context, d *schema.ResourceData, m interfac
 	}
 
 	d.Set("name", result.Name)
+	d.Set("active", result.Active)
 	d.Set("rule", result.Pattern)
 	d.Set("rule_type", result.Type)
 	d.Set("origin_group", result.OriginGroup)
@@ -172,6 +180,7 @@ func resourceCDNRuleUpdate(ctx context.Context, d *schema.ResourceData, m interf
 
 	var req rules.UpdateRequest
 	req.Name = d.Get("name").(string)
+	req.Active = d.Get("active").(bool)
 	req.Rule = d.Get("rule").(string)
 	req.RuleType = d.Get("rule_type").(int)
 
