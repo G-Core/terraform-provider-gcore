@@ -57,7 +57,7 @@ resource "gcore_lbpool" "pl" {
 
 - `lb_algorithm` (String) Available values is 'ROUND_ROBIN', 'LEAST_CONNECTIONS', 'SOURCE_IP', 'SOURCE_IP_PORT'
 - `name` (String)
-- `protocol` (String) Available values is 'HTTP' (currently work, other do not work on ed-8), 'HTTPS', 'TCP', 'UDP'
+- `protocol` (String) Available values are 'HTTP' (currently work, other do not work on ed-8), 'HTTPS', 'TCP', 'UDP', 'PROXY'
 
 ### Optional
 

@@ -57,7 +57,9 @@ output "view" {
 - `id` (String) The ID of this resource.
 - `metadata_read_only` (List of Object) (see [below for nested schema](#nestedatt--metadata_read_only))
 - `vip_address` (String)
+- `vip_ip_family` (String)
 - `vip_port_id` (String)
+- `vrrp_ips` (List of Object) (see [below for nested schema](#nestedatt--vrrp_ips))
 
 <a id="nestedatt--metadata_read_only"></a>
 ### Nested Schema for `metadata_read_only`
@@ -67,3 +69,12 @@ Read-Only:
 - `key` (String)
 - `read_only` (Boolean)
 - `value` (String)
+
+
+<a id="nestedatt--vrrp_ips"></a>
+### Nested Schema for `vrrp_ips`
+
+Read-Only:
+
+- `ip_address` (String)
+- `subnet_id` (String)

@@ -130,9 +130,10 @@ resource "gcore_cdn_resource" "cdn_example_com" {
 
 ### Optional
 
+- `active` (Boolean) The setting allows to enable or disable a Rule. If not specified, it will be enabled.
 - `options` (Block List, Max: 1) Each option in CDN resource settings. Each option added to CDN resource settings should have the following mandatory request fields: enabled, value. (see [below for nested schema](#nestedblock--options))
 - `origin_group` (Number) ID of the Origins Group. Use one of your Origins Group or create a new one. You can use either 'origin' parameter or 'originGroup' in the resource definition.
-- `origin_protocol` (String) This option defines the protocol that will be used by CDN servers to request content from an origin source. If not specified, it will be inherit from resource. Possible values are: HTTPS, HTTP, MATCH.
+- `origin_protocol` (String) This option defines the protocol that will be used by CDN servers to request content from an origin source. If not specified, it will be inherited from resource. Possible values are: HTTPS, HTTP, MATCH.
 - `weight` (Number) Rule weight that determines rule execution order: from the smallest (0) to the highest.
 
 ### Read-Only
