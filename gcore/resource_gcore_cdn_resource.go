@@ -1069,7 +1069,7 @@ func resourceCDNResource() *schema.Resource {
 			"origin_protocol": {
 				Type:        schema.TypeString,
 				Optional:    true,
-				Computed:    true,
+				Default:     "HTTP",
 				Description: "This option defines the protocol that will be used by CDN servers to request content from an origin source. If not specified, we will use HTTP to connect to an origin server. Possible values are: HTTPS, HTTP, MATCH.",
 			},
 			"secondary_hostnames": {
