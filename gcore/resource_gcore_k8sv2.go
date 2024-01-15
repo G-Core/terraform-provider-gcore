@@ -90,12 +90,12 @@ func resourceK8sV2() *schema.Resource {
 			},
 			"fixed_network": {
 				Type:     schema.TypeString,
-				Required: true,
+				Optional: true,
 				ForceNew: true,
 			},
 			"fixed_subnet": {
 				Type:        schema.TypeString,
-				Required:    true,
+				Optional:    true,
 				ForceNew:    true,
 				Description: "Subnet should have a router",
 			},
@@ -109,6 +109,16 @@ func resourceK8sV2() *schema.Resource {
 				Optional: true,
 				ForceNew: true,
 			},
+			"pods_ipv6_pool": {
+				Type:     schema.TypeString,
+				Optional: true,
+				ForceNew: true,
+			},
+			"services_ipv6_pool": {
+				Type:     schema.TypeString,
+				Optional: true,
+				ForceNew: true,
+			},
 			"keypair": {
 				Type:     schema.TypeString,
 				Required: true,
@@ -116,6 +126,12 @@ func resourceK8sV2() *schema.Resource {
 			"version": {
 				Type:     schema.TypeString,
 				Required: true,
+			},
+			"is_ipv6": {
+				Type:        schema.TypeBool,
+				Description: "Enable public v6 address",
+				Optional:    true,
+				Computed:    true,
 			},
 			"pool": {
 				Type:     schema.TypeList,
@@ -225,6 +241,7 @@ func resourceK8sV2Create(ctx context.Context, d *schema.ResourceData, m interfac
 		FixedSubnet:  d.Get("fixed_subnet").(string),
 		KeyPair:      d.Get("keypair").(string),
 		Version:      d.Get("version").(string),
+		IsIPV6:       d.Get("is_ipv6").(bool),
 	}
 
 	if podsIP, ok := d.GetOk("pods_ip_pool"); ok {
@@ -241,6 +258,22 @@ func resourceK8sV2Create(ctx context.Context, d *schema.ResourceData, m interfac
 			return diag.FromErr(err)
 		}
 		opts.ServicesIPPool = &gccidr
+	}
+
+	if podsIPV6, ok := d.GetOk("pods_ipv6_pool"); ok {
+		gccidr, err := parseCIDRFromString(podsIPV6.(string))
+		if err != nil {
+			return diag.FromErr(err)
+		}
+		opts.PodsIPV6Pool = &gccidr
+	}
+
+	if svcIPV6, ok := d.GetOk("services_ipv6_pool"); ok {
+		gccidr, err := parseCIDRFromString(svcIPV6.(string))
+		if err != nil {
+			return diag.FromErr(err)
+		}
+		opts.ServicesIPV6Pool = &gccidr
 	}
 
 	for _, poolRaw := range d.Get("pool").([]interface{}) {

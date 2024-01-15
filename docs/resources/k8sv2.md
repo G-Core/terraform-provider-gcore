@@ -41,8 +41,6 @@ resource "gcore_k8sv2" "cl" {
 
 ### Required
 
-- `fixed_network` (String)
-- `fixed_subnet` (String) Subnet should have a router
 - `keypair` (String)
 - `name` (String)
 - `pool` (Block List, Min: 1) (see [below for nested schema](#nestedblock--pool))
@@ -50,12 +48,17 @@ resource "gcore_k8sv2" "cl" {
 
 ### Optional
 
+- `fixed_network` (String)
+- `fixed_subnet` (String) Subnet should have a router
+- `is_ipv6` (Boolean) Enable public v6 address
 - `pods_ip_pool` (String)
+- `pods_ipv6_pool` (String)
 - `project_id` (Number)
 - `project_name` (String)
 - `region_id` (Number)
 - `region_name` (String)
 - `services_ip_pool` (String)
+- `services_ipv6_pool` (String)
 - `timeouts` (Block, Optional) (see [below for nested schema](#nestedblock--timeouts))
 
 ### Read-Only

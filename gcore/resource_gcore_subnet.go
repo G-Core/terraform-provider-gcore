@@ -191,14 +191,15 @@ func resourceSubnetCreate(ctx context.Context, d *schema.ResourceData, m interfa
 
 	var gccidr gcorecloud.CIDR
 	cidr := d.Get("cidr").(string)
-	if cidr != "" {
-		_, netIPNet, err := net.ParseCIDR(cidr)
-		if err != nil {
-			return diag.FromErr(err)
-		}
-		gccidr.IP = netIPNet.IP
-		gccidr.Mask = netIPNet.Mask
-		createOpts.CIDR = gccidr
+	_, netIPNet, err := net.ParseCIDR(cidr)
+	if err != nil {
+		return diag.FromErr(err)
+	}
+	gccidr.IP = netIPNet.IP
+	gccidr.Mask = netIPNet.Mask
+	createOpts.CIDR = gccidr
+	if netIPNet.IP.To4() == nil {
+		createOpts.IPVersion = 6
 	}
 
 	dns_nameservers := d.Get("dns_nameservers").([]interface{})

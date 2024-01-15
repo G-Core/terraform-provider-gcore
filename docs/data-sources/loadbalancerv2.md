@@ -51,13 +51,13 @@ output "view" {
 - `project_name` (String)
 - `region_id` (Number)
 - `region_name` (String)
+- `vip_ip_family` (String)
 
 ### Read-Only
 
 - `id` (String) The ID of this resource.
 - `metadata_read_only` (List of Object) (see [below for nested schema](#nestedatt--metadata_read_only))
 - `vip_address` (String)
-- `vip_ip_family` (String)
 - `vip_port_id` (String)
 - `vrrp_ips` (List of Object) (see [below for nested schema](#nestedatt--vrrp_ips))
 

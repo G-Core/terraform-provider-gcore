@@ -4,6 +4,7 @@ import (
 	"context"
 	"log"
 
+	gcorecloud "github.com/G-Core/gcorelabscloud-go"
 	"github.com/G-Core/gcorelabscloud-go/gcore/keypair/v2/keypairs"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
@@ -106,7 +107,14 @@ func resourceKeypairRead(ctx context.Context, d *schema.ResourceData, m interfac
 	kpID := d.Id()
 	kp, err := keypairs.Get(client, kpID).Extract()
 	if err != nil {
-		return diag.Errorf("cannot get keypairs with ID %s. Error: %s", kpID, err.Error())
+		switch err.(type) {
+		case gcorecloud.ErrDefault404:
+			log.Printf("[WARN] Removing keypair %s because resource doesn't exist anymore", d.Id())
+			d.SetId("")
+			return nil
+		default:
+			return diag.Errorf("cannot get keypairs with ID %s. Error: %s", kpID, err.Error())
+		}
 	}
 
 	d.Set("sshkey_name", kp.Name)
