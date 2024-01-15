@@ -133,7 +133,7 @@ resource "gcore_cdn_resource" "cdn_example_com" {
 - `active` (Boolean) The setting allows to enable or disable a Rule. If not specified, it will be enabled.
 - `options` (Block List, Max: 1) Each option in CDN resource settings. Each option added to CDN resource settings should have the following mandatory request fields: enabled, value. (see [below for nested schema](#nestedblock--options))
 - `origin_group` (Number) ID of the Origins Group. Use one of your Origins Group or create a new one. You can use either 'origin' parameter or 'originGroup' in the resource definition.
-- `origin_protocol` (String) This option defines the protocol that will be used by CDN servers to request content from an origin source. If not specified, it will be inherited from resource. Possible values are: HTTPS, HTTP, MATCH.
+- `origin_protocol` (String) This option defines the protocol that will be used by CDN servers to request content from an origin source. If not specified, it will be inherit from resource. Possible values are: HTTPS, HTTP, MATCH.
 - `weight` (Number) Rule weight that determines rule execution order: from the smallest (0) to the highest.
 
 ### Read-Only
@@ -186,7 +186,7 @@ Optional:
 - `use_default_le_chain` (Block List, Max: 1) The option allows choosing a Let's Encrypt certificate chain. The specified chain will be used during the next Let's Encrypt certificate issue or renewal. (see [below for nested schema](#nestedblock--options--use_default_le_chain))
 - `use_rsa_le_cert` (Block List, Max: 1) The option allows choosing the RSA Let's Encrypt certificate type for the resource. (see [below for nested schema](#nestedblock--options--use_rsa_le_cert))
 - `user_agent_acl` (Block List, Max: 1) User agents policy option allows to control access to the content for specified user-agent. (see [below for nested schema](#nestedblock--options--user_agent_acl))
-- `waf` (Block List, Max: 1) The Basic WAF option protects you against the most common threats. (see [below for nested schema](#nestedblock--options--waf))
+- `waf` (Block List, Max: 1) Option allows to enable Basic WAF to protect you against the most common threats. (see [below for nested schema](#nestedblock--options--waf))
 - `webp` (Block List, Max: 1) Legacy option. Use the image_stack option instead. (see [below for nested schema](#nestedblock--options--webp))
 - `websockets` (Block List, Max: 1) WebSockets option allows WebSockets connections to an origin server. (see [below for nested schema](#nestedblock--options--websockets))
 
@@ -716,7 +716,6 @@ Required:
 Optional:
 
 - `enabled` (Boolean)
-
 
 
 <a id="nestedblock--options--webp"></a>
