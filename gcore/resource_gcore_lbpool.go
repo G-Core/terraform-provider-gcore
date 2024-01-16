@@ -361,15 +361,15 @@ func resourceLBPoolUpdate(ctx context.Context, d *schema.ResourceData, m interfa
 
 	if d.HasChange("health_monitor") {
 		opts.HealthMonitor = extractHealthMonitorMap(d)
-		change = true
 		if opts.HealthMonitor == nil {
 			lbpools.DeleteHealthMonitor(client, d.Id())
+		} else {
+			change = true
 		}
 	}
 
 	if d.HasChange("session_persistence") {
 		opts.SessionPersistence = extractSessionPersistenceMap(d)
-		change = true
 		if opts.SessionPersistence == nil {
 			results, err := lbpools.Unset(client, d.Id(), lbpools.UnsetOpts{SessionPersistence: true}).Extract()
 			if err != nil {
@@ -383,6 +383,8 @@ func resourceLBPoolUpdate(ctx context.Context, d *schema.ResourceData, m interfa
 				}
 				return nil, nil
 			})
+		} else {
+			change = true
 		}
 	}
 
