@@ -362,11 +362,28 @@ func resourceLBPoolUpdate(ctx context.Context, d *schema.ResourceData, m interfa
 	if d.HasChange("health_monitor") {
 		opts.HealthMonitor = extractHealthMonitorMap(d)
 		change = true
+		if opts.HealthMonitor == nil {
+			lbpools.DeleteHealthMonitor(client, d.Id())
+		}
 	}
 
 	if d.HasChange("session_persistence") {
 		opts.SessionPersistence = extractSessionPersistenceMap(d)
 		change = true
+		if opts.SessionPersistence == nil {
+			results, err := lbpools.Unset(client, d.Id(), lbpools.UnsetOpts{SessionPersistence: true}).Extract()
+			if err != nil {
+				return diag.FromErr(err)
+			}
+			taskID := results.Tasks[0]
+			_, err = tasks.WaitTaskAndReturnResult(client, taskID, true, LBPoolsCreateTimeout, func(task tasks.TaskID) (interface{}, error) {
+				_, err := tasks.Get(client, string(task)).Extract()
+				if err != nil {
+					return nil, fmt.Errorf("cannot get task with ID: %s. Error: %w", task, err)
+				}
+				return nil, nil
+			})
+		}
 	}
 
 	if !change {
