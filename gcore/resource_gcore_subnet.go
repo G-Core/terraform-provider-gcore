@@ -91,6 +91,7 @@ func resourceSubnet() *schema.Resource {
 			"cidr": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
+				ForceNew: true,
 			},
 			"network_id": &schema.Schema{
 				Type:     schema.TypeString,
