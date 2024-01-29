@@ -55,7 +55,30 @@ func dataSourceFloatingIP() *schema.Resource {
 			},
 			"floating_ip_address": &schema.Schema{
 				Type:     schema.TypeString,
-				Required: true,
+				Optional: true,
+				Computed: true,
+				ExactlyOneOf: []string{
+					"fixed_ip_address",
+					"floating_ip_address",
+				},
+				ValidateDiagFunc: func(val interface{}, key cty.Path) diag.Diagnostics {
+					v := val.(string)
+					ip := net.ParseIP(v)
+					if ip != nil {
+						return diag.Diagnostics{}
+					}
+
+					return diag.FromErr(fmt.Errorf("%q must be a valid ip, got: %s", key, v))
+				},
+			},
+			"fixed_ip_address": &schema.Schema{
+				Type:     schema.TypeString,
+				Optional: true,
+				Computed: true,
+				ExactlyOneOf: []string{
+					"fixed_ip_address",
+					"floating_ip_address",
+				},
 				ValidateDiagFunc: func(val interface{}, key cty.Path) diag.Diagnostics {
 					v := val.(string)
 					ip := net.ParseIP(v)
@@ -67,10 +90,6 @@ func dataSourceFloatingIP() *schema.Resource {
 				},
 			},
 			"status": &schema.Schema{
-				Type:     schema.TypeString,
-				Computed: true,
-			},
-			"fixed_ip_address": &schema.Schema{
 				Type:     schema.TypeString,
 				Computed: true,
 			},
@@ -129,6 +148,10 @@ func dataSourceFloatingIPRead(ctx context.Context, d *schema.ResourceData, m int
 	}
 
 	ipAddr := d.Get("floating_ip_address").(string)
+	if ipAddr == "" {
+		ipAddr = d.Get("fixed_ip_address").(string)
+	}
+
 	metaOpts := &floatingips.ListOpts{}
 
 	if metadataK, ok := d.GetOk("metadata_k"); ok {
@@ -152,6 +175,12 @@ func dataSourceFloatingIPRead(ctx context.Context, d *schema.ResourceData, m int
 	var floatingIP floatingips.FloatingIPDetail
 	for _, ip := range ips {
 		if ip.FloatingIPAddress.String() == ipAddr {
+			floatingIP = ip
+			found = true
+			break
+		}
+
+		if ip.FixedIPAddress.String() == ipAddr {
 			floatingIP = ip
 			found = true
 			break
