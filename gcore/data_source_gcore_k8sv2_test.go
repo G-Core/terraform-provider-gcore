@@ -8,13 +8,16 @@ import (
 	"net"
 	"os"
 	"strconv"
+	"strings"
 	"testing"
 
 	gcorecloud "github.com/G-Core/gcorelabscloud-go"
 	"github.com/G-Core/gcorelabscloud-go/gcore/k8s/v2/clusters"
 	"github.com/G-Core/gcorelabscloud-go/gcore/k8s/v2/pools"
 	"github.com/G-Core/gcorelabscloud-go/gcore/keypair/v2/keypairs"
+	"github.com/G-Core/gcorelabscloud-go/gcore/network/v1/availablenetworks"
 	"github.com/G-Core/gcorelabscloud-go/gcore/network/v1/networks"
+	"github.com/G-Core/gcorelabscloud-go/gcore/router/v1/routers"
 	"github.com/G-Core/gcorelabscloud-go/gcore/subnet/v1/subnets"
 	"github.com/G-Core/gcorelabscloud-go/gcore/task/v1/tasks"
 	"github.com/G-Core/gcorelabscloud-go/gcore/volume/v1/volumes"
@@ -201,4 +204,49 @@ func deleteTestClusterV2(client *gcorecloud.ServiceClient, clusterID string) err
 		}
 	})
 	return err
+}
+
+func patchRouterForK8S(provider *gcorecloud.ProviderClient, networkID string) error {
+	routersClient, err := CreateTestClient(provider, RouterPoint, versionPointV1)
+	if err != nil {
+		return err
+	}
+
+	aNetClient, err := CreateTestClient(provider, sharedNetworksPoint, versionPointV1)
+	if err != nil {
+		return err
+	}
+
+	availableNetworks, err := availablenetworks.ListAll(aNetClient, nil)
+	if err != nil {
+		return err
+	}
+	var extNet availablenetworks.Network
+	for _, an := range availableNetworks {
+		if an.External {
+			extNet = an
+			break
+		}
+	}
+
+	rs, err := routers.ListAll(routersClient, nil)
+	if err != nil {
+		return err
+	}
+
+	var router routers.Router
+	for _, r := range rs {
+		if strings.Contains(r.Name, networkID) {
+			router = r
+			break
+		}
+	}
+
+	extSubnet := extNet.Subnets[0]
+	routerOpts := routers.UpdateOpts{Routes: extSubnet.HostRoutes}
+	_, err = routers.Update(routersClient, router.ID, routerOpts).Extract()
+	if err != nil {
+		return err
+	}
+	return nil
 }

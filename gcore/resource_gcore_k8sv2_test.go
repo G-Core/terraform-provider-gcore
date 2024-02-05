@@ -80,7 +80,7 @@ func TestAccK8sV2(t *testing.T) {
 	}
 
 	kpOpts := keypairs.CreateOpts{
-		Name:      kpName,
+		Name:      "testkp",
 		PublicKey: pkTest,
 		ProjectID: pid,
 	}
@@ -115,7 +115,7 @@ func TestAccK8sV2(t *testing.T) {
 	resource.Test(t, resource.TestCase{
 		PreCheck:          func() { testAccPreCheck(t) },
 		ProviderFactories: testAccProviders,
-		CheckDestroy:      testAccK8sDestroy,
+		CheckDestroy:      testAccK8sV2Destroy,
 		Steps: []resource.TestStep{
 			{
 				Config: ipTemplate,
