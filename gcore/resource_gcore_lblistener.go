@@ -146,6 +146,22 @@ func resourceLbListener() *schema.Resource {
 				Optional: true,
 				Computed: true,
 			},
+			"timeout_client_data": &schema.Schema{
+				Type:     schema.TypeInt,
+				Optional: true,
+			},
+			"timeout_member_connect": &schema.Schema{
+				Type:     schema.TypeInt,
+				Optional: true,
+			},
+			"timeout_member_data": &schema.Schema{
+				Type:     schema.TypeInt,
+				Optional: true,
+			},
+			"connection_limit": &schema.Schema{
+				Type:     schema.TypeInt,
+				Optional: true,
+			},
 		},
 	}
 }
@@ -169,6 +185,23 @@ func resourceLBListenerCreate(ctx context.Context, d *schema.ResourceData, m int
 		InsertXForwarded: d.Get("insert_x_forwarded").(bool),
 		SecretID:         d.Get("secret_id").(string),
 	}
+	if tcd, ok := d.GetOkExists("timeout_client_data"); ok {
+		timeoutClientData := tcd.(int)
+		opts.TimeoutClientData = &timeoutClientData
+	}
+	if tmc, ok := d.GetOkExists("timeout_member_connect"); ok {
+		timeoutMemberConnect := tmc.(int)
+		opts.TimeoutMemberConnect = &timeoutMemberConnect
+	}
+	if tmd, ok := d.GetOkExists("timeout_member_data"); ok {
+		timeoutMemberConnect := tmd.(int)
+		opts.TimeoutMemberData = &timeoutMemberConnect
+	}
+	if cl, ok := d.GetOkExists("connection_limit"); ok {
+		connectionLimit := cl.(int)
+		opts.ConnectionLimit = &connectionLimit
+	}
+
 	sniSecretIDRaw := d.Get("sni_secret_id").([]interface{})
 	if len(sniSecretIDRaw) != 0 {
 		sniSecretID := make([]string, len(sniSecretIDRaw))
@@ -243,7 +276,7 @@ func resourceLBListenerUpdate(ctx context.Context, d *schema.ResourceData, m int
 	config := m.(*Config)
 	provider := config.Provider
 
-	client, err := CreateClient(provider, d, LBListenersPoint, versionPointV1)
+	client, err := CreateClient(provider, d, LBListenersPoint, versionPointV2)
 	if err != nil {
 		return diag.FromErr(err)
 	}
@@ -267,6 +300,29 @@ func resourceLBListenerUpdate(ctx context.Context, d *schema.ResourceData, m int
 			sniSecretID[i] = s.(string)
 		}
 		opts.SNISecretID = sniSecretID
+		changed = true
+	}
+	if d.HasChange("timeout_client_data") {
+		timeoutClientData := d.Get("timeout_client_data").(int)
+		opts.TimeoutClientData = &timeoutClientData
+		changed = true
+	}
+
+	if d.HasChange("timeout_member_connect") {
+		timeoutMemberConnect := d.Get("timeout_member_connect").(int)
+		opts.TimeoutMemberConnect = &timeoutMemberConnect
+		changed = true
+	}
+
+	if d.HasChange("timeout_member_data") {
+		timeoutMemberData := d.Get("timeout_member_data").(int)
+		opts.TimeoutMemberData = &timeoutMemberData
+		changed = true
+	}
+
+	if d.HasChange("connection_limit") {
+		connectionLimit := d.Get("connection_limit").(int)
+		opts.ConnectionLimit = &connectionLimit
 		changed = true
 	}
 
