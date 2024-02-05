@@ -41,35 +41,33 @@ resource "gcore_k8sv2" "cl" {
 
 ### Required
 
-- `keypair` (String)
-- `name` (String)
+- `keypair` (String) Name of the keypair used for SSH access to nodes.
+- `name` (String) Cluster name.
 - `pool` (Block List, Min: 1) (see [below for nested schema](#nestedblock--pool))
-- `version` (String)
+- `version` (String) Kubernetes version.
 
 ### Optional
 
-- `fixed_network` (String)
-- `fixed_subnet` (String) Subnet should have a router
-- `is_ipv6` (Boolean) Enable public v6 address
-- `pods_ip_pool` (String)
-- `pods_ipv6_pool` (String)
+- `fixed_network` (String) Fixed network used to allocate network addresses for cluster nodes.
+- `fixed_subnet` (String) Fixed subnet used to allocate network addresses for cluster nodes. Subnet should have a router.
+- `is_ipv6` (Boolean) Enable public IPv6 address.
+- `pods_ip_pool` (String) Pods IPv4 IP pool in CIDR notation.
+- `pods_ipv6_pool` (String) Pods IPv6 IP pool in CIDR notation.
 - `project_id` (Number)
 - `project_name` (String)
 - `region_id` (Number)
 - `region_name` (String)
-- `services_ip_pool` (String)
-- `services_ipv6_pool` (String)
+- `services_ip_pool` (String) Services IPv4 IP pool in CIDR notation.
+- `services_ipv6_pool` (String) Services IPv6 IP pool in CIDR notation.
 - `timeouts` (Block, Optional) (see [below for nested schema](#nestedblock--timeouts))
 
 ### Read-Only
 
-- `created_at` (String)
+- `created_at` (String) Cluster creation date.
 - `creator_task_id` (String)
-- `flavor_id` (String)
 - `id` (String) The ID of this resource.
-- `is_public` (Boolean)
-- `node_count` (Number)
-- `status` (String)
+- `is_public` (Boolean) True if the cluster is public.
+- `status` (String) Cluster status.
 - `task_id` (String)
 
 <a id="nestedblock--pool"></a>
@@ -77,23 +75,23 @@ resource "gcore_k8sv2" "cl" {
 
 Required:
 
-- `flavor_id` (String)
-- `min_node_count` (Number)
-- `name` (String)
+- `flavor_id` (String) Cluster pool node flavor ID. Changing the value of this attribute will trigger recreation of the cluster pool.
+- `min_node_count` (Number) Minimum number of nodes in the cluster pool.
+- `name` (String) Cluster pool name. Changing the value of this attribute will trigger recreation of the cluster pool.
 
 Optional:
 
-- `auto_healing_enabled` (Boolean)
-- `boot_volume_size` (Number)
-- `boot_volume_type` (String) Available values are 'standard', 'ssd_hiiops', 'cold', 'ultra'.
-- `is_public_ipv4` (Boolean)
-- `max_node_count` (Number)
+- `auto_healing_enabled` (Boolean) Enable/disable auto healing of cluster pool nodes.
+- `boot_volume_size` (Number) Cluster pool boot volume size. Must be set only for VM pools. Changing the value of this attribute will trigger recreation of the cluster pool.
+- `boot_volume_type` (String) Cluster pool boot volume type. Must be set only for VM pools. Available values are 'standard', 'ssd_hiiops', 'cold', 'ultra'. Changing the value of this attribute will trigger recreation of the cluster pool.
+- `is_public_ipv4` (Boolean) Assign public IPv4 address to nodes in this pool. Changing the value of this attribute will trigger recreation of the cluster pool.
+- `max_node_count` (Number) Maximum number of nodes in the cluster pool.
 
 Read-Only:
 
-- `created_at` (String)
-- `node_count` (Number)
-- `status` (String)
+- `created_at` (String) Cluster pool creation date.
+- `node_count` (Number) Current node count in the cluster pool.
+- `status` (String) Cluster pool status.
 
 
 <a id="nestedblock--timeouts"></a>
