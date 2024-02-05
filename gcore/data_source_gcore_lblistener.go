@@ -77,6 +77,22 @@ func dataSourceLBListener() *schema.Resource {
 				Type:     schema.TypeString,
 				Computed: true,
 			},
+			"timeout_client_data": &schema.Schema{
+				Type:     schema.TypeInt,
+				Optional: true,
+			},
+			"timeout_member_connect": &schema.Schema{
+				Type:     schema.TypeInt,
+				Optional: true,
+			},
+			"timeout_member_data": &schema.Schema{
+				Type:     schema.TypeInt,
+				Optional: true,
+			},
+			"connection_limit": &schema.Schema{
+				Type:     schema.TypeInt,
+				Optional: true,
+			},
 		},
 	}
 }
@@ -128,6 +144,10 @@ func dataSourceLBListenerRead(ctx context.Context, d *schema.ResourceData, m int
 	d.Set("loadbalancer_id", lbID)
 	d.Set("project_id", d.Get("project_id").(int))
 	d.Set("region_id", d.Get("region_id").(int))
+	d.Set("timeout_client_data", lb.TimeoutClientData)
+	d.Set("timeout_member_connect", lb.TimeoutMemberConnect)
+	d.Set("timeout_member_data", lb.TimeoutMemberData)
+	d.Set("connection_limit", lb.ConnectionLimit)
 
 	log.Println("[DEBUG] Finish LBListener reading")
 	return diags

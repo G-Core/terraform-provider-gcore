@@ -46,6 +46,7 @@ resource "gcore_lblistener" "listener" {
 
 ### Optional
 
+- `connection_limit` (Number)
 - `insert_x_forwarded` (Boolean) Insert *-forwarded headers
 - `last_updated` (String)
 - `project_id` (Number)
@@ -54,6 +55,9 @@ resource "gcore_lblistener" "listener" {
 - `region_name` (String)
 - `secret_id` (String)
 - `sni_secret_id` (List of String)
+- `timeout_client_data` (Number)
+- `timeout_member_connect` (Number)
+- `timeout_member_data` (Number)
 - `timeouts` (Block, Optional) (see [below for nested schema](#nestedblock--timeouts))
 
 ### Read-Only

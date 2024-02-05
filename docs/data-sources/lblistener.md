@@ -46,11 +46,15 @@ output "view" {
 
 ### Optional
 
+- `connection_limit` (Number)
 - `loadbalancer_id` (String)
 - `project_id` (Number)
 - `project_name` (String)
 - `region_id` (Number)
 - `region_name` (String)
+- `timeout_client_data` (Number)
+- `timeout_member_connect` (Number)
+- `timeout_member_data` (Number)
 
 ### Read-Only
 
