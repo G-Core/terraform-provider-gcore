@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"log"
+	"slices"
 	"time"
 
 	gcorecloud "github.com/G-Core/gcorelabscloud-go"
@@ -350,9 +351,11 @@ func resourceK8sV2Read(ctx context.Context, d *schema.ResourceData, m interface{
 	d.Set("creator_task_id", cluster.CreatorTaskID)
 	d.Set("task_id", cluster.TaskID)
 
-	var ps []map[string]interface{}
+	// pools always come sorted alphabetically, so we need to reorder them to match TF state
+	poolData := d.Get("pool").([]interface{})
 	for _, pool := range cluster.Pools {
-		ps = append(ps, map[string]interface{}{
+		idx := slices.IndexFunc(poolData, func(old interface{}) bool { return old.(map[string]interface{})["name"] == pool.Name })
+		obj := map[string]interface{}{
 			"name":                 pool.Name,
 			"flavor_id":            pool.FlavorID,
 			"min_node_count":       pool.MinNodeCount,
@@ -364,9 +367,14 @@ func resourceK8sV2Read(ctx context.Context, d *schema.ResourceData, m interface{
 			"is_public_ipv4":       pool.IsPublicIPv4,
 			"status":               pool.Status,
 			"created_at":           pool.CreatedAt.Format(time.RFC850),
-		})
+		}
+		if idx >= 0 {
+			poolData[idx] = obj
+		} else {
+			poolData = append(poolData, obj)
+		}
 	}
-	if err := d.Set("pool", ps); err != nil {
+	if err := d.Set("pool", poolData); err != nil {
 		return diag.FromErr(err)
 	}
 

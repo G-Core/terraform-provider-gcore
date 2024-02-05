@@ -23,7 +23,7 @@ func TestAccRegionDataSource(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	rs, err := regions.ListAll(client)
+	rs, err := regions.ListAll(client, nil)
 	if err != nil {
 		t.Fatal(err)
 	}
