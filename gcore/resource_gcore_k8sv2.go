@@ -85,52 +85,60 @@ func resourceK8sV2() *schema.Resource {
 				},
 			},
 			"name": {
-				Type:     schema.TypeString,
-				Required: true,
-				ForceNew: true,
+				Type:        schema.TypeString,
+				Description: "Cluster name.",
+				Required:    true,
+				ForceNew:    true,
 			},
 			"fixed_network": {
-				Type:     schema.TypeString,
-				Optional: true,
-				ForceNew: true,
+				Type:        schema.TypeString,
+				Description: "Fixed network used to allocate network addresses for cluster nodes.",
+				Optional:    true,
+				ForceNew:    true,
 			},
 			"fixed_subnet": {
 				Type:        schema.TypeString,
+				Description: "Fixed subnet used to allocate network addresses for cluster nodes. Subnet should have a router.",
 				Optional:    true,
 				ForceNew:    true,
-				Description: "Subnet should have a router",
 			},
 			"pods_ip_pool": {
-				Type:     schema.TypeString,
-				Optional: true,
-				ForceNew: true,
+				Type:        schema.TypeString,
+				Description: "Pods IPv4 IP pool in CIDR notation.",
+				Optional:    true,
+				ForceNew:    true,
 			},
 			"services_ip_pool": {
-				Type:     schema.TypeString,
-				Optional: true,
-				ForceNew: true,
+				Type:        schema.TypeString,
+				Description: "Services IPv4 IP pool in CIDR notation.",
+				Optional:    true,
+				ForceNew:    true,
 			},
 			"pods_ipv6_pool": {
-				Type:     schema.TypeString,
-				Optional: true,
-				ForceNew: true,
+				Type:        schema.TypeString,
+				Description: "Pods IPv6 IP pool in CIDR notation.",
+				Optional:    true,
+				ForceNew:    true,
 			},
 			"services_ipv6_pool": {
-				Type:     schema.TypeString,
-				Optional: true,
-				ForceNew: true,
+				Type:        schema.TypeString,
+				Description: "Services IPv6 IP pool in CIDR notation.",
+				Optional:    true,
+				ForceNew:    true,
 			},
 			"keypair": {
-				Type:     schema.TypeString,
-				Required: true,
+				Type:        schema.TypeString,
+				Description: "Name of the keypair used for SSH access to nodes.",
+				Required:    true,
 			},
 			"version": {
-				Type:     schema.TypeString,
-				Required: true,
+				Type:        schema.TypeString,
+				Description: "Kubernetes version.",
+				Required:    true,
 			},
 			"is_ipv6": {
 				Type:        schema.TypeBool,
-				Description: "Enable public v6 address",
+				Description: "Enable public IPv6 address.",
 				Optional:    true,
 				Computed:    true,
 			},
@@ -141,77 +149,82 @@ func resourceK8sV2() *schema.Resource {
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
 						"name": {
-							Type:     schema.TypeString,
-							Required: true,
+							Type:        schema.TypeString,
+							Description: "Cluster pool name. Changing the value of this attribute will trigger recreation of the cluster pool.",
+							Required:    true,
 						},
 						"flavor_id": {
-							Type:     schema.TypeString,
-							Required: true,
+							Type:        schema.TypeString,
+							Description: "Cluster pool node flavor ID. Changing the value of this attribute will trigger recreation of the cluster pool.",
+							Required:    true,
 						},
 						"min_node_count": {
-							Type:     schema.TypeInt,
-							Required: true,
+							Type:        schema.TypeInt,
+							Description: "Minimum number of nodes in the cluster pool.",
+							Required:    true,
 						},
 						"max_node_count": {
-							Type:     schema.TypeInt,
-							Optional: true,
-							Computed: true,
+							Type:        schema.TypeInt,
+							Description: "Maximum number of nodes in the cluster pool.",
+							Optional:    true,
+							Computed:    true,
 						},
 						"node_count": {
-							Type:     schema.TypeInt,
-							Computed: true,
+							Type:        schema.TypeInt,
+							Description: "Current node count in the cluster pool.",
+							Computed:    true,
 						},
 						"boot_volume_type": {
 							Type:        schema.TypeString,
-							Description: "Available values are 'standard', 'ssd_hiiops', 'cold', 'ultra'.",
+							Description: "Cluster pool boot volume type. Must be set only for VM pools. Available values are 'standard', 'ssd_hiiops', 'cold', 'ultra'. Changing the value of this attribute will trigger recreation of the cluster pool.",
 							Optional:    true,
 							Computed:    true,
 						},
 						"boot_volume_size": {
-							Type:     schema.TypeInt,
-							Optional: true,
-							Computed: true,
+							Type:        schema.TypeInt,
+							Description: "Cluster pool boot volume size. Must be set only for VM pools. Changing the value of this attribute will trigger recreation of the cluster pool.",
+							Optional:    true,
+							Computed:    true,
 						},
 						"auto_healing_enabled": {
-							Type:     schema.TypeBool,
-							Optional: true,
-							Computed: true,
+							Type:        schema.TypeBool,
+							Description: "Enable/disable auto healing of cluster pool nodes.",
+							Optional:    true,
+							Computed:    true,
 						},
 						"is_public_ipv4": {
-							Type:     schema.TypeBool,
-							Optional: true,
-							Computed: true,
+							Type:        schema.TypeBool,
+							Description: "Assign public IPv4 address to nodes in this pool. Changing the value of this attribute will trigger recreation of the cluster pool.",
+							Optional:    true,
+							Computed:    true,
 						},
 						"status": {
-							Type:     schema.TypeString,
-							Computed: true,
+							Type:        schema.TypeString,
+							Description: "Cluster pool status.",
+							Computed:    true,
 						},
 						"created_at": {
-							Type:     schema.TypeString,
-							Computed: true,
+							Type:        schema.TypeString,
+							Description: "Cluster pool creation date.",
+							Computed:    true,
 						},
 					},
 				},
 			},
-			"node_count": {
-				Type:     schema.TypeInt,
-				Computed: true,
-			},
-			"flavor_id": {
-				Type:     schema.TypeString,
-				Computed: true,
-			},
 			"status": {
-				Type:     schema.TypeString,
-				Computed: true,
+				Type:        schema.TypeString,
+				Description: "Cluster status.",
+				Computed:    true,
 			},
 			"is_public": {
-				Type:     schema.TypeBool,
-				Computed: true,
+				Type:        schema.TypeBool,
+				Description: "True if the cluster is public.",
+				Computed:    true,
 			},
 			"created_at": {
-				Type:     schema.TypeString,
-				Computed: true,
+				Type:        schema.TypeString,
+				Description: "Cluster creation date.",
+				Computed:    true,
 			},
 			"creator_task_id": {
 				Type:     schema.TypeString,
@@ -343,8 +356,6 @@ func resourceK8sV2Read(ctx context.Context, d *schema.ResourceData, m interface{
 	d.Set("fixed_subnet", cluster.FixedSubnet)
 	d.Set("keypair", cluster.KeyPair)
 	d.Set("version", cluster.Version)
-	d.Set("node_count", cluster.NodeCount)
-	d.Set("flavor_id", cluster.FlavorID)
 	d.Set("status", cluster.Status)
 	d.Set("is_public", cluster.IsPublic)
 	d.Set("created_at", cluster.CreatedAt.Format(time.RFC850))
@@ -419,65 +430,50 @@ func resourceK8sV2Update(ctx context.Context, d *schema.ResourceData, m interfac
 	}
 
 	if d.HasChange("pool") {
-		add, upd, del := diffK8sV2ClusterPoolChange(d.GetChange("pool"))
-		for _, pool := range del {
-			poolName := pool["name"].(string)
-			log.Printf("[DEBUG] Removing pool (%s)", poolName)
+		// 1 pool   => Allow in-place updates and add/delete, but return error on replace.
+		//             Users must create a new pool with different name in such case.
+		// 2+ pools => Allow all operations, but make sure we don't end up with 0 pools at any moment.
+		//             This means we process each pool change one-by-one, and perform adds before deletes.
+		o, n := d.GetChange("pool")
+		old, new := o.([]interface{}), n.([]interface{})
 
-			results, err := pools.Delete(client, clusterName, poolName).Extract()
-			if err != nil {
-				return diag.FromErr(err)
-			}
-
-			taskID := results.Tasks[0]
-			log.Printf("[DEBUG] Task id (%s)", taskID)
-			_, err = tasks.WaitTaskAndReturnResult(tasksClient, taskID, true, K8sCreateTimeout, func(task tasks.TaskID) (interface{}, error) {
-				return nil, nil
-			})
-			if err != nil {
-				return diag.FromErr(err)
+		// Any new pools must be created first, so that "replace" can safely delete pools that it will recreate.
+		// This also covers pools that were renamed, because pool name must be unique.
+		for _, pool := range new {
+			if resourceK8sV2FindClusterPool(old, pool) == nil {
+				if err := resourceK8sV2CreateClusterPool(client, tasksClient, clusterName, pool); err != nil {
+					return diag.FromErr(err)
+				}
 			}
 		}
-		for _, pool := range upd {
-			poolName := pool["name"].(string)
-			log.Printf("[DEBUG] Updating pool (%s)", poolName)
 
-			opts := pools.UpdateOpts{
-				AutoHealingEnabled: pool["auto_healing_enabled"].(bool),
-				MinNodeCount:       pool["min_node_count"].(int),
-				MaxNodeCount:       pool["max_node_count"].(int),
-			}
-			_, err := pools.Update(client, clusterName, poolName, opts).Extract()
-			if err != nil {
-				return diag.FromErr(err)
+		// Check replaces before updates, because replace due to its nature results in all fields being updated.
+		for _, pool := range new {
+			if resourceK8sV2ClusterPoolNeedsReplace(old, pool) {
+				if len(old) == 1 && len(new) == 1 {
+					msg := "cannot replace the only pool in the cluster, please create a new pool with different name and remove this one"
+					return diag.FromErr(fmt.Errorf("%s", msg))
+				}
+				if err := resourceK8sV2DeleteClusterPool(client, tasksClient, clusterName, pool); err != nil {
+					return diag.FromErr(err)
+				}
+				if err := resourceK8sV2CreateClusterPool(client, tasksClient, clusterName, pool); err != nil {
+					return diag.FromErr(err)
+				}
+			} else if resourceK8sV2ClusterPoolNeedsUpdate(old, pool) {
+				if err := resourceK8sV2UpdateClusterPool(client, clusterName, pool); err != nil {
+					return diag.FromErr(err)
+				}
 			}
 		}
-		for _, pool := range add {
-			poolName := pool["name"].(string)
-			log.Printf("[DEBUG] Creating pool (%s)", poolName)
 
-			opts := pools.CreateOpts{
-				Name:               pool["name"].(string),
-				FlavorID:           pool["flavor_id"].(string),
-				MinNodeCount:       pool["min_node_count"].(int),
-				MaxNodeCount:       pool["max_node_count"].(int),
-				BootVolumeSize:     pool["boot_volume_size"].(int),
-				BootVolumeType:     volumes.VolumeType(pool["boot_volume_type"].(string)),
-				AutoHealingEnabled: pool["auto_healing_enabled"].(bool),
-				IsPublicIPv4:       pool["is_public_ipv4"].(bool),
-			}
-			results, err := pools.Create(client, clusterName, opts).Extract()
-			if err != nil {
-				return diag.FromErr(err)
-			}
-
-			taskID := results.Tasks[0]
-			log.Printf("[DEBUG] Task id (%s)", taskID)
-			_, err = tasks.WaitTaskAndReturnResult(tasksClient, taskID, true, K8sCreateTimeout, func(task tasks.TaskID) (interface{}, error) {
-				return nil, nil
-			})
-			if err != nil {
-				return diag.FromErr(err)
+		// Finish up by removing all pools that need to be deleted (explicit deletes and leftovers from renames).
+		// This allows us to have replace working in case we are going down to 1 pool.
+		for _, pool := range old {
+			if resourceK8sV2FindClusterPool(new, pool) == nil {
+				if err := resourceK8sV2DeleteClusterPool(client, tasksClient, clusterName, pool); err != nil {
+					return diag.FromErr(err)
+				}
 			}
 		}
 	}
@@ -532,30 +528,125 @@ func resourceK8sV2Delete(ctx context.Context, d *schema.ResourceData, m interfac
 	return diags
 }
 
-func diffK8sV2ClusterPoolChange(old, new interface{}) ([]map[string]interface{}, []map[string]interface{}, []map[string]interface{}) {
-	oldmap := map[string]map[string]interface{}{}
-	for _, o := range old.([]interface{}) {
-		v := o.(map[string]interface{})
-		oldmap[v["name"].(string)] = v
+func resourceK8sV2FindClusterPool(list []interface{}, pool interface{}) interface{} {
+	for _, item := range list {
+		if item.(map[string]interface{})["name"] == pool.(map[string]interface{})["name"] {
+			return item
+		}
 	}
-	newmap := map[string]map[string]interface{}{}
-	for _, n := range new.([]interface{}) {
-		v := n.(map[string]interface{})
-		newmap[v["name"].(string)] = v
+	return nil
+}
+
+func resourceK8sV2ClusterPoolNeedsUpdate(list []interface{}, pool interface{}) bool {
+	found := resourceK8sV2FindClusterPool(list, pool)
+	if found == nil {
+		return false // adding new pool is not an update
+	}
+	old, new := found.(map[string]interface{}), pool.(map[string]interface{})
+	if old["min_node_count"] != new["min_node_count"] {
+		return true
+	}
+	if old["max_node_count"] != new["max_node_count"] {
+		return true
+	}
+	if old["auto_healing_enabled"] != new["auto_healing_enabled"] {
+		return true
+	}
+	return false
+}
+
+func resourceK8sV2ClusterPoolNeedsReplace(list []interface{}, pool interface{}) bool {
+	found := resourceK8sV2FindClusterPool(list, pool)
+	if found == nil {
+		return false // adding new pool is not a replace
+	}
+	old, new := found.(map[string]interface{}), pool.(map[string]interface{})
+	if old["flavor_id"] != new["flavor_id"] {
+		return true
+	}
+	if old["boot_volume_type"] != new["boot_volume_type"] {
+		return true
+	}
+	if old["boot_volume_size"] != new["boot_volume_size"] {
+		return true
+	}
+	if old["is_public_ipv4"] != new["is_public_ipv4"] {
+		return true
+	}
+	return false
+}
+
+func resourceK8sV2CreateClusterPool(client, tasksClient *gcorecloud.ServiceClient, clusterName string, data interface{}) error {
+	pool := data.(map[string]interface{})
+	poolName := pool["name"].(string)
+	log.Printf("[DEBUG] Creating cluster pool (%s)", poolName)
+
+	opts := pools.CreateOpts{
+		Name:               pool["name"].(string),
+		FlavorID:           pool["flavor_id"].(string),
+		MinNodeCount:       pool["min_node_count"].(int),
+		MaxNodeCount:       pool["max_node_count"].(int),
+		BootVolumeSize:     pool["boot_volume_size"].(int),
+		BootVolumeType:     volumes.VolumeType(pool["boot_volume_type"].(string)),
+		AutoHealingEnabled: pool["auto_healing_enabled"].(bool),
+		IsPublicIPv4:       pool["is_public_ipv4"].(bool),
+	}
+	results, err := pools.Create(client, clusterName, opts).Extract()
+	if err != nil {
+		return fmt.Errorf("create cluster pool: %w", err)
 	}
 
-	var add, upd, del []map[string]interface{}
-	for k, v := range newmap {
-		if _, ok := oldmap[k]; ok {
-			upd = append(upd, v)
-		} else {
-			add = append(add, v)
-		}
+	taskID := results.Tasks[0]
+	log.Printf("[DEBUG] Task id (%s)", taskID)
+	_, err = tasks.WaitTaskAndReturnResult(tasksClient, taskID, true, K8sCreateTimeout, func(task tasks.TaskID) (interface{}, error) {
+		return nil, nil
+	})
+	if err != nil {
+		return fmt.Errorf("wait for task %s: %w", taskID, err)
 	}
-	for k, v := range oldmap {
-		if _, ok := newmap[k]; !ok {
-			del = append(del, v)
-		}
+
+	log.Printf("[DEBUG] Created cluster pool (%s)", poolName)
+	return nil
+}
+
+func resourceK8sV2DeleteClusterPool(client, tasksClient *gcorecloud.ServiceClient, clusterName string, data interface{}) error {
+	pool := data.(map[string]interface{})
+	poolName := pool["name"].(string)
+	log.Printf("[DEBUG] Deleting cluster pool (%s)", poolName)
+
+	results, err := pools.Delete(client, clusterName, poolName).Extract()
+	if err != nil {
+		return fmt.Errorf("delete cluster pool: %w", err)
 	}
-	return add, upd, del
+
+	taskID := results.Tasks[0]
+	log.Printf("[DEBUG] Task id (%s)", taskID)
+	_, err = tasks.WaitTaskAndReturnResult(tasksClient, taskID, true, K8sCreateTimeout, func(task tasks.TaskID) (interface{}, error) {
+		return nil, nil
+	})
+	if err != nil {
+		return fmt.Errorf("wait for task %s: %w", taskID, err)
+	}
+
+	log.Printf("[DEBUG] Deleted cluster pool (%s)", poolName)
+	return nil
+}
+
+func resourceK8sV2UpdateClusterPool(client *gcorecloud.ServiceClient, clusterName string, data interface{}) error {
+	pool := data.(map[string]interface{})
+	poolName := pool["name"].(string)
+	log.Printf("[DEBUG] Updating cluster pool (%s)", poolName)
+
+	opts := pools.UpdateOpts{
+		AutoHealingEnabled: pool["auto_healing_enabled"].(bool),
+		MinNodeCount:       pool["min_node_count"].(int),
+		MaxNodeCount:       pool["max_node_count"].(int),
+	}
+	_, err := pools.Update(client, clusterName, poolName, opts).Extract()
+	if err != nil {
+		return fmt.Errorf("update cluster pool: %w", err)
+	}
+
+	log.Printf("[DEBUG] Updated cluster pool (%s)", poolName)
+	return nil
 }

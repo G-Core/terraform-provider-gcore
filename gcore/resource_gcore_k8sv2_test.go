@@ -7,7 +7,6 @@ import (
 	"fmt"
 	"net"
 	"os"
-	"reflect"
 	"strconv"
 	"testing"
 
@@ -146,91 +145,4 @@ func testAccK8sV2Destroy(s *terraform.State) error {
 	}
 
 	return nil
-}
-
-func TestDiffK8sV2ClusterPoolChange(t *testing.T) {
-	tests := []struct {
-		name                      string
-		old, new                  interface{}
-		wantAdd, wantUpd, wantDel []map[string]interface{}
-	}{
-		{
-			name: "no change",
-			old: []map[string]interface{}{
-				{"name": "pool-1", "max_node_count": 1},
-			},
-			new: []map[string]interface{}{
-				{"name": "pool-1", "max_node_count": 1},
-			},
-			wantUpd: []map[string]interface{}{
-				{"name": "pool-1", "max_node_count": 1},
-			},
-		},
-		{
-			name: "remove pool",
-			old: []map[string]interface{}{
-				{"name": "pool-1", "max_node_count": 1},
-				{"name": "pool-2", "max_node_count": 2},
-			},
-			new: []map[string]interface{}{
-				{"name": "pool-2", "max_node_count": 2},
-			},
-			wantUpd: []map[string]interface{}{
-				{"name": "pool-2", "max_node_count": 2},
-			},
-			wantDel: []map[string]interface{}{
-				{"name": "pool-1", "max_node_count": 1},
-			},
-		},
-		{
-			name: "add pool",
-			old: []map[string]interface{}{
-				{"name": "pool-1", "max_node_count": 1},
-			},
-			new: []map[string]interface{}{
-				{"name": "pool-1", "max_node_count": 1},
-				{"name": "pool-2", "max_node_count": 2},
-			},
-			wantAdd: []map[string]interface{}{
-				{"name": "pool-2", "max_node_count": 2},
-			},
-			wantUpd: []map[string]interface{}{
-				{"name": "pool-1", "max_node_count": 1},
-			},
-		},
-		{
-			name: "add remove pool",
-			old: []map[string]interface{}{
-				{"name": "pool-1", "max_node_count": 1},
-				{"name": "pool-2", "max_node_count": 2},
-			},
-			new: []map[string]interface{}{
-				{"name": "pool-2", "max_node_count": 2},
-				{"name": "pool-3", "max_node_count": 3},
-			},
-			wantAdd: []map[string]interface{}{
-				{"name": "pool-3", "max_node_count": 3},
-			},
-			wantUpd: []map[string]interface{}{
-				{"name": "pool-2", "max_node_count": 2},
-			},
-			wantDel: []map[string]interface{}{
-				{"name": "pool-1", "max_node_count": 1},
-			},
-		},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			add, upd, del := diffK8sV2ClusterPoolChange(tt.old, tt.new)
-			if !reflect.DeepEqual(add, tt.wantAdd) {
-				t.Errorf("diffClusterPoolChange() add got: %v, want: %v", add, tt.wantAdd)
-			}
-			if !reflect.DeepEqual(upd, tt.wantUpd) {
-				t.Errorf("diffClusterPoolChange() upd got: %v, want: %v", upd, tt.wantUpd)
-			}
-			if !reflect.DeepEqual(del, tt.wantDel) {
-				t.Errorf("diffClusterPoolChange() del got: %v, want: %v", del, tt.wantDel)
-			}
-		})
-	}
 }
