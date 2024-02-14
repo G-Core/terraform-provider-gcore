@@ -48,6 +48,7 @@ resource "gcore_k8sv2" "cl" {
 
 ### Optional
 
+- `cni` (Block List, Max: 1) (see [below for nested schema](#nestedblock--cni))
 - `fixed_network` (String) Fixed network used to allocate network addresses for cluster nodes.
 - `fixed_subnet` (String) Fixed subnet used to allocate network addresses for cluster nodes. Subnet should have a router.
 - `is_ipv6` (Boolean) Enable public IPv6 address.
@@ -92,6 +93,14 @@ Read-Only:
 - `created_at` (String) Cluster pool creation date.
 - `node_count` (Number) Current node count in the cluster pool.
 - `status` (String) Cluster pool status.
+
+
+<a id="nestedblock--cni"></a>
+### Nested Schema for `cni`
+
+Required:
+
+- `provider` (String)
 
 
 <a id="nestedblock--timeouts"></a>
