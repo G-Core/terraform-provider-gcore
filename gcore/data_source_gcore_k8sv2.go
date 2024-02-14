@@ -53,6 +53,20 @@ func dataSourceK8sV2() *schema.Resource {
 				Type:     schema.TypeString,
 				Required: true,
 			},
+			"cni": {
+				Type:     schema.TypeList,
+				Optional: true,
+				ForceNew: true,
+				Elem: &schema.Resource{
+					Schema: map[string]*schema.Schema{
+						"provider": {
+							Type:     schema.TypeString,
+							Required: true,
+							ForceNew: true,
+						},
+					},
+				},
+			},
 			"fixed_network": {
 				Type:     schema.TypeString,
 				Computed: true,
@@ -185,6 +199,13 @@ func dataSourceK8sV2Read(ctx context.Context, d *schema.ResourceData, m interfac
 	d.Set("created_at", cluster.CreatedAt.Format(time.RFC850))
 	d.Set("creator_task_id", cluster.CreatorTaskID)
 	d.Set("task_id", cluster.TaskID)
+
+	if cluster.CNI != nil {
+		v := map[string]interface{}{
+			"provider": cluster.CNI.Provider.String(),
+		}
+		d.Set("cni", []interface{}{v})
+	}
 
 	var ps []map[string]interface{}
 	for _, pool := range cluster.Pools {

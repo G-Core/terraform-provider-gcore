@@ -90,6 +90,21 @@ func resourceK8sV2() *schema.Resource {
 				Required:    true,
 				ForceNew:    true,
 			},
+			"cni": {
+				Type:     schema.TypeList,
+				Optional: true,
+				MaxItems: 1,
+				ForceNew: true,
+				Elem: &schema.Resource{
+					Schema: map[string]*schema.Schema{
+						"provider": {
+							Type:     schema.TypeString,
+							Required: true,
+							ForceNew: true,
+						},
+					},
+				},
+			},
 			"fixed_network": {
 				Type:        schema.TypeString,
 				Description: "Fixed network used to allocate network addresses for cluster nodes.",
@@ -258,6 +273,12 @@ func resourceK8sV2Create(ctx context.Context, d *schema.ResourceData, m interfac
 		IsIPV6:       d.Get("is_ipv6").(bool),
 	}
 
+	if cniI, ok := d.GetOk("cni"); ok {
+		cniA := cniI.([]interface{})
+		cni := cniA[0].(map[string]interface{})
+		opts.CNI = &clusters.CNICreateOpts{Provider: clusters.CNIProvider(cni["provider"].(string))}
+	}
+
 	if podsIP, ok := d.GetOk("pods_ip_pool"); ok {
 		gccidr, err := parseCIDRFromString(podsIP.(string))
 		if err != nil {
@@ -361,6 +382,13 @@ func resourceK8sV2Read(ctx context.Context, d *schema.ResourceData, m interface{
 	d.Set("created_at", cluster.CreatedAt.Format(time.RFC850))
 	d.Set("creator_task_id", cluster.CreatorTaskID)
 	d.Set("task_id", cluster.TaskID)
+
+	if cluster.CNI != nil {
+		v := map[string]interface{}{
+			"provider": cluster.CNI.Provider.String(),
+		}
+		d.Set("cni", []interface{}{v})
+	}
 
 	// pools always come sorted alphabetically, so we need to reorder them to match TF state
 	poolData := d.Get("pool").([]interface{})
