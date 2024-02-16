@@ -149,10 +149,10 @@ resource "gcore_loadbalancerv2" "private_lb_dualstack" {
 - `flavor` (String) Desired flavor to be used for load balancer. Changing this value will re-create load balancer.
 - `last_updated` (String) Datetime when load balancer was updated at the last time.
 - `metadata_map` (Map of String) Metadata map to apply to the load balancer.
-- `project_id` (Number)
-- `project_name` (String)
-- `region_id` (Number)
-- `region_name` (String)
+- `project_id` (Number) ID of the desired project to create load balancer in.
+- `project_name` (String) Name of the desired project to create load balancer in.
+- `region_id` (Number) ID of the desired region to create load balancer in.
+- `region_name` (String) Name of the desired region to create load balancer in.
 - `timeouts` (Block, Optional) (see [below for nested schema](#nestedblock--timeouts))
 - `vip_ip_family` (String) Available values are 'ipv4', 'ipv6', 'dual'
 - `vip_network_id` (String) ID of the desired network. Note: add all created `gcore_subnet` resources within the network with this id to the `depends_on` to be sure that `gcore_loadbalancerv2` will be destroyed first
