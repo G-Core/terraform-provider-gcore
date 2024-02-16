@@ -211,26 +211,26 @@ resource "gcore_lbmember" "instance_member" {
 
 ### Required
 
-- `address` (String)
-- `pool_id` (String)
-- `protocol_port` (Number)
+- `address` (String) IP address to communicate with real server.
+- `pool_id` (String) ID of the target load balancer pool to attach newly created member.
+- `protocol_port` (Number) Port to communicate with real server.
 
 ### Optional
 
-- `instance_id` (String)
-- `last_updated` (String)
-- `project_id` (Number)
-- `project_name` (String)
-- `region_id` (Number)
-- `region_name` (String)
-- `subnet_id` (String)
+- `instance_id` (String) ID of the gcore_instance.
+- `last_updated` (String) Datetime when load balancer member was updated at the last time.
+- `project_id` (Number) ID of the desired project to create load balancer member in.
+- `project_name` (String) Name of the desired project to create load balancer member in.
+- `region_id` (Number) ID of the desired region to create load balancer member in.
+- `region_name` (String) Name of the desired region to create load balancer member in.
+- `subnet_id` (String) ID of the subnet in which real server placed.
 - `timeouts` (Block, Optional) (see [below for nested schema](#nestedblock--timeouts))
-- `weight` (Number) Value between 0 and 256
+- `weight` (Number) Value between 0 and 256, default 1.
 
 ### Read-Only
 
 - `id` (String) The ID of this resource.
-- `operating_status` (String)
+- `operating_status` (String) Operating status of this member.
 
 <a id="nestedblock--timeouts"></a>
 ### Nested Schema for `timeouts`

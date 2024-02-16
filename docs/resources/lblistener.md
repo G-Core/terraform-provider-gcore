@@ -73,33 +73,33 @@ resource "gcore_lblistener" "prometheus_80" {
 
 ### Required
 
-- `loadbalancer_id` (String)
-- `name` (String)
+- `loadbalancer_id` (String) ID of the target load balancer to attach newly created listener.
+- `name` (String) Listener name.
 - `protocol` (String) Available values are 'HTTP', 'HTTPS', 'TCP', 'UDP', 'TERMINATED_HTTPS', 'PROMETHEUS'
-- `protocol_port` (Number)
+- `protocol_port` (Number) Port number to listen, between 1 and 65535.
 
 ### Optional
 
-- `connection_limit` (Number)
-- `insert_x_forwarded` (Boolean) Insert *-forwarded headers
-- `last_updated` (String)
-- `project_id` (Number)
-- `project_name` (String)
-- `region_id` (Number)
-- `region_name` (String)
-- `secret_id` (String)
-- `sni_secret_id` (List of String)
-- `timeout_client_data` (Number)
-- `timeout_member_connect` (Number)
-- `timeout_member_data` (Number)
+- `connection_limit` (Number) Number of simultaneous connections for this listener, between 1 and 1,000,000.
+- `insert_x_forwarded` (Boolean) Insert X-Forwarded headers for 'HTTP', 'HTTPS', 'TERMINATED_HTTPS' protocols.
+- `last_updated` (String) Datetime when load balancer was updated at the last time.
+- `project_id` (Number) ID of the desired project to create load balancer listener in.
+- `project_name` (String) Name of the desired project to create load balancer listener in.
+- `region_id` (Number) ID of the desired region to create load balancer listener in.
+- `region_name` (String) Name of the desired region to create load balancer listener in.
+- `secret_id` (String) Secret ID to use with 'TERMINATED_HTTPS' protocol.
+- `sni_secret_id` (List of String) List of additional Secret IDs to use with 'TERMINATED_HTTPS' protocol.
+- `timeout_client_data` (Number) Frontend client inactivity timeout in milliseconds.
+- `timeout_member_connect` (Number) Backend member connection timeout in milliseconds.
+- `timeout_member_data` (Number) Backend member inactivity timeout in milliseconds.
 - `timeouts` (Block, Optional) (see [below for nested schema](#nestedblock--timeouts))
 
 ### Read-Only
 
 - `id` (String) The ID of this resource.
-- `operating_status` (String)
-- `pool_count` (Number)
-- `provisioning_status` (String)
+- `operating_status` (String) Operating status of this listener.
+- `pool_count` (Number) Number of pools in this listener.
+- `provisioning_status` (String) Provisioning status of this listener.
 
 <a id="nestedblock--timeouts"></a>
 ### Nested Schema for `timeouts`
