@@ -29,7 +29,7 @@ data "gcore_image" "ubuntu" {
   project_id = data.gcore_project.project.id
   region_id  = data.gcore_region.region.id
 
-  name       = "ubuntu-23.10"
+  name       = "ubuntu-22.04"
 }
 
 resource "gcore_volume" "instance_member_volume" {

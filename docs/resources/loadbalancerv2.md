@@ -142,28 +142,28 @@ resource "gcore_loadbalancerv2" "private_lb_dualstack" {
 
 ### Required
 
-- `name` (String)
+- `name` (String) Name of the load balancer.
 
 ### Optional
 
-- `flavor` (String)
-- `last_updated` (String)
-- `metadata_map` (Map of String)
+- `flavor` (String) Desired flavor to be used for load balancer. Changing this value will re-create load balancer.
+- `last_updated` (String) Datetime when load balancer was updated at the last time.
+- `metadata_map` (Map of String) Metadata map to apply to the load balancer.
 - `project_id` (Number)
 - `project_name` (String)
 - `region_id` (Number)
 - `region_name` (String)
 - `timeouts` (Block, Optional) (see [below for nested schema](#nestedblock--timeouts))
 - `vip_ip_family` (String) Available values are 'ipv4', 'ipv6', 'dual'
-- `vip_network_id` (String) Note: add all created `gcore_subnet` resources within the network with this id to the `depends_on` to be sure that `gcore_loadbalancerv2` will be destroyed first
-- `vip_subnet_id` (String)
+- `vip_network_id` (String) ID of the desired network. Note: add all created `gcore_subnet` resources within the network with this id to the `depends_on` to be sure that `gcore_loadbalancerv2` will be destroyed first
+- `vip_port_id` (String) Load balancer Port ID.
+- `vip_subnet_id` (String) ID of the desired subnet.
 
 ### Read-Only
 
 - `id` (String) The ID of this resource.
-- `metadata_read_only` (List of Object) (see [below for nested schema](#nestedatt--metadata_read_only))
-- `vip_address` (String) Load balancer IP address
-- `vip_port_id` (String) Load balancer Port ID
+- `metadata_read_only` (List of Object) List of metadata items. (see [below for nested schema](#nestedatt--metadata_read_only))
+- `vip_address` (String) Load balancer IP address.
 
 <a id="nestedblock--timeouts"></a>
 ### Nested Schema for `timeouts`
@@ -193,6 +193,6 @@ Import is supported using the following syntax:
 
 ```shell
 # import using <project_id>:<region_id>:<loadbalancer_id> format
-terraform import gcore_loadbalancer.loadbalancer1 1:6:447d2959-8ae0-4ca0-8d47-9f050a3637d7
+terraform import gcore_loadbalancerv2.loadbalancer1 1:6:447d2959-8ae0-4ca0-8d47-9f050a3637d7
 ```
 
