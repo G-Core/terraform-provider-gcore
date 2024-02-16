@@ -20,4 +20,3 @@ data "gcore_lblistener" "l" {
 output "view" {
   value = data.gcore_lblistener.l
 }
-

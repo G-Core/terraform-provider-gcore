@@ -19,4 +19,3 @@ data "gcore_network" "tnw" {
 output "view" {
   value = data.gcore_network.tnw
 }
-

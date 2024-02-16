@@ -12,25 +12,60 @@ Represent load balancer listener. Can not be created without load balancer. A li
 
 ## Example Usage
 
+### Prerequisite
+
 ```terraform
 provider gcore {
   permanent_api_token = "251$d3361.............1b35f26d8"
 }
 
-resource "gcore_loadbalancerv2" "lb" {
-  project_id = 1
-  region_id  = 1
-  name       = "test"
-  flavor     = "lb1-1-2"
+data "gcore_project" "project" {
+  name = "Default"
 }
 
-resource "gcore_lblistener" "listener" {
-  project_id      = 1
-  region_id       = 1
-  name            = "test"
-  protocol        = "TCP"
-  protocol_port   = 36621
+data "gcore_region" "region" {
+  name = "Luxembourg-2"
+}
+```
+
+```terraform
+resource "gcore_loadbalancerv2" "lb" {
+  project_id = data.gcore_project.project.id
+  region_id  = data.gcore_region.region.id
+
+  name       = "My first load balancer with listeners"
+  flavor     = "lb1-1-2"
+}
+```
+
+### TCP
+
+```terraform
+resource "gcore_lblistener" "tcp_80" {
+  project_id = data.gcore_project.project.id
+  region_id  = data.gcore_region.region.id
+
   loadbalancer_id = gcore_loadbalancerv2.lb.id
+
+  name          = "tcp-80"
+  protocol      = "TCP"
+  protocol_port = 80
+}
+```
+
+### Prometheus metrics (from private network)
+
+```terraform
+resource "gcore_lblistener" "prometheus_80" {
+  project_id = data.gcore_project.project.id
+  region_id  = data.gcore_region.region.id
+
+  loadbalancer_id = gcore_loadbalancerv2.lb.id
+
+  name          = "prometheus-80"
+  protocol      = "PROMETHEUS"
+  protocol_port = 8080
+  allowed_cidrs = ["10.0.0.0/8"]  # example of how to allow access only from private network
 }
 ```
 
@@ -75,6 +110,10 @@ Optional:
 - `create` (String)
 - `delete` (String)
 
+
+
+
+
 ## Import
 
 Import is supported using the following syntax:
@@ -83,3 +122,4 @@ Import is supported using the following syntax:
 # import using <project_id>:<region_id>:<lblistener_id>:<loadbalancer_id> format
 terraform import gcore_lblistener.lblistener1 1:6:a775dd94-4e9c-4da7-9f0e-ffc9ae34446b:447d2959-8ae0-4ca0-8d47-9f050a3637d7
 ```
+

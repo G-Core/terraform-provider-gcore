@@ -12,20 +12,62 @@ Represent subnets. Subnetwork is a range of IP addresses in a cloud network. Add
 
 ## Example Usage
 
+### Prerequisite
+
+```terraform
+variable "dns_nameservers" {
+  type = list
+  default = ["8.8.4.4", "1.1.1.1"]
+}
+
+variable "host_routes" {
+  type = list(object({
+    destination = string
+    nexthop = string
+   }))
+  default = [
+    {
+      destination = "10.0.3.0/24"
+      nexthop = "10.0.0.13"
+    },
+    {
+      destination = "10.0.4.0/24"
+      nexthop = "10.0.0.14"
+    },
+  ]
+}
+```
+
 ```terraform
 provider gcore {
   permanent_api_token = "251$d3361.............1b35f26d8"
 }
 
-resource "gcore_network" "network" {
-  name       = "network_example"
-  type       = "vxlan"
-  region_id  = 1
-  project_id = 1
+data "gcore_project" "project" {
+  name = "Default"
 }
 
-resource "gcore_subnet" "subnet" {
-  name            = "subnet_example"
+data "gcore_region" "region" {
+  name = "Luxembourg-2"
+}
+
+resource "gcore_network" "network" {
+  project_id = data.gcore_project.project.id
+  region_id  = data.gcore_region.region.id
+
+  name       = "network_example"
+  type       = "vxlan"
+}
+```
+
+### IPv4
+
+```terraform
+resource "gcore_subnet" "subnet_ipv4" {
+  project_id = data.gcore_project.project.id
+  region_id  = data.gcore_region.region.id
+
+  name            = "subnet_ipv4"
   cidr            = "192.168.10.0/24"
   network_id      = gcore_network.network.id
   dns_nameservers = var.dns_nameservers
@@ -40,8 +82,19 @@ resource "gcore_subnet" "subnet" {
   }
 
   gateway_ip = "192.168.10.1"
-  region_id  = 1
-  project_id = 1
+}
+```
+
+### IPv6
+
+```terraform
+resource "gcore_subnet" "subnet_ipv6" {
+  project_id = data.gcore_project.project.id
+  region_id  = data.gcore_region.region.id
+
+  name            = "subnet_ipv6"
+  cidr            = "fd00::/8"
+  network_id      = gcore_network.network.id
 }
 ```
 
@@ -91,6 +144,10 @@ Read-Only:
 - `read_only` (Boolean)
 - `value` (String)
 
+
+
+
+
 ## Import
 
 Import is supported using the following syntax:
@@ -99,3 +156,4 @@ Import is supported using the following syntax:
 # import using <project_id>:<region_id>:<subnet_id> format
 terraform import gcore_subnet.subnet1 1:6:447d2959-8ae0-4ca0-8d47-9f050a3637d7
 ```
+

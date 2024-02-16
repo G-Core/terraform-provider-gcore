@@ -19,4 +19,3 @@ data "gcore_loadbalancer" "lb" {
 output "view" {
   value = data.gcore_loadbalancer.lb
 }
-

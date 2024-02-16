@@ -19,4 +19,3 @@ data "gcore_lbpool" "pool" {
 output "view" {
   value = data.gcore_lbpool.pool
 }
-

@@ -12,41 +12,85 @@ Represent load balancer listener pool. A pool is a list of virtual machines to w
 
 ## Example Usage
 
+### Prerequisite
+
 ```terraform
 provider gcore {
   permanent_api_token = "251$d3361.............1b35f26d8"
 }
 
-resource "gcore_loadbalancer" "lb" {
-  project_id = 1
-  region_id  = 1
-  name       = "test1"
-  flavor     = "lb1-1-2"
-  listener {
-    name          = "test"
-    protocol      = "HTTP"
-    protocol_port = 80
-  }
+data "gcore_project" "project" {
+  name = "Default"
 }
 
-resource "gcore_lbpool" "pl" {
-  project_id      = 1
-  region_id       = 1
-  name            = "test_pool1"
-  protocol        = "HTTP"
-  lb_algorithm    = "LEAST_CONNECTIONS"
-  loadbalancer_id = gcore_loadbalancer.lb.id
-  listener_id     = gcore_loadbalancer.lb.listener.0.id
+data "gcore_region" "region" {
+  name = "Luxembourg-2"
+}
+```
+
+### TCP Pool with health monitor and session persistence
+
+```terraform
+resource "gcore_lblistener" "tcp_80" {
+  project_id = data.gcore_project.project.id
+  region_id  = data.gcore_region.region.id
+
+  loadbalancer_id = gcore_loadbalancerv2.lb.id
+
+  name          = "My first tcp listener with pool"
+  protocol      = "TCP"
+  protocol_port = 80
+}
+
+resource "gcore_lbpool" "tcp_80" {
+  project_id = data.gcore_project.project.id
+  region_id  = data.gcore_region.region.id
+
+  loadbalancer_id = gcore_loadbalancerv2.lb.id
+  listener_id     = gcore_lblistener.tcp_80.id
+
+  name            = "My first tcp pool"
+  protocol        = "TCP"
+  lb_algorithm    = "ROUND_ROBIN"
+
   health_monitor {
     type        = "PING"
-    delay       = 60
+    delay       = 10
     max_retries = 5
-    timeout     = 10
+    timeout     = 5
   }
+
   session_persistence {
     type        = "APP_COOKIE"
     cookie_name = "test_new_cookie"
   }
+}
+```
+
+### Simple pool with proxy protocol
+
+```terraform
+resource "gcore_lblistener" "proxy_8080" {
+  project_id = data.gcore_project.project.id
+  region_id  = data.gcore_region.region.id
+
+  loadbalancer_id = gcore_loadbalancerv2.lb.id
+
+  name          = "My first proxy listener with pool"
+  protocol      = "TCP"
+  protocol_port = 8080
+}
+
+resource "gcore_lbpool" "proxy_8080" {
+  project_id = data.gcore_project.project.id
+  region_id  = data.gcore_region.region.id
+
+  loadbalancer_id = gcore_loadbalancerv2.lb.id
+  listener_id     = gcore_lblistener.proxy_8080.id
+
+  name            = "My first proxy pool"
+  protocol        = "PROXY"
+  lb_algorithm    = "LEAST_CONNECTIONS"
 }
 ```
 
@@ -120,6 +164,10 @@ Optional:
 - `create` (String)
 - `delete` (String)
 
+
+
+
+
 ## Import
 
 Import is supported using the following syntax:
@@ -128,3 +176,4 @@ Import is supported using the following syntax:
 # import using <project_id>:<region_id>:<lbpool_id> format
 terraform import gcore_lbpool.lbpool1 1:6:447d2959-8ae0-4ca0-8d47-9f050a3637d7
 ```
+

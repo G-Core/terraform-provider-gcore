@@ -12,50 +12,198 @@ Represent load balancer member
 
 ## Example Usage
 
+### Prerequisite
+
 ```terraform
 provider gcore {
   permanent_api_token = "251$d3361.............1b35f26d8"
 }
 
-resource "gcore_loadbalancer" "lb" {
-  project_id = 1
-  region_id  = 1
-  name       = "test1"
+data "gcore_project" "project" {
+  name = "Default"
+}
+
+data "gcore_region" "region" {
+  name = "Luxembourg-2"
+}
+```
+
+```terraform
+resource "gcore_loadbalancerv2" "lb" {
+  project_id = data.gcore_project.project.id
+  region_id  = data.gcore_region.region.id
+
+  name       = "My first complex load balancer"
   flavor     = "lb1-1-2"
-  listeners {
-    name          = "test"
-    protocol      = "HTTP"
-    protocol_port = 80
-  }
 }
 
-resource "gcore_lbpool" "pl" {
-  project_id      = 1
-  region_id       = 1
-  name            = "test_pool1"
+resource "gcore_lblistener" "http_80" {
+  project_id = data.gcore_project.project.id
+  region_id  = data.gcore_region.region.id
+
+  loadbalancer_id = gcore_loadbalancerv2.lb.id
+
+  name          = "http-80"
+  protocol      = "HTTP"
+  protocol_port = 80
+}
+
+resource "gcore_lbpool" "http" {
+  project_id = data.gcore_project.project.id
+  region_id  = data.gcore_region.region.id
+
+  loadbalancer_id = gcore_loadbalancerv2.lb.id
+  listener_id     = gcore_lblistener.http_80.id
+
+  name            = "My HTTP pool"
   protocol        = "HTTP"
-  lb_algorithm    = "LEAST_CONNECTIONS"
-  loadbalancer_id = gcore_loadbalancer.lb.id
-  listener_id     = gcore_loadbalancer.lb.listeners.0.id
+  lb_algorithm    = "ROUND_ROBIN"
+
   health_monitor {
-    type        = "PING"
-    delay       = 60
-    max_retries = 5
-    timeout     = 10
+    type        = "TCP"
+    delay       = 10
+    max_retries = 3
+    timeout     = 5
   }
-  session_persistence {
-    type        = "APP_COOKIE"
-    cookie_name = "test_new_cookie"
+}
+```
+
+### Public member
+
+```terraform
+resource "gcore_lbmember" "public_member" {
+  project_id = data.gcore_project.project.id
+  region_id  = data.gcore_region.region.id
+
+  pool_id       = gcore_lbpool.http.id
+
+  address       = "8.8.8.8"
+  protocol_port = 80
+  weight        = 1
+}
+```
+
+### Private member
+
+```terraform
+resource "gcore_network" "private_network" {
+  project_id = data.gcore_project.project.id
+  region_id  = data.gcore_region.region.id
+
+  name = "my-private-network"
+}
+
+resource "gcore_subnet" "private_subnet" {
+  project_id = data.gcore_project.project.id
+  region_id  = data.gcore_region.region.id
+
+  cidr       = "10.0.0.0/24"
+  name       = "my-private-network-subnet"
+  network_id = gcore_network.private_network.id
+}
+
+resource "gcore_reservedfixedip" "fixed_ip" {
+  project_id = data.gcore_project.project.id
+  region_id  = data.gcore_region.region.id
+
+  type             = "ip_address"
+  network_id       = gcore_network.private_network.id
+  subnet_id        = gcore_subnet.private_subnet.id
+  fixed_ip_address = "10.0.0.10"
+  is_vip           = false
+}
+
+resource "gcore_lbmember" "private_member" {
+  project_id = data.gcore_project.project.id
+  region_id  = data.gcore_region.region.id
+
+  pool_id = gcore_lbpool.http.id
+
+  address   = gcore_reservedfixedip.fixed_ip.fixed_ip_address
+  subnet_id = gcore_reservedfixedip.fixed_ip.subnet_id
+
+  protocol_port = 80
+  weight        = 1
+}
+```
+
+### Private Instance member
+
+```terraform
+resource "gcore_network" "instance_member_private_network" {
+  project_id = data.gcore_project.project.id
+  region_id  = data.gcore_region.region.id
+
+  name = "my-private-network"
+}
+
+resource "gcore_subnet" "instance_member_private_subnet" {
+  project_id = data.gcore_project.project.id
+  region_id  = data.gcore_region.region.id
+
+  cidr       = "10.0.0.0/24"
+  name       = "my-private-network-subnet"
+  network_id = gcore_network.instance_member_private_network.id
+}
+
+resource "gcore_reservedfixedip" "instance_member_fixed_ip" {
+  project_id = data.gcore_project.project.id
+  region_id  = data.gcore_region.region.id
+
+  type             = "ip_address"
+  network_id       = gcore_network.instance_member_private_network.id
+  subnet_id        = gcore_subnet.instance_member_private_subnet.id
+  fixed_ip_address = "10.0.0.11"
+  is_vip           = false
+}
+
+data "gcore_image" "ubuntu" {
+  project_id = data.gcore_project.project.id
+  region_id  = data.gcore_region.region.id
+
+  name       = "ubuntu-23.10"
+}
+
+resource "gcore_volume" "instance_member_volume" {
+  project_id = data.gcore_project.project.id
+  region_id  = data.gcore_region.region.id
+
+  name       = "boot volume"
+  type_name  = "ssd_hiiops"
+  size       = 10
+  image_id   = data.gcore_image.ubuntu.id
+}
+
+
+resource "gcore_instance" "instance_member" {
+  project_id = data.gcore_project.project.id
+  region_id  = data.gcore_region.region.id
+
+  name_template = "ed-c16-{ip_octets}"
+  flavor_id  = "g1-standard-1-2"
+
+  volume {
+    source     = "existing-volume"
+    volume_id  = gcore_volume.instance_member_volume.id
+    boot_index = 0
+  }
+
+  interface {
+    type            = "reserved_fixed_ip"
+    port_id         = gcore_reservedfixedip.instance_member_fixed_ip.port_id
   }
 }
 
-resource "gcore_lbmember" "lbm" {
-  project_id    = 1
-  region_id     = 1
-  pool_id       = gcore_lbpool.pl.id
-  address       = "10.10.2.15"
-  protocol_port = 8081
-  weight        = 5
+resource "gcore_lbmember" "instance_member" {
+  project_id = data.gcore_project.project.id
+  region_id  = data.gcore_region.region.id
+
+  pool_id       = gcore_lbpool.http.id
+
+  instance_id = gcore_instance.instance_member.id
+  address       = gcore_reservedfixedip.instance_member_fixed_ip.fixed_ip_address
+  protocol_port = 80
+  weight        = 1
 }
 ```
 
@@ -93,6 +241,10 @@ Optional:
 - `create` (String)
 - `delete` (String)
 
+
+
+
+
 ## Import
 
 Import is supported using the following syntax:
@@ -101,3 +253,4 @@ Import is supported using the following syntax:
 # import using <project_id>:<region_id>:<lbmember>:<pool_id> format
 terraform import gcore_lbmember.lbmember1 1:6:a775dd94-4e9c-4da7-9f0e-ffc9ae34446b:447d2959-8ae0-4ca0-8d47-9f050a3637d7
 ```
+

@@ -19,4 +19,3 @@ data "gcore_image" "ubuntu" {
 output "view" {
   value = data.gcore_image.ubuntu
 }
-
