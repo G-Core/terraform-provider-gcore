@@ -28,7 +28,7 @@ func resourceSubnet() *schema.Resource {
 		ReadContext:   resourceSubnetRead,
 		UpdateContext: resourceSubnetUpdate,
 		DeleteContext: resourceSubnetDelete,
-		Description:   "Represent subnets. Subnetwork is a range of IP addresses in a cloud network. Addresses from this range will be assigned to machines in the cloud",
+		Description:   "Represent subnets. Subnetwork is a range of IP addresses in a cloud network. Addresses from this range will be assigned to machines in the cloud.",
 		Importer: &schema.ResourceImporter{
 			StateContext: func(ctx context.Context, d *schema.ResourceData, meta interface{}) ([]*schema.ResourceData, error) {
 				projectID, regionID, subnetID, err := ImportStringParser(d.Id())
@@ -46,8 +46,9 @@ func resourceSubnet() *schema.Resource {
 
 		Schema: map[string]*schema.Schema{
 			"project_id": &schema.Schema{
-				Type:     schema.TypeInt,
-				Optional: true,
+				Type:        schema.TypeInt,
+				Description: "ID of the desired project to create subnet in.",
+				Optional:    true,
 				ExactlyOneOf: []string{
 					"project_id",
 					"project_name",
@@ -55,8 +56,9 @@ func resourceSubnet() *schema.Resource {
 				DiffSuppressFunc: suppressDiffProjectID,
 			},
 			"region_id": &schema.Schema{
-				Type:     schema.TypeInt,
-				Optional: true,
+				Type:        schema.TypeInt,
+				Description: "ID of the desired region to create subnet in.",
+				Optional:    true,
 				ExactlyOneOf: []string{
 					"region_id",
 					"region_name",
@@ -64,38 +66,44 @@ func resourceSubnet() *schema.Resource {
 				DiffSuppressFunc: suppressDiffRegionID,
 			},
 			"project_name": &schema.Schema{
-				Type:     schema.TypeString,
-				Optional: true,
+				Type:        schema.TypeString,
+				Description: "Name of the desired project to create subnet in.",
+				Optional:    true,
 				ExactlyOneOf: []string{
 					"project_id",
 					"project_name",
 				},
 			},
 			"region_name": &schema.Schema{
-				Type:     schema.TypeString,
-				Optional: true,
+				Type:        schema.TypeString,
+				Description: "Name of the desired region to create subnet in.",
+				Optional:    true,
 				ExactlyOneOf: []string{
 					"region_id",
 					"region_name",
 				},
 			},
 			"name": &schema.Schema{
-				Type:     schema.TypeString,
-				Required: true,
+				Type:        schema.TypeString,
+				Description: "Name of the subnet.",
+				Required:    true,
 			},
 			"enable_dhcp": &schema.Schema{
-				Type:     schema.TypeBool,
-				Optional: true,
-				Computed: true,
+				Type:        schema.TypeBool,
+				Description: "Enable DHCP for this subnet.",
+				Optional:    true,
+				Computed:    true,
 			},
 			"cidr": &schema.Schema{
-				Type:     schema.TypeString,
-				Required: true,
-				ForceNew: true,
+				Type:        schema.TypeString,
+				Description: "Classless Inter-Domain Routing, can be IPv4 or IPv6.",
+				Required:    true,
+				ForceNew:    true,
 			},
 			"network_id": &schema.Schema{
-				Type:     schema.TypeString,
-				Required: true,
+				Type:        schema.TypeString,
+				Description: "ID of the desired network to create subnet in.",
+				Required:    true,
 			},
 			"connect_to_network_router": &schema.Schema{
 				Type:        schema.TypeBool,
@@ -104,9 +112,10 @@ func resourceSubnet() *schema.Resource {
 				Default:     true,
 			},
 			"dns_nameservers": &schema.Schema{
-				Type:     schema.TypeList,
-				Optional: true,
-				Computed: true,
+				Type:        schema.TypeList,
+				Description: "List of strings contains DNS addresses, e.g. 95.85.95.85.",
+				Optional:    true,
+				Computed:    true,
 				Elem: &schema.Schema{
 					Type: schema.TypeString,
 				},
@@ -117,8 +126,9 @@ func resourceSubnet() *schema.Resource {
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
 						"destination": &schema.Schema{
-							Type:     schema.TypeString,
-							Required: true,
+							Type:        schema.TypeString,
+							Description: "Classless Inter-Domain Routing, can be IPv4 or IPv6.",
+							Required:    true,
 						},
 						"nexthop": &schema.Schema{
 							Type:        schema.TypeString,
@@ -129,9 +139,10 @@ func resourceSubnet() *schema.Resource {
 				},
 			},
 			"gateway_ip": &schema.Schema{
-				Type:     schema.TypeString,
-				Optional: true,
-				Computed: true,
+				Type:        schema.TypeString,
+				Description: "Desired IP address of the subnet's gateway.",
+				Optional:    true,
+				Computed:    true,
 				ValidateDiagFunc: func(val interface{}, key cty.Path) diag.Diagnostics {
 					v := val.(string)
 					var IP = regexp.MustCompile(`(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)(\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)){3}`)
@@ -142,36 +153,42 @@ func resourceSubnet() *schema.Resource {
 				},
 			},
 			"metadata_map": &schema.Schema{
-				Type:     schema.TypeMap,
-				Optional: true,
+				Type:        schema.TypeMap,
+				Description: "Metadata map to apply to the subnet.",
+				Optional:    true,
 				Elem: &schema.Schema{
 					Type: schema.TypeString,
 				},
 			},
 			"metadata_read_only": &schema.Schema{
-				Type:     schema.TypeList,
-				Computed: true,
+				Type:        schema.TypeList,
+				Description: "List of metadata items.",
+				Computed:    true,
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
 						"key": {
-							Type:     schema.TypeString,
-							Computed: true,
+							Type:        schema.TypeString,
+							Description: "Key of the metadata (tag) item.",
+							Computed:    true,
 						},
 						"value": {
-							Type:     schema.TypeString,
-							Computed: true,
+							Type:        schema.TypeString,
+							Description: "Value of the metadata (tag) item.",
+							Computed:    true,
 						},
 						"read_only": {
-							Type:     schema.TypeBool,
-							Computed: true,
+							Type:        schema.TypeBool,
+							Description: "Is the current key read-only or not.",
+							Computed:    true,
 						},
 					},
 				},
 			},
 			"last_updated": &schema.Schema{
-				Type:     schema.TypeString,
-				Optional: true,
-				Computed: true,
+				Type:        schema.TypeString,
+				Description: "Datetime when subnet was updated at the last time.",
+				Optional:    true,
+				Computed:    true,
 			},
 		},
 	}

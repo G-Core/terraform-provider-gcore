@@ -2,12 +2,12 @@
 page_title: "gcore_subnet Resource - terraform-provider-gcore"
 subcategory: ""
 description: |-
-  Represent subnets. Subnetwork is a range of IP addresses in a cloud network. Addresses from this range will be assigned to machines in the cloud
+  Represent subnets. Subnetwork is a range of IP addresses in a cloud network. Addresses from this range will be assigned to machines in the cloud.
 ---
 
 # gcore_subnet (Resource)
 
-Represent subnets. Subnetwork is a range of IP addresses in a cloud network. Addresses from this range will be assigned to machines in the cloud
+Represent subnets. Subnetwork is a range of IP addresses in a cloud network. Addresses from this range will be assigned to machines in the cloud.
 
 ## Example Usage
 
@@ -15,7 +15,7 @@ Represent subnets. Subnetwork is a range of IP addresses in a cloud network. Add
 
 ```terraform
 variable "dns_nameservers" {
-  type = list
+  type = list(string)
   default = ["8.8.4.4", "1.1.1.1"]
 }
 
@@ -102,35 +102,35 @@ resource "gcore_subnet" "subnet_ipv6" {
 
 ### Required
 
-- `cidr` (String)
-- `name` (String)
-- `network_id` (String)
+- `cidr` (String) Classless Inter-Domain Routing, can be IPv4 or IPv6.
+- `name` (String) Name of the subnet.
+- `network_id` (String) ID of the desired network to create subnet in.
 
 ### Optional
 
 - `connect_to_network_router` (Boolean) True if the network's router should get a gateway in this subnet. Must be explicitly 'false' when gateway_ip is null. Default true.
-- `dns_nameservers` (List of String)
-- `enable_dhcp` (Boolean)
-- `gateway_ip` (String)
+- `dns_nameservers` (List of String) List of strings contains DNS addresses, e.g. 95.85.95.85.
+- `enable_dhcp` (Boolean) Enable DHCP for this subnet.
+- `gateway_ip` (String) Desired IP address of the subnet's gateway.
 - `host_routes` (Block List) (see [below for nested schema](#nestedblock--host_routes))
-- `last_updated` (String)
-- `metadata_map` (Map of String)
-- `project_id` (Number)
-- `project_name` (String)
-- `region_id` (Number)
-- `region_name` (String)
+- `last_updated` (String) Datetime when subnet was updated at the last time.
+- `metadata_map` (Map of String) Metadata map to apply to the subnet.
+- `project_id` (Number) ID of the desired project to create subnet in.
+- `project_name` (String) Name of the desired project to create subnet in.
+- `region_id` (Number) ID of the desired region to create subnet in.
+- `region_name` (String) Name of the desired region to create subnet in.
 
 ### Read-Only
 
 - `id` (String) The ID of this resource.
-- `metadata_read_only` (List of Object) (see [below for nested schema](#nestedatt--metadata_read_only))
+- `metadata_read_only` (List of Object) List of metadata items. (see [below for nested schema](#nestedatt--metadata_read_only))
 
 <a id="nestedblock--host_routes"></a>
 ### Nested Schema for `host_routes`
 
 Required:
 
-- `destination` (String)
+- `destination` (String) Classless Inter-Domain Routing, can be IPv4 or IPv6.
 - `nexthop` (String) IPv4 address to forward traffic to if it's destination IP matches 'destination' CIDR
 
 
