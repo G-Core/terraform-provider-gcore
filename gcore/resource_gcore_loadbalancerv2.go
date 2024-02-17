@@ -118,6 +118,7 @@ func resourceLoadBalancerV2() *schema.Resource {
 				Description: "Load balancer Port ID.",
 				Optional:    true,
 				Computed:    true,
+				ForceNew:    true,
 			},
 			"vip_ip_family": &schema.Schema{
 				Type:        schema.TypeString,
@@ -189,6 +190,7 @@ func resourceLoadBalancerV2Create(ctx context.Context, d *schema.ResourceData, m
 		Name:         d.Get("name").(string),
 		VipNetworkID: d.Get("vip_network_id").(string),
 		VipSubnetID:  d.Get("vip_subnet_id").(string),
+		VipPortID:    d.Get("vip_port_id").(string),
 		VIPIPFamily:  types.IPFamilyType(d.Get("vip_ip_family").(string)),
 	}
 
