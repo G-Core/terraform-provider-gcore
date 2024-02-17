@@ -2,21 +2,22 @@ provider gcore {
   permanent_api_token = "251$d3361.............1b35f26d8"
 }
 
-data "gcore_project" "pr" {
-  name = "test"
+data "gcore_project" "project" {
+  name = "Default"
 }
 
-data "gcore_region" "rg" {
-  name = "ED-10 Preprod"
+data "gcore_region" "region" {
+  name = "Luxembourg-2"
 }
 
-data "gcore_lblistener" "l" {
+data "gcore_lblistener" "listener" {
+  region_id  = data.gcore_region.region.id
+  project_id = data.gcore_project.project.id
+
   name            = "test-listener"
-  loadbalancer_id = "59b2eabc-c0a8-4545-8081-979bd963c6ab" //optional
-  region_id       = data.gcore_region.rg.id
-  project_id      = data.gcore_project.pr.id
+  // loadbalancer_id = gcore.loadbalancer_v2.lb
 }
 
 output "view" {
-  value = data.gcore_lblistener.l
+  value = data.gcore_lblistener.listener
 }

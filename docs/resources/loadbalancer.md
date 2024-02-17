@@ -67,7 +67,7 @@ resource "gcore_loadbalancer" "lb" {
 Required:
 
 - `name` (String)
-- `protocol` (String) Available values is 'HTTP' (currently work, other do not work on ed-8), 'HTTPS', 'TCP', 'UDP'
+- `protocol` (String) Available values are 'HTTP', 'HTTPS', 'TCP', 'UDP'
 - `protocol_port` (Number)
 
 Optional:

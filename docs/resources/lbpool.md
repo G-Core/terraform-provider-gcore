@@ -100,19 +100,19 @@ resource "gcore_lbpool" "proxy_8080" {
 
 - `lb_algorithm` (String) Available values is 'ROUND_ROBIN', 'LEAST_CONNECTIONS', 'SOURCE_IP', 'SOURCE_IP_PORT'
 - `name` (String) Pool name.
-- `protocol` (String) Available values are 'HTTP' (currently work, other do not work on ed-8), 'HTTPS', 'TCP', 'UDP', 'PROXY'
+- `protocol` (String) Available values are 'HTTP', 'HTTPS', 'TCP', 'UDP', 'PROXY'
 
 ### Optional
 
 - `health_monitor` (Block List, Max: 1) Health Monitor settings for defining health state of members inside this pool. (see [below for nested schema](#nestedblock--health_monitor))
-- `last_updated` (String)
+- `last_updated` (String) Datetime when load balancer pool was updated at the last time.
 - `listener_id` (String) ID of the target listener associated with load balancer to attach newly created pool.
 - `loadbalancer_id` (String) ID of the target load balancer to attach newly created pool.
 - `project_id` (Number) ID of the desired project to create load balancer pool in.
 - `project_name` (String) Name of the desired project to create load balancer pool in.
 - `region_id` (Number) ID of the desired region to create load balancer pool in.
 - `region_name` (String) Name of the desired region to create load balancer pool in.
-- `session_persistence` (Block List, Max: 1) (see [below for nested schema](#nestedblock--session_persistence))
+- `session_persistence` (Block List, Max: 1) Pool session persistence tells the load balancer to attempt to send future requests from a client to the same backend member as the initial request. (see [below for nested schema](#nestedblock--session_persistence))
 - `timeouts` (Block, Optional) (see [below for nested schema](#nestedblock--timeouts))
 
 ### Read-Only

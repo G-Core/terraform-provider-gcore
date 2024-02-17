@@ -111,7 +111,7 @@ func resourceLBPool() *schema.Resource {
 			"protocol": &schema.Schema{
 				Type:        schema.TypeString,
 				Required:    true,
-				Description: fmt.Sprintf("Available values are '%s' (currently work, other do not work on ed-8), '%s', '%s', '%s', '%s'", types.ProtocolTypeHTTP, types.ProtocolTypeHTTPS, types.ProtocolTypeTCP, types.ProtocolTypeUDP, types.ProtocolTypePROXY),
+				Description: fmt.Sprintf("Available values are '%s', '%s', '%s', '%s', '%s'", types.ProtocolTypeHTTP, types.ProtocolTypeHTTPS, types.ProtocolTypeTCP, types.ProtocolTypeUDP, types.ProtocolTypePROXY),
 				ValidateDiagFunc: func(val interface{}, key cty.Path) diag.Diagnostics {
 					v := val.(string)
 					switch types.ProtocolType(v) {
@@ -202,9 +202,10 @@ func resourceLBPool() *schema.Resource {
 				},
 			},
 			"session_persistence": &schema.Schema{
-				Type:     schema.TypeList,
-				Optional: true,
-				MaxItems: 1,
+				Type:        schema.TypeList,
+				Description: "Pool session persistence tells the load balancer to attempt to send future requests from a client to the same backend member as the initial request.",
+				Optional:    true,
+				MaxItems:    1,
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
 						"type": &schema.Schema{
@@ -234,9 +235,10 @@ func resourceLBPool() *schema.Resource {
 				},
 			},
 			"last_updated": &schema.Schema{
-				Type:     schema.TypeString,
-				Optional: true,
-				Computed: true,
+				Type:        schema.TypeString,
+				Description: "Datetime when load balancer pool was updated at the last time.",
+				Optional:    true,
+				Computed:    true,
 			},
 		},
 	}
