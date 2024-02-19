@@ -218,10 +218,10 @@ resource "gcore_lbmember" "instance_member" {
 ### Optional
 
 - `instance_id` (String) ID of the gcore_instance.
-- `project_id` (Number) ID of the desired project to create load balancer member in.
-- `project_name` (String) Name of the desired project to create load balancer member in.
-- `region_id` (Number) ID of the desired region to create load balancer member in.
-- `region_name` (String) Name of the desired region to create load balancer member in.
+- `project_id` (Number) ID of the desired project to create load balancer member in. Alternative for `project_name`. One of them should be specified.
+- `project_name` (String) Name of the desired project to create load balancer member in. Alternative for `project_id`. One of them should be specified.
+- `region_id` (Number) ID of the desired region to create load balancer member in. Alternative for `region_name`. One of them should be specified.
+- `region_name` (String) Name of the desired region to create load balancer member in. Alternative for `region_id`. One of them should be specified.
 - `subnet_id` (String) ID of the subnet in which real server placed.
 - `timeouts` (Block, Optional) (see [below for nested schema](#nestedblock--timeouts))
 - `weight` (Number) Value between 0 and 256, default 1.

@@ -116,11 +116,12 @@ func resourceLoadBalancerV2() *schema.Resource {
 				Computed:    true,
 			},
 			"vip_port_id": &schema.Schema{
-				Type:        schema.TypeString,
-				Description: "Load balancer Port ID. It might be ID of the already created Reserved Fixed IP, otherwise we will create port automatically in specified `vip_network_id`/`vip_subnet_id`.",
-				Optional:    true,
-				Computed:    true,
-				ForceNew:    true,
+				Type: schema.TypeString,
+				Description: "Load balancer Port ID. It might be ID of the already created Reserved Fixed IP, otherwise we will create port automatically in specified `vip_network_id`/`vip_subnet_id`. " +
+					"It is an alternative for specifying `vip_network_id`/`vip_subnet_id`.",
+				Optional: true,
+				Computed: true,
+				ForceNew: true,
 			},
 			"vip_ip_family": &schema.Schema{
 				Type:        schema.TypeString,

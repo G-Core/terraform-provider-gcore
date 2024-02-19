@@ -114,10 +114,10 @@ resource "gcore_subnet" "subnet_ipv6" {
 - `gateway_ip` (String) Desired IP address of the subnet's gateway.
 - `host_routes` (Block List) (see [below for nested schema](#nestedblock--host_routes))
 - `metadata_map` (Map of String) Metadata map to apply to the subnet.
-- `project_id` (Number) ID of the desired project to create subnet in.
-- `project_name` (String) Name of the desired project to create subnet in.
-- `region_id` (Number) ID of the desired region to create subnet in.
-- `region_name` (String) Name of the desired region to create subnet in.
+- `project_id` (Number) ID of the desired project to create subnet in. Alternative for `project_name`. One of them should be specified.
+- `project_name` (String) Name of the desired project to create subnet in. Alternative for `project_id`. One of them should be specified.
+- `region_id` (Number) ID of the desired region to create subnet in. Alternative for `region_name`. One of them should be specified.
+- `region_name` (String) Name of the desired region to create subnet in. Alternative for `region_id`. One of them should be specified.
 
 ### Read-Only
 

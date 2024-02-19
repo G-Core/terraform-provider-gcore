@@ -107,10 +107,10 @@ resource "gcore_lbpool" "proxy_8080" {
 - `health_monitor` (Block List, Max: 1) Health Monitor settings for defining health state of members inside this pool. (see [below for nested schema](#nestedblock--health_monitor))
 - `listener_id` (String) ID of the target listener associated with load balancer to attach newly created pool.
 - `loadbalancer_id` (String) ID of the target load balancer to attach newly created pool.
-- `project_id` (Number) ID of the desired project to create load balancer pool in.
-- `project_name` (String) Name of the desired project to create load balancer pool in.
-- `region_id` (Number) ID of the desired region to create load balancer pool in.
-- `region_name` (String) Name of the desired region to create load balancer pool in.
+- `project_id` (Number) ID of the desired project to create load balancer pool in. Alternative for `project_name`. One of them should be specified.
+- `project_name` (String) Name of the desired project to create load balancer pool in. Alternative for `project_id`. One of them should be specified.
+- `region_id` (Number) ID of the desired region to create load balancer pool in. Alternative for `region_name`. One of them should be specified.
+- `region_name` (String) Name of the desired region to create load balancer pool in. Alternative for `region_id`. One of them should be specified.
 - `session_persistence` (Block List, Max: 1) Pool session persistence tells the load balancer to attempt to send future requests from a client to the same backend member as the initial request. (see [below for nested schema](#nestedblock--session_persistence))
 - `timeouts` (Block, Optional) (see [below for nested schema](#nestedblock--timeouts))
 

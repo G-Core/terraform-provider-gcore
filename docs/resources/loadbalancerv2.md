@@ -175,15 +175,15 @@ resource "gcore_loadbalancerv2" "private_lb_dualstack" {
 
 - `flavor` (String) Desired flavor to be used for load balancer. Changing this value will re-create load balancer.
 - `metadata_map` (Map of String) Metadata map to apply to the load balancer.
-- `project_id` (Number) ID of the desired project to create load balancer in.
-- `project_name` (String) Name of the desired project to create load balancer in.
-- `region_id` (Number) ID of the desired region to create load balancer in.
-- `region_name` (String) Name of the desired region to create load balancer in.
+- `project_id` (Number) ID of the desired project to create load balancer in. Alternative for `project_name`. One of them should be specified.
+- `project_name` (String) Name of the desired project to create load balancer in. Alternative for `project_id`. One of them should be specified.
+- `region_id` (Number) ID of the desired region to create load balancer in. Alternative for `region_name`. One of them should be specified.
+- `region_name` (String) Name of the desired region to create load balancer in. Alternative for `region_id`. One of them should be specified.
 - `timeouts` (Block, Optional) (see [below for nested schema](#nestedblock--timeouts))
 - `vip_ip_family` (String) Available values are 'ipv4', 'ipv6', 'dual'
-- `vip_network_id` (String) ID of the desired network. Note: add all created `gcore_subnet` resources within the network with this id to the `depends_on` to be sure that `gcore_loadbalancerv2` will be destroyed first
-- `vip_port_id` (String) Load balancer Port ID.
-- `vip_subnet_id` (String) ID of the desired subnet.
+- `vip_network_id` (String) ID of the desired network. Can be used with vip_subnet_id, in this case Load Balancer will be created in specified subnet, otherwise in most free subnet. Note: add all created `gcore_subnet` resources within the network with this id to the `depends_on` to be sure that `gcore_loadbalancerv2` will be destroyed first
+- `vip_port_id` (String) Load balancer Port ID. It might be ID of the already created Reserved Fixed IP, otherwise we will create port automatically in specified `vip_network_id`/`vip_subnet_id`. It is an alternative for specifying `vip_network_id`/`vip_subnet_id`.
+- `vip_subnet_id` (String) ID of the desired subnet. Should be used together with vip_network_id.
 
 ### Read-Only
 

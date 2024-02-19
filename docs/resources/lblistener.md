@@ -82,10 +82,10 @@ resource "gcore_lblistener" "prometheus_80" {
 
 - `connection_limit` (Number) Number of simultaneous connections for this listener, between 1 and 1,000,000.
 - `insert_x_forwarded` (Boolean) Insert X-Forwarded headers for 'HTTP', 'HTTPS', 'TERMINATED_HTTPS' protocols.
-- `project_id` (Number) ID of the desired project to create load balancer listener in.
-- `project_name` (String) Name of the desired project to create load balancer listener in.
-- `region_id` (Number) ID of the desired region to create load balancer listener in.
-- `region_name` (String) Name of the desired region to create load balancer listener in.
+- `project_id` (Number) ID of the desired project to create load balancer listener in. Alternative for `project_name`. One of them should be specified.
+- `project_name` (String) Name of the desired project to create load balancer listener in. Alternative for `project_id`. One of them should be specified.
+- `region_id` (Number) ID of the desired region to create load balancer listener in. Alternative for `region_name`. One of them should be specified.
+- `region_name` (String) Name of the desired region to create load balancer listener in. Alternative for `region_id`. One of them should be specified.
 - `secret_id` (String) Secret ID to use with 'TERMINATED_HTTPS' protocol.
 - `sni_secret_id` (List of String) List of additional Secret IDs to use with 'TERMINATED_HTTPS' protocol.
 - `timeout_client_data` (Number) Frontend client inactivity timeout in milliseconds.
