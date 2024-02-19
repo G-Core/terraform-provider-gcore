@@ -190,7 +190,7 @@ resource "gcore_loadbalancerv2" "private_lb_dualstack" {
 - `id` (String) The ID of this resource.
 - `last_updated` (String) Datetime when load balancer was updated at the last time.
 - `metadata_read_only` (List of Object) List of metadata items. (see [below for nested schema](#nestedatt--metadata_read_only))
-- `vip_address` (String) Load balancer IP address.
+- `vip_address` (String) Load balancer IP address. IP address will be changed when load balancer will be recreated if `vip_port_id` is not specified.
 
 <a id="nestedblock--timeouts"></a>
 ### Nested Schema for `timeouts`

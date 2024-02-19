@@ -112,7 +112,7 @@ func resourceLoadBalancerV2() *schema.Resource {
 			},
 			"vip_address": &schema.Schema{
 				Type:        schema.TypeString,
-				Description: "Load balancer IP address.",
+				Description: "Load balancer IP address. IP address will be changed when load balancer will be recreated if `vip_port_id` is not specified.",
 				Computed:    true,
 			},
 			"vip_port_id": &schema.Schema{
