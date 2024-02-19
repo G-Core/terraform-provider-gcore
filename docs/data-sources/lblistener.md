@@ -30,7 +30,7 @@ data "gcore_lblistener" "listener" {
   project_id = data.gcore_project.project.id
 
   name            = "test-listener"
-  // loadbalancer_id = gcore.loadbalancer_v2.lb
+  // loadbalancer_id = gcore.loadbalancer_v2.lb.id
 }
 
 output "view" {
