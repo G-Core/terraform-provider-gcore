@@ -1,5 +1,5 @@
 variable "dns_nameservers" {
-  type = list
+  type = list(string)
   default = ["8.8.4.4", "1.1.1.1"]
 }
 

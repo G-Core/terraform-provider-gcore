@@ -2,6 +2,7 @@ package gcore
 
 import (
 	"context"
+	"fmt"
 	"log"
 
 	"github.com/G-Core/gcorelabscloud-go/gcore/utils"
@@ -18,8 +19,9 @@ func dataSourceLoadBalancerV2() *schema.Resource {
 		ReadContext: dataSourceLoadBalancerV2Read,
 		Schema: map[string]*schema.Schema{
 			"project_id": &schema.Schema{
-				Type:     schema.TypeInt,
-				Optional: true,
+				Type:        schema.TypeInt,
+				Description: "ID of the project in which load balancer was created.",
+				Optional:    true,
 				ExactlyOneOf: []string{
 					"project_id",
 					"project_name",
@@ -27,8 +29,9 @@ func dataSourceLoadBalancerV2() *schema.Resource {
 				DiffSuppressFunc: suppressDiffProjectID,
 			},
 			"region_id": &schema.Schema{
-				Type:     schema.TypeInt,
-				Optional: true,
+				Type:        schema.TypeInt,
+				Description: "ID of the region in which load balancer was created.",
+				Optional:    true,
 				ExactlyOneOf: []string{
 					"region_id",
 					"region_name",
@@ -36,32 +39,37 @@ func dataSourceLoadBalancerV2() *schema.Resource {
 				DiffSuppressFunc: suppressDiffRegionID,
 			},
 			"project_name": &schema.Schema{
-				Type:     schema.TypeString,
-				Optional: true,
+				Type:        schema.TypeString,
+				Description: "Name of the project in which load balancer was created.",
+				Optional:    true,
 				ExactlyOneOf: []string{
 					"project_id",
 					"project_name",
 				},
 			},
 			"region_name": &schema.Schema{
-				Type:     schema.TypeString,
-				Optional: true,
+				Type:        schema.TypeString,
+				Description: "Name of the region in which load balancer was created.",
+				Optional:    true,
 				ExactlyOneOf: []string{
 					"region_id",
 					"region_name",
 				},
 			},
 			"name": &schema.Schema{
-				Type:     schema.TypeString,
-				Required: true,
+				Type:        schema.TypeString,
+				Description: "Name of the load balancer.",
+				Required:    true,
 			},
 			"vip_address": &schema.Schema{
-				Type:     schema.TypeString,
-				Computed: true,
+				Type:        schema.TypeString,
+				Description: "Load balancer IP address.",
+				Computed:    true,
 			},
 			"vip_port_id": &schema.Schema{
-				Type:     schema.TypeString,
-				Computed: true,
+				Type:        schema.TypeString,
+				Description: "Load balancer Port ID.",
+				Computed:    true,
 			},
 			"vrrp_ips": &schema.Schema{
 				Type:     schema.TypeList,
@@ -69,49 +77,58 @@ func dataSourceLoadBalancerV2() *schema.Resource {
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
 						"ip_address": {
-							Type:     schema.TypeString,
-							Computed: true,
+							Type:        schema.TypeString,
+							Description: "IP address of the LB instance.",
+							Computed:    true,
 						},
 						"subnet_id": {
-							Type:     schema.TypeString,
-							Computed: true,
+							Type:        schema.TypeString,
+							Description: "Subnet ID of the LB instance.",
+							Computed:    true,
 						},
 					},
 				},
 			},
 			"vip_ip_family": &schema.Schema{
 				Type:         schema.TypeString,
+				Description:  fmt.Sprintf("Available values are '%s', '%s', '%s'", types.IPv4IPFamilyType, types.IPv6IPFamilyType, types.DualStackIPFamilyType),
 				Computed:     true,
 				Optional:     true,
 				ValidateFunc: validation.StringInSlice(types.IPFamilyType("").StringList(), false),
 			},
 			"metadata_k": &schema.Schema{
-				Type:     schema.TypeString,
-				Optional: true,
+				Type:        schema.TypeString,
+				Description: "Metadata string of the load balancer.",
+				Optional:    true,
 			},
 			"metadata_kv": &schema.Schema{
-				Type:     schema.TypeMap,
-				Optional: true,
+				Type:        schema.TypeMap,
+				Description: "Metadata map of the load balancer.",
+				Optional:    true,
 				Elem: &schema.Schema{
 					Type: schema.TypeString,
 				},
 			},
 			"metadata_read_only": &schema.Schema{
-				Type:     schema.TypeList,
-				Computed: true,
+				Type:        schema.TypeList,
+				Description: "List of metadata items.",
+				Computed:    true,
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
 						"key": {
-							Type:     schema.TypeString,
-							Computed: true,
+							Type:        schema.TypeString,
+							Description: "Key of the metadata (tag) item.",
+							Computed:    true,
 						},
 						"value": {
-							Type:     schema.TypeString,
-							Computed: true,
+							Type:        schema.TypeString,
+							Description: "Value of the metadata (tag) item.",
+							Computed:    true,
 						},
 						"read_only": {
-							Type:     schema.TypeBool,
-							Computed: true,
+							Type:        schema.TypeBool,
+							Description: "Is the current key read-only or not.",
+							Computed:    true,
 						},
 					},
 				},

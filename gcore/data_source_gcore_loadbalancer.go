@@ -80,7 +80,7 @@ func dataSourceLoadBalancer() *schema.Resource {
 						"protocol": &schema.Schema{
 							Type:        schema.TypeString,
 							Computed:    true,
-							Description: fmt.Sprintf("Available values is '%s' (currently work, other do not work on ed-8), '%s', '%s', '%s'", types.ProtocolTypeHTTP, types.ProtocolTypeHTTPS, types.ProtocolTypeTCP, types.ProtocolTypeUDP),
+							Description: fmt.Sprintf("Available values is '%s', '%s', '%s', '%s'", types.ProtocolTypeHTTP, types.ProtocolTypeHTTPS, types.ProtocolTypeTCP, types.ProtocolTypeUDP),
 						},
 						"protocol_port": &schema.Schema{
 							Type:     schema.TypeInt,

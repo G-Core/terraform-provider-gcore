@@ -19,4 +19,3 @@ data "gcore_volume" "tv" {
 output "view" {
   value = data.gcore_volume.tv
 }
-

@@ -45,7 +45,6 @@ resource "gcore_loadbalancer" "lb" {
 ### Optional
 
 - `flavor` (String)
-- `last_updated` (String)
 - `metadata_map` (Map of String)
 - `project_id` (Number)
 - `project_name` (String)
@@ -58,6 +57,7 @@ resource "gcore_loadbalancer" "lb" {
 ### Read-Only
 
 - `id` (String) The ID of this resource.
+- `last_updated` (String)
 - `metadata_read_only` (List of Object) (see [below for nested schema](#nestedatt--metadata_read_only))
 - `vip_address` (String) Load balancer IP address
 
@@ -67,7 +67,7 @@ resource "gcore_loadbalancer" "lb" {
 Required:
 
 - `name` (String)
-- `protocol` (String) Available values is 'HTTP' (currently work, other do not work on ed-8), 'HTTPS', 'TCP', 'UDP'
+- `protocol` (String) Available values are 'HTTP', 'HTTPS', 'TCP', 'UDP'
 - `protocol_port` (Number)
 
 Optional:

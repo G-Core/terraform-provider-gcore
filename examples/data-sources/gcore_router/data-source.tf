@@ -19,5 +19,3 @@ data "gcore_router" "tr" {
 output "view" {
   value = data.gcore_router.tr
 }
-
-

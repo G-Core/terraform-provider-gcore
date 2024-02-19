@@ -1,0 +1,34 @@
+---
+page_title: "{{ .Name }} {{ .Type }} - {{ .ProviderName	}}"
+subcategory: ""
+description: |-
+  {{ .Description }}
+---
+
+# {{ .Name }} ({{ .Type }})
+
+{{ .Description }}
+
+## Example Usage
+
+### Prerequisite
+
+{{tffile "examples/resources/gcore_lbpool/main.tf"}}
+
+### TCP Pool with health monitor and session persistence
+
+{{tffile "examples/resources/gcore_lbpool/tcp-80.tf"}}
+
+### Simple pool with proxy protocol
+
+{{tffile "examples/resources/gcore_lbpool/proxy-8080.tf"}}
+
+{{ .SchemaMarkdown }}
+
+{{ if .HasImport }}
+## Import
+
+Import is supported using the following syntax:
+
+{{ codefile "shell" .ImportFile }}
+{{ end }}

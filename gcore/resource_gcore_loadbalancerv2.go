@@ -44,9 +44,10 @@ func resourceLoadBalancerV2() *schema.Resource {
 
 		Schema: map[string]*schema.Schema{
 			"project_id": &schema.Schema{
-				Type:     schema.TypeInt,
-				Optional: true,
-				ForceNew: true,
+				Type:        schema.TypeInt,
+				Description: "ID of the desired project to create load balancer in. Alternative for `project_name`. One of them should be specified.",
+				Optional:    true,
+				ForceNew:    true,
 				ExactlyOneOf: []string{
 					"project_id",
 					"project_name",
@@ -54,9 +55,10 @@ func resourceLoadBalancerV2() *schema.Resource {
 				DiffSuppressFunc: suppressDiffProjectID,
 			},
 			"region_id": &schema.Schema{
-				Type:     schema.TypeInt,
-				Optional: true,
-				ForceNew: true,
+				Type:        schema.TypeInt,
+				Description: "ID of the desired region to create load balancer in. Alternative for `region_name`. One of them should be specified.",
+				Optional:    true,
+				ForceNew:    true,
 				ExactlyOneOf: []string{
 					"region_id",
 					"region_name",
@@ -64,52 +66,62 @@ func resourceLoadBalancerV2() *schema.Resource {
 				DiffSuppressFunc: suppressDiffRegionID,
 			},
 			"project_name": &schema.Schema{
-				Type:     schema.TypeString,
-				Optional: true,
-				ForceNew: true,
+				Type:        schema.TypeString,
+				Description: "Name of the desired project to create load balancer in. Alternative for `project_id`. One of them should be specified.",
+				Optional:    true,
+				ForceNew:    true,
 				ExactlyOneOf: []string{
 					"project_id",
 					"project_name",
 				},
 			},
 			"region_name": &schema.Schema{
-				Type:     schema.TypeString,
-				Optional: true,
-				ForceNew: true,
+				Type:        schema.TypeString,
+				Description: "Name of the desired region to create load balancer in. Alternative for `region_id`. One of them should be specified.",
+				Optional:    true,
+				ForceNew:    true,
 				ExactlyOneOf: []string{
 					"region_id",
 					"region_name",
 				},
 			},
 			"name": &schema.Schema{
-				Type:     schema.TypeString,
-				Required: true,
+				Type:        schema.TypeString,
+				Description: "Name of the load balancer.",
+				Required:    true,
 			},
 			"flavor": &schema.Schema{
-				Type:     schema.TypeString,
-				Optional: true,
-				ForceNew: true,
-			},
-			"vip_network_id": &schema.Schema{
 				Type:        schema.TypeString,
-				Description: "Note: add all created `gcore_subnet` resources within the network with this id to the `depends_on` to be sure that `gcore_loadbalancerv2` will be destroyed first",
+				Description: "Desired flavor to be used for load balancer. Changing this value will re-create load balancer. By default, `lb1-1-2` will be used. ",
 				Optional:    true,
 				ForceNew:    true,
 			},
-			"vip_subnet_id": &schema.Schema{
-				Type:     schema.TypeString,
+			"vip_network_id": &schema.Schema{
+				Type: schema.TypeString,
+				Description: "ID of the desired network. " +
+					"Can be used with vip_subnet_id, in this case Load Balancer will be created in specified subnet, otherwise in most free subnet. " +
+					"Note: add all created `gcore_subnet` resources within the network with this id to the `depends_on` to be sure that `gcore_loadbalancerv2` will be destroyed first",
 				Optional: true,
 				ForceNew: true,
 			},
+			"vip_subnet_id": &schema.Schema{
+				Type:        schema.TypeString,
+				Description: "ID of the desired subnet. Should be used together with vip_network_id.",
+				Optional:    true,
+				ForceNew:    true,
+			},
 			"vip_address": &schema.Schema{
 				Type:        schema.TypeString,
-				Description: "Load balancer IP address",
+				Description: "Load balancer IP address. IP address will be changed when load balancer will be recreated if `vip_port_id` is not specified.",
 				Computed:    true,
 			},
 			"vip_port_id": &schema.Schema{
-				Type:        schema.TypeString,
-				Description: "Load balancer Port ID",
-				Computed:    true,
+				Type: schema.TypeString,
+				Description: "Load balancer Port ID. It might be ID of the already created Reserved Fixed IP, otherwise we will create port automatically in specified `vip_network_id`/`vip_subnet_id`. " +
+					"It is an alternative for specifying `vip_network_id`/`vip_subnet_id`.",
+				Optional: true,
+				Computed: true,
+				ForceNew: true,
 			},
 			"vip_ip_family": &schema.Schema{
 				Type:        schema.TypeString,
@@ -125,33 +137,38 @@ func resourceLoadBalancerV2() *schema.Resource {
 				},
 			},
 			"last_updated": &schema.Schema{
-				Type:     schema.TypeString,
-				Optional: true,
-				Computed: true,
+				Type:        schema.TypeString,
+				Description: "Datetime when load balancer was updated at the last time.",
+				Computed:    true,
 			},
 			"metadata_map": &schema.Schema{
-				Type:     schema.TypeMap,
-				Optional: true,
+				Type:        schema.TypeMap,
+				Optional:    true,
+				Description: "Metadata map to apply to the load balancer.",
 				Elem: &schema.Schema{
 					Type: schema.TypeString,
 				},
 			},
 			"metadata_read_only": &schema.Schema{
-				Type:     schema.TypeList,
-				Computed: true,
+				Type:        schema.TypeList,
+				Computed:    true,
+				Description: "List of metadata items.",
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
 						"key": {
-							Type:     schema.TypeString,
-							Computed: true,
+							Type:        schema.TypeString,
+							Description: "Key of the metadata (tag) item.",
+							Computed:    true,
 						},
 						"value": {
-							Type:     schema.TypeString,
-							Computed: true,
+							Type:        schema.TypeString,
+							Description: "Value of the metadata (tag) item.",
+							Computed:    true,
 						},
 						"read_only": {
-							Type:     schema.TypeBool,
-							Computed: true,
+							Type:        schema.TypeBool,
+							Description: "Is the current key read-only or not.",
+							Computed:    true,
 						},
 					},
 				},
@@ -175,6 +192,7 @@ func resourceLoadBalancerV2Create(ctx context.Context, d *schema.ResourceData, m
 		Name:         d.Get("name").(string),
 		VipNetworkID: d.Get("vip_network_id").(string),
 		VipSubnetID:  d.Get("vip_subnet_id").(string),
+		VipPortID:    d.Get("vip_port_id").(string),
 		VIPIPFamily:  types.IPFamilyType(d.Get("vip_ip_family").(string)),
 	}
 

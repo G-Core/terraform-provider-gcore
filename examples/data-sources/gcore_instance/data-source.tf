@@ -19,4 +19,3 @@ data "gcore_instance" "vm" {
 output "view" {
   value = data.gcore_instance.vm
 }
-
