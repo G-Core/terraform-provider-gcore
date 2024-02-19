@@ -82,7 +82,6 @@ resource "gcore_lblistener" "prometheus_80" {
 
 - `connection_limit` (Number) Number of simultaneous connections for this listener, between 1 and 1,000,000.
 - `insert_x_forwarded` (Boolean) Insert X-Forwarded headers for 'HTTP', 'HTTPS', 'TERMINATED_HTTPS' protocols.
-- `last_updated` (String) Datetime when load balancer was updated at the last time.
 - `project_id` (Number) ID of the desired project to create load balancer listener in.
 - `project_name` (String) Name of the desired project to create load balancer listener in.
 - `region_id` (Number) ID of the desired region to create load balancer listener in.
@@ -97,6 +96,7 @@ resource "gcore_lblistener" "prometheus_80" {
 ### Read-Only
 
 - `id` (String) The ID of this resource.
+- `last_updated` (String) Datetime when load balancer was updated at the last time.
 - `operating_status` (String) Operating status of this listener.
 - `pool_count` (Number) Number of pools in this listener.
 - `provisioning_status` (String) Provisioning status of this listener.

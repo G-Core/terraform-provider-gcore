@@ -105,7 +105,6 @@ resource "gcore_lbpool" "proxy_8080" {
 ### Optional
 
 - `health_monitor` (Block List, Max: 1) Health Monitor settings for defining health state of members inside this pool. (see [below for nested schema](#nestedblock--health_monitor))
-- `last_updated` (String) Datetime when load balancer pool was updated at the last time.
 - `listener_id` (String) ID of the target listener associated with load balancer to attach newly created pool.
 - `loadbalancer_id` (String) ID of the target load balancer to attach newly created pool.
 - `project_id` (Number) ID of the desired project to create load balancer pool in.
@@ -118,6 +117,7 @@ resource "gcore_lbpool" "proxy_8080" {
 ### Read-Only
 
 - `id` (String) The ID of this resource.
+- `last_updated` (String) Datetime when load balancer pool was updated at the last time.
 
 <a id="nestedblock--health_monitor"></a>
 ### Nested Schema for `health_monitor`

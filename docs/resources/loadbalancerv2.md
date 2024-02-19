@@ -174,7 +174,6 @@ resource "gcore_loadbalancerv2" "private_lb_dualstack" {
 ### Optional
 
 - `flavor` (String) Desired flavor to be used for load balancer. Changing this value will re-create load balancer.
-- `last_updated` (String) Datetime when load balancer was updated at the last time.
 - `metadata_map` (Map of String) Metadata map to apply to the load balancer.
 - `project_id` (Number) ID of the desired project to create load balancer in.
 - `project_name` (String) Name of the desired project to create load balancer in.
@@ -189,6 +188,7 @@ resource "gcore_loadbalancerv2" "private_lb_dualstack" {
 ### Read-Only
 
 - `id` (String) The ID of this resource.
+- `last_updated` (String) Datetime when load balancer was updated at the last time.
 - `metadata_read_only` (List of Object) List of metadata items. (see [below for nested schema](#nestedatt--metadata_read_only))
 - `vip_address` (String) Load balancer IP address.
 

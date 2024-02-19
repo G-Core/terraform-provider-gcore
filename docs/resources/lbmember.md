@@ -218,7 +218,6 @@ resource "gcore_lbmember" "instance_member" {
 ### Optional
 
 - `instance_id` (String) ID of the gcore_instance.
-- `last_updated` (String) Datetime when load balancer member was updated at the last time.
 - `project_id` (Number) ID of the desired project to create load balancer member in.
 - `project_name` (String) Name of the desired project to create load balancer member in.
 - `region_id` (Number) ID of the desired region to create load balancer member in.
@@ -230,6 +229,7 @@ resource "gcore_lbmember" "instance_member" {
 ### Read-Only
 
 - `id` (String) The ID of this resource.
+- `last_updated` (String) Datetime when load balancer member was updated at the last time.
 - `operating_status` (String) Operating status of this member.
 
 <a id="nestedblock--timeouts"></a>

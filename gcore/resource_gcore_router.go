@@ -176,7 +176,6 @@ func resourceRouter() *schema.Resource {
 			},
 			"last_updated": &schema.Schema{
 				Type:     schema.TypeString,
-				Optional: true,
 				Computed: true,
 			},
 		},

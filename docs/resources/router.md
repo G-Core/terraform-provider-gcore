@@ -64,7 +64,6 @@ resource "gcore_router" "router" {
 
 - `external_gateway_info` (Block List, Max: 1) (see [below for nested schema](#nestedblock--external_gateway_info))
 - `interfaces` (Block Set) (see [below for nested schema](#nestedblock--interfaces))
-- `last_updated` (String)
 - `project_id` (Number)
 - `project_name` (String)
 - `region_id` (Number)
@@ -74,6 +73,7 @@ resource "gcore_router" "router" {
 ### Read-Only
 
 - `id` (String) The ID of this resource.
+- `last_updated` (String)
 
 <a id="nestedblock--external_gateway_info"></a>
 ### Nested Schema for `external_gateway_info`

@@ -187,7 +187,6 @@ func resourceSubnet() *schema.Resource {
 			"last_updated": &schema.Schema{
 				Type:        schema.TypeString,
 				Description: "Datetime when subnet was updated at the last time.",
-				Optional:    true,
 				Computed:    true,
 			},
 		},

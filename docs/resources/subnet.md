@@ -113,7 +113,6 @@ resource "gcore_subnet" "subnet_ipv6" {
 - `enable_dhcp` (Boolean) Enable DHCP for this subnet.
 - `gateway_ip` (String) Desired IP address of the subnet's gateway.
 - `host_routes` (Block List) (see [below for nested schema](#nestedblock--host_routes))
-- `last_updated` (String) Datetime when subnet was updated at the last time.
 - `metadata_map` (Map of String) Metadata map to apply to the subnet.
 - `project_id` (Number) ID of the desired project to create subnet in.
 - `project_name` (String) Name of the desired project to create subnet in.
@@ -123,6 +122,7 @@ resource "gcore_subnet" "subnet_ipv6" {
 ### Read-Only
 
 - `id` (String) The ID of this resource.
+- `last_updated` (String) Datetime when subnet was updated at the last time.
 - `metadata_read_only` (List of Object) List of metadata items. (see [below for nested schema](#nestedatt--metadata_read_only))
 
 <a id="nestedblock--host_routes"></a>

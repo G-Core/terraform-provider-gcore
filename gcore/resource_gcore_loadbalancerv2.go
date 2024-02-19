@@ -136,7 +136,6 @@ func resourceLoadBalancerV2() *schema.Resource {
 			"last_updated": &schema.Schema{
 				Type:        schema.TypeString,
 				Description: "Datetime when load balancer was updated at the last time.",
-				Optional:    true,
 				Computed:    true,
 			},
 			"metadata_map": &schema.Schema{

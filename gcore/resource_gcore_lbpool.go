@@ -237,7 +237,6 @@ func resourceLBPool() *schema.Resource {
 			"last_updated": &schema.Schema{
 				Type:        schema.TypeString,
 				Description: "Datetime when load balancer pool was updated at the last time.",
-				Optional:    true,
 				Computed:    true,
 			},
 		},
