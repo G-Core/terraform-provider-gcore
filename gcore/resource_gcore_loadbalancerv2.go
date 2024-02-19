@@ -92,7 +92,7 @@ func resourceLoadBalancerV2() *schema.Resource {
 			},
 			"flavor": &schema.Schema{
 				Type:        schema.TypeString,
-				Description: "Desired flavor to be used for load balancer. Changing this value will re-create load balancer.",
+				Description: "Desired flavor to be used for load balancer. Changing this value will re-create load balancer. By default, `lb1-1-2` will be used. ",
 				Optional:    true,
 				ForceNew:    true,
 			},
