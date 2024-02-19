@@ -45,7 +45,7 @@ func resourceLoadBalancerV2() *schema.Resource {
 		Schema: map[string]*schema.Schema{
 			"project_id": &schema.Schema{
 				Type:        schema.TypeInt,
-				Description: "ID of the desired project to create load balancer in.",
+				Description: "ID of the desired project to create load balancer in. Alternative for `project_name`. One of them should be specified.",
 				Optional:    true,
 				ForceNew:    true,
 				ExactlyOneOf: []string{
@@ -56,7 +56,7 @@ func resourceLoadBalancerV2() *schema.Resource {
 			},
 			"region_id": &schema.Schema{
 				Type:        schema.TypeInt,
-				Description: "ID of the desired region to create load balancer in.",
+				Description: "ID of the desired region to create load balancer in. Alternative for `region_name`. One of them should be specified.",
 				Optional:    true,
 				ForceNew:    true,
 				ExactlyOneOf: []string{
@@ -67,7 +67,7 @@ func resourceLoadBalancerV2() *schema.Resource {
 			},
 			"project_name": &schema.Schema{
 				Type:        schema.TypeString,
-				Description: "Name of the desired project to create load balancer in.",
+				Description: "Name of the desired project to create load balancer in. Alternative for `project_id`. One of them should be specified.",
 				Optional:    true,
 				ForceNew:    true,
 				ExactlyOneOf: []string{
@@ -77,7 +77,7 @@ func resourceLoadBalancerV2() *schema.Resource {
 			},
 			"region_name": &schema.Schema{
 				Type:        schema.TypeString,
-				Description: "Name of the desired region to create load balancer in.",
+				Description: "Name of the desired region to create load balancer in. Alternative for `region_id`. One of them should be specified.",
 				Optional:    true,
 				ForceNew:    true,
 				ExactlyOneOf: []string{
@@ -97,14 +97,16 @@ func resourceLoadBalancerV2() *schema.Resource {
 				ForceNew:    true,
 			},
 			"vip_network_id": &schema.Schema{
-				Type:        schema.TypeString,
-				Description: "ID of the desired network. Note: add all created `gcore_subnet` resources within the network with this id to the `depends_on` to be sure that `gcore_loadbalancerv2` will be destroyed first",
-				Optional:    true,
-				ForceNew:    true,
+				Type: schema.TypeString,
+				Description: "ID of the desired network. " +
+					"Can be used with vip_subnet_id, in this case Load Balancer will be created in specified subnet, otherwise in most free subnet. " +
+					"Note: add all created `gcore_subnet` resources within the network with this id to the `depends_on` to be sure that `gcore_loadbalancerv2` will be destroyed first",
+				Optional: true,
+				ForceNew: true,
 			},
 			"vip_subnet_id": &schema.Schema{
 				Type:        schema.TypeString,
-				Description: "ID of the desired subnet.",
+				Description: "ID of the desired subnet. Should be used together with vip_network_id.",
 				Optional:    true,
 				ForceNew:    true,
 			},
@@ -115,7 +117,7 @@ func resourceLoadBalancerV2() *schema.Resource {
 			},
 			"vip_port_id": &schema.Schema{
 				Type:        schema.TypeString,
-				Description: "Load balancer Port ID.",
+				Description: "Load balancer Port ID. It might be ID of the already created Reserved Fixed IP, otherwise we will create port automatically in specified `vip_network_id`/`vip_subnet_id`.",
 				Optional:    true,
 				Computed:    true,
 				ForceNew:    true,

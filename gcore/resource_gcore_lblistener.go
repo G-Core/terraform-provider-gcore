@@ -50,7 +50,7 @@ func resourceLbListener() *schema.Resource {
 		Schema: map[string]*schema.Schema{
 			"project_id": &schema.Schema{
 				Type:        schema.TypeInt,
-				Description: "ID of the desired project to create load balancer listener in.",
+				Description: "ID of the desired project to create load balancer listener in. Alternative for `project_name`. One of them should be specified.",
 				Optional:    true,
 				ForceNew:    true,
 				ExactlyOneOf: []string{
@@ -61,7 +61,7 @@ func resourceLbListener() *schema.Resource {
 			},
 			"region_id": &schema.Schema{
 				Type:        schema.TypeInt,
-				Description: "ID of the desired region to create load balancer listener in.",
+				Description: "ID of the desired region to create load balancer listener in. Alternative for `region_name`. One of them should be specified.",
 				Optional:    true,
 				ForceNew:    true,
 				ExactlyOneOf: []string{
@@ -72,7 +72,7 @@ func resourceLbListener() *schema.Resource {
 			},
 			"project_name": &schema.Schema{
 				Type:        schema.TypeString,
-				Description: "Name of the desired project to create load balancer listener in.",
+				Description: "Name of the desired project to create load balancer listener in. Alternative for `project_id`. One of them should be specified.",
 				Optional:    true,
 				ForceNew:    true,
 				ExactlyOneOf: []string{
@@ -82,7 +82,7 @@ func resourceLbListener() *schema.Resource {
 			},
 			"region_name": &schema.Schema{
 				Type:        schema.TypeString,
-				Description: "Name of the desired region to create load balancer listener in.",
+				Description: "Name of the desired region to create load balancer listener in. Alternative for `region_id`. One of them should be specified.",
 				Optional:    true,
 				ForceNew:    true,
 				ExactlyOneOf: []string{

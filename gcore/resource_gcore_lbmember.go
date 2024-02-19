@@ -51,7 +51,7 @@ func resourceLBMember() *schema.Resource {
 		Schema: map[string]*schema.Schema{
 			"project_id": &schema.Schema{
 				Type:        schema.TypeInt,
-				Description: "ID of the desired project to create load balancer member in.",
+				Description: "ID of the desired project to create load balancer member in. Alternative for `project_name`. One of them should be specified.",
 				Optional:    true,
 				ForceNew:    true,
 				ExactlyOneOf: []string{
@@ -62,7 +62,7 @@ func resourceLBMember() *schema.Resource {
 			},
 			"region_id": &schema.Schema{
 				Type:        schema.TypeInt,
-				Description: "ID of the desired region to create load balancer member in.",
+				Description: "ID of the desired region to create load balancer member in. Alternative for `region_name`. One of them should be specified.",
 				Optional:    true,
 				ForceNew:    true,
 				ExactlyOneOf: []string{
@@ -73,7 +73,7 @@ func resourceLBMember() *schema.Resource {
 			},
 			"project_name": &schema.Schema{
 				Type:        schema.TypeString,
-				Description: "Name of the desired project to create load balancer member in.",
+				Description: "Name of the desired project to create load balancer member in. Alternative for `project_id`. One of them should be specified.",
 				Optional:    true,
 				ForceNew:    true,
 				ExactlyOneOf: []string{
@@ -83,7 +83,7 @@ func resourceLBMember() *schema.Resource {
 			},
 			"region_name": &schema.Schema{
 				Type:        schema.TypeString,
-				Description: "Name of the desired region to create load balancer member in.",
+				Description: "Name of the desired region to create load balancer member in. Alternative for `region_id`. One of them should be specified.",
 				Optional:    true,
 				ForceNew:    true,
 				ExactlyOneOf: []string{

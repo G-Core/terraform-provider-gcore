@@ -47,7 +47,7 @@ func resourceSubnet() *schema.Resource {
 		Schema: map[string]*schema.Schema{
 			"project_id": &schema.Schema{
 				Type:        schema.TypeInt,
-				Description: "ID of the desired project to create subnet in.",
+				Description: "ID of the desired project to create subnet in. Alternative for `project_name`. One of them should be specified.",
 				Optional:    true,
 				ExactlyOneOf: []string{
 					"project_id",
@@ -57,7 +57,7 @@ func resourceSubnet() *schema.Resource {
 			},
 			"region_id": &schema.Schema{
 				Type:        schema.TypeInt,
-				Description: "ID of the desired region to create subnet in.",
+				Description: "ID of the desired region to create subnet in. Alternative for `region_name`. One of them should be specified.",
 				Optional:    true,
 				ExactlyOneOf: []string{
 					"region_id",
@@ -67,7 +67,7 @@ func resourceSubnet() *schema.Resource {
 			},
 			"project_name": &schema.Schema{
 				Type:        schema.TypeString,
-				Description: "Name of the desired project to create subnet in.",
+				Description: "Name of the desired project to create subnet in. Alternative for `project_id`. One of them should be specified.",
 				Optional:    true,
 				ExactlyOneOf: []string{
 					"project_id",
@@ -76,7 +76,7 @@ func resourceSubnet() *schema.Resource {
 			},
 			"region_name": &schema.Schema{
 				Type:        schema.TypeString,
-				Description: "Name of the desired region to create subnet in.",
+				Description: "Name of the desired region to create subnet in. Alternative for `region_id`. One of them should be specified.",
 				Optional:    true,
 				ExactlyOneOf: []string{
 					"region_id",
