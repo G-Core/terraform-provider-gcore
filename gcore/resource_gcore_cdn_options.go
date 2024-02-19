@@ -903,34 +903,6 @@ var (
 				},
 			},
 		},
-		"webp": { // deprecated in favor of image_stack
-			Type:        schema.TypeList,
-			MaxItems:    1,
-			Optional:    true,
-			Description: "Legacy option. Use the image_stack option instead.",
-			Elem: &schema.Resource{
-				Schema: map[string]*schema.Schema{
-					"enabled": {
-						Type:     schema.TypeBool,
-						Optional: true,
-						Default:  true,
-					},
-					"jpg_quality": {
-						Type:     schema.TypeInt,
-						Required: true,
-					},
-					"png_quality": {
-						Type:     schema.TypeInt,
-						Required: true,
-					},
-					"png_lossless": {
-						Type:     schema.TypeBool,
-						Optional: true,
-						Default:  false,
-					},
-				},
-			},
-		},
 		"websockets": {
 			Type:        schema.TypeList,
 			MaxItems:    1,
