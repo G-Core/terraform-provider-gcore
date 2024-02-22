@@ -27,4 +27,4 @@ resource "gcore_ai_cluster" "cluster1" {
   cluster_metadata = {
     meta = "meta1"
   }
-}  
+}

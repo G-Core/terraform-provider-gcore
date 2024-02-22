@@ -140,6 +140,3 @@ resource "gcore_instance" "v" {
     security_groups = ["ada84751-fcca-4491-9249-2dfceb321616"]
   }
 }
-
-
-

@@ -58,10 +58,6 @@ resource "gcore_cdn_resource" "cdn_example_com" {
     rewrite {
       body = "/(.*) /$1"
     }
-    webp {
-      jpg_quality = 55
-      png_quality = 66
-    }
 
     tls_versions {
       enabled = true
@@ -149,7 +145,6 @@ Optional:
 - `use_rsa_le_cert` (Block List, Max: 1) The option allows choosing the RSA Let's Encrypt certificate type for the resource. (see [below for nested schema](#nestedblock--options--use_rsa_le_cert))
 - `user_agent_acl` (Block List, Max: 1) User agents policy option allows to control access to the content for specified user-agent. (see [below for nested schema](#nestedblock--options--user_agent_acl))
 - `waf` (Block List, Max: 1) Option allows to enable Basic WAF to protect you against the most common threats. (see [below for nested schema](#nestedblock--options--waf))
-- `webp` (Block List, Max: 1) Legacy option. Use the image_stack option instead. (see [below for nested schema](#nestedblock--options--webp))
 - `websockets` (Block List, Max: 1) WebSockets option allows WebSockets connections to an origin server. (see [below for nested schema](#nestedblock--options--websockets))
 
 <a id="nestedblock--options--allowed_http_methods"></a>
@@ -678,20 +673,6 @@ Required:
 Optional:
 
 - `enabled` (Boolean)
-
-
-<a id="nestedblock--options--webp"></a>
-### Nested Schema for `options.webp`
-
-Required:
-
-- `jpg_quality` (Number)
-- `png_quality` (Number)
-
-Optional:
-
-- `enabled` (Boolean)
-- `png_lossless` (Boolean)
 
 
 <a id="nestedblock--options--websockets"></a>

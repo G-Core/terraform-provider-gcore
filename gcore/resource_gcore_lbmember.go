@@ -50,9 +50,10 @@ func resourceLBMember() *schema.Resource {
 
 		Schema: map[string]*schema.Schema{
 			"project_id": &schema.Schema{
-				Type:     schema.TypeInt,
-				Optional: true,
-				ForceNew: true,
+				Type:        schema.TypeInt,
+				Description: "ID of the desired project to create load balancer member in. Alternative for `project_name`. One of them should be specified.",
+				Optional:    true,
+				ForceNew:    true,
 				ExactlyOneOf: []string{
 					"project_id",
 					"project_name",
@@ -60,9 +61,10 @@ func resourceLBMember() *schema.Resource {
 				DiffSuppressFunc: suppressDiffProjectID,
 			},
 			"region_id": &schema.Schema{
-				Type:     schema.TypeInt,
-				Optional: true,
-				ForceNew: true,
+				Type:        schema.TypeInt,
+				Description: "ID of the desired region to create load balancer member in. Alternative for `region_name`. One of them should be specified.",
+				Optional:    true,
+				ForceNew:    true,
 				ExactlyOneOf: []string{
 					"region_id",
 					"region_name",
@@ -70,31 +72,35 @@ func resourceLBMember() *schema.Resource {
 				DiffSuppressFunc: suppressDiffRegionID,
 			},
 			"project_name": &schema.Schema{
-				Type:     schema.TypeString,
-				Optional: true,
-				ForceNew: true,
+				Type:        schema.TypeString,
+				Description: "Name of the desired project to create load balancer member in. Alternative for `project_id`. One of them should be specified.",
+				Optional:    true,
+				ForceNew:    true,
 				ExactlyOneOf: []string{
 					"project_id",
 					"project_name",
 				},
 			},
 			"region_name": &schema.Schema{
-				Type:     schema.TypeString,
-				Optional: true,
-				ForceNew: true,
+				Type:        schema.TypeString,
+				Description: "Name of the desired region to create load balancer member in. Alternative for `region_id`. One of them should be specified.",
+				Optional:    true,
+				ForceNew:    true,
 				ExactlyOneOf: []string{
 					"region_id",
 					"region_name",
 				},
 			},
 			"pool_id": &schema.Schema{
-				Type:     schema.TypeString,
-				Required: true,
-				ForceNew: true,
+				Type:        schema.TypeString,
+				Description: "ID of the target load balancer pool to attach newly created member.",
+				Required:    true,
+				ForceNew:    true,
 			},
 			"address": &schema.Schema{
-				Type:     schema.TypeString,
-				Required: true,
+				Type:        schema.TypeString,
+				Description: "IP address to communicate with real server.",
+				Required:    true,
 				ValidateDiagFunc: func(val interface{}, key cty.Path) diag.Diagnostics {
 					v := val.(string)
 					ip := net.ParseIP(v)
@@ -106,13 +112,15 @@ func resourceLBMember() *schema.Resource {
 				},
 			},
 			"protocol_port": &schema.Schema{
-				Type:     schema.TypeInt,
-				Required: true,
+				Type:        schema.TypeInt,
+				Description: "Port to communicate with real server.",
+				Required:    true,
 			},
 			"weight": &schema.Schema{
 				Type:        schema.TypeInt,
 				Optional:    true,
-				Description: "Value between 0 and 256",
+				Description: "Value between 0 and 256, default 1.",
+				Default:     1,
 				ValidateDiagFunc: func(val interface{}, path cty.Path) diag.Diagnostics {
 					v := val.(int)
 					if v >= minWeight && v <= maxWeight {
@@ -122,22 +130,25 @@ func resourceLBMember() *schema.Resource {
 				},
 			},
 			"subnet_id": &schema.Schema{
-				Type:     schema.TypeString,
-				Optional: true,
-				Computed: true,
+				Type:        schema.TypeString,
+				Description: "ID of the subnet in which real server placed.",
+				Optional:    true,
+				Computed:    true,
 			},
 			"instance_id": &schema.Schema{
-				Type:     schema.TypeString,
-				Optional: true,
+				Type:        schema.TypeString,
+				Description: "ID of the gcore_instance.",
+				Optional:    true,
 			},
 			"operating_status": &schema.Schema{
-				Type:     schema.TypeString,
-				Computed: true,
+				Type:        schema.TypeString,
+				Description: "Operating status of this member.",
+				Computed:    true,
 			},
 			"last_updated": &schema.Schema{
-				Type:     schema.TypeString,
-				Optional: true,
-				Computed: true,
+				Type:        schema.TypeString,
+				Description: "Datetime when load balancer member was updated at the last time.",
+				Computed:    true,
 			},
 		},
 	}

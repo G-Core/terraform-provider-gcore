@@ -43,10 +43,6 @@ resource "gcore_cdn_resource" "cdn_example_com" {
     rewrite {
       body = "/(.*) /$1"
     }
-    webp {
-      jpg_quality = 55
-      png_quality = 66
-    }
 
     tls_versions {
       enabled = true

@@ -19,4 +19,3 @@ data "gcore_securitygroup" "default" {
 output "view" {
   value = data.gcore_securitygroup.default
 }
-

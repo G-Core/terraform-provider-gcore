@@ -227,11 +227,6 @@ resource "gcore_cdn_rule" "cdn_example_com_rule_1" {
         "UserAgent"
       ]
     }
-    webp {
-      enabled = false
-      jpg_quality = 55
-      png_quality = 66
-    }
     websockets {
       value = true
     }

@@ -19,4 +19,3 @@ data "gcore_reservedfixedip" "ip" {
 output "view" {
   value = data.gcore_reservedfixedip.ip
 }
-

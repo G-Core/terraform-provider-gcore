@@ -152,14 +152,14 @@ func resourceLoadBalancer() *schema.Resource {
 						"protocol": &schema.Schema{
 							Type:        schema.TypeString,
 							Required:    true,
-							Description: fmt.Sprintf("Available values is '%s' (currently work, other do not work on ed-8), '%s', '%s', '%s'", types.ProtocolTypeHTTP, types.ProtocolTypeHTTPS, types.ProtocolTypeTCP, types.ProtocolTypeUDP),
+							Description: fmt.Sprintf("Available values are '%s', '%s', '%s', '%s'", types.ProtocolTypeHTTP, types.ProtocolTypeHTTPS, types.ProtocolTypeTCP, types.ProtocolTypeUDP),
 							ValidateDiagFunc: func(val interface{}, key cty.Path) diag.Diagnostics {
 								v := val.(string)
 								switch types.ProtocolType(v) {
 								case types.ProtocolTypeHTTP, types.ProtocolTypeHTTPS, types.ProtocolTypeTCP, types.ProtocolTypeUDP:
 									return diag.Diagnostics{}
 								}
-								return diag.Errorf("wrong protocol %s, available values is 'HTTP', 'HTTPS', 'TCP', 'UDP'", v)
+								return diag.Errorf("wrong protocol %s, available values are 'HTTP', 'HTTPS', 'TCP', 'UDP'", v)
 							},
 						},
 						"certificate_chain": &schema.Schema{
@@ -192,7 +192,6 @@ func resourceLoadBalancer() *schema.Resource {
 			},
 			"last_updated": &schema.Schema{
 				Type:     schema.TypeString,
-				Optional: true,
 				Computed: true,
 			},
 			"metadata_map": &schema.Schema{
