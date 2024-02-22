@@ -234,11 +234,6 @@ resource "gcore_cdn_resource" "cdn_example_com" {
     use_rsa_le_cert {
       value = true
     }
-    webp {
-      enabled = false
-      jpg_quality = 55
-      png_quality = 66
-    }
     websockets {
       value = true
     }
