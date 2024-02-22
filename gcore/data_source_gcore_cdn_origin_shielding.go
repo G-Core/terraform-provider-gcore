@@ -25,7 +25,7 @@ func dataOriginShieldingLocation() *schema.Resource {
 	}
 }
 
-func getLocationByName(arr []originshielding.OriginShieldingLocations, city string) (int, error) {
+func getLocationByCity(arr []originshielding.OriginShieldingLocations, city string) (int, error) {
 	for _, el := range arr {
 		if el.City == city {
 			return el.ID, nil
@@ -46,7 +46,7 @@ func dataOriginShieldingLocationRead(ctx context.Context, d *schema.ResourceData
 		return diag.FromErr(err)
 	}
 	log.Printf("[DEBUG] Shielding locations: %v", result)
-	locationID, err := getLocationByName(result, city)
+	locationID, err := getLocationByCity(result, city)
 	if err != nil {
 		return diag.FromErr(err)
 	}

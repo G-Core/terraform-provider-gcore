@@ -43,10 +43,6 @@ resource "gcore_cdn_resource" "cdn_example_com" {
     rewrite {
       body = "/(.*) /$1"
     }
-    webp {
-      jpg_quality = 55
-      png_quality = 66
-    }
 
     tls_versions {
       enabled = true
@@ -62,7 +58,11 @@ resource "gcore_cdn_resource" "cdn_example_com" {
   }
 }
 
+data "gcore_cdn_shielding_location" "sl" {
+  city = "Luxembourg"
+}
+
 resource "gcore_cdn_originshielding" "origin_shielding_1" {
   resource_id   = gcore_cdn_resource.cdn_example_com.id
-  shielding_pop = 1
+  shielding_pop = data.gcore_cdn_shielding_location.sl.id
 }

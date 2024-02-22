@@ -26,7 +26,7 @@ data "gcore_region" "rg" {
 }
 
 data "gcore_image" "ubuntu" {
-  name       = "ubuntu-20.04"
+  name       = "ubuntu-22.04-x64"
   region_id  = data.gcore_region.rg.id
   project_id = data.gcore_project.pr.id
 }

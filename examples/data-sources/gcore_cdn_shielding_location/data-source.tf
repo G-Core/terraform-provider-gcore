@@ -5,3 +5,8 @@ provider gcore {
 data "gcore_cdn_shielding_location" "sl" {
   city = "Luxembourg"
 }
+
+resource "gcore_cdn_originshielding" "origin_shielding_1" {
+  resource_id   = 1
+  shielding_pop = data.gcore_cdn_shielding_location.sl.id
+}
