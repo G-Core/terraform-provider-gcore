@@ -85,7 +85,7 @@ func resourceCDNRule() *schema.Resource {
 				Computed:    true,
 				Description: "Rule weight that determines rule execution order: from the smallest (0) to the highest.",
 			},
-			"options": optionsSchema,
+			"options": ruleOptionsSchema,
 		},
 		CreateContext: resourceCDNRuleCreate,
 		ReadContext:   resourceCDNRuleRead,
