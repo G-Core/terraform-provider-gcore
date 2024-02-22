@@ -17,18 +17,19 @@ provider gcore {
   permanent_api_token = "251$d3361.............1b35f26d8"
 }
 
-data "gcore_project" "pr" {
-  name = "test"
+data "gcore_project" "project" {
+  name = "Default"
 }
 
-data "gcore_region" "rg" {
-  name = "ED-10 Preprod"
+data "gcore_region" "region" {
+  name = "Luxembourg-2"
 }
 
 data "gcore_lbpool" "pool" {
+  region_id  = data.gcore_region.region.id
+  project_id = data.gcore_project.project.id
+
   name       = "test-pool"
-  region_id  = data.gcore_region.rg.id
-  project_id = data.gcore_project.pr.id
 }
 
 output "view" {
@@ -41,24 +42,24 @@ output "view" {
 
 ### Required
 
-- `name` (String)
+- `name` (String) Name of the load balancer pool.
 
 ### Optional
 
-- `listener_id` (String)
-- `loadbalancer_id` (String)
-- `project_id` (Number)
-- `project_name` (String)
-- `region_id` (Number)
-- `region_name` (String)
+- `listener_id` (String) ID of the load balancer listener to which pool was attached.
+- `loadbalancer_id` (String) ID of the load balancer to which pool was attached.
+- `project_id` (Number) ID of the project in which load balancer pool was created.
+- `project_name` (String) Name of the project in which load balancer pool was created.
+- `region_id` (Number) ID of the region in which load balancer pool was created.
+- `region_name` (String) Name of the region in which load balancer pool was created.
 
 ### Read-Only
 
-- `health_monitor` (List of Object) (see [below for nested schema](#nestedatt--health_monitor))
+- `health_monitor` (List of Object) Health Monitor settings for defining health state of members inside this pool. (see [below for nested schema](#nestedatt--health_monitor))
 - `id` (String) The ID of this resource.
 - `lb_algorithm` (String) Available values is 'ROUND_ROBIN', 'LEAST_CONNECTIONS', 'SOURCE_IP', 'SOURCE_IP_PORT'
-- `protocol` (String) Available values is 'HTTP' (currently work, other do not work on ed-8), 'HTTPS', 'TCP', 'UDP'
-- `session_persistence` (List of Object) (see [below for nested schema](#nestedatt--session_persistence))
+- `protocol` (String) Available values are 'HTTP', 'HTTPS', 'TCP', 'UDP', 'PROXY'
+- `session_persistence` (List of Object) Pool session persistence tells the load balancer to attempt to send future requests from a client to the same backend member as the initial request. (see [below for nested schema](#nestedatt--session_persistence))
 
 <a id="nestedatt--health_monitor"></a>
 ### Nested Schema for `health_monitor`

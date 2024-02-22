@@ -45,6 +45,7 @@ output "view" {
 
 ### Optional
 
+- `cni` (Block List) (see [below for nested schema](#nestedblock--cni))
 - `project_id` (Number)
 - `project_name` (String)
 - `region_id` (Number)
@@ -65,6 +66,14 @@ output "view" {
 - `status` (String)
 - `task_id` (String)
 - `version` (String)
+
+<a id="nestedblock--cni"></a>
+### Nested Schema for `cni`
+
+Required:
+
+- `provider` (String)
+
 
 <a id="nestedatt--pools"></a>
 ### Nested Schema for `pools`

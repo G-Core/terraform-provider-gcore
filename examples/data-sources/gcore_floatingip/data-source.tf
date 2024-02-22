@@ -25,4 +25,3 @@ data "gcore_floatingip" "ip_by_fixed_ip" {
 output "view" {
   value = data.gcore_floatingip.ip
 }
-

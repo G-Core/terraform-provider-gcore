@@ -12,5 +12,3 @@ resource "gcore_snapshot" "snapshot" {
     env = "test"
   }
 }
-
-

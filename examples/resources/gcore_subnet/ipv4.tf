@@ -1,16 +1,8 @@
-provider gcore {
-  permanent_api_token = "251$d3361.............1b35f26d8"
-}
+resource "gcore_subnet" "subnet_ipv4" {
+  project_id = data.gcore_project.project.id
+  region_id  = data.gcore_region.region.id
 
-resource "gcore_network" "network" {
-  name       = "network_example"
-  type       = "vxlan"
-  region_id  = 1
-  project_id = 1
-}
-
-resource "gcore_subnet" "subnet" {
-  name            = "subnet_example"
+  name            = "subnet_ipv4"
   cidr            = "192.168.10.0/24"
   network_id      = gcore_network.network.id
   dns_nameservers = var.dns_nameservers
@@ -25,6 +17,4 @@ resource "gcore_subnet" "subnet" {
   }
 
   gateway_ip = "192.168.10.1"
-  region_id  = 1
-  project_id = 1
 }

@@ -19,4 +19,3 @@ data "gcore_subnet" "tsn" {
 output "view" {
   value = data.gcore_subnet.tsn
 }
-

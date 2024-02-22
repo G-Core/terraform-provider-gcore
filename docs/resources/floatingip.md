@@ -31,7 +31,6 @@ resource "gcore_floatingip" "floating_ip" {
 ### Optional
 
 - `fixed_ip_address` (String)
-- `last_updated` (String)
 - `metadata_map` (Map of String)
 - `port_id` (String)
 - `project_id` (Number)
@@ -44,6 +43,7 @@ resource "gcore_floatingip" "floating_ip" {
 - `created_at` (String)
 - `floating_ip_address` (String)
 - `id` (String) The ID of this resource.
+- `last_updated` (String)
 - `metadata_read_only` (List of Object) (see [below for nested schema](#nestedatt--metadata_read_only))
 - `router_id` (String)
 - `status` (String)

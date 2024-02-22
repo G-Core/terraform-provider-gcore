@@ -1,0 +1,36 @@
+---
+page_title: "{{ .Name }} {{ .Type }} - {{ .ProviderName	}}"
+subcategory: ""
+description: |-
+  {{ .Description }}
+---
+
+# {{ .Name }} ({{ .Type }})
+
+{{ .Description }}
+
+## Example Usage
+
+### Prerequisite
+
+{{tffile "examples/resources/gcore_subnet/vars.tf"}}
+
+{{tffile "examples/resources/gcore_subnet/main.tf"}}
+
+### IPv4
+
+{{tffile "examples/resources/gcore_subnet/ipv4.tf"}}
+
+### IPv6
+
+{{tffile "examples/resources/gcore_subnet/ipv6.tf"}}
+
+{{ .SchemaMarkdown }}
+
+{{ if .HasImport }}
+## Import
+
+Import is supported using the following syntax:
+
+{{ codefile "shell" .ImportFile }}
+{{ end }}

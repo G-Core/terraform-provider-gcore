@@ -11,4 +11,3 @@ resource "gcore_faas_namespace" "ns" {
             BIG_ENV = "EXAMPLE"
         }
 }
-

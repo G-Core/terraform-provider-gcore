@@ -1,0 +1,36 @@
+---
+page_title: "{{ .Name }} {{ .Type }} - {{ .ProviderName	}}"
+subcategory: ""
+description: |-
+  {{ .Description }}
+---
+
+# {{ .Name }} ({{ .Type }})
+
+{{ .Description }}
+
+## Example Usage
+
+### Prerequisite
+
+{{tffile "examples/resources/gcore_lblistener/main.tf"}}
+
+{{tffile "examples/resources/gcore_lblistener/lb.tf"}}
+
+### TCP
+
+{{tffile "examples/resources/gcore_lblistener/tcp-80.tf"}}
+
+### Prometheus metrics (from private network)
+
+{{tffile "examples/resources/gcore_lblistener/prometheus-8080.tf"}}
+
+{{ .SchemaMarkdown }}
+
+{{ if .HasImport }}
+## Import
+
+Import is supported using the following syntax:
+
+{{ codefile "shell" .ImportFile }}
+{{ end }}
