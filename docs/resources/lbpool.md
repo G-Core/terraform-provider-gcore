@@ -100,7 +100,7 @@ resource "gcore_lbpool" "proxy_8080" {
 
 - `lb_algorithm` (String) Available values is 'ROUND_ROBIN', 'LEAST_CONNECTIONS', 'SOURCE_IP', 'SOURCE_IP_PORT'
 - `name` (String) Pool name.
-- `protocol` (String) Available values are 'HTTP', 'HTTPS', 'TCP', 'UDP', 'PROXY'
+- `protocol` (String) Available values are 'HTTP', 'HTTPS', 'TCP', 'UDP', 'PROXY', 'PROXYV2'
 
 ### Optional
 
