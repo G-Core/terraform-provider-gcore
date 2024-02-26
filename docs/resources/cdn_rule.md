@@ -127,7 +127,7 @@ resource "gcore_cdn_resource" "cdn_example_com" {
 ### Optional
 
 - `active` (Boolean) The setting allows to enable or disable a Rule. If not specified, it will be enabled.
-- `options` (Block List, Max: 1) Each option in CDN resource settings. Each option added to CDN resource settings should have the following mandatory request fields: enabled, value. (see [below for nested schema](#nestedblock--options))
+- `options` (Block List, Max: 1) Each option in CDN rule settings. Each option added to CDN rule settings should have the following mandatory request fields: enabled, value. (see [below for nested schema](#nestedblock--options))
 - `origin_group` (Number) ID of the Origins Group. Use one of your Origins Group or create a new one. You can use either 'origin' parameter or 'originGroup' in the resource definition.
 - `origin_protocol` (String) This option defines the protocol that will be used by CDN servers to request content from an origin source. If not specified, it will be inherit from resource. Possible values are: HTTPS, HTTP, MATCH.
 - `weight` (Number) Rule weight that determines rule execution order: from the smallest (0) to the highest.
@@ -354,18 +354,6 @@ Optional:
 Required:
 
 - `value` (String)
-
-Optional:
-
-- `enabled` (Boolean)
-
-
-<a id="nestedblock--options--http3_enabled"></a>
-### Nested Schema for `options.http3_enabled`
-
-Required:
-
-- `value` (Boolean)
 
 Optional:
 
@@ -646,42 +634,6 @@ Optional:
 
 - `always` (Boolean) Specifies if the header will be added to a response from CDN regardless of response code.
 
-
-
-<a id="nestedblock--options--tls_versions"></a>
-### Nested Schema for `options.tls_versions`
-
-Required:
-
-- `value` (Set of String) Possible values (case sensitive): SSLv3, TLSv1, TLSv1.1, TLSv1.2, TLSv1.3.
-
-Optional:
-
-- `enabled` (Boolean)
-
-
-<a id="nestedblock--options--use_default_le_chain"></a>
-### Nested Schema for `options.use_default_le_chain`
-
-Required:
-
-- `value` (Boolean)
-
-Optional:
-
-- `enabled` (Boolean)
-
-
-<a id="nestedblock--options--use_rsa_le_cert"></a>
-### Nested Schema for `options.use_rsa_le_cert`
-
-Required:
-
-- `value` (Boolean)
-
-Optional:
-
-- `enabled` (Boolean)
 
 
 <a id="nestedblock--options--user_agent_acl"></a>

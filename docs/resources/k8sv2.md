@@ -98,9 +98,24 @@ Read-Only:
 <a id="nestedblock--cni"></a>
 ### Nested Schema for `cni`
 
-Required:
+Optional:
 
+- `cilium` (Block List, Max: 1) (see [below for nested schema](#nestedblock--cni--cilium))
 - `provider` (String)
+
+<a id="nestedblock--cni--cilium"></a>
+### Nested Schema for `cni.cilium`
+
+Optional:
+
+- `encryption` (Boolean)
+- `lb_acceleration` (Boolean)
+- `lb_mode` (String)
+- `mask_size` (Number)
+- `mask_size_v6` (Number)
+- `routing_mode` (String)
+- `tunnel` (String)
+
 
 
 <a id="nestedblock--timeouts"></a>
