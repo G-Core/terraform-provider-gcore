@@ -111,14 +111,14 @@ func resourceLBPool() *schema.Resource {
 			"protocol": &schema.Schema{
 				Type:        schema.TypeString,
 				Required:    true,
-				Description: fmt.Sprintf("Available values are '%s', '%s', '%s', '%s', '%s'", types.ProtocolTypeHTTP, types.ProtocolTypeHTTPS, types.ProtocolTypeTCP, types.ProtocolTypeUDP, types.ProtocolTypePROXY),
+				Description: fmt.Sprintf("Available values are '%s', '%s', '%s', '%s', '%s', '%s'", types.ProtocolTypeHTTP, types.ProtocolTypeHTTPS, types.ProtocolTypeTCP, types.ProtocolTypeUDP, types.ProtocolTypePROXY, types.ProtocolTypePROXYV2),
 				ValidateDiagFunc: func(val interface{}, key cty.Path) diag.Diagnostics {
 					v := val.(string)
 					switch types.ProtocolType(v) {
-					case types.ProtocolTypeHTTP, types.ProtocolTypeHTTPS, types.ProtocolTypeTCP, types.ProtocolTypeUDP, types.ProtocolTypePROXY:
+					case types.ProtocolTypeHTTP, types.ProtocolTypeHTTPS, types.ProtocolTypeTCP, types.ProtocolTypeUDP, types.ProtocolTypePROXY, types.ProtocolTypePROXYV2:
 						return diag.Diagnostics{}
 					}
-					return diag.Errorf("wrong type %s, available values are '%s', '%s', '%s', '%s', '%s'", v, types.ProtocolTypeHTTP, types.ProtocolTypeHTTPS, types.ProtocolTypeTCP, types.ProtocolTypeUDP, types.ProtocolTypePROXY)
+					return diag.Errorf("wrong type %s, available values are '%s', '%s', '%s', '%s', '%s', '%s'", v, types.ProtocolTypeHTTP, types.ProtocolTypeHTTPS, types.ProtocolTypeTCP, types.ProtocolTypeUDP, types.ProtocolTypePROXY, types.ProtocolTypePROXYV2)
 				},
 			},
 			"loadbalancer_id": &schema.Schema{

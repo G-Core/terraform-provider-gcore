@@ -45,7 +45,6 @@ output "view" {
 
 ### Optional
 
-- `cni` (Block List) (see [below for nested schema](#nestedblock--cni))
 - `project_id` (Number)
 - `project_name` (String)
 - `region_id` (Number)
@@ -53,26 +52,47 @@ output "view" {
 
 ### Read-Only
 
+- `cni` (List of Object) (see [below for nested schema](#nestedatt--cni))
 - `created_at` (String)
 - `creator_task_id` (String)
 - `fixed_network` (String)
 - `fixed_subnet` (String)
 - `flavor_id` (String)
 - `id` (String) The ID of this resource.
+- `is_ipv6` (Boolean) Enable public IPv6 address.
 - `is_public` (Boolean)
 - `keypair` (String)
 - `node_count` (Number)
+- `pods_ip_pool` (String) Pods IPv4 IP pool in CIDR notation.
+- `pods_ipv6_pool` (String) Pods IPv6 IP pool in CIDR notation.
 - `pools` (List of Object) (see [below for nested schema](#nestedatt--pools))
+- `services_ip_pool` (String) Services IPv4 IP pool in CIDR notation.
+- `services_ipv6_pool` (String) Services IPv6 IP pool in CIDR notation.
 - `status` (String)
 - `task_id` (String)
 - `version` (String)
 
-<a id="nestedblock--cni"></a>
+<a id="nestedatt--cni"></a>
 ### Nested Schema for `cni`
 
-Required:
+Read-Only:
 
+- `cilium` (List of Object) (see [below for nested schema](#nestedobjatt--cni--cilium))
 - `provider` (String)
+
+<a id="nestedobjatt--cni--cilium"></a>
+### Nested Schema for `cni.cilium`
+
+Read-Only:
+
+- `encryption` (Boolean)
+- `lb_acceleration` (Boolean)
+- `lb_mode` (String)
+- `mask_size` (Number)
+- `mask_size_v6` (Number)
+- `routing_mode` (String)
+- `tunnel` (String)
+
 
 
 <a id="nestedatt--pools"></a>

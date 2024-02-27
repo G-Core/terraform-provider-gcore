@@ -48,7 +48,6 @@ func resourceK8sV2() *schema.Resource {
 				return []*schema.ResourceData{d}, nil
 			},
 		},
-
 		Schema: map[string]*schema.Schema{
 			"project_id": {
 				Type:     schema.TypeInt,
@@ -92,17 +91,72 @@ func resourceK8sV2() *schema.Resource {
 			},
 			"cni": {
 				Type:     schema.TypeList,
-				Optional: true,
 				MaxItems: 1,
+				MinItems: 1,
+				Optional: true,
+				Computed: true,
 				ForceNew: true,
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
 						"provider": {
 							Type:     schema.TypeString,
-							Required: true,
+							Optional: true,
 							ForceNew: true,
+							Default:  clusters.CalicoProvider.String(),
 						},
-					},
+						"cilium": {
+							Type:     schema.TypeList,
+							MaxItems: 1,
+							MinItems: 1,
+							ForceNew: true,
+							Optional: true,
+							Elem: &schema.Resource{
+								Schema: map[string]*schema.Schema{
+									"mask_size": {
+										Type:     schema.TypeInt,
+										Optional: true,
+										Computed: true,
+										ForceNew: true,
+									},
+									"mask_size_v6": {
+										Type:     schema.TypeInt,
+										Optional: true,
+										Computed: true,
+										ForceNew: true,
+									},
+									"tunnel": {
+										Type:     schema.TypeString,
+										Optional: true,
+										Computed: true,
+										ForceNew: true,
+									},
+									"encryption": {
+										Type:     schema.TypeBool,
+										Optional: true,
+										Computed: true,
+										ForceNew: true,
+									},
+									"lb_mode": {
+										Type:     schema.TypeString,
+										Optional: true,
+										Computed: true,
+										ForceNew: true,
+									},
+									"lb_acceleration": {
+										Type:     schema.TypeBool,
+										Optional: true,
+										Computed: true,
+										ForceNew: true,
+									},
+									"routing_mode": {
+										Type:     schema.TypeString,
+										Optional: true,
+										Computed: true,
+										ForceNew: true,
+									},
+								},
+							},
+						}},
 				},
 			},
 			"fixed_network": {
@@ -121,24 +175,28 @@ func resourceK8sV2() *schema.Resource {
 				Type:        schema.TypeString,
 				Description: "Pods IPv4 IP pool in CIDR notation.",
 				Optional:    true,
+				Computed:    true,
 				ForceNew:    true,
 			},
 			"services_ip_pool": {
 				Type:        schema.TypeString,
 				Description: "Services IPv4 IP pool in CIDR notation.",
 				Optional:    true,
+				Computed:    true,
 				ForceNew:    true,
 			},
 			"pods_ipv6_pool": {
 				Type:        schema.TypeString,
 				Description: "Pods IPv6 IP pool in CIDR notation.",
 				Optional:    true,
+				Computed:    true,
 				ForceNew:    true,
 			},
 			"services_ipv6_pool": {
 				Type:        schema.TypeString,
 				Description: "Services IPv6 IP pool in CIDR notation.",
 				Optional:    true,
+				Computed:    true,
 				ForceNew:    true,
 			},
 			"keypair": {
@@ -155,7 +213,7 @@ func resourceK8sV2() *schema.Resource {
 				Type:        schema.TypeBool,
 				Description: "Enable public IPv6 address.",
 				Optional:    true,
-				Computed:    true,
+				ForceNew:    true,
 			},
 			"pool": {
 				Type:     schema.TypeList,
@@ -277,6 +335,19 @@ func resourceK8sV2Create(ctx context.Context, d *schema.ResourceData, m interfac
 		cniA := cniI.([]interface{})
 		cni := cniA[0].(map[string]interface{})
 		opts.CNI = &clusters.CNICreateOpts{Provider: clusters.CNIProvider(cni["provider"].(string))}
+		if ciliumI, ok := d.GetOk("cilium"); ok {
+			ciliumA := ciliumI.([]interface{})
+			cilium := ciliumA[0].(map[string]interface{})
+			opts.CNI.Cilium = &clusters.CiliumCreateOpts{
+				MaskSize:                 cilium["mask_size"].(int),
+				MaskSizeV6:               cilium["mask_size_v6"].(int),
+				Tunnel:                   clusters.TunnelType(cilium["tunnel"].(string)),
+				Encryption:               cilium["encryption"].(bool),
+				LoadBalancerMode:         clusters.LBModeType(cilium["lb_mode"].(string)),
+				LoadBalancerAcceleration: cilium["lb_acceleration"].(bool),
+				RoutingMode:              clusters.RoutingModeType(cilium["routing_mode"].(string)),
+			}
+		}
 	}
 
 	if podsIP, ok := d.GetOk("pods_ip_pool"); ok {
@@ -382,10 +453,34 @@ func resourceK8sV2Read(ctx context.Context, d *schema.ResourceData, m interface{
 	d.Set("created_at", cluster.CreatedAt.Format(time.RFC850))
 	d.Set("creator_task_id", cluster.CreatorTaskID)
 	d.Set("task_id", cluster.TaskID)
+	d.Set("is_ipv6", cluster.IsIPV6)
+	if cluster.PodsIPPool != nil {
+		d.Set("pods_ip_pool", cluster.PodsIPPool.String())
+	}
+	if cluster.ServicesIPPool != nil {
+		d.Set("services_ip_pool", cluster.ServicesIPPool.String())
+	}
+	if cluster.PodsIPV6Pool != nil {
+		d.Set("pods_ipv6_pool", cluster.PodsIPV6Pool.String())
+	}
+	if cluster.ServicesIPV6Pool != nil {
+		d.Set("services_ipv6_pool", cluster.ServicesIPV6Pool.String())
+	}
 
 	if cluster.CNI != nil {
 		v := map[string]interface{}{
 			"provider": cluster.CNI.Provider.String(),
+		}
+		if cluster.CNI.Cilium != nil {
+			v["cilium"] = map[string]interface{}{
+				"mask_size":       cluster.CNI.Cilium.MaskSize,
+				"mask_size_v6":    cluster.CNI.Cilium.MaskSizeV6,
+				"tunnel":          cluster.CNI.Cilium.Tunnel.String(),
+				"encryption":      cluster.CNI.Cilium.Encryption,
+				"lb_mode":         cluster.CNI.Cilium.LoadBalancerMode.String(),
+				"lb_acceleration": cluster.CNI.Cilium.LoadBalancerAcceleration,
+				"routing_mode":    cluster.CNI.Cilium.RoutingMode.String(),
+			}
 		}
 		d.Set("cni", []interface{}{v})
 	}

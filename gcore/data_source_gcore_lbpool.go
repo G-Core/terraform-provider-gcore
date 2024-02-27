@@ -78,7 +78,7 @@ func dataSourceLBPool() *schema.Resource {
 			"protocol": &schema.Schema{
 				Type:        schema.TypeString,
 				Computed:    true,
-				Description: fmt.Sprintf("Available values are '%s', '%s', '%s', '%s', '%s'", types.ProtocolTypeHTTP, types.ProtocolTypeHTTPS, types.ProtocolTypeTCP, types.ProtocolTypeUDP, types.ProtocolTypePROXY),
+				Description: fmt.Sprintf("Available values are '%s', '%s', '%s', '%s', '%s', '%s'", types.ProtocolTypeHTTP, types.ProtocolTypeHTTPS, types.ProtocolTypeTCP, types.ProtocolTypeUDP, types.ProtocolTypePROXY, types.ProtocolTypePROXYV2),
 			},
 			"health_monitor": &schema.Schema{
 				Type:        schema.TypeList,
