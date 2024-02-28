@@ -183,6 +183,7 @@ func Provider() *schema.Provider {
 			"gcore_reservedfixedip":       dataSourceReservedFixedIP(),
 			"gcore_servergroup":           dataSourceServerGroup(),
 			"gcore_k8sv2":                 dataSourceK8sV2(),
+			"gcore_k8sv2_kubeconfig":      dataSourceK8sV2KubeConfig(),
 			"gcore_secret":                dataSourceSecret(),
 			"gcore_laas_hosts":            dataSourceLaaSHosts(),
 			"gcore_laas_status":           dataSourceLaaSStatus(),
