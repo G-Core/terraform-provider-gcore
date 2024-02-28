@@ -92,9 +92,8 @@ func resourceLoadBalancerV2() *schema.Resource {
 			},
 			"flavor": &schema.Schema{
 				Type:        schema.TypeString,
-				Description: "Desired flavor to be used for load balancer. Changing this value will re-create load balancer. By default, `lb1-1-2` will be used. ",
+				Description: "Desired flavor to be used for load balancer. By default, `lb1-1-2` will be used. ",
 				Optional:    true,
-				ForceNew:    true,
 			},
 			"vip_network_id": &schema.Schema{
 				Type: schema.TypeString,
@@ -330,6 +329,30 @@ func resourceLoadBalancerV2Update(ctx context.Context, d *schema.ResourceData, m
 			return diag.Errorf("cannot update metadata. Error: %s", err)
 		}
 	}
+
+	if d.HasChange("flavor") {
+		flavor := d.Get("flavor").(string)
+		results, err := loadbalancers.Resize(client, d.Id(), loadbalancers.ResizeOpts{
+			Flavor: flavor,
+		}).Extract()
+		if err != nil {
+			return diag.FromErr(err)
+		}
+		taskID := results.Tasks[0]
+		log.Printf("[DEBUG] Task id (%s)", taskID)
+		taskState, err := tasks.WaitTaskAndReturnResult(client, taskID, true, LoadBalancerCreateTimeout, func(task tasks.TaskID) (interface{}, error) {
+			taskInfo, err := tasks.Get(client, string(task)).Extract()
+			if err != nil {
+				return nil, fmt.Errorf("cannot get task with ID: %s. Error: %w", task, err)
+			}
+			return taskInfo.State, nil
+		})
+		log.Printf("[DEBUG] Task state (%s)", taskState)
+		if err != nil {
+			return diag.FromErr(err)
+		}
+	}
+
 	log.Println("[DEBUG] Finish LoadBalancer updating")
 	return resourceLoadBalancerV2Read(ctx, d, m)
 }
