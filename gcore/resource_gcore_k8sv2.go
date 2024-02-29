@@ -335,7 +335,7 @@ func resourceK8sV2Create(ctx context.Context, d *schema.ResourceData, m interfac
 		cniA := cniI.([]interface{})
 		cni := cniA[0].(map[string]interface{})
 		opts.CNI = &clusters.CNICreateOpts{Provider: clusters.CNIProvider(cni["provider"].(string))}
-		if ciliumI, ok := d.GetOk("cilium"); ok {
+		if ciliumI, ok := cni["cilium"]; ok {
 			ciliumA := ciliumI.([]interface{})
 			cilium := ciliumA[0].(map[string]interface{})
 			opts.CNI.Cilium = &clusters.CiliumCreateOpts{
