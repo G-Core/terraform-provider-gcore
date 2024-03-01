@@ -10,6 +10,7 @@ import (
 	gcorecloud "github.com/G-Core/gcorelabscloud-go"
 	"github.com/G-Core/gcorelabscloud-go/gcore/k8s/v2/clusters"
 	"github.com/G-Core/gcorelabscloud-go/gcore/k8s/v2/pools"
+	"github.com/G-Core/gcorelabscloud-go/gcore/servergroup/v1/servergroups"
 	"github.com/G-Core/gcorelabscloud-go/gcore/task/v1/tasks"
 	"github.com/G-Core/gcorelabscloud-go/gcore/volume/v1/volumes"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
@@ -236,6 +237,11 @@ func resourceK8sV2() *schema.Resource {
 							Description: "Minimum number of nodes in the cluster pool.",
 							Required:    true,
 						},
+						"servergroup_policy": {
+							Type:        schema.TypeString,
+							Description: "Server group policy: anti-affinity, soft-anti-affinity or affinity",
+							Required:    true,
+						},
 						"max_node_count": {
 							Type:        schema.TypeInt,
 							Description: "Maximum number of nodes in the cluster pool.",
@@ -274,6 +280,16 @@ func resourceK8sV2() *schema.Resource {
 						"status": {
 							Type:        schema.TypeString,
 							Description: "Cluster pool status.",
+							Computed:    true,
+						},
+						"servergroup_name": {
+							Type:        schema.TypeString,
+							Description: "Server group name",
+							Computed:    true,
+						},
+						"servergroup_id": {
+							Type:        schema.TypeString,
+							Description: "Server group id",
 							Computed:    true,
 						},
 						"created_at": {
@@ -335,17 +351,19 @@ func resourceK8sV2Create(ctx context.Context, d *schema.ResourceData, m interfac
 		cniA := cniI.([]interface{})
 		cni := cniA[0].(map[string]interface{})
 		opts.CNI = &clusters.CNICreateOpts{Provider: clusters.CNIProvider(cni["provider"].(string))}
-		if ciliumI, ok := cni["cilium"]; ok {
-			ciliumA := ciliumI.([]interface{})
-			cilium := ciliumA[0].(map[string]interface{})
-			opts.CNI.Cilium = &clusters.CiliumCreateOpts{
-				MaskSize:                 cilium["mask_size"].(int),
-				MaskSizeV6:               cilium["mask_size_v6"].(int),
-				Tunnel:                   clusters.TunnelType(cilium["tunnel"].(string)),
-				Encryption:               cilium["encryption"].(bool),
-				LoadBalancerMode:         clusters.LBModeType(cilium["lb_mode"].(string)),
-				LoadBalancerAcceleration: cilium["lb_acceleration"].(bool),
-				RoutingMode:              clusters.RoutingModeType(cilium["routing_mode"].(string)),
+		if cni["provider"].(string) == "cilium" {
+			if ciliumI, ok := cni["cilium"]; ok {
+				ciliumA := ciliumI.([]interface{})
+				cilium := ciliumA[0].(map[string]interface{})
+				opts.CNI.Cilium = &clusters.CiliumCreateOpts{
+					MaskSize:                 cilium["mask_size"].(int),
+					MaskSizeV6:               cilium["mask_size_v6"].(int),
+					Tunnel:                   clusters.TunnelType(cilium["tunnel"].(string)),
+					Encryption:               cilium["encryption"].(bool),
+					LoadBalancerMode:         clusters.LBModeType(cilium["lb_mode"].(string)),
+					LoadBalancerAcceleration: cilium["lb_acceleration"].(bool),
+					RoutingMode:              clusters.RoutingModeType(cilium["routing_mode"].(string)),
+				}
 			}
 		}
 	}
@@ -393,6 +411,7 @@ func resourceK8sV2Create(ctx context.Context, d *schema.ResourceData, m interfac
 			BootVolumeType:     volumes.VolumeType(pool["boot_volume_type"].(string)),
 			AutoHealingEnabled: pool["auto_healing_enabled"].(bool),
 			IsPublicIPv4:       pool["is_public_ipv4"].(bool),
+			ServerGroupPolicy:  servergroups.ServerGroupPolicy(pool["servergroup_policy"].(string)),
 		})
 	}
 
@@ -499,6 +518,9 @@ func resourceK8sV2Read(ctx context.Context, d *schema.ResourceData, m interface{
 			"boot_volume_size":     pool.BootVolumeSize,
 			"auto_healing_enabled": pool.AutoHealingEnabled,
 			"is_public_ipv4":       pool.IsPublicIPv4,
+			"servergroup_policy":   pool.ServerGroupPolicy,
+			"servergroup_name":     pool.ServerGroupName,
+			"servergroup_id":       pool.ServerGroupID,
 			"status":               pool.Status,
 			"created_at":           pool.CreatedAt.Format(time.RFC850),
 		}
@@ -712,6 +734,7 @@ func resourceK8sV2CreateClusterPool(client, tasksClient *gcorecloud.ServiceClien
 		BootVolumeSize:     pool["boot_volume_size"].(int),
 		BootVolumeType:     volumes.VolumeType(pool["boot_volume_type"].(string)),
 		AutoHealingEnabled: pool["auto_healing_enabled"].(bool),
+		ServerGroupPolicy:  servergroups.ServerGroupPolicy(pool["servergroup_policy"].(string)),
 		IsPublicIPv4:       pool["is_public_ipv4"].(bool),
 	}
 	results, err := pools.Create(client, clusterName, opts).Extract()

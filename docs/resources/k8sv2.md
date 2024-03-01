@@ -91,6 +91,7 @@ Required:
 - `flavor_id` (String) Cluster pool node flavor ID. Changing the value of this attribute will trigger recreation of the cluster pool.
 - `min_node_count` (Number) Minimum number of nodes in the cluster pool.
 - `name` (String) Cluster pool name. Changing the value of this attribute will trigger recreation of the cluster pool.
+- `servergroup_policy` (String) Server group policy: anti-affinity, soft-anti-affinity or affinity
 
 Optional:
 
@@ -104,6 +105,8 @@ Read-Only:
 
 - `created_at` (String) Cluster pool creation date.
 - `node_count` (Number) Current node count in the cluster pool.
+- `servergroup_id` (String) Server group id
+- `servergroup_name` (String) Server group name
 - `status` (String) Cluster pool status.
 
 
