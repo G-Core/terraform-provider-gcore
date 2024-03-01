@@ -354,15 +354,17 @@ func resourceK8sV2Create(ctx context.Context, d *schema.ResourceData, m interfac
 		if cni["provider"].(string) == "cilium" {
 			if ciliumI, ok := cni["cilium"]; ok {
 				ciliumA := ciliumI.([]interface{})
-				cilium := ciliumA[0].(map[string]interface{})
-				opts.CNI.Cilium = &clusters.CiliumCreateOpts{
-					MaskSize:                 cilium["mask_size"].(int),
-					MaskSizeV6:               cilium["mask_size_v6"].(int),
-					Tunnel:                   clusters.TunnelType(cilium["tunnel"].(string)),
-					Encryption:               cilium["encryption"].(bool),
-					LoadBalancerMode:         clusters.LBModeType(cilium["lb_mode"].(string)),
-					LoadBalancerAcceleration: cilium["lb_acceleration"].(bool),
-					RoutingMode:              clusters.RoutingModeType(cilium["routing_mode"].(string)),
+				if len(ciliumA) != 0 {
+					cilium := ciliumA[0].(map[string]interface{})
+					opts.CNI.Cilium = &clusters.CiliumCreateOpts{
+						MaskSize:                 cilium["mask_size"].(int),
+						MaskSizeV6:               cilium["mask_size_v6"].(int),
+						Tunnel:                   clusters.TunnelType(cilium["tunnel"].(string)),
+						Encryption:               cilium["encryption"].(bool),
+						LoadBalancerMode:         clusters.LBModeType(cilium["lb_mode"].(string)),
+						LoadBalancerAcceleration: cilium["lb_acceleration"].(bool),
+						RoutingMode:              clusters.RoutingModeType(cilium["routing_mode"].(string)),
+					}
 				}
 			}
 		}
