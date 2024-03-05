@@ -19,3 +19,15 @@ resource "gcore_k8sv2" "cl" {
     boot_volume_type = "standard"
   }
 }
+
+data "gcore_k8sv2_kubeconfig" "config" {
+  cluster_name       = gcore_k8sv2.cl.name
+  region_id          = data.gcore_region.rg.id
+  project_id         = data.gcore_project.pr.id
+}
+
+// to store kubeconfig in a file pls use
+// terraform output -raw kubeconfig > config.yaml
+output "kubeconfig" {
+  value = data.gcore_k8sv2_kubeconfig.config.kubeconfig
+}

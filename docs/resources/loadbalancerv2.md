@@ -173,7 +173,7 @@ resource "gcore_loadbalancerv2" "private_lb_dualstack" {
 
 ### Optional
 
-- `flavor` (String) Desired flavor to be used for load balancer. Changing this value will re-create load balancer. By default, `lb1-1-2` will be used.
+- `flavor` (String) Desired flavor to be used for load balancer. By default, `lb1-1-2` will be used.
 - `metadata_map` (Map of String) Metadata map to apply to the load balancer.
 - `project_id` (Number) ID of the desired project to create load balancer in. Alternative for `project_name`. One of them should be specified.
 - `project_name` (String) Name of the desired project to create load balancer in. Alternative for `project_id`. One of them should be specified.

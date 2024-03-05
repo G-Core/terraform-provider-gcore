@@ -110,4 +110,7 @@ Read-Only:
 - `min_node_count` (Number)
 - `name` (String)
 - `node_count` (Number)
+- `servergroup_id` (String)
+- `servergroup_name` (String)
+- `servergroup_policy` (String)
 - `status` (String)

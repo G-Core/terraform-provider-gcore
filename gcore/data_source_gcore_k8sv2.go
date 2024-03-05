@@ -184,6 +184,21 @@ func dataSourceK8sV2() *schema.Resource {
 							Type:     schema.TypeBool,
 							Computed: true,
 						},
+						"servergroup_policy": {
+							Type:        schema.TypeString,
+							Description: "Server group policy: anti-affinity, soft-anti-affinity or affinity",
+							Computed:    true,
+						},
+						"servergroup_name": {
+							Type:        schema.TypeString,
+							Description: "Server group name",
+							Computed:    true,
+						},
+						"servergroup_id": {
+							Type:        schema.TypeString,
+							Description: "Server group id",
+							Computed:    true,
+						},
 						"status": {
 							Type:     schema.TypeString,
 							Computed: true,

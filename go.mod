@@ -7,7 +7,7 @@ require (
 	github.com/G-Core/gcore-dns-sdk-go v0.2.7-0.20230801110428-99ef24b50d4d
 	github.com/G-Core/gcore-storage-sdk-go v0.1.34
 	github.com/G-Core/gcorelabscdn-go v1.0.8
-	github.com/G-Core/gcorelabscloud-go v0.6.37
+	github.com/G-Core/gcorelabscloud-go v0.7.0
 	github.com/hashicorp/go-cty v1.4.1-0.20200414143053-d3edf31b6320
 	github.com/hashicorp/terraform-plugin-sdk/v2 v2.27.0
 	github.com/mitchellh/mapstructure v1.5.0
