@@ -45,8 +45,8 @@ func dataOriginShieldingLocationRead(ctx context.Context, d *schema.ResourceData
 	if err != nil {
 		return diag.FromErr(err)
 	}
-	log.Printf("[DEBUG] Shielding locations: %v", result)
-	locationID, err := getLocationByCity(result, city)
+	log.Printf("[DEBUG] Shielding locations: %v", *result)
+	locationID, err := getLocationByCity(*result, city)
 	if err != nil {
 		return diag.FromErr(err)
 	}

@@ -2,6 +2,7 @@ package gcore
 
 import (
 	"context"
+	"github.com/AlekSi/pointer"
 	"github.com/G-Core/gcorelabscdn-go/originshielding"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
@@ -25,8 +26,10 @@ func resourceCDNOriginShielding() *schema.Resource {
 				Description: "ID of the shielding point of present",
 			},
 		},
+		CreateContext: resourceCDNOriginShieldingUpdate,
 		ReadContext:   resourceCDNOriginShieldingRead,
 		UpdateContext: resourceCDNOriginShieldingUpdate,
+		DeleteContext: resourceCDNOriginShieldingDelete,
 		Description:   "Represent origin shielding",
 	}
 }
@@ -42,7 +45,10 @@ func resourceCDNOriginShieldingRead(ctx context.Context, d *schema.ResourceData,
 		return diag.FromErr(err)
 	}
 
-	d.Set("shielding_pop", result.ShieldingPop)
+	err = d.Set("shielding_pop", result.ShieldingPop)
+	if err != nil {
+		return diag.FromErr(err)
+	}
 
 	log.Println("[DEBUG] Finish CDN Origin Shielding reading")
 	return nil
@@ -55,7 +61,7 @@ func resourceCDNOriginShieldingUpdate(ctx context.Context, d *schema.ResourceDat
 	client := config.CDNClient
 
 	var req originshielding.UpdateRequest
-	req.ShieldingPop = d.Get("shielding_pop").(int)
+	req.ShieldingPop = pointer.ToInt(d.Get("shielding_pop").(int))
 
 	if _, err := client.OriginShielding().Update(ctx, int64(resourceID), &req); err != nil {
 		return diag.FromErr(err)
@@ -64,4 +70,23 @@ func resourceCDNOriginShieldingUpdate(ctx context.Context, d *schema.ResourceDat
 	log.Printf("[DEBUG] Finish CDN Origin Shielding updating")
 
 	return resourceCDNOriginShieldingRead(ctx, d, m)
+}
+
+func resourceCDNOriginShieldingDelete(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
+	resourceID := d.Get("resource_id").(int)
+	log.Printf("[DEBUG] Start CDN Origin Shielding deleting (id=%s)\n", resourceID)
+	config := m.(*Config)
+	client := config.CDNClient
+
+	var req originshielding.UpdateRequest
+	var intPointer *int
+	req.ShieldingPop = intPointer
+
+	if _, err := client.OriginShielding().Update(ctx, int64(resourceID), &req); err != nil {
+		return diag.FromErr(err)
+	}
+
+	log.Printf("[DEBUG] Finish CDN Origin Shielding deleting")
+
+	return nil
 }
