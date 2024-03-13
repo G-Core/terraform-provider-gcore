@@ -16,28 +16,28 @@ func dataOriginShieldingLocation() *schema.Resource {
 		ReadContext: dataOriginShieldingLocationRead,
 		Description: "Represent shielding locations data",
 		Schema: map[string]*schema.Schema{
-			"city": {
+			"datacenter": {
 				Type:        schema.TypeString,
-				Description: "Displayed shielding location point of present",
+				Description: "Displayed shielding location for point of present",
 				Required:    true,
 			},
 		},
 	}
 }
 
-func getLocationByCity(arr []originshielding.OriginShieldingLocations, city string) (int, error) {
+func getLocationByDatacenter(arr []originshielding.OriginShieldingLocations, datacenter string) (int, error) {
 	for _, el := range arr {
-		if el.City == city {
+		if el.Datacenter == datacenter {
 			return el.ID, nil
 		}
 	}
-	return 0, fmt.Errorf("shielding location for city %s not found", city)
+	return 0, fmt.Errorf("shielding location for datacenter %s not found", datacenter)
 }
 
 func dataOriginShieldingLocationRead(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	log.Println("[DEBUG] Start reading origin shielding locations")
 
-	city := d.Get("city").(string)
+	datacenter := d.Get("datacenter").(string)
 	config := m.(*Config)
 	client := config.CDNClient
 
@@ -46,12 +46,15 @@ func dataOriginShieldingLocationRead(ctx context.Context, d *schema.ResourceData
 		return diag.FromErr(err)
 	}
 	log.Printf("[DEBUG] Shielding locations: %v", *result)
-	locationID, err := getLocationByCity(*result, city)
+	locationID, err := getLocationByDatacenter(*result, datacenter)
 	if err != nil {
 		return diag.FromErr(err)
 	}
 	d.SetId(strconv.Itoa(locationID))
-	d.Set("city", city)
+	err = d.Set("datacenter", datacenter)
+	if err != nil {
+		return diag.FromErr(err)
+	}
 
 	log.Println("[DEBUG] Finish reading origin shielding locations")
 	return nil

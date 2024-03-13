@@ -3,7 +3,7 @@ provider gcore {
 }
 
 data "gcore_cdn_shielding_location" "sl" {
-  city = "Luxembourg"
+  datacenter = "am3"
 }
 
 resource "gcore_cdn_originshielding" "origin_shielding_1" {

@@ -18,7 +18,7 @@ provider gcore {
 }
 
 data "gcore_cdn_shielding_location" "sl" {
-  city = "Luxembourg"
+  datacenter = "am3"
 }
 
 resource "gcore_cdn_originshielding" "origin_shielding_1" {
@@ -32,7 +32,7 @@ resource "gcore_cdn_originshielding" "origin_shielding_1" {
 
 ### Required
 
-- `city` (String) Displayed shielding location point of present
+- `datacenter` (String) Displayed shielding location for point of present
 
 ### Read-Only
 
