@@ -248,7 +248,7 @@ func resourceLoadBalancerV2Read(ctx context.Context, d *schema.ResourceData, m i
 		return diag.FromErr(err)
 	}
 
-	lb, err := loadbalancers.Get(client, d.Id()).Extract()
+	lb, err := loadbalancers.Get(client, d.Id(), nil).Extract()
 	if err != nil {
 		return diag.FromErr(err)
 	}

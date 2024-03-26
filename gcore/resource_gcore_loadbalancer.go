@@ -240,7 +240,7 @@ func resourceLoadBalancerRead(ctx context.Context, d *schema.ResourceData, m int
 		return diag.FromErr(err)
 	}
 
-	lb, err := loadbalancers.Get(client, d.Id()).Extract()
+	lb, err := loadbalancers.Get(client, d.Id(), nil).Extract()
 	if err != nil {
 		return diag.FromErr(err)
 	}
@@ -464,7 +464,7 @@ func resourceLoadBalancerDelete(ctx context.Context, d *schema.ResourceData, m i
 
 	taskID := results.Tasks[0]
 	_, err = tasks.WaitTaskAndReturnResult(client, taskID, true, LoadBalancerCreateTimeout, func(task tasks.TaskID) (interface{}, error) {
-		_, err := loadbalancers.Get(client, id).Extract()
+		_, err := loadbalancers.Get(client, id, nil).Extract()
 		if err == nil {
 			return nil, fmt.Errorf("cannot delete loadbalancer with ID: %s", id)
 		}

@@ -15,6 +15,10 @@ github.com/G-Core/gcorelabscdn-go v1.0.10 h1:0iLUn0uhckXilJKeDgPtrUOhPw2eptGE1Vz
 github.com/G-Core/gcorelabscdn-go v1.0.10/go.mod h1:iSGXaTvZBzDHQW+rKFS918BgFVpONcyLEijwh8WsXpE=
 github.com/G-Core/gcorelabscloud-go v0.7.0 h1:qWiz6pHvBHgMrNvG7NQf7K6xKe9eAeDLxLI5/OWyXLM=
 github.com/G-Core/gcorelabscloud-go v0.7.0/go.mod h1:13Z1USxlxPbDFuYQyWqfNexlk4kUvOYTXbnvV/Z1lZo=
+github.com/G-Core/gcorelabscloud-go v0.7.6-0.20240326221428-9e17e5fffbfe h1:W+kqycEoK/hMzZa9Ab+R1L3mK1QQVpwGb3ZGZ5p1E48=
+github.com/G-Core/gcorelabscloud-go v0.7.6-0.20240326221428-9e17e5fffbfe/go.mod h1:13Z1USxlxPbDFuYQyWqfNexlk4kUvOYTXbnvV/Z1lZo=
+github.com/G-Core/gcorelabscloud-go v0.7.6-0.20240326231745-d6acc71376c6 h1:n2QV7WS663+73N8qusRDpBeyFAnIjsjVv/ww8Bdfg0I=
+github.com/G-Core/gcorelabscloud-go v0.7.6-0.20240326231745-d6acc71376c6/go.mod h1:13Z1USxlxPbDFuYQyWqfNexlk4kUvOYTXbnvV/Z1lZo=
 github.com/Kunde21/markdownfmt/v3 v3.1.0 h1:KiZu9LKs+wFFBQKhrZJrFZwtLnCCWJahL+S+E/3VnM0=
 github.com/Kunde21/markdownfmt/v3 v3.1.0/go.mod h1:tPXN1RTyOzJwhfHoon9wUr4HGYmWgVxSQN6VBJDkrVc=
 github.com/Masterminds/goutils v1.1.1 h1:5nUrii3FMTL5diU80unEVvNevw1nH4+ZV4DSLVJLSYI=

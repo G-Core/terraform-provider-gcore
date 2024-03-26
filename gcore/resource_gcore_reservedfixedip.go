@@ -28,7 +28,7 @@ func resourceReservedFixedIP() *schema.Resource {
 		ReadContext:   resourceReservedFixedIPRead,
 		UpdateContext: resourceReservedFixedIPUpdate,
 		DeleteContext: resourceReservedFixedIPDelete,
-		Description:   "Represent reserved ips",
+		Description:   "Represent reserved fixed ips",
 		Importer: &schema.ResourceImporter{
 			StateContext: func(ctx context.Context, d *schema.ResourceData, meta interface{}) ([]*schema.ResourceData, error) {
 				projectID, regionID, ipID, err := ImportStringParser(d.Id())
@@ -46,9 +46,10 @@ func resourceReservedFixedIP() *schema.Resource {
 
 		Schema: map[string]*schema.Schema{
 			"project_id": &schema.Schema{
-				Type:     schema.TypeInt,
-				Optional: true,
-				ForceNew: true,
+				Type:        schema.TypeInt,
+				Description: "ID of the desired project to create reserved fixed ip in. Alternative for `project_name`. One of them should be specified.",
+				Optional:    true,
+				ForceNew:    true,
 				ExactlyOneOf: []string{
 					"project_id",
 					"project_name",
@@ -56,9 +57,10 @@ func resourceReservedFixedIP() *schema.Resource {
 				DiffSuppressFunc: suppressDiffProjectID,
 			},
 			"region_id": &schema.Schema{
-				Type:     schema.TypeInt,
-				Optional: true,
-				ForceNew: true,
+				Type:        schema.TypeInt,
+				Description: "ID of the desired region to create reserved fixed ip in. Alternative for `region_name`. One of them should be specified.",
+				Optional:    true,
+				ForceNew:    true,
 				ExactlyOneOf: []string{
 					"region_id",
 					"region_name",
@@ -66,18 +68,20 @@ func resourceReservedFixedIP() *schema.Resource {
 				DiffSuppressFunc: suppressDiffRegionID,
 			},
 			"project_name": &schema.Schema{
-				Type:     schema.TypeString,
-				Optional: true,
-				ForceNew: true,
+				Type:        schema.TypeString,
+				Description: "Name of the desired project to create reserved fixed ip in. Alternative for `project_id`. One of them should be specified.",
+				Optional:    true,
+				ForceNew:    true,
 				ExactlyOneOf: []string{
 					"project_id",
 					"project_name",
 				},
 			},
 			"region_name": &schema.Schema{
-				Type:     schema.TypeString,
-				Optional: true,
-				ForceNew: true,
+				Type:        schema.TypeString,
+				Description: "Name of the desired region to create reserved fixed ip in. Alternative for `region_id`. One of them should be specified.",
+				Optional:    true,
+				ForceNew:    true,
 				ExactlyOneOf: []string{
 					"region_id",
 					"region_name",
@@ -87,25 +91,27 @@ func resourceReservedFixedIP() *schema.Resource {
 				Type:        schema.TypeString,
 				Required:    true,
 				ForceNew:    true,
-				Description: fmt.Sprintf("Available values is '%s', '%s', '%s', '%s'", reservedfixedips.External, reservedfixedips.Subnet, reservedfixedips.AnySubnet, reservedfixedips.IPAddress),
+				Description: fmt.Sprintf("Type of the reserved fixed ip for create. Available values are '%s', '%s', '%s', '%s', '%s'", reservedfixedips.External, reservedfixedips.Subnet, reservedfixedips.AnySubnet, reservedfixedips.IPAddress, reservedfixedips.Port),
 				ValidateDiagFunc: func(val interface{}, key cty.Path) diag.Diagnostics {
 					v := val.(string)
 					switch reservedfixedips.ReservedFixedIPType(v) {
-					case reservedfixedips.External, reservedfixedips.Subnet, reservedfixedips.AnySubnet, reservedfixedips.IPAddress:
+					case reservedfixedips.External, reservedfixedips.Subnet, reservedfixedips.AnySubnet, reservedfixedips.IPAddress, reservedfixedips.Port:
 						return diag.Diagnostics{}
 					}
-					return diag.Errorf("wrong type %s, available values is '%s', '%s', '%s', '%s'", v, reservedfixedips.External, reservedfixedips.Subnet, reservedfixedips.AnySubnet, reservedfixedips.IPAddress)
+					return diag.Errorf("wrong type %s, available values are '%s', '%s', '%s', '%s', '%s'", v, reservedfixedips.External, reservedfixedips.Subnet, reservedfixedips.AnySubnet, reservedfixedips.IPAddress, reservedfixedips.Port)
 				},
 			},
 			"status": &schema.Schema{
-				Type:     schema.TypeString,
-				Computed: true,
+				Type:        schema.TypeString,
+				Description: "Underlying port status",
+				Computed:    true,
 			},
 			"fixed_ip_address": &schema.Schema{
-				Type:     schema.TypeString,
-				Optional: true,
-				Computed: true,
-				ForceNew: true,
+				Type:        schema.TypeString,
+				Description: "IP address of the port. Can be passed with type `ip_address` or retrieved after creation.",
+				Optional:    true,
+				Computed:    true,
+				ForceNew:    true,
 				ValidateDiagFunc: func(val interface{}, key cty.Path) diag.Diagnostics {
 					v := val.(string)
 					ip := net.ParseIP(v)
@@ -117,25 +123,31 @@ func resourceReservedFixedIP() *schema.Resource {
 				},
 			},
 			"subnet_id": &schema.Schema{
-				Type:     schema.TypeString,
-				Optional: true,
-				Computed: true,
-				ForceNew: true,
+				Type:        schema.TypeString,
+				Description: "ID of the desired subnet. Can be used together with `network_id`.",
+				Optional:    true,
+				Computed:    true,
+				ForceNew:    true,
 			},
 			"network_id": &schema.Schema{
-				Type:     schema.TypeString,
-				Optional: true,
-				Computed: true,
-				ForceNew: true,
+				Type:        schema.TypeString,
+				Description: "ID of the desired network. Should be used together with `subnet_id`.",
+				Optional:    true,
+				Computed:    true,
+				ForceNew:    true,
 			},
 			"is_vip": &schema.Schema{
-				Type:     schema.TypeBool,
-				Required: true,
+				Type:        schema.TypeBool,
+				Description: "Flag to indicate whether the port is a virtual IP address.",
+				Optional:    true,
+				Computed:    true,
 			},
 			"port_id": &schema.Schema{
 				Type:        schema.TypeString,
-				Description: "ID of the port_id underlying the reserved fixed IP",
+				Description: "ID of the port underlying the reserved fixed IP. Can be passed with type `port` or retrieved after creation.",
+				ForceNew:    true,
 				Computed:    true,
+				Optional:    true,
 			},
 			"allowed_address_pairs": {
 				Type:        schema.TypeList,
@@ -144,19 +156,22 @@ func resourceReservedFixedIP() *schema.Resource {
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
 						"ip_address": {
-							Type:     schema.TypeString,
-							Optional: true,
+							Type:        schema.TypeString,
+							Description: "IPv4 or IPv6 address.",
+							Optional:    true,
 						},
 						"mac_address": {
-							Type:     schema.TypeString,
-							Optional: true,
+							Type:        schema.TypeString,
+							Description: "MAC address.",
+							Optional:    true,
 						},
 					},
 				},
 			},
 			"last_updated": &schema.Schema{
-				Type:     schema.TypeString,
-				Computed: true,
+				Type:        schema.TypeString,
+				Description: "Datetime when reserved fixed ip was updated at the last time.",
+				Computed:    true,
 			},
 		},
 	}
@@ -173,9 +188,7 @@ func resourceReservedFixedIPCreate(ctx context.Context, d *schema.ResourceData, 
 		return diag.FromErr(err)
 	}
 
-	opts := reservedfixedips.CreateOpts{
-		IsVip: d.Get("is_vip").(bool),
-	}
+	opts := reservedfixedips.CreateOpts{}
 
 	portType := d.Get("type").(string)
 	switch reservedfixedips.ReservedFixedIPType(portType) {
@@ -187,12 +200,23 @@ func resourceReservedFixedIPCreate(ctx context.Context, d *schema.ResourceData, 
 		}
 
 		opts.SubnetID = subnetID
+
+		isVip := d.Get("is_vip")
+		if isVip != nil {
+			opts.IsVip = isVip.(bool)
+		}
 	case reservedfixedips.AnySubnet:
 		networkID := d.Get("network_id").(string)
 		if networkID == "" {
 			return diag.Errorf("'network_id' required if the type is 'any_subnet'")
 		}
+
 		opts.NetworkID = networkID
+
+		isVip := d.Get("is_vip")
+		if isVip != nil {
+			opts.IsVip = isVip.(bool)
+		}
 	case reservedfixedips.IPAddress:
 		networkID := d.Get("network_id").(string)
 		ipAddress := d.Get("fixed_ip_address").(string)
@@ -202,8 +226,26 @@ func resourceReservedFixedIPCreate(ctx context.Context, d *schema.ResourceData, 
 
 		opts.NetworkID = networkID
 		opts.IPAddress = net.ParseIP(ipAddress)
+
+		isVip := d.Get("is_vip")
+		if isVip != nil {
+			opts.IsVip = isVip.(bool)
+		}
+	case reservedfixedips.Port:
+		portID := d.Get("port_id").(string)
+
+		if portID == "" {
+			return diag.Errorf("'network_id' and 'fixed_ip_address' required if the type is 'ip_address'")
+		}
+
+		opts.PortID = portID
+
+		isVip := d.Get("is_vip")
+		if isVip != nil {
+			return diag.Errorf("'is_vip' can not be used for type `port`.")
+		}
 	default:
-		return diag.Errorf("wrong type %s, available values is 'external', 'subnet', 'any_subnet', 'ip_address'", portType)
+		return diag.Errorf("wrong type %s, available values is 'external', 'subnet', 'any_subnet', 'ip_address', 'port'", portType)
 	}
 
 	opts.Type = reservedfixedips.ReservedFixedIPType(portType)
