@@ -180,17 +180,19 @@ func resourceLbListener() *schema.Resource {
 			},
 			"user_list": &schema.Schema{
 				Type:        schema.TypeList,
-				Description: "Load balancer listener list of username and encrypted password items.",
+				Description: "Listener list of username and encrypted password items.",
 				Optional:    true,
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
 						"username": &schema.Schema{
-							Type:     schema.TypeString,
-							Required: true,
+							Type:        schema.TypeString,
+							Description: "Username to auth via Basic Authentication",
+							Required:    true,
 						},
 						"encrypted_password": &schema.Schema{
-							Type:     schema.TypeString,
-							Required: true,
+							Type:        schema.TypeString,
+							Description: "Encrypted password (hash) to auth via Basic Authentication",
+							Required:    true,
 						},
 					},
 				},

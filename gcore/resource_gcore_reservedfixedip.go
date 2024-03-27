@@ -240,8 +240,8 @@ func resourceReservedFixedIPCreate(ctx context.Context, d *schema.ResourceData, 
 
 		opts.PortID = portID
 
-		isVip := d.Get("is_vip")
-		if isVip != nil {
+		_, isVipExists := d.GetOk("is_vip")
+		if isVipExists != false {
 			return diag.Errorf("'is_vip' can not be used for type `port`.")
 		}
 	default:

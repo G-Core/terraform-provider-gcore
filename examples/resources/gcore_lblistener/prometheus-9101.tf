@@ -1,4 +1,4 @@
-resource "random_password" "password" {
+resource "random_password" "prometheus_password" {
   length           = 16
   special          = true
   override_special = "!#$%&*()-_=+[]{}<>:?"
@@ -17,6 +17,10 @@ resource "gcore_lblistener" "prometheus_9101" {
 
   user_list {
     username = "admin1"
-    encrypted_password = random_password.password.bcrypt_hash
+    encrypted_password = random_password.prometheus_password.bcrypt_hash
   }
+}
+
+output "prometheus_password" {
+  value = random_password.prometheus_password.result
 }

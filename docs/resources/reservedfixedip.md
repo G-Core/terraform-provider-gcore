@@ -14,8 +14,21 @@ Represent reserved fixed ips
 #### Prerequisite
 
 ```terraform
+terraform {
+  required_providers {
+    gcore = {
+      source  = "G-Core/gcore"
+      version = ">= 0.3.65"
+      # source = "local.gcore.com/repo/gcore"
+      # version = ">=0.3.64"
+    }
+  }
+  required_version = ">= 0.13.0"
+}
+
 provider gcore {
-  permanent_api_token = "251$d3361.............1b35f26d8"
+  gcore_cloud_api = "https://cloud-api-preprod.k8s-ed7-2.cloud.gc.onl/"
+  permanent_api_token = "369557$4b9bce05a6857f630c3173f37c34a2ace15e5741cb667f944a4ad8fc72af1a70f2c41a27666c459dc4121a0646bde3a28efb76d6b4ddecfa587c8a4b245a6530"
 }
 
 data "gcore_project" "project" {
@@ -23,7 +36,7 @@ data "gcore_project" "project" {
 }
 
 data "gcore_region" "region" {
-  name = "Luxembourg-2"
+  name = "Luxembourg Preprod"
 }
 ```
 
@@ -123,12 +136,16 @@ resource "gcore_loadbalancerv2" "lb" {
   flavor     = "lb1-1-2"
 }
 
+locals {
+  preserved_port_id = gcore_loadbalancerv2.lb.vip_port_id
+}
+
 resource "gcore_reservedfixedip" "fixed_ip_by_port" {
   project_id = data.gcore_project.project.id
   region_id  = data.gcore_region.region.id
 
   type       = "port"
-  port_id = gcore_loadbalancerv2.lb.vip_port_id
+  port_id = local.preserved_port_id
 }
 ```
 
