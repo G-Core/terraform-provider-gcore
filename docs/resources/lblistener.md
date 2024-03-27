@@ -14,6 +14,21 @@ Represent load balancer listener. Can not be created without load balancer. A li
 ### Prerequisite
 
 ```terraform
+variable "user_list" {
+  type = list(object({
+    username = string
+    encrypted_password = string
+  }))
+  default = [
+    {
+      username = "admin"
+      encrypted_password = "$5$isRr.HJ1IrQP38.m$oViu3DJOpUG2ZsjCBtbITV3mqpxxbZfyWJojLPNSPO5"
+    }
+  ]
+}
+```
+
+```terraform
 provider gcore {
   permanent_api_token = "251$d3361.............1b35f26d8"
 }
@@ -65,6 +80,15 @@ resource "gcore_lblistener" "prometheus_80" {
   protocol      = "PROMETHEUS"
   protocol_port = 8080
   allowed_cidrs = ["10.0.0.0/8"]  # example of how to allow access only from private network
+
+  dynamic user_list {
+    iterator = u
+    for_each = var.user_list
+    content = {
+      username           = u.value.username
+      encrypted_password = u.value.encrypted_password
+    }
+  }
 }
 ```
 
@@ -92,6 +116,7 @@ resource "gcore_lblistener" "prometheus_80" {
 - `timeout_member_connect` (Number) Backend member connection timeout in milliseconds.
 - `timeout_member_data` (Number) Backend member inactivity timeout in milliseconds.
 - `timeouts` (Block, Optional) (see [below for nested schema](#nestedblock--timeouts))
+- `user_list` (Block List) (see [below for nested schema](#nestedblock--user_list))
 
 ### Read-Only
 
@@ -108,6 +133,14 @@ Optional:
 
 - `create` (String)
 - `delete` (String)
+
+<a id="nestedblock--user_list"></a>
+### Nested Schema for `user_list`
+
+Required:
+
+- `username` (String) Username to auth via Basic Authentication
+- `encrypted_password` (String) Encrypted password to auth via Basic Authentication
 
 
 

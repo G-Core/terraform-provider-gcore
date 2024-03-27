@@ -8,4 +8,13 @@ resource "gcore_lblistener" "prometheus_80" {
   protocol      = "PROMETHEUS"
   protocol_port = 8080
   allowed_cidrs = ["10.0.0.0/8"]  # example of how to allow access only from private network
+
+  dynamic user_list {
+    iterator = u
+    for_each = var.user_list
+    content = {
+      username           = u.value.username
+      encrypted_password = u.value.encrypted_password
+    }
+  }
 }
