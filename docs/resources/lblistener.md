@@ -14,6 +14,21 @@ Represent load balancer listener. Can not be created without load balancer. A li
 ### Prerequisite
 
 ```terraform
+variable "user_list" {
+  type = list(object({
+    username = string
+    encrypted_password = string
+  }))
+  default = [
+    {
+      username = "admin"
+      encrypted_password = "$5$isRr.HJ1IrQP38.m$oViu3DJOpUG2ZsjCBtbITV3mqpxxbZfyWJojLPNSPO5"
+    }
+  ]
+}
+```
+
+```terraform
 provider gcore {
   permanent_api_token = "251$d3361.............1b35f26d8"
 }
@@ -124,6 +139,14 @@ Optional:
 
 - `create` (String)
 - `delete` (String)
+
+<a id="nestedblock--user_list"></a>
+### Nested Schema for `user_list`
+
+Required:
+
+- `username` (String) Username to auth via Basic Authentication
+- `encrypted_password` (String) Encrypted password to auth via Basic Authentication
 
 
 <a id="nestedblock--user_list"></a>
