@@ -72,5 +72,5 @@ output "view" {
 
 Required:
 
-- `encrypted_password` (String) Encrypted password (hash) to auth via Basic Authentication
+- `encrypted_password` (String, Sensitive) Encrypted password (hash) to auth via Basic Authentication
 - `username` (String) Username to auth via Basic Authentication
