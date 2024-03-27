@@ -180,7 +180,7 @@ func resourceLbListener() *schema.Resource {
 			},
 			"user_list": &schema.Schema{
 				Type:        schema.TypeList,
-				Description: "Listener list of username and encrypted password items.",
+				Description: "Load balancer listener list of username and encrypted password items.",
 				Optional:    true,
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
