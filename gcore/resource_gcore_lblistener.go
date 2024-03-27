@@ -178,6 +178,23 @@ func resourceLbListener() *schema.Resource {
 				Description: "Number of simultaneous connections for this listener, between 1 and 1,000,000.",
 				Optional:    true,
 			},
+			"user_list": &schema.Schema{
+				Type:        schema.TypeList,
+				Description: "Load balancer listener list of username and encrypted password items.",
+				Optional:    true,
+				Elem: &schema.Resource{
+					Schema: map[string]*schema.Schema{
+						"username": &schema.Schema{
+							Type:     schema.TypeString,
+							Required: true,
+						},
+						"encrypted_password": &schema.Schema{
+							Type:     schema.TypeString,
+							Required: true,
+						},
+					},
+				},
+			},
 		},
 	}
 }
@@ -225,6 +242,15 @@ func resourceLBListenerCreate(ctx context.Context, d *schema.ResourceData, m int
 			sniSecretID[i] = s.(string)
 		}
 		opts.SNISecretID = sniSecretID
+	}
+
+	u := d.Get("user_list")
+	if len(u.([]interface{})) > 0 {
+		userList, err := extractUserList(u.([]interface{}))
+		if err != nil {
+			return diag.FromErr(err)
+		}
+		opts.UserList = userList
 	}
 
 	results, err := listeners.Create(client, opts).Extract()
@@ -339,6 +365,19 @@ func resourceLBListenerUpdate(ctx context.Context, d *schema.ResourceData, m int
 	if d.HasChange("connection_limit") {
 		connectionLimit := d.Get("connection_limit").(int)
 		opts.ConnectionLimit = &connectionLimit
+		changed = true
+	}
+
+	if d.HasChange("user_list") {
+		u := d.Get("user_list")
+		opts.UserList = make([]listeners.CreateUserListOpts, 0)
+		if len(u.([]interface{})) > 0 {
+			userList, err := extractUserList(u.([]interface{}))
+			if err != nil {
+				return diag.FromErr(err)
+			}
+			opts.UserList = userList
+		}
 		changed = true
 	}
 
