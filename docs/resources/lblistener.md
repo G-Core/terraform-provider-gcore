@@ -55,27 +55,31 @@ resource "gcore_lblistener" "tcp_80" {
 ### Prometheus metrics (from private network)
 
 ```terraform
-resource "random_password" "password" {
+resource "random_password" "prometheus_password" {
   length           = 16
   special          = true
   override_special = "!#$%&*()-_=+[]{}<>:?"
 }
 
-resource "gcore_lblistener" "prometheus_80" {
+resource "gcore_lblistener" "prometheus_9101" {
   project_id = data.gcore_project.project.id
   region_id  = data.gcore_region.region.id
 
   loadbalancer_id = gcore_loadbalancerv2.lb.id
 
-  name          = "prometheus-80"
+  name          = "prometheus-9101"
   protocol      = "PROMETHEUS"
-  protocol_port = 8080
+  protocol_port = 9101
   allowed_cidrs = ["10.0.0.0/8"]  # example of how to allow access only from private network
 
   user_list {
     username = "admin1"
-    encrypted_password = random_password.password.bcrypt_hash
+    encrypted_password = random_password.prometheus_password.bcrypt_hash
   }
+}
+
+output "prometheus_password" {
+  value = random_password.prometheus_password.result
 }
 ```
 
@@ -103,7 +107,7 @@ resource "gcore_lblistener" "prometheus_80" {
 - `timeout_member_connect` (Number) Backend member connection timeout in milliseconds.
 - `timeout_member_data` (Number) Backend member inactivity timeout in milliseconds.
 - `timeouts` (Block, Optional) (see [below for nested schema](#nestedblock--timeouts))
-- `user_list` (Block List) (see [below for nested schema](#nestedblock--user_list))
+- `user_list` (Block List) Listener list of username and encrypted password items. (see [below for nested schema](#nestedblock--user_list))
 
 ### Read-Only
 
@@ -121,13 +125,14 @@ Optional:
 - `create` (String)
 - `delete` (String)
 
+
 <a id="nestedblock--user_list"></a>
 ### Nested Schema for `user_list`
 
 Required:
 
+- `encrypted_password` (String, Sensitive) Encrypted password (hash) to auth via Basic Authentication
 - `username` (String) Username to auth via Basic Authentication
-- `encrypted_password` (String) Encrypted password to auth via Basic Authentication
 
 
 

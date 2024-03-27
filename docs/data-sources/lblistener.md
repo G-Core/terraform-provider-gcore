@@ -56,6 +56,7 @@ output "view" {
 - `timeout_client_data` (Number) Frontend client inactivity timeout in milliseconds.
 - `timeout_member_connect` (Number) Backend member connection timeout in milliseconds.
 - `timeout_member_data` (Number) Backend member inactivity timeout in milliseconds.
+- `user_list` (Block List) Listener list of username and encrypted password items. (see [below for nested schema](#nestedblock--user_list))
 
 ### Read-Only
 
@@ -65,3 +66,11 @@ output "view" {
 - `protocol` (String) Available values are 'HTTP', 'HTTPS', 'TCP', 'UDP', 'TERMINATED_HTTPS', 'PROMETHEUS'
 - `protocol_port` (Number) Port number to listen, between 1 and 65535.
 - `provisioning_status` (String) Provisioning status of this listener.
+
+<a id="nestedblock--user_list"></a>
+### Nested Schema for `user_list`
+
+Required:
+
+- `encrypted_password` (String, Sensitive) Encrypted password (hash) to auth via Basic Authentication
+- `username` (String) Username to auth via Basic Authentication

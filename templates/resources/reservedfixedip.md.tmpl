@@ -1,0 +1,50 @@
+---
+page_title: "{{ .Name }} {{ .Type }} - {{ .ProviderName	}}"
+subcategory: ""
+description: |-
+  {{ .Description }}
+---
+
+# {{ .Name }} ({{ .Type }})
+
+{{ .Description }}
+
+## Example Usage
+
+#### Prerequisite
+
+{{tffile "examples/resources/gcore_reservedfixedip/main.tf"}}
+
+### Reserving external address
+
+{{tffile "examples/resources/gcore_reservedfixedip/external.tf"}}
+
+#### Prerequisite for Private Reserved Fixed IPs
+
+{{tffile "examples/resources/gcore_reservedfixedip/net.tf"}}
+
+### Creating Private Reserved Fixed IP in subnet
+
+{{tffile "examples/resources/gcore_reservedfixedip/subnet.tf"}}
+
+### Creating Private Reserved Fixed IP in any subnet
+
+{{tffile "examples/resources/gcore_reservedfixedip/any_subnet.tf"}}
+
+### Creating Private Reserved Fixed IP using ip address
+
+{{tffile "examples/resources/gcore_reservedfixedip/ip_address.tf"}}
+
+### Creating Private Reserved Fixed IP using port
+
+{{tffile "examples/resources/gcore_reservedfixedip/port.tf"}}
+
+{{ .SchemaMarkdown }}
+
+{{ if .HasImport }}
+## Import
+
+Import is supported using the following syntax:
+
+{{ codefile "shell" .ImportFile }}
+{{ end }}
