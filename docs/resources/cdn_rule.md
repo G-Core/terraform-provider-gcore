@@ -162,6 +162,8 @@ Optional:
 - `ip_address_acl` (Block List, Max: 1) IP access policy option allows to control access to the CDN Resource content for specific IP addresses. (see [below for nested schema](#nestedblock--options--ip_address_acl))
 - `limit_bandwidth` (Block List, Max: 1) The option allows to control the download speed per connection. (see [below for nested schema](#nestedblock--options--limit_bandwidth))
 - `proxy_cache_methods_set` (Block List, Max: 1) Allows caching for GET, HEAD and POST requests. (see [below for nested schema](#nestedblock--options--proxy_cache_methods_set))
+- `proxy_connect_timeout` (Block List, Max: 1) The option allows you to control the time limit for establishing a connection with the origin server. (see [below for nested schema](#nestedblock--options--proxy_connect_timeout))
+- `proxy_read_timeout` (Block List, Max: 1) The option allows you to control the time limit for receiving a partial response from the origin server. (see [below for nested schema](#nestedblock--options--proxy_read_timeout))
 - `query_params_blacklist` (Block List, Max: 1) Specify list of query strings. Files with those query strings will be cached as one object. (see [below for nested schema](#nestedblock--options--query_params_blacklist))
 - `query_params_whitelist` (Block List, Max: 1) Specify list of query strings. Files with those query strings will be cached as different objects. (see [below for nested schema](#nestedblock--options--query_params_whitelist))
 - `redirect_http_to_https` (Block List, Max: 1) When enabled, HTTP requests are redirected to HTTPS. (see [below for nested schema](#nestedblock--options--redirect_http_to_https))
@@ -437,6 +439,27 @@ Optional:
 
 - `enabled` (Boolean)
 
+<a id="nestedblock--options--proxy_connect_timeout"></a>
+### Nested Schema for `options.proxy_connect_timeout`
+
+Required:
+
+- `value` (Map of String) Specify time in seconds ('1s', '5s' for example).
+
+Optional:
+
+- `enabled` (Boolean)
+
+<a id="nestedblock--options--proxy_read_timeout"></a>
+### Nested Schema for `options.proxy_read_timeout`
+
+Required:
+
+- `value` (Map of String) Specify time in seconds ('1s', '30s' for example).
+
+Optional:
+
+- `enabled` (Boolean)
 
 <a id="nestedblock--options--query_params_blacklist"></a>
 ### Nested Schema for `options.query_params_blacklist`
