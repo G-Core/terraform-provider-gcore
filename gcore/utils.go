@@ -555,6 +555,20 @@ func extractHealthMonitorMap(d *schema.ResourceData) *lbpools.CreateHealthMonito
 	return healthOpts
 }
 
+func extractUserList(v []interface{}) ([]listeners.CreateUserListOpts, error) {
+	UserList := make([]listeners.CreateUserListOpts, len(v))
+	for i, userList := range v {
+		u := userList.(map[string]interface{})
+		var U listeners.CreateUserListOpts
+		err := MapStructureDecoder(&U, &u, config)
+		if err != nil {
+			return nil, err
+		}
+		UserList[i] = U
+	}
+	return UserList, nil
+}
+
 func routerInterfaceUniqueID(i interface{}) int {
 	e := i.(map[string]interface{})
 	h := md5.New()

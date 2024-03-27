@@ -107,6 +107,23 @@ func dataSourceLBListener() *schema.Resource {
 				Description: "Number of simultaneous connections for this listener, between 1 and 1,000,000.",
 				Optional:    true,
 			},
+			"user_list": &schema.Schema{
+				Type:        schema.TypeList,
+				Description: "Load balancer listener list of username and encrypted password items.",
+				Optional:    true,
+				Elem: &schema.Resource{
+					Schema: map[string]*schema.Schema{
+						"username": &schema.Schema{
+							Type:     schema.TypeString,
+							Required: true,
+						},
+						"encrypted_password": &schema.Schema{
+							Type:     schema.TypeString,
+							Required: true,
+						},
+					},
+				},
+			},
 		},
 	}
 }
@@ -148,6 +165,12 @@ func dataSourceLBListenerRead(ctx context.Context, d *schema.ResourceData, m int
 		return diag.Errorf("lb listener with name %s not found", name)
 	}
 
+	userList := make([]map[string]string, len(lb.UserList))
+	for i, userData := range lb.UserList {
+		u := map[string]string{"username": userData.Username, "encrypted_password": userData.EncryptedPassword}
+		userList[i] = u
+	}
+
 	d.SetId(lb.ID)
 	d.Set("name", lb.Name)
 	d.Set("protocol", lb.Protocol.String())
@@ -162,6 +185,7 @@ func dataSourceLBListenerRead(ctx context.Context, d *schema.ResourceData, m int
 	d.Set("timeout_member_connect", lb.TimeoutMemberConnect)
 	d.Set("timeout_member_data", lb.TimeoutMemberData)
 	d.Set("connection_limit", lb.ConnectionLimit)
+	d.Set("user_list", userList)
 
 	log.Println("[DEBUG] Finish LBListener reading")
 	return diags
