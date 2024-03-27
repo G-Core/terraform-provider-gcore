@@ -70,6 +70,12 @@ resource "gcore_lblistener" "tcp_80" {
 ### Prometheus metrics (from private network)
 
 ```terraform
+resource "random_password" "password" {
+  length           = 16
+  special          = true
+  override_special = "!#$%&*()-_=+[]{}<>:?"
+}
+
 resource "gcore_lblistener" "prometheus_80" {
   project_id = data.gcore_project.project.id
   region_id  = data.gcore_region.region.id
@@ -81,13 +87,9 @@ resource "gcore_lblistener" "prometheus_80" {
   protocol_port = 8080
   allowed_cidrs = ["10.0.0.0/8"]  # example of how to allow access only from private network
 
-  dynamic user_list {
-    iterator = u
-    for_each = var.user_list
-    content = {
-      username           = u.value.username
-      encrypted_password = u.value.encrypted_password
-    }
+  user_list {
+    username = "admin1"
+    encrypted_password = random_password.password.bcrypt_hash
   }
 }
 ```
