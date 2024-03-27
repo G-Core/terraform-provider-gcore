@@ -121,6 +121,7 @@ func dataSourceLBListener() *schema.Resource {
 						"encrypted_password": &schema.Schema{
 							Type:        schema.TypeString,
 							Description: "Encrypted password (hash) to auth via Basic Authentication",
+							Sensitive:   true,
 							Required:    true,
 						},
 					},
