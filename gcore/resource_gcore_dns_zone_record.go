@@ -158,7 +158,8 @@ func resourceDNSZoneRecord() *schema.Resource {
 							Type:     schema.TypeString,
 							Required: true,
 							ValidateDiagFunc: func(i interface{}, path cty.Path) diag.Diagnostics {
-								names := []string{"geodns", "geodistance", "default", "first_n", "is_healthy"}
+								names := []string{"geodns", "geodistance", "default", "first_n", "is_healthy",
+									"healthcheck", "weighted_shuffle", "asn", "country", "continent", "region", "ip"}
 								name := i.(string)
 								for _, n := range names {
 									if n == name {
