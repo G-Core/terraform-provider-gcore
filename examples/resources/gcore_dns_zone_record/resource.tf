@@ -18,7 +18,7 @@ resource "gcore_dns_zone_record" "example_rrset0" {
   zone   = gcore_dns_zone.examplezone0.name
   domain = "${gcore_dns_zone.examplezone0.name}"
   type   = "A"
-  ttl    = 100
+  ttl    = 120
 
   resource_record {
     content = "127.0.0.100"
@@ -36,7 +36,7 @@ resource "gcore_dns_zone_record" "subdomain_examplezone" {
   zone   = "examplezone.com"
   domain = "subdomain.examplezone.com"
   type   = "TXT"
-  ttl    = 10
+  ttl    = 120
 
   filter {
     type   = "geodistance"
@@ -52,7 +52,7 @@ resource "gcore_dns_zone_record" "subdomain_examplezone" {
       latlong    = [52.367, 4.9041]
       asn        = [12345]
       ip         = ["1.1.1.1"]
-      notes      = ["notes"]
+      notes      = "notes"
       continents = ["asia"]
       countries  = ["russia"]
       default    = true
@@ -64,7 +64,7 @@ resource "gcore_dns_zone_record" "subdomain_examplezone_mx" {
   zone   = "examplezone.com"
   domain = "subdomain.examplezone.com"
   type   = "MX"
-  ttl    = 10
+  ttl    = 120
 
   resource_record {
     content = "10 mail.my.com."
@@ -76,7 +76,7 @@ resource "gcore_dns_zone_record" "subdomain_examplezone_caa" {
   zone   = "examplezone.com"
   domain = "subdomain.examplezone.com"
   type   = "CAA"
-  ttl    = 10
+  ttl    = 120
 
   resource_record {
     content = "0 issue \"company.org; account=12345\""

@@ -67,7 +67,7 @@ resource "gcore_dns_zone_record" "subdomain_examplezone" {
       latlong    = [52.367, 4.9041]
       asn        = [12345]
       ip         = ["1.1.1.1"]
-      notes      = ["notes"]
+      notes      = "notes"
       continents = ["asia"]
       countries  = ["russia"]
       default    = true
@@ -79,7 +79,7 @@ resource "gcore_dns_zone_record" "subdomain_examplezone_mx" {
   zone   = "examplezone.com"
   domain = "subdomain.examplezone.com"
   type   = "MX"
-  ttl    = 10
+  ttl    = 120
 
   resource_record {
     content = "10 mail.my.com."
@@ -91,7 +91,7 @@ resource "gcore_dns_zone_record" "subdomain_examplezone_caa" {
   zone   = "examplezone.com"
   domain = "subdomain.examplezone.com"
   type   = "CAA"
-  ttl    = 10
+  ttl    = 120
 
   resource_record {
     content = "0 issue \"company.org; account=12345\""
