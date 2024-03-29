@@ -225,33 +225,7 @@ func resourceSecurityGroupCreate(ctx context.Context, d *schema.ResourceData, m 
 	}
 
 	rawRules := d.Get("security_group_rules").(*schema.Set).List()
-	rules := make([]securitygroups.CreateSecurityGroupRuleOpts, len(rawRules))
-	for i, r := range rawRules {
-		rule := r.(map[string]interface{})
-
-		portRangeMax := rule["port_range_max"].(int)
-		portRangeMin := rule["port_range_min"].(int)
-		descr := rule["description"].(string)
-		remoteIPPrefix := rule["remote_ip_prefix"].(string)
-
-		sgrOpts := securitygroups.CreateSecurityGroupRuleOpts{
-			Direction:   types.RuleDirection(rule["direction"].(string)),
-			EtherType:   types.EtherType(rule["ethertype"].(string)),
-			Protocol:    types.Protocol(rule["protocol"].(string)),
-			Description: &descr,
-		}
-
-		if remoteIPPrefix != "" {
-			sgrOpts.RemoteIPPrefix = &remoteIPPrefix
-		}
-
-		if portRangeMax != 0 && portRangeMin != 0 {
-			sgrOpts.PortRangeMax = &portRangeMax
-			sgrOpts.PortRangeMin = &portRangeMin
-		}
-
-		rules[i] = sgrOpts
-	}
+	rules := convertToSecurityGroupRules(rawRules)
 
 	createSecurityGroupOpts := &securitygroups.CreateSecurityGroupOpts{}
 	createSecurityGroupOpts.Name = d.Get("name").(string)
@@ -325,47 +299,7 @@ func resourceSecurityGroupRead(ctx context.Context, d *schema.ResourceData, m in
 		return diag.FromErr(err)
 	}
 
-	newSgRules := make([]interface{}, len(sg.SecurityGroupRules))
-	for i, sgr := range sg.SecurityGroupRules {
-		log.Printf("rules: %+v", sgr)
-		r := make(map[string]interface{})
-		r["id"] = sgr.ID
-		r["direction"] = sgr.Direction.String()
-
-		if sgr.EtherType != nil {
-			r["ethertype"] = sgr.EtherType.String()
-		}
-
-		r["protocol"] = types.ProtocolAny
-		if sgr.Protocol != nil {
-			r["protocol"] = sgr.Protocol.String()
-		}
-
-		r["port_range_max"] = 0
-		if sgr.PortRangeMax != nil {
-			r["port_range_max"] = *sgr.PortRangeMax
-		}
-		r["port_range_min"] = 0
-		if sgr.PortRangeMin != nil {
-			r["port_range_min"] = *sgr.PortRangeMin
-		}
-
-		r["description"] = ""
-		if sgr.Description != nil {
-			r["description"] = *sgr.Description
-		}
-
-		r["remote_ip_prefix"] = ""
-		if sgr.RemoteIPPrefix != nil {
-			r["remote_ip_prefix"] = *sgr.RemoteIPPrefix
-		}
-
-		r["updated_at"] = sgr.UpdatedAt.String()
-		r["created_at"] = sgr.CreatedAt.String()
-
-		newSgRules[i] = r
-	}
-
+	newSgRules := convertSecurityGroupRules(sg.SecurityGroupRules)
 	if err := d.Set("security_group_rules", schema.NewSet(secGroupUniqueID, newSgRules)); err != nil {
 		return diag.FromErr(err)
 	}
@@ -481,4 +415,79 @@ func resourceSecurityGroupDelete(ctx context.Context, d *schema.ResourceData, m 
 	d.SetId("")
 	log.Printf("[DEBUG] Finish of SecurityGroup deleting")
 	return diags
+}
+
+func convertSecurityGroupRules(rules []securitygroups.SecurityGroupRule) []interface{} {
+	result := make([]interface{}, len(rules))
+	for i, sgr := range rules {
+		log.Printf("rules: %+v", sgr)
+		r := make(map[string]interface{})
+		r["id"] = sgr.ID
+		r["direction"] = sgr.Direction.String()
+
+		if sgr.EtherType != nil {
+			r["ethertype"] = sgr.EtherType.String()
+		}
+
+		r["protocol"] = types.ProtocolAny
+		if sgr.Protocol != nil {
+			r["protocol"] = sgr.Protocol.String()
+		}
+
+		r["port_range_max"] = 0
+		if sgr.PortRangeMax != nil {
+			r["port_range_max"] = *sgr.PortRangeMax
+		}
+		r["port_range_min"] = 0
+		if sgr.PortRangeMin != nil {
+			r["port_range_min"] = *sgr.PortRangeMin
+		}
+
+		r["description"] = ""
+		if sgr.Description != nil {
+			r["description"] = *sgr.Description
+		}
+
+		r["remote_ip_prefix"] = ""
+		if sgr.RemoteIPPrefix != nil {
+			r["remote_ip_prefix"] = *sgr.RemoteIPPrefix
+		}
+
+		r["updated_at"] = sgr.UpdatedAt.String()
+		r["created_at"] = sgr.CreatedAt.String()
+
+		result[i] = r
+	}
+	return result
+}
+
+func convertToSecurityGroupRules(rawRules []interface{}) []securitygroups.CreateSecurityGroupRuleOpts {
+	rules := make([]securitygroups.CreateSecurityGroupRuleOpts, len(rawRules))
+	for i, r := range rawRules {
+		rule := r.(map[string]interface{})
+
+		portRangeMax := rule["port_range_max"].(int)
+		portRangeMin := rule["port_range_min"].(int)
+		descr := rule["description"].(string)
+		remoteIPPrefix := rule["remote_ip_prefix"].(string)
+
+		sgrOpts := securitygroups.CreateSecurityGroupRuleOpts{
+			Direction:   types.RuleDirection(rule["direction"].(string)),
+			EtherType:   types.EtherType(rule["ethertype"].(string)),
+			Protocol:    types.Protocol(rule["protocol"].(string)),
+			Description: &descr,
+		}
+
+		if remoteIPPrefix != "" {
+			sgrOpts.RemoteIPPrefix = &remoteIPPrefix
+		}
+
+		if portRangeMax != 0 && portRangeMin != 0 {
+			sgrOpts.PortRangeMax = &portRangeMax
+			sgrOpts.PortRangeMin = &portRangeMin
+		}
+
+		rules[i] = sgrOpts
+	}
+	return rules
 }

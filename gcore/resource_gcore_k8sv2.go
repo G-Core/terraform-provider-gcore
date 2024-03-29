@@ -5,14 +5,18 @@ import (
 	"fmt"
 	"log"
 	"slices"
+	"strings"
 	"time"
 
 	gcorecloud "github.com/G-Core/gcorelabscloud-go"
 	"github.com/G-Core/gcorelabscloud-go/gcore/k8s/v2/clusters"
 	"github.com/G-Core/gcorelabscloud-go/gcore/k8s/v2/pools"
+	"github.com/G-Core/gcorelabscloud-go/gcore/securitygroup/v1/securitygroups"
+	"github.com/G-Core/gcorelabscloud-go/gcore/securitygroup/v1/types"
 	"github.com/G-Core/gcorelabscloud-go/gcore/servergroup/v1/servergroups"
 	"github.com/G-Core/gcorelabscloud-go/gcore/task/v1/tasks"
 	"github.com/G-Core/gcorelabscloud-go/gcore/volume/v1/volumes"
+	"github.com/hashicorp/go-cty/cty"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 )
@@ -21,6 +25,8 @@ const (
 	K8sPoint         = "k8s/clusters"
 	tasksPoint       = "tasks"
 	K8sCreateTimeout = 3600
+
+	k8sSgMetadataKey = "gcloud_cluster_name"
 )
 
 var k8sCreateTimeout = time.Second * time.Duration(K8sCreateTimeout)
@@ -300,6 +306,138 @@ func resourceK8sV2() *schema.Resource {
 					},
 				},
 			},
+			"security_group_rules_internal": &schema.Schema{
+				Type:        schema.TypeList,
+				Computed:    true,
+				Description: "Default readonly security group rules. It is used for internal purposes only.",
+				Elem: &schema.Resource{
+					Schema: map[string]*schema.Schema{
+						"id": &schema.Schema{
+							Type:     schema.TypeString,
+							Computed: true,
+						},
+						"direction": &schema.Schema{
+							Type:        schema.TypeString,
+							Computed:    true,
+							Description: fmt.Sprintf("Available value is '%s', '%s'", types.RuleDirectionIngress, types.RuleDirectionEgress),
+						},
+						"ethertype": &schema.Schema{
+							Type:        schema.TypeString,
+							Computed:    true,
+							Description: fmt.Sprintf("Available value is '%s', '%s'", types.EtherTypeIPv4, types.EtherTypeIPv6),
+						},
+						"protocol": &schema.Schema{
+							Type:        schema.TypeString,
+							Computed:    true,
+							Description: fmt.Sprintf("Available value is %s", strings.Join(types.Protocol("").StringList(), ",")),
+						},
+						"port_range_min": &schema.Schema{
+							Type:     schema.TypeInt,
+							Computed: true,
+						},
+						"port_range_max": &schema.Schema{
+							Type:     schema.TypeInt,
+							Computed: true,
+						},
+						"description": &schema.Schema{
+							Type:     schema.TypeString,
+							Computed: true,
+						},
+						"remote_ip_prefix": &schema.Schema{
+							Type:     schema.TypeString,
+							Computed: true,
+						},
+						"updated_at": &schema.Schema{
+							Type:     schema.TypeString,
+							Computed: true,
+						},
+						"created_at": &schema.Schema{
+							Type:     schema.TypeString,
+							Computed: true,
+						},
+					},
+				},
+			},
+			"security_group_rules": &schema.Schema{
+				Type:        schema.TypeSet,
+				Optional:    true,
+				Description: "Firewall rules control what inbound(ingress) and outbound(egress) traffic is allowed to enter or leave a Instance. At least one 'egress' rule should be set",
+				Set:         secGroupUniqueID,
+				Elem: &schema.Resource{
+					Schema: map[string]*schema.Schema{
+						"id": &schema.Schema{
+							Type:     schema.TypeString,
+							Computed: true,
+						},
+						"direction": &schema.Schema{
+							Type:        schema.TypeString,
+							Required:    true,
+							Description: fmt.Sprintf("Available value is '%s', '%s'", types.RuleDirectionIngress, types.RuleDirectionEgress),
+							ValidateDiagFunc: func(v interface{}, path cty.Path) diag.Diagnostics {
+								val := v.(string)
+								switch types.RuleDirection(val) {
+								case types.RuleDirectionIngress, types.RuleDirectionEgress:
+									return nil
+								}
+								return diag.Errorf("wrong direction '%s', available value is '%s', '%s'", val, types.RuleDirectionIngress, types.RuleDirectionEgress)
+							},
+						},
+						"ethertype": &schema.Schema{
+							Type:        schema.TypeString,
+							Required:    true,
+							Description: fmt.Sprintf("Available value is '%s', '%s'", types.EtherTypeIPv4, types.EtherTypeIPv6),
+							ValidateDiagFunc: func(v interface{}, path cty.Path) diag.Diagnostics {
+								val := v.(string)
+								switch types.EtherType(val) {
+								case types.EtherTypeIPv4, types.EtherTypeIPv6:
+									return nil
+								}
+								return diag.Errorf("wrong ethertype '%s', available value is '%s', '%s'", val, types.EtherTypeIPv4, types.EtherTypeIPv6)
+							},
+						},
+						"protocol": &schema.Schema{
+							Type:        schema.TypeString,
+							Required:    true,
+							Description: fmt.Sprintf("Available value is %s", strings.Join(types.Protocol("").StringList(), ",")),
+						},
+						"port_range_min": &schema.Schema{
+							Type:             schema.TypeInt,
+							Optional:         true,
+							Default:          0,
+							ValidateDiagFunc: validatePortRange,
+						},
+						"port_range_max": &schema.Schema{
+							Type:             schema.TypeInt,
+							Optional:         true,
+							Default:          0,
+							ValidateDiagFunc: validatePortRange,
+						},
+						"description": &schema.Schema{
+							Type:     schema.TypeString,
+							Optional: true,
+							Default:  "",
+						},
+						"remote_ip_prefix": &schema.Schema{
+							Type:     schema.TypeString,
+							Optional: true,
+							Default:  "",
+						},
+						"updated_at": &schema.Schema{
+							Type:     schema.TypeString,
+							Computed: true,
+						},
+						"created_at": &schema.Schema{
+							Type:     schema.TypeString,
+							Computed: true,
+						},
+					},
+				},
+			},
+			"security_group_id": {
+				Type:        schema.TypeString,
+				Computed:    true,
+				Description: "Security group ID.",
+			},
 			"status": {
 				Type:        schema.TypeString,
 				Description: "Cluster status.",
@@ -441,10 +579,49 @@ func resourceK8sV2Create(ctx context.Context, d *schema.ResourceData, m interfac
 	}
 
 	d.SetId(clusterName.(string))
-	resourceK8sV2Read(ctx, d, m)
 
+	sgClient, err := CreateClient(provider, d, securityGroupPoint, versionPointV1)
+	if err != nil {
+		return diag.FromErr(err)
+	}
+
+	sgs, err := securitygroups.ListAll(
+		sgClient, securitygroups.ListOpts{MetadataKV: map[string]string{k8sSgMetadataKey: clusterName.(string)}},
+	)
+	sg := getSuitableSecurityGroup(sgs, clusterName.(string), d.Get("project_id").(int), d.Get("region_id").(int))
+	if len(d.Get("security_group_rules_internal").([]interface{})) == 0 {
+		rules := convertSecurityGroupRules(sg.SecurityGroupRules)
+		if err := d.Set("security_group_rules_internal", rules); err != nil {
+			return diag.FromErr(err)
+		}
+	}
+	if sg != nil {
+		rawRules := d.Get("security_group_rules").(*schema.Set).List()
+		if len(rawRules) != 0 {
+			usersRules := convertToSecurityGroupRules(rawRules)
+
+			for _, rule := range usersRules {
+				_, err = securitygroups.AddRule(sgClient, sg.ID, rule).Extract()
+				if err != nil {
+					log.Println("[ERROR] Cannot add rule to security group", err)
+				}
+			}
+		}
+	}
+
+	resourceK8sV2Read(ctx, d, m)
 	log.Printf("[DEBUG] Finish k8s cluster creating (%s)", clusterName)
 	return diags
+}
+
+func getSuitableSecurityGroup(sgs []securitygroups.SecurityGroup, name string, projectID, regionID int) *securitygroups.SecurityGroup {
+	sgName := fmt.Sprintf("%s-%d-%d-worker", name, regionID, projectID)
+	for _, sg := range sgs {
+		if sg.Name == sgName {
+			return &sg
+		}
+	}
+	return nil
 }
 
 func resourceK8sV2Read(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
@@ -461,6 +638,12 @@ func resourceK8sV2Read(ctx context.Context, d *schema.ResourceData, m interface{
 	clusterName := d.Get("name").(string)
 	cluster, err := clusters.Get(client, clusterName).Extract()
 	if err != nil {
+		switch err.(type) {
+		case gcorecloud.ErrDefault404:
+			d.SetId("")
+			log.Printf("[WARNING] k8s cluster not found, removing from state")
+			return nil
+		}
 		return diag.FromErr(err)
 	}
 
@@ -475,6 +658,7 @@ func resourceK8sV2Read(ctx context.Context, d *schema.ResourceData, m interface{
 	d.Set("creator_task_id", cluster.CreatorTaskID)
 	d.Set("task_id", cluster.TaskID)
 	d.Set("is_ipv6", cluster.IsIPV6)
+
 	if cluster.PodsIPPool != nil {
 		d.Set("pods_ip_pool", cluster.PodsIPPool.String())
 	}
@@ -534,6 +718,36 @@ func resourceK8sV2Read(ctx context.Context, d *schema.ResourceData, m interface{
 	}
 	if err := d.Set("pool", poolData); err != nil {
 		return diag.FromErr(err)
+	}
+
+	// get cluster's security group
+	sgClient, err := CreateClient(provider, d, securityGroupPoint, versionPointV1)
+	if err != nil {
+		return diag.FromErr(err)
+	}
+
+	sgs, err := securitygroups.ListAll(
+		sgClient, securitygroups.ListOpts{MetadataKV: map[string]string{k8sSgMetadataKey: clusterName}},
+	)
+	sg := getSuitableSecurityGroup(sgs, clusterName, d.Get("project_id").(int), d.Get("region_id").(int))
+	if err == nil && sg != nil {
+		if len(d.Get("security_group_rules_internal").([]interface{})) == 0 {
+			rules := convertSecurityGroupRules(sg.SecurityGroupRules)
+			if err := d.Set("security_group_rules_internal", rules); err != nil {
+				return diag.FromErr(err)
+			}
+		}
+
+		d.Set("security_group_id", sg.ID)
+		// todo read security group for the cluster
+		rulesRaw := convertSecurityGroupRules(sg.SecurityGroupRules)
+		actualRules := schema.NewSet(secGroupUniqueID, rulesRaw)
+		readOnlyRules := schema.NewSet(secGroupUniqueID, d.Get("security_group_rules_internal").([]interface{}))
+		resultRules := actualRules.Difference(readOnlyRules)
+
+		if err := d.Set("security_group_rules", resultRules); err != nil {
+			return diag.FromErr(err)
+		}
 	}
 
 	log.Println("[DEBUG] Finish k8s cluster reading")
@@ -623,6 +837,57 @@ func resourceK8sV2Update(ctx context.Context, d *schema.ResourceData, m interfac
 				}
 			}
 		}
+	}
+
+	if d.HasChange("security_group_rules") {
+		o, n := d.GetChange("security_group_rules")
+		newUsersRules := n.(*schema.Set)
+		oldUsersRules := o.(*schema.Set)
+
+		sgClient, err := CreateClient(provider, d, securityGroupPoint, versionPointV1)
+		if err != nil {
+			return diag.FromErr(err)
+		}
+
+		updateRequest := securitygroups.UpdateOpts{}
+		for _, rule := range oldUsersRules.List() {
+			r := rule.(map[string]interface{})
+			updateRequest.ChangedRules = append(updateRequest.ChangedRules, securitygroups.UpdateSecurityGroupRuleOpts{
+				Action:              types.ActionDelete,
+				SecurityGroupRuleID: r["id"].(string),
+			})
+		}
+
+		for _, rule := range newUsersRules.List() {
+			r := rule.(map[string]interface{})
+			changedRules := securitygroups.UpdateSecurityGroupRuleOpts{
+				Action:    types.ActionCreate,
+				Direction: types.RuleDirection(r["direction"].(string)),
+				EtherType: types.EtherType(r["ethertype"].(string)),
+				Protocol:  types.Protocol(r["protocol"].(string)),
+			}
+
+			if port := r["port_range_max"].(int); port != 0 {
+				changedRules.PortRangeMax = &port
+			}
+			if port := r["port_range_min"].(int); port != 0 {
+				changedRules.PortRangeMin = &port
+			}
+			if descr := r["description"].(string); descr != "" {
+				changedRules.Description = &descr
+			}
+			if remoteIPPrefix := r["remote_ip_prefix"].(string); remoteIPPrefix != "" {
+				changedRules.RemoteIPPrefix = &remoteIPPrefix
+			}
+
+			updateRequest.ChangedRules = append(updateRequest.ChangedRules, changedRules)
+		}
+
+		_, err = securitygroups.Update(sgClient, d.Get("security_group_id").(string), updateRequest).Extract()
+		if err != nil {
+			return diag.FromErr(err)
+		}
+
 	}
 
 	diags := resourceK8sV2Read(ctx, d, m)
