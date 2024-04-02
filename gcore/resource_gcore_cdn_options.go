@@ -496,6 +496,46 @@ var (
 				},
 			},
 		},
+		"proxy_connect_timeout": {
+			Type:        schema.TypeList,
+			MaxItems:    1,
+			Optional:    true,
+			Computed:    true,
+			Description: "The time limit for establishing a connection with the origin.",
+			Elem: &schema.Resource{
+				Schema: map[string]*schema.Schema{
+					"enabled": {
+						Type:     schema.TypeBool,
+						Optional: true,
+						Default:  true,
+					},
+					"value": {
+						Type:     schema.TypeString,
+						Required: true,
+					},
+				},
+			},
+		},
+		"proxy_read_timeout": {
+			Type:        schema.TypeList,
+			MaxItems:    1,
+			Optional:    true,
+			Computed:    true,
+			Description: "The time limit for receiving a partial response from the origin. If no response is received within this time, the connection will be closed.",
+			Elem: &schema.Resource{
+				Schema: map[string]*schema.Schema{
+					"enabled": {
+						Type:     schema.TypeBool,
+						Optional: true,
+						Default:  true,
+					},
+					"values": {
+						Type:     schema.TypeString,
+						Required: true,
+					},
+				},
+			},
+		},
 		"query_params_blacklist": {
 			Type:        schema.TypeList,
 			MaxItems:    1,

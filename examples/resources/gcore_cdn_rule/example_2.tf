@@ -128,6 +128,14 @@ resource "gcore_cdn_rule" "cdn_example_com_rule_1" {
     proxy_cache_methods_set {
       value = false
     }
+    proxy_connect_timeout {
+      enabled = true
+      value = "1s"
+    }
+    proxy_read_timeout {
+      enabled = true
+      value = "1s"
+    }
     query_params_blacklist {
       enabled = false
       value = [

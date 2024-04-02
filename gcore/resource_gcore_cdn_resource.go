@@ -397,6 +397,18 @@ func listToOptions(l []interface{}) *gcdn.Options {
 			Value:   opt["value"].(bool),
 		}
 	}
+	if opt, ok := getOptByName(fields, "proxy_connect_timeout"); ok {
+		opts.ProxyConnectTimeout = &gcdn.ProxyConnectTimeout{
+			Enabled: opt["enabled"].(bool),
+			Value:   opt["value"].(string),
+		}
+	}
+	if opt, ok := getOptByName(fields, "proxy_read_timeout"); ok {
+		opts.ProxyReadTimeout = &gcdn.ProxyReadTimeout{
+			Enabled: opt["enabled"].(bool),
+			Value:   opt["value"].(string),
+		}
+	}
 	if opt, ok := getOptByName(fields, "query_params_blacklist"); ok {
 		opts.QueryParamsBlacklist = &gcdn.QueryParamsBlacklist{
 			Enabled: opt["enabled"].(bool),
@@ -679,6 +691,14 @@ func optionsToList(options *gcdn.Options) []interface{} {
 	if options.ProxyCacheMethodsSet != nil {
 		m := structToMap(options.ProxyCacheMethodsSet)
 		result["proxy_cache_methods_set"] = []interface{}{m}
+	}
+	if options.ProxyConnectTimeout != nil {
+		m := structToMap(options.ProxyConnectTimeout)
+		result["proxy_connect_timeout"] = []interface{}{m}
+	}
+	if options.ProxyReadTimeout != nil {
+		m := structToMap(options.ProxyReadTimeout)
+		result["proxy_read_timeout"] = []interface{}{m}
 	}
 	if options.QueryParamsBlacklist != nil {
 		m := structToMap(options.QueryParamsBlacklist)
