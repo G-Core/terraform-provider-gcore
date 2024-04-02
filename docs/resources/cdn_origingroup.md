@@ -41,6 +41,10 @@ resource "gcore_cdn_origingroup" "origin_group_1" {
 - `origin` (Block Set, Min: 1) Contains information about all IP address or Domain names of your origin and the port if custom (see [below for nested schema](#nestedblock--origin))
 - `use_next` (Boolean) This options have two possible values: true — The option is active. In case the origin responds with 4XX or 5XX codes, use the next origin from the list. false — The option is disabled.
 
+### Optional
+
+- `proxy_next_upstream` (Set of String) Available values: error, timeout, invalid_header, http_403, http_404, http_429, http_500, http_502, http_503, http_504.
+
 ### Read-Only
 
 - `id` (String) The ID of this resource.
