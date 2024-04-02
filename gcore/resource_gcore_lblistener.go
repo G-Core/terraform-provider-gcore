@@ -153,6 +153,12 @@ func resourceLbListener() *schema.Resource {
 				Elem:        &schema.Schema{Type: schema.TypeString},
 				Optional:    true,
 			},
+			"allowed_cidrs": &schema.Schema{
+				Type:        schema.TypeList,
+				Description: "List of networks from which listener is accessible",
+				Elem:        &schema.Schema{Type: schema.TypeString},
+				Optional:    true,
+			},
 			"last_updated": &schema.Schema{
 				Type:        schema.TypeString,
 				Description: "Datetime when load balancer was updated at the last time.",
@@ -245,6 +251,15 @@ func resourceLBListenerCreate(ctx context.Context, d *schema.ResourceData, m int
 			sniSecretID[i] = s.(string)
 		}
 		opts.SNISecretID = sniSecretID
+	}
+
+	allowedCIDRSRaw := d.Get("allowed_cidrs").([]interface{})
+	if len(allowedCIDRSRaw) != 0 {
+		allowedCIDRS := make([]string, len(allowedCIDRSRaw))
+		for i, a := range allowedCIDRSRaw {
+			allowedCIDRS[i] = a.(string)
+		}
+		opts.AllowedCIDRS = allowedCIDRS
 	}
 
 	u := d.Get("user_list")
