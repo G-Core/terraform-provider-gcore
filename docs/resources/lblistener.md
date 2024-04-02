@@ -130,15 +130,6 @@ Optional:
 
 Required:
 
-- `username` (String) Username to auth via Basic Authentication
-- `encrypted_password` (String) Encrypted password to auth via Basic Authentication
-
-
-<a id="nestedblock--user_list"></a>
-### Nested Schema for `user_list`
-
-Required:
-
 - `encrypted_password` (String, Sensitive) Encrypted password (hash) to auth via Basic Authentication
 - `username` (String) Username to auth via Basic Authentication
 
