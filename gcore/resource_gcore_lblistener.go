@@ -424,6 +424,16 @@ func resourceLBListenerUpdate(ctx context.Context, d *schema.ResourceData, m int
 		changed = true
 	}
 
+	if d.HasChange("allowed_cidrs") {
+		allowedCIDRSRaw := d.Get("allowed_cidrs").([]interface{})
+		allowedCIDRS := make([]string, len(allowedCIDRSRaw))
+		for i, a := range allowedCIDRSRaw {
+			allowedCIDRS[i] = a.(string)
+		}
+		opts.AllowedCIDRS = allowedCIDRS
+		changed = true
+	}
+
 	if d.HasChange("user_list") {
 		u := d.Get("user_list")
 		updateOpts.UserList = make([]listeners.CreateUserListOpts, 0)
