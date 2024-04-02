@@ -323,6 +323,7 @@ func resourceLBListenerRead(ctx context.Context, d *schema.ResourceData, m inter
 	d.Set("provisioning_status", lb.ProvisioningStatus.String())
 	d.Set("secret_id", lb.SecretID)
 	d.Set("sni_secret_id", lb.SNISecretID)
+	d.Set("allowed_cidrs", lb.AllowedCIDRS)
 
 	fields := []string{"project_id", "region_id", "loadbalancer_id", "insert_x_forwarded"}
 	revertState(d, &fields)
@@ -383,6 +384,16 @@ func resourceLBListenerUpdate(ctx context.Context, d *schema.ResourceData, m int
 	if d.HasChange("connection_limit") {
 		connectionLimit := d.Get("connection_limit").(int)
 		opts.ConnectionLimit = &connectionLimit
+		changed = true
+	}
+
+	if d.HasChange("allowed_cidrs") {
+		allowedCIDRSRaw := d.Get("allowed_cidrs").([]interface{})
+		allowedCIDRS := make([]string, len(allowedCIDRSRaw))
+		for i, a := range allowedCIDRSRaw {
+			allowedCIDRS[i] = a.(string)
+		}
+		opts.AllowedCIDRS = allowedCIDRS
 		changed = true
 	}
 
