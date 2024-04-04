@@ -56,6 +56,13 @@ func resourceCDNOriginGroup() *schema.Resource {
 					},
 				},
 			},
+			"proxy_next_upstream": {
+				Type:        schema.TypeSet,
+				Elem:        &schema.Schema{Type: schema.TypeString},
+				Optional:    true,
+				Computed:    true,
+				Description: "Available values: error, timeout, invalid_header, http_403, http_404, http_429, http_500, http_502, http_503, http_504.",
+			},
 		},
 		CreateContext: resourceCDNOriginGroupCreate,
 		ReadContext:   resourceCDNOriginGroupRead,
@@ -74,6 +81,14 @@ func resourceCDNOriginGroupCreate(ctx context.Context, d *schema.ResourceData, m
 	req.Name = d.Get("name").(string)
 	req.UseNext = d.Get("use_next").(bool)
 	req.Sources = setToSourceRequests(d.Get("origin").(*schema.Set))
+
+	proxyNextUpstream, ok := d.Get("proxy_next_upstream").(*schema.Set)
+	if ok && proxyNextUpstream.Len() > 0 {
+		req.ProxyNextUpstream = make([]string, 0)
+		for _, upstreamError := range d.Get("proxy_next_upstream").(*schema.Set).List() {
+			req.ProxyNextUpstream = append(req.ProxyNextUpstream, upstreamError.(string))
+		}
+	}
 
 	result, err := client.OriginGroups().Create(ctx, &req)
 	if err != nil {
@@ -108,6 +123,7 @@ func resourceCDNOriginGroupRead(ctx context.Context, d *schema.ResourceData, m i
 	if err := d.Set("origin", originsToSet(result.Sources)); err != nil {
 		return diag.FromErr(err)
 	}
+	d.Set("proxy_next_upstream", result.ProxyNextUpstream)
 
 	log.Println("[DEBUG] Finish CDN OriginGroup reading")
 	return nil
@@ -128,6 +144,16 @@ func resourceCDNOriginGroupUpdate(ctx context.Context, d *schema.ResourceData, m
 	req.Name = d.Get("name").(string)
 	req.UseNext = d.Get("use_next").(bool)
 	req.Sources = setToSourceRequests(d.Get("origin").(*schema.Set))
+
+	if req.UseNext == true {
+		proxyNextUpstream, ok := d.Get("proxy_next_upstream").(*schema.Set)
+		if ok && proxyNextUpstream.Len() > 0 {
+			req.ProxyNextUpstream = make([]string, 0)
+			for _, upstreamError := range d.Get("proxy_next_upstream").(*schema.Set).List() {
+				req.ProxyNextUpstream = append(req.ProxyNextUpstream, upstreamError.(string))
+			}
+		}
+	}
 
 	if _, err := client.OriginGroups().Update(ctx, id, &req); err != nil {
 		return diag.FromErr(err)
