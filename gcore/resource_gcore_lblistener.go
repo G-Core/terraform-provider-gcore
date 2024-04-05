@@ -8,16 +8,20 @@ import (
 
 	gcorecloud "github.com/G-Core/gcorelabscloud-go"
 	"github.com/G-Core/gcorelabscloud-go/gcore/loadbalancer/v1/listeners"
+	"github.com/G-Core/gcorelabscloud-go/gcore/loadbalancer/v1/loadbalancers"
 	"github.com/G-Core/gcorelabscloud-go/gcore/loadbalancer/v1/types"
 	"github.com/G-Core/gcorelabscloud-go/gcore/task/v1/tasks"
 	"github.com/hashicorp/go-cty/cty"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/retry"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 )
 
 const (
 	LBListenersPoint        = "lblisteners"
 	LBListenerCreateTimeout = 2400
+
+	LoadbalancerProvisioningStatusActive = "ACTIVE"
 )
 
 func resourceLbListener() *schema.Resource {
@@ -208,6 +212,16 @@ func resourceLbListener() *schema.Resource {
 	}
 }
 
+func LoadbalancerProvisioningStatusRefreshedFunc(client *gcorecloud.ServiceClient, loadbalancerID string) retry.StateRefreshFunc {
+	return func() (interface{}, string, error) {
+		loadbalancer, err := loadbalancers.Get(client, loadbalancerID, nil).Extract()
+		if err != nil {
+			return loadbalancer, "", err
+		}
+		return loadbalancer, loadbalancer.ProvisioningStatus.String(), nil
+	}
+}
+
 func resourceLBListenerCreate(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	log.Println("[DEBUG] Start LBListener creating")
 	var diags diag.Diagnostics
@@ -337,20 +351,27 @@ func resourceLBListenerUpdate(ctx context.Context, d *schema.ResourceData, m int
 	config := m.(*Config)
 	provider := config.Provider
 
-	client, err := CreateClient(provider, d, LBListenersPoint, versionPointV2)
+	clientV1, err := CreateClient(provider, d, LoadBalancersPoint, versionPointV1)
+	if err != nil {
+		return diag.FromErr(err)
+	}
+	clientV2, err := CreateClient(provider, d, LBListenersPoint, versionPointV2)
 	if err != nil {
 		return diag.FromErr(err)
 	}
 
 	var changed bool
-	opts := listeners.UpdateOpts{}
+	var toUnset bool
+	updateOpts := listeners.UpdateOpts{}
+	unsetOpts := listeners.UnsetOpts{}
+
 	if d.HasChange("name") {
-		opts.Name = d.Get("name").(string)
+		updateOpts.Name = d.Get("name").(string)
 		changed = true
 	}
 
 	if d.HasChange("secret_id") {
-		opts.SecretID = d.Get("secret_id").(string)
+		updateOpts.SecretID = d.Get("secret_id").(string)
 		changed = true
 	}
 
@@ -360,60 +381,87 @@ func resourceLBListenerUpdate(ctx context.Context, d *schema.ResourceData, m int
 		for i, s := range sniSecretIDRaw {
 			sniSecretID[i] = s.(string)
 		}
-		opts.SNISecretID = sniSecretID
+		updateOpts.SNISecretID = sniSecretID
 		changed = true
 	}
+
 	if d.HasChange("timeout_client_data") {
 		timeoutClientData := d.Get("timeout_client_data").(int)
-		opts.TimeoutClientData = &timeoutClientData
+		updateOpts.TimeoutClientData = &timeoutClientData
 		changed = true
 	}
 
 	if d.HasChange("timeout_member_connect") {
 		timeoutMemberConnect := d.Get("timeout_member_connect").(int)
-		opts.TimeoutMemberConnect = &timeoutMemberConnect
+		updateOpts.TimeoutMemberConnect = &timeoutMemberConnect
 		changed = true
 	}
 
 	if d.HasChange("timeout_member_data") {
 		timeoutMemberData := d.Get("timeout_member_data").(int)
-		opts.TimeoutMemberData = &timeoutMemberData
+		updateOpts.TimeoutMemberData = &timeoutMemberData
 		changed = true
 	}
 
 	if d.HasChange("connection_limit") {
 		connectionLimit := d.Get("connection_limit").(int)
-		opts.ConnectionLimit = &connectionLimit
+		updateOpts.ConnectionLimit = &connectionLimit
 		changed = true
 	}
 
 	if d.HasChange("allowed_cidrs") {
 		allowedCIDRSRaw := d.Get("allowed_cidrs").([]interface{})
-		allowedCIDRS := make([]string, len(allowedCIDRSRaw))
-		for i, a := range allowedCIDRSRaw {
-			allowedCIDRS[i] = a.(string)
+		if len(allowedCIDRSRaw) != 0 {
+			allowedCIDRS := make([]string, len(allowedCIDRSRaw))
+			for i, a := range allowedCIDRSRaw {
+				allowedCIDRS[i] = a.(string)
+			}
+			updateOpts.AllowedCIDRS = allowedCIDRS
+		} else {
+			unsetOpts.AllowedCIDRS = true
+			toUnset = true
 		}
-		opts.AllowedCIDRS = allowedCIDRS
 		changed = true
 	}
 
 	if d.HasChange("user_list") {
 		u := d.Get("user_list")
-		opts.UserList = make([]listeners.CreateUserListOpts, 0)
+		updateOpts.UserList = make([]listeners.CreateUserListOpts, 0)
 		if len(u.([]interface{})) > 0 {
 			userList, err := extractUserList(u.([]interface{}))
 			if err != nil {
 				return diag.FromErr(err)
 			}
-			opts.UserList = userList
+			updateOpts.UserList = userList
+		} else {
+			unsetOpts.UserList = true
+			toUnset = true
 		}
 		changed = true
 	}
 
 	if changed {
-		_, err = listeners.Update(client, d.Id(), opts).Extract()
+		_, err = listeners.Update(clientV2, d.Id(), updateOpts).Extract()
 		if err != nil {
 			return diag.FromErr(err)
+		}
+
+		if toUnset {
+			stopWaitConf := retry.StateChangeConf{
+				Target:     []string{types.ProvisioningStatusActive.String()},
+				Refresh:    LoadbalancerProvisioningStatusRefreshedFunc(clientV1, d.Get("loadbalancer_id").(string)),
+				Timeout:    3 * time.Minute,
+				Delay:      10 * time.Second,
+				MinTimeout: 5 * time.Second,
+			}
+			_, err = stopWaitConf.WaitForStateContext(ctx)
+			if err != nil {
+				return diag.Errorf("Error waiting for loadbalancer (%s): %s", d.Get("loadbalancer_id").(string), err)
+			}
+			_, err := listeners.Unset(clientV2, d.Id(), unsetOpts).Extract()
+			if err != nil {
+				return diag.FromErr(err)
+			}
 		}
 
 		d.Set("last_updated", time.Now().Format(time.RFC850))
