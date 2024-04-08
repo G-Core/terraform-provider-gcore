@@ -95,6 +95,7 @@ output "prometheus_password" {
 
 ### Optional
 
+- `allowed_cidrs` (List of String) List of networks from which listener is accessible
 - `connection_limit` (Number) Number of simultaneous connections for this listener, between 1 and 1,000,000.
 - `insert_x_forwarded` (Boolean) Insert X-Forwarded headers for 'HTTP', 'HTTPS', 'TERMINATED_HTTPS' protocols.
 - `project_id` (Number) ID of the desired project to create load balancer listener in. Alternative for `project_name`. One of them should be specified.
@@ -103,12 +104,11 @@ output "prometheus_password" {
 - `region_name` (String) Name of the desired region to create load balancer listener in. Alternative for `region_id`. One of them should be specified.
 - `secret_id` (String) Secret ID to use with 'TERMINATED_HTTPS' protocol.
 - `sni_secret_id` (List of String) List of additional Secret IDs to use with 'TERMINATED_HTTPS' protocol.
-- `allowed_cidrs` (List of String) List of networks from which listener is accessible
 - `timeout_client_data` (Number) Frontend client inactivity timeout in milliseconds.
 - `timeout_member_connect` (Number) Backend member connection timeout in milliseconds.
 - `timeout_member_data` (Number) Backend member inactivity timeout in milliseconds.
 - `timeouts` (Block, Optional) (see [below for nested schema](#nestedblock--timeouts))
-- `user_list` (Block List) Listener list of username and encrypted password items. (see [below for nested schema](#nestedblock--user_list))
+- `user_list` (Block List) Load balancer listener list of username and encrypted password items. (see [below for nested schema](#nestedblock--user_list))
 
 ### Read-Only
 
