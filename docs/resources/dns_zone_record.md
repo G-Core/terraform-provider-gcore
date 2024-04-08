@@ -33,7 +33,7 @@ resource "gcore_dns_zone_record" "example_rrset0" {
   zone   = gcore_dns_zone.examplezone0.name
   domain = "${gcore_dns_zone.examplezone0.name}"
   type   = "A"
-  ttl    = 100
+  ttl    = 120
 
   resource_record {
     content = "127.0.0.100"
@@ -51,7 +51,7 @@ resource "gcore_dns_zone_record" "subdomain_examplezone" {
   zone   = "examplezone.com"
   domain = "subdomain.examplezone.com"
   type   = "TXT"
-  ttl    = 10
+  ttl    = 120
 
   filter {
     type   = "geodistance"
