@@ -225,7 +225,7 @@ func originSetIDFunc(i interface{}) int {
 	fields := i.(map[string]interface{})
 	h := md5.New()
 
-	key := fmt.Sprintf("%d-%s-%t-%t", fields["source"], fields["enabled"], fields["backup"])
+	key := fmt.Sprintf("%d-%s-%t", fields["source"], fields["enabled"], fields["backup"])
 	log.Printf("[DEBUG] Origin Set ID = %s\n", key)
 
 	io.WriteString(h, key)
