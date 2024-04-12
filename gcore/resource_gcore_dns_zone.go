@@ -15,8 +15,8 @@ import (
 const (
 	DNSZoneResource = "gcore_dns_zone"
 
-	DNSZoneSchemaName       = "name"
-	DNSZoneSchemaDNSSECName = "dnssec"
+	DNSZoneSchemaName   = "name"
+	DNSZoneSchemaDNSSEC = "dnssec"
 )
 
 func resourceDNSZone() *schema.Resource {
@@ -35,12 +35,13 @@ func resourceDNSZone() *schema.Resource {
 				},
 				Description: "A name of DNS Zone resource.",
 			},
-			DNSZoneSchemaDNSSECName: {
+			DNSZoneSchemaDNSSEC: {
 				Type:     schema.TypeBool,
 				Optional: true,
 				Default:  false,
-				Description: "Activation or deactivation of DNSSEC for the zone. By default, DNSSEC is disabled. " +
-					"However, if this is set to true, DNSSEC will be enabled.",
+				Description: "Activation or deactivation of DNSSEC for the zone." +
+					"Set it to true to enable DNSSEC for the zone or false to disable it." +
+					"By default, DNSSEC is set to false wich means it is disabled.",
 			},
 		},
 		Timeouts: &schema.ResourceTimeout{
@@ -84,7 +85,7 @@ func resourceDNSZoneCreate(ctx context.Context, d *schema.ResourceData, m interf
 		return diag.FromErr(fmt.Errorf("create zone: %v", err))
 	}
 
-	enableDnssec := d.Get(DNSZoneSchemaDNSSECName).(bool)
+	enableDnssec := d.Get(DNSZoneSchemaDNSSEC).(bool)
 	if enableDnssec {
 		_, err = client.ToggleDnssec(ctx, name, true)
 		if err != nil {
@@ -108,7 +109,7 @@ func resourceDNSZoneUpdate(ctx context.Context, d *schema.ResourceData, m interf
 	config := m.(*Config)
 	client := config.DNSClient
 
-	enableDnssec := d.Get(DNSZoneSchemaDNSSECName).(bool)
+	enableDnssec := d.Get(DNSZoneSchemaDNSSEC).(bool)
 	_, err := client.ToggleDnssec(ctx, name, enableDnssec)
 	if err != nil {
 		return diag.FromErr(fmt.Errorf("enable dnssec: %v", err))
@@ -130,7 +131,7 @@ func resourceDNSZoneRead(ctx context.Context, d *schema.ResourceData, m interfac
 		return diag.FromErr(fmt.Errorf("get zone: %w", err))
 	}
 
-	enableDnssec := d.Get(DNSZoneSchemaDNSSECName).(bool)
+	enableDnssec := d.Get(DNSZoneSchemaDNSSEC).(bool)
 	if enableDnssec {
 		_, errDnssecDS := client.DNSSecDS(ctx, zoneName)
 		if errDnssecDS != nil {
