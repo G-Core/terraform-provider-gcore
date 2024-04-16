@@ -189,7 +189,7 @@ Optional:
 - `asn` (List of Number) An asn meta (eg. 12345) of DNS Zone Record resource.
 - `backup` (Boolean) Set as backup record
 - `continents` (List of String) Continents meta (eg. Asia) of DNS Zone Record resource.
-- `countries` (List of String) Countries meta (eg. USA) of DNS Zone Record resource.
+- `countries` (List of String) Countries ISO codes meta (eg. us) of DNS Zone Record resource.
 - `default` (Boolean) Fallback meta equals true marks records which are used as a default answer (when nothing was selected by specified meta fields).
 - `failover` (Map of String) Computed UUID of failover healtcheck property
 - `fallback` (Boolean) Set as fallback record
