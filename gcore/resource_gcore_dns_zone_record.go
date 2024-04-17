@@ -256,7 +256,7 @@ func resourceDNSZoneRecord() *schema.Resource {
 											Type: schema.TypeString,
 										},
 										Optional:    true,
-										Description: "Countries meta (eg. USA) of DNS Zone Record resource.",
+										Description: "Countries ISO codes meta (eg. us) of DNS Zone Record resource.",
 									},
 									DNSZoneRecordSchemaMetaDefault: {
 										Type:        schema.TypeBool,
