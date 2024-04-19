@@ -31,6 +31,7 @@ resource "gcore_dns_zone" "example_zone" {
 
 ### Optional
 
+- `dnssec` (Boolean) Activation or deactivation of DNSSEC for the zone.Set it to true to enable DNSSEC for the zone or false to disable it.By default, DNSSEC is set to false wich means it is disabled.
 - `timeouts` (Block, Optional) (see [below for nested schema](#nestedblock--timeouts))
 
 ### Read-Only
