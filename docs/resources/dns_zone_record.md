@@ -69,7 +69,7 @@ resource "gcore_dns_zone_record" "subdomain_examplezone" {
       ip         = ["1.1.1.1"]
       notes      = "notes"
       continents = ["asia"]
-      countries  = ["russia"]
+      countries  = ["us"]
       default    = true
     }
   }
