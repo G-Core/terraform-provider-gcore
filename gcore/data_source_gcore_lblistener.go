@@ -87,6 +87,23 @@ func dataSourceLBListener() *schema.Resource {
 				Description: "Provisioning status of this listener.",
 				Computed:    true,
 			},
+			"secret_id": &schema.Schema{
+				Type:        schema.TypeString,
+				Description: "Secret ID to use with 'TERMINATED_HTTPS' protocol.",
+				Optional:    true,
+			},
+			"sni_secret_id": &schema.Schema{
+				Type:        schema.TypeList,
+				Description: "List of additional Secret IDs to use with 'TERMINATED_HTTPS' protocol.",
+				Elem:        &schema.Schema{Type: schema.TypeString},
+				Optional:    true,
+			},
+			"allowed_cidrs": &schema.Schema{
+				Type:        schema.TypeList,
+				Description: "List of networks from which listener is accessible",
+				Elem:        &schema.Schema{Type: schema.TypeString},
+				Optional:    true,
+			},
 			"timeout_client_data": &schema.Schema{
 				Type:        schema.TypeInt,
 				Description: "Frontend client inactivity timeout in milliseconds.",
@@ -109,7 +126,7 @@ func dataSourceLBListener() *schema.Resource {
 			},
 			"user_list": &schema.Schema{
 				Type:        schema.TypeList,
-				Description: "Listener list of username and encrypted password items.",
+				Description: "Load balancer listener list of username and encrypted password items.",
 				Optional:    true,
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
@@ -180,6 +197,10 @@ func dataSourceLBListenerRead(ctx context.Context, d *schema.ResourceData, m int
 	d.Set("protocol_port", lb.ProtocolPort)
 	d.Set("pool_count", lb.PoolCount)
 	d.Set("operating_status", lb.OperationStatus.String())
+	d.Set("provisioning_status", lb.ProvisioningStatus.String())
+	d.Set("secret_id", lb.SecretID)
+	d.Set("sni_secret_id", lb.SNISecretID)
+	d.Set("allowed_cidrs", lb.AllowedCIDRS)
 	d.Set("provisioning_status", lb.ProvisioningStatus.String())
 	d.Set("loadbalancer_id", lbID)
 	d.Set("project_id", d.Get("project_id").(int))

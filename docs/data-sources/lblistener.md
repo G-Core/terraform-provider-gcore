@@ -47,16 +47,19 @@ output "view" {
 
 ### Optional
 
+- `allowed_cidrs` (List of String) List of networks from which listener is accessible
 - `connection_limit` (Number) Number of simultaneous connections for this listener, between 1 and 1,000,000.
 - `loadbalancer_id` (String) ID of the load balancer to which listener was attached.
 - `project_id` (Number) ID of the project in which load balancer listener was created.
 - `project_name` (String) Name of the project in which load balancer listener was created.
 - `region_id` (Number) ID of the region in which load balancer listener was created.
 - `region_name` (String) Name of the region in which load balancer listener was created.
+- `secret_id` (String) Secret ID to use with 'TERMINATED_HTTPS' protocol.
+- `sni_secret_id` (List of String) List of additional Secret IDs to use with 'TERMINATED_HTTPS' protocol.
 - `timeout_client_data` (Number) Frontend client inactivity timeout in milliseconds.
 - `timeout_member_connect` (Number) Backend member connection timeout in milliseconds.
 - `timeout_member_data` (Number) Backend member inactivity timeout in milliseconds.
-- `user_list` (Block List) Listener list of username and encrypted password items. (see [below for nested schema](#nestedblock--user_list))
+- `user_list` (Block List) Load balancer listener list of username and encrypted password items. (see [below for nested schema](#nestedblock--user_list))
 
 ### Read-Only
 

@@ -13,8 +13,10 @@ import (
 )
 
 const (
-	DNSZoneResource   = "gcore_dns_zone"
-	DNSZoneSchemaName = "name"
+	DNSZoneResource = "gcore_dns_zone"
+
+	DNSZoneSchemaName   = "name"
+	DNSZoneSchemaDNSSEC = "dnssec"
 )
 
 func resourceDNSZone() *schema.Resource {
@@ -33,6 +35,14 @@ func resourceDNSZone() *schema.Resource {
 				},
 				Description: "A name of DNS Zone resource.",
 			},
+			DNSZoneSchemaDNSSEC: {
+				Type:     schema.TypeBool,
+				Optional: true,
+				Default:  false,
+				Description: "Activation or deactivation of DNSSEC for the zone." +
+					"Set it to true to enable DNSSEC for the zone or false to disable it." +
+					"By default, DNSSEC is set to false wich means it is disabled.",
+			},
 		},
 		Timeouts: &schema.ResourceTimeout{
 			Create: schema.DefaultTimeout(5 * time.Minute),
@@ -40,6 +50,7 @@ func resourceDNSZone() *schema.Resource {
 		},
 		CreateContext: checkDNSDependency(resourceDNSZoneCreate),
 		ReadContext:   checkDNSDependency(resourceDNSZoneRead),
+		UpdateContext: checkDNSDependency(resourceDNSZoneUpdate),
 		DeleteContext: checkDNSDependency(resourceDNSZoneDelete),
 		Description:   "Represent DNS zone resource. https://dns.gcore.com/zones",
 		Importer: &schema.ResourceImporter{
@@ -73,7 +84,36 @@ func resourceDNSZoneCreate(ctx context.Context, d *schema.ResourceData, m interf
 	if err != nil {
 		return diag.FromErr(fmt.Errorf("create zone: %v", err))
 	}
+
+	enableDnssec := d.Get(DNSZoneSchemaDNSSEC).(bool)
+	if enableDnssec {
+		_, err = client.ToggleDnssec(ctx, name, true)
+		if err != nil {
+			return diag.FromErr(fmt.Errorf("enable dnssec: %v", err))
+		}
+	}
+
 	d.SetId(name)
+	return resourceDNSZoneRead(ctx, d, m)
+}
+
+func resourceDNSZoneUpdate(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
+	name := strings.TrimSpace(d.Get(DNSZoneSchemaName).(string))
+	if d.Id() == "" {
+		return diag.Errorf("empty id")
+	}
+
+	log.Printf("[DEBUG] Start DNS Zone Resource updating (id=%s)\n", name)
+	defer log.Printf("[DEBUG] Finish DNS Zone Resource updating (id=%s)\n", name)
+
+	config := m.(*Config)
+	client := config.DNSClient
+
+	enableDnssec := d.Get(DNSZoneSchemaDNSSEC).(bool)
+	_, err := client.ToggleDnssec(ctx, name, enableDnssec)
+	if err != nil {
+		return diag.FromErr(fmt.Errorf("enable dnssec: %v", err))
+	}
 
 	return resourceDNSZoneRead(ctx, d, m)
 }
@@ -90,6 +130,15 @@ func resourceDNSZoneRead(ctx context.Context, d *schema.ResourceData, m interfac
 	if err != nil {
 		return diag.FromErr(fmt.Errorf("get zone: %w", err))
 	}
+
+	enableDnssec := d.Get(DNSZoneSchemaDNSSEC).(bool)
+	if enableDnssec {
+		_, errDnssecDS := client.DNSSecDS(ctx, zoneName)
+		if errDnssecDS != nil {
+			return diag.FromErr(fmt.Errorf("verify dnssec created: %w", errDnssecDS))
+		}
+	}
+
 	d.SetId(result.Name)
 	_ = d.Set(DNSZoneSchemaName, result.Name)
 

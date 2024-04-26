@@ -2,11 +2,12 @@ package gcore
 
 import (
 	"context"
+	"log"
+
 	"github.com/AlekSi/pointer"
 	"github.com/G-Core/gcorelabscdn-go/originshielding"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
-	"log"
 )
 
 func resourceCDNOriginShielding() *schema.Resource {
@@ -36,7 +37,7 @@ func resourceCDNOriginShielding() *schema.Resource {
 
 func resourceCDNOriginShieldingRead(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	resourceID := d.Get("resource_id").(int)
-	log.Printf("[DEBUG] Start CDN Origin Shielding reading (id=%s)\n", resourceID)
+	log.Printf("[DEBUG] Start CDN Origin Shielding reading (id=%d)\n", resourceID)
 	config := m.(*Config)
 	client := config.CDNClient
 
@@ -56,7 +57,7 @@ func resourceCDNOriginShieldingRead(ctx context.Context, d *schema.ResourceData,
 
 func resourceCDNOriginShieldingUpdate(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	resourceID := d.Get("resource_id").(int)
-	log.Printf("[DEBUG] Start CDN Origin Shielding updating (id=%s)\n", resourceID)
+	log.Printf("[DEBUG] Start CDN Origin Shielding updating (id=%d)\n", resourceID)
 	config := m.(*Config)
 	client := config.CDNClient
 
@@ -74,7 +75,7 @@ func resourceCDNOriginShieldingUpdate(ctx context.Context, d *schema.ResourceDat
 
 func resourceCDNOriginShieldingDelete(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	resourceID := d.Get("resource_id").(int)
-	log.Printf("[DEBUG] Start CDN Origin Shielding deleting (id=%s)\n", resourceID)
+	log.Printf("[DEBUG] Start CDN Origin Shielding deleting (id=%d)\n", resourceID)
 	config := m.(*Config)
 	client := config.CDNClient
 

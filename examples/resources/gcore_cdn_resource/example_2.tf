@@ -124,6 +124,14 @@ resource "gcore_cdn_resource" "cdn_example_com" {
     proxy_cache_methods_set {
       value = false
     }
+    proxy_connect_timeout {
+      enabled = true
+      value = "1s"
+    }
+    proxy_read_timeout {
+      enabled = true
+      value = "1s"
+    }
     query_params_blacklist {
       enabled = false
       value = [
