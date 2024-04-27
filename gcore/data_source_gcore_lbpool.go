@@ -73,7 +73,7 @@ func dataSourceLBPool() *schema.Resource {
 			"lb_algorithm": &schema.Schema{
 				Type:        schema.TypeString,
 				Computed:    true,
-				Description: fmt.Sprintf("Available values is '%s', '%s', '%s', '%s'", types.LoadBalancerAlgorithmRoundRobin, types.LoadBalancerAlgorithmLeastConnections, types.LoadBalancerAlgorithmSourceIP, types.LoadBalancerAlgorithmSourceIPPort),
+				Description: fmt.Sprintf("Available values is '%s', '%s', '%s'", types.LoadBalancerAlgorithmRoundRobin, types.LoadBalancerAlgorithmLeastConnections, types.LoadBalancerAlgorithmSourceIP),
 			},
 			"protocol": &schema.Schema{
 				Type:        schema.TypeString,

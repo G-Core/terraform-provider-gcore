@@ -57,7 +57,7 @@ output "view" {
 
 - `health_monitor` (List of Object) Health Monitor settings for defining health state of members inside this pool. (see [below for nested schema](#nestedatt--health_monitor))
 - `id` (String) The ID of this resource.
-- `lb_algorithm` (String) Available values is 'ROUND_ROBIN', 'LEAST_CONNECTIONS', 'SOURCE_IP', 'SOURCE_IP_PORT'
+- `lb_algorithm` (String) Available values is 'ROUND_ROBIN', 'LEAST_CONNECTIONS', 'SOURCE_IP'
 - `protocol` (String) Available values are 'HTTP', 'HTTPS', 'TCP', 'UDP', 'PROXY', 'PROXYV2'
 - `session_persistence` (List of Object) Pool session persistence tells the load balancer to attempt to send future requests from a client to the same backend member as the initial request. (see [below for nested schema](#nestedatt--session_persistence))
 
