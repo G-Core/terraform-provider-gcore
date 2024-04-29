@@ -6,6 +6,7 @@ import (
 	"log"
 	"time"
 
+	gcorecloud "github.com/G-Core/gcorelabscloud-go"
 	"github.com/G-Core/gcorelabscloud-go/gcore/loadbalancer/v1/loadbalancers"
 	"github.com/G-Core/gcorelabscloud-go/gcore/loadbalancer/v1/types"
 	"github.com/G-Core/gcorelabscloud-go/gcore/task/v1/tasks"
@@ -24,8 +25,9 @@ func resourceLoadBalancerV2() *schema.Resource {
 		DeleteContext: resourceLoadBalancerDelete,
 		Description:   "Represent load balancer without nested listener",
 		Timeouts: &schema.ResourceTimeout{
-			Create: schema.DefaultTimeout(5 * time.Minute),
-			Delete: schema.DefaultTimeout(5 * time.Minute),
+			Create: schema.DefaultTimeout(LoadBalancerResourceTimeoutMinutes * time.Minute),
+			Delete: schema.DefaultTimeout(LoadBalancerResourceTimeoutMinutes * time.Minute),
+			Update: schema.DefaultTimeout(LoadBalancerResourceTimeoutMinutes * time.Minute),
 		},
 		Importer: &schema.ResourceImporter{
 			StateContext: func(ctx context.Context, d *schema.ResourceData, m interface{}) ([]*schema.ResourceData, error) {
@@ -207,14 +209,18 @@ func resourceLoadBalancerV2Create(ctx context.Context, d *schema.ResourceData, m
 	if len(lbFlavor) != 0 {
 		opts.Flavor = &lbFlavor
 	}
-
-	results, err := loadbalancers.Create(client, opts).Extract()
+	timeout := int(d.Timeout(schema.TimeoutCreate).Seconds())
+	rc := GetConflictRetryConfig(timeout)
+	results, err := loadbalancers.Create(client, opts, &gcorecloud.RequestOpts{
+		ConflictRetryAmount:   rc.Amount,
+		ConflictRetryInterval: rc.Interval,
+	}).Extract()
 	if err != nil {
 		return diag.FromErr(err)
 	}
 
 	taskID := results.Tasks[0]
-	lbID, err := tasks.WaitTaskAndReturnResult(client, taskID, true, LoadBalancerCreateTimeout, func(task tasks.TaskID) (interface{}, error) {
+	lbID, err := tasks.WaitTaskAndReturnResult(client, taskID, true, timeout, func(task tasks.TaskID) (interface{}, error) {
 		taskInfo, err := tasks.Get(client, string(task)).Extract()
 		if err != nil {
 			return nil, fmt.Errorf("cannot get task with ID: %s. Error: %w", task, err)
@@ -332,15 +338,20 @@ func resourceLoadBalancerV2Update(ctx context.Context, d *schema.ResourceData, m
 
 	if d.HasChange("flavor") {
 		flavor := d.Get("flavor").(string)
+		timeout := int(d.Timeout(schema.TimeoutUpdate).Seconds())
+		rc := GetConflictRetryConfig(timeout)
 		results, err := loadbalancers.Resize(client, d.Id(), loadbalancers.ResizeOpts{
 			Flavor: flavor,
+		}, &gcorecloud.RequestOpts{
+			ConflictRetryAmount:   rc.Amount,
+			ConflictRetryInterval: rc.Interval,
 		}).Extract()
 		if err != nil {
 			return diag.FromErr(err)
 		}
 		taskID := results.Tasks[0]
 		log.Printf("[DEBUG] Task id (%s)", taskID)
-		taskState, err := tasks.WaitTaskAndReturnResult(client, taskID, true, LoadBalancerCreateTimeout, func(task tasks.TaskID) (interface{}, error) {
+		taskState, err := tasks.WaitTaskAndReturnResult(client, taskID, true, timeout, func(task tasks.TaskID) (interface{}, error) {
 			taskInfo, err := tasks.Get(client, string(task)).Extract()
 			if err != nil {
 				return nil, fmt.Errorf("cannot get task with ID: %s. Error: %w", task, err)

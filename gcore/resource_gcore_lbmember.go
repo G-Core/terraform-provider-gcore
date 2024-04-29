@@ -17,8 +17,9 @@ import (
 )
 
 const (
-	minWeight = 0
-	maxWeight = 256
+	minWeight                      = 0
+	maxWeight                      = 256
+	LBMemberResourceTimeoutMinutes = 30
 )
 
 func resourceLBMember() *schema.Resource {
@@ -29,8 +30,9 @@ func resourceLBMember() *schema.Resource {
 		DeleteContext: resourceLBMemberDelete,
 		Description:   "Represent load balancer member",
 		Timeouts: &schema.ResourceTimeout{
-			Create: schema.DefaultTimeout(5 * time.Minute),
-			Delete: schema.DefaultTimeout(5 * time.Minute),
+			Create: schema.DefaultTimeout(LBMemberResourceTimeoutMinutes * time.Minute),
+			Delete: schema.DefaultTimeout(LBMemberResourceTimeoutMinutes * time.Minute),
+			Update: schema.DefaultTimeout(LBMemberResourceTimeoutMinutes * time.Minute),
 		},
 		Importer: &schema.ResourceImporter{
 			StateContext: func(ctx context.Context, d *schema.ResourceData, meta interface{}) ([]*schema.ResourceData, error) {
@@ -172,14 +174,18 @@ func resourceLBMemberCreate(ctx context.Context, d *schema.ResourceData, m inter
 		SubnetID:     d.Get("subnet_id").(string),
 		InstanceID:   d.Get("instance_id").(string),
 	}
-
-	results, err := lbpools.CreateMember(client, d.Get("pool_id").(string), opts).Extract()
+	timeout := int(d.Timeout(schema.TimeoutCreate).Seconds())
+	rc := GetConflictRetryConfig(timeout)
+	results, err := lbpools.CreateMember(client, d.Get("pool_id").(string), opts, &gcorecloud.RequestOpts{
+		ConflictRetryAmount:   rc.Amount,
+		ConflictRetryInterval: rc.Interval,
+	}).Extract()
 	if err != nil {
 		return diag.FromErr(err)
 	}
 
 	taskID := results.Tasks[0]
-	pmID, err := tasks.WaitTaskAndReturnResult(client, taskID, true, LBPoolsCreateTimeout, func(task tasks.TaskID) (interface{}, error) {
+	pmID, err := tasks.WaitTaskAndReturnResult(client, taskID, true, timeout, func(task tasks.TaskID) (interface{}, error) {
 		taskInfo, err := tasks.Get(client, string(task)).Extract()
 		if err != nil {
 			return nil, fmt.Errorf("cannot get task with ID: %s. Error: %w", task, err)
@@ -277,13 +283,18 @@ func resourceLBMemberUpdate(ctx context.Context, d *schema.ResourceData, m inter
 	}
 
 	opts := lbpools.UpdateOpts{Name: pool.Name, Members: members}
-	results, err := lbpools.Update(client, pool.ID, opts).Extract()
+	timeout := int(d.Timeout(schema.TimeoutUpdate).Seconds())
+	rc := GetConflictRetryConfig(timeout)
+	results, err := lbpools.Update(client, pool.ID, opts, &gcorecloud.RequestOpts{
+		ConflictRetryAmount:   rc.Amount,
+		ConflictRetryInterval: rc.Interval,
+	}).Extract()
 	if err != nil {
 		return diag.FromErr(err)
 	}
 
 	taskID := results.Tasks[0]
-	_, err = tasks.WaitTaskAndReturnResult(client, taskID, true, LBPoolsCreateTimeout, func(task tasks.TaskID) (interface{}, error) {
+	_, err = tasks.WaitTaskAndReturnResult(client, taskID, true, timeout, func(task tasks.TaskID) (interface{}, error) {
 		taskInfo, err := tasks.Get(client, string(task)).Extract()
 		if err != nil {
 			return nil, fmt.Errorf("cannot get task with ID: %s. Error: %w", task, err)
@@ -316,7 +327,12 @@ func resourceLBMemberDelete(ctx context.Context, d *schema.ResourceData, m inter
 
 	mid := d.Id()
 	pid := d.Get("pool_id").(string)
-	results, err := lbpools.DeleteMember(client, pid, mid).Extract()
+	timeout := int(d.Timeout(schema.TimeoutDelete).Seconds())
+	rc := GetConflictRetryConfig(timeout)
+	results, err := lbpools.DeleteMember(client, pid, mid, &gcorecloud.RequestOpts{
+		ConflictRetryAmount:   rc.Amount,
+		ConflictRetryInterval: rc.Interval,
+	}).Extract()
 	if err != nil {
 		switch err.(type) {
 		case gcorecloud.ErrDefault404:
@@ -329,7 +345,7 @@ func resourceLBMemberDelete(ctx context.Context, d *schema.ResourceData, m inter
 	}
 
 	taskID := results.Tasks[0]
-	_, err = tasks.WaitTaskAndReturnResult(client, taskID, true, LBPoolsCreateTimeout, func(task tasks.TaskID) (interface{}, error) {
+	_, err = tasks.WaitTaskAndReturnResult(client, taskID, true, timeout, func(task tasks.TaskID) (interface{}, error) {
 		pool, err := lbpools.Get(client, pid).Extract()
 		if err != nil {
 			return nil, err

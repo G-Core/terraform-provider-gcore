@@ -9,6 +9,7 @@ import (
 	"log"
 	"net"
 	"net/url"
+	"os"
 	"reflect"
 	"strconv"
 	"strings"
@@ -44,6 +45,8 @@ const (
 
 	projectPoint = "projects"
 	regionPoint  = "regions"
+
+	ConflictRetryInterval = 10
 )
 
 type Config struct {
@@ -71,6 +74,11 @@ type Region struct {
 type Regions struct {
 	Count   int      `json:"count"`
 	Results []Region `json:"results"`
+}
+
+type ConflictRetryConfig struct {
+	Amount   int
+	Interval int
 }
 
 var config = &mapstructure.DecoderConfig{
@@ -895,4 +903,31 @@ func toString(v any) (s string, typ dataTypeValidation) {
 		return v.(string), dtvString
 	}
 	return ``, dtvNotString
+}
+
+func getIntEnvOrDefault(key string, defaultValue int) int {
+	envVal := os.Getenv(key)
+	if envVal == "" {
+		return defaultValue
+	}
+	val, err := strconv.Atoi(envVal)
+	if err != nil {
+		return defaultValue
+	}
+	return val
+}
+
+func GetConflictRetryConfig(resourceTimeoutSeconds int) ConflictRetryConfig {
+	interval := getIntEnvOrDefault("TF_CONFLICT_RETRY_INTERVAL_SECONDS", ConflictRetryInterval)
+	var amount int
+	if interval != 0 {
+		amount = resourceTimeoutSeconds / interval
+	} else {
+		amount = 0
+	}
+
+	return ConflictRetryConfig{
+		Amount:   amount,
+		Interval: interval,
+	}
 }

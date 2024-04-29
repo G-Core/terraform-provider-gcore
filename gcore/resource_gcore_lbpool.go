@@ -17,8 +17,8 @@ import (
 )
 
 const (
-	LBPoolsPoint         = "lbpools"
-	LBPoolsCreateTimeout = 2400
+	LBPoolsPoint                  = "lbpools"
+	LBPoolsResourceTimeoutMinutes = 30
 )
 
 func resourceLBPool() *schema.Resource {
@@ -29,8 +29,9 @@ func resourceLBPool() *schema.Resource {
 		DeleteContext: resourceLBPoolDelete,
 		Description:   "Represent load balancer listener pool. A pool is a list of virtual machines to which the listener will redirect incoming traffic",
 		Timeouts: &schema.ResourceTimeout{
-			Create: schema.DefaultTimeout(5 * time.Minute),
-			Delete: schema.DefaultTimeout(5 * time.Minute),
+			Create: schema.DefaultTimeout(LBPoolsResourceTimeoutMinutes * time.Minute),
+			Delete: schema.DefaultTimeout(LBPoolsResourceTimeoutMinutes * time.Minute),
+			Update: schema.DefaultTimeout(LBPoolsResourceTimeoutMinutes * time.Minute),
 		},
 
 		Importer: &schema.ResourceImporter{
@@ -265,14 +266,18 @@ func resourceLBPoolCreate(ctx context.Context, d *schema.ResourceData, m interfa
 		HealthMonitor:      healthOpts,
 		SessionPersistence: sessionOpts,
 	}
-
-	results, err := lbpools.Create(client, opts).Extract()
+	timeout := int(d.Timeout(schema.TimeoutCreate).Seconds())
+	rc := GetConflictRetryConfig(timeout)
+	results, err := lbpools.Create(client, opts, &gcorecloud.RequestOpts{
+		ConflictRetryAmount:   rc.Amount,
+		ConflictRetryInterval: rc.Interval,
+	}).Extract()
 	if err != nil {
 		return diag.FromErr(err)
 	}
 
 	taskID := results.Tasks[0]
-	lbPoolID, err := tasks.WaitTaskAndReturnResult(client, taskID, true, LBPoolsCreateTimeout, func(task tasks.TaskID) (interface{}, error) {
+	lbPoolID, err := tasks.WaitTaskAndReturnResult(client, taskID, true, timeout, func(task tasks.TaskID) (interface{}, error) {
 		taskInfo, err := tasks.Get(client, string(task)).Extract()
 		if err != nil {
 			return nil, fmt.Errorf("cannot get task with ID: %s. Error: %w", task, err)
@@ -374,6 +379,8 @@ func resourceLBPoolUpdate(ctx context.Context, d *schema.ResourceData, m interfa
 
 	var change bool
 	opts := lbpools.UpdateOpts{Name: d.Get("name").(string)}
+	timeout := int(d.Timeout(schema.TimeoutUpdate).Seconds())
+	rc := GetConflictRetryConfig(timeout)
 
 	if d.HasChange("lb_algorithm") {
 		opts.LBPoolAlgorithm = types.LoadBalancerAlgorithm(d.Get("lb_algorithm").(string))
@@ -383,7 +390,10 @@ func resourceLBPoolUpdate(ctx context.Context, d *schema.ResourceData, m interfa
 	if d.HasChange("health_monitor") {
 		opts.HealthMonitor = extractHealthMonitorMap(d)
 		if opts.HealthMonitor == nil {
-			lbpools.DeleteHealthMonitor(client, d.Id())
+			lbpools.DeleteHealthMonitor(client, d.Id(), &gcorecloud.RequestOpts{
+				ConflictRetryAmount:   rc.Amount,
+				ConflictRetryInterval: rc.Interval,
+			})
 		} else {
 			change = true
 		}
@@ -392,18 +402,24 @@ func resourceLBPoolUpdate(ctx context.Context, d *schema.ResourceData, m interfa
 	if d.HasChange("session_persistence") {
 		opts.SessionPersistence = extractSessionPersistenceMap(d)
 		if opts.SessionPersistence == nil {
-			results, err := lbpools.Unset(client, d.Id(), lbpools.UnsetOpts{SessionPersistence: true}).Extract()
+			results, err := lbpools.Unset(client, d.Id(), lbpools.UnsetOpts{SessionPersistence: true}, &gcorecloud.RequestOpts{
+				ConflictRetryAmount:   rc.Amount,
+				ConflictRetryInterval: rc.Interval,
+			}).Extract()
 			if err != nil {
 				return diag.FromErr(err)
 			}
 			taskID := results.Tasks[0]
-			_, err = tasks.WaitTaskAndReturnResult(client, taskID, true, LBPoolsCreateTimeout, func(task tasks.TaskID) (interface{}, error) {
+			_, err = tasks.WaitTaskAndReturnResult(client, taskID, true, timeout, func(task tasks.TaskID) (interface{}, error) {
 				_, err := tasks.Get(client, string(task)).Extract()
 				if err != nil {
 					return nil, fmt.Errorf("cannot get task with ID: %s. Error: %w", task, err)
 				}
 				return nil, nil
 			})
+			if err != nil {
+				return diag.FromErr(err)
+			}
 		} else {
 			change = true
 		}
@@ -414,13 +430,16 @@ func resourceLBPoolUpdate(ctx context.Context, d *schema.ResourceData, m interfa
 		return resourceLBPoolRead(ctx, d, m)
 	}
 
-	results, err := lbpools.Update(client, d.Id(), opts).Extract()
+	results, err := lbpools.Update(client, d.Id(), opts, &gcorecloud.RequestOpts{
+		ConflictRetryAmount:   rc.Amount,
+		ConflictRetryInterval: rc.Interval,
+	}).Extract()
 	if err != nil {
 		return diag.FromErr(err)
 	}
 
 	taskID := results.Tasks[0]
-	_, err = tasks.WaitTaskAndReturnResult(client, taskID, true, LBPoolsCreateTimeout, func(task tasks.TaskID) (interface{}, error) {
+	_, err = tasks.WaitTaskAndReturnResult(client, taskID, true, int(d.Timeout(schema.TimeoutUpdate).Seconds()), func(task tasks.TaskID) (interface{}, error) {
 		_, err := tasks.Get(client, string(task)).Extract()
 		if err != nil {
 			return nil, fmt.Errorf("cannot get task with ID: %s. Error: %w", task, err)
@@ -447,9 +466,13 @@ func resourceLBPoolDelete(ctx context.Context, d *schema.ResourceData, m interfa
 	if err != nil {
 		return diag.FromErr(err)
 	}
-
+	timeout := int(d.Timeout(schema.TimeoutDelete).Seconds())
+	rc := GetConflictRetryConfig(timeout)
 	id := d.Id()
-	results, err := lbpools.Delete(client, id).Extract()
+	results, err := lbpools.Delete(client, id, &gcorecloud.RequestOpts{
+		ConflictRetryAmount:   rc.Amount,
+		ConflictRetryInterval: rc.Interval,
+	}).Extract()
 	if err != nil {
 		switch err.(type) {
 		case gcorecloud.ErrDefault404:
@@ -459,7 +482,7 @@ func resourceLBPoolDelete(ctx context.Context, d *schema.ResourceData, m interfa
 	}
 
 	taskID := results.Tasks[0]
-	_, err = tasks.WaitTaskAndReturnResult(client, taskID, true, LBPoolsCreateTimeout, func(task tasks.TaskID) (interface{}, error) {
+	_, err = tasks.WaitTaskAndReturnResult(client, taskID, true, timeout, func(task tasks.TaskID) (interface{}, error) {
 		_, err := lbpools.Get(client, id).Extract()
 		if err == nil {
 			return nil, fmt.Errorf("cannot delete LBPool with ID: %s", id)

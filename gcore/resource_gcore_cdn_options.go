@@ -510,8 +510,8 @@ var (
 						Default:  true,
 					},
 					"value": {
-						Type:     schema.TypeString,
-						Required: true,
+						Type:        schema.TypeString,
+						Required:    true,
 						Description: "Specify time in seconds ('1s', '30s' for example).",
 					},
 				},
@@ -531,8 +531,8 @@ var (
 						Default:  true,
 					},
 					"value": {
-						Type:     schema.TypeString,
-						Required: true,
+						Type:        schema.TypeString,
+						Required:    true,
 						Description: "Specify time in seconds ('1s', '30s' for example).",
 					},
 				},

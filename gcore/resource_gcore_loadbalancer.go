@@ -19,8 +19,8 @@ import (
 )
 
 const (
-	LoadBalancersPoint        = "loadbalancers"
-	LoadBalancerCreateTimeout = 2400
+	LoadBalancersPoint                 = "loadbalancers"
+	LoadBalancerResourceTimeoutMinutes = 30
 )
 
 func resourceLoadBalancer() *schema.Resource {
@@ -32,8 +32,9 @@ func resourceLoadBalancer() *schema.Resource {
 		DeleteContext:      resourceLoadBalancerDelete,
 		Description:        "Represent load balancer",
 		Timeouts: &schema.ResourceTimeout{
-			Create: schema.DefaultTimeout(5 * time.Minute),
-			Delete: schema.DefaultTimeout(5 * time.Minute),
+			Create: schema.DefaultTimeout(LoadBalancerResourceTimeoutMinutes * time.Minute),
+			Delete: schema.DefaultTimeout(LoadBalancerResourceTimeoutMinutes * time.Minute),
+			Update: schema.DefaultTimeout(LoadBalancerResourceTimeoutMinutes * time.Minute),
 		},
 		Importer: &schema.ResourceImporter{
 			StateContext: func(ctx context.Context, d *schema.ResourceData, m interface{}) ([]*schema.ResourceData, error) {
@@ -351,13 +352,13 @@ func resourceLoadBalancerUpdate(ctx context.Context, d *schema.ResourceData, m i
 			oldListener["protocol_port"].(int) != newListener["protocol_port"].(int) {
 			// if protocol or port changed listener need to be recreated
 			// delete at first
-			results, err := listeners.Delete(client, listenerID).Extract()
+			results, err := listeners.Delete(client, listenerID, nil).Extract()
 			if err != nil {
 				return diag.FromErr(err)
 			}
 
 			taskID := results.Tasks[0]
-			_, err = tasks.WaitTaskAndReturnResult(client, taskID, true, LBListenerCreateTimeout, func(task tasks.TaskID) (interface{}, error) {
+			_, err = tasks.WaitTaskAndReturnResult(client, taskID, true, int(d.Timeout(schema.TimeoutUpdate).Seconds()), func(task tasks.TaskID) (interface{}, error) {
 				_, err := listeners.Get(client, listenerID).Extract()
 				if err == nil {
 					return nil, fmt.Errorf("cannot delete LBListener with ID: %s", listenerID)
@@ -390,13 +391,13 @@ func resourceLoadBalancerUpdate(ctx context.Context, d *schema.ResourceData, m i
 				opts.SNISecretID = sniSecretID
 			}
 
-			results, err = listeners.Create(client, opts).Extract()
+			results, err = listeners.Create(client, opts, nil).Extract()
 			if err != nil {
 				return diag.FromErr(err)
 			}
 
 			taskID = results.Tasks[0]
-			_, err = tasks.WaitTaskAndReturnResult(client, taskID, true, LBListenerCreateTimeout, func(task tasks.TaskID) (interface{}, error) {
+			_, err = tasks.WaitTaskAndReturnResult(client, taskID, true, int(d.Timeout(schema.TimeoutUpdate).Seconds()), func(task tasks.TaskID) (interface{}, error) {
 				taskInfo, err := tasks.Get(client, string(task)).Extract()
 				if err != nil {
 					return nil, fmt.Errorf("cannot get task with ID: %s. Error: %w", task, err)
@@ -421,7 +422,7 @@ func resourceLoadBalancerUpdate(ctx context.Context, d *schema.ResourceData, m i
 				sniSecretID[i] = s.(string)
 			}
 			opts.SNISecretID = sniSecretID
-			if _, err := listeners.Update(client, listenerID, opts).Extract(); err != nil {
+			if _, err := listeners.Update(client, listenerID, opts, &gcorecloud.RequestOpts{}).Extract(); err != nil {
 				return diag.FromErr(err)
 			}
 		}
@@ -457,13 +458,18 @@ func resourceLoadBalancerDelete(ctx context.Context, d *schema.ResourceData, m i
 	}
 
 	id := d.Id()
-	results, err := loadbalancers.Delete(client, id).Extract()
+	timeout := int(d.Timeout(schema.TimeoutDelete).Seconds())
+	rc := GetConflictRetryConfig(timeout)
+	results, err := loadbalancers.Delete(client, id, &gcorecloud.RequestOpts{
+		ConflictRetryAmount:   rc.Amount,
+		ConflictRetryInterval: rc.Interval,
+	}).Extract()
 	if err != nil {
 		return diag.FromErr(err)
 	}
 
 	taskID := results.Tasks[0]
-	_, err = tasks.WaitTaskAndReturnResult(client, taskID, true, LoadBalancerCreateTimeout, func(task tasks.TaskID) (interface{}, error) {
+	_, err = tasks.WaitTaskAndReturnResult(client, taskID, true, timeout, func(task tasks.TaskID) (interface{}, error) {
 		_, err := loadbalancers.Get(client, id, nil).Extract()
 		if err == nil {
 			return nil, fmt.Errorf("cannot delete loadbalancer with ID: %s", id)
