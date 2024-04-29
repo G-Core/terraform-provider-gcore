@@ -260,7 +260,11 @@ func resourceSubnetCreate(ctx context.Context, d *schema.ResourceData, m interfa
 	}
 
 	log.Printf("Create subnet ops: %+v", createOpts)
-	results, err := subnets.Create(client, createOpts).Extract()
+	rc := GetConflictRetryConfig()
+	results, err := subnets.Create(client, createOpts, &gcorecloud.RequestOpts{
+		ConflictRetryAmount:   rc.Amount,
+		ConflictRetryInterval: rc.Interval,
+	}).Extract()
 	if err != nil {
 		return diag.FromErr(err)
 	}
@@ -450,7 +454,11 @@ func resourceSubnetDelete(ctx context.Context, d *schema.ResourceData, m interfa
 		return diag.FromErr(err)
 	}
 
-	results, err := subnets.Delete(client, subnetID).Extract()
+	rc := GetConflictRetryConfig()
+	results, err := subnets.Delete(client, subnetID, &gcorecloud.RequestOpts{
+		ConflictRetryAmount:   rc.Amount,
+		ConflictRetryInterval: rc.Interval,
+	}).Extract()
 	if err != nil {
 		return diag.FromErr(err)
 	}

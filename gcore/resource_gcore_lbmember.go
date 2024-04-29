@@ -172,8 +172,11 @@ func resourceLBMemberCreate(ctx context.Context, d *schema.ResourceData, m inter
 		SubnetID:     d.Get("subnet_id").(string),
 		InstanceID:   d.Get("instance_id").(string),
 	}
-
-	results, err := lbpools.CreateMember(client, d.Get("pool_id").(string), opts).Extract()
+	rc := GetConflictRetryConfig()
+	results, err := lbpools.CreateMember(client, d.Get("pool_id").(string), opts, &gcorecloud.RequestOpts{
+		ConflictRetryAmount:   rc.Amount,
+		ConflictRetryInterval: rc.Interval,
+	}).Extract()
 	if err != nil {
 		return diag.FromErr(err)
 	}
@@ -277,7 +280,11 @@ func resourceLBMemberUpdate(ctx context.Context, d *schema.ResourceData, m inter
 	}
 
 	opts := lbpools.UpdateOpts{Name: pool.Name, Members: members}
-	results, err := lbpools.Update(client, pool.ID, opts).Extract()
+	rc := GetConflictRetryConfig()
+	results, err := lbpools.Update(client, pool.ID, opts, &gcorecloud.RequestOpts{
+		ConflictRetryAmount:   rc.Amount,
+		ConflictRetryInterval: rc.Interval,
+	}).Extract()
 	if err != nil {
 		return diag.FromErr(err)
 	}
@@ -316,7 +323,11 @@ func resourceLBMemberDelete(ctx context.Context, d *schema.ResourceData, m inter
 
 	mid := d.Id()
 	pid := d.Get("pool_id").(string)
-	results, err := lbpools.DeleteMember(client, pid, mid).Extract()
+	rc := GetConflictRetryConfig()
+	results, err := lbpools.DeleteMember(client, pid, mid, &gcorecloud.RequestOpts{
+		ConflictRetryAmount:   rc.Amount,
+		ConflictRetryInterval: rc.Interval,
+	}).Extract()
 	if err != nil {
 		switch err.(type) {
 		case gcorecloud.ErrDefault404:

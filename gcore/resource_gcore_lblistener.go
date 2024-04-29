@@ -285,7 +285,11 @@ func resourceLBListenerCreate(ctx context.Context, d *schema.ResourceData, m int
 		opts.UserList = userList
 	}
 
-	results, err := listeners.Create(client, opts).Extract()
+	rc := GetConflictRetryConfig()
+	results, err := listeners.Create(client, opts, &gcorecloud.RequestOpts{
+		ConflictRetryAmount:   rc.Amount,
+		ConflictRetryInterval: rc.Interval,
+	}).Extract()
 	if err != nil {
 		return diag.FromErr(err)
 	}
@@ -441,7 +445,11 @@ func resourceLBListenerUpdate(ctx context.Context, d *schema.ResourceData, m int
 	}
 
 	if changed {
-		_, err = listeners.Update(clientV2, d.Id(), updateOpts).Extract()
+		rc := GetConflictRetryConfig()
+		_, err = listeners.Update(clientV2, d.Id(), updateOpts, &gcorecloud.RequestOpts{
+			ConflictRetryAmount:   rc.Amount,
+			ConflictRetryInterval: rc.Interval,
+		}).Extract()
 		if err != nil {
 			return diag.FromErr(err)
 		}
@@ -458,7 +466,10 @@ func resourceLBListenerUpdate(ctx context.Context, d *schema.ResourceData, m int
 			if err != nil {
 				return diag.Errorf("Error waiting for loadbalancer (%s): %s", d.Get("loadbalancer_id").(string), err)
 			}
-			_, err := listeners.Unset(clientV2, d.Id(), unsetOpts).Extract()
+			_, err := listeners.Unset(clientV2, d.Id(), unsetOpts, &gcorecloud.RequestOpts{
+				ConflictRetryAmount:   rc.Amount,
+				ConflictRetryInterval: rc.Interval,
+			}).Extract()
 			if err != nil {
 				return diag.FromErr(err)
 			}
@@ -483,7 +494,11 @@ func resourceLBListenerDelete(ctx context.Context, d *schema.ResourceData, m int
 	}
 
 	id := d.Id()
-	results, err := listeners.Delete(client, id).Extract()
+	rc := GetConflictRetryConfig()
+	results, err := listeners.Delete(client, id, &gcorecloud.RequestOpts{
+		ConflictRetryAmount:   rc.Amount,
+		ConflictRetryInterval: rc.Interval,
+	}).Extract()
 	if err != nil {
 		return diag.FromErr(err)
 	}

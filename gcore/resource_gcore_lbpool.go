@@ -266,7 +266,11 @@ func resourceLBPoolCreate(ctx context.Context, d *schema.ResourceData, m interfa
 		SessionPersistence: sessionOpts,
 	}
 
-	results, err := lbpools.Create(client, opts).Extract()
+	rc := GetConflictRetryConfig()
+	results, err := lbpools.Create(client, opts, &gcorecloud.RequestOpts{
+		ConflictRetryAmount:   rc.Amount,
+		ConflictRetryInterval: rc.Interval,
+	}).Extract()
 	if err != nil {
 		return diag.FromErr(err)
 	}
@@ -374,6 +378,7 @@ func resourceLBPoolUpdate(ctx context.Context, d *schema.ResourceData, m interfa
 
 	var change bool
 	opts := lbpools.UpdateOpts{Name: d.Get("name").(string)}
+	rc := GetConflictRetryConfig()
 
 	if d.HasChange("lb_algorithm") {
 		opts.LBPoolAlgorithm = types.LoadBalancerAlgorithm(d.Get("lb_algorithm").(string))
@@ -383,7 +388,10 @@ func resourceLBPoolUpdate(ctx context.Context, d *schema.ResourceData, m interfa
 	if d.HasChange("health_monitor") {
 		opts.HealthMonitor = extractHealthMonitorMap(d)
 		if opts.HealthMonitor == nil {
-			lbpools.DeleteHealthMonitor(client, d.Id())
+			lbpools.DeleteHealthMonitor(client, d.Id(), &gcorecloud.RequestOpts{
+				ConflictRetryAmount:   rc.Amount,
+				ConflictRetryInterval: rc.Interval,
+			})
 		} else {
 			change = true
 		}
@@ -392,7 +400,10 @@ func resourceLBPoolUpdate(ctx context.Context, d *schema.ResourceData, m interfa
 	if d.HasChange("session_persistence") {
 		opts.SessionPersistence = extractSessionPersistenceMap(d)
 		if opts.SessionPersistence == nil {
-			results, err := lbpools.Unset(client, d.Id(), lbpools.UnsetOpts{SessionPersistence: true}).Extract()
+			results, err := lbpools.Unset(client, d.Id(), lbpools.UnsetOpts{SessionPersistence: true}, &gcorecloud.RequestOpts{
+				ConflictRetryAmount:   rc.Amount,
+				ConflictRetryInterval: rc.Interval,
+			}).Extract()
 			if err != nil {
 				return diag.FromErr(err)
 			}
@@ -414,7 +425,10 @@ func resourceLBPoolUpdate(ctx context.Context, d *schema.ResourceData, m interfa
 		return resourceLBPoolRead(ctx, d, m)
 	}
 
-	results, err := lbpools.Update(client, d.Id(), opts).Extract()
+	results, err := lbpools.Update(client, d.Id(), opts, &gcorecloud.RequestOpts{
+		ConflictRetryAmount:   rc.Amount,
+		ConflictRetryInterval: rc.Interval,
+	}).Extract()
 	if err != nil {
 		return diag.FromErr(err)
 	}
@@ -448,8 +462,12 @@ func resourceLBPoolDelete(ctx context.Context, d *schema.ResourceData, m interfa
 		return diag.FromErr(err)
 	}
 
+	rc := GetConflictRetryConfig()
 	id := d.Id()
-	results, err := lbpools.Delete(client, id).Extract()
+	results, err := lbpools.Delete(client, id, &gcorecloud.RequestOpts{
+		ConflictRetryAmount:   rc.Amount,
+		ConflictRetryInterval: rc.Interval,
+	}).Extract()
 	if err != nil {
 		switch err.(type) {
 		case gcorecloud.ErrDefault404:

@@ -351,7 +351,7 @@ func resourceLoadBalancerUpdate(ctx context.Context, d *schema.ResourceData, m i
 			oldListener["protocol_port"].(int) != newListener["protocol_port"].(int) {
 			// if protocol or port changed listener need to be recreated
 			// delete at first
-			results, err := listeners.Delete(client, listenerID).Extract()
+			results, err := listeners.Delete(client, listenerID, nil).Extract()
 			if err != nil {
 				return diag.FromErr(err)
 			}
@@ -390,7 +390,7 @@ func resourceLoadBalancerUpdate(ctx context.Context, d *schema.ResourceData, m i
 				opts.SNISecretID = sniSecretID
 			}
 
-			results, err = listeners.Create(client, opts).Extract()
+			results, err = listeners.Create(client, opts, nil).Extract()
 			if err != nil {
 				return diag.FromErr(err)
 			}
@@ -421,7 +421,7 @@ func resourceLoadBalancerUpdate(ctx context.Context, d *schema.ResourceData, m i
 				sniSecretID[i] = s.(string)
 			}
 			opts.SNISecretID = sniSecretID
-			if _, err := listeners.Update(client, listenerID, opts).Extract(); err != nil {
+			if _, err := listeners.Update(client, listenerID, opts, &gcorecloud.RequestOpts{}).Extract(); err != nil {
 				return diag.FromErr(err)
 			}
 		}
@@ -457,7 +457,7 @@ func resourceLoadBalancerDelete(ctx context.Context, d *schema.ResourceData, m i
 	}
 
 	id := d.Id()
-	results, err := loadbalancers.Delete(client, id).Extract()
+	results, err := loadbalancers.Delete(client, id, nil).Extract()
 	if err != nil {
 		return diag.FromErr(err)
 	}
