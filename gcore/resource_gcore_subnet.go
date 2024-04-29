@@ -20,6 +20,7 @@ import (
 
 const SubnetDeleting int = 1200
 const SubnetCreatingTimeout int = 1200
+const SubnetResourceTimeoutMinutes = 5
 const subnetPoint = "subnets"
 
 func resourceSubnet() *schema.Resource {
@@ -29,6 +30,10 @@ func resourceSubnet() *schema.Resource {
 		UpdateContext: resourceSubnetUpdate,
 		DeleteContext: resourceSubnetDelete,
 		Description:   "Represent subnets. Subnetwork is a range of IP addresses in a cloud network. Addresses from this range will be assigned to machines in the cloud.",
+		Timeouts: &schema.ResourceTimeout{
+			Create: schema.DefaultTimeout(SubnetResourceTimeoutMinutes * time.Minute),
+			Delete: schema.DefaultTimeout(SubnetResourceTimeoutMinutes * time.Minute),
+		},
 		Importer: &schema.ResourceImporter{
 			StateContext: func(ctx context.Context, d *schema.ResourceData, meta interface{}) ([]*schema.ResourceData, error) {
 				projectID, regionID, subnetID, err := ImportStringParser(d.Id())
@@ -260,7 +265,7 @@ func resourceSubnetCreate(ctx context.Context, d *schema.ResourceData, m interfa
 	}
 
 	log.Printf("Create subnet ops: %+v", createOpts)
-	rc := GetConflictRetryConfig()
+	rc := GetConflictRetryConfig(SubnetResourceTimeoutMinutes)
 	results, err := subnets.Create(client, createOpts, &gcorecloud.RequestOpts{
 		ConflictRetryAmount:   rc.Amount,
 		ConflictRetryInterval: rc.Interval,
@@ -454,7 +459,7 @@ func resourceSubnetDelete(ctx context.Context, d *schema.ResourceData, m interfa
 		return diag.FromErr(err)
 	}
 
-	rc := GetConflictRetryConfig()
+	rc := GetConflictRetryConfig(SubnetResourceTimeoutMinutes)
 	results, err := subnets.Delete(client, subnetID, &gcorecloud.RequestOpts{
 		ConflictRetryAmount:   rc.Amount,
 		ConflictRetryInterval: rc.Interval,

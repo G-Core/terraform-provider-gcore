@@ -918,9 +918,11 @@ func getIntEnvOrDefault(key string, defaultValue int) int {
 	return val
 }
 
-func GetConflictRetryConfig() ConflictRetryConfig {
+func GetConflictRetryConfig(resourceTimeoutMinutes int) ConflictRetryConfig {
+	interval := getIntEnvOrDefault("TF_CONFLICT_RETRY_INTERVAL_SECONDS", ConflictRetryInterval)
+	amount := resourceTimeoutMinutes * 60 / interval
 	return ConflictRetryConfig{
-		Amount:   getIntEnvOrDefault("TF_CONFLICT_RETRY_AMOUNT", ConflictRetryAmount),
-		Interval: getIntEnvOrDefault("TF_CONFLICT_RETRY_INTERVAL", ConflictRetryInterval),
+		Amount:   amount,
+		Interval: interval,
 	}
 }

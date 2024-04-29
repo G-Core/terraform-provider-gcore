@@ -18,8 +18,9 @@ import (
 )
 
 const (
-	LBListenersPoint        = "lblisteners"
-	LBListenerCreateTimeout = 2400
+	LBListenersPoint                 = "lblisteners"
+	LBListenerCreateTimeout          = 2400
+	LBListenerResourceTimeoutMinutes = 30
 
 	LoadbalancerProvisioningStatusActive = "ACTIVE"
 )
@@ -32,8 +33,8 @@ func resourceLbListener() *schema.Resource {
 		DeleteContext: resourceLBListenerDelete,
 		Description:   "Represent load balancer listener. Can not be created without load balancer. A listener is a process that checks for connection requests, using the protocol and port that you configure",
 		Timeouts: &schema.ResourceTimeout{
-			Create: schema.DefaultTimeout(5 * time.Minute),
-			Delete: schema.DefaultTimeout(5 * time.Minute),
+			Create: schema.DefaultTimeout(LBListenerResourceTimeoutMinutes * time.Minute),
+			Delete: schema.DefaultTimeout(LBListenerResourceTimeoutMinutes * time.Minute),
 		},
 		Importer: &schema.ResourceImporter{
 			StateContext: func(ctx context.Context, d *schema.ResourceData, meta interface{}) ([]*schema.ResourceData, error) {
@@ -285,7 +286,7 @@ func resourceLBListenerCreate(ctx context.Context, d *schema.ResourceData, m int
 		opts.UserList = userList
 	}
 
-	rc := GetConflictRetryConfig()
+	rc := GetConflictRetryConfig(LBListenerResourceTimeoutMinutes)
 	results, err := listeners.Create(client, opts, &gcorecloud.RequestOpts{
 		ConflictRetryAmount:   rc.Amount,
 		ConflictRetryInterval: rc.Interval,
@@ -445,7 +446,7 @@ func resourceLBListenerUpdate(ctx context.Context, d *schema.ResourceData, m int
 	}
 
 	if changed {
-		rc := GetConflictRetryConfig()
+		rc := GetConflictRetryConfig(LBListenerResourceTimeoutMinutes)
 		_, err = listeners.Update(clientV2, d.Id(), updateOpts, &gcorecloud.RequestOpts{
 			ConflictRetryAmount:   rc.Amount,
 			ConflictRetryInterval: rc.Interval,
@@ -494,7 +495,7 @@ func resourceLBListenerDelete(ctx context.Context, d *schema.ResourceData, m int
 	}
 
 	id := d.Id()
-	rc := GetConflictRetryConfig()
+	rc := GetConflictRetryConfig(LBListenerResourceTimeoutMinutes)
 	results, err := listeners.Delete(client, id, &gcorecloud.RequestOpts{
 		ConflictRetryAmount:   rc.Amount,
 		ConflictRetryInterval: rc.Interval,

@@ -17,8 +17,9 @@ import (
 )
 
 const (
-	LBPoolsPoint         = "lbpools"
-	LBPoolsCreateTimeout = 2400
+	LBPoolsPoint                  = "lbpools"
+	LBPoolsCreateTimeout          = 2400
+	LBPoolsResourceTimeoutMinutes = 30
 )
 
 func resourceLBPool() *schema.Resource {
@@ -29,8 +30,8 @@ func resourceLBPool() *schema.Resource {
 		DeleteContext: resourceLBPoolDelete,
 		Description:   "Represent load balancer listener pool. A pool is a list of virtual machines to which the listener will redirect incoming traffic",
 		Timeouts: &schema.ResourceTimeout{
-			Create: schema.DefaultTimeout(5 * time.Minute),
-			Delete: schema.DefaultTimeout(5 * time.Minute),
+			Create: schema.DefaultTimeout(LBPoolsResourceTimeoutMinutes * time.Minute),
+			Delete: schema.DefaultTimeout(LBPoolsResourceTimeoutMinutes * time.Minute),
 		},
 
 		Importer: &schema.ResourceImporter{
@@ -266,7 +267,7 @@ func resourceLBPoolCreate(ctx context.Context, d *schema.ResourceData, m interfa
 		SessionPersistence: sessionOpts,
 	}
 
-	rc := GetConflictRetryConfig()
+	rc := GetConflictRetryConfig(LBPoolsResourceTimeoutMinutes)
 	results, err := lbpools.Create(client, opts, &gcorecloud.RequestOpts{
 		ConflictRetryAmount:   rc.Amount,
 		ConflictRetryInterval: rc.Interval,
@@ -378,7 +379,7 @@ func resourceLBPoolUpdate(ctx context.Context, d *schema.ResourceData, m interfa
 
 	var change bool
 	opts := lbpools.UpdateOpts{Name: d.Get("name").(string)}
-	rc := GetConflictRetryConfig()
+	rc := GetConflictRetryConfig(LBPoolsResourceTimeoutMinutes)
 
 	if d.HasChange("lb_algorithm") {
 		opts.LBPoolAlgorithm = types.LoadBalancerAlgorithm(d.Get("lb_algorithm").(string))
@@ -462,7 +463,7 @@ func resourceLBPoolDelete(ctx context.Context, d *schema.ResourceData, m interfa
 		return diag.FromErr(err)
 	}
 
-	rc := GetConflictRetryConfig()
+	rc := GetConflictRetryConfig(LBPoolsResourceTimeoutMinutes)
 	id := d.Id()
 	results, err := lbpools.Delete(client, id, &gcorecloud.RequestOpts{
 		ConflictRetryAmount:   rc.Amount,

@@ -17,8 +17,9 @@ import (
 )
 
 const (
-	minWeight = 0
-	maxWeight = 256
+	minWeight                      = 0
+	maxWeight                      = 256
+	LBMemberResourceTimeoutMinutes = 30
 )
 
 func resourceLBMember() *schema.Resource {
@@ -29,8 +30,8 @@ func resourceLBMember() *schema.Resource {
 		DeleteContext: resourceLBMemberDelete,
 		Description:   "Represent load balancer member",
 		Timeouts: &schema.ResourceTimeout{
-			Create: schema.DefaultTimeout(5 * time.Minute),
-			Delete: schema.DefaultTimeout(5 * time.Minute),
+			Create: schema.DefaultTimeout(LBMemberResourceTimeoutMinutes * time.Minute),
+			Delete: schema.DefaultTimeout(LBMemberResourceTimeoutMinutes * time.Minute),
 		},
 		Importer: &schema.ResourceImporter{
 			StateContext: func(ctx context.Context, d *schema.ResourceData, meta interface{}) ([]*schema.ResourceData, error) {
@@ -172,7 +173,7 @@ func resourceLBMemberCreate(ctx context.Context, d *schema.ResourceData, m inter
 		SubnetID:     d.Get("subnet_id").(string),
 		InstanceID:   d.Get("instance_id").(string),
 	}
-	rc := GetConflictRetryConfig()
+	rc := GetConflictRetryConfig(LBMemberResourceTimeoutMinutes)
 	results, err := lbpools.CreateMember(client, d.Get("pool_id").(string), opts, &gcorecloud.RequestOpts{
 		ConflictRetryAmount:   rc.Amount,
 		ConflictRetryInterval: rc.Interval,
@@ -280,7 +281,7 @@ func resourceLBMemberUpdate(ctx context.Context, d *schema.ResourceData, m inter
 	}
 
 	opts := lbpools.UpdateOpts{Name: pool.Name, Members: members}
-	rc := GetConflictRetryConfig()
+	rc := GetConflictRetryConfig(LBMemberResourceTimeoutMinutes)
 	results, err := lbpools.Update(client, pool.ID, opts, &gcorecloud.RequestOpts{
 		ConflictRetryAmount:   rc.Amount,
 		ConflictRetryInterval: rc.Interval,
@@ -323,7 +324,7 @@ func resourceLBMemberDelete(ctx context.Context, d *schema.ResourceData, m inter
 
 	mid := d.Id()
 	pid := d.Get("pool_id").(string)
-	rc := GetConflictRetryConfig()
+	rc := GetConflictRetryConfig(LBMemberResourceTimeoutMinutes)
 	results, err := lbpools.DeleteMember(client, pid, mid, &gcorecloud.RequestOpts{
 		ConflictRetryAmount:   rc.Amount,
 		ConflictRetryInterval: rc.Interval,

@@ -19,8 +19,9 @@ import (
 )
 
 const (
-	LoadBalancersPoint        = "loadbalancers"
-	LoadBalancerCreateTimeout = 2400
+	LoadBalancersPoint                 = "loadbalancers"
+	LoadBalancerCreateTimeout          = 2400
+	LoadBalancerResourceTimeoutMinutes = 30
 )
 
 func resourceLoadBalancer() *schema.Resource {
@@ -32,8 +33,8 @@ func resourceLoadBalancer() *schema.Resource {
 		DeleteContext:      resourceLoadBalancerDelete,
 		Description:        "Represent load balancer",
 		Timeouts: &schema.ResourceTimeout{
-			Create: schema.DefaultTimeout(5 * time.Minute),
-			Delete: schema.DefaultTimeout(5 * time.Minute),
+			Create: schema.DefaultTimeout(LoadBalancerResourceTimeoutMinutes * time.Minute),
+			Delete: schema.DefaultTimeout(LoadBalancerResourceTimeoutMinutes * time.Minute),
 		},
 		Importer: &schema.ResourceImporter{
 			StateContext: func(ctx context.Context, d *schema.ResourceData, m interface{}) ([]*schema.ResourceData, error) {
@@ -457,7 +458,11 @@ func resourceLoadBalancerDelete(ctx context.Context, d *schema.ResourceData, m i
 	}
 
 	id := d.Id()
-	results, err := loadbalancers.Delete(client, id, nil).Extract()
+	rc := GetConflictRetryConfig(LoadBalancerResourceTimeoutMinutes)
+	results, err := loadbalancers.Delete(client, id, &gcorecloud.RequestOpts{
+		ConflictRetryAmount:   rc.Amount,
+		ConflictRetryInterval: rc.Interval,
+	}).Extract()
 	if err != nil {
 		return diag.FromErr(err)
 	}
