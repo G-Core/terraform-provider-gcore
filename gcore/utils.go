@@ -46,7 +46,6 @@ const (
 	projectPoint = "projects"
 	regionPoint  = "regions"
 
-	ConflictRetryAmount   = 180
 	ConflictRetryInterval = 10
 )
 
@@ -918,9 +917,15 @@ func getIntEnvOrDefault(key string, defaultValue int) int {
 	return val
 }
 
-func GetConflictRetryConfig(resourceTimeoutMinutes int) ConflictRetryConfig {
+func GetConflictRetryConfig(resourceTimeoutSeconds int) ConflictRetryConfig {
 	interval := getIntEnvOrDefault("TF_CONFLICT_RETRY_INTERVAL_SECONDS", ConflictRetryInterval)
-	amount := resourceTimeoutMinutes * 60 / interval
+	var amount int
+	if interval != 0 {
+		amount = resourceTimeoutSeconds / interval
+	} else {
+		amount = 0
+	}
+
 	return ConflictRetryConfig{
 		Amount:   amount,
 		Interval: interval,

@@ -19,7 +19,6 @@ import (
 
 const (
 	LBListenersPoint                 = "lblisteners"
-	LBListenerCreateTimeout          = 2400
 	LBListenerResourceTimeoutMinutes = 30
 
 	LoadbalancerProvisioningStatusActive = "ACTIVE"
@@ -35,6 +34,7 @@ func resourceLbListener() *schema.Resource {
 		Timeouts: &schema.ResourceTimeout{
 			Create: schema.DefaultTimeout(LBListenerResourceTimeoutMinutes * time.Minute),
 			Delete: schema.DefaultTimeout(LBListenerResourceTimeoutMinutes * time.Minute),
+			Update: schema.DefaultTimeout(LBListenerResourceTimeoutMinutes * time.Minute),
 		},
 		Importer: &schema.ResourceImporter{
 			StateContext: func(ctx context.Context, d *schema.ResourceData, meta interface{}) ([]*schema.ResourceData, error) {
@@ -285,8 +285,8 @@ func resourceLBListenerCreate(ctx context.Context, d *schema.ResourceData, m int
 		}
 		opts.UserList = userList
 	}
-
-	rc := GetConflictRetryConfig(LBListenerResourceTimeoutMinutes)
+	timeout := int(d.Timeout(schema.TimeoutCreate).Seconds())
+	rc := GetConflictRetryConfig(timeout)
 	results, err := listeners.Create(client, opts, &gcorecloud.RequestOpts{
 		ConflictRetryAmount:   rc.Amount,
 		ConflictRetryInterval: rc.Interval,
@@ -296,7 +296,7 @@ func resourceLBListenerCreate(ctx context.Context, d *schema.ResourceData, m int
 	}
 
 	taskID := results.Tasks[0]
-	listenerID, err := tasks.WaitTaskAndReturnResult(client, taskID, true, LBListenerCreateTimeout, func(task tasks.TaskID) (interface{}, error) {
+	listenerID, err := tasks.WaitTaskAndReturnResult(client, taskID, true, timeout, func(task tasks.TaskID) (interface{}, error) {
 		taskInfo, err := tasks.Get(client, string(task)).Extract()
 		if err != nil {
 			return nil, fmt.Errorf("cannot get task with ID: %s. Error: %w", task, err)
@@ -446,7 +446,7 @@ func resourceLBListenerUpdate(ctx context.Context, d *schema.ResourceData, m int
 	}
 
 	if changed {
-		rc := GetConflictRetryConfig(LBListenerResourceTimeoutMinutes)
+		rc := GetConflictRetryConfig(int(d.Timeout(schema.TimeoutUpdate).Seconds()))
 		_, err = listeners.Update(clientV2, d.Id(), updateOpts, &gcorecloud.RequestOpts{
 			ConflictRetryAmount:   rc.Amount,
 			ConflictRetryInterval: rc.Interval,
@@ -495,7 +495,8 @@ func resourceLBListenerDelete(ctx context.Context, d *schema.ResourceData, m int
 	}
 
 	id := d.Id()
-	rc := GetConflictRetryConfig(LBListenerResourceTimeoutMinutes)
+	timeout := int(d.Timeout(schema.TimeoutDelete).Seconds())
+	rc := GetConflictRetryConfig(timeout)
 	results, err := listeners.Delete(client, id, &gcorecloud.RequestOpts{
 		ConflictRetryAmount:   rc.Amount,
 		ConflictRetryInterval: rc.Interval,
@@ -505,7 +506,7 @@ func resourceLBListenerDelete(ctx context.Context, d *schema.ResourceData, m int
 	}
 
 	taskID := results.Tasks[0]
-	_, err = tasks.WaitTaskAndReturnResult(client, taskID, true, LBListenerCreateTimeout, func(task tasks.TaskID) (interface{}, error) {
+	_, err = tasks.WaitTaskAndReturnResult(client, taskID, true, timeout, func(task tasks.TaskID) (interface{}, error) {
 		_, err := listeners.Get(client, id).Extract()
 		if err == nil {
 			return nil, fmt.Errorf("cannot delete LBListener with ID: %s", id)

@@ -20,7 +20,6 @@ import (
 
 const (
 	LoadBalancersPoint                 = "loadbalancers"
-	LoadBalancerCreateTimeout          = 2400
 	LoadBalancerResourceTimeoutMinutes = 30
 )
 
@@ -35,6 +34,7 @@ func resourceLoadBalancer() *schema.Resource {
 		Timeouts: &schema.ResourceTimeout{
 			Create: schema.DefaultTimeout(LoadBalancerResourceTimeoutMinutes * time.Minute),
 			Delete: schema.DefaultTimeout(LoadBalancerResourceTimeoutMinutes * time.Minute),
+			Update: schema.DefaultTimeout(LoadBalancerResourceTimeoutMinutes * time.Minute),
 		},
 		Importer: &schema.ResourceImporter{
 			StateContext: func(ctx context.Context, d *schema.ResourceData, m interface{}) ([]*schema.ResourceData, error) {
@@ -358,7 +358,7 @@ func resourceLoadBalancerUpdate(ctx context.Context, d *schema.ResourceData, m i
 			}
 
 			taskID := results.Tasks[0]
-			_, err = tasks.WaitTaskAndReturnResult(client, taskID, true, LBListenerCreateTimeout, func(task tasks.TaskID) (interface{}, error) {
+			_, err = tasks.WaitTaskAndReturnResult(client, taskID, true, int(d.Timeout(schema.TimeoutUpdate).Seconds()), func(task tasks.TaskID) (interface{}, error) {
 				_, err := listeners.Get(client, listenerID).Extract()
 				if err == nil {
 					return nil, fmt.Errorf("cannot delete LBListener with ID: %s", listenerID)
@@ -397,7 +397,7 @@ func resourceLoadBalancerUpdate(ctx context.Context, d *schema.ResourceData, m i
 			}
 
 			taskID = results.Tasks[0]
-			_, err = tasks.WaitTaskAndReturnResult(client, taskID, true, LBListenerCreateTimeout, func(task tasks.TaskID) (interface{}, error) {
+			_, err = tasks.WaitTaskAndReturnResult(client, taskID, true, int(d.Timeout(schema.TimeoutUpdate).Seconds()), func(task tasks.TaskID) (interface{}, error) {
 				taskInfo, err := tasks.Get(client, string(task)).Extract()
 				if err != nil {
 					return nil, fmt.Errorf("cannot get task with ID: %s. Error: %w", task, err)
@@ -458,7 +458,8 @@ func resourceLoadBalancerDelete(ctx context.Context, d *schema.ResourceData, m i
 	}
 
 	id := d.Id()
-	rc := GetConflictRetryConfig(LoadBalancerResourceTimeoutMinutes)
+	timeout := int(d.Timeout(schema.TimeoutDelete).Seconds())
+	rc := GetConflictRetryConfig(timeout)
 	results, err := loadbalancers.Delete(client, id, &gcorecloud.RequestOpts{
 		ConflictRetryAmount:   rc.Amount,
 		ConflictRetryInterval: rc.Interval,
@@ -468,7 +469,7 @@ func resourceLoadBalancerDelete(ctx context.Context, d *schema.ResourceData, m i
 	}
 
 	taskID := results.Tasks[0]
-	_, err = tasks.WaitTaskAndReturnResult(client, taskID, true, LoadBalancerCreateTimeout, func(task tasks.TaskID) (interface{}, error) {
+	_, err = tasks.WaitTaskAndReturnResult(client, taskID, true, timeout, func(task tasks.TaskID) (interface{}, error) {
 		_, err := loadbalancers.Get(client, id, nil).Extract()
 		if err == nil {
 			return nil, fmt.Errorf("cannot delete loadbalancer with ID: %s", id)

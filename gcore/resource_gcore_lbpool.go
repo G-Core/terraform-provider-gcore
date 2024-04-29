@@ -18,7 +18,6 @@ import (
 
 const (
 	LBPoolsPoint                  = "lbpools"
-	LBPoolsCreateTimeout          = 2400
 	LBPoolsResourceTimeoutMinutes = 30
 )
 
@@ -32,6 +31,7 @@ func resourceLBPool() *schema.Resource {
 		Timeouts: &schema.ResourceTimeout{
 			Create: schema.DefaultTimeout(LBPoolsResourceTimeoutMinutes * time.Minute),
 			Delete: schema.DefaultTimeout(LBPoolsResourceTimeoutMinutes * time.Minute),
+			Update: schema.DefaultTimeout(LBPoolsResourceTimeoutMinutes * time.Minute),
 		},
 
 		Importer: &schema.ResourceImporter{
@@ -266,8 +266,8 @@ func resourceLBPoolCreate(ctx context.Context, d *schema.ResourceData, m interfa
 		HealthMonitor:      healthOpts,
 		SessionPersistence: sessionOpts,
 	}
-
-	rc := GetConflictRetryConfig(LBPoolsResourceTimeoutMinutes)
+	timeout := int(d.Timeout(schema.TimeoutCreate).Seconds())
+	rc := GetConflictRetryConfig(timeout)
 	results, err := lbpools.Create(client, opts, &gcorecloud.RequestOpts{
 		ConflictRetryAmount:   rc.Amount,
 		ConflictRetryInterval: rc.Interval,
@@ -277,7 +277,7 @@ func resourceLBPoolCreate(ctx context.Context, d *schema.ResourceData, m interfa
 	}
 
 	taskID := results.Tasks[0]
-	lbPoolID, err := tasks.WaitTaskAndReturnResult(client, taskID, true, LBPoolsCreateTimeout, func(task tasks.TaskID) (interface{}, error) {
+	lbPoolID, err := tasks.WaitTaskAndReturnResult(client, taskID, true, timeout, func(task tasks.TaskID) (interface{}, error) {
 		taskInfo, err := tasks.Get(client, string(task)).Extract()
 		if err != nil {
 			return nil, fmt.Errorf("cannot get task with ID: %s. Error: %w", task, err)
@@ -379,7 +379,8 @@ func resourceLBPoolUpdate(ctx context.Context, d *schema.ResourceData, m interfa
 
 	var change bool
 	opts := lbpools.UpdateOpts{Name: d.Get("name").(string)}
-	rc := GetConflictRetryConfig(LBPoolsResourceTimeoutMinutes)
+	timeout := int(d.Timeout(schema.TimeoutUpdate).Seconds())
+	rc := GetConflictRetryConfig(timeout)
 
 	if d.HasChange("lb_algorithm") {
 		opts.LBPoolAlgorithm = types.LoadBalancerAlgorithm(d.Get("lb_algorithm").(string))
@@ -409,13 +410,16 @@ func resourceLBPoolUpdate(ctx context.Context, d *schema.ResourceData, m interfa
 				return diag.FromErr(err)
 			}
 			taskID := results.Tasks[0]
-			_, err = tasks.WaitTaskAndReturnResult(client, taskID, true, LBPoolsCreateTimeout, func(task tasks.TaskID) (interface{}, error) {
+			_, err = tasks.WaitTaskAndReturnResult(client, taskID, true, timeout, func(task tasks.TaskID) (interface{}, error) {
 				_, err := tasks.Get(client, string(task)).Extract()
 				if err != nil {
 					return nil, fmt.Errorf("cannot get task with ID: %s. Error: %w", task, err)
 				}
 				return nil, nil
 			})
+			if err != nil {
+				return diag.FromErr(err)
+			}
 		} else {
 			change = true
 		}
@@ -435,7 +439,7 @@ func resourceLBPoolUpdate(ctx context.Context, d *schema.ResourceData, m interfa
 	}
 
 	taskID := results.Tasks[0]
-	_, err = tasks.WaitTaskAndReturnResult(client, taskID, true, LBPoolsCreateTimeout, func(task tasks.TaskID) (interface{}, error) {
+	_, err = tasks.WaitTaskAndReturnResult(client, taskID, true, int(d.Timeout(schema.TimeoutUpdate).Seconds()), func(task tasks.TaskID) (interface{}, error) {
 		_, err := tasks.Get(client, string(task)).Extract()
 		if err != nil {
 			return nil, fmt.Errorf("cannot get task with ID: %s. Error: %w", task, err)
@@ -462,8 +466,8 @@ func resourceLBPoolDelete(ctx context.Context, d *schema.ResourceData, m interfa
 	if err != nil {
 		return diag.FromErr(err)
 	}
-
-	rc := GetConflictRetryConfig(LBPoolsResourceTimeoutMinutes)
+	timeout := int(d.Timeout(schema.TimeoutDelete).Seconds())
+	rc := GetConflictRetryConfig(timeout)
 	id := d.Id()
 	results, err := lbpools.Delete(client, id, &gcorecloud.RequestOpts{
 		ConflictRetryAmount:   rc.Amount,
@@ -478,7 +482,7 @@ func resourceLBPoolDelete(ctx context.Context, d *schema.ResourceData, m interfa
 	}
 
 	taskID := results.Tasks[0]
-	_, err = tasks.WaitTaskAndReturnResult(client, taskID, true, LBPoolsCreateTimeout, func(task tasks.TaskID) (interface{}, error) {
+	_, err = tasks.WaitTaskAndReturnResult(client, taskID, true, timeout, func(task tasks.TaskID) (interface{}, error) {
 		_, err := lbpools.Get(client, id).Extract()
 		if err == nil {
 			return nil, fmt.Errorf("cannot delete LBPool with ID: %s", id)
