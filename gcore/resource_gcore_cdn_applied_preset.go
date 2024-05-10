@@ -43,7 +43,7 @@ func resourceCDNAppliedPreset() *schema.Resource {
 		CreateContext: resourceCDNPresetApply,
 		ReadContext:   resourceCDNAppliedPresetRead,
 		DeleteContext: resourceCDNPresetUnapply,
-		Description:   "Represent preset",
+		Description:   "Represent applied preset",
 	}
 }
 
