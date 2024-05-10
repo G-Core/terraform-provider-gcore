@@ -13,8 +13,18 @@ import (
 func resourceCDNAppliedPreset() *schema.Resource {
 	return &schema.Resource{
 		Importer: &schema.ResourceImporter{
-			// todo: implement import
-			StateContext: schema.ImportStatePassthroughContext,
+			StateContext: func(ctx context.Context, d *schema.ResourceData, meta interface{}) ([]*schema.ResourceData, error) {
+				presetID, objectID, err := ImportAppliedPresetStringParser(d.Id())
+
+				if err != nil {
+					return nil, err
+				}
+				d.Set("preset_id", presetID)
+				d.Set("object_id", objectID)
+				d.SetId(fmt.Sprintf("%d-%d", presetID, objectID))
+
+				return []*schema.ResourceData{d}, nil
+			},
 		},
 		Schema: map[string]*schema.Schema{
 			"preset_id": {
