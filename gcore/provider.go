@@ -155,6 +155,7 @@ func Provider() *schema.Provider {
 			"gcore_cdn_resource":        resourceCDNResource(),
 			"gcore_cdn_origingroup":     resourceCDNOriginGroup(),
 			"gcore_cdn_originshielding": resourceCDNOriginShielding(),
+			"gcore_cdn_preset":          resourceCDNAppliedPreset(),
 			"gcore_cdn_rule":            resourceCDNRule(),
 			"gcore_cdn_sslcert":         resourceCDNCert(),
 			lifecyclePolicyResource:     resourceLifecyclePolicy(),
