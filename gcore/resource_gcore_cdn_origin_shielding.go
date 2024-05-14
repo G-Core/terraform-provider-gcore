@@ -2,7 +2,9 @@ package gcore
 
 import (
 	"context"
+	"fmt"
 	"log"
+	"strconv"
 
 	"github.com/AlekSi/pointer"
 	"github.com/G-Core/gcorelabscdn-go/originshielding"
@@ -36,7 +38,11 @@ func resourceCDNOriginShielding() *schema.Resource {
 }
 
 func resourceCDNOriginShieldingRead(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
-	resourceID := d.Get("resource_id").(int)
+	resourceID, err := strconv.Atoi(d.Id())
+	if err != nil {
+		return diag.Errorf("Failed reading: wrong input id: %s", d.Id())
+	}
+
 	log.Printf("[DEBUG] Start CDN Origin Shielding reading (id=%d)\n", resourceID)
 	config := m.(*Config)
 	client := config.CDNClient
@@ -68,9 +74,11 @@ func resourceCDNOriginShieldingUpdate(ctx context.Context, d *schema.ResourceDat
 		return diag.FromErr(err)
 	}
 
-	log.Printf("[DEBUG] Finish CDN Origin Shielding updating")
+	d.SetId(fmt.Sprintf("%d", resourceID))
+	resourceCDNOriginShieldingRead(ctx, d, m)
 
-	return resourceCDNOriginShieldingRead(ctx, d, m)
+	log.Printf("[DEBUG] Finish CDN Origin Shielding updating")
+	return nil
 }
 
 func resourceCDNOriginShieldingDelete(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
@@ -87,7 +95,7 @@ func resourceCDNOriginShieldingDelete(ctx context.Context, d *schema.ResourceDat
 		return diag.FromErr(err)
 	}
 
+	d.SetId("")
 	log.Printf("[DEBUG] Finish CDN Origin Shielding deleting")
-
 	return nil
 }
