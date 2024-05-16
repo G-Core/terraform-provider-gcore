@@ -448,6 +448,27 @@ func ImportStringParserExtended(infoStr string) (int, int, string, string, error
 	return projectID, regionID, infoStrings[2], infoStrings[3], nil
 }
 
+// ImportAppliedPresetStringParser is a helper function for the import module of the Preset resource.
+func ImportAppliedPresetStringParser(infoStr string) (int, int, error) {
+	log.Printf("[DEBUG] Input id string: %s", infoStr)
+	infoStrings := strings.Split(infoStr, ":")
+
+	if len(infoStrings) != 2 {
+		return 0, 0, fmt.Errorf("Failed import: wrong input id: %s", infoStr)
+	}
+
+	presetID, err := strconv.Atoi(infoStrings[0])
+	if err != nil {
+		return 0, 0, err
+	}
+
+	objectID, err := strconv.Atoi(infoStrings[1])
+	if err != nil {
+		return 0, 0, err
+	}
+	return presetID, objectID, nil
+}
+
 func CreateClient(provider *gcorecloud.ProviderClient, d *schema.ResourceData, endpoint string, version string) (*gcorecloud.ServiceClient, error) {
 	projectID, err := GetProject(provider, d.Get("project_id").(int), d.Get("project_name").(string))
 	if err != nil {

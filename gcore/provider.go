@@ -155,6 +155,7 @@ func Provider() *schema.Provider {
 			"gcore_cdn_resource":        resourceCDNResource(),
 			"gcore_cdn_origingroup":     resourceCDNOriginGroup(),
 			"gcore_cdn_originshielding": resourceCDNOriginShielding(),
+			"gcore_cdn_applied_preset":  resourceCDNAppliedPreset(),
 			"gcore_cdn_rule":            resourceCDNRule(),
 			"gcore_cdn_sslcert":         resourceCDNCert(),
 			lifecyclePolicyResource:     resourceLifecyclePolicy(),
@@ -192,6 +193,7 @@ func Provider() *schema.Provider {
 			"gcore_faas_function":          dataSourceFaaSFunction(),
 			"gcore_ddos_profile_template":  dataSourceDDoSProfileTemplate(),
 			"gcore_cdn_shielding_location": dataOriginShieldingLocation(),
+			"gcore_cdn_preset":             dataPreset(),
 		},
 		ConfigureContextFunc: providerConfigure,
 	}
