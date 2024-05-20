@@ -106,6 +106,7 @@ Read-Only:
 - `created_at` (String)
 - `flavor_id` (String)
 - `is_public_ipv4` (Boolean)
+- `labels` (Map of String)
 - `max_node_count` (Number)
 - `min_node_count` (Number)
 - `name` (String)
@@ -114,3 +115,4 @@ Read-Only:
 - `servergroup_name` (String)
 - `servergroup_policy` (String)
 - `status` (String)
+- `taints` (Map of String)
