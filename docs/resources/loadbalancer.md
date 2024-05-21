@@ -81,7 +81,7 @@ Optional:
 
 Read-Only:
 
-- `id` (String) The ID of this resource.
+- `id` (String)
 
 
 <a id="nestedblock--timeouts"></a>
@@ -91,6 +91,7 @@ Optional:
 
 - `create` (String)
 - `delete` (String)
+- `update` (String)
 
 
 <a id="nestedatt--metadata_read_only"></a>
