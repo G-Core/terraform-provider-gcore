@@ -102,7 +102,9 @@ Optional:
 - `boot_volume_size` (Number) Cluster pool boot volume size. Must be set only for VM pools. Changing the value of this attribute will trigger recreation of the cluster pool.
 - `boot_volume_type` (String) Cluster pool boot volume type. Must be set only for VM pools. Available values are 'standard', 'ssd_hiiops', 'cold', 'ultra'. Changing the value of this attribute will trigger recreation of the cluster pool.
 - `is_public_ipv4` (Boolean) Assign public IPv4 address to nodes in this pool. Changing the value of this attribute will trigger recreation of the cluster pool.
+- `labels` (Map of String) Labels applied to the cluster pool nodes.
 - `max_node_count` (Number) Maximum number of nodes in the cluster pool.
+- `taints` (Map of String) Taints applied to the cluster pool nodes.
 
 Read-Only:
 

@@ -118,6 +118,7 @@ resource "gcore_subnet" "subnet_ipv6" {
 - `project_name` (String) Name of the desired project to create subnet in. Alternative for `project_id`. One of them should be specified.
 - `region_id` (Number) ID of the desired region to create subnet in. Alternative for `region_name`. One of them should be specified.
 - `region_name` (String) Name of the desired region to create subnet in. Alternative for `region_id`. One of them should be specified.
+- `timeouts` (Block, Optional) (see [below for nested schema](#nestedblock--timeouts))
 
 ### Read-Only
 
@@ -132,6 +133,15 @@ Required:
 
 - `destination` (String) Classless Inter-Domain Routing, can be IPv4 or IPv6.
 - `nexthop` (String) IPv4 address to forward traffic to if it's destination IP matches 'destination' CIDR
+
+
+<a id="nestedblock--timeouts"></a>
+### Nested Schema for `timeouts`
+
+Optional:
+
+- `create` (String)
+- `delete` (String)
 
 
 <a id="nestedatt--metadata_read_only"></a>

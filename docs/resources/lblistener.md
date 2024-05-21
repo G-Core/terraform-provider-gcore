@@ -125,6 +125,7 @@ Optional:
 
 - `create` (String)
 - `delete` (String)
+- `update` (String)
 
 
 <a id="nestedblock--user_list"></a>

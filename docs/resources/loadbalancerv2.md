@@ -197,6 +197,7 @@ Optional:
 
 - `create` (String)
 - `delete` (String)
+- `update` (String)
 
 
 <a id="nestedatt--metadata_read_only"></a>

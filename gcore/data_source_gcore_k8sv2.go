@@ -184,6 +184,18 @@ func dataSourceK8sV2() *schema.Resource {
 							Type:     schema.TypeBool,
 							Computed: true,
 						},
+						"labels": {
+							Type:        schema.TypeMap,
+							Description: "Labels applied to the cluster pool nodes.",
+							Optional:    true,
+							Computed:    true,
+						},
+						"taints": {
+							Type:        schema.TypeMap,
+							Description: "Taints applied to the cluster pool nodes.",
+							Optional:    true,
+							Computed:    true,
+						},
 						"servergroup_policy": {
 							Type:        schema.TypeString,
 							Description: "Server group policy: anti-affinity, soft-anti-affinity or affinity",
@@ -317,6 +329,11 @@ func dataSourceK8sV2Read(ctx context.Context, d *schema.ResourceData, m interfac
 			"boot_volume_size":     pool.BootVolumeSize,
 			"auto_healing_enabled": pool.AutoHealingEnabled,
 			"is_public_ipv4":       pool.IsPublicIPv4,
+			"labels":               resourceK8sV2FilteredPoolLabels(pool.Labels),
+			"taints":               pool.Taints,
+			"servergroup_policy":   pool.ServerGroupPolicy,
+			"servergroup_name":     pool.ServerGroupName,
+			"servergroup_id":       pool.ServerGroupID,
 			"status":               pool.Status,
 			"created_at":           pool.CreatedAt.Format(time.RFC850),
 		})

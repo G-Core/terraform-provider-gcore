@@ -4,19 +4,16 @@ import (
 	"context"
 	"fmt"
 	"log"
-	"slices"
+	"reflect"
 	"strings"
 	"time"
 
 	gcorecloud "github.com/G-Core/gcorelabscloud-go"
 	"github.com/G-Core/gcorelabscloud-go/gcore/k8s/v2/clusters"
 	"github.com/G-Core/gcorelabscloud-go/gcore/k8s/v2/pools"
-	"github.com/G-Core/gcorelabscloud-go/gcore/securitygroup/v1/securitygroups"
-	"github.com/G-Core/gcorelabscloud-go/gcore/securitygroup/v1/types"
 	"github.com/G-Core/gcorelabscloud-go/gcore/servergroup/v1/servergroups"
 	"github.com/G-Core/gcorelabscloud-go/gcore/task/v1/tasks"
 	"github.com/G-Core/gcorelabscloud-go/gcore/volume/v1/volumes"
-	"github.com/hashicorp/go-cty/cty"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 )
@@ -25,8 +22,6 @@ const (
 	K8sPoint         = "k8s/clusters"
 	tasksPoint       = "tasks"
 	K8sCreateTimeout = 3600
-
-	k8sSgMetadataKey = "gcloud_cluster_name"
 )
 
 var k8sCreateTimeout = time.Second * time.Duration(K8sCreateTimeout)
@@ -283,6 +278,18 @@ func resourceK8sV2() *schema.Resource {
 							Optional:    true,
 							Computed:    true,
 						},
+						"labels": {
+							Type:        schema.TypeMap,
+							Description: "Labels applied to the cluster pool nodes.",
+							Optional:    true,
+							Computed:    true,
+						},
+						"taints": {
+							Type:        schema.TypeMap,
+							Description: "Taints applied to the cluster pool nodes.",
+							Optional:    true,
+							Computed:    true,
+						},
 						"status": {
 							Type:        schema.TypeString,
 							Description: "Cluster pool status.",
@@ -305,138 +312,6 @@ func resourceK8sV2() *schema.Resource {
 						},
 					},
 				},
-			},
-			"security_group_rules_internal": &schema.Schema{
-				Type:        schema.TypeList,
-				Computed:    true,
-				Description: "Default readonly security group rules. It is used for internal purposes only.",
-				Elem: &schema.Resource{
-					Schema: map[string]*schema.Schema{
-						"id": &schema.Schema{
-							Type:     schema.TypeString,
-							Computed: true,
-						},
-						"direction": &schema.Schema{
-							Type:        schema.TypeString,
-							Computed:    true,
-							Description: fmt.Sprintf("Available value is '%s', '%s'", types.RuleDirectionIngress, types.RuleDirectionEgress),
-						},
-						"ethertype": &schema.Schema{
-							Type:        schema.TypeString,
-							Computed:    true,
-							Description: fmt.Sprintf("Available value is '%s', '%s'", types.EtherTypeIPv4, types.EtherTypeIPv6),
-						},
-						"protocol": &schema.Schema{
-							Type:        schema.TypeString,
-							Computed:    true,
-							Description: fmt.Sprintf("Available value is %s", strings.Join(types.Protocol("").StringList(), ",")),
-						},
-						"port_range_min": &schema.Schema{
-							Type:     schema.TypeInt,
-							Computed: true,
-						},
-						"port_range_max": &schema.Schema{
-							Type:     schema.TypeInt,
-							Computed: true,
-						},
-						"description": &schema.Schema{
-							Type:     schema.TypeString,
-							Computed: true,
-						},
-						"remote_ip_prefix": &schema.Schema{
-							Type:     schema.TypeString,
-							Computed: true,
-						},
-						"updated_at": &schema.Schema{
-							Type:     schema.TypeString,
-							Computed: true,
-						},
-						"created_at": &schema.Schema{
-							Type:     schema.TypeString,
-							Computed: true,
-						},
-					},
-				},
-			},
-			"security_group_rules": &schema.Schema{
-				Type:        schema.TypeSet,
-				Optional:    true,
-				Description: "Firewall rules control what inbound(ingress) and outbound(egress) traffic is allowed to enter or leave a Instance. At least one 'egress' rule should be set",
-				Set:         secGroupUniqueID,
-				Elem: &schema.Resource{
-					Schema: map[string]*schema.Schema{
-						"id": &schema.Schema{
-							Type:     schema.TypeString,
-							Computed: true,
-						},
-						"direction": &schema.Schema{
-							Type:        schema.TypeString,
-							Required:    true,
-							Description: fmt.Sprintf("Available value is '%s', '%s'", types.RuleDirectionIngress, types.RuleDirectionEgress),
-							ValidateDiagFunc: func(v interface{}, path cty.Path) diag.Diagnostics {
-								val := v.(string)
-								switch types.RuleDirection(val) {
-								case types.RuleDirectionIngress, types.RuleDirectionEgress:
-									return nil
-								}
-								return diag.Errorf("wrong direction '%s', available value is '%s', '%s'", val, types.RuleDirectionIngress, types.RuleDirectionEgress)
-							},
-						},
-						"ethertype": &schema.Schema{
-							Type:        schema.TypeString,
-							Required:    true,
-							Description: fmt.Sprintf("Available value is '%s', '%s'", types.EtherTypeIPv4, types.EtherTypeIPv6),
-							ValidateDiagFunc: func(v interface{}, path cty.Path) diag.Diagnostics {
-								val := v.(string)
-								switch types.EtherType(val) {
-								case types.EtherTypeIPv4, types.EtherTypeIPv6:
-									return nil
-								}
-								return diag.Errorf("wrong ethertype '%s', available value is '%s', '%s'", val, types.EtherTypeIPv4, types.EtherTypeIPv6)
-							},
-						},
-						"protocol": &schema.Schema{
-							Type:        schema.TypeString,
-							Required:    true,
-							Description: fmt.Sprintf("Available value is %s", strings.Join(types.Protocol("").StringList(), ",")),
-						},
-						"port_range_min": &schema.Schema{
-							Type:             schema.TypeInt,
-							Optional:         true,
-							Default:          0,
-							ValidateDiagFunc: validatePortRange,
-						},
-						"port_range_max": &schema.Schema{
-							Type:             schema.TypeInt,
-							Optional:         true,
-							Default:          0,
-							ValidateDiagFunc: validatePortRange,
-						},
-						"description": &schema.Schema{
-							Type:     schema.TypeString,
-							Optional: true,
-							Default:  "",
-						},
-						"remote_ip_prefix": &schema.Schema{
-							Type:     schema.TypeString,
-							Optional: true,
-							Default:  "",
-						},
-						"updated_at": &schema.Schema{
-							Type:     schema.TypeString,
-							Computed: true,
-						},
-						"created_at": &schema.Schema{
-							Type:     schema.TypeString,
-							Computed: true,
-						},
-					},
-				},
-			},
-			"security_group_id": {
-				Type:        schema.TypeString,
-				Computed:    true,
-				Description: "Security group ID.",
 			},
 			"status": {
 				Type:        schema.TypeString,
@@ -542,7 +417,7 @@ func resourceK8sV2Create(ctx context.Context, d *schema.ResourceData, m interfac
 
 	for _, poolRaw := range d.Get("pool").([]interface{}) {
 		pool := poolRaw.(map[string]interface{})
-		opts.Pools = append(opts.Pools, pools.CreateOpts{
+		poolOpts := pools.CreateOpts{
 			Name:               pool["name"].(string),
 			FlavorID:           pool["flavor_id"].(string),
 			MinNodeCount:       pool["min_node_count"].(int),
@@ -552,7 +427,20 @@ func resourceK8sV2Create(ctx context.Context, d *schema.ResourceData, m interfac
 			AutoHealingEnabled: pool["auto_healing_enabled"].(bool),
 			IsPublicIPv4:       pool["is_public_ipv4"].(bool),
 			ServerGroupPolicy:  servergroups.ServerGroupPolicy(pool["servergroup_policy"].(string)),
-		})
+		}
+		if labels, ok := pool["labels"].(map[string]interface{}); ok {
+			poolOpts.Labels = map[string]string{}
+			for k, v := range labels {
+				poolOpts.Labels[k] = v.(string)
+			}
+		}
+		if taints, ok := pool["taints"].(map[string]interface{}); ok {
+			poolOpts.Taints = map[string]string{}
+			for k, v := range taints {
+				poolOpts.Taints[k] = v.(string)
+			}
+		}
+		opts.Pools = append(opts.Pools, poolOpts)
 	}
 
 	results, err := clusters.Create(client, opts).Extract()
@@ -579,49 +467,10 @@ func resourceK8sV2Create(ctx context.Context, d *schema.ResourceData, m interfac
 	}
 
 	d.SetId(clusterName.(string))
-
-	sgClient, err := CreateClient(provider, d, securityGroupPoint, versionPointV1)
-	if err != nil {
-		return diag.FromErr(err)
-	}
-
-	sgs, err := securitygroups.ListAll(
-		sgClient, securitygroups.ListOpts{MetadataKV: map[string]string{k8sSgMetadataKey: clusterName.(string)}},
-	)
-	sg := getSuitableSecurityGroup(sgs, clusterName.(string), d.Get("project_id").(int), d.Get("region_id").(int))
-	if len(d.Get("security_group_rules_internal").([]interface{})) == 0 {
-		rules := convertSecurityGroupRules(sg.SecurityGroupRules)
-		if err := d.Set("security_group_rules_internal", rules); err != nil {
-			return diag.FromErr(err)
-		}
-	}
-	if sg != nil {
-		rawRules := d.Get("security_group_rules").(*schema.Set).List()
-		if len(rawRules) != 0 {
-			usersRules := convertToSecurityGroupRules(rawRules)
-
-			for _, rule := range usersRules {
-				_, err = securitygroups.AddRule(sgClient, sg.ID, rule).Extract()
-				if err != nil {
-					log.Println("[ERROR] Cannot add rule to security group", err)
-				}
-			}
-		}
-	}
-
 	resourceK8sV2Read(ctx, d, m)
+
 	log.Printf("[DEBUG] Finish k8s cluster creating (%s)", clusterName)
 	return diags
-}
-
-func getSuitableSecurityGroup(sgs []securitygroups.SecurityGroup, name string, projectID, regionID int) *securitygroups.SecurityGroup {
-	sgName := fmt.Sprintf("%s-%d-%d-worker", name, regionID, projectID)
-	for _, sg := range sgs {
-		if sg.Name == sgName {
-			return &sg
-		}
-	}
-	return nil
 }
 
 func resourceK8sV2Read(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
@@ -638,12 +487,6 @@ func resourceK8sV2Read(ctx context.Context, d *schema.ResourceData, m interface{
 	clusterName := d.Get("name").(string)
 	cluster, err := clusters.Get(client, clusterName).Extract()
 	if err != nil {
-		switch err.(type) {
-		case gcorecloud.ErrDefault404:
-			d.SetId("")
-			log.Printf("[WARNING] k8s cluster not found, removing from state")
-			return nil
-		}
 		return diag.FromErr(err)
 	}
 
@@ -658,7 +501,6 @@ func resourceK8sV2Read(ctx context.Context, d *schema.ResourceData, m interface{
 	d.Set("creator_task_id", cluster.CreatorTaskID)
 	d.Set("task_id", cluster.TaskID)
 	d.Set("is_ipv6", cluster.IsIPV6)
-
 	if cluster.PodsIPPool != nil {
 		d.Set("pods_ip_pool", cluster.PodsIPPool.String())
 	}
@@ -690,64 +532,31 @@ func resourceK8sV2Read(ctx context.Context, d *schema.ResourceData, m interface{
 		d.Set("cni", []interface{}{v})
 	}
 
-	// pools always come sorted alphabetically, so we need to reorder them to match TF state
-	poolData := d.Get("pool").([]interface{})
+	poolMap := map[string]pools.ClusterPool{}
 	for _, pool := range cluster.Pools {
-		idx := slices.IndexFunc(poolData, func(old interface{}) bool { return old.(map[string]interface{})["name"] == pool.Name })
-		obj := map[string]interface{}{
-			"name":                 pool.Name,
-			"flavor_id":            pool.FlavorID,
-			"min_node_count":       pool.MinNodeCount,
-			"max_node_count":       pool.MaxNodeCount,
-			"node_count":           pool.NodeCount,
-			"boot_volume_type":     pool.BootVolumeType.String(),
-			"boot_volume_size":     pool.BootVolumeSize,
-			"auto_healing_enabled": pool.AutoHealingEnabled,
-			"is_public_ipv4":       pool.IsPublicIPv4,
-			"servergroup_policy":   pool.ServerGroupPolicy,
-			"servergroup_name":     pool.ServerGroupName,
-			"servergroup_id":       pool.ServerGroupID,
-			"status":               pool.Status,
-			"created_at":           pool.CreatedAt.Format(time.RFC850),
-		}
-		if idx >= 0 {
-			poolData[idx] = obj
+		poolMap[pool.Name] = pool
+	}
+
+	// Returned pool order needs to match TF state or users will see broken diff,
+	// so we first process all pools stored in the state file, and then append any remaining pools.
+	var poolData []interface{}
+	for _, rawPool := range d.Get("pool").([]interface{}) {
+		pool := rawPool.(map[string]interface{})
+		poolName := pool["name"].(string)
+		if p, ok := poolMap[poolName]; ok {
+			poolData = append(poolData, resourceK8sV2PoolDataFromPool(p))
+			delete(poolMap, poolName)
 		} else {
-			poolData = append(poolData, obj)
+			// prevent breaking diff when a pool from state file is missing
+			log.Printf("[DEBUG] Returning cluster pool placeholder for %q\n", poolName)
+			poolData = append(poolData, map[string]interface{}{})
 		}
+	}
+	for _, pool := range poolMap {
+		poolData = append(poolData, resourceK8sV2PoolDataFromPool(pool))
 	}
 	if err := d.Set("pool", poolData); err != nil {
 		return diag.FromErr(err)
-	}
-
-	// get cluster's security group
-	sgClient, err := CreateClient(provider, d, securityGroupPoint, versionPointV1)
-	if err != nil {
-		return diag.FromErr(err)
-	}
-
-	sgs, err := securitygroups.ListAll(
-		sgClient, securitygroups.ListOpts{MetadataKV: map[string]string{k8sSgMetadataKey: clusterName}},
-	)
-	sg := getSuitableSecurityGroup(sgs, clusterName, d.Get("project_id").(int), d.Get("region_id").(int))
-	if err == nil && sg != nil {
-		if len(d.Get("security_group_rules_internal").([]interface{})) == 0 {
-			rules := convertSecurityGroupRules(sg.SecurityGroupRules)
-			if err := d.Set("security_group_rules_internal", rules); err != nil {
-				return diag.FromErr(err)
-			}
-		}
-
-		d.Set("security_group_id", sg.ID)
-		// todo read security group for the cluster
-		rulesRaw := convertSecurityGroupRules(sg.SecurityGroupRules)
-		actualRules := schema.NewSet(secGroupUniqueID, rulesRaw)
-		readOnlyRules := schema.NewSet(secGroupUniqueID, d.Get("security_group_rules_internal").([]interface{}))
-		resultRules := actualRules.Difference(readOnlyRules)
-
-		if err := d.Set("security_group_rules", resultRules); err != nil {
-			return diag.FromErr(err)
-		}
 	}
 
 	log.Println("[DEBUG] Finish k8s cluster reading")
@@ -839,57 +648,6 @@ func resourceK8sV2Update(ctx context.Context, d *schema.ResourceData, m interfac
 		}
 	}
 
-	if d.HasChange("security_group_rules") {
-		o, n := d.GetChange("security_group_rules")
-		newUsersRules := n.(*schema.Set)
-		oldUsersRules := o.(*schema.Set)
-
-		sgClient, err := CreateClient(provider, d, securityGroupPoint, versionPointV1)
-		if err != nil {
-			return diag.FromErr(err)
-		}
-
-		updateRequest := securitygroups.UpdateOpts{}
-		for _, rule := range oldUsersRules.List() {
-			r := rule.(map[string]interface{})
-			updateRequest.ChangedRules = append(updateRequest.ChangedRules, securitygroups.UpdateSecurityGroupRuleOpts{
-				Action:              types.ActionDelete,
-				SecurityGroupRuleID: r["id"].(string),
-			})
-		}
-
-		for _, rule := range newUsersRules.List() {
-			r := rule.(map[string]interface{})
-			changedRules := securitygroups.UpdateSecurityGroupRuleOpts{
-				Action:    types.ActionCreate,
-				Direction: types.RuleDirection(r["direction"].(string)),
-				EtherType: types.EtherType(r["ethertype"].(string)),
-				Protocol:  types.Protocol(r["protocol"].(string)),
-			}
-
-			if port := r["port_range_max"].(int); port != 0 {
-				changedRules.PortRangeMax = &port
-			}
-			if port := r["port_range_min"].(int); port != 0 {
-				changedRules.PortRangeMin = &port
-			}
-			if descr := r["description"].(string); descr != "" {
-				changedRules.Description = &descr
-			}
-			if remoteIPPrefix := r["remote_ip_prefix"].(string); remoteIPPrefix != "" {
-				changedRules.RemoteIPPrefix = &remoteIPPrefix
-			}
-
-			updateRequest.ChangedRules = append(updateRequest.ChangedRules, changedRules)
-		}
-
-		_, err = securitygroups.Update(sgClient, d.Get("security_group_id").(string), updateRequest).Extract()
-		if err != nil {
-			return diag.FromErr(err)
-		}
-
-	}
-
 	diags := resourceK8sV2Read(ctx, d, m)
 	log.Printf("[DEBUG] Finish k8s cluster updating (%s)", clusterName)
 	return diags
@@ -941,7 +699,13 @@ func resourceK8sV2Delete(ctx context.Context, d *schema.ResourceData, m interfac
 }
 
 func resourceK8sV2FindClusterPool(list []interface{}, pool interface{}) interface{} {
+	if _, ok := pool.(map[string]interface{}); !ok {
+		return nil
+	}
 	for _, item := range list {
+		if _, ok := item.(map[string]interface{}); !ok {
+			continue
+		}
 		if item.(map[string]interface{})["name"] == pool.(map[string]interface{})["name"] {
 			return item
 		}
@@ -962,6 +726,12 @@ func resourceK8sV2ClusterPoolNeedsUpdate(list []interface{}, pool interface{}) b
 		return true
 	}
 	if old["auto_healing_enabled"] != new["auto_healing_enabled"] {
+		return true
+	}
+	if !reflect.DeepEqual(old["labels"], new["labels"]) {
+		return true
+	}
+	if !reflect.DeepEqual(old["taints"], new["taints"]) {
 		return true
 	}
 	return false
@@ -985,6 +755,9 @@ func resourceK8sV2ClusterPoolNeedsReplace(list []interface{}, pool interface{}) 
 	if old["is_public_ipv4"] != new["is_public_ipv4"] {
 		return true
 	}
+	if old["servergroup_policy"] != new["servergroup_policy"] {
+		return true
+	}
 	return false
 }
 
@@ -1003,6 +776,18 @@ func resourceK8sV2CreateClusterPool(client, tasksClient *gcorecloud.ServiceClien
 		AutoHealingEnabled: pool["auto_healing_enabled"].(bool),
 		ServerGroupPolicy:  servergroups.ServerGroupPolicy(pool["servergroup_policy"].(string)),
 		IsPublicIPv4:       pool["is_public_ipv4"].(bool),
+	}
+	if labels, ok := pool["labels"].(map[string]interface{}); ok {
+		opts.Labels = map[string]string{}
+		for k, v := range labels {
+			opts.Labels[k] = v.(string)
+		}
+	}
+	if taints, ok := pool["taints"].(map[string]interface{}); ok {
+		opts.Taints = map[string]string{}
+		for k, v := range taints {
+			opts.Taints[k] = v.(string)
+		}
 	}
 	results, err := pools.Create(client, clusterName, opts).Extract()
 	if err != nil {
@@ -1023,13 +808,24 @@ func resourceK8sV2CreateClusterPool(client, tasksClient *gcorecloud.ServiceClien
 }
 
 func resourceK8sV2DeleteClusterPool(client, tasksClient *gcorecloud.ServiceClient, clusterName string, data interface{}) error {
-	pool := data.(map[string]interface{})
-	poolName := pool["name"].(string)
-	log.Printf("[DEBUG] Deleting cluster pool (%s)", poolName)
+	pool, ok := data.(map[string]interface{})
+	if !ok {
+		return nil
+	}
+	poolName, ok := pool["name"].(string)
+	if !ok || poolName == "" {
+		return nil
+	}
 
+	log.Printf("[DEBUG] Deleting cluster pool (%s)", poolName)
 	results, err := pools.Delete(client, clusterName, poolName).Extract()
 	if err != nil {
-		return fmt.Errorf("delete cluster pool: %w", err)
+		switch err.(type) {
+		case gcorecloud.ErrDefault404:
+			return nil
+		default:
+			return fmt.Errorf("delete cluster pool: %w", err)
+		}
 	}
 
 	taskID := results.Tasks[0]
@@ -1051,9 +847,25 @@ func resourceK8sV2UpdateClusterPool(client *gcorecloud.ServiceClient, clusterNam
 	log.Printf("[DEBUG] Updating cluster pool (%s)", poolName)
 
 	opts := pools.UpdateOpts{
-		AutoHealingEnabled: pool["auto_healing_enabled"].(bool),
-		MinNodeCount:       pool["min_node_count"].(int),
-		MaxNodeCount:       pool["max_node_count"].(int),
+		MinNodeCount: pool["min_node_count"].(int),
+		MaxNodeCount: pool["max_node_count"].(int),
+	}
+	if v, ok := pool["auto_healing_enabled"].(bool); ok {
+		opts.AutoHealingEnabled = &v
+	}
+	if labels, ok := pool["labels"].(map[string]interface{}); ok && len(labels) > 0 {
+		result := map[string]string{}
+		for k, v := range labels {
+			result[k] = v.(string)
+		}
+		opts.Labels = &result
+	}
+	if taints, ok := pool["taints"].(map[string]interface{}); ok && len(taints) > 0 {
+		result := map[string]string{}
+		for k, v := range taints {
+			result[k] = v.(string)
+		}
+		opts.Taints = &result
 	}
 	_, err := pools.Update(client, clusterName, poolName, opts).Extract()
 	if err != nil {
@@ -1062,4 +874,37 @@ func resourceK8sV2UpdateClusterPool(client *gcorecloud.ServiceClient, clusterNam
 
 	log.Printf("[DEBUG] Updated cluster pool (%s)", poolName)
 	return nil
+}
+
+func resourceK8sV2PoolDataFromPool(pool pools.ClusterPool) interface{} {
+	return map[string]interface{}{
+		"name":                 pool.Name,
+		"flavor_id":            pool.FlavorID,
+		"min_node_count":       pool.MinNodeCount,
+		"max_node_count":       pool.MaxNodeCount,
+		"node_count":           pool.NodeCount,
+		"boot_volume_type":     pool.BootVolumeType.String(),
+		"boot_volume_size":     pool.BootVolumeSize,
+		"auto_healing_enabled": pool.AutoHealingEnabled,
+		"is_public_ipv4":       pool.IsPublicIPv4,
+		"labels":               resourceK8sV2FilteredPoolLabels(pool.Labels),
+		"taints":               pool.Taints,
+		"servergroup_policy":   pool.ServerGroupPolicy,
+		"servergroup_name":     pool.ServerGroupName,
+		"servergroup_id":       pool.ServerGroupID,
+		"status":               pool.Status,
+		"created_at":           pool.CreatedAt.Format(time.RFC850),
+	}
+}
+
+func resourceK8sV2FilteredPoolLabels(labels map[string]string) map[string]string {
+	result := map[string]string{}
+	for k, v := range labels {
+		// filter out system labels to hide them from state file and diffs
+		if strings.HasPrefix(k, "gcorecluster.x-k8s.io") {
+			continue
+		}
+		result[k] = v
+	}
+	return result
 }
