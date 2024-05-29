@@ -70,7 +70,6 @@ output "kubeconfig" {
 - `project_name` (String)
 - `region_id` (Number)
 - `region_name` (String)
-- `security_group_rules` (Block Set) Firewall rules control what inbound(ingress) and outbound(egress) traffic is allowed to enter or leave a Instance. At least one 'egress' rule should be set (see [below for nested schema](#nestedblock--security_group_rules))
 - `services_ip_pool` (String) Services IPv4 IP pool in CIDR notation.
 - `services_ipv6_pool` (String) Services IPv6 IP pool in CIDR notation.
 - `timeouts` (Block, Optional) (see [below for nested schema](#nestedblock--timeouts))
@@ -81,8 +80,6 @@ output "kubeconfig" {
 - `creator_task_id` (String)
 - `id` (String) The ID of this resource.
 - `is_public` (Boolean) True if the cluster is public.
-- `security_group_id` (String) Security group ID.
-- `security_group_rules_internal` (List of Object) Default readonly security group rules. It is used for internal purposes only. (see [below for nested schema](#nestedatt--security_group_rules_internal))
 - `status` (String) Cluster status.
 - `task_id` (String)
 
@@ -94,7 +91,6 @@ Required:
 - `flavor_id` (String) Cluster pool node flavor ID. Changing the value of this attribute will trigger recreation of the cluster pool.
 - `min_node_count` (Number) Minimum number of nodes in the cluster pool.
 - `name` (String) Cluster pool name. Changing the value of this attribute will trigger recreation of the cluster pool.
-- `servergroup_policy` (String) Server group policy: anti-affinity, soft-anti-affinity or affinity
 
 Optional:
 
@@ -104,6 +100,7 @@ Optional:
 - `is_public_ipv4` (Boolean) Assign public IPv4 address to nodes in this pool. Changing the value of this attribute will trigger recreation of the cluster pool.
 - `labels` (Map of String) Labels applied to the cluster pool nodes.
 - `max_node_count` (Number) Maximum number of nodes in the cluster pool.
+- `servergroup_policy` (String) Server group policy: anti-affinity, soft-anti-affinity or affinity
 - `taints` (Map of String) Taints applied to the cluster pool nodes.
 
 Read-Only:
@@ -138,29 +135,6 @@ Optional:
 
 
 
-<a id="nestedblock--security_group_rules"></a>
-### Nested Schema for `security_group_rules`
-
-Required:
-
-- `direction` (String) Available value is 'ingress', 'egress'
-- `ethertype` (String) Available value is 'IPv4', 'IPv6'
-- `protocol` (String) Available value is udp,tcp,any,ipv6-icmp,ipv6-route,ipv6-opts,ipv6-nonxt,ipv6-frag,ipv6-encap,icmp,ah,dccp,egp,esp,gre,igmp,ospf,pgm,rsvp,sctp,udplite,vrrp,51,50,112,0,4,ipip,ipencap
-
-Optional:
-
-- `description` (String)
-- `port_range_max` (Number)
-- `port_range_min` (Number)
-- `remote_ip_prefix` (String)
-
-Read-Only:
-
-- `created_at` (String)
-- `id` (String) The ID of this resource.
-- `updated_at` (String)
-
-
 <a id="nestedblock--timeouts"></a>
 ### Nested Schema for `timeouts`
 
@@ -168,23 +142,6 @@ Optional:
 
 - `create` (String)
 - `update` (String)
-
-
-<a id="nestedatt--security_group_rules_internal"></a>
-### Nested Schema for `security_group_rules_internal`
-
-Read-Only:
-
-- `created_at` (String)
-- `description` (String)
-- `direction` (String)
-- `ethertype` (String)
-- `id` (String)
-- `port_range_max` (Number)
-- `port_range_min` (Number)
-- `protocol` (String)
-- `remote_ip_prefix` (String)
-- `updated_at` (String)
 
 ## Import
 
