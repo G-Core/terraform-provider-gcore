@@ -15,6 +15,7 @@ import (
 	"github.com/G-Core/gcorelabscloud-go/gcore/task/v1/tasks"
 	"github.com/G-Core/gcorelabscloud-go/gcore/volume/v1/volumes"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/customdiff"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 )
 
@@ -241,7 +242,7 @@ func resourceK8sV2() *schema.Resource {
 						"servergroup_policy": {
 							Type:        schema.TypeString,
 							Description: "Server group policy: anti-affinity, soft-anti-affinity or affinity",
-							Required:    true,
+							Optional:    true,
 						},
 						"max_node_count": {
 							Type:        schema.TypeInt,
@@ -337,6 +338,22 @@ func resourceK8sV2() *schema.Resource {
 				Computed: true,
 			},
 		},
+		CustomizeDiff: customdiff.All(
+			customdiff.ValidateChange("pool", func(ctx context.Context, old, new, meta interface{}) error {
+				for _, p := range new.([]interface{}) {
+					pool := p.(map[string]interface{})
+					if resourceK8sV2IsVMFlavor(pool["flavor_id"].(string)) {
+						if pool["servergroup_policy"].(string) == "" {
+							return fmt.Errorf("servergroup_policy is required for flavor %v", pool["flavor_id"])
+						}
+					} else {
+						if pool["servergroup_policy"].(string) != "" {
+							return fmt.Errorf("servergroup_policy cannot be set for flavor %v", pool["flavor_id"])
+						}
+					}
+				}
+				return nil
+			})),
 	}
 }
 
@@ -907,4 +924,8 @@ func resourceK8sV2FilteredPoolLabels(labels map[string]string) map[string]string
 		result[k] = v
 	}
 	return result
+}
+
+func resourceK8sV2IsVMFlavor(flavor string) bool {
+	return strings.HasPrefix(flavor, "g") || strings.HasPrefix(flavor, "a")
 }
