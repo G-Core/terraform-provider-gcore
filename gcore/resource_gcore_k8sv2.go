@@ -2,6 +2,7 @@ package gcore
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"log"
 	"reflect"
@@ -624,6 +625,10 @@ func resourceK8sV2Update(ctx context.Context, d *schema.ResourceData, m interfac
 		o, n := d.GetChange("pool")
 		old, new := o.([]interface{}), n.([]interface{})
 
+		if err := resourceK8sV2CheckLimits(client, old, new); err != nil {
+			return diag.FromErr(err)
+		}
+
 		// Any new pools must be created first, so that "replace" can safely delete pools that it will recreate.
 		// This also covers pools that were renamed, because pool name must be unique.
 		for _, pool := range new {
@@ -928,4 +933,55 @@ func resourceK8sV2FilteredPoolLabels(labels map[string]string) map[string]string
 
 func resourceK8sV2IsVMFlavor(flavor string) bool {
 	return strings.HasPrefix(flavor, "g") || strings.HasPrefix(flavor, "a")
+}
+
+func resourceK8sV2CheckLimits(client *gcorecloud.ServiceClient, old, new []interface{}) error {
+	log.Printf("[DEBUG] Checking quota limits")
+
+	opts := &clusters.CheckLimitsOpts{}
+	for _, n := range new {
+		newPool, ok := n.(map[string]interface{})
+		if !ok || len(newPool) == 0 {
+			continue
+		}
+		if resourceK8sV2FindClusterPool(old, newPool) == nil || resourceK8sV2ClusterPoolNeedsReplace(old, newPool) {
+			poolOpts := clusters.CheckLimitsPoolOpts{
+				Name:              newPool["name"].(string),
+				FlavorID:          newPool["flavor_id"].(string),
+				MinNodeCount:      newPool["min_node_count"].(int),
+				MaxNodeCount:      newPool["max_node_count"].(int),
+				BootVolumeSize:    newPool["boot_volume_size"].(int),
+				ServerGroupPolicy: servergroups.ServerGroupPolicy(newPool["servergroup_policy"].(string)),
+			}
+			opts.Pools = append(opts.Pools, poolOpts)
+		} else if resourceK8sV2ClusterPoolNeedsUpdate(old, newPool) {
+			oldPool := resourceK8sV2FindClusterPool(old, newPool).(map[string]interface{})
+			minCount := newPool["min_node_count"].(int) - oldPool["min_node_count"].(int)
+			maxCount := newPool["max_node_count"].(int) - oldPool["max_node_count"].(int)
+			if minCount <= 0 {
+				continue
+			}
+			poolOpts := clusters.CheckLimitsPoolOpts{
+				Name:              newPool["name"].(string),
+				FlavorID:          newPool["flavor_id"].(string),
+				MinNodeCount:      minCount,
+				MaxNodeCount:      maxCount,
+				BootVolumeSize:    newPool["boot_volume_size"].(int),
+				ServerGroupPolicy: servergroups.ServerGroupPolicy(newPool["servergroup_policy"].(string)),
+			}
+			opts.Pools = append(opts.Pools, poolOpts)
+		}
+	}
+
+	if len(opts.Pools) > 0 {
+		quota, err := clusters.CheckLimits(client, opts).Extract()
+		if err != nil {
+			return fmt.Errorf("check limits: %w", err)
+		}
+		if len(*quota) > 0 {
+			b, _ := json.Marshal(quota) // pretty print map
+			return fmt.Errorf("quota limits exceeded for this operation: %s", string(b))
+		}
+	}
+	return nil
 }
