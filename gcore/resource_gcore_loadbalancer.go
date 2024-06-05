@@ -2,6 +2,7 @@ package gcore
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"log"
 	"time"
@@ -471,11 +472,9 @@ func resourceLoadBalancerDelete(ctx context.Context, d *schema.ResourceData, m i
 	taskID := results.Tasks[0]
 	_, err = tasks.WaitTaskAndReturnResult(client, taskID, true, timeout, func(task tasks.TaskID) (interface{}, error) {
 		_, err := loadbalancers.Get(client, id, nil).Extract()
-		if err == nil {
-			return nil, fmt.Errorf("cannot delete loadbalancer with ID: %s", id)
-		}
-		switch err.(type) {
-		case gcorecloud.ErrDefault404:
+		var errDefault404 gcorecloud.ErrDefault404
+		switch {
+		case errors.As(err, &errDefault404):
 			return nil, nil
 		default:
 			return nil, err
