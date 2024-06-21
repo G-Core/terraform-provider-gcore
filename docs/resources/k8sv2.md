@@ -60,6 +60,8 @@ output "kubeconfig" {
 
 ### Optional
 
+- `authentication` (Block List, Max: 1) (see [below for nested schema](#nestedblock--authentication))
+- `autoscaler_config` (Map of String) Cluster autoscaler configuration params. Keys and values are expected to follow the cluster-autoscaler option format.
 - `cni` (Block List, Max: 1) (see [below for nested schema](#nestedblock--cni))
 - `fixed_network` (String) Fixed network used to allocate network addresses for cluster nodes.
 - `fixed_subnet` (String) Fixed subnet used to allocate network addresses for cluster nodes. Subnet should have a router.
@@ -97,7 +99,9 @@ Optional:
 - `auto_healing_enabled` (Boolean) Enable/disable auto healing of cluster pool nodes.
 - `boot_volume_size` (Number) Cluster pool boot volume size. Must be set only for VM pools. Changing the value of this attribute will trigger recreation of the cluster pool.
 - `boot_volume_type` (String) Cluster pool boot volume type. Must be set only for VM pools. Available values are 'standard', 'ssd_hiiops', 'cold', 'ultra'. Changing the value of this attribute will trigger recreation of the cluster pool.
+- `crio_config` (Map of String) Crio configuration for pool nodes. Keys and values are expected to follow the crio option format.
 - `is_public_ipv4` (Boolean) Assign public IPv4 address to nodes in this pool. Changing the value of this attribute will trigger recreation of the cluster pool.
+- `kubelet_config` (Map of String) Kubelet configuration for pool nodes. Keys and values are expected to follow the kubelet configuration file format.
 - `labels` (Map of String) Labels applied to the cluster pool nodes.
 - `max_node_count` (Number) Maximum number of nodes in the cluster pool.
 - `servergroup_policy` (String) Server group policy: anti-affinity, soft-anti-affinity or affinity
@@ -110,6 +114,29 @@ Read-Only:
 - `servergroup_id` (String) Server group id
 - `servergroup_name` (String) Server group name
 - `status` (String) Cluster pool status.
+
+
+<a id="nestedblock--authentication"></a>
+### Nested Schema for `authentication`
+
+Optional:
+
+- `oidc` (Block List, Max: 1) (see [below for nested schema](#nestedblock--authentication--oidc))
+
+<a id="nestedblock--authentication--oidc"></a>
+### Nested Schema for `authentication.oidc`
+
+Optional:
+
+- `client_id` (String) A client id that all tokens must be issued for.
+- `groups_claim` (String) JWT claim to use as the user's group.
+- `groups_prefix` (String) Prefix prepended to group claims to prevent clashes with existing names.
+- `issuer_url` (String) URL of the provider that allows the API server to discover public signing keys. Only URLs that use the https:// scheme are accepted.
+- `required_claims` (Map of String) A map describing required claims in the ID Token. Each claim is verified to be present in the ID Token with a matching value.
+- `signing_algs` (Set of String) Accepted signing algorithms. Supported values are: RS256, RS384, RS512, ES256, ES384, ES512, PS256, PS384, PS512.
+- `username_claim` (String) JWT claim to use as the user name. When not specified, the `sub` claim will be used.
+- `username_prefix` (String) Prefix prepended to username claims to prevent clashes with existing names.
+
 
 
 <a id="nestedblock--cni"></a>
@@ -126,6 +153,8 @@ Optional:
 Optional:
 
 - `encryption` (Boolean)
+- `hubble_relay` (Boolean)
+- `hubble_ui` (Boolean)
 - `lb_acceleration` (Boolean)
 - `lb_mode` (String)
 - `mask_size` (Number)

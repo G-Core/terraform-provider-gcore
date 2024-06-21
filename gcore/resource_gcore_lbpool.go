@@ -387,7 +387,7 @@ func resourceLBPoolUpdate(ctx context.Context, d *schema.ResourceData, m interfa
 		change = true
 	}
 
-    if d.HasChange("protocol") {
+	if d.HasChange("protocol") {
 		opts.Protocol = types.ProtocolType(d.Get("protocol").(string))
 		change = true
 	}

@@ -52,6 +52,8 @@ output "view" {
 
 ### Read-Only
 
+- `authentication` (List of Object) (see [below for nested schema](#nestedatt--authentication))
+- `autoscaler_config` (Map of String) Cluster autoscaler configuration params. Keys and values are expected to follow the cluster-autoscaler option format.
 - `cni` (List of Object) (see [below for nested schema](#nestedatt--cni))
 - `created_at` (String)
 - `creator_task_id` (String)
@@ -72,6 +74,29 @@ output "view" {
 - `task_id` (String)
 - `version` (String)
 
+<a id="nestedatt--authentication"></a>
+### Nested Schema for `authentication`
+
+Read-Only:
+
+- `oidc` (List of Object) (see [below for nested schema](#nestedobjatt--authentication--oidc))
+
+<a id="nestedobjatt--authentication--oidc"></a>
+### Nested Schema for `authentication.oidc`
+
+Read-Only:
+
+- `client_id` (String)
+- `groups_claim` (String)
+- `groups_prefix` (String)
+- `issuer_url` (String)
+- `required_claims` (Map of String)
+- `signing_algs` (Set of String)
+- `username_claim` (String)
+- `username_prefix` (String)
+
+
+
 <a id="nestedatt--cni"></a>
 ### Nested Schema for `cni`
 
@@ -86,6 +111,8 @@ Read-Only:
 Read-Only:
 
 - `encryption` (Boolean)
+- `hubble_relay` (Boolean)
+- `hubble_ui` (Boolean)
 - `lb_acceleration` (Boolean)
 - `lb_mode` (String)
 - `mask_size` (Number)
@@ -104,8 +131,10 @@ Read-Only:
 - `boot_volume_size` (Number)
 - `boot_volume_type` (String)
 - `created_at` (String)
+- `crio_config` (Map of String)
 - `flavor_id` (String)
 - `is_public_ipv4` (Boolean)
+- `kubelet_config` (Map of String)
 - `labels` (Map of String)
 - `max_node_count` (Number)
 - `min_node_count` (Number)
