@@ -93,6 +93,89 @@ func resourceK8sV2() *schema.Resource {
 				Required:    true,
 				ForceNew:    true,
 			},
+			"authentication": {
+				Type:     schema.TypeList,
+				MaxItems: 1,
+				Optional: true,
+				Computed: true,
+				Elem: &schema.Resource{
+					Schema: map[string]*schema.Schema{
+						"oidc": {
+							Type:     schema.TypeList,
+							MaxItems: 1,
+							Optional: true,
+							Computed: true,
+							Elem: &schema.Resource{
+								Schema: map[string]*schema.Schema{
+									"client_id": {
+										Type:        schema.TypeString,
+										Description: "A client id that all tokens must be issued for.",
+										Optional:    true,
+										Computed:    true,
+									},
+									"groups_claim": {
+										Type:        schema.TypeString,
+										Description: "JWT claim to use as the user's group.",
+										Optional:    true,
+										Computed:    true,
+									},
+									"groups_prefix": {
+										Type:        schema.TypeString,
+										Description: "Prefix prepended to group claims to prevent clashes with existing names.",
+										Optional:    true,
+										Computed:    true,
+									},
+									"issuer_url": {
+										Type:        schema.TypeString,
+										Description: "URL of the provider that allows the API server to discover public signing keys. Only URLs that use the https:// scheme are accepted.",
+										Optional:    true,
+										Computed:    true,
+									},
+									"required_claims": {
+										Type:        schema.TypeMap,
+										Description: "A map describing required claims in the ID Token. Each claim is verified to be present in the ID Token with a matching value.",
+										Optional:    true,
+										Computed:    true,
+										Elem: &schema.Schema{
+											Type: schema.TypeString,
+										},
+									},
+									"signing_algs": {
+										Type:        schema.TypeSet,
+										Description: "Accepted signing algorithms. Supported values are: RS256, RS384, RS512, ES256, ES384, ES512, PS256, PS384, PS512.",
+										Optional:    true,
+										Computed:    true,
+										Elem: &schema.Schema{
+											Type: schema.TypeString,
+										},
+									},
+									"username_claim": {
+										Type:        schema.TypeString,
+										Description: "JWT claim to use as the user name. When not specified, the `sub` claim will be used.",
+										Optional:    true,
+										Computed:    true,
+									},
+									"username_prefix": {
+										Type:        schema.TypeString,
+										Description: "Prefix prepended to username claims to prevent clashes with existing names.",
+										Optional:    true,
+										Computed:    true,
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+			"autoscaler_config": {
+				Type:        schema.TypeMap,
+				Description: "Cluster autoscaler configuration params. Keys and values are expected to follow the cluster-autoscaler option format.",
+				Optional:    true,
+				Computed:    true,
+				Elem: &schema.Schema{
+					Type: schema.TypeString,
+				},
+			},
 			"cni": {
 				Type:     schema.TypeList,
 				MaxItems: 1,
@@ -154,6 +237,18 @@ func resourceK8sV2() *schema.Resource {
 									},
 									"routing_mode": {
 										Type:     schema.TypeString,
+										Optional: true,
+										Computed: true,
+										ForceNew: true,
+									},
+									"hubble_relay": {
+										Type:     schema.TypeBool,
+										Optional: true,
+										Computed: true,
+										ForceNew: true,
+									},
+									"hubble_ui": {
+										Type:     schema.TypeBool,
 										Optional: true,
 										Computed: true,
 										ForceNew: true,
@@ -292,6 +387,24 @@ func resourceK8sV2() *schema.Resource {
 							Optional:    true,
 							Computed:    true,
 						},
+						"crio_config": {
+							Type:        schema.TypeMap,
+							Description: "Crio configuration for pool nodes. Keys and values are expected to follow the crio option format.",
+							Optional:    true,
+							Computed:    true,
+							Elem: &schema.Schema{
+								Type: schema.TypeString,
+							},
+						},
+						"kubelet_config": {
+							Type:        schema.TypeMap,
+							Description: "Kubelet configuration for pool nodes. Keys and values are expected to follow the kubelet configuration file format.",
+							Optional:    true,
+							Computed:    true,
+							Elem: &schema.Schema{
+								Type: schema.TypeString,
+							},
+						},
 						"status": {
 							Type:        schema.TypeString,
 							Description: "Cluster pool status.",
@@ -378,6 +491,45 @@ func resourceK8sV2Create(ctx context.Context, d *schema.ResourceData, m interfac
 		IsIPV6:       d.Get("is_ipv6").(bool),
 	}
 
+	if authI, ok := d.GetOk("authentication"); ok {
+		authA := authI.([]interface{})
+		auth := authA[0].(map[string]interface{})
+		opts.Authentication = &clusters.AuthenticationCreateOpts{}
+		if oidcI, ok := auth["oidc"]; ok {
+			oidcA := oidcI.([]interface{})
+			if len(oidcA) != 0 {
+				oidc := oidcA[0].(map[string]interface{})
+				opts.Authentication.OIDC = &clusters.OIDCCreateOpts{
+					ClientID:       oidc["client_id"].(string),
+					GroupsClaim:    oidc["groups_claim"].(string),
+					GroupsPrefix:   oidc["groups_prefix"].(string),
+					IssuerURL:      oidc["issuer_url"].(string),
+					UsernameClaim:  oidc["username_claim"].(string),
+					UsernamePrefix: oidc["username_prefix"].(string),
+				}
+				if len(oidc["required_claims"].(map[string]interface{})) > 0 {
+					opts.Authentication.OIDC.RequiredClaims = map[string]string{}
+					for k, v := range oidc["required_claims"].(map[string]interface{}) {
+						opts.Authentication.OIDC.RequiredClaims[k] = v.(string)
+					}
+				}
+				if algs, ok := oidc["signing_algs"].(*schema.Set); ok {
+					for _, alg := range algs.List() {
+						opts.Authentication.OIDC.SigningAlgs = append(opts.Authentication.OIDC.SigningAlgs, alg.(string))
+					}
+				}
+			}
+		}
+	}
+
+	if autoscalerCfgI, ok := d.GetOk("autoscaler_config"); ok {
+		autoscalerCfg := autoscalerCfgI.(map[string]interface{})
+		opts.AutoscalerConfig = map[string]string{}
+		for k, v := range autoscalerCfg {
+			opts.AutoscalerConfig[k] = v.(string)
+		}
+	}
+
 	if cniI, ok := d.GetOk("cni"); ok {
 		cniA := cniI.([]interface{})
 		cni := cniA[0].(map[string]interface{})
@@ -395,6 +547,8 @@ func resourceK8sV2Create(ctx context.Context, d *schema.ResourceData, m interfac
 						LoadBalancerMode:         clusters.LBModeType(cilium["lb_mode"].(string)),
 						LoadBalancerAcceleration: cilium["lb_acceleration"].(bool),
 						RoutingMode:              clusters.RoutingModeType(cilium["routing_mode"].(string)),
+						HubbleRelay:              cilium["hubble_relay"].(bool),
+						HubbleUI:                 cilium["hubble_ui"].(bool),
 					}
 				}
 			}
@@ -458,6 +612,18 @@ func resourceK8sV2Create(ctx context.Context, d *schema.ResourceData, m interfac
 				poolOpts.Taints[k] = v.(string)
 			}
 		}
+		if crioCfg, ok := pool["crio_config"].(map[string]interface{}); ok {
+			poolOpts.CrioConfig = map[string]string{}
+			for k, v := range crioCfg {
+				poolOpts.CrioConfig[k] = v.(string)
+			}
+		}
+		if kubeletCfg, ok := pool["kubelet_config"].(map[string]interface{}); ok {
+			poolOpts.KubeletConfig = map[string]string{}
+			for k, v := range kubeletCfg {
+				poolOpts.KubeletConfig[k] = v.(string)
+			}
+		}
 		opts.Pools = append(opts.Pools, poolOpts)
 	}
 
@@ -519,6 +685,8 @@ func resourceK8sV2Read(ctx context.Context, d *schema.ResourceData, m interface{
 	d.Set("creator_task_id", cluster.CreatorTaskID)
 	d.Set("task_id", cluster.TaskID)
 	d.Set("is_ipv6", cluster.IsIPV6)
+	d.Set("autoscaler_config", cluster.AutoscalerConfig)
+
 	if cluster.PodsIPPool != nil {
 		d.Set("pods_ip_pool", cluster.PodsIPPool.String())
 	}
@@ -532,12 +700,31 @@ func resourceK8sV2Read(ctx context.Context, d *schema.ResourceData, m interface{
 		d.Set("services_ipv6_pool", cluster.ServicesIPV6Pool.String())
 	}
 
+	if cluster.Authentication != nil {
+		v := map[string]interface{}{}
+		if cluster.Authentication.OIDC != nil {
+			v["oidc"] = []map[string]interface{}{{
+				"client_id":       cluster.Authentication.OIDC.ClientID,
+				"groups_claim":    cluster.Authentication.OIDC.GroupsClaim,
+				"groups_prefix":   cluster.Authentication.OIDC.GroupsPrefix,
+				"issuer_url":      cluster.Authentication.OIDC.IssuerURL,
+				"required_claims": cluster.Authentication.OIDC.RequiredClaims,
+				"signing_algs":    cluster.Authentication.OIDC.SigningAlgs,
+				"username_claim":  cluster.Authentication.OIDC.UsernameClaim,
+				"username_prefix": cluster.Authentication.OIDC.UsernamePrefix,
+			}}
+		}
+		if err := d.Set("authentication", []interface{}{v}); err != nil {
+			return diag.FromErr(err)
+		}
+	}
+
 	if cluster.CNI != nil {
 		v := map[string]interface{}{
 			"provider": cluster.CNI.Provider.String(),
 		}
 		if cluster.CNI.Cilium != nil {
-			v["cilium"] = map[string]interface{}{
+			v["cilium"] = []map[string]interface{}{{
 				"mask_size":       cluster.CNI.Cilium.MaskSize,
 				"mask_size_v6":    cluster.CNI.Cilium.MaskSizeV6,
 				"tunnel":          cluster.CNI.Cilium.Tunnel.String(),
@@ -545,9 +732,13 @@ func resourceK8sV2Read(ctx context.Context, d *schema.ResourceData, m interface{
 				"lb_mode":         cluster.CNI.Cilium.LoadBalancerMode.String(),
 				"lb_acceleration": cluster.CNI.Cilium.LoadBalancerAcceleration,
 				"routing_mode":    cluster.CNI.Cilium.RoutingMode.String(),
-			}
+				"hubble_relay":    cluster.CNI.Cilium.HubbleRelay,
+				"hubble_ui":       cluster.CNI.Cilium.HubbleUI,
+			}}
 		}
-		d.Set("cni", []interface{}{v})
+		if err := d.Set("cni", []interface{}{v}); err != nil {
+			return diag.FromErr(err)
+		}
 	}
 
 	poolMap := map[string]pools.ClusterPool{}
@@ -599,20 +790,13 @@ func resourceK8sV2Update(ctx context.Context, d *schema.ResourceData, m interfac
 	clusterName := d.Get("name").(string)
 
 	if d.HasChange("version") {
-		upgradeOpts := clusters.UpgradeOpts{
-			Version: d.Get("version").(string),
-		}
-		results, err := clusters.Upgrade(client, clusterName, upgradeOpts).Extract()
-		if err != nil {
+		if err := resourceK8sV2UgradeCluster(client, tasksClient, clusterName, d); err != nil {
 			return diag.FromErr(err)
 		}
+	}
 
-		taskID := results.Tasks[0]
-		log.Printf("[DEBUG] Task id (%s)", taskID)
-		_, err = tasks.WaitTaskAndReturnResult(tasksClient, taskID, true, K8sCreateTimeout, func(task tasks.TaskID) (interface{}, error) {
-			return nil, nil
-		})
-		if err != nil {
+	if d.HasChanges("authentication", "autoscaler_config") {
+		if err := resourceK8sV2UpdateCluster(client, tasksClient, clusterName, d); err != nil {
 			return diag.FromErr(err)
 		}
 	}
@@ -673,6 +857,89 @@ func resourceK8sV2Update(ctx context.Context, d *schema.ResourceData, m interfac
 	diags := resourceK8sV2Read(ctx, d, m)
 	log.Printf("[DEBUG] Finish k8s cluster updating (%s)", clusterName)
 	return diags
+}
+
+func resourceK8sV2UgradeCluster(client, tasksClient *gcorecloud.ServiceClient, clusterName string, d *schema.ResourceData) error {
+	upgradeOpts := clusters.UpgradeOpts{
+		Version: d.Get("version").(string),
+	}
+	results, err := clusters.Upgrade(client, clusterName, upgradeOpts).Extract()
+	if err != nil {
+		return fmt.Errorf("upgrade cluster: %w", err)
+	}
+
+	taskID := results.Tasks[0]
+	log.Printf("[DEBUG] Task id (%s)", taskID)
+	_, err = tasks.WaitTaskAndReturnResult(tasksClient, taskID, true, K8sCreateTimeout, func(task tasks.TaskID) (interface{}, error) {
+		return nil, nil
+	})
+	if err != nil {
+		return fmt.Errorf("wait for task %s: %w", taskID, err)
+	}
+	return nil
+}
+
+func resourceK8sV2UpdateCluster(client, tasksClient *gcorecloud.ServiceClient, clusterName string, d *schema.ResourceData) error {
+	opts := clusters.UpdateOpts{}
+
+	if d.HasChange("authentication") {
+		if authI, ok := d.GetOk("authentication"); ok {
+			authA := authI.([]interface{})
+			auth := authA[0].(map[string]interface{})
+			opts.Authentication = &clusters.AuthenticationCreateOpts{}
+			if oidcI, ok := auth["oidc"]; ok {
+				oidcA := oidcI.([]interface{})
+				oidc := oidcA[0].(map[string]interface{})
+				if len(oidc) > 0 {
+					opts.Authentication.OIDC = &clusters.OIDCCreateOpts{
+						ClientID:       oidc["client_id"].(string),
+						GroupsClaim:    oidc["groups_claim"].(string),
+						GroupsPrefix:   oidc["groups_prefix"].(string),
+						IssuerURL:      oidc["issuer_url"].(string),
+						UsernameClaim:  oidc["username_claim"].(string),
+						UsernamePrefix: oidc["username_prefix"].(string),
+					}
+					if len(oidc["required_claims"].(map[string]interface{})) > 0 {
+						opts.Authentication.OIDC.RequiredClaims = map[string]string{}
+						for k, v := range oidc["required_claims"].(map[string]interface{}) {
+							opts.Authentication.OIDC.RequiredClaims[k] = v.(string)
+						}
+					}
+					if algs, ok := oidc["signing_algs"].(*schema.Set); ok {
+						for _, alg := range algs.List() {
+							opts.Authentication.OIDC.SigningAlgs = append(opts.Authentication.OIDC.SigningAlgs, alg.(string))
+						}
+					}
+				}
+			}
+		}
+	}
+
+	if d.HasChange("autoscaler_config") {
+		if autoscalerCfgI, ok := d.GetOk("autoscaler_config"); ok {
+			autoscalerCfg := autoscalerCfgI.(map[string]interface{})
+			opts.AutoscalerConfig = map[string]string{}
+			for k, v := range autoscalerCfg {
+				opts.AutoscalerConfig[k] = v.(string)
+			}
+		}
+	}
+
+	results, err := clusters.Update(client, clusterName, opts).Extract()
+	if err != nil {
+		return fmt.Errorf("update cluster: %w", err)
+	}
+
+	taskID := results.Tasks[0]
+	log.Printf("[DEBUG] Task id (%s)", taskID)
+	_, err = tasks.WaitTaskAndReturnResult(tasksClient, taskID, true, K8sCreateTimeout, func(task tasks.TaskID) (interface{}, error) {
+		return nil, nil
+	})
+	if err != nil {
+		return fmt.Errorf("wait for task %s: %w", taskID, err)
+	}
+
+	return nil
 }
 
 func resourceK8sV2Delete(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
@@ -780,6 +1047,12 @@ func resourceK8sV2ClusterPoolNeedsReplace(list []interface{}, pool interface{}) 
 	if old["servergroup_policy"] != new["servergroup_policy"] {
 		return true
 	}
+	if !reflect.DeepEqual(old["crio_config"], new["crio_config"]) {
+		return true
+	}
+	if !reflect.DeepEqual(old["kubelet_config"], new["kubelet_config"]) {
+		return true
+	}
 	return false
 }
 
@@ -809,6 +1082,18 @@ func resourceK8sV2CreateClusterPool(client, tasksClient *gcorecloud.ServiceClien
 		opts.Taints = map[string]string{}
 		for k, v := range taints {
 			opts.Taints[k] = v.(string)
+		}
+	}
+	if crioCfg, ok := pool["crio_config"].(map[string]interface{}); ok {
+		opts.CrioConfig = map[string]string{}
+		for k, v := range crioCfg {
+			opts.CrioConfig[k] = v.(string)
+		}
+	}
+	if kubeletCfg, ok := pool["kubelet_config"].(map[string]interface{}); ok {
+		opts.KubeletConfig = map[string]string{}
+		for k, v := range kubeletCfg {
+			opts.KubeletConfig[k] = v.(string)
 		}
 	}
 	results, err := pools.Create(client, clusterName, opts).Extract()
@@ -911,6 +1196,8 @@ func resourceK8sV2PoolDataFromPool(pool pools.ClusterPool) interface{} {
 		"is_public_ipv4":       pool.IsPublicIPv4,
 		"labels":               resourceK8sV2FilteredPoolLabels(pool.Labels),
 		"taints":               pool.Taints,
+		"crio_config":          pool.CrioConfig,
+		"kubelet_config":       pool.KubeletConfig,
 		"servergroup_policy":   pool.ServerGroupPolicy,
 		"servergroup_name":     pool.ServerGroupName,
 		"servergroup_id":       pool.ServerGroupID,

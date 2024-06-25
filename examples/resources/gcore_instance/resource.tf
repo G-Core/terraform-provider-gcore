@@ -64,7 +64,6 @@ resource "gcore_instance" "instance" {
     network_id = gcore_network.network.id
     subnet_id  = gcore_subnet.subnet.id
     security_groups = ["d75db0b2-58f1-4a11-88c6-a932bb897310"]
-  }
     //port_id = null
     //ip_address = null
     //fip_source = null

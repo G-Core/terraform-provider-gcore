@@ -53,6 +53,76 @@ func dataSourceK8sV2() *schema.Resource {
 				Type:     schema.TypeString,
 				Required: true,
 			},
+			"authentication": {
+				Type:     schema.TypeList,
+				Computed: true,
+				Elem: &schema.Resource{
+					Schema: map[string]*schema.Schema{
+						"oidc": {
+							Type:     schema.TypeList,
+							Computed: true,
+							Elem: &schema.Resource{
+								Schema: map[string]*schema.Schema{
+									"client_id": {
+										Type:        schema.TypeString,
+										Description: "A client id that all tokens must be issued for.",
+										Computed:    true,
+									},
+									"groups_claim": {
+										Type:        schema.TypeString,
+										Description: "JWT claim to use as the user's group.",
+										Computed:    true,
+									},
+									"groups_prefix": {
+										Type:        schema.TypeString,
+										Description: "Prefix prepended to group claims to prevent clashes with existing names.",
+										Computed:    true,
+									},
+									"issuer_url": {
+										Type:        schema.TypeString,
+										Description: "URL of the provider that allows the API server to discover public signing keys. Only URLs that use the https:// scheme are accepted.",
+										Computed:    true,
+									},
+									"required_claims": {
+										Type:        schema.TypeMap,
+										Description: "A map describing required claims in the ID Token. Each claim is verified to be present in the ID Token with a matching value.",
+										Computed:    true,
+										Elem: &schema.Schema{
+											Type: schema.TypeString,
+										},
+									},
+									"signing_algs": {
+										Type:        schema.TypeSet,
+										Description: "Accepted signing algorithms. Supported values are: RS256, RS384, RS512, ES256, ES384, ES512, PS256, PS384, PS512.",
+										Computed:    true,
+										Elem: &schema.Schema{
+											Type: schema.TypeString,
+										},
+									},
+									"username_claim": {
+										Type:        schema.TypeString,
+										Description: "JWT claim to use as the user name. When not specified, the `sub` claim will be used.",
+										Computed:    true,
+									},
+									"username_prefix": {
+										Type:        schema.TypeString,
+										Description: "Prefix prepended to username claims to prevent clashes with existing names.",
+										Computed:    true,
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+			"autoscaler_config": {
+				Type:        schema.TypeMap,
+				Description: "Cluster autoscaler configuration params. Keys and values are expected to follow the cluster-autoscaler option format.",
+				Computed:    true,
+				Elem: &schema.Schema{
+					Type: schema.TypeString,
+				},
+			},
 			"cni": {
 				Type:     schema.TypeList,
 				Computed: true,
@@ -93,6 +163,14 @@ func dataSourceK8sV2() *schema.Resource {
 									},
 									"routing_mode": {
 										Type:     schema.TypeString,
+										Computed: true,
+									},
+									"hubble_relay": {
+										Type:     schema.TypeBool,
+										Computed: true,
+									},
+									"hubble_ui": {
+										Type:     schema.TypeBool,
 										Computed: true,
 									},
 								},
@@ -187,14 +265,36 @@ func dataSourceK8sV2() *schema.Resource {
 						"labels": {
 							Type:        schema.TypeMap,
 							Description: "Labels applied to the cluster pool nodes.",
-							Optional:    true,
 							Computed:    true,
+							Elem: &schema.Schema{
+								Type: schema.TypeString,
+							},
 						},
 						"taints": {
 							Type:        schema.TypeMap,
 							Description: "Taints applied to the cluster pool nodes.",
+							Computed:    true,
+							Elem: &schema.Schema{
+								Type: schema.TypeString,
+							},
+						},
+						"crio_config": {
+							Type:        schema.TypeMap,
+							Description: "Crio configuration for pool nodes. Keys and values are expected to follow the crio option format.",
 							Optional:    true,
 							Computed:    true,
+							Elem: &schema.Schema{
+								Type: schema.TypeString,
+							},
+						},
+						"kubelet_config": {
+							Type:        schema.TypeMap,
+							Description: "Kubelet configuration for pool nodes. Keys and values are expected to follow the kubelet configuration file format.",
+							Optional:    true,
+							Computed:    true,
+							Elem: &schema.Schema{
+								Type: schema.TypeString,
+							},
 						},
 						"servergroup_policy": {
 							Type:        schema.TypeString,
@@ -286,6 +386,8 @@ func dataSourceK8sV2Read(ctx context.Context, d *schema.ResourceData, m interfac
 	d.Set("creator_task_id", cluster.CreatorTaskID)
 	d.Set("task_id", cluster.TaskID)
 	d.Set("is_ipv6", cluster.IsIPV6)
+	d.Set("autoscaler_config", cluster.AutoscalerConfig)
+
 	if cluster.PodsIPPool != nil {
 		d.Set("pods_ip_pool", cluster.PodsIPPool.String())
 	}
@@ -299,12 +401,31 @@ func dataSourceK8sV2Read(ctx context.Context, d *schema.ResourceData, m interfac
 		d.Set("services_ipv6_pool", cluster.ServicesIPV6Pool.String())
 	}
 
+	if cluster.Authentication != nil {
+		v := map[string]interface{}{}
+		if cluster.Authentication.OIDC != nil {
+			v["oidc"] = []map[string]interface{}{{
+				"client_id":       cluster.Authentication.OIDC.ClientID,
+				"groups_claim":    cluster.Authentication.OIDC.GroupsClaim,
+				"groups_prefix":   cluster.Authentication.OIDC.GroupsPrefix,
+				"issuer_url":      cluster.Authentication.OIDC.IssuerURL,
+				"required_claims": cluster.Authentication.OIDC.RequiredClaims,
+				"signing_algs":    cluster.Authentication.OIDC.SigningAlgs,
+				"username_claim":  cluster.Authentication.OIDC.UsernameClaim,
+				"username_prefix": cluster.Authentication.OIDC.UsernamePrefix,
+			}}
+		}
+		if err := d.Set("authentication", []interface{}{v}); err != nil {
+			return diag.FromErr(err)
+		}
+	}
+
 	if cluster.CNI != nil {
 		v := map[string]interface{}{
 			"provider": cluster.CNI.Provider.String(),
 		}
 		if cluster.CNI.Cilium != nil {
-			v["cilium"] = map[string]interface{}{
+			v["cilium"] = []map[string]interface{}{{
 				"mask_size":       cluster.CNI.Cilium.MaskSize,
 				"mask_size_v6":    cluster.CNI.Cilium.MaskSizeV6,
 				"tunnel":          cluster.CNI.Cilium.Tunnel.String(),
@@ -312,9 +433,13 @@ func dataSourceK8sV2Read(ctx context.Context, d *schema.ResourceData, m interfac
 				"lb_mode":         cluster.CNI.Cilium.LoadBalancerMode.String(),
 				"lb_acceleration": cluster.CNI.Cilium.LoadBalancerAcceleration,
 				"routing_mode":    cluster.CNI.Cilium.RoutingMode.String(),
-			}
+				"hubble_relay":    cluster.CNI.Cilium.HubbleRelay,
+				"hubble_ui":       cluster.CNI.Cilium.HubbleUI,
+			}}
 		}
-		d.Set("cni", []interface{}{v})
+		if err := d.Set("cni", []interface{}{v}); err != nil {
+			return diag.FromErr(err)
+		}
 	}
 
 	var ps []map[string]interface{}
@@ -331,6 +456,8 @@ func dataSourceK8sV2Read(ctx context.Context, d *schema.ResourceData, m interfac
 			"is_public_ipv4":       pool.IsPublicIPv4,
 			"labels":               resourceK8sV2FilteredPoolLabels(pool.Labels),
 			"taints":               pool.Taints,
+			"crio_config":          pool.CrioConfig,
+			"kubelet_config":       pool.KubeletConfig,
 			"servergroup_policy":   pool.ServerGroupPolicy,
 			"servergroup_name":     pool.ServerGroupName,
 			"servergroup_id":       pool.ServerGroupID,
