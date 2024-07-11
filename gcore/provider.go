@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"net/url"
 	"os"
+	"sync"
 
 	dnssdk "github.com/G-Core/gcore-dns-sdk-go"
 	storageSDK "github.com/G-Core/gcore-storage-sdk-go"
@@ -283,6 +284,7 @@ func providerConfigure(_ context.Context, d *schema.ResourceData) (interface{}, 
 	config := Config{
 		Provider:  provider,
 		CDNClient: cdnService,
+		CDNMutex:  &sync.Mutex{},
 	}
 
 	userAgent := fmt.Sprintf("terraform/%s", version.Version)

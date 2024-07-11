@@ -52,6 +52,9 @@ func resourceCDNPresetApply(ctx context.Context, d *schema.ResourceData, m inter
 	config := m.(*Config)
 	client := config.CDNClient
 
+	config.CDNMutex.Lock()
+	defer config.CDNMutex.Unlock()
+
 	var req presets.ApplyRequest
 	req.ObjectID = d.Get("object_id").(int)
 
@@ -95,6 +98,9 @@ func resourceCDNPresetUnapply(ctx context.Context, d *schema.ResourceData, m int
 
 	config := m.(*Config)
 	client := config.CDNClient
+
+	config.CDNMutex.Lock()
+	defer config.CDNMutex.Unlock()
 
 	if err := client.Presets().Unapply(ctx, d.Get("preset_id").(int), d.Get("object_id").(int)); err != nil {
 		return diag.FromErr(err)

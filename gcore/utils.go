@@ -13,6 +13,7 @@ import (
 	"reflect"
 	"strconv"
 	"strings"
+	"sync"
 
 	dnssdk "github.com/G-Core/gcore-dns-sdk-go"
 	storageSDK "github.com/G-Core/gcore-storage-sdk-go"
@@ -52,6 +53,7 @@ const (
 type Config struct {
 	Provider      *gcorecloud.ProviderClient
 	CDNClient     gcdn.ClientService
+	CDNMutex      *sync.Mutex
 	StorageClient *storageSDK.SDK
 	DNSClient     *dnssdk.Client
 }

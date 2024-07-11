@@ -67,6 +67,9 @@ func resourceCDNOriginShieldingUpdate(ctx context.Context, d *schema.ResourceDat
 	config := m.(*Config)
 	client := config.CDNClient
 
+	config.CDNMutex.Lock()
+	defer config.CDNMutex.Unlock()
+
 	var req originshielding.UpdateRequest
 	req.ShieldingPop = pointer.ToInt(d.Get("shielding_pop").(int))
 
@@ -86,6 +89,9 @@ func resourceCDNOriginShieldingDelete(ctx context.Context, d *schema.ResourceDat
 	log.Printf("[DEBUG] Start CDN Origin Shielding deleting (id=%d)\n", resourceID)
 	config := m.(*Config)
 	client := config.CDNClient
+
+	config.CDNMutex.Lock()
+	defer config.CDNMutex.Unlock()
 
 	var req originshielding.UpdateRequest
 	var intPointer *int
