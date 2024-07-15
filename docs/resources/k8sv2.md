@@ -60,9 +60,9 @@ output "kubeconfig" {
 
 ### Optional
 
-- `authentication` (Block List, Max: 1) (see [below for nested schema](#nestedblock--authentication))
+- `authentication` (Block List, Max: 1) Cluster authentication configuration. (see [below for nested schema](#nestedblock--authentication))
 - `autoscaler_config` (Map of String) Cluster autoscaler configuration params. Keys and values are expected to follow the cluster-autoscaler option format.
-- `cni` (Block List, Max: 1) (see [below for nested schema](#nestedblock--cni))
+- `cni` (Block List, Max: 1) Cluster CNI configuration. (see [below for nested schema](#nestedblock--cni))
 - `fixed_network` (String) Fixed network used to allocate network addresses for cluster nodes.
 - `fixed_subnet` (String) Fixed subnet used to allocate network addresses for cluster nodes. Subnet should have a router.
 - `is_ipv6` (Boolean) Enable public IPv6 address.
@@ -121,7 +121,7 @@ Read-Only:
 
 Optional:
 
-- `oidc` (Block List, Max: 1) (see [below for nested schema](#nestedblock--authentication--oidc))
+- `oidc` (Block List, Max: 1) OpenID Connect configuration settings. (see [below for nested schema](#nestedblock--authentication--oidc))
 
 <a id="nestedblock--authentication--oidc"></a>
 ### Nested Schema for `authentication.oidc`
@@ -144,23 +144,23 @@ Optional:
 
 Optional:
 
-- `cilium` (Block List, Max: 1) (see [below for nested schema](#nestedblock--cni--cilium))
-- `provider` (String)
+- `cilium` (Block List, Max: 1) Cilium CNI configuration. (see [below for nested schema](#nestedblock--cni--cilium))
+- `provider` (String) CNI provider to use when creating the cluster. Supported values are: calico, cilium. The default value is calico.
 
 <a id="nestedblock--cni--cilium"></a>
 ### Nested Schema for `cni.cilium`
 
 Optional:
 
-- `encryption` (Boolean)
-- `hubble_relay` (Boolean)
-- `hubble_ui` (Boolean)
-- `lb_acceleration` (Boolean)
-- `lb_mode` (String)
-- `mask_size` (Number)
-- `mask_size_v6` (Number)
-- `routing_mode` (String)
-- `tunnel` (String)
+- `encryption` (Boolean) Enables transparent network encryption. The default value is false.
+- `hubble_relay` (Boolean) Enables Hubble Relay. The default value is false.
+- `hubble_ui` (Boolean) Enables Hubble UI. Requires `hubble_relay=true`. The default value is false.
+- `lb_acceleration` (Boolean) Enables load balancer acceleration via XDP. The default value is false.
+- `lb_mode` (String) The operation mode of load balancing for remote backends. Supported values are snat, dsr, hybrid. The default value is snat.
+- `mask_size` (Number) Specifies the size allocated from pods_ip_pool CIDR to node.ipam.podCIDRs. The default value is 24.
+- `mask_size_v6` (Number) Specifies the size allocated from pods_ipv6_pool CIDR to node.ipam.podCIDRs. The default value is 120.
+- `routing_mode` (String) Enables native-routing mode or tunneling mode. The default value is tunnel.
+- `tunnel` (String) Tunneling protocol to use in tunneling mode and for ad-hoc tunnels. The default value is geneve.
 
 
 

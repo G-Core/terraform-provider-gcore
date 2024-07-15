@@ -52,9 +52,9 @@ output "view" {
 
 ### Read-Only
 
-- `authentication` (List of Object) (see [below for nested schema](#nestedatt--authentication))
+- `authentication` (List of Object) Cluster authentication configuration. (see [below for nested schema](#nestedatt--authentication))
 - `autoscaler_config` (Map of String) Cluster autoscaler configuration params. Keys and values are expected to follow the cluster-autoscaler option format.
-- `cni` (List of Object) (see [below for nested schema](#nestedatt--cni))
+- `cni` (List of Object) Cluster CNI configuration. (see [below for nested schema](#nestedatt--cni))
 - `created_at` (String)
 - `creator_task_id` (String)
 - `fixed_network` (String)

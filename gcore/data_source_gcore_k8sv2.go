@@ -54,13 +54,15 @@ func dataSourceK8sV2() *schema.Resource {
 				Required: true,
 			},
 			"authentication": {
-				Type:     schema.TypeList,
-				Computed: true,
+				Type:        schema.TypeList,
+				Description: "Cluster authentication configuration.",
+				Computed:    true,
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
 						"oidc": {
-							Type:     schema.TypeList,
-							Computed: true,
+							Type:        schema.TypeList,
+							Description: "OpenID Connect configuration settings.",
+							Computed:    true,
 							Elem: &schema.Resource{
 								Schema: map[string]*schema.Schema{
 									"client_id": {
@@ -124,54 +126,66 @@ func dataSourceK8sV2() *schema.Resource {
 				},
 			},
 			"cni": {
-				Type:     schema.TypeList,
-				Computed: true,
+				Type:        schema.TypeList,
+				Description: "Cluster CNI configuration.",
+				Computed:    true,
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
 						"provider": {
-							Type:     schema.TypeString,
-							Computed: true,
+							Type:        schema.TypeString,
+							Description: "CNI provider used by the cluster. Supported values are: calico, cilium.",
+							Computed:    true,
 						},
 						"cilium": {
-							Type:     schema.TypeList,
-							Computed: true,
+							Type:        schema.TypeList,
+							Description: "Cilium CNI configuration.",
+							Computed:    true,
 							Elem: &schema.Resource{
 								Schema: map[string]*schema.Schema{
 									"mask_size": {
-										Type:     schema.TypeInt,
-										Computed: true,
+										Type:        schema.TypeInt,
+										Description: "The size allocated from pods_ip_pool CIDR to node.ipam.podCIDRs.",
+										Computed:    true,
 									},
 									"mask_size_v6": {
-										Type:     schema.TypeInt,
-										Computed: true,
+										Type:        schema.TypeInt,
+										Description: "The size allocated from pods_ipv6_pool CIDR to node.ipam.podCIDRs.",
+										Computed:    true,
 									},
 									"tunnel": {
-										Type:     schema.TypeString,
-										Computed: true,
+										Type:        schema.TypeString,
+										Description: "Tunneling protocol used in tunneling mode and for ad-hoc tunnels.",
+										Computed:    true,
 									},
 									"encryption": {
-										Type:     schema.TypeBool,
-										Computed: true,
+										Type:        schema.TypeBool,
+										Description: "Is transparent network encryption enabled or not.",
+										Computed:    true,
 									},
 									"lb_mode": {
-										Type:     schema.TypeString,
-										Computed: true,
+										Type:        schema.TypeString,
+										Description: "The operation mode of load balancing for remote backends. Supported values are snat, dsr, hybrid.",
+										Computed:    true,
 									},
 									"lb_acceleration": {
-										Type:     schema.TypeBool,
-										Computed: true,
+										Type:        schema.TypeBool,
+										Description: "Is load balancer acceleration via XDP enabled or not.",
+										Computed:    true,
 									},
 									"routing_mode": {
-										Type:     schema.TypeString,
-										Computed: true,
+										Type:        schema.TypeString,
+										Description: "Is native-routing mode or tunneling mode enabled.",
+										Computed:    true,
 									},
 									"hubble_relay": {
-										Type:     schema.TypeBool,
-										Computed: true,
+										Type:        schema.TypeBool,
+										Description: "Is Hubble Relay enabled or not.",
+										Computed:    true,
 									},
 									"hubble_ui": {
-										Type:     schema.TypeBool,
-										Computed: true,
+										Type:        schema.TypeBool,
+										Description: "Is Hubble UI enabled or not.",
+										Computed:    true,
 									},
 								},
 							},
