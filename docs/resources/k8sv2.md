@@ -159,7 +159,6 @@ Optional:
 - `lb_mode` (String) The operation mode of load balancing for remote backends. Supported values are snat, dsr, hybrid. The default value is snat.
 - `mask_size` (Number) Specifies the size allocated from pods_ip_pool CIDR to node.ipam.podCIDRs. The default value is 24.
 - `mask_size_v6` (Number) Specifies the size allocated from pods_ipv6_pool CIDR to node.ipam.podCIDRs. The default value is 120.
-- `routing_mode` (String) Enables native-routing mode or tunneling mode. The default value is tunnel.
 - `tunnel` (String) Tunneling protocol to use in tunneling mode and for ad-hoc tunnels. The default value is geneve.
 
 

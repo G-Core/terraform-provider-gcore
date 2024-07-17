@@ -172,11 +172,6 @@ func dataSourceK8sV2() *schema.Resource {
 										Description: "Is load balancer acceleration via XDP enabled or not.",
 										Computed:    true,
 									},
-									"routing_mode": {
-										Type:        schema.TypeString,
-										Description: "Is native-routing mode or tunneling mode enabled.",
-										Computed:    true,
-									},
 									"hubble_relay": {
 										Type:        schema.TypeBool,
 										Description: "Is Hubble Relay enabled or not.",
@@ -446,7 +441,6 @@ func dataSourceK8sV2Read(ctx context.Context, d *schema.ResourceData, m interfac
 				"encryption":      cluster.CNI.Cilium.Encryption,
 				"lb_mode":         cluster.CNI.Cilium.LoadBalancerMode.String(),
 				"lb_acceleration": cluster.CNI.Cilium.LoadBalancerAcceleration,
-				"routing_mode":    cluster.CNI.Cilium.RoutingMode.String(),
 				"hubble_relay":    cluster.CNI.Cilium.HubbleRelay,
 				"hubble_ui":       cluster.CNI.Cilium.HubbleUI,
 			}}

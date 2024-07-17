@@ -80,6 +80,7 @@ resource "gcore_lblistener" "prometheus_9101" {
 
 output "prometheus_password" {
   value = random_password.prometheus_password.result
+  sensitive = true
 }
 ```
 
