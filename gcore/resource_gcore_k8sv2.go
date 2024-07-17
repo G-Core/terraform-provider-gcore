@@ -246,13 +246,6 @@ func resourceK8sV2() *schema.Resource {
 										Computed:    true,
 										ForceNew:    true,
 									},
-									"routing_mode": {
-										Type:        schema.TypeString,
-										Description: "Enables native-routing mode or tunneling mode. The default value is tunnel.",
-										Optional:    true,
-										Computed:    true,
-										ForceNew:    true,
-									},
 									"hubble_relay": {
 										Type:        schema.TypeBool,
 										Description: "Enables Hubble Relay. The default value is false.",
@@ -560,7 +553,6 @@ func resourceK8sV2Create(ctx context.Context, d *schema.ResourceData, m interfac
 						Encryption:               cilium["encryption"].(bool),
 						LoadBalancerMode:         clusters.LBModeType(cilium["lb_mode"].(string)),
 						LoadBalancerAcceleration: cilium["lb_acceleration"].(bool),
-						RoutingMode:              clusters.RoutingModeType(cilium["routing_mode"].(string)),
 						HubbleRelay:              cilium["hubble_relay"].(bool),
 						HubbleUI:                 cilium["hubble_ui"].(bool),
 					}
@@ -745,7 +737,6 @@ func resourceK8sV2Read(ctx context.Context, d *schema.ResourceData, m interface{
 				"encryption":      cluster.CNI.Cilium.Encryption,
 				"lb_mode":         cluster.CNI.Cilium.LoadBalancerMode.String(),
 				"lb_acceleration": cluster.CNI.Cilium.LoadBalancerAcceleration,
-				"routing_mode":    cluster.CNI.Cilium.RoutingMode.String(),
 				"hubble_relay":    cluster.CNI.Cilium.HubbleRelay,
 				"hubble_ui":       cluster.CNI.Cilium.HubbleUI,
 			}}
