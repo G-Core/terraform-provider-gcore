@@ -78,6 +78,13 @@ resource "gcore_cdn_rule" "cdn_example_com_rule_1" {
         "101" = "400s"
       }
     }
+    fastedge {
+      on_request_headers {
+        enabled = true
+        app_id = "1001"
+        interrupt_on_error = true
+      }
+    }
     fetch_compressed {
       value = false
     }
