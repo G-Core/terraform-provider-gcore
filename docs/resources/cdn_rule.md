@@ -150,6 +150,7 @@ Optional:
 - `disable_cache` (Block List, Max: 1) Option enables browser caching. When enabled, content caching is completely disabled. (see [below for nested schema](#nestedblock--options--disable_cache))
 - `disable_proxy_force_ranges` (Block List, Max: 1) The option allows getting 206 responses regardless settings of an origin source. Enabled by default. (see [below for nested schema](#nestedblock--options--disable_proxy_force_ranges))
 - `edge_cache_settings` (Block List, Max: 1) The cache expiration time for CDN servers. (see [below for nested schema](#nestedblock--options--edge_cache_settings))
+- `fastedge` (Block List, Max: 1) Allows to configure FastEdge app to be called on different request/response phases. (see [below for nested schema](#nestedblock--options--fastedge))
 - `fetch_compressed` (Block List, Max: 1) Option allows to enable fetch compressed. CDN request and cache already compressed content. Your server should support compression. CDN servers will not ungzip your content even if a user's browser doesn't accept compression (nowadays almost all browsers support it). (see [below for nested schema](#nestedblock--options--fetch_compressed))
 - `follow_origin_redirect` (Block List, Max: 1) Enable redirection from origin. If the origin server returns a redirect, the option allows the CDN to pull the requested content from the origin server that was returned in the redirect. (see [below for nested schema](#nestedblock--options--follow_origin_redirect))
 - `force_return` (Block List, Max: 1) Allows to apply custom HTTP code to the CDN content. Specify HTTP-code you need and text or URL if you are going to set up redirect. (see [below for nested schema](#nestedblock--options--force_return))
@@ -287,6 +288,31 @@ Optional:
 - `default` (String) Content will be cached according to origin cache settings. The value applies for a response with codes 200, 201, 204, 206, 301, 302, 303, 304, 307, 308, if an origin server does not have caching HTTP headers. Responses with other codes will not be cached.
 - `enabled` (Boolean)
 - `value` (String) Specify caching time for the response with codes 200, 206, 301, 302. Responses with codes 4xx, 5xx will not be cached. Use '0s' to disable caching. Use custom_values field to specify a custom caching time for a response with specific codes.
+
+
+<a id="nestedblock--options--fastedge"></a>
+### Nested Schema for `options.fastedge`
+
+Required:
+
+- `on_request_headers` (Block List, Min: 1, Max: 1) Allows to configure FastEdge application that will be called to handle request headers as soon as CDN receives incoming HTTP request. (see [below for nested schema](#nestedblock--options--fastedge--on_request_headers))
+
+Optional:
+
+- `enabled` (Boolean)
+
+<a id="nestedblock--options--fastedge--on_request_headers"></a>
+### Nested Schema for `options.fastedge.on_request_headers`
+
+Required:
+
+- `app_id` (String) The ID of the application in FastEdge.
+
+Optional:
+
+- `enabled` (Boolean) Determines if the FastEdge application should be called whenever HTTP request headers are received.
+- `interrupt_on_error` (Boolean) Determines if the request execution should be interrupted when an error occurs.
+
 
 
 <a id="nestedblock--options--fetch_compressed"></a>
