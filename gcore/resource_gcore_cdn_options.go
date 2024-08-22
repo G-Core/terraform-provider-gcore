@@ -220,6 +220,48 @@ var (
 				},
 			},
 		},
+		"fastedge": {
+			Type:        schema.TypeList,
+			MaxItems:    1,
+			Optional:    true,
+			Description: "Allows to configure FastEdge app to be called on different request/response phases.",
+			Elem: &schema.Resource{
+				Schema: map[string]*schema.Schema{
+					"enabled": {
+						Type:     schema.TypeBool,
+						Optional: true,
+						Default:  true,
+					},
+					"on_request_headers": {
+						Type:        schema.TypeList,
+						MaxItems:    1,
+						Required:    true,
+						Description: "Allows to configure FastEdge application that will be called to handle request headers as soon as CDN receives incoming HTTP request.",
+						Elem: &schema.Resource{
+							Schema: map[string]*schema.Schema{
+								"enabled": {
+									Type:        schema.TypeBool,
+									Optional:    true,
+									Default:     true,
+									Description: "Determines if the FastEdge application should be called whenever HTTP request headers are received.",
+								},
+								"app_id": {
+									Type:        schema.TypeString,
+									Required:    true,
+									Description: "The ID of the application in FastEdge.",
+								},
+								"interrupt_on_error": {
+									Type:        schema.TypeBool,
+									Optional:    true,
+									Default:     true,
+									Description: "Determines if the request execution should be interrupted when an error occurs.",
+								},
+							},
+						},
+					},
+				},
+			},
+		},
 		"fetch_compressed": {
 			Type:        schema.TypeList,
 			MaxItems:    1,
