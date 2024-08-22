@@ -298,6 +298,18 @@ func listToOptions(l []interface{}) *gcdn.Options {
 			Default:      opt["default"].(string),
 		}
 	}
+	if opt, ok := getOptByName(fields, "fastedge"); ok {
+		opts.FastEdge = &gcdn.FastEdge{
+			Enabled: opt["enabled"].(bool),
+		}
+		if onRequestHeaders, ok := getOptByName(opt, "on_request_headers"); ok {
+			opts.FastEdge.OnRequestHeaders = &gcdn.FastEdgeAppConfig{
+				Enabled:          onRequestHeaders["enabled"].(bool),
+				AppID:            onRequestHeaders["app_id"].(string),
+				InterruptOnError: onRequestHeaders["interrupt_on_error"].(bool),
+			}
+		}
+	}
 	if opt, ok := getOptByName(fields, "fetch_compressed"); ok {
 		opts.FetchCompressed = &gcdn.FetchCompressed{
 			Enabled: opt["enabled"].(bool),
@@ -639,6 +651,13 @@ func optionsToList(options *gcdn.Options) []interface{} {
 	if options.EdgeCacheSettings != nil {
 		m := structToMap(options.EdgeCacheSettings)
 		result["edge_cache_settings"] = []interface{}{m}
+	}
+	if options.FastEdge != nil {
+		m := structToMap(options.FastEdge)
+		if options.FastEdge.OnRequestHeaders != nil {
+			m["on_request_headers"] = []interface{}{structToMap(options.FastEdge.OnRequestHeaders)}
+		}
+		result["fastedge"] = []interface{}{m}
 	}
 	if options.FetchCompressed != nil {
 		m := structToMap(options.FetchCompressed)
