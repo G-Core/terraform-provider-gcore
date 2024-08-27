@@ -70,6 +70,13 @@ resource "gcore_cdn_resource" "cdn_example_com" {
         "101" = "400s"
       }
     }
+    fastedge {
+      on_request_headers {
+        enabled = true
+        app_id = "1001"
+        interrupt_on_error = true
+      }
+    }
     fetch_compressed {
       value = false
     }
