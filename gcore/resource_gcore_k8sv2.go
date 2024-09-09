@@ -440,58 +440,6 @@ func resourceK8sV2() *schema.Resource {
 					},
 				},
 			},
-			"security_group_rules_internal": {
-				Type:        schema.TypeList,
-				Computed:    true,
-				Description: "Default readonly security group rules. It is used for internal purposes only.",
-				Elem: &schema.Resource{
-					Schema: map[string]*schema.Schema{
-						"id": {
-							Type:     schema.TypeString,
-							Computed: true,
-						},
-						"direction": {
-							Type:        schema.TypeString,
-							Computed:    true,
-							Description: fmt.Sprintf("Available value is '%s', '%s'", types.RuleDirectionIngress, types.RuleDirectionEgress),
-						},
-						"ethertype": {
-							Type:        schema.TypeString,
-							Computed:    true,
-							Description: fmt.Sprintf("Available value is '%s', '%s'", types.EtherTypeIPv4, types.EtherTypeIPv6),
-						},
-						"protocol": {
-							Type:        schema.TypeString,
-							Computed:    true,
-							Description: fmt.Sprintf("Available value is %s", strings.Join(types.Protocol("").StringList(), ",")),
-						},
-						"port_range_min": {
-							Type:     schema.TypeInt,
-							Computed: true,
-						},
-						"port_range_max": {
-							Type:     schema.TypeInt,
-							Computed: true,
-						},
-						"description": {
-							Type:     schema.TypeString,
-							Computed: true,
-						},
-						"remote_ip_prefix": {
-							Type:     schema.TypeString,
-							Computed: true,
-						},
-						"updated_at": {
-							Type:     schema.TypeString,
-							Computed: true,
-						},
-						"created_at": {
-							Type:     schema.TypeString,
-							Computed: true,
-						},
-					},
-				},
-			},
 			"security_group_rules": {
 				Type:        schema.TypeSet,
 				Optional:    true,
@@ -805,12 +753,6 @@ func resourceK8sV2Create(ctx context.Context, d *schema.ResourceData, m interfac
 		sgClient, securitygroups.ListOpts{MetadataKV: map[string]string{k8sSgMetadataKey: clusterName.(string)}},
 	)
 	sg := getSuitableSecurityGroup(sgs, clusterName.(string), d.Get("project_id").(int), d.Get("region_id").(int))
-	if len(d.Get("security_group_rules_internal").([]interface{})) == 0 {
-		rules := convertSecurityGroupRules(sg.SecurityGroupRules)
-		if err := d.Set("security_group_rules_internal", rules); err != nil {
-			return diag.FromErr(err)
-		}
-	}
 	if sg != nil {
 		rawRules := d.Get("security_group_rules").(*schema.Set).List()
 		if len(rawRules) != 0 {
@@ -838,6 +780,17 @@ func getSuitableSecurityGroup(sgs []securitygroups.SecurityGroup, name string, p
 		}
 	}
 	return nil
+}
+
+func filterSecurityGroupRules(rules []securitygroups.SecurityGroupRule) []securitygroups.SecurityGroupRule {
+	newRules := []securitygroups.SecurityGroupRule{}
+	for _, rule := range rules {
+		if *rule.Description == "system" {
+			continue
+		}
+		newRules = append(newRules, rule)
+	}
+	return newRules
 }
 
 func resourceK8sV2Read(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
@@ -968,19 +921,10 @@ func resourceK8sV2Read(ctx context.Context, d *schema.ResourceData, m interface{
 	)
 	sg := getSuitableSecurityGroup(sgs, clusterName, d.Get("project_id").(int), d.Get("region_id").(int))
 	if err == nil && sg != nil {
-		if len(d.Get("security_group_rules_internal").([]interface{})) == 0 {
-			rules := convertSecurityGroupRules(sg.SecurityGroupRules)
-			if err := d.Set("security_group_rules_internal", rules); err != nil {
-				return diag.FromErr(err)
-			}
-		}
-
 		d.Set("security_group_id", sg.ID)
 		// todo read security group for the cluster
-		rulesRaw := convertSecurityGroupRules(sg.SecurityGroupRules)
-		actualRules := schema.NewSet(secGroupUniqueID, rulesRaw)
-		readOnlyRules := schema.NewSet(secGroupUniqueID, d.Get("security_group_rules_internal").([]interface{}))
-		resultRules := actualRules.Difference(readOnlyRules)
+		rulesRaw := convertSecurityGroupRules(filterSecurityGroupRules(sg.SecurityGroupRules))
+		resultRules := schema.NewSet(secGroupUniqueID, rulesRaw)
 
 		if err := d.Set("security_group_rules", resultRules); err != nil {
 			return diag.FromErr(err)
