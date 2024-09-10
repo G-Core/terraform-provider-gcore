@@ -205,8 +205,8 @@ func resourceK8sV2() *schema.Resource {
 							Description: "Cilium CNI configuration.",
 							MaxItems:    1,
 							MinItems:    1,
-							ForceNew:    true,
 							Optional:    true,
+							Computed:    true,
 							Elem: &schema.Resource{
 								Schema: map[string]*schema.Schema{
 									"mask_size": {
@@ -227,43 +227,43 @@ func resourceK8sV2() *schema.Resource {
 										Type:        schema.TypeString,
 										Description: "Tunneling protocol to use in tunneling mode and for ad-hoc tunnels. The default value is geneve.",
 										Optional:    true,
-										Computed:    true,
-										ForceNew:    true,
+										Default:     "geneve",
 									},
 									"encryption": {
 										Type:        schema.TypeBool,
 										Description: "Enables transparent network encryption. The default value is false.",
 										Optional:    true,
-										Computed:    true,
-										ForceNew:    true,
+										Default:     false,
 									},
 									"lb_mode": {
 										Type:        schema.TypeString,
 										Description: "The operation mode of load balancing for remote backends. Supported values are snat, dsr, hybrid. The default value is snat.",
 										Optional:    true,
-										Computed:    true,
-										ForceNew:    true,
+										Default:     "snat",
 									},
 									"lb_acceleration": {
 										Type:        schema.TypeBool,
 										Description: "Enables load balancer acceleration via XDP. The default value is false.",
 										Optional:    true,
-										Computed:    true,
-										ForceNew:    true,
+										Default:     false,
+									},
+									"routing_mode": {
+										Type:        schema.TypeString,
+										Description: "Enables native-routing mode or tunneling mode. The default value is tunnel.",
+										Optional:    true,
+										Default:     "tunnel",
 									},
 									"hubble_relay": {
 										Type:        schema.TypeBool,
 										Description: "Enables Hubble Relay. The default value is false.",
 										Optional:    true,
-										Computed:    true,
-										ForceNew:    true,
+										Default:     false,
 									},
 									"hubble_ui": {
 										Type:        schema.TypeBool,
 										Description: "Enables Hubble UI. Requires `hubble_relay=true`. The default value is false.",
 										Optional:    true,
-										Computed:    true,
-										ForceNew:    true,
+										Default:     false,
 									},
 								},
 							},
@@ -436,58 +436,6 @@ func resourceK8sV2() *schema.Resource {
 							Type:        schema.TypeString,
 							Description: "Cluster pool creation date.",
 							Computed:    true,
-						},
-					},
-				},
-			},
-			"security_group_rules_internal": {
-				Type:        schema.TypeList,
-				Computed:    true,
-				Description: "Default readonly security group rules. It is used for internal purposes only.",
-				Elem: &schema.Resource{
-					Schema: map[string]*schema.Schema{
-						"id": {
-							Type:     schema.TypeString,
-							Computed: true,
-						},
-						"direction": {
-							Type:        schema.TypeString,
-							Computed:    true,
-							Description: fmt.Sprintf("Available value is '%s', '%s'", types.RuleDirectionIngress, types.RuleDirectionEgress),
-						},
-						"ethertype": {
-							Type:        schema.TypeString,
-							Computed:    true,
-							Description: fmt.Sprintf("Available value is '%s', '%s'", types.EtherTypeIPv4, types.EtherTypeIPv6),
-						},
-						"protocol": {
-							Type:        schema.TypeString,
-							Computed:    true,
-							Description: fmt.Sprintf("Available value is %s", strings.Join(types.Protocol("").StringList(), ",")),
-						},
-						"port_range_min": {
-							Type:     schema.TypeInt,
-							Computed: true,
-						},
-						"port_range_max": {
-							Type:     schema.TypeInt,
-							Computed: true,
-						},
-						"description": {
-							Type:     schema.TypeString,
-							Computed: true,
-						},
-						"remote_ip_prefix": {
-							Type:     schema.TypeString,
-							Computed: true,
-						},
-						"updated_at": {
-							Type:     schema.TypeString,
-							Computed: true,
-						},
-						"created_at": {
-							Type:     schema.TypeString,
-							Computed: true,
 						},
 					},
 				},
@@ -690,6 +638,7 @@ func resourceK8sV2Create(ctx context.Context, d *schema.ResourceData, m interfac
 						Encryption:               cilium["encryption"].(bool),
 						LoadBalancerMode:         clusters.LBModeType(cilium["lb_mode"].(string)),
 						LoadBalancerAcceleration: cilium["lb_acceleration"].(bool),
+						RoutingMode:              clusters.RoutingModeType(cilium["routing_mode"].(string)),
 						HubbleRelay:              cilium["hubble_relay"].(bool),
 						HubbleUI:                 cilium["hubble_ui"].(bool),
 					}
@@ -804,12 +753,6 @@ func resourceK8sV2Create(ctx context.Context, d *schema.ResourceData, m interfac
 		sgClient, securitygroups.ListOpts{MetadataKV: map[string]string{k8sSgMetadataKey: clusterName.(string)}},
 	)
 	sg := getSuitableSecurityGroup(sgs, clusterName.(string), d.Get("project_id").(int), d.Get("region_id").(int))
-	if len(d.Get("security_group_rules_internal").([]interface{})) == 0 {
-		rules := convertSecurityGroupRules(sg.SecurityGroupRules)
-		if err := d.Set("security_group_rules_internal", rules); err != nil {
-			return diag.FromErr(err)
-		}
-	}
 	if sg != nil {
 		rawRules := d.Get("security_group_rules").(*schema.Set).List()
 		if len(rawRules) != 0 {
@@ -837,6 +780,17 @@ func getSuitableSecurityGroup(sgs []securitygroups.SecurityGroup, name string, p
 		}
 	}
 	return nil
+}
+
+func filterSecurityGroupRules(rules []securitygroups.SecurityGroupRule) []securitygroups.SecurityGroupRule {
+	newRules := []securitygroups.SecurityGroupRule{}
+	for _, rule := range rules {
+		if *rule.Description == "system" {
+			continue
+		}
+		newRules = append(newRules, rule)
+	}
+	return newRules
 }
 
 func resourceK8sV2Read(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
@@ -919,6 +873,7 @@ func resourceK8sV2Read(ctx context.Context, d *schema.ResourceData, m interface{
 				"encryption":      cluster.CNI.Cilium.Encryption,
 				"lb_mode":         cluster.CNI.Cilium.LoadBalancerMode.String(),
 				"lb_acceleration": cluster.CNI.Cilium.LoadBalancerAcceleration,
+				"routing_mode":    cluster.CNI.Cilium.RoutingMode.String(),
 				"hubble_relay":    cluster.CNI.Cilium.HubbleRelay,
 				"hubble_ui":       cluster.CNI.Cilium.HubbleUI,
 			}}
@@ -966,19 +921,10 @@ func resourceK8sV2Read(ctx context.Context, d *schema.ResourceData, m interface{
 	)
 	sg := getSuitableSecurityGroup(sgs, clusterName, d.Get("project_id").(int), d.Get("region_id").(int))
 	if err == nil && sg != nil {
-		if len(d.Get("security_group_rules_internal").([]interface{})) == 0 {
-			rules := convertSecurityGroupRules(sg.SecurityGroupRules)
-			if err := d.Set("security_group_rules_internal", rules); err != nil {
-				return diag.FromErr(err)
-			}
-		}
-
 		d.Set("security_group_id", sg.ID)
 		// todo read security group for the cluster
-		rulesRaw := convertSecurityGroupRules(sg.SecurityGroupRules)
-		actualRules := schema.NewSet(secGroupUniqueID, rulesRaw)
-		readOnlyRules := schema.NewSet(secGroupUniqueID, d.Get("security_group_rules_internal").([]interface{}))
-		resultRules := actualRules.Difference(readOnlyRules)
+		rulesRaw := convertSecurityGroupRules(filterSecurityGroupRules(sg.SecurityGroupRules))
+		resultRules := schema.NewSet(secGroupUniqueID, rulesRaw)
 
 		if err := d.Set("security_group_rules", resultRules); err != nil {
 			return diag.FromErr(err)
@@ -1012,7 +958,7 @@ func resourceK8sV2Update(ctx context.Context, d *schema.ResourceData, m interfac
 		}
 	}
 
-	if d.HasChanges("authentication", "autoscaler_config") {
+	if d.HasChanges("authentication", "autoscaler_config", "cni") {
 		if err := resourceK8sV2UpdateCluster(client, tasksClient, clusterName, d); err != nil {
 			return diag.FromErr(err)
 		}
@@ -1189,6 +1135,33 @@ func resourceK8sV2UpdateCluster(client, tasksClient *gcorecloud.ServiceClient, c
 			opts.AutoscalerConfig = map[string]string{}
 			for k, v := range autoscalerCfg {
 				opts.AutoscalerConfig[k] = v.(string)
+			}
+		}
+	}
+
+	if d.HasChange("cni") {
+		if cniI, ok := d.GetOk("cni"); ok {
+			cniA := cniI.([]interface{})
+			cni := cniA[0].(map[string]interface{})
+			opts.CNI = &clusters.CNICreateOpts{Provider: clusters.CNIProvider(cni["provider"].(string))}
+			if cni["provider"].(string) == "cilium" {
+				if ciliumI, ok := cni["cilium"]; ok {
+					ciliumA := ciliumI.([]interface{})
+					if len(ciliumA) != 0 {
+						cilium := ciliumA[0].(map[string]interface{})
+						opts.CNI.Cilium = &clusters.CiliumCreateOpts{
+							MaskSize:                 cilium["mask_size"].(int),
+							MaskSizeV6:               cilium["mask_size_v6"].(int),
+							Tunnel:                   clusters.TunnelType(cilium["tunnel"].(string)),
+							Encryption:               cilium["encryption"].(bool),
+							LoadBalancerMode:         clusters.LBModeType(cilium["lb_mode"].(string)),
+							LoadBalancerAcceleration: cilium["lb_acceleration"].(bool),
+							RoutingMode:              clusters.RoutingModeType(cilium["routing_mode"].(string)),
+							HubbleRelay:              cilium["hubble_relay"].(bool),
+							HubbleUI:                 cilium["hubble_ui"].(bool),
+						}
+					}
+				}
 			}
 		}
 	}
