@@ -2,7 +2,10 @@ package gcore
 
 import (
 	"context"
+	"crypto/md5"
+	"encoding/binary"
 	"fmt"
+	"io"
 	"log"
 	"sort"
 	"strconv"
@@ -21,23 +24,16 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/validation"
 )
 
-const (
-	InstanceDeleting        int = 1200
-	InstanceCreatingTimeout int = 1200
-	InstancePoint               = "instances"
-
-	InstanceVMStateActive  = "active"
-	InstanceVMStateStopped = "stopped"
-)
-
-func resourceInstance() *schema.Resource {
+func resourceInstanceV2() *schema.Resource {
 	return &schema.Resource{
-		CreateContext:      resourceInstanceCreate,
-		ReadContext:        resourceInstanceRead,
-		UpdateContext:      resourceInstanceUpdate,
-		DeleteContext:      resourceInstanceDelete,
-		Description:        "Represent instance",
-		DeprecationMessage: "!> **WARNING:** This resource is deprecated, please use 'gcore_instancev2' instead",
+		CreateContext: resourceInstanceV2Create,
+		ReadContext:   resourceInstanceV2Read,
+		UpdateContext: resourceInstanceV2Update,
+		DeleteContext: resourceInstanceDelete,
+		Description: `
+Gcore Instance offer a flexible, powerful, and scalable solution for hosting applications and services.
+Designed to meet a wide range of computing needs, our instances ensure optimal performance, reliability, and security for
+your applications.`,
 		Importer: &schema.ResourceImporter{
 			StateContext: func(ctx context.Context, d *schema.ResourceData, meta interface{}) ([]*schema.ResourceData, error) {
 				projectID, regionID, InstanceID, err := ImportStringParser(d.Id())
@@ -89,17 +85,20 @@ func resourceInstance() *schema.Resource {
 				},
 			},
 			"flavor_id": &schema.Schema{
-				Type:     schema.TypeString,
-				Required: true,
+				Type:        schema.TypeString,
+				Required:    true,
+				Description: "Flavor ID",
 			},
 			"name": &schema.Schema{
-				Type:     schema.TypeString,
-				Optional: true,
-				Computed: true,
+				Type:        schema.TypeString,
+				Optional:    true,
+				Description: "Name of the instance.",
+				Computed:    true,
 			},
 			"name_templates": &schema.Schema{
 				Type:          schema.TypeList,
 				Optional:      true,
+				Description:   "List of instance names which will be changed by template. You can use forms 'ip_octets', 'two_ip_octets', 'one_ip_octet'",
 				Deprecated:    "Use name_template instead",
 				ConflictsWith: []string{"name_template"},
 				Elem:          &schema.Schema{Type: schema.TypeString},
@@ -107,12 +106,14 @@ func resourceInstance() *schema.Resource {
 			"name_template": &schema.Schema{
 				Type:          schema.TypeString,
 				Optional:      true,
+				Description:   "Instance name template. You can use forms 'ip_octets', 'two_ip_octets', 'one_ip_octet'",
 				ConflictsWith: []string{"name_templates"},
 			},
 			"volume": &schema.Schema{
-				Type:     schema.TypeSet,
-				Optional: true,
-				Set:      volumeUniqueID,
+				Type:        schema.TypeSet,
+				Optional:    true,
+				Description: "List of volumes for the instance",
+				Set:         volumeUniqueID,
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
 						"name": {
@@ -171,14 +172,21 @@ func resourceInstance() *schema.Resource {
 				},
 			},
 			"interface": &schema.Schema{
-				Type:     schema.TypeList,
-				Required: true,
+				Type:        schema.TypeSet,
+				Set:         instanceInterfaceUniqueID,
+				Required:    true,
+				Description: "List of interfaces for the instance.",
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
 						"type": {
 							Type:        schema.TypeString,
 							Optional:    true,
 							Description: fmt.Sprintf("Available value is '%s', '%s', '%s', '%s'", types.SubnetInterfaceType, types.AnySubnetInterfaceType, types.ExternalInterfaceType, types.ReservedFixedIpType),
+						},
+						"name": {
+							Type:        schema.TypeString,
+							Required:    true,
+							Description: "Name of interface, should be unique for the instance",
 						},
 						"order": {
 							Type:        schema.TypeInt,
@@ -227,12 +235,14 @@ func resourceInstance() *schema.Resource {
 				},
 			},
 			"keypair_name": &schema.Schema{
-				Type:     schema.TypeString,
-				Optional: true,
+				Type:        schema.TypeString,
+				Optional:    true,
+				Description: "Name of the keypair to use for the instance",
 			},
 			"server_group": &schema.Schema{
-				Type:     schema.TypeString,
-				Optional: true,
+				Type:        schema.TypeString,
+				Optional:    true,
+				Description: "ID of the server group to use for the instance",
 			},
 			"security_group": &schema.Schema{
 				Type:        schema.TypeList,
@@ -246,8 +256,9 @@ func resourceInstance() *schema.Resource {
 							Required:    true,
 						},
 						"name": {
-							Type:     schema.TypeString,
-							Required: true,
+							Type:        schema.TypeString,
+							Required:    true,
+							Description: "Firewall name",
 						},
 					},
 				},
@@ -255,10 +266,19 @@ func resourceInstance() *schema.Resource {
 			"password": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
+				Description: `
+For Linux instances, 'username' and 'password' are used to create a new user.
+When only 'password' is provided, it is set as the password for the default user of the image. 'user_data' is ignored
+when 'password' is specified. For Windows instances, 'username' cannot be specified. Use the 'password' field to set
+the password for the 'Admin' user on Windows. Use the 'user_data' field to provide a script to create new users
+on Windows. The password of the Admin user cannot be updated via 'user_data'`,
 			},
 			"username": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
+				Description: `
+For Linux instances, 'username' and 'password' are used to create a new user. For Windows
+instances, 'username' cannot be specified. Use 'password' field to set the password for the 'Admin' user on Windows.`,
 			},
 			"metadata": &schema.Schema{
 				Type:          schema.TypeList,
@@ -281,14 +301,16 @@ func resourceInstance() *schema.Resource {
 			"metadata_map": &schema.Schema{
 				Type:          schema.TypeMap,
 				Optional:      true,
+				Description:   "Create one or more metadata items for the instance",
 				ConflictsWith: []string{"metadata"},
 				Elem: &schema.Schema{
 					Type: schema.TypeString,
 				},
 			},
 			"configuration": &schema.Schema{
-				Type:     schema.TypeList,
-				Optional: true,
+				Type:        schema.TypeList,
+				Optional:    true,
+				Description: "Parameters for the application template from the marketplace",
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
 						"key": {
@@ -310,23 +332,29 @@ func resourceInstance() *schema.Resource {
 				ConflictsWith: []string{"user_data"},
 			},
 			"user_data": &schema.Schema{
-				Type:          schema.TypeString,
-				Optional:      true,
+				Type:     schema.TypeString,
+				Optional: true,
+				Description: `
+String in base64 format. For Linux instances, 'user_data' is ignored when 'password' field is provided.
+For Windows instances, Admin user password is set by 'password' field and cannot be updated via 'user_data'
+`,
 				ConflictsWith: []string{"userdata"},
 			},
 			"allow_app_ports": &schema.Schema{
 				Type:     schema.TypeBool,
 				Optional: true,
+				Description: `If true, application ports will be allowed in the security group for instances created
+				from the marketplace application template`,
 			},
 			"flavor": &schema.Schema{
-				Type:     schema.TypeMap,
-				Optional: true,
-				Computed: true,
+				Type:        schema.TypeMap,
+				Description: "Flavor details, RAM, vCPU, etc.",
+				Computed:    true,
 			},
 			"status": &schema.Schema{
-				Type:     schema.TypeString,
-				Optional: true,
-				Computed: true,
+				Type:        schema.TypeString,
+				Description: "Status of the instance",
+				Computed:    true,
 			},
 			"vm_state": &schema.Schema{
 				Type:        schema.TypeString,
@@ -338,9 +366,9 @@ func resourceInstance() *schema.Resource {
 				}, true),
 			},
 			"addresses": &schema.Schema{
-				Type:     schema.TypeList,
-				Optional: true,
-				Computed: true,
+				Type:        schema.TypeList,
+				Description: "List of instance addresses",
+				Computed:    true,
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
 						"net": {
@@ -371,11 +399,130 @@ func resourceInstance() *schema.Resource {
 	}
 }
 
-func resourceInstanceCreate(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
-	return diag.FromErr(fmt.Errorf("use gcore_instancev2 resource instead"))
+func resourceInstanceV2Create(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
+	log.Println("[DEBUG] Start Instance creating")
+	var diags diag.Diagnostics
+	config := m.(*Config)
+	provider := config.Provider
+
+	clientv1, err := CreateClient(provider, d, InstancePoint, versionPointV1)
+	if err != nil {
+		return diag.FromErr(err)
+	}
+	clientv2, err := CreateClient(provider, d, InstancePoint, versionPointV2)
+	if err != nil {
+		return diag.FromErr(err)
+	}
+
+	createOpts := instances.CreateOpts{SecurityGroups: []gcorecloud.ItemID{}}
+
+	createOpts.Flavor = d.Get("flavor_id").(string)
+	createOpts.Password = d.Get("password").(string)
+	createOpts.Username = d.Get("username").(string)
+	createOpts.Keypair = d.Get("keypair_name").(string)
+	createOpts.ServerGroupID = d.Get("server_group").(string)
+
+	if userData, ok := d.GetOk("userdata"); ok {
+		createOpts.UserData = userData.(string)
+	} else if userData, ok := d.GetOk("user_data"); ok {
+		createOpts.UserData = userData.(string)
+	}
+
+	name := d.Get("name").(string)
+	if len(name) > 0 {
+		createOpts.Names = []string{name}
+	}
+
+	if nameTemplatesRaw, ok := d.GetOk("name_templates"); ok {
+		nameTemplates := nameTemplatesRaw.([]interface{})
+		if len(nameTemplates) > 0 {
+			NameTemp := make([]string, len(nameTemplates))
+			for i, nametemp := range nameTemplates {
+				NameTemp[i] = nametemp.(string)
+			}
+			createOpts.NameTemplates = NameTemp
+		}
+	} else if nameTemplate, ok := d.GetOk("name_template"); ok {
+		createOpts.NameTemplates = []string{nameTemplate.(string)}
+	}
+
+	createOpts.AllowAppPorts = d.Get("allow_app_ports").(bool)
+
+	currentVols := d.Get("volume").(*schema.Set).List()
+	if len(currentVols) > 0 {
+		vs, err := extractVolumesMap(currentVols)
+		if err != nil {
+			return diag.FromErr(err)
+		}
+		createOpts.Volumes = vs
+	}
+
+	ifs := d.Get("interface").(*schema.Set).List()
+	// sort interfaces by 'order' key to attach it in right order
+	sort.Sort(instanceInterfaces(ifs))
+	if len(ifs) > 0 {
+		ifaces, err := extractInstanceInterfacesMapV2(ifs)
+		if err != nil {
+			return diag.FromErr(err)
+		}
+		createOpts.Interfaces = ifaces
+	}
+
+	if metadata, ok := d.GetOk("metadata"); ok {
+		if len(metadata.([]interface{})) > 0 {
+			md, err := extractKeyValue(metadata.([]interface{}))
+			if err != nil {
+				return diag.FromErr(err)
+			}
+			createOpts.Metadata = &md
+		}
+	} else if metadataRaw, ok := d.GetOk("metadata_map"); ok {
+		md := extractMetadataMap(metadataRaw.(map[string]interface{}))
+		createOpts.Metadata = &md
+	}
+
+	configuration := d.Get("configuration")
+	if len(configuration.([]interface{})) > 0 {
+		conf, err := extractKeyValue(configuration.([]interface{}))
+		if err != nil {
+			return diag.FromErr(err)
+		}
+		createOpts.Configuration = &conf
+	}
+
+	log.Printf("[DEBUG] Interface create options: %+v", createOpts)
+	results, err := instances.Create(clientv2, createOpts).Extract()
+	if err != nil {
+		return diag.FromErr(err)
+	}
+
+	taskID := results.Tasks[0]
+	log.Printf("[DEBUG] Task id (%s)", taskID)
+	InstanceID, err := tasks.WaitTaskAndReturnResult(clientv1, taskID, true, InstanceCreatingTimeout, func(task tasks.TaskID) (interface{}, error) {
+		taskInfo, err := tasks.Get(clientv1, string(task)).Extract()
+		if err != nil {
+			return nil, fmt.Errorf("cannot get task with ID: %s. Error: %w", task, err)
+		}
+		Instance, err := instances.ExtractInstanceIDFromTask(taskInfo)
+		if err != nil {
+			return nil, fmt.Errorf("cannot retrieve Instance ID from task info: %w", err)
+		}
+		return Instance, nil
+	},
+	)
+	log.Printf("[DEBUG] Instance id (%s)", InstanceID)
+	if err != nil {
+		return diag.FromErr(err)
+	}
+
+	d.SetId(InstanceID.(string))
+	resourceInstanceV2Read(ctx, d, m)
+
+	log.Printf("[DEBUG] Finish Instance creating (%s)", InstanceID)
+	return diags
 }
 
-func resourceInstanceRead(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
+func resourceInstanceV2Read(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	log.Println("[DEBUG] Start Instance reading")
 	var diags diag.Diagnostics
 	config := m.(*Config)
@@ -448,7 +595,8 @@ func resourceInstanceRead(ctx context.Context, d *schema.ResourceData, m interfa
 		return diag.FromErr(err)
 	}
 
-	interfaces, err := extractInstanceInterfaceIntoMap(d.Get("interface").([]interface{}))
+	statesInterface := d.Get("interface").(*schema.Set)
+	interfaces, err := extractInstanceInterfaceIntoMapV2(statesInterface.List())
 	if err != nil {
 		return diag.FromErr(err)
 	}
@@ -468,11 +616,11 @@ func resourceInstanceRead(ctx context.Context, d *schema.ResourceData, m interfa
 			var ok bool
 			// we need to match our interfaces with api's interfaces
 			// but we don't have any unique values, that's why we use exactly that list of keys
-			for _, k := range []string{subnetID, iface.PortID, iface.NetworkID, types.ExternalInterfaceType.String()} {
-				if orderedIOpts, ok = interfaces[k]; ok {
-					iOpts = orderedIOpts.InterfaceOpts
-					break
-				}
+			if iface.Name == nil {
+				return diag.Errorf("cannot get interface name for instance %s", instanceID)
+			}
+			if orderedIOpts, ok = interfaces[*iface.Name]; ok {
+				iOpts = orderedIOpts.InterfaceOpts
 			}
 
 			i := make(map[string]interface{})
@@ -482,14 +630,10 @@ func resourceInstanceRead(ctx context.Context, d *schema.ResourceData, m interfa
 				i["type"] = iOpts.Type.String()
 			}
 
-			var name string
-			if iface.Name != nil {
-				name = *iface.Name
-			}
-			i["name"] = name
 			i["network_id"] = iface.NetworkID
 			i["subnet_id"] = subnetID
 			i["port_id"] = iface.PortID
+			i["name"] = *iface.Name
 			i["order"] = orderedIOpts.Order
 			if len(iface.FloatingIPDetails) > 0 {
 				i["fip_source"] = types.ExistingFloatingIP
@@ -508,7 +652,7 @@ func resourceInstanceRead(ctx context.Context, d *schema.ResourceData, m interfa
 			cleanInterfaces = append(cleanInterfaces, i)
 		}
 	}
-	if err := d.Set("interface", cleanInterfaces); err != nil {
+	if err := d.Set("interface", schema.NewSet(instanceInterfaceUniqueID, cleanInterfaces)); err != nil {
 		return diag.FromErr(err)
 	}
 
@@ -563,7 +707,7 @@ func resourceInstanceRead(ctx context.Context, d *schema.ResourceData, m interfa
 	return diags
 }
 
-func resourceInstanceUpdate(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
+func resourceInstanceV2Update(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	log.Println("[DEBUG] Start Instance updating")
 	instanceID := d.Id()
 	log.Printf("[DEBUG] Instance id = %s", instanceID)
@@ -691,10 +835,10 @@ func resourceInstanceUpdate(ctx context.Context, d *schema.ResourceData, m inter
 
 		ifsOldRaw, ifsNewRaw := d.GetChange("interface")
 
-		ifsOld := ifsOldRaw.([]interface{})
-		ifsNew := ifsNewRaw.([]interface{})
+		ifsOld := ifsOldRaw.(*schema.Set)
+		ifsNew := ifsNewRaw.(*schema.Set)
 
-		for _, i := range ifsOld {
+		for _, i := range ifsOld.Difference(ifsNew).List() {
 			iface := i.(map[string]interface{})
 			var opts instances.InterfaceOpts
 			opts.PortID = iface["port_id"].(string)
@@ -719,13 +863,18 @@ func resourceInstanceUpdate(ctx context.Context, d *schema.ResourceData, m inter
 			}
 		}
 
-		sort.Sort(instanceInterfaces(ifsNew))
-		for _, i := range ifsNew {
+		ifsNewSorted := ifsNew.Difference(ifsOld).List()
+		sort.Sort(instanceInterfaces(ifsNewSorted))
+		for _, i := range ifsNewSorted {
 			iface := i.(map[string]interface{})
 
 			iType := types.InterfaceType(iface["type"].(string))
+			ifaceName := iface["name"].(string)
 			opts := instances.InterfaceInstanceCreateOpts{
-				InterfaceOpts: instances.InterfaceOpts{Type: iType},
+				InterfaceOpts: instances.InterfaceOpts{
+					Name: &ifaceName,
+					Type: iType,
+				},
 			}
 
 			switch iType {
@@ -846,90 +995,12 @@ func resourceInstanceUpdate(ctx context.Context, d *schema.ResourceData, m inter
 
 	d.Set("last_updated", time.Now().Format(time.RFC850))
 	log.Println("[DEBUG] Finish Instance updating")
-	return resourceInstanceRead(ctx, d, m)
+	return resourceInstanceV2Read(ctx, d, m)
 }
 
-func resourceInstanceDelete(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
-	log.Println("[DEBUG] Start Instance deleting")
-	var diags diag.Diagnostics
-	config := m.(*Config)
-	provider := config.Provider
-	instanceID := d.Id()
-	log.Printf("[DEBUG] Instance id = %s", instanceID)
-
-	client, err := CreateClient(provider, d, InstancePoint, versionPointV1)
-	if err != nil {
-		return diag.FromErr(err)
-	}
-
-	var delOpts instances.DeleteOpts
-	results, err := instances.Delete(client, instanceID, delOpts).Extract()
-	if err != nil {
-		return diag.FromErr(err)
-	}
-	taskID := results.Tasks[0]
-	log.Printf("[DEBUG] Task id (%s)", taskID)
-	_, err = tasks.WaitTaskAndReturnResult(client, taskID, true, InstanceDeleting, func(task tasks.TaskID) (interface{}, error) {
-		_, err := instances.Get(client, instanceID).Extract()
-		if err == nil {
-			return nil, fmt.Errorf("cannot delete instance with ID: %s", instanceID)
-		}
-		switch err.(type) {
-		case gcorecloud.ErrDefault404:
-			return nil, nil
-		default:
-			return nil, err
-		}
-	})
-	if err != nil {
-		return diag.FromErr(err)
-	}
-
-	d.SetId("")
-	log.Printf("[DEBUG] Finish of Instance deleting")
-	return diags
-}
-
-// ServerV2StateRefreshFunc returns a resource.StateRefreshFunc that is used to watch
-// a gcorecloud instance.
-func ServerV2StateRefreshFunc(client *gcorecloud.ServiceClient, instanceID string) resource.StateRefreshFunc {
-	return func() (interface{}, string, error) {
-		s, err := instances.Get(client, instanceID).Extract()
-		if err != nil {
-			if _, ok := err.(gcorecloud.ErrDefault404); ok {
-				return s, "DELETED", nil
-			}
-			return nil, "", err
-		}
-
-		return s, s.VMState, nil
-	}
-}
-
-func findInstancePort(portID string, ports []instances.InstancePorts) (instances.InstancePorts, error) {
-	for _, port := range ports {
-		if port.ID == portID {
-			return port, nil
-		}
-	}
-
-	return instances.InstancePorts{}, fmt.Errorf("port not found")
-}
-
-func prepareSecurityGroups(ports []instances.InstancePorts) []interface{} {
-	sgs := make(map[string]string)
-	for _, port := range ports {
-		for _, sg := range port.SecurityGroups {
-			sgs[sg.ID] = sg.Name
-		}
-	}
-
-	secGroups := make([]interface{}, 0, len(sgs))
-	for sgID, sgName := range sgs {
-		s := make(map[string]interface{})
-		s["id"] = sgID
-		s["name"] = sgName
-		secGroups = append(secGroups, s)
-	}
-	return secGroups
+func instanceInterfaceUniqueID(i interface{}) int {
+	e := i.(map[string]interface{})
+	h := md5.New()
+	io.WriteString(h, e["name"].(string))
+	return int(binary.BigEndian.Uint64(h.Sum(nil)))
 }

@@ -33,6 +33,13 @@ resource "gcore_cdn_resource" "cdn_example_com" {
   secondary_hostnames = ["cdn2.example.com"]
 
   options {
+    fastedge {
+      on_request_headers {
+        enabled = true
+        app_id = "1001"
+        interrupt_on_error = true
+      }
+    }
     edge_cache_settings {
       default = "8d"
     }
@@ -58,7 +65,6 @@ resource "gcore_cdn_resource" "cdn_example_com" {
     rewrite {
       body = "/(.*) /$1"
     }
-
     tls_versions {
       enabled = true
       value = [

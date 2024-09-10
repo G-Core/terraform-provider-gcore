@@ -90,6 +90,13 @@ resource "gcore_cdn_rule" "cdn_example_com_rule_3" {
   origin_protocol = "HTTP"
 
   options {
+    fastedge {
+      on_request_headers {
+        enabled = true
+        app_id = "1001"
+        interrupt_on_error = true
+      }
+    }
     force_return {
       code = 404
       body = "Not found."
