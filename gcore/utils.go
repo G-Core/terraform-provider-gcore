@@ -231,6 +231,45 @@ func extractInstanceVolumesMap(volumes []interface{}) map[string]bool {
 	return result
 }
 
+func extractInstanceInterfacesMapV2(interfaces []interface{}) ([]instances.InterfaceInstanceCreateOpts, error) {
+	Interfaces := make([]instances.InterfaceInstanceCreateOpts, len(interfaces))
+	for i, iface := range interfaces {
+		inter := iface.(map[string]interface{})
+
+		var I instances.InterfaceOpts
+		err := MapStructureDecoder(&I, &inter, config)
+		if err != nil {
+			return nil, err
+		}
+
+		if inter["fip_source"] != "" {
+			var fip instances.CreateNewInterfaceFloatingIPOpts
+			if inter["existing_fip_id"] != "" {
+				fip.Source = types.ExistingFloatingIP
+				fip.ExistingFloatingID = inter["existing_fip_id"].(string)
+			} else {
+				fip.Source = types.NewFloatingIP
+			}
+			I.FloatingIP = &fip
+		}
+
+		rawSgsID := inter["security_groups"].([]interface{})
+		sgs := make([]gcorecloud.ItemID, len(rawSgsID))
+		for i, sgID := range rawSgsID {
+			sgs[i] = gcorecloud.ItemID{ID: sgID.(string)}
+		}
+
+		name := inter["name"].(string)
+		I.Name = &name
+
+		Interfaces[i] = instances.InterfaceInstanceCreateOpts{
+			InterfaceOpts:  I,
+			SecurityGroups: sgs,
+		}
+	}
+	return Interfaces, nil
+}
+
 func extractInstanceInterfacesMap(interfaces []interface{}) ([]instances.InterfaceInstanceCreateOpts, error) {
 	Interfaces := make([]instances.InterfaceInstanceCreateOpts, len(interfaces))
 	for i, iface := range interfaces {
@@ -270,6 +309,46 @@ func extractInstanceInterfacesMap(interfaces []interface{}) ([]instances.Interfa
 type OrderedInterfaceOpts struct {
 	instances.InterfaceOpts
 	Order int
+}
+
+func extractInstanceInterfaceIntoMapV2(interfaces []interface{}) (map[string]OrderedInterfaceOpts, error) {
+	Interfaces := make(map[string]OrderedInterfaceOpts)
+	for _, iface := range interfaces {
+		if iface == nil {
+			continue
+		}
+		inter := iface.(map[string]interface{})
+
+		var I instances.InterfaceOpts
+		err := MapStructureDecoder(&I, &inter, config)
+		if err != nil {
+			return nil, err
+		}
+
+		if inter["fip_source"] != "" {
+			var fip instances.CreateNewInterfaceFloatingIPOpts
+			if inter["existing_fip_id"] != "" {
+				fip.Source = types.ExistingFloatingIP
+				fip.ExistingFloatingID = inter["existing_fip_id"].(string)
+			} else {
+				fip.Source = types.NewFloatingIP
+			}
+			I.FloatingIP = &fip
+		}
+		o, _ := inter["order"].(int)
+
+		if name, ok := inter["name"].(string); ok {
+			I.Name = &name
+		}
+
+		if I.Name == nil {
+			return nil, fmt.Errorf("interface name is required")
+		}
+
+		orderedInt := OrderedInterfaceOpts{I, o}
+		Interfaces[*I.Name] = orderedInt
+	}
+	return Interfaces, nil
 }
 
 // todo refactoring
