@@ -19,7 +19,6 @@ resource "gcore_instancev2" "instance" {
   keypair_name  = "my-keypair"
 
   volume {
-    source     = "existing-volume"
     volume_id  = gcore_volume.boot_volume.id
     boot_index = 0
   }
@@ -29,7 +28,6 @@ resource "gcore_instancev2" "instance" {
     name    = "my-floating-ip-interface"
     port_id = gcore_reservedfixedip.fixed_ip.port_id
 
-    fip_source      = "existing"
     existing_fip_id = gcore_floatingip.floating_ip.id
   }
 

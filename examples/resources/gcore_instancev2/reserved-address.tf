@@ -10,7 +10,6 @@ resource "gcore_instancev2" "instance" {
   keypair_name  = "my-keypair"
 
   volume {
-    source     = "existing-volume"
     volume_id  = gcore_volume.boot_volume.id
     boot_index = 0
   }

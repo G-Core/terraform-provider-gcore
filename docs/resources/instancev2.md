@@ -55,7 +55,7 @@ data "gcore_image" "ubuntu" {
 }
 
 resource "gcore_volume" "boot_volume" {
-  name       = "boot volume"
+  name       = "my-boot-volume"
   type_name  = "ssd_hiiops"
   size       = 5
   image_id   = data.gcore_image.ubuntu.id
@@ -81,7 +81,6 @@ resource "gcore_instancev2" "instance" {
   keypair_name  = "my-keypair"
 
   volume {
-    source     = "existing-volume"
     volume_id  = gcore_volume.boot_volume.id
     boot_index = 0
   }
@@ -107,7 +106,6 @@ resource "gcore_instancev2" "instance" {
   keypair_name  = "my-keypair"
 
   volume {
-    source     = "existing-volume"
     volume_id  = gcore_volume.boot_volume.id
     boot_index = 0
   }
@@ -139,7 +137,7 @@ data "gcore_image" "windows" {
 }
 
 resource "gcore_volume" "boot_volume_windows" {
-  name       = "windows boot volume"
+  name       = "my-windows-boot-volume"
   type_name  = "ssd_hiiops"
   size       = 50
   image_id   = data.gcore_image.windows.id
@@ -194,7 +192,6 @@ resource "gcore_instancev2" "instance" {
   keypair_name  = "my-keypair"
 
   volume {
-    source     = "existing-volume"
     volume_id  = gcore_volume.boot_volume.id
     boot_index = 0
   }
@@ -204,7 +201,6 @@ resource "gcore_instancev2" "instance" {
     name    = "my-floating-ip-interface"
     port_id = gcore_reservedfixedip.fixed_ip.port_id
 
-    fip_source      = "existing"
     existing_fip_id = gcore_floatingip.floating_ip.id
   }
 
@@ -228,7 +224,6 @@ resource "gcore_instancev2" "instance" {
   keypair_name  = "my-keypair"
 
   volume {
-    source     = "existing-volume"
     volume_id  = gcore_volume.boot_volume.id
     boot_index = 0
   }
@@ -305,7 +300,6 @@ resource "gcore_instancev2" "instance" {
   keypair_name  = "my-keypair"
 
   volume {
-    source     = "existing-volume"
     volume_id  = gcore_volume.boot_volume.id
     boot_index = 0
   }
@@ -328,8 +322,12 @@ resource "gcore_instancev2" "instance" {
 This example shows how to create a Windows instance with two users. The second user is added by using
 the userdata feature to automate the creation process.
 
-userdata:
-```userdata
+
+```terraform
+variable "second_user_userdata" {
+ description = "This is a variable of type string"
+ type        = string
+ default     = <<EOF
 <powershell>
 # Be sure to set the username and password on these two lines. Of course this is not a good
 # security practice to include a password at command line.
@@ -339,9 +337,9 @@ New-LocalUser $User -Password $Password
 Add-LocalGroupMember -Group "Remote Desktop Users" -Member $User
 Add-LocalGroupMember -Group "Administrators" -Member $User
 </powershell>
-```
+EOF
+}
 
-```terraform
 data "gcore_image" "windows" {
   name       = "windows-server-2022"
   region_id  = data.gcore_region.region.id
@@ -349,7 +347,7 @@ data "gcore_image" "windows" {
 }
 
 resource "gcore_volume" "boot_volume_windows" {
-  name       = "windows boot volume"
+  name       = "my-windows-boot-volume"
   type_name  = "ssd_hiiops"
   size       = 50
   image_id   = data.gcore_image.windows.id
@@ -361,10 +359,9 @@ resource "gcore_instancev2" "instance" {
   flavor_id     = "g1w-standard-4-8"
   name          = "my-windows-instance"
   password      = "my-s3cR3tP@ssw0rd"
-  user_data     = "PHBvd2Vyc2hlbGw+CiMgQmUgc3VyZSB0byBzZXQgdGhlIHVzZXJuYW1lIGFuZCBwYXNzd29yZCBvbiB0aGVzZSB0d28gbGluZXMuIE9mIGNvdXJzZSB0aGlzIGlzIG5vdCBhIGdvb2QKIyBzZWN1cml0eSBwcmFjdGljZSB0byBpbmNsdWRlIGEgcGFzc3dvcmQgYXQgY29tbWFuZCBsaW5lLgokVXNlciA9ICJTZWNvbmRVc2VyIgokUGFzc3dvcmQgPSBDb252ZXJ0VG8tU2VjdXJlU3RyaW5nICJzM2NSM3RQQHNzdzByZCIgLUFzUGxhaW5UZXh0IC1Gb3JjZQpOZXctTG9jYWxVc2VyICRVc2VyIC1QYXNzd29yZCAkUGFzc3dvcmQKQWRkLUxvY2FsR3JvdXBNZW1iZXIgLUdyb3VwICJSZW1vdGUgRGVza3RvcCBVc2VycyIgLU1lbWJlciAkVXNlcgpBZGQtTG9jYWxHcm91cE1lbWJlciAtR3JvdXAgIkFkbWluaXN0cmF0b3JzIiAtTWVtYmVyICRVc2VyCjwvcG93ZXJzaGVsbD4="
+  user_data     = base64encode(var.second_user_userdata)
 
   volume {
-    source     = "existing-volume"
     volume_id  = gcore_volume.boot_volume_windows.id
     boot_index = 0
   }
@@ -436,7 +433,6 @@ Required:
 Optional:
 
 - `existing_fip_id` (String)
-- `fip_source` (String)
 - `ip_address` (String)
 - `network_id` (String) required if type is 'subnet' or 'any_subnet'
 - `order` (Number) Order of attaching interface
@@ -466,10 +462,6 @@ Required:
 
 <a id="nestedblock--volume"></a>
 ### Nested Schema for `volume`
-
-Required:
-
-- `source` (String) Currently available only 'existing-volume' value
 
 Optional:
 

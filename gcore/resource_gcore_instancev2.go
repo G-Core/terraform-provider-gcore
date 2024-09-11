@@ -17,7 +17,6 @@ import (
 	"github.com/G-Core/gcorelabscloud-go/gcore/instance/v1/types"
 	"github.com/G-Core/gcorelabscloud-go/gcore/task/v1/tasks"
 	"github.com/G-Core/gcorelabscloud-go/gcore/volume/v1/volumes"
-	"github.com/hashicorp/go-cty/cty"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
@@ -120,18 +119,6 @@ your applications.`,
 							Type:     schema.TypeString,
 							Optional: true,
 						},
-						"source": {
-							Type:        schema.TypeString,
-							Required:    true,
-							Description: "Currently available only 'existing-volume' value",
-							ValidateDiagFunc: func(val interface{}, key cty.Path) diag.Diagnostics {
-								v := val.(string)
-								if types.VolumeSource(v) == types.ExistingVolume {
-									return diag.Diagnostics{}
-								}
-								return diag.Errorf("wrong source type %s, now available values is '%s'", v, types.ExistingVolume)
-							},
-						},
 						"boot_index": {
 							Type:        schema.TypeInt,
 							Description: "If boot_index==0 volumes can not detached",
@@ -206,10 +193,6 @@ your applications.`,
 							Computed:    true,
 						},
 						// nested map is not supported, in this case, you do not need to use the list for the map
-						"fip_source": {
-							Type:     schema.TypeString,
-							Optional: true,
-						},
 						"existing_fip_id": {
 							Type:     schema.TypeString,
 							Optional: true,
@@ -535,6 +518,11 @@ func resourceInstanceV2Read(ctx context.Context, d *schema.ResourceData, m inter
 		return diag.FromErr(err)
 	}
 
+	clientVol, err := CreateClient(provider, d, volumesPoint, versionPointV1)
+	if err != nil {
+		return diag.FromErr(err)
+	}
+
 	instance, err := instances.Get(client, instanceID).Extract()
 	if err != nil {
 		switch err.(type) {
@@ -568,11 +556,17 @@ func resourceInstanceV2Read(ctx context.Context, d *schema.ResourceData, m inter
 		if !ok {
 			v = make(map[string]interface{})
 			v["volume_id"] = vol.ID
-			v["source"] = types.ExistingVolume.String()
 		}
-
 		v["id"] = vol.ID
 		v["delete_on_termination"] = vol.DeleteOnTermination
+
+		volume, err := volumes.Get(clientVol, vol.ID).Extract()
+		if err != nil {
+			return diag.FromErr(err)
+		}
+		v["size"] = volume.Size
+		v["type_name"] = volume.VolumeType.String()
+
 		extVolumes = append(extVolumes, v)
 	}
 
@@ -636,7 +630,6 @@ func resourceInstanceV2Read(ctx context.Context, d *schema.ResourceData, m inter
 			i["name"] = *iface.Name
 			i["order"] = orderedIOpts.Order
 			if len(iface.FloatingIPDetails) > 0 {
-				i["fip_source"] = types.ExistingFloatingIP
 				i["existing_fip_id"] = iface.FloatingIPDetails[0].ID
 			}
 			i["ip_address"] = assignment.IPAddress.String()
