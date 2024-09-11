@@ -207,6 +207,7 @@ func extractVolumesMap(volumes []interface{}) ([]instances.CreateVolumeOpts, err
 		if err != nil {
 			return nil, err
 		}
+		V.Source = types.ExistingVolume
 		Volumes[i] = V
 	}
 	return Volumes, nil
@@ -242,14 +243,10 @@ func extractInstanceInterfacesMapV2(interfaces []interface{}) ([]instances.Inter
 			return nil, err
 		}
 
-		if inter["fip_source"] != "" {
-			var fip instances.CreateNewInterfaceFloatingIPOpts
-			if inter["existing_fip_id"] != "" {
-				fip.Source = types.ExistingFloatingIP
-				fip.ExistingFloatingID = inter["existing_fip_id"].(string)
-			} else {
-				fip.Source = types.NewFloatingIP
-			}
+		var fip instances.CreateNewInterfaceFloatingIPOpts
+		if inter["existing_fip_id"] != "" {
+			fip.Source = types.ExistingFloatingIP
+			fip.ExistingFloatingID = inter["existing_fip_id"].(string)
 			I.FloatingIP = &fip
 		}
 

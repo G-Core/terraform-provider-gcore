@@ -56,18 +56,6 @@ incoming traffic on ports 22, 80, and 443. Outgoing traffic is allowed on all po
 This example shows how to create a Windows instance with two users. The second user is added by using
 the userdata feature to automate the creation process.
 
-userdata:
-```userdata
-<powershell>
-# Be sure to set the username and password on these two lines. Of course this is not a good
-# security practice to include a password at command line.
-$User = "SecondUser"
-$Password = ConvertTo-SecureString "s3cR3tP@ssw0rd" -AsPlainText -Force
-New-LocalUser $User -Password $Password
-Add-LocalGroupMember -Group "Remote Desktop Users" -Member $User
-Add-LocalGroupMember -Group "Administrators" -Member $User
-</powershell>
-```
 
 {{tffile "examples/resources/gcore_instancev2/windows-with-userdata.tf"}}
 

@@ -84,7 +84,6 @@ output "kubeconfig" {
 - `id` (String) The ID of this resource.
 - `is_public` (Boolean) True if the cluster is public.
 - `security_group_id` (String) Security group ID.
-- `security_group_rules_internal` (List of Object) Default readonly security group rules. It is used for internal purposes only. (see [below for nested schema](#nestedatt--security_group_rules_internal))
 - `status` (String) Cluster status.
 - `task_id` (String)
 
@@ -197,23 +196,6 @@ Optional:
 
 - `create` (String)
 - `update` (String)
-
-
-<a id="nestedatt--security_group_rules_internal"></a>
-### Nested Schema for `security_group_rules_internal`
-
-Read-Only:
-
-- `created_at` (String)
-- `description` (String)
-- `direction` (String)
-- `ethertype` (String)
-- `id` (String)
-- `port_range_max` (Number)
-- `port_range_min` (Number)
-- `protocol` (String)
-- `remote_ip_prefix` (String)
-- `updated_at` (String)
 
 ## Import
 
