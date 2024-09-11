@@ -177,6 +177,11 @@ inside an instance resource.`,
 							Optional:    true,
 							Description: "Order of attaching interface",
 						},
+						"ip_family": {
+							Type:        schema.TypeString,
+							Optional:    true,
+							Description: "IP family for the interface, available values are 'dual', 'ipv4' and 'ipv6'",
+						},
 						"network_id": {
 							Type:        schema.TypeString,
 							Description: "required if type is 'subnet' or 'any_subnet'",
@@ -771,8 +776,9 @@ func resourceInstanceV2Update(ctx context.Context, d *schema.ResourceData, m int
 			ifaceName := iface["name"].(string)
 			opts := instances.InterfaceInstanceCreateOpts{
 				InterfaceOpts: instances.InterfaceOpts{
-					Name: &ifaceName,
-					Type: iType,
+					Name:     &ifaceName,
+					Type:     iType,
+					IPFamily: types.IPFamilyType(iface["ip_family"].(string)),
 				},
 			}
 
