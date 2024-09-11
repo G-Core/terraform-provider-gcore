@@ -5,7 +5,7 @@ data "gcore_image" "windows" {
 }
 
 resource "gcore_volume" "boot_volume_windows" {
-  name       = "windows boot volume"
+  name       = "my-windows-boot-volume"
   type_name  = "ssd_hiiops"
   size       = 50
   image_id   = data.gcore_image.windows.id

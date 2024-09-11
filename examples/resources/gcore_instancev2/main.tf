@@ -33,7 +33,7 @@ data "gcore_image" "ubuntu" {
 }
 
 resource "gcore_volume" "boot_volume" {
-  name       = "boot volume"
+  name       = "my-boot-volume"
   type_name  = "ssd_hiiops"
   size       = 5
   image_id   = data.gcore_image.ubuntu.id

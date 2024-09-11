@@ -80,7 +80,7 @@ resource "gcore_volume" "third_volume" {
   project_id = var.project_id
 }
 
-resource "gcore_instance" "instance" {
+resource "gcore_instancev2" "instance" {
   flavor_id    = "g1-standard-2-4"
   name         = "test_instance_1"
   keypair_name = gcore_keypair.kp.sshkey_name
@@ -149,12 +149,12 @@ resource "gcore_lbmember" "lbm" {
   project_id    = var.project_id
   region_id     = var.region_id
   pool_id       = gcore_lbpool.pl.id
-  instance_id   = gcore_instance.instance.id
-  address       = tolist(gcore_instance.instance.interface).0.ip_address
+  instance_id   = gcore_instancev2.instance.id
+  address       = tolist(gcore_instancev2.instance.interface).0.ip_address
   protocol_port = 8081
 }
 
-resource "gcore_instance" "instance2" {
+resource "gcore_instancev2" "instance2" {
   flavor_id    = "g1-standard-2-4"
   name         = "test_instance_2"
   keypair_name = gcore_keypair.kp.sshkey_name
@@ -190,8 +190,8 @@ resource "gcore_lbmember" "lbm2" {
   project_id    = var.project_id
   region_id     = var.region_id
   pool_id       = gcore_lbpool.pl.id
-  instance_id   = gcore_instance.instance2.id
-  address       = tolist(gcore_instance.instance2.interface).0.ip_address
+  instance_id   = gcore_instancev2.instance2.id
+  address       = tolist(gcore_instancev2.instance2.interface).0.ip_address
   protocol_port = 8081
   weight        = 5
 }
