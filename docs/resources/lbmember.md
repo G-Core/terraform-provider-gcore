@@ -182,7 +182,6 @@ resource "gcore_instancev2" "instance_member" {
   flavor_id  = "g1-standard-1-2"
 
   volume {
-    source     = "existing-volume"
     volume_id  = gcore_volume.instance_member_volume.id
     boot_index = 0
   }

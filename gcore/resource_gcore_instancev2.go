@@ -94,25 +94,19 @@ your applications.`,
 				Description: "Name of the instance.",
 				Computed:    true,
 			},
-			"name_templates": &schema.Schema{
-				Type:          schema.TypeList,
-				Optional:      true,
-				Description:   "List of instance names which will be changed by template. You can use forms 'ip_octets', 'two_ip_octets', 'one_ip_octet'",
-				Deprecated:    "Use name_template instead",
-				ConflictsWith: []string{"name_template"},
-				Elem:          &schema.Schema{Type: schema.TypeString},
-			},
 			"name_template": &schema.Schema{
-				Type:          schema.TypeString,
-				Optional:      true,
-				Description:   "Instance name template. You can use forms 'ip_octets', 'two_ip_octets', 'one_ip_octet'",
-				ConflictsWith: []string{"name_templates"},
+				Type:        schema.TypeString,
+				Optional:    true,
+				Description: "Instance name template. You can use forms 'ip_octets', 'two_ip_octets', 'one_ip_octet'",
 			},
 			"volume": &schema.Schema{
-				Type:        schema.TypeSet,
-				Optional:    true,
-				Description: "List of volumes for the instance",
-				Set:         volumeUniqueID,
+				Type:     schema.TypeSet,
+				Optional: true,
+				Description: `
+List of volumes for the instance. You can detach the volume from the instance by removing the
+volume from the instance resource. You cannot detach the boot volume. You can attach a data volume
+by adding the volume resource inside an instance resource.`,
+				Set: volumeUniqueID,
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
 						"name": {
@@ -159,10 +153,13 @@ your applications.`,
 				},
 			},
 			"interface": &schema.Schema{
-				Type:        schema.TypeSet,
-				Set:         instanceInterfaceUniqueID,
-				Required:    true,
-				Description: "List of interfaces for the instance.",
+				Type:     schema.TypeSet,
+				Set:      instanceInterfaceUniqueID,
+				Required: true,
+				Description: `
+List of interfaces for the instance. You can detach the interface from the instance by removing the
+interface from the instance resource and attach the interface by adding the interface resource
+inside an instance resource.`,
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
 						"type": {
@@ -206,7 +203,7 @@ your applications.`,
 						"security_groups": {
 							Type:        schema.TypeList,
 							Optional:    true,
-							Description: "list of security group IDs",
+							Description: "list of security group IDs, they will be attached to exact interface",
 							Elem:        &schema.Schema{Type: schema.TypeString},
 						},
 						"ip_address": {
@@ -230,7 +227,7 @@ your applications.`,
 			"security_group": &schema.Schema{
 				Type:        schema.TypeList,
 				Computed:    true,
-				Description: "Firewalls list",
+				Description: "Firewalls list, they will be attached globally on all instance's interfaces",
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
 						"id": {
@@ -247,8 +244,9 @@ your applications.`,
 				},
 			},
 			"password": &schema.Schema{
-				Type:     schema.TypeString,
-				Optional: true,
+				Type:      schema.TypeString,
+				Optional:  true,
+				Sensitive: true,
 				Description: `
 For Linux instances, 'username' and 'password' are used to create a new user.
 When only 'password' is provided, it is set as the password for the default user of the image. 'user_data' is ignored
@@ -263,29 +261,10 @@ on Windows. The password of the Admin user cannot be updated via 'user_data'`,
 For Linux instances, 'username' and 'password' are used to create a new user. For Windows
 instances, 'username' cannot be specified. Use 'password' field to set the password for the 'Admin' user on Windows.`,
 			},
-			"metadata": &schema.Schema{
-				Type:          schema.TypeList,
-				Optional:      true,
-				Deprecated:    "Use metadata_map instead",
-				ConflictsWith: []string{"metadata_map"},
-				Elem: &schema.Resource{
-					Schema: map[string]*schema.Schema{
-						"key": {
-							Type:     schema.TypeString,
-							Required: true,
-						},
-						"value": {
-							Type:     schema.TypeString,
-							Required: true,
-						},
-					},
-				},
-			},
 			"metadata_map": &schema.Schema{
-				Type:          schema.TypeMap,
-				Optional:      true,
-				Description:   "Create one or more metadata items for the instance",
-				ConflictsWith: []string{"metadata"},
+				Type:        schema.TypeMap,
+				Optional:    true,
+				Description: "Create one or more metadata items for the instance",
 				Elem: &schema.Schema{
 					Type: schema.TypeString,
 				},
@@ -307,21 +286,14 @@ instances, 'username' cannot be specified. Use 'password' field to set the passw
 					},
 				},
 			},
-			"userdata": &schema.Schema{
-				Type:          schema.TypeString,
-				Optional:      true,
-				Description:   "**Deprecated**",
-				Deprecated:    "Use user_data instead",
-				ConflictsWith: []string{"user_data"},
-			},
 			"user_data": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
+				ForceNew: true,
 				Description: `
 String in base64 format. For Linux instances, 'user_data' is ignored when 'password' field is provided.
 For Windows instances, Admin user password is set by 'password' field and cannot be updated via 'user_data'
 `,
-				ConflictsWith: []string{"userdata"},
 			},
 			"allow_app_ports": &schema.Schema{
 				Type:     schema.TypeBool,
@@ -405,9 +377,7 @@ func resourceInstanceV2Create(ctx context.Context, d *schema.ResourceData, m int
 	createOpts.Keypair = d.Get("keypair_name").(string)
 	createOpts.ServerGroupID = d.Get("server_group").(string)
 
-	if userData, ok := d.GetOk("userdata"); ok {
-		createOpts.UserData = userData.(string)
-	} else if userData, ok := d.GetOk("user_data"); ok {
+	if userData, ok := d.GetOk("user_data"); ok {
 		createOpts.UserData = userData.(string)
 	}
 
@@ -416,16 +386,7 @@ func resourceInstanceV2Create(ctx context.Context, d *schema.ResourceData, m int
 		createOpts.Names = []string{name}
 	}
 
-	if nameTemplatesRaw, ok := d.GetOk("name_templates"); ok {
-		nameTemplates := nameTemplatesRaw.([]interface{})
-		if len(nameTemplates) > 0 {
-			NameTemp := make([]string, len(nameTemplates))
-			for i, nametemp := range nameTemplates {
-				NameTemp[i] = nametemp.(string)
-			}
-			createOpts.NameTemplates = NameTemp
-		}
-	} else if nameTemplate, ok := d.GetOk("name_template"); ok {
+	if nameTemplate, ok := d.GetOk("name_template"); ok {
 		createOpts.NameTemplates = []string{nameTemplate.(string)}
 	}
 
@@ -451,15 +412,7 @@ func resourceInstanceV2Create(ctx context.Context, d *schema.ResourceData, m int
 		createOpts.Interfaces = ifaces
 	}
 
-	if metadata, ok := d.GetOk("metadata"); ok {
-		if len(metadata.([]interface{})) > 0 {
-			md, err := extractKeyValue(metadata.([]interface{}))
-			if err != nil {
-				return diag.FromErr(err)
-			}
-			createOpts.Metadata = &md
-		}
-	} else if metadataRaw, ok := d.GetOk("metadata_map"); ok {
+	if metadataRaw, ok := d.GetOk("metadata_map"); ok {
 		md := extractMetadataMap(metadataRaw.(map[string]interface{}))
 		createOpts.Metadata = &md
 	}
@@ -649,34 +602,17 @@ func resourceInstanceV2Read(ctx context.Context, d *schema.ResourceData, m inter
 		return diag.FromErr(err)
 	}
 
-	if metadataRaw, ok := d.GetOk("metadata"); ok {
-		metadata := metadataRaw.([]interface{})
-		sliced := make([]map[string]string, len(metadata))
-		for i, data := range metadata {
-			d := data.(map[string]interface{})
-			mdata := make(map[string]string, 2)
-			md, err := instances.MetadataGet(client, instanceID, d["key"].(string)).Extract()
-			if err != nil {
-				return diag.Errorf("cannot get metadata with key: %s. Error: %s", instanceID, err)
-			}
-			mdata["key"] = md.Key
-			mdata["value"] = md.Value
-			sliced[i] = mdata
+	metadata := d.Get("metadata_map").(map[string]interface{})
+	newMetadata := make(map[string]interface{}, len(metadata))
+	for k := range metadata {
+		md, err := instances.MetadataGet(client, instanceID, k).Extract()
+		if err != nil {
+			return diag.Errorf("cannot get metadata with key: %s. Error: %s", instanceID, err)
 		}
-		d.Set("metadata", sliced)
-	} else {
-		metadata := d.Get("metadata_map").(map[string]interface{})
-		newMetadata := make(map[string]interface{}, len(metadata))
-		for k := range metadata {
-			md, err := instances.MetadataGet(client, instanceID, k).Extract()
-			if err != nil {
-				return diag.Errorf("cannot get metadata with key: %s. Error: %s", instanceID, err)
-			}
-			newMetadata[k] = md.Value
-		}
-		if err := d.Set("metadata_map", newMetadata); err != nil {
-			return diag.FromErr(err)
-		}
+		newMetadata[k] = md.Value
+	}
+	if err := d.Set("metadata_map", newMetadata); err != nil {
+		return diag.FromErr(err)
 	}
 
 	addresses := []map[string][]map[string]string{}
@@ -717,9 +653,8 @@ func resourceInstanceV2Update(ctx context.Context, d *schema.ResourceData, m int
 	}
 
 	if d.HasChange("name") {
-		nameTemplates := d.Get("name_templates").([]interface{})
 		nameTemplate := d.Get("name_template").(string)
-		if len(nameTemplate) == 0 && len(nameTemplates) == 0 {
+		if len(nameTemplate) == 0 {
 			opts := instances.RenameInstanceOpts{
 				Name: d.Get("name").(string),
 			}
@@ -751,36 +686,7 @@ func resourceInstanceV2Update(ctx context.Context, d *schema.ResourceData, m int
 		}
 	}
 
-	if d.HasChange("metadata") {
-		omd, nmd := d.GetChange("metadata")
-		if len(omd.([]interface{})) > 0 {
-			for _, data := range omd.([]interface{}) {
-				d := data.(map[string]interface{})
-				k := d["key"].(string)
-				err := instances.MetadataDelete(client, instanceID, k).Err
-				if err != nil {
-					return diag.Errorf("cannot delete metadata key: %s. Error: %s", k, err)
-				}
-			}
-		}
-		if len(nmd.([]interface{})) > 0 {
-			var MetaData []instances.MetadataOpts
-			for _, data := range nmd.([]interface{}) {
-				d := data.(map[string]interface{})
-				var md instances.MetadataOpts
-				md.Key = d["key"].(string)
-				md.Value = d["value"].(string)
-				MetaData = append(MetaData, md)
-			}
-			createOpts := instances.MetadataSetOpts{
-				Metadata: MetaData,
-			}
-			err := instances.MetadataCreate(client, instanceID, createOpts).Err
-			if err != nil {
-				return diag.Errorf("cannot create metadata. Error: %s", err)
-			}
-		}
-	} else if d.HasChange("metadata_map") {
+	if d.HasChange("metadata_map") {
 		omd, nmd := d.GetChange("metadata_map")
 		if len(omd.(map[string]interface{})) > 0 {
 			for k := range omd.(map[string]interface{}) {
