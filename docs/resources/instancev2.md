@@ -151,7 +151,6 @@ resource "gcore_instancev2" "instance" {
   password      = "my-s3cR3tP@ssw0rd"
 
   volume {
-    source     = "existing-volume"
     volume_id  = gcore_volume.boot_volume_windows.id
     boot_index = 0
   }
@@ -383,7 +382,9 @@ resource "gcore_instancev2" "instance" {
 ### Required
 
 - `flavor_id` (String) Flavor ID
-- `interface` (Block Set, Min: 1) List of interfaces for the instance. (see [below for nested schema](#nestedblock--interface))
+- `interface` (Block Set, Min: 1) List of interfaces for the instance. You can detach the interface from the instance by removing the
+interface from the instance resource and attach the interface by adding the interface resource
+inside an instance resource. (see [below for nested schema](#nestedblock--interface))
 
 ### Optional
 
@@ -392,12 +393,10 @@ resource "gcore_instancev2" "instance" {
 - `configuration` (Block List) Parameters for the application template from the marketplace (see [below for nested schema](#nestedblock--configuration))
 - `keypair_name` (String) Name of the keypair to use for the instance
 - `last_updated` (String)
-- `metadata` (Block List, Deprecated) (see [below for nested schema](#nestedblock--metadata))
 - `metadata_map` (Map of String) Create one or more metadata items for the instance
 - `name` (String) Name of the instance.
 - `name_template` (String) Instance name template. You can use forms 'ip_octets', 'two_ip_octets', 'one_ip_octet'
-- `name_templates` (List of String, Deprecated) List of instance names which will be changed by template. You can use forms 'ip_octets', 'two_ip_octets', 'one_ip_octet'
-- `password` (String) For Linux instances, 'username' and 'password' are used to create a new user.
+- `password` (String, Sensitive) For Linux instances, 'username' and 'password' are used to create a new user.
 When only 'password' is provided, it is set as the password for the default user of the image. 'user_data' is ignored
 when 'password' is specified. For Windows instances, 'username' cannot be specified. Use the 'password' field to set
 the password for the 'Admin' user on Windows. Use the 'user_data' field to provide a script to create new users
@@ -409,18 +408,19 @@ on Windows. The password of the Admin user cannot be updated via 'user_data'
 - `server_group` (String) ID of the server group to use for the instance
 - `user_data` (String) String in base64 format. For Linux instances, 'user_data' is ignored when 'password' field is provided.
 For Windows instances, Admin user password is set by 'password' field and cannot be updated via 'user_data'
-- `userdata` (String, Deprecated) **Deprecated**
 - `username` (String) For Linux instances, 'username' and 'password' are used to create a new user. For Windows
 instances, 'username' cannot be specified. Use 'password' field to set the password for the 'Admin' user on Windows.
 - `vm_state` (String) Current vm state, use stopped to stop vm and active to start
-- `volume` (Block Set) List of volumes for the instance (see [below for nested schema](#nestedblock--volume))
+- `volume` (Block Set) List of volumes for the instance. You can detach the volume from the instance by removing the
+volume from the instance resource. You cannot detach the boot volume. You can attach a data volume
+by adding the volume resource inside an instance resource. (see [below for nested schema](#nestedblock--volume))
 
 ### Read-Only
 
 - `addresses` (List of Object) List of instance addresses (see [below for nested schema](#nestedatt--addresses))
 - `flavor` (Map of String) Flavor details, RAM, vCPU, etc.
 - `id` (String) The ID of this resource.
-- `security_group` (List of Object) Firewalls list (see [below for nested schema](#nestedatt--security_group))
+- `security_group` (List of Object) Firewalls list, they will be attached globally on all instance's interfaces (see [below for nested schema](#nestedatt--security_group))
 - `status` (String) Status of the instance
 
 <a id="nestedblock--interface"></a>
@@ -437,22 +437,13 @@ Optional:
 - `network_id` (String) required if type is 'subnet' or 'any_subnet'
 - `order` (Number) Order of attaching interface
 - `port_id` (String) required if type is  'reserved_fixed_ip'
-- `security_groups` (List of String) list of security group IDs
+- `security_groups` (List of String) list of security group IDs, they will be attached to exact interface
 - `subnet_id` (String) required if type is 'subnet'
 - `type` (String) Available value is 'subnet', 'any_subnet', 'external', 'reserved_fixed_ip'
 
 
 <a id="nestedblock--configuration"></a>
 ### Nested Schema for `configuration`
-
-Required:
-
-- `key` (String)
-- `value` (String)
-
-
-<a id="nestedblock--metadata"></a>
-### Nested Schema for `metadata`
 
 Required:
 

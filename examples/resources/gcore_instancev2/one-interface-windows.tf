@@ -19,7 +19,6 @@ resource "gcore_instancev2" "instance" {
   password      = "my-s3cR3tP@ssw0rd"
 
   volume {
-    source     = "existing-volume"
     volume_id  = gcore_volume.boot_volume_windows.id
     boot_index = 0
   }
