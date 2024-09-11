@@ -434,6 +434,7 @@ Optional:
 
 - `existing_fip_id` (String)
 - `ip_address` (String)
+- `ip_family` (String) IP family for the interface, available values are 'dual', 'ipv4' and 'ipv6'
 - `network_id` (String) required if type is 'subnet' or 'any_subnet'
 - `order` (Number) Order of attaching interface
 - `port_id` (String) required if type is  'reserved_fixed_ip'

@@ -84,15 +84,15 @@ require (
 	golang.org/x/text v0.15.0 // indirect
 	google.golang.org/appengine v1.6.7 // indirect
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20230629202037-9506855d4529 // indirect
-	google.golang.org/grpc v1.56.1 // indirect
-	google.golang.org/protobuf v1.31.0 // indirect
+	google.golang.org/grpc v1.56.3 // indirect
+	google.golang.org/protobuf v1.33.0 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
 
 require (
 	github.com/go-openapi/runtime v0.26.0 // indirect
-	github.com/hashicorp/terraform v1.5.2
+	github.com/hashicorp/terraform v1.5.7
 	github.com/hashicorp/terraform-exec v0.21.0 // indirect
 	github.com/mattn/go-colorable v0.1.13 // indirect
 	go.mongodb.org/mongo-driver v1.12.0 // indirect

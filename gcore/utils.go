@@ -258,6 +258,7 @@ func extractInstanceInterfacesMapV2(interfaces []interface{}) ([]instances.Inter
 
 		name := inter["name"].(string)
 		I.Name = &name
+		I.IPFamily = types.IPFamilyType(inter["ip_family"].(string))
 
 		Interfaces[i] = instances.InterfaceInstanceCreateOpts{
 			InterfaceOpts:  I,
