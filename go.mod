@@ -7,7 +7,7 @@ require (
 	github.com/G-Core/gcore-dns-sdk-go v0.2.9
 	github.com/G-Core/gcore-storage-sdk-go v0.1.34
 	github.com/G-Core/gcorelabscdn-go v1.0.16
-	github.com/G-Core/gcorelabscloud-go v0.8.4
+	github.com/G-Core/gcorelabscloud-go v0.8.6
 	github.com/hashicorp/go-cty v1.4.1-0.20200414143053-d3edf31b6320
 	github.com/hashicorp/terraform-plugin-sdk/v2 v2.27.0
 	github.com/mitchellh/mapstructure v1.5.0
@@ -92,7 +92,7 @@ require (
 
 require (
 	github.com/go-openapi/runtime v0.26.0 // indirect
-	github.com/hashicorp/terraform v1.5.2
+	github.com/hashicorp/terraform v1.5.7
 	github.com/hashicorp/terraform-exec v0.21.0 // indirect
 	github.com/mattn/go-colorable v0.1.13 // indirect
 	go.mongodb.org/mongo-driver v1.12.0 // indirect
