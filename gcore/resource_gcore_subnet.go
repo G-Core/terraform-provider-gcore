@@ -2,6 +2,7 @@ package gcore
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"log"
 	"net"
@@ -315,6 +316,12 @@ func resourceSubnetRead(ctx context.Context, d *schema.ResourceData, m interface
 
 	subnet, err := subnets.Get(client, subnetID).Extract()
 	if err != nil {
+		var errDefault404 gcorecloud.ErrDefault404
+		if errors.As(err, &errDefault404) {
+			// removing from state because it doesn't exist anymore
+			d.SetId("")
+			return nil
+		}
 		return diag.Errorf("cannot get subnet with ID: %s. Error: %s", subnetID, err)
 	}
 

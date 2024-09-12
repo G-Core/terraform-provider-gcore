@@ -2,6 +2,7 @@ package gcore
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"log"
 	"time"
@@ -238,6 +239,12 @@ func resourceVolumeRead(ctx context.Context, d *schema.ResourceData, m interface
 
 	volume, err := volumes.Get(client, volumeID).Extract()
 	if err != nil {
+		var errDefault404 gcorecloud.ErrDefault404
+		if errors.As(err, &errDefault404) {
+			// removing from state because it doesn't exist anymore
+			d.SetId("")
+			return nil
+		}
 		return diag.Errorf("cannot get volume with ID: %s. Error: %s", volumeID, err)
 	}
 

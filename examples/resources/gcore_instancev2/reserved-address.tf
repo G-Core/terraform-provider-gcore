@@ -4,7 +4,7 @@ resource "gcore_reservedfixedip" "fixed_ip" {
   type       = "external"
 }
 
-resource "gcore_instancev2" "instance" {
+resource "gcore_instancev2" "instance-with-reserved-address" {
   flavor_id     = "g1-standard-2-4"
   name          = "my-instance"
   keypair_name  = "my-keypair"
@@ -18,6 +18,7 @@ resource "gcore_instancev2" "instance" {
     type    = "reserved_fixed_ip"
     name    = "my-reserved-public-interface"
     port_id = gcore_reservedfixedip.fixed_ip.port_id
+    security_groups = [gcore_securitygroup.default.id]
   }
 
   project_id = data.gcore_project.project.id
