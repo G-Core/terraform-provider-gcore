@@ -174,7 +174,7 @@ resource "gcore_volume" "instance_member_volume" {
 }
 
 
-resource "gcore_instance" "instance_member" {
+resource "gcore_instancev2" "instance_member" {
   project_id = data.gcore_project.project.id
   region_id  = data.gcore_region.region.id
 
@@ -182,13 +182,13 @@ resource "gcore_instance" "instance_member" {
   flavor_id  = "g1-standard-1-2"
 
   volume {
-    source     = "existing-volume"
     volume_id  = gcore_volume.instance_member_volume.id
     boot_index = 0
   }
 
   interface {
     type            = "reserved_fixed_ip"
+    name            = "my-private-network-interface"
     port_id         = gcore_reservedfixedip.instance_member_fixed_ip.port_id
   }
 }
@@ -199,7 +199,7 @@ resource "gcore_lbmember" "instance_member" {
 
   pool_id       = gcore_lbpool.http.id
 
-  instance_id = gcore_instance.instance_member.id
+  instance_id = gcore_instancev2.instance_member.id
   address       = gcore_reservedfixedip.instance_member_fixed_ip.fixed_ip_address
   protocol_port = 80
   weight        = 1

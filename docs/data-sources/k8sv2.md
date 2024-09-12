@@ -117,6 +117,7 @@ Read-Only:
 - `lb_mode` (String)
 - `mask_size` (Number)
 - `mask_size_v6` (Number)
+- `routing_mode` (String)
 - `tunnel` (String)
 
 

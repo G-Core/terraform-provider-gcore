@@ -2,9 +2,11 @@ package gcore
 
 import (
 	"context"
+	"fmt"
 	"log"
 	"strings"
 
+	gcorecloud "github.com/G-Core/gcorelabscloud-go"
 	"github.com/G-Core/gcorelabscloud-go/gcore/image/v1/images"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
@@ -57,13 +59,20 @@ func dataSourceImage() *schema.Resource {
 				},
 			},
 			"name": &schema.Schema{
-				Type:        schema.TypeString,
-				Description: "use 'os-version', for example 'ubuntu-20.04'",
-				Required:    true,
+				Type:         schema.TypeString,
+				Description:  "use 'os-version', for example 'ubuntu-20.04'",
+				Optional:     true,
+				ExactlyOneOf: []string{"name", "image_id"},
+			},
+			"image_id": &schema.Schema{
+				Type:         schema.TypeString,
+				Description:  "use 'image_id' if you know it, for example 'f4b1b1b1-1b1b-1b1b-1b1b-1b1b1b1b1b1b'",
+				Optional:     true,
+				ExactlyOneOf: []string{"name", "image_id"},
 			},
 			"is_baremetal": &schema.Schema{
 				Type:        schema.TypeBool,
-				Description: "set to true if need to get baremetal image",
+				Description: "set to true if you need to get baremetal image",
 				Optional:    true,
 			},
 			"min_disk": &schema.Schema{
@@ -124,6 +133,7 @@ func dataSourceImage() *schema.Resource {
 func dataSourceImageRead(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	log.Println("[DEBUG] Start Image reading")
 	name := d.Get("name").(string)
+	imageID := d.Get("image_id").(string)
 
 	config := m.(*Config)
 	provider := config.Provider
@@ -137,37 +147,17 @@ func dataSourceImageRead(ctx context.Context, d *schema.ResourceData, m interfac
 		return diag.FromErr(err)
 	}
 
-	listOpts := &images.ListOpts{}
-
-	if metadataK, ok := d.GetOk("metadata_k"); ok {
-		listOpts.MetadataK = metadataK.(string)
-	}
-
-	if metadataRaw, ok := d.GetOk("metadata_kv"); ok {
-		typedMetadataKV := make(map[string]string, len(metadataRaw.(map[string]interface{})))
-		for k, v := range metadataRaw.(map[string]interface{}) {
-			typedMetadataKV[k] = v.(string)
+	var image *images.Image
+	if imageID != "" {
+		image, err = images.Get(client, imageID).Extract()
+		if err != nil {
+			return diag.FromErr(err)
 		}
-		listOpts.MetadataKV = typedMetadataKV
-	}
-
-	allImages, err := images.ListAll(client, *listOpts)
-	if err != nil {
-		return diag.FromErr(err)
-	}
-
-	var found bool
-	var image images.Image
-	for _, img := range allImages {
-		if strings.HasPrefix(strings.ToLower(img.Name), strings.ToLower(name)) {
-			image = img
-			found = true
-			break
+	} else {
+		image, err = findImageByNameAndMetadata(client, d, name)
+		if err != nil {
+			return diag.FromErr(err)
 		}
-	}
-
-	if !found {
-		return diag.Errorf("image with name %s not found", name)
 	}
 
 	d.SetId(image.ID)
@@ -195,4 +185,53 @@ func dataSourceImageRead(ctx context.Context, d *schema.ResourceData, m interfac
 	}
 	log.Println("[DEBUG] Finish Image reading")
 	return nil
+}
+
+func imagesNames(images []images.Image) []string {
+	result := make([]string, 0, len(images))
+	for _, img := range images {
+		result = append(result, fmt.Sprintf("%s (%s)", img.Name, img.ID))
+	}
+	return result
+
+}
+
+func findImageByNameAndMetadata(client *gcorecloud.ServiceClient, d *schema.ResourceData, name string) (*images.Image, error) {
+	listOpts := &images.ListOpts{}
+	if metadataK, ok := d.GetOk("metadata_k"); ok {
+		listOpts.MetadataK = metadataK.(string)
+	}
+
+	if metadataRaw, ok := d.GetOk("metadata_kv"); ok {
+		typedMetadataKV := make(map[string]string, len(metadataRaw.(map[string]interface{})))
+		for k, v := range metadataRaw.(map[string]interface{}) {
+			typedMetadataKV[k] = v.(string)
+		}
+		listOpts.MetadataKV = typedMetadataKV
+	}
+
+	allImages, err := images.ListAll(client, *listOpts)
+	if err != nil {
+		return nil, err
+	}
+
+	collectedImages := make([]images.Image, 0)
+	for _, img := range allImages {
+		if strings.HasPrefix(strings.ToLower(img.Name), strings.ToLower(name)) {
+			collectedImages = append(collectedImages, img)
+		}
+	}
+
+	if len(collectedImages) == 0 {
+		return nil, fmt.Errorf("image with name %s not found", name)
+	}
+
+	if len(collectedImages) > 1 {
+		return nil, fmt.Errorf(
+			"found more than one image with name %s - %s, pls choose image by iamge_id",
+			name, strings.Join(imagesNames(collectedImages), ", "),
+		)
+	}
+
+	return &collectedImages[0], nil
 }

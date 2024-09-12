@@ -1,0 +1,71 @@
+---
+page_title: "{{ .Name }} {{ .Type }} - {{ .ProviderName	}}"
+subcategory: ""
+description: |-
+  {{ .Description }}
+---
+
+# {{ .Name }} ({{ .Type }})
+
+{{ .Description }}
+
+## Example Usage
+
+##### Prerequisite
+
+{{tffile "examples/resources/gcore_instancev2/main.tf"}}
+
+### Basic example
+
+#### Creating instance with one public interface
+
+{{tffile "examples/resources/gcore_instancev2/one-interface.tf"}}
+
+#### Creating instance with two interfaces
+
+This example demonstrates how to create an instance with two network interfaces: one public and one private.
+
+{{tffile "examples/resources/gcore_instancev2/two-interface.tf"}}
+
+#### Creating Windows instance with one public interface
+
+{{tffile "examples/resources/gcore_instancev2/one-interface-windows.tf"}}
+
+### Advanced examples
+
+#### Creating instance with floating ip
+
+{{tffile "examples/resources/gcore_instancev2/fip.tf"}}
+
+#### Creating instance with a reserved public interface
+
+{{tffile "examples/resources/gcore_instancev2/reserved-address.tf"}}
+
+
+#### Creating instance with custom security group
+
+This example demonstrates how to create an instance with a custom security group. The security group allows all
+incoming traffic on ports 22, 80, and 443. Outgoing traffic is allowed on all ports, except port 25 for security reasons.
+
+
+{{tffile "examples/resources/gcore_instancev2/custom-sg.tf"}}
+
+
+#### Creating Windows instance with two users
+
+This example shows how to create a Windows instance with two users. The second user is added by using
+the userdata feature to automate the creation process.
+
+
+{{tffile "examples/resources/gcore_instancev2/windows-with-userdata.tf"}}
+
+
+{{ .SchemaMarkdown }}
+
+{{ if .HasImport }}
+## Import
+
+Import is supported using the following syntax:
+
+{{ codefile "shell" .ImportFile }}
+{{ end }}

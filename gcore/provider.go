@@ -129,6 +129,7 @@ func Provider() *schema.Provider {
 			"gcore_subnet":              resourceSubnet(),
 			"gcore_router":              resourceRouter(),
 			"gcore_instance":            resourceInstance(),
+			"gcore_instancev2":          resourceInstanceV2(),
 			"gcore_keypair":             resourceKeypair(),
 			"gcore_reservedfixedip":     resourceReservedFixedIP(),
 			"gcore_floatingip":          resourceFloatingIP(),

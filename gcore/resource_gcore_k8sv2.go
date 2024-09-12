@@ -12,9 +12,12 @@ import (
 	gcorecloud "github.com/G-Core/gcorelabscloud-go"
 	"github.com/G-Core/gcorelabscloud-go/gcore/k8s/v2/clusters"
 	"github.com/G-Core/gcorelabscloud-go/gcore/k8s/v2/pools"
+	"github.com/G-Core/gcorelabscloud-go/gcore/securitygroup/v1/securitygroups"
+	"github.com/G-Core/gcorelabscloud-go/gcore/securitygroup/v1/types"
 	"github.com/G-Core/gcorelabscloud-go/gcore/servergroup/v1/servergroups"
 	"github.com/G-Core/gcorelabscloud-go/gcore/task/v1/tasks"
 	"github.com/G-Core/gcorelabscloud-go/gcore/volume/v1/volumes"
+	"github.com/hashicorp/go-cty/cty"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/customdiff"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
@@ -24,6 +27,8 @@ const (
 	K8sPoint         = "k8s/clusters"
 	tasksPoint       = "tasks"
 	K8sCreateTimeout = 3600
+
+	k8sSgMetadataKey = "gcloud_cluster_name"
 )
 
 var k8sCreateTimeout = time.Second * time.Duration(K8sCreateTimeout)
@@ -200,8 +205,8 @@ func resourceK8sV2() *schema.Resource {
 							Description: "Cilium CNI configuration.",
 							MaxItems:    1,
 							MinItems:    1,
-							ForceNew:    true,
 							Optional:    true,
+							Computed:    true,
 							Elem: &schema.Resource{
 								Schema: map[string]*schema.Schema{
 									"mask_size": {
@@ -222,43 +227,43 @@ func resourceK8sV2() *schema.Resource {
 										Type:        schema.TypeString,
 										Description: "Tunneling protocol to use in tunneling mode and for ad-hoc tunnels. The default value is geneve.",
 										Optional:    true,
-										Computed:    true,
-										ForceNew:    true,
+										Default:     "geneve",
 									},
 									"encryption": {
 										Type:        schema.TypeBool,
 										Description: "Enables transparent network encryption. The default value is false.",
 										Optional:    true,
-										Computed:    true,
-										ForceNew:    true,
+										Default:     false,
 									},
 									"lb_mode": {
 										Type:        schema.TypeString,
 										Description: "The operation mode of load balancing for remote backends. Supported values are snat, dsr, hybrid. The default value is snat.",
 										Optional:    true,
-										Computed:    true,
-										ForceNew:    true,
+										Default:     "snat",
 									},
 									"lb_acceleration": {
 										Type:        schema.TypeBool,
 										Description: "Enables load balancer acceleration via XDP. The default value is false.",
 										Optional:    true,
-										Computed:    true,
-										ForceNew:    true,
+										Default:     false,
+									},
+									"routing_mode": {
+										Type:        schema.TypeString,
+										Description: "Enables native-routing mode or tunneling mode. The default value is tunnel.",
+										Optional:    true,
+										Default:     "tunnel",
 									},
 									"hubble_relay": {
 										Type:        schema.TypeBool,
 										Description: "Enables Hubble Relay. The default value is false.",
 										Optional:    true,
-										Computed:    true,
-										ForceNew:    true,
+										Default:     false,
 									},
 									"hubble_ui": {
 										Type:        schema.TypeBool,
 										Description: "Enables Hubble UI. Requires `hubble_relay=true`. The default value is false.",
 										Optional:    true,
-										Computed:    true,
-										ForceNew:    true,
+										Default:     false,
 									},
 								},
 							},
@@ -435,6 +440,86 @@ func resourceK8sV2() *schema.Resource {
 					},
 				},
 			},
+			"security_group_rules": {
+				Type:        schema.TypeSet,
+				Optional:    true,
+				Description: "Firewall rules control what inbound(ingress) and outbound(egress) traffic is allowed to enter or leave a Instance. At least one 'egress' rule should be set",
+				Set:         secGroupUniqueID,
+				Elem: &schema.Resource{
+					Schema: map[string]*schema.Schema{
+						"id": {
+							Type:     schema.TypeString,
+							Computed: true,
+						},
+						"direction": {
+							Type:        schema.TypeString,
+							Required:    true,
+							Description: fmt.Sprintf("Available value is '%s', '%s'", types.RuleDirectionIngress, types.RuleDirectionEgress),
+							ValidateDiagFunc: func(v interface{}, path cty.Path) diag.Diagnostics {
+								val := v.(string)
+								switch types.RuleDirection(val) {
+								case types.RuleDirectionIngress, types.RuleDirectionEgress:
+									return nil
+								}
+								return diag.Errorf("wrong direction '%s', available value is '%s', '%s'", val, types.RuleDirectionIngress, types.RuleDirectionEgress)
+							},
+						},
+						"ethertype": {
+							Type:        schema.TypeString,
+							Required:    true,
+							Description: fmt.Sprintf("Available value is '%s', '%s'", types.EtherTypeIPv4, types.EtherTypeIPv6),
+							ValidateDiagFunc: func(v interface{}, path cty.Path) diag.Diagnostics {
+								val := v.(string)
+								switch types.EtherType(val) {
+								case types.EtherTypeIPv4, types.EtherTypeIPv6:
+									return nil
+								}
+								return diag.Errorf("wrong ethertype '%s', available value is '%s', '%s'", val, types.EtherTypeIPv4, types.EtherTypeIPv6)
+							},
+						},
+						"protocol": {
+							Type:        schema.TypeString,
+							Required:    true,
+							Description: fmt.Sprintf("Available value is %s", strings.Join(types.Protocol("").StringList(), ",")),
+						},
+						"port_range_min": {
+							Type:             schema.TypeInt,
+							Optional:         true,
+							Default:          0,
+							ValidateDiagFunc: validatePortRange,
+						},
+						"port_range_max": {
+							Type:             schema.TypeInt,
+							Optional:         true,
+							Default:          0,
+							ValidateDiagFunc: validatePortRange,
+						},
+						"description": {
+							Type:     schema.TypeString,
+							Optional: true,
+							Default:  "",
+						},
+						"remote_ip_prefix": {
+							Type:     schema.TypeString,
+							Optional: true,
+							Default:  "",
+						},
+						"updated_at": {
+							Type:     schema.TypeString,
+							Computed: true,
+						},
+						"created_at": {
+							Type:     schema.TypeString,
+							Computed: true,
+						},
+					},
+				},
+			},
+			"security_group_id": {
+				Type:        schema.TypeString,
+				Computed:    true,
+				Description: "Security group ID.",
+			},
 			"status": {
 				Type:        schema.TypeString,
 				Description: "Cluster status.",
@@ -553,6 +638,7 @@ func resourceK8sV2Create(ctx context.Context, d *schema.ResourceData, m interfac
 						Encryption:               cilium["encryption"].(bool),
 						LoadBalancerMode:         clusters.LBModeType(cilium["lb_mode"].(string)),
 						LoadBalancerAcceleration: cilium["lb_acceleration"].(bool),
+						RoutingMode:              clusters.RoutingModeType(cilium["routing_mode"].(string)),
 						HubbleRelay:              cilium["hubble_relay"].(bool),
 						HubbleUI:                 cilium["hubble_ui"].(bool),
 					}
@@ -657,10 +743,54 @@ func resourceK8sV2Create(ctx context.Context, d *schema.ResourceData, m interfac
 	}
 
 	d.SetId(clusterName.(string))
-	resourceK8sV2Read(ctx, d, m)
 
+	sgClient, err := CreateClient(provider, d, securityGroupPoint, versionPointV1)
+	if err != nil {
+		return diag.FromErr(err)
+	}
+
+	sgs, err := securitygroups.ListAll(
+		sgClient, securitygroups.ListOpts{MetadataKV: map[string]string{k8sSgMetadataKey: clusterName.(string)}},
+	)
+	sg := getSuitableSecurityGroup(sgs, clusterName.(string), d.Get("project_id").(int), d.Get("region_id").(int))
+	if sg != nil {
+		rawRules := d.Get("security_group_rules").(*schema.Set).List()
+		if len(rawRules) != 0 {
+			usersRules := convertToSecurityGroupRules(rawRules)
+
+			for _, rule := range usersRules {
+				_, err = securitygroups.AddRule(sgClient, sg.ID, rule).Extract()
+				if err != nil {
+					log.Println("[ERROR] Cannot add rule to security group", err)
+				}
+			}
+		}
+	}
+
+	resourceK8sV2Read(ctx, d, m)
 	log.Printf("[DEBUG] Finish k8s cluster creating (%s)", clusterName)
 	return diags
+}
+
+func getSuitableSecurityGroup(sgs []securitygroups.SecurityGroup, name string, projectID, regionID int) *securitygroups.SecurityGroup {
+	sgName := fmt.Sprintf("%s-%d-%d-worker", name, regionID, projectID)
+	for _, sg := range sgs {
+		if sg.Name == sgName {
+			return &sg
+		}
+	}
+	return nil
+}
+
+func filterSecurityGroupRules(rules []securitygroups.SecurityGroupRule) []securitygroups.SecurityGroupRule {
+	newRules := []securitygroups.SecurityGroupRule{}
+	for _, rule := range rules {
+		if *rule.Description == "system" {
+			continue
+		}
+		newRules = append(newRules, rule)
+	}
+	return newRules
 }
 
 func resourceK8sV2Read(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
@@ -677,6 +807,12 @@ func resourceK8sV2Read(ctx context.Context, d *schema.ResourceData, m interface{
 	clusterName := d.Get("name").(string)
 	cluster, err := clusters.Get(client, clusterName).Extract()
 	if err != nil {
+		switch err.(type) {
+		case gcorecloud.ErrDefault404:
+			d.SetId("")
+			log.Printf("[WARNING] k8s cluster not found, removing from state")
+			return nil
+		}
 		return diag.FromErr(err)
 	}
 
@@ -737,6 +873,7 @@ func resourceK8sV2Read(ctx context.Context, d *schema.ResourceData, m interface{
 				"encryption":      cluster.CNI.Cilium.Encryption,
 				"lb_mode":         cluster.CNI.Cilium.LoadBalancerMode.String(),
 				"lb_acceleration": cluster.CNI.Cilium.LoadBalancerAcceleration,
+				"routing_mode":    cluster.CNI.Cilium.RoutingMode.String(),
 				"hubble_relay":    cluster.CNI.Cilium.HubbleRelay,
 				"hubble_ui":       cluster.CNI.Cilium.HubbleUI,
 			}}
@@ -773,6 +910,27 @@ func resourceK8sV2Read(ctx context.Context, d *schema.ResourceData, m interface{
 		return diag.FromErr(err)
 	}
 
+	// get cluster's security group
+	sgClient, err := CreateClient(provider, d, securityGroupPoint, versionPointV1)
+	if err != nil {
+		return diag.FromErr(err)
+	}
+
+	sgs, err := securitygroups.ListAll(
+		sgClient, securitygroups.ListOpts{MetadataKV: map[string]string{k8sSgMetadataKey: clusterName}},
+	)
+	sg := getSuitableSecurityGroup(sgs, clusterName, d.Get("project_id").(int), d.Get("region_id").(int))
+	if err == nil && sg != nil {
+		d.Set("security_group_id", sg.ID)
+		// todo read security group for the cluster
+		rulesRaw := convertSecurityGroupRules(filterSecurityGroupRules(sg.SecurityGroupRules))
+		resultRules := schema.NewSet(secGroupUniqueID, rulesRaw)
+
+		if err := d.Set("security_group_rules", resultRules); err != nil {
+			return diag.FromErr(err)
+		}
+	}
+
 	log.Println("[DEBUG] Finish k8s cluster reading")
 	return diags
 }
@@ -800,7 +958,7 @@ func resourceK8sV2Update(ctx context.Context, d *schema.ResourceData, m interfac
 		}
 	}
 
-	if d.HasChanges("authentication", "autoscaler_config") {
+	if d.HasChanges("authentication", "autoscaler_config", "cni") {
 		if err := resourceK8sV2UpdateCluster(client, tasksClient, clusterName, d); err != nil {
 			return diag.FromErr(err)
 		}
@@ -857,6 +1015,57 @@ func resourceK8sV2Update(ctx context.Context, d *schema.ResourceData, m interfac
 				}
 			}
 		}
+	}
+
+	if d.HasChange("security_group_rules") {
+		o, n := d.GetChange("security_group_rules")
+		newUsersRules := n.(*schema.Set)
+		oldUsersRules := o.(*schema.Set)
+
+		sgClient, err := CreateClient(provider, d, securityGroupPoint, versionPointV1)
+		if err != nil {
+			return diag.FromErr(err)
+		}
+
+		updateRequest := securitygroups.UpdateOpts{}
+		for _, rule := range oldUsersRules.List() {
+			r := rule.(map[string]interface{})
+			updateRequest.ChangedRules = append(updateRequest.ChangedRules, securitygroups.UpdateSecurityGroupRuleOpts{
+				Action:              types.ActionDelete,
+				SecurityGroupRuleID: r["id"].(string),
+			})
+		}
+
+		for _, rule := range newUsersRules.List() {
+			r := rule.(map[string]interface{})
+			changedRules := securitygroups.UpdateSecurityGroupRuleOpts{
+				Action:    types.ActionCreate,
+				Direction: types.RuleDirection(r["direction"].(string)),
+				EtherType: types.EtherType(r["ethertype"].(string)),
+				Protocol:  types.Protocol(r["protocol"].(string)),
+			}
+
+			if port := r["port_range_max"].(int); port != 0 {
+				changedRules.PortRangeMax = &port
+			}
+			if port := r["port_range_min"].(int); port != 0 {
+				changedRules.PortRangeMin = &port
+			}
+			if descr := r["description"].(string); descr != "" {
+				changedRules.Description = &descr
+			}
+			if remoteIPPrefix := r["remote_ip_prefix"].(string); remoteIPPrefix != "" {
+				changedRules.RemoteIPPrefix = &remoteIPPrefix
+			}
+
+			updateRequest.ChangedRules = append(updateRequest.ChangedRules, changedRules)
+		}
+
+		_, err = securitygroups.Update(sgClient, d.Get("security_group_id").(string), updateRequest).Extract()
+		if err != nil {
+			return diag.FromErr(err)
+		}
+
 	}
 
 	diags := resourceK8sV2Read(ctx, d, m)
@@ -926,6 +1135,33 @@ func resourceK8sV2UpdateCluster(client, tasksClient *gcorecloud.ServiceClient, c
 			opts.AutoscalerConfig = map[string]string{}
 			for k, v := range autoscalerCfg {
 				opts.AutoscalerConfig[k] = v.(string)
+			}
+		}
+	}
+
+	if d.HasChange("cni") {
+		if cniI, ok := d.GetOk("cni"); ok {
+			cniA := cniI.([]interface{})
+			cni := cniA[0].(map[string]interface{})
+			opts.CNI = &clusters.CNICreateOpts{Provider: clusters.CNIProvider(cni["provider"].(string))}
+			if cni["provider"].(string) == "cilium" {
+				if ciliumI, ok := cni["cilium"]; ok {
+					ciliumA := ciliumI.([]interface{})
+					if len(ciliumA) != 0 {
+						cilium := ciliumA[0].(map[string]interface{})
+						opts.CNI.Cilium = &clusters.CiliumCreateOpts{
+							MaskSize:                 cilium["mask_size"].(int),
+							MaskSizeV6:               cilium["mask_size_v6"].(int),
+							Tunnel:                   clusters.TunnelType(cilium["tunnel"].(string)),
+							Encryption:               cilium["encryption"].(bool),
+							LoadBalancerMode:         clusters.LBModeType(cilium["lb_mode"].(string)),
+							LoadBalancerAcceleration: cilium["lb_acceleration"].(bool),
+							RoutingMode:              clusters.RoutingModeType(cilium["routing_mode"].(string)),
+							HubbleRelay:              cilium["hubble_relay"].(bool),
+							HubbleUI:                 cilium["hubble_ui"].(bool),
+						}
+					}
+				}
 			}
 		}
 	}
