@@ -12,6 +12,7 @@ import (
 	"github.com/G-Core/gcorelabscdn-go/origingroups"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/validation"
 )
 
 func resourceCDNOriginGroup() *schema.Resource {
@@ -27,13 +28,21 @@ func resourceCDNOriginGroup() *schema.Resource {
 			},
 			"use_next": {
 				Type:        schema.TypeBool,
-				Required:    true,
+				Optional:    true,
+				Default:     true,
 				Description: "This options have two possible values: true — The option is active. In case the origin responds with 4XX or 5XX codes, use the next origin from the list. false — The option is disabled.",
+			},
+			"proxy_next_upstream": {
+				Type:        schema.TypeSet,
+				Elem:        &schema.Schema{Type: schema.TypeString},
+				Optional:    true,
+				Computed:    true,
+				Description: "Available values: error, timeout, invalid_header, http_403, http_404, http_429, http_500, http_502, http_503, http_504.",
 			},
 			"origin": {
 				Type:        schema.TypeSet,
-				Required:    true,
-				Description: "Contains information about all IP address or Domain names of your origin and the port if custom",
+				Optional:    true,
+				Description: "Contains information about all IP address or Domain names of your origin and the port if custom. This field is required unless `auth` is specified. `origin` and `auth` cannot both be specified simultaneously.",
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
 						"source": {
@@ -56,12 +65,48 @@ func resourceCDNOriginGroup() *schema.Resource {
 					},
 				},
 			},
-			"proxy_next_upstream": {
-				Type:        schema.TypeSet,
-				Elem:        &schema.Schema{Type: schema.TypeString},
+			"auth": {
+				Type:        schema.TypeList,
 				Optional:    true,
-				Computed:    true,
-				Description: "Available values: error, timeout, invalid_header, http_403, http_404, http_429, http_500, http_502, http_503, http_504.",
+				MaxItems:    1,
+				Description: "Authentication configuration for S3 storage. This field is required unless `origin` is specified. `auth` and `origin` cannot both be specified simultaneously.",
+				Elem: &schema.Resource{
+					Schema: map[string]*schema.Schema{
+						"s3_type": {
+							Type:         schema.TypeString,
+							Required:     true,
+							ValidateFunc: validation.StringInSlice([]string{"other", "amazon"}, false),
+							Description:  "Type of the S3 storage, accepted values: 'other' or 'amazon'",
+						},
+						"s3_storage_hostname": {
+							Type:        schema.TypeString,
+							Optional:    true,
+							Description: "Hostname of the S3 storage, required if s3_type is 'other'",
+						},
+						"s3_access_key_id": {
+							Type:        schema.TypeString,
+							Required:    true,
+							Sensitive:   true,
+							Description: "Access key ID for the S3 storage",
+						},
+						"s3_secret_access_key": {
+							Type:        schema.TypeString,
+							Required:    true,
+							Sensitive:   true,
+							Description: "Secret access key for the S3 storage",
+						},
+						"s3_region": {
+							Type:        schema.TypeString,
+							Optional:    true,
+							Description: "Region of the S3 storage, required if s3_type is 'amazon'",
+						},
+						"s3_bucket_name": {
+							Type:        schema.TypeString,
+							Required:    true,
+							Description: "Bucket name of the S3 storage",
+						},
+					},
+				},
 			},
 		},
 		CreateContext: resourceCDNOriginGroupCreate,
@@ -69,7 +114,44 @@ func resourceCDNOriginGroup() *schema.Resource {
 		UpdateContext: resourceCDNOriginGroupUpdate,
 		DeleteContext: resourceCDNOriginGroupDelete,
 		Description:   "Represent origin group",
+		CustomizeDiff: validateCDNOriginGroupConfig,
 	}
+}
+
+func validateCDNOriginGroupConfig(ctx context.Context, diff *schema.ResourceDiff, v interface{}) error {
+	_, originExists := diff.GetOk("origin")
+	authRaw, authExists := diff.GetOk("auth")
+
+	if !originExists && !authExists {
+		return fmt.Errorf("One of `origin` or `auth` must be specified")
+	}
+
+	if originExists && authExists {
+		return fmt.Errorf("Both `origin` and `auth` cannot be specified at the same time")
+	}
+
+	if authExists {
+		authList := authRaw.([]interface{})
+
+		if len(authList) > 0 {
+			auth := authList[0].(map[string]interface{})
+			s3Type := auth["s3_type"].(string)
+
+			if s3Type == "other" {
+				if storageHostname, ok := auth["s3_storage_hostname"].(string); !ok || storageHostname == "" {
+					return fmt.Errorf("`s3_storage_hostname` is required when `s3_type` is 'other'")
+				}
+			}
+
+			if s3Type == "amazon" {
+				if s3Region, ok := auth["s3_region"].(string); !ok || s3Region == "" {
+					return fmt.Errorf("`s3_region` is required when `s3_type` is 'amazon'")
+				}
+			}
+		}
+	}
+
+	return nil
 }
 
 func resourceCDNOriginGroupCreate(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
@@ -80,7 +162,15 @@ func resourceCDNOriginGroupCreate(ctx context.Context, d *schema.ResourceData, m
 	var req origingroups.GroupRequest
 	req.Name = d.Get("name").(string)
 	req.UseNext = d.Get("use_next").(bool)
-	req.Sources = setToSourceRequests(d.Get("origin").(*schema.Set))
+
+	if originSet, ok := d.GetOk("origin"); ok {
+		req.AuthType = "none"
+		req.Sources = setToSourceRequests(originSet.(*schema.Set))
+	} else {
+		req.AuthType = "awsSignatureV4"
+		req.Auth = listToAuthS3(d.Get("auth").([]interface{}))
+		req.Sources = nil
+	}
 
 	proxyNextUpstream, ok := d.Get("proxy_next_upstream").(*schema.Set)
 	if ok && proxyNextUpstream.Len() > 0 {
@@ -96,7 +186,16 @@ func resourceCDNOriginGroupCreate(ctx context.Context, d *schema.ResourceData, m
 	}
 
 	d.SetId(fmt.Sprintf("%d", result.ID))
-	resourceCDNOriginGroupRead(ctx, d, m)
+	diags := resourceCDNOriginGroupRead(ctx, d, m)
+
+	if diags.HasError() {
+		return diags
+	}
+
+	if _, ok := d.GetOk("auth"); ok {
+		d.Set("auth.0.s3_secret_access_key", req.Auth.S3SecretAccessKey)
+		d.Set("auth.0.s3_access_key_id", req.Auth.S3AccessKeyID)
+	}
 
 	log.Printf("[DEBUG] Finish CDN OriginGroup creating (id=%d)\n", result.ID)
 	return nil
@@ -125,6 +224,24 @@ func resourceCDNOriginGroupRead(ctx context.Context, d *schema.ResourceData, m i
 	}
 	d.Set("proxy_next_upstream", result.ProxyNextUpstream)
 
+	// keep s3_secret_access_key and s3_access_key_id unchanged by API response
+	currentSecretAccessKey, keyExists := d.GetOk("auth.0.s3_secret_access_key")
+	currentAccessKeyID, keyIDExists := d.GetOk("auth.0.s3_access_key_id")
+	if err := d.Set("auth", authToList(result.Auth)); err != nil {
+		return diag.FromErr(err)
+	}
+	if keyExists && keyIDExists {
+		authList := d.Get("auth").([]interface{})
+		if len(authList) > 0 {
+			authMap := authList[0].(map[string]interface{})
+			authMap["s3_secret_access_key"] = currentSecretAccessKey
+			authMap["s3_access_key_id"] = currentAccessKeyID
+			if err := d.Set("auth", []interface{}{authMap}); err != nil {
+				return diag.FromErr(err)
+			}
+		}
+	}
+
 	log.Println("[DEBUG] Finish CDN OriginGroup reading")
 	return nil
 }
@@ -143,7 +260,15 @@ func resourceCDNOriginGroupUpdate(ctx context.Context, d *schema.ResourceData, m
 	var req origingroups.GroupRequest
 	req.Name = d.Get("name").(string)
 	req.UseNext = d.Get("use_next").(bool)
-	req.Sources = setToSourceRequests(d.Get("origin").(*schema.Set))
+
+	if originSet, ok := d.GetOk("origin"); ok {
+		req.AuthType = "none"
+		req.Sources = setToSourceRequests(originSet.(*schema.Set))
+	} else {
+		req.AuthType = "awsSignatureV4"
+		req.Auth = listToAuthS3(d.Get("auth").([]interface{}))
+		req.Sources = nil
+	}
 
 	if req.UseNext == true {
 		proxyNextUpstream, ok := d.Get("proxy_next_upstream").(*schema.Set)
@@ -159,9 +284,26 @@ func resourceCDNOriginGroupUpdate(ctx context.Context, d *schema.ResourceData, m
 		return diag.FromErr(err)
 	}
 
-	log.Println("[DEBUG] Finish CDN OriginGroup updating")
+	diags := resourceCDNOriginGroupRead(ctx, d, m)
 
-	return resourceCDNOriginGroupRead(ctx, d, m)
+	if diags.HasError() {
+		return diags
+	}
+
+	if authList, ok := d.GetOk("auth"); ok {
+		if len(authList.([]interface{})) > 0 {
+			authConfig := authList.([]interface{})[0].(map[string]interface{})
+			if secretAccessKey, ok := authConfig["s3_secret_access_key"].(string); ok {
+				d.Set("s3_secret_access_key", secretAccessKey)
+			}
+			if accessKeyID, ok := authConfig["s3_access_key_id"].(string); ok {
+				d.Set("s3_access_key_id", accessKeyID)
+			}
+		}
+	}
+
+	log.Println("[DEBUG] Finish CDN OriginGroup updating")
+	return nil
 }
 
 func resourceCDNOriginGroupDelete(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
@@ -231,4 +373,50 @@ func originSetIDFunc(i interface{}) int {
 	io.WriteString(h, key)
 
 	return int(binary.BigEndian.Uint64(h.Sum(nil)))
+}
+
+func listToAuthS3(authList []interface{}) *origingroups.AuthS3 {
+	if len(authList) == 0 {
+		return nil
+	}
+
+	authConfig := authList[0].(map[string]interface{})
+
+	auth := &origingroups.AuthS3{
+		S3Type:            authConfig["s3_type"].(string),
+		S3AccessKeyID:     authConfig["s3_access_key_id"].(string),
+		S3SecretAccessKey: authConfig["s3_secret_access_key"].(string),
+		S3BucketName:      authConfig["s3_bucket_name"].(string),
+	}
+
+	if s3StorageHostname, ok := authConfig["s3_storage_hostname"]; ok {
+		auth.S3StorageHostname = s3StorageHostname.(string)
+	}
+
+	if s3Region, ok := authConfig["s3_region"]; ok {
+		auth.S3Region = s3Region.(string)
+	}
+
+	return auth
+}
+
+func authToList(auth *origingroups.AuthS3) []interface{} {
+	if auth == nil {
+		return nil
+	}
+
+	authMap := map[string]interface{}{
+		"s3_type":        auth.S3Type,
+		"s3_bucket_name": auth.S3BucketName,
+	}
+
+	if auth.S3StorageHostname != "" {
+		authMap["s3_storage_hostname"] = auth.S3StorageHostname
+	}
+
+	if auth.S3Region != "" {
+		authMap["s3_region"] = auth.S3Region
+	}
+
+	return []interface{}{authMap}
 }
