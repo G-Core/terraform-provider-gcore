@@ -115,7 +115,7 @@ Optional:
 - `cache_http_headers` (Block List, Max: 1) Legacy option. Use the response_headers_hiding_policy option instead. (see [below for nested schema](#nestedblock--options--cache_http_headers))
 - `cors` (Block List, Max: 1) CORS header support option adds the Access-Control-Allow-Origin header to responses from CDN servers. (see [below for nested schema](#nestedblock--options--cors))
 - `country_acl` (Block List, Max: 1) Country access policy enables control access to content for specified countries. (see [below for nested schema](#nestedblock--options--country_acl))
-- `disable_cache` (Block List, Max: 1) Option enables browser caching. When enabled, content caching is completely disabled. (see [below for nested schema](#nestedblock--options--disable_cache))
+- `disable_cache` (Block List, Max: 1) Legacy option. Use the edge_cache_settings option instead. (see [below for nested schema](#nestedblock--options--disable_cache))
 - `disable_proxy_force_ranges` (Block List, Max: 1) The option allows getting 206 responses regardless settings of an origin source. Enabled by default. (see [below for nested schema](#nestedblock--options--disable_proxy_force_ranges))
 - `edge_cache_settings` (Block List, Max: 1) The cache expiration time for CDN servers. (see [below for nested schema](#nestedblock--options--edge_cache_settings))
 - `fastedge` (Block List, Max: 1) Allows to configure FastEdge app to be called on different request/response phases. (see [below for nested schema](#nestedblock--options--fastedge))

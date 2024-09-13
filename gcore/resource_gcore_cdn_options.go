@@ -146,11 +146,11 @@ var (
 				},
 			},
 		},
-		"disable_cache": {
+		"disable_cache": { // deprecated in favor of edge_cache_settings
 			Type:        schema.TypeList,
 			MaxItems:    1,
 			Optional:    true,
-			Description: "Option enables browser caching. When enabled, content caching is completely disabled.",
+			Description: "Legacy option. Use the edge_cache_settings option instead.",
 			Elem: &schema.Resource{
 				Schema: map[string]*schema.Schema{
 					"enabled": {
