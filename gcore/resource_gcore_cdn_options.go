@@ -76,6 +76,7 @@ var (
 			MaxItems:    1,
 			Optional:    true,
 			Computed:    true,
+			Deprecated:  "Use the response_headers_hiding_policy option instead.",
 			Description: "Legacy option. Use the response_headers_hiding_policy option instead.",
 			Elem: &schema.Resource{
 				Schema: map[string]*schema.Schema{
@@ -150,6 +151,7 @@ var (
 			Type:        schema.TypeList,
 			MaxItems:    1,
 			Optional:    true,
+			Deprecated:  "Use the edge_cache_settings option instead.",
 			Description: "Legacy option. Use the edge_cache_settings option instead.",
 			Elem: &schema.Resource{
 				Schema: map[string]*schema.Schema{
@@ -865,6 +867,7 @@ var (
 			Type:        schema.TypeList,
 			MaxItems:    1,
 			Optional:    true,
+			Deprecated:  "Use the static_response_headers option instead.",
 			Description: "Legacy option. Use the static_response_headers option instead.",
 			Elem: &schema.Resource{
 				Schema: map[string]*schema.Schema{
