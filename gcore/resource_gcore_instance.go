@@ -372,7 +372,126 @@ func resourceInstance() *schema.Resource {
 }
 
 func resourceInstanceCreate(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
-	return diag.FromErr(fmt.Errorf("use gcore_instancev2 resource instead"))
+	log.Println("[DEBUG] Start Instance creating")
+	var diags diag.Diagnostics
+	config := m.(*Config)
+	provider := config.Provider
+
+	clientv1, err := CreateClient(provider, d, InstancePoint, versionPointV1)
+	if err != nil {
+		return diag.FromErr(err)
+	}
+	clientv2, err := CreateClient(provider, d, InstancePoint, versionPointV2)
+	if err != nil {
+		return diag.FromErr(err)
+	}
+
+	createOpts := instances.CreateOpts{SecurityGroups: []gcorecloud.ItemID{}}
+
+	createOpts.Flavor = d.Get("flavor_id").(string)
+	createOpts.Password = d.Get("password").(string)
+	createOpts.Username = d.Get("username").(string)
+	createOpts.Keypair = d.Get("keypair_name").(string)
+	createOpts.ServerGroupID = d.Get("server_group").(string)
+
+	if userData, ok := d.GetOk("userdata"); ok {
+		createOpts.UserData = userData.(string)
+	} else if userData, ok := d.GetOk("user_data"); ok {
+		createOpts.UserData = userData.(string)
+	}
+
+	name := d.Get("name").(string)
+	if len(name) > 0 {
+		createOpts.Names = []string{name}
+	}
+
+	if nameTemplatesRaw, ok := d.GetOk("name_templates"); ok {
+		nameTemplates := nameTemplatesRaw.([]interface{})
+		if len(nameTemplates) > 0 {
+			NameTemp := make([]string, len(nameTemplates))
+			for i, nametemp := range nameTemplates {
+				NameTemp[i] = nametemp.(string)
+			}
+			createOpts.NameTemplates = NameTemp
+		}
+	} else if nameTemplate, ok := d.GetOk("name_template"); ok {
+		createOpts.NameTemplates = []string{nameTemplate.(string)}
+	}
+
+	createOpts.AllowAppPorts = d.Get("allow_app_ports").(bool)
+
+	currentVols := d.Get("volume").(*schema.Set).List()
+	if len(currentVols) > 0 {
+		vs, err := extractVolumesMap(currentVols)
+		if err != nil {
+			return diag.FromErr(err)
+		}
+		createOpts.Volumes = vs
+	}
+
+	ifs := d.Get("interface").([]interface{})
+	// sort interfaces by 'order' key to attach it in right order
+	sort.Sort(instanceInterfaces(ifs))
+	if len(ifs) > 0 {
+		ifaces, err := extractInstanceInterfacesMap(ifs)
+		if err != nil {
+			return diag.FromErr(err)
+		}
+		createOpts.Interfaces = ifaces
+	}
+
+	if metadata, ok := d.GetOk("metadata"); ok {
+		if len(metadata.([]interface{})) > 0 {
+			md, err := extractKeyValue(metadata.([]interface{}))
+			if err != nil {
+				return diag.FromErr(err)
+			}
+			createOpts.Metadata = &md
+		}
+	} else if metadataRaw, ok := d.GetOk("metadata_map"); ok {
+		md := extractMetadataMap(metadataRaw.(map[string]interface{}))
+		createOpts.Metadata = &md
+	}
+
+	configuration := d.Get("configuration")
+	if len(configuration.([]interface{})) > 0 {
+		conf, err := extractKeyValue(configuration.([]interface{}))
+		if err != nil {
+			return diag.FromErr(err)
+		}
+		createOpts.Configuration = &conf
+	}
+
+	log.Printf("[DEBUG] Interface create options: %+v", createOpts)
+	results, err := instances.Create(clientv2, createOpts).Extract()
+	if err != nil {
+		return diag.FromErr(err)
+	}
+
+	taskID := results.Tasks[0]
+	log.Printf("[DEBUG] Task id (%s)", taskID)
+	InstanceID, err := tasks.WaitTaskAndReturnResult(clientv1, taskID, true, InstanceCreatingTimeout, func(task tasks.TaskID) (interface{}, error) {
+		taskInfo, err := tasks.Get(clientv1, string(task)).Extract()
+		if err != nil {
+			return nil, fmt.Errorf("cannot get task with ID: %s. Error: %w", task, err)
+		}
+		Instance, err := instances.ExtractInstanceIDFromTask(taskInfo)
+		if err != nil {
+			return nil, fmt.Errorf("cannot retrieve Instance ID from task info: %w", err)
+		}
+		return Instance, nil
+	},
+	)
+	log.Printf("[DEBUG] Instance id (%s)", InstanceID)
+	if err != nil {
+		return diag.FromErr(err)
+	}
+
+	d.SetId(InstanceID.(string))
+	resourceInstanceRead(ctx, d, m)
+
+	log.Printf("[DEBUG] Finish Instance creating (%s)", InstanceID)
+	return diags
 }
 
 func resourceInstanceRead(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
