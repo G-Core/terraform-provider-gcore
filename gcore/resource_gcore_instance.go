@@ -36,8 +36,8 @@ func resourceInstance() *schema.Resource {
 		ReadContext:        resourceInstanceRead,
 		UpdateContext:      resourceInstanceUpdate,
 		DeleteContext:      resourceInstanceDelete,
-		Description:        "Represent instance",
-		DeprecationMessage: "!> **WARNING:** This resource is deprecated, please use 'gcore_instancev2' instead",
+		Description:        "Represent instance. **WARNING: This resource is deprecated, please use 'gcore_instancev2' instead**",
+		DeprecationMessage: "!> **WARNING:** This resource is deprecated, please use 'gcore_instancev2' instead. gcore_instance's creation will be disabled at 01.11.2024",
 		Importer: &schema.ResourceImporter{
 			StateContext: func(ctx context.Context, d *schema.ResourceData, meta interface{}) ([]*schema.ResourceData, error) {
 				projectID, regionID, InstanceID, err := ImportStringParser(d.Id())

@@ -47,3 +47,8 @@ resource "gcore_keypair" "my_keypair" {
   public_key  = "ssh-ed25519 ...your public key... gcore@gcore.com"
 }
 
+data "gcore_securitygroup" "default" {
+  name       = "default"
+  project_id = data.gcore_project.project.id
+  region_id  = data.gcore_region.region.id
+}

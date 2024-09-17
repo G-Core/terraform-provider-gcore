@@ -68,6 +68,12 @@ resource "gcore_keypair" "my_keypair" {
   sshkey_name = "my-keypair"
   public_key  = "ssh-ed25519 ...your public key... gcore@gcore.com"
 }
+
+data "gcore_securitygroup" "default" {
+  name       = "default"
+  project_id = data.gcore_project.project.id
+  region_id  = data.gcore_region.region.id
+}
 ```
 
 ### Basic example
@@ -75,7 +81,7 @@ resource "gcore_keypair" "my_keypair" {
 #### Creating instance with one public interface
 
 ```terraform
-resource "gcore_instancev2" "instance" {
+resource "gcore_instancev2" "instance-with-one-interface" {
   flavor_id     = "g1-standard-2-4"
   name          = "my-instance"
   keypair_name  = "my-keypair"
@@ -88,6 +94,7 @@ resource "gcore_instancev2" "instance" {
   interface {
     type = "external"
     name = "my-external-interface"
+    security_groups = [gcore_securitygroup.default.id]
   }
 
   project_id = data.gcore_project.project.id
@@ -100,7 +107,7 @@ resource "gcore_instancev2" "instance" {
 This example demonstrates how to create an instance with two network interfaces: one public and one private.
 
 ```terraform
-resource "gcore_instancev2" "instance" {
+resource "gcore_instancev2" "instance-with-two-interface" {
   flavor_id     = "g1-standard-2-4"
   name          = "my-instance"
   keypair_name  = "my-keypair"
@@ -113,11 +120,13 @@ resource "gcore_instancev2" "instance" {
   interface {
     type = "external"
     name = "my-external-interface"
+    security_groups = [gcore_securitygroup.default.id]
   }
 
   interface {
     type = "subnet"
     name = "my-private-interface"
+    security_groups = [gcore_securitygroup.default.id]
 
     network_id = gcore_network.network.id
     subnet_id = gcore_subnet.subnet.id
@@ -145,7 +154,7 @@ resource "gcore_volume" "boot_volume_windows" {
   region_id  = data.gcore_region.region.id
 }
 
-resource "gcore_instancev2" "instance" {
+resource "gcore_instancev2" "windows-instance" {
   flavor_id     = "g1w-standard-4-8"
   name          = "my-windows-instance"
   password      = "my-s3cR3tP@ssw0rd"
@@ -158,6 +167,7 @@ resource "gcore_instancev2" "instance" {
   interface {
     type = "external"
     name = "my-external-interface"
+    security_groups = [gcore_securitygroup.default.id]
   }
 
   project_id = data.gcore_project.project.id
@@ -166,6 +176,39 @@ resource "gcore_instancev2" "instance" {
 ```
 
 ### Advanced examples
+
+
+#### Creating instance with a dual-stack public interface
+
+This example demonstrates how to create an instance with a dual-stack public interface.
+The instance has both an IPv4 and an IPv6 address.
+
+```terraform
+resource "gcore_instancev2" "instance-with-dualstack" {
+  flavor_id     = "g1-standard-2-4"
+  name          = "my-instance"
+  keypair_name  = "my-keypair"
+
+  volume {
+    volume_id  = gcore_volume.boot_volume.id
+    boot_index = 0
+  }
+
+  interface {
+    type      = "external"
+    ip_family = "dual"
+    name      = "my-external-interface"
+    security_groups = [gcore_securitygroup.default.id]
+  }
+
+  project_id = data.gcore_project.project.id
+  region_id  = data.gcore_region.region.id
+}
+
+output "addresses" {
+  value = gcore_instancev2.instance.addresses
+}
+```
 
 #### Creating instance with floating ip
 
@@ -185,7 +228,7 @@ resource "gcore_floatingip" "floating_ip" {
   port_id          = gcore_reservedfixedip.fixed_ip.port_id
 }
 
-resource "gcore_instancev2" "instance" {
+resource "gcore_instancev2" "instance-with-floating-ip" {
   flavor_id     = "g1-standard-2-4"
   name          = "my-instance"
   keypair_name  = "my-keypair"
@@ -201,6 +244,7 @@ resource "gcore_instancev2" "instance" {
     port_id = gcore_reservedfixedip.fixed_ip.port_id
 
     existing_fip_id = gcore_floatingip.floating_ip.id
+    security_groups = [gcore_securitygroup.default.id]
   }
 
   project_id = data.gcore_project.project.id
@@ -217,7 +261,7 @@ resource "gcore_reservedfixedip" "fixed_ip" {
   type       = "external"
 }
 
-resource "gcore_instancev2" "instance" {
+resource "gcore_instancev2" "instance-with-reserved-address" {
   flavor_id     = "g1-standard-2-4"
   name          = "my-instance"
   keypair_name  = "my-keypair"
@@ -231,6 +275,7 @@ resource "gcore_instancev2" "instance" {
     type    = "reserved_fixed_ip"
     name    = "my-reserved-public-interface"
     port_id = gcore_reservedfixedip.fixed_ip.port_id
+    security_groups = [gcore_securitygroup.default.id]
   }
 
   project_id = data.gcore_project.project.id
@@ -293,7 +338,7 @@ resource "gcore_securitygroup" "web_server_security_group" {
 
 }
 
-resource "gcore_instancev2" "instance" {
+resource "gcore_instancev2" "instance-with-custom-security-group" {
   flavor_id     = "g1-standard-2-4"
   name          = "my-instance"
   keypair_name  = "my-keypair"
@@ -354,7 +399,7 @@ resource "gcore_volume" "boot_volume_windows" {
   region_id  = data.gcore_region.region.id
 }
 
-resource "gcore_instancev2" "instance" {
+resource "gcore_instancev2" "instance-windows-with-userdata" {
   flavor_id     = "g1w-standard-4-8"
   name          = "my-windows-instance"
   password      = "my-s3cR3tP@ssw0rd"
@@ -368,6 +413,7 @@ resource "gcore_instancev2" "instance" {
   interface {
     type = "external"
     name = "my-external-interface"
+    security_groups = [gcore_securitygroup.default.id]
   }
 
   project_id = data.gcore_project.project.id
@@ -385,6 +431,9 @@ resource "gcore_instancev2" "instance" {
 - `interface` (Block Set, Min: 1) List of interfaces for the instance. You can detach the interface from the instance by removing the
 interface from the instance resource and attach the interface by adding the interface resource
 inside an instance resource. (see [below for nested schema](#nestedblock--interface))
+- `volume` (Block Set, Min: 1) List of volumes for the instance. You can detach the volume from the instance by removing the
+volume from the instance resource. You cannot detach the boot volume. You can attach a data volume
+by adding the volume resource inside an instance resource. (see [below for nested schema](#nestedblock--volume))
 
 ### Optional
 
@@ -392,7 +441,6 @@ inside an instance resource. (see [below for nested schema](#nestedblock--interf
 				from the marketplace application template
 - `configuration` (Block List) Parameters for the application template from the marketplace (see [below for nested schema](#nestedblock--configuration))
 - `keypair_name` (String) Name of the keypair to use for the instance
-- `last_updated` (String)
 - `metadata_map` (Map of String) Create one or more metadata items for the instance
 - `name` (String) Name of the instance.
 - `name_template` (String) Instance name template. You can use forms 'ip_octets', 'two_ip_octets', 'one_ip_octet'
@@ -401,26 +449,23 @@ When only 'password' is provided, it is set as the password for the default user
 when 'password' is specified. For Windows instances, 'username' cannot be specified. Use the 'password' field to set
 the password for the 'Admin' user on Windows. Use the 'user_data' field to provide a script to create new users
 on Windows. The password of the Admin user cannot be updated via 'user_data'
-- `project_id` (Number)
-- `project_name` (String)
-- `region_id` (Number)
-- `region_name` (String)
+- `project_id` (Number) Project ID, only one of project_id or project_name should be set
+- `project_name` (String) Project name, only one of project_id or project_name should be set
+- `region_id` (Number) Region ID, only one of region_id or region_name should be set
+- `region_name` (String) Region name, only one of region_id or region_name should be set
 - `server_group` (String) ID of the server group to use for the instance
 - `user_data` (String) String in base64 format. For Linux instances, 'user_data' is ignored when 'password' field is provided.
 For Windows instances, Admin user password is set by 'password' field and cannot be updated via 'user_data'
 - `username` (String) For Linux instances, 'username' and 'password' are used to create a new user. For Windows
 instances, 'username' cannot be specified. Use 'password' field to set the password for the 'Admin' user on Windows.
 - `vm_state` (String) Current vm state, use stopped to stop vm and active to start
-- `volume` (Block Set) List of volumes for the instance. You can detach the volume from the instance by removing the
-volume from the instance resource. You cannot detach the boot volume. You can attach a data volume
-by adding the volume resource inside an instance resource. (see [below for nested schema](#nestedblock--volume))
 
 ### Read-Only
 
 - `addresses` (List of Object) List of instance addresses (see [below for nested schema](#nestedatt--addresses))
 - `flavor` (Map of String) Flavor details, RAM, vCPU, etc.
 - `id` (String) The ID of this resource.
-- `security_group` (List of Object) Firewalls list, they will be attached globally on all instance's interfaces (see [below for nested schema](#nestedatt--security_group))
+- `last_updated` (String)
 - `status` (String) Status of the instance
 
 <a id="nestedblock--interface"></a>
@@ -429,18 +474,40 @@ by adding the volume resource inside an instance resource. (see [below for neste
 Required:
 
 - `name` (String) Name of interface, should be unique for the instance
+- `security_groups` (List of String) list of security group IDs, they will be attached to exact interface
 
 Optional:
 
-- `existing_fip_id` (String)
-- `ip_address` (String)
+- `existing_fip_id` (String) The id of the existing floating IP that will be attached to the interface
+- `ip_address` (String) IP address for the interface.
 - `ip_family` (String) IP family for the interface, available values are 'dual', 'ipv4' and 'ipv6'
 - `network_id` (String) required if type is 'subnet' or 'any_subnet'
 - `order` (Number) Order of attaching interface
 - `port_id` (String) required if type is  'reserved_fixed_ip'
-- `security_groups` (List of String) list of security group IDs, they will be attached to exact interface
 - `subnet_id` (String) required if type is 'subnet'
 - `type` (String) Available value is 'subnet', 'any_subnet', 'external', 'reserved_fixed_ip'
+
+
+<a id="nestedblock--volume"></a>
+### Nested Schema for `volume`
+
+Required:
+
+- `volume_id` (String)
+
+Optional:
+
+- `boot_index` (Number) If boot_index==0 volumes can not detached
+
+Read-Only:
+
+- `attachment_tag` (String) Tag for the volume attachment
+- `delete_on_termination` (Boolean) Delete volume on termination
+- `id` (String)
+- `image_id` (String) Image ID for the volume
+- `name` (String) Name of the volume
+- `size` (Number) Size of the volume in GiB
+- `type_name` (String) Volume type name
 
 
 <a id="nestedblock--configuration"></a>
@@ -450,22 +517,6 @@ Required:
 
 - `key` (String)
 - `value` (String)
-
-
-<a id="nestedblock--volume"></a>
-### Nested Schema for `volume`
-
-Optional:
-
-- `attachment_tag` (String)
-- `boot_index` (Number) If boot_index==0 volumes can not detached
-- `delete_on_termination` (Boolean)
-- `id` (String)
-- `image_id` (String)
-- `name` (String)
-- `size` (Number)
-- `type_name` (String)
-- `volume_id` (String)
 
 
 <a id="nestedatt--addresses"></a>
@@ -483,15 +534,6 @@ Read-Only:
 - `addr` (String)
 - `type` (String)
 
-
-
-<a id="nestedatt--security_group"></a>
-### Nested Schema for `security_group`
-
-Read-Only:
-
-- `id` (String)
-- `name` (String)
 
 
 

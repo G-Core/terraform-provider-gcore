@@ -1,4 +1,4 @@
-resource "gcore_instancev2" "instance" {
+resource "gcore_instancev2" "instance-with-one-interface" {
   flavor_id     = "g1-standard-2-4"
   name          = "my-instance"
   keypair_name  = "my-keypair"
@@ -11,6 +11,7 @@ resource "gcore_instancev2" "instance" {
   interface {
     type = "external"
     name = "my-external-interface"
+    security_groups = [gcore_securitygroup.default.id]
   }
 
   project_id = data.gcore_project.project.id

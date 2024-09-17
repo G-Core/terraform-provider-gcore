@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"io"
 	"log"
+	"slices"
 	"sort"
 	"strconv"
 	"time"
@@ -15,6 +16,7 @@ import (
 	"github.com/G-Core/gcorelabscloud-go/gcore/floatingip/v1/floatingips"
 	"github.com/G-Core/gcorelabscloud-go/gcore/instance/v1/instances"
 	"github.com/G-Core/gcorelabscloud-go/gcore/instance/v1/types"
+	"github.com/G-Core/gcorelabscloud-go/gcore/securitygroup/v1/securitygroups"
 	"github.com/G-Core/gcorelabscloud-go/gcore/task/v1/tasks"
 	"github.com/G-Core/gcorelabscloud-go/gcore/volume/v1/volumes"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
@@ -50,8 +52,9 @@ your applications.`,
 
 		Schema: map[string]*schema.Schema{
 			"project_id": &schema.Schema{
-				Type:     schema.TypeInt,
-				Optional: true,
+				Type:        schema.TypeInt,
+				Optional:    true,
+				Description: "Project ID, only one of project_id or project_name should be set",
 				ExactlyOneOf: []string{
 					"project_id",
 					"project_name",
@@ -59,8 +62,9 @@ your applications.`,
 				DiffSuppressFunc: suppressDiffProjectID,
 			},
 			"region_id": &schema.Schema{
-				Type:     schema.TypeInt,
-				Optional: true,
+				Type:        schema.TypeInt,
+				Optional:    true,
+				Description: "Region ID, only one of region_id or region_name should be set",
 				ExactlyOneOf: []string{
 					"region_id",
 					"region_name",
@@ -68,16 +72,18 @@ your applications.`,
 				DiffSuppressFunc: suppressDiffRegionID,
 			},
 			"project_name": &schema.Schema{
-				Type:     schema.TypeString,
-				Optional: true,
+				Type:        schema.TypeString,
+				Optional:    true,
+				Description: "Project name, only one of project_id or project_name should be set",
 				ExactlyOneOf: []string{
 					"project_id",
 					"project_name",
 				},
 			},
 			"region_name": &schema.Schema{
-				Type:     schema.TypeString,
-				Optional: true,
+				Type:        schema.TypeString,
+				Optional:    true,
+				Description: "Region name, only one of region_id or region_name should be set",
 				ExactlyOneOf: []string{
 					"region_id",
 					"region_name",
@@ -101,7 +107,7 @@ your applications.`,
 			},
 			"volume": &schema.Schema{
 				Type:     schema.TypeSet,
-				Optional: true,
+				Required: true,
 				Description: `
 List of volumes for the instance. You can detach the volume from the instance by removing the
 volume from the instance resource. You cannot detach the boot volume. You can attach a data volume
@@ -110,8 +116,9 @@ by adding the volume resource inside an instance resource.`,
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
 						"name": {
-							Type:     schema.TypeString,
-							Optional: true,
+							Type:        schema.TypeString,
+							Description: "Name of the volume",
+							Computed:    true,
 						},
 						"boot_index": {
 							Type:        schema.TypeInt,
@@ -119,35 +126,37 @@ by adding the volume resource inside an instance resource.`,
 							Optional:    true,
 						},
 						"type_name": {
-							Type:     schema.TypeString,
-							Optional: true,
+							Type:        schema.TypeString,
+							Description: "Volume type name",
+							Computed:    true,
 						},
 						"image_id": {
-							Type:     schema.TypeString,
-							Optional: true,
+							Type:        schema.TypeString,
+							Description: "Image ID for the volume",
+							Computed:    true,
 						},
 						"size": {
-							Type:     schema.TypeInt,
-							Optional: true,
-							Computed: true,
+							Type:        schema.TypeInt,
+							Description: "Size of the volume in GiB",
+							Computed:    true,
 						},
 						"volume_id": {
 							Type:     schema.TypeString,
-							Optional: true,
+							Required: true,
 						},
 						"attachment_tag": {
-							Type:     schema.TypeString,
-							Optional: true,
+							Type:        schema.TypeString,
+							Description: "Tag for the volume attachment",
+							Computed:    true,
 						},
 						"id": {
 							Type:     schema.TypeString,
-							Optional: true,
 							Computed: true,
 						},
 						"delete_on_termination": {
-							Type:     schema.TypeBool,
-							Optional: true,
-							Computed: true,
+							Type:        schema.TypeBool,
+							Description: "Delete volume on termination",
+							Computed:    true,
 						},
 					},
 				},
@@ -196,8 +205,9 @@ inside an instance resource.`,
 						},
 						// nested map is not supported, in this case, you do not need to use the list for the map
 						"existing_fip_id": {
-							Type:     schema.TypeString,
-							Optional: true,
+							Type:        schema.TypeString,
+							Description: "The id of the existing floating IP that will be attached to the interface",
+							Optional:    true,
 						},
 						"port_id": {
 							Type:        schema.TypeString,
@@ -207,14 +217,15 @@ inside an instance resource.`,
 						},
 						"security_groups": {
 							Type:        schema.TypeList,
-							Optional:    true,
+							Required:    true,
 							Description: "list of security group IDs, they will be attached to exact interface",
 							Elem:        &schema.Schema{Type: schema.TypeString},
 						},
 						"ip_address": {
-							Type:     schema.TypeString,
-							Computed: true,
-							Optional: true,
+							Type:        schema.TypeString,
+							Computed:    true,
+							Optional:    true,
+							Description: "IP address for the interface.",
 						},
 					},
 				},
@@ -228,25 +239,6 @@ inside an instance resource.`,
 				Type:        schema.TypeString,
 				Optional:    true,
 				Description: "ID of the server group to use for the instance",
-			},
-			"security_group": &schema.Schema{
-				Type:        schema.TypeList,
-				Computed:    true,
-				Description: "Firewalls list, they will be attached globally on all instance's interfaces",
-				Elem: &schema.Resource{
-					Schema: map[string]*schema.Schema{
-						"id": {
-							Type:        schema.TypeString,
-							Description: "Firewall unique id",
-							Required:    true,
-						},
-						"name": {
-							Type:        schema.TypeString,
-							Required:    true,
-							Description: "Firewall name",
-						},
-					},
-				},
 			},
 			"password": &schema.Schema{
 				Type:      schema.TypeString,
@@ -337,12 +329,14 @@ For Windows instances, Admin user password is set by 'password' field and cannot
 							Elem: &schema.Resource{
 								Schema: map[string]*schema.Schema{
 									"addr": {
-										Type:     schema.TypeString,
-										Required: true,
+										Type:        schema.TypeString,
+										Computed:    true,
+										Description: "IP address",
 									},
 									"type": {
-										Type:     schema.TypeString,
-										Required: true,
+										Type:        schema.TypeString,
+										Computed:    true,
+										Description: "Type of the address",
 									},
 								},
 							},
@@ -352,7 +346,6 @@ For Windows instances, Admin user password is set by 'password' field and cannot
 			},
 			"last_updated": &schema.Schema{
 				Type:     schema.TypeString,
-				Optional: true,
 				Computed: true,
 			},
 		},
@@ -536,12 +529,6 @@ func resourceInstanceV2Read(ctx context.Context, d *schema.ResourceData, m inter
 	if err != nil {
 		return diag.FromErr(err)
 	}
-	secGroups := prepareSecurityGroups(instancePorts)
-
-	if err := d.Set("security_group", secGroups); err != nil {
-		return diag.FromErr(err)
-	}
-
 	ifs, err := instances.ListInterfacesAll(client, instanceID)
 	if err != nil {
 		return diag.FromErr(err)
@@ -593,7 +580,7 @@ func resourceInstanceV2Read(ctx context.Context, d *schema.ResourceData, m inter
 			i["ip_address"] = assignment.IPAddress.String()
 
 			if port, err := findInstancePort(iface.PortID, instancePorts); err == nil {
-				sgs := make([]string, len(port.SecurityGroups))
+				sgs := make([]interface{}, len(port.SecurityGroups))
 				for i, sg := range port.SecurityGroups {
 					sgs[i] = sg.ID
 				}
@@ -652,7 +639,11 @@ func resourceInstanceV2Update(ctx context.Context, d *schema.ResourceData, m int
 		return diag.FromErr(err)
 	}
 
-	fipClient, err := CreateClient(provider, d, floatingIPsPoint, versionPointV1)
+	clientFip, err := CreateClient(provider, d, floatingIPsPoint, versionPointV1)
+	if err != nil {
+		return diag.FromErr(err)
+	}
+	clientSg, err := CreateClient(provider, d, securityGroupPoint, versionPointV1)
 	if err != nil {
 		return diag.FromErr(err)
 	}
@@ -721,6 +712,11 @@ func resourceInstanceV2Update(ctx context.Context, d *schema.ResourceData, m int
 	}
 
 	if d.HasChange("interface") {
+		instancePorts, err := instances.ListPortsAll(client, instanceID)
+		if err != nil {
+			return diag.FromErr(err)
+		}
+
 		iList, err := instances.ListInterfacesAll(client, instanceID)
 		if err != nil {
 			return diag.FromErr(err)
@@ -742,7 +738,21 @@ func resourceInstanceV2Update(ctx context.Context, d *schema.ResourceData, m int
 		ifsOld := ifsOldRaw.(*schema.Set)
 		ifsNew := ifsNewRaw.(*schema.Set)
 
+		// we have to create separate sets for old and new interfaces by name, to be able to match
+		// interfaces which wasn't changed. We do it because new set doesn't contain portID.
+		// port id is needed to reassign security groups
+		ifsSetByNameOld := schema.NewSet(instanceInterfaceUniqueIDByName, ifsOld.List())
+		ifsSetByNameNew := schema.NewSet(instanceInterfaceUniqueIDByName, ifsNew.List())
+
+		ifsForUpdate := schema.NewSet(instanceInterfaceUniqueIDByName, []interface{}{})
+
 		for _, i := range ifsOld.Difference(ifsNew).List() {
+			// if name left the same in new set, we can skip detaching
+			if ifsSetByNameNew.Contains(i) {
+				ifsForUpdate.Add(i)
+				continue
+			}
+
 			iface := i.(map[string]interface{})
 			var opts instances.InterfaceOpts
 			opts.PortID = iface["port_id"].(string)
@@ -770,44 +780,75 @@ func resourceInstanceV2Update(ctx context.Context, d *schema.ResourceData, m int
 		ifsNewSorted := ifsNew.Difference(ifsOld).List()
 		sort.Sort(instanceInterfaces(ifsNewSorted))
 		for _, i := range ifsNewSorted {
+			// if it is completely new interface we need to attach it
+			if !ifsSetByNameOld.Contains(i) {
+				if err := attachNewInterface(i, client, instanceID); err != nil {
+					return diag.FromErr(err)
+				}
+				continue
+			}
+
 			iface := i.(map[string]interface{})
 
-			iType := types.InterfaceType(iface["type"].(string))
-			ifaceName := iface["name"].(string)
-			opts := instances.InterfaceInstanceCreateOpts{
-				InterfaceOpts: instances.InterfaceOpts{
-					Name:     &ifaceName,
-					Type:     iType,
-					IPFamily: types.IPFamilyType(iface["ip_family"].(string)),
-				},
+			var portID string
+			// try to find port id from old interfaces
+			for _, iOld := range ifsForUpdate.List() {
+				interfaceOld := iOld.(map[string]interface{})
+				if interfaceOld["name"] == iface["name"] {
+					portID = interfaceOld["port_id"].(string)
+					break
+				}
 			}
 
-			switch iType {
-			case types.SubnetInterfaceType:
-				opts.SubnetID = iface["subnet_id"].(string)
-			case types.AnySubnetInterfaceType:
-				opts.NetworkID = iface["network_id"].(string)
-			case types.ReservedFixedIpType:
-				opts.PortID = iface["port_id"].(string)
-			}
-
-			rawSgsID := iface["security_groups"].([]interface{})
-			sgs := make([]gcorecloud.ItemID, len(rawSgsID))
-			for i, sgID := range rawSgsID {
-				sgs[i] = gcorecloud.ItemID{ID: sgID.(string)}
-			}
-			opts.SecurityGroups = sgs
-
-			log.Printf("[DEBUG] attach interface: %+v", opts)
-			results, err := instances.AttachInterface(client, instanceID, opts).Extract()
+			log.Println("[DEBUG] Reassign security groups")
+			port, err := findInstancePort(portID, instancePorts)
 			if err != nil {
-				return diag.Errorf("cannot attach interface: %s. Error: %s", iType, err)
+				log.Println("[DEBUG] Port not found")
+				continue
 			}
 
-			taskID := results.Tasks[0]
-			log.Printf("[DEBUG] attach interface taskID: %s", taskID)
-			if err = tasks.WaitForStatus(client, string(taskID), tasks.TaskStateFinished, InstanceCreatingTimeout, true); err != nil {
-				return diag.FromErr(err)
+			// detach what should be detached
+			sgToDetach := make([]string, 0)
+			for _, sg := range port.SecurityGroups {
+				if !slices.ContainsFunc(iface["security_groups"].([]interface{}), func(s interface{}) bool {
+					return s.(string) == sg.ID
+				}) {
+					sgToDetach = append(sgToDetach, sg.Name)
+				}
+			}
+			detachOpts := instances.SecurityGroupOpts{
+				PortsSecurityGroupNames: []instances.PortSecurityGroupNames{{
+					PortID:             &portID,
+					SecurityGroupNames: sgToDetach,
+				}},
+			}
+			if err := instances.UnAssignSecurityGroup(client, instanceID, detachOpts).ExtractErr(); err != nil {
+				log.Printf("[WARNING] Cannot detach security groups: %v", err)
+			}
+
+			// attach what should be attached
+			sgToAttach := make([]string, 0)
+			for _, sg := range iface["security_groups"].([]interface{}) {
+				if !slices.ContainsFunc(port.SecurityGroups, func(s gcorecloud.ItemIDName) bool {
+					return s.ID == sg.(string)
+				}) {
+					// get the name of the security group
+					secGroup, err := securitygroups.Get(clientSg, sg.(string)).Extract()
+					if err != nil {
+						log.Printf("[WARNING] Cannot get security group %s: %v", sg, err)
+						continue
+					}
+					sgToAttach = append(sgToAttach, secGroup.Name)
+				}
+			}
+			attachOpts := instances.SecurityGroupOpts{
+				PortsSecurityGroupNames: []instances.PortSecurityGroupNames{{
+					PortID:             &portID,
+					SecurityGroupNames: sgToAttach,
+				}},
+			}
+			if err := instances.AssignSecurityGroup(client, instanceID, attachOpts).ExtractErr(); err != nil {
+				log.Printf("[WARNING] Cannot attach security groups: %v", err)
 			}
 		}
 
@@ -818,7 +859,7 @@ func resourceInstanceV2Update(ctx context.Context, d *schema.ResourceData, m int
 				mm[i.Key] = i.Value
 			}
 
-			_, err := floatingips.Assign(fipClient, fip.ID, floatingips.CreateOpts{
+			_, err := floatingips.Assign(clientFip, fip.ID, floatingips.CreateOpts{
 				PortID:         fip.PortID,
 				FixedIPAddress: fip.FixedIPAddress,
 				Metadata:       mm,
@@ -906,6 +947,61 @@ func resourceInstanceV2Update(ctx context.Context, d *schema.ResourceData, m int
 func instanceInterfaceUniqueID(i interface{}) int {
 	e := i.(map[string]interface{})
 	h := md5.New()
+	securitygroupsRaw := e["security_groups"].([]interface{})
+	var securitygroups string
+	for _, sg := range securitygroupsRaw {
+		securitygroups += sg.(string)
+	}
+	io.WriteString(h, e["name"].(string))
+	io.WriteString(h, securitygroups)
+	return int(binary.BigEndian.Uint64(h.Sum(nil)))
+}
+
+func instanceInterfaceUniqueIDByName(i interface{}) int {
+	e := i.(map[string]interface{})
+	h := md5.New()
 	io.WriteString(h, e["name"].(string))
 	return int(binary.BigEndian.Uint64(h.Sum(nil)))
+}
+
+func attachNewInterface(i interface{}, client *gcorecloud.ServiceClient, instanceID string) error {
+	iface := i.(map[string]interface{})
+	iType := types.InterfaceType(iface["type"].(string))
+	ifaceName := iface["name"].(string)
+	opts := instances.InterfaceInstanceCreateOpts{
+		InterfaceOpts: instances.InterfaceOpts{
+			Name:     &ifaceName,
+			Type:     iType,
+			IPFamily: types.IPFamilyType(iface["ip_family"].(string)),
+		},
+	}
+
+	switch iType {
+	case types.SubnetInterfaceType:
+		opts.SubnetID = iface["subnet_id"].(string)
+	case types.AnySubnetInterfaceType:
+		opts.NetworkID = iface["network_id"].(string)
+	case types.ReservedFixedIpType:
+		opts.PortID = iface["port_id"].(string)
+	}
+
+	rawSgsID := iface["security_groups"].([]interface{})
+	sgs := make([]gcorecloud.ItemID, len(rawSgsID))
+	for i, sgID := range rawSgsID {
+		sgs[i] = gcorecloud.ItemID{ID: sgID.(string)}
+	}
+	opts.SecurityGroups = sgs
+
+	log.Printf("[DEBUG] attach interface: %+v", opts)
+	results, err := instances.AttachInterface(client, instanceID, opts).Extract()
+	if err != nil {
+		return fmt.Errorf("cannot attach interface: %s. Error: %s", iType, err)
+	}
+
+	taskID := results.Tasks[0]
+	log.Printf("[DEBUG] attach interface taskID: %s", taskID)
+	if err = tasks.WaitForStatus(client, string(taskID), tasks.TaskStateFinished, InstanceCreatingTimeout, true); err != nil {
+		return err
+	}
+	return nil
 }

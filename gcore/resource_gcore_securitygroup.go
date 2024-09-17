@@ -2,11 +2,13 @@ package gcore
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"log"
 	"strings"
 	"time"
 
+	gcorecloud "github.com/G-Core/gcorelabscloud-go"
 	"github.com/G-Core/gcorelabscloud-go/gcore/securitygroup/v1/securitygrouprules"
 	"github.com/G-Core/gcorelabscloud-go/gcore/securitygroup/v1/securitygroups"
 	"github.com/G-Core/gcorelabscloud-go/gcore/securitygroup/v1/types"
@@ -268,6 +270,12 @@ func resourceSecurityGroupRead(ctx context.Context, d *schema.ResourceData, m in
 
 	sg, err := securitygroups.Get(client, d.Id()).Extract()
 	if err != nil {
+		var errDefault404 gcorecloud.ErrDefault404
+		if errors.As(err, &errDefault404) {
+			// removing from state because it doesn't exist anymore
+			d.SetId("")
+			return nil
+		}
 		return diag.FromErr(err)
 	}
 
@@ -409,7 +417,11 @@ func resourceSecurityGroupDelete(ctx context.Context, d *schema.ResourceData, m 
 
 	err = securitygroups.Delete(client, sgID).Err
 	if err != nil {
-		return diag.FromErr(err)
+		// if err is not found that's mean everything is ok
+		var errDefault404 gcorecloud.ErrDefault404
+		if !errors.As(err, &errDefault404) {
+			return diag.FromErr(err)
+		}
 	}
 
 	d.SetId("")

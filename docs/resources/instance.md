@@ -3,12 +3,12 @@
 page_title: "gcore_instance Resource - terraform-provider-gcore"
 subcategory: ""
 description: |-
-  Represent instance
+  Represent instance. WARNING: This resource is deprecated, please use 'gcore_instancev2' instead
 ---
 
 # gcore_instance (Resource)
 
-Represent instance
+Represent instance. **WARNING: This resource is deprecated, please use 'gcore_instancev2' instead**
 
 ## Example Usage
 
