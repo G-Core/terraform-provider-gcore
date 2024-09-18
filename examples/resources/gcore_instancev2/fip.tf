@@ -29,7 +29,7 @@ resource "gcore_instancev2" "instance_with_floating_ip" {
     port_id = gcore_reservedfixedip.fixed_ip.port_id
 
     existing_fip_id = gcore_floatingip.floating_ip.id
-    security_groups = [gcore_securitygroup.default.id]
+    security_groups = [data.gcore_securitygroup.default.id]
   }
 
   project_id = data.gcore_project.project.id

@@ -196,7 +196,7 @@ resource "gcore_instancev2" "instance_member" {
     type            = "reserved_fixed_ip"
     name            = "my-private-network-interface"
     port_id         = gcore_reservedfixedip.instance_member_fixed_ip.port_id
-    security_groups = [gcore_securitygroup.default.id]
+    security_groups = [data.gcore_securitygroup.default.id]
   }
 }
 
