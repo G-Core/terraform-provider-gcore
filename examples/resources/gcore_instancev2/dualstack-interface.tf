@@ -1,4 +1,4 @@
-resource "gcore_instancev2" "instance-with-dualstack" {
+resource "gcore_instancev2" "instance_with_dualstack" {
   flavor_id     = "g1-standard-2-4"
   name          = "my-instance"
   keypair_name  = "my-keypair"
@@ -12,7 +12,7 @@ resource "gcore_instancev2" "instance-with-dualstack" {
     type      = "external"
     ip_family = "dual"
     name      = "my-external-interface"
-    security_groups = [gcore_securitygroup.default.id]
+    security_groups = [data.gcore_securitygroup.default.id]
   }
 
   project_id = data.gcore_project.project.id
@@ -20,5 +20,5 @@ resource "gcore_instancev2" "instance-with-dualstack" {
 }
 
 output "addresses" {
-  value = gcore_instancev2.instance.addresses
+  value = gcore_instancev2.instance_with_dualstack.addresses
 }

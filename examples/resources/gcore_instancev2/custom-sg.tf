@@ -45,7 +45,7 @@ resource "gcore_securitygroup" "web_server_security_group" {
 
 }
 
-resource "gcore_instancev2" "instance-with-custom-security-group" {
+resource "gcore_instancev2" "instance_with_custom_security_group" {
   flavor_id     = "g1-standard-2-4"
   name          = "my-instance"
   keypair_name  = "my-keypair"

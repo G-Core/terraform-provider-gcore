@@ -52,3 +52,10 @@ data "gcore_securitygroup" "default" {
   project_id = data.gcore_project.project.id
   region_id  = data.gcore_region.region.id
 }
+
+data "gcore_image" "windows" {
+  name       = "windows-server-2022"
+  region_id  = data.gcore_region.region.id
+  project_id = data.gcore_project.project.id
+}
+

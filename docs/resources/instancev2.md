@@ -74,6 +74,12 @@ data "gcore_securitygroup" "default" {
   project_id = data.gcore_project.project.id
   region_id  = data.gcore_region.region.id
 }
+
+data "gcore_image" "windows" {
+  name       = "windows-server-2022"
+  region_id  = data.gcore_region.region.id
+  project_id = data.gcore_project.project.id
+}
 ```
 
 ### Basic example
@@ -81,7 +87,7 @@ data "gcore_securitygroup" "default" {
 #### Creating instance with one public interface
 
 ```terraform
-resource "gcore_instancev2" "instance-with-one-interface" {
+resource "gcore_instancev2" "instance_with_one_interface" {
   flavor_id     = "g1-standard-2-4"
   name          = "my-instance"
   keypair_name  = "my-keypair"
@@ -94,7 +100,7 @@ resource "gcore_instancev2" "instance-with-one-interface" {
   interface {
     type = "external"
     name = "my-external-interface"
-    security_groups = [gcore_securitygroup.default.id]
+    security_groups = [data.gcore_securitygroup.default.id]
   }
 
   project_id = data.gcore_project.project.id
@@ -107,7 +113,7 @@ resource "gcore_instancev2" "instance-with-one-interface" {
 This example demonstrates how to create an instance with two network interfaces: one public and one private.
 
 ```terraform
-resource "gcore_instancev2" "instance-with-two-interface" {
+resource "gcore_instancev2" "instance_with_two_interface" {
   flavor_id     = "g1-standard-2-4"
   name          = "my-instance"
   keypair_name  = "my-keypair"
@@ -120,13 +126,13 @@ resource "gcore_instancev2" "instance-with-two-interface" {
   interface {
     type = "external"
     name = "my-external-interface"
-    security_groups = [gcore_securitygroup.default.id]
+    security_groups = [data.gcore_securitygroup.default.id]
   }
 
   interface {
     type = "subnet"
     name = "my-private-interface"
-    security_groups = [gcore_securitygroup.default.id]
+    security_groups = [data.gcore_securitygroup.default.id]
 
     network_id = gcore_network.network.id
     subnet_id = gcore_subnet.subnet.id
@@ -139,12 +145,6 @@ resource "gcore_instancev2" "instance-with-two-interface" {
 #### Creating Windows instance with one public interface
 
 ```terraform
-data "gcore_image" "windows" {
-  name       = "windows-server-2022"
-  region_id  = data.gcore_region.region.id
-  project_id = data.gcore_project.project.id
-}
-
 resource "gcore_volume" "boot_volume_windows" {
   name       = "my-windows-boot-volume"
   type_name  = "ssd_hiiops"
@@ -154,7 +154,7 @@ resource "gcore_volume" "boot_volume_windows" {
   region_id  = data.gcore_region.region.id
 }
 
-resource "gcore_instancev2" "windows-instance" {
+resource "gcore_instancev2" "windows_instance" {
   flavor_id     = "g1w-standard-4-8"
   name          = "my-windows-instance"
   password      = "my-s3cR3tP@ssw0rd"
@@ -167,7 +167,7 @@ resource "gcore_instancev2" "windows-instance" {
   interface {
     type = "external"
     name = "my-external-interface"
-    security_groups = [gcore_securitygroup.default.id]
+    security_groups = [data.gcore_securitygroup.default.id]
   }
 
   project_id = data.gcore_project.project.id
@@ -184,7 +184,7 @@ This example demonstrates how to create an instance with a dual-stack public int
 The instance has both an IPv4 and an IPv6 address.
 
 ```terraform
-resource "gcore_instancev2" "instance-with-dualstack" {
+resource "gcore_instancev2" "instance_with_dualstack" {
   flavor_id     = "g1-standard-2-4"
   name          = "my-instance"
   keypair_name  = "my-keypair"
@@ -198,7 +198,7 @@ resource "gcore_instancev2" "instance-with-dualstack" {
     type      = "external"
     ip_family = "dual"
     name      = "my-external-interface"
-    security_groups = [gcore_securitygroup.default.id]
+    security_groups = [data.gcore_securitygroup.default.id]
   }
 
   project_id = data.gcore_project.project.id
@@ -206,7 +206,7 @@ resource "gcore_instancev2" "instance-with-dualstack" {
 }
 
 output "addresses" {
-  value = gcore_instancev2.instance.addresses
+  value = gcore_instancev2.instance_with_dualstack.addresses
 }
 ```
 
@@ -228,7 +228,7 @@ resource "gcore_floatingip" "floating_ip" {
   port_id          = gcore_reservedfixedip.fixed_ip.port_id
 }
 
-resource "gcore_instancev2" "instance-with-floating-ip" {
+resource "gcore_instancev2" "instance_with_floating_ip" {
   flavor_id     = "g1-standard-2-4"
   name          = "my-instance"
   keypair_name  = "my-keypair"
@@ -255,13 +255,13 @@ resource "gcore_instancev2" "instance-with-floating-ip" {
 #### Creating instance with a reserved public interface
 
 ```terraform
-resource "gcore_reservedfixedip" "fixed_ip" {
+resource "gcore_reservedfixedip" "external_fixed_ip" {
   project_id = data.gcore_project.project.id
   region_id  = data.gcore_region.region.id
   type       = "external"
 }
 
-resource "gcore_instancev2" "instance-with-reserved-address" {
+resource "gcore_instancev2" "instance_with_reserved_address" {
   flavor_id     = "g1-standard-2-4"
   name          = "my-instance"
   keypair_name  = "my-keypair"
@@ -274,8 +274,8 @@ resource "gcore_instancev2" "instance-with-reserved-address" {
   interface {
     type    = "reserved_fixed_ip"
     name    = "my-reserved-public-interface"
-    port_id = gcore_reservedfixedip.fixed_ip.port_id
-    security_groups = [gcore_securitygroup.default.id]
+    port_id = gcore_reservedfixedip.external_fixed_ip.port_id
+    security_groups = [data.gcore_securitygroup.default.id]
   }
 
   project_id = data.gcore_project.project.id
@@ -338,7 +338,7 @@ resource "gcore_securitygroup" "web_server_security_group" {
 
 }
 
-resource "gcore_instancev2" "instance-with-custom-security-group" {
+resource "gcore_instancev2" "instance_with_custom_security_group" {
   flavor_id     = "g1-standard-2-4"
   name          = "my-instance"
   keypair_name  = "my-keypair"
@@ -384,13 +384,7 @@ Add-LocalGroupMember -Group "Administrators" -Member $User
 EOF
 }
 
-data "gcore_image" "windows" {
-  name       = "windows-server-2022"
-  region_id  = data.gcore_region.region.id
-  project_id = data.gcore_project.project.id
-}
-
-resource "gcore_volume" "boot_volume_windows" {
+resource "gcore_volume" "boot_volume_windows_with_userdata" {
   name       = "my-windows-boot-volume"
   type_name  = "ssd_hiiops"
   size       = 50
@@ -399,21 +393,21 @@ resource "gcore_volume" "boot_volume_windows" {
   region_id  = data.gcore_region.region.id
 }
 
-resource "gcore_instancev2" "instance-windows-with-userdata" {
+resource "gcore_instancev2" "instance_windows_with_userdata" {
   flavor_id     = "g1w-standard-4-8"
   name          = "my-windows-instance"
   password      = "my-s3cR3tP@ssw0rd"
   user_data     = base64encode(var.second_user_userdata)
 
   volume {
-    volume_id  = gcore_volume.boot_volume_windows.id
+    volume_id  = gcore_volume.boot_volume_windows_with_userdata.id
     boot_index = 0
   }
 
   interface {
     type = "external"
     name = "my-external-interface"
-    security_groups = [gcore_securitygroup.default.id]
+    security_groups = [data.gcore_securitygroup.default.id]
   }
 
   project_id = data.gcore_project.project.id
