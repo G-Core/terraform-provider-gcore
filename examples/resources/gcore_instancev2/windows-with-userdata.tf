@@ -14,13 +14,7 @@ Add-LocalGroupMember -Group "Administrators" -Member $User
 EOF
 }
 
-data "gcore_image" "windows" {
-  name       = "windows-server-2022"
-  region_id  = data.gcore_region.region.id
-  project_id = data.gcore_project.project.id
-}
-
-resource "gcore_volume" "boot_volume_windows" {
+resource "gcore_volume" "boot_volume_windows_with_userdata" {
   name       = "my-windows-boot-volume"
   type_name  = "ssd_hiiops"
   size       = 50
@@ -29,21 +23,21 @@ resource "gcore_volume" "boot_volume_windows" {
   region_id  = data.gcore_region.region.id
 }
 
-resource "gcore_instancev2" "instance-windows-with-userdata" {
+resource "gcore_instancev2" "instance_windows_with_userdata" {
   flavor_id     = "g1w-standard-4-8"
   name          = "my-windows-instance"
   password      = "my-s3cR3tP@ssw0rd"
   user_data     = base64encode(var.second_user_userdata)
 
   volume {
-    volume_id  = gcore_volume.boot_volume_windows.id
+    volume_id  = gcore_volume.boot_volume_windows_with_userdata.id
     boot_index = 0
   }
 
   interface {
     type = "external"
     name = "my-external-interface"
-    security_groups = [gcore_securitygroup.default.id]
+    security_groups = [data.gcore_securitygroup.default.id]
   }
 
   project_id = data.gcore_project.project.id

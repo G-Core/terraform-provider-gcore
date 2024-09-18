@@ -13,7 +13,7 @@ resource "gcore_floatingip" "floating_ip" {
   port_id          = gcore_reservedfixedip.fixed_ip.port_id
 }
 
-resource "gcore_instancev2" "instance-with-floating-ip" {
+resource "gcore_instancev2" "instance_with_floating_ip" {
   flavor_id     = "g1-standard-2-4"
   name          = "my-instance"
   keypair_name  = "my-keypair"
