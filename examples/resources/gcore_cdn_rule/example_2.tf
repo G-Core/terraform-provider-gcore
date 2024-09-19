@@ -40,18 +40,6 @@ resource "gcore_cdn_rule" "cdn_example_com_rule_1" {
     browser_cache_settings {
       value = "3600s"
     }
-    cache_http_headers {
-      enabled = false
-      value = [
-        "connection",
-        "content-length",
-        "date",
-        "server",
-        "accept-ranges",
-        "content-type",
-        "content-encoding",
-      ]
-    }
     cors {
       value = [
         "*",
@@ -64,9 +52,6 @@ resource "gcore_cdn_rule" "cdn_example_com_rule_1" {
         "GB",
         "DE",
       ]
-    }
-    disable_cache {
-      value = false
     }
     disable_proxy_force_ranges {
       value = true
@@ -208,12 +193,6 @@ resource "gcore_cdn_rule" "cdn_example_com_rule_1" {
         "http_404",
         "http_500",
       ]
-    }
-    static_headers {
-      enabled = false
-      value = {
-        "X-Custom" = "test"
-      }
     }
     static_request_headers {
       value = {
