@@ -113,6 +113,9 @@ resource "gcore_cdn_resource" "cdn_example_com" {
       speed = 100
       buffer = 200
     }
+    proxy_cache_key {
+      value = "$scheme$uri"
+    }
     proxy_cache_methods_set {
       value = false
     }

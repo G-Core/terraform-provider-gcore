@@ -403,6 +403,12 @@ func listToOptions(l []interface{}) *gcdn.Options {
 			opts.LimitBandwidth.Buffer = opt["buffer"].(int)
 		}
 	}
+	if opt, ok := getOptByName(fields, "proxy_cache_key"); ok {
+		opts.ProxyCacheKey = &gcdn.ProxyCacheKey{
+			Enabled: opt["enabled"].(bool),
+			Value:   opt["value"].(string),
+		}
+	}
 	if opt, ok := getOptByName(fields, "proxy_cache_methods_set"); ok {
 		opts.ProxyCacheMethodsSet = &gcdn.ProxyCacheMethodsSet{
 			Enabled: opt["enabled"].(bool),
@@ -706,6 +712,10 @@ func optionsToList(options *gcdn.Options) []interface{} {
 	if options.LimitBandwidth != nil {
 		m := structToMap(options.LimitBandwidth)
 		result["limit_bandwidth"] = []interface{}{m}
+	}
+	if options.ProxyCacheKey != nil {
+		m := structToMap(options.ProxyCacheKey)
+		result["proxy_cache_key"] = []interface{}{m}
 	}
 	if options.ProxyCacheMethodsSet != nil {
 		m := structToMap(options.ProxyCacheMethodsSet)

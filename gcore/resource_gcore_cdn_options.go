@@ -1,8 +1,9 @@
 package gcore
 
 import (
-	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"maps"
+
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 )
 
 var (
@@ -517,6 +518,26 @@ var (
 						Optional:    true,
 						Computed:    true,
 						Description: "Amount of downloaded data after which the user will be rate limited.",
+					},
+				},
+			},
+		},
+		"proxy_cache_key": {
+			Type:        schema.TypeList,
+			MaxItems:    1,
+			Optional:    true,
+			Description: "The option allows to modify the cache key. If omitted, the default value is $request_uri. Warning: Enabling and changing this option can invalidate your current cache and affect the cache hit ratio. Furthermore, the \"Purge by pattern\" option will not work.",
+			Elem: &schema.Resource{
+				Schema: map[string]*schema.Schema{
+					"enabled": {
+						Type:     schema.TypeBool,
+						Optional: true,
+						Default:  true,
+					},
+					"value": {
+						Type:        schema.TypeString,
+						Required:    true,
+						Description: "Key for caching. Should be a combination of the specified variables: $http_host, $request_uri, $scheme, $uri.",
 					},
 				},
 			},
