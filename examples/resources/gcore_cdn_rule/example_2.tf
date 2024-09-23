@@ -132,6 +132,9 @@ resource "gcore_cdn_rule" "cdn_example_com_rule_1" {
       speed = 100
       buffer = 200
     }
+    proxy_cache_key {
+      value = "$scheme$request_uri"
+    }
     proxy_cache_methods_set {
       value = false
     }

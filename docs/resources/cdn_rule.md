@@ -169,6 +169,7 @@ Optional:
 - `image_stack` (Block List, Max: 1) Image stack option allows transforming JPG and PNG images (such as resizing or cropping) and automatically converting them to WebP or AVIF format. It is a paid option. (see [below for nested schema](#nestedblock--options--image_stack))
 - `ip_address_acl` (Block List, Max: 1) IP access policy option allows to control access to the CDN Resource content for specific IP addresses. (see [below for nested schema](#nestedblock--options--ip_address_acl))
 - `limit_bandwidth` (Block List, Max: 1) The option allows to control the download speed per connection. (see [below for nested schema](#nestedblock--options--limit_bandwidth))
+- `proxy_cache_key` (Block List, Max: 1) The option allows to modify the cache key. If omitted, the default value is $request_uri. Warning: Enabling and changing this option can invalidate your current cache and affect the cache hit ratio. Furthermore, the "Purge by pattern" option will not work. (see [below for nested schema](#nestedblock--options--proxy_cache_key))
 - `proxy_cache_methods_set` (Block List, Max: 1) Allows caching for GET, HEAD and POST requests. (see [below for nested schema](#nestedblock--options--proxy_cache_methods_set))
 - `proxy_connect_timeout` (Block List, Max: 1) The time limit for establishing a connection with the origin. (see [below for nested schema](#nestedblock--options--proxy_connect_timeout))
 - `proxy_read_timeout` (Block List, Max: 1) The time limit for receiving a partial response from the origin. If no response is received within this time, the connection will be closed. (see [below for nested schema](#nestedblock--options--proxy_read_timeout))
@@ -459,6 +460,18 @@ Optional:
 - `buffer` (Number) Amount of downloaded data after which the user will be rate limited.
 - `enabled` (Boolean)
 - `speed` (Number) Maximum download speed per connection. Must be greater than 0.
+
+
+<a id="nestedblock--options--proxy_cache_key"></a>
+### Nested Schema for `options.proxy_cache_key`
+
+Required:
+
+- `value` (String) Key for caching. Should be a combination of the specified variables: $http_host, $request_uri, $scheme, $uri.
+
+Optional:
+
+- `enabled` (Boolean)
 
 
 <a id="nestedblock--options--proxy_cache_methods_set"></a>
