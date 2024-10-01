@@ -16,6 +16,7 @@ import (
 	"github.com/G-Core/gcorelabscloud-go/gcore/task/v1/tasks"
 	"github.com/G-Core/gcorelabscloud-go/gcore/utils/metadata/v1/metadata"
 	"github.com/G-Core/gcorelabscloud-go/gcore/volume/v1/volumes"
+	volumesV2 "github.com/G-Core/gcorelabscloud-go/gcore/volume/v2/volumes"
 	"github.com/hashicorp/go-cty/cty"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
@@ -949,25 +950,38 @@ func resourceAIClusterUpdate(ctx context.Context, d *schema.ResourceData, m inte
 			return diag.FromErr(errors.New("only one vm poplar clusters are supported"))
 		}
 		instanceID := poplarInstances[0].(map[string]interface{})["instance_id"].(string)
-		vClient, err := CreateClient(provider, d, volumesPoint, versionPointV1)
+		vClient, err := CreateClient(provider, d, volumesPoint, versionPointV2)
 		if err != nil {
 			return diag.FromErr(err)
 		}
 		vOpts := volumes.InstanceOperationOpts{InstanceID: instanceID}
-		for oldVolID := range oldVolumeList {
-			if isAttached := newVolumeList[oldVolID]; isAttached {
+		for vid := range oldVolumeList {
+			if isAttached := newVolumeList[vid]; isAttached {
 				// mark as already attached
-				newVolumeList[oldVolID] = false
+				newVolumeList[vid] = false
 				continue
 			}
-			if _, err := volumes.Detach(vClient, oldVolID, vOpts).Extract(); err != nil {
+			results, err := volumesV2.Detach(vClient, vid, vOpts).Extract()
+			if err != nil {
+				return diag.FromErr(err)
+			}
+
+			taskID := results.Tasks[0]
+			if err := waitInstanceOperation(clientV1, taskID); err != nil {
 				return diag.FromErr(err)
 			}
 		}
+
 		// range over not attached volumes
-		for newVolID, ok := range newVolumeList {
+		for vid, ok := range newVolumeList {
 			if ok {
-				if _, err := volumes.Attach(vClient, newVolID, vOpts).Extract(); err != nil {
+				results, err := volumesV2.Attach(vClient, vid, vOpts).Extract()
+				if err != nil {
+					return diag.FromErr(err)
+				}
+
+				taskID := results.Tasks[0]
+				if err := waitInstanceOperation(clientV1, taskID); err != nil {
 					return diag.FromErr(err)
 				}
 			}
