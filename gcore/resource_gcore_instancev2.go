@@ -16,13 +16,19 @@ import (
 	"github.com/G-Core/gcorelabscloud-go/gcore/floatingip/v1/floatingips"
 	"github.com/G-Core/gcorelabscloud-go/gcore/instance/v1/instances"
 	"github.com/G-Core/gcorelabscloud-go/gcore/instance/v1/types"
+	instancesV2 "github.com/G-Core/gcorelabscloud-go/gcore/instance/v2/instances"
+	typesV2 "github.com/G-Core/gcorelabscloud-go/gcore/instance/v2/types"
 	"github.com/G-Core/gcorelabscloud-go/gcore/securitygroup/v1/securitygroups"
 	"github.com/G-Core/gcorelabscloud-go/gcore/task/v1/tasks"
 	"github.com/G-Core/gcorelabscloud-go/gcore/volume/v1/volumes"
+	volumesV2 "github.com/G-Core/gcorelabscloud-go/gcore/volume/v2/volumes"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
-	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/validation"
+)
+
+const (
+	instanceOperationTimeout = 1200
 )
 
 func resourceInstanceV2() *schema.Resource {
@@ -639,6 +645,11 @@ func resourceInstanceV2Update(ctx context.Context, d *schema.ResourceData, m int
 		return diag.FromErr(err)
 	}
 
+	clientV2, err := CreateClient(provider, d, InstancePoint, versionPointV1)
+	if err != nil {
+		return diag.FromErr(err)
+	}
+
 	clientFip, err := CreateClient(provider, d, floatingIPsPoint, versionPointV1)
 	if err != nil {
 		return diag.FromErr(err)
@@ -872,7 +883,7 @@ func resourceInstanceV2Update(ctx context.Context, d *schema.ResourceData, m int
 	}
 
 	if d.HasChange("volume") {
-		vClient, err := CreateClient(provider, d, volumesPoint, versionPointV1)
+		vClient, err := CreateClient(provider, d, volumesPoint, versionPointV2)
 		if err != nil {
 			return diag.FromErr(err)
 		}
@@ -888,7 +899,13 @@ func resourceInstanceV2Update(ctx context.Context, d *schema.ResourceData, m int
 				newVolumes[vid] = false
 				continue
 			}
-			if _, err := volumes.Detach(vClient, vid, vOpts).Extract(); err != nil {
+			results, err := volumesV2.Detach(vClient, vid, vOpts).Extract()
+			if err != nil {
+				return diag.FromErr(err)
+			}
+
+			taskID := results.Tasks[0]
+			if err := waitInstanceOperation(client, taskID); err != nil {
 				return diag.FromErr(err)
 			}
 		}
@@ -896,7 +913,13 @@ func resourceInstanceV2Update(ctx context.Context, d *schema.ResourceData, m int
 		// range over not attached volumes
 		for vid, ok := range newVolumes {
 			if ok {
-				if _, err := volumes.Attach(vClient, vid, vOpts).Extract(); err != nil {
+				results, err := volumesV2.Attach(vClient, vid, vOpts).Extract()
+				if err != nil {
+					return diag.FromErr(err)
+				}
+
+				taskID := results.Tasks[0]
+				if err := waitInstanceOperation(client, taskID); err != nil {
 					return diag.FromErr(err)
 				}
 			}
@@ -905,37 +928,22 @@ func resourceInstanceV2Update(ctx context.Context, d *schema.ResourceData, m int
 
 	if d.HasChange("vm_state") {
 		state := d.Get("vm_state").(string)
+		opts := instancesV2.ActionOpts{}
 		switch state {
 		case InstanceVMStateActive:
-			if _, err := instances.Start(client, instanceID).Extract(); err != nil {
-				return diag.FromErr(err)
-			}
-			startStateConf := &resource.StateChangeConf{
-				Target:     []string{InstanceVMStateActive},
-				Refresh:    ServerV2StateRefreshFunc(client, instanceID),
-				Timeout:    d.Timeout(schema.TimeoutCreate),
-				Delay:      10 * time.Second,
-				MinTimeout: 3 * time.Second,
-			}
-			_, err = startStateConf.WaitForStateContext(ctx)
-			if err != nil {
-				return diag.Errorf("Error waiting for instance (%s) to become active: %s", d.Id(), err)
-			}
+			opts.Action = typesV2.InstanceActionTypeStart
 		case InstanceVMStateStopped:
-			if _, err := instances.Stop(client, instanceID).Extract(); err != nil {
-				return diag.FromErr(err)
-			}
-			stopStateConf := &resource.StateChangeConf{
-				Target:     []string{InstanceVMStateStopped},
-				Refresh:    ServerV2StateRefreshFunc(client, instanceID),
-				Timeout:    d.Timeout(schema.TimeoutCreate),
-				Delay:      10 * time.Second,
-				MinTimeout: 3 * time.Second,
-			}
-			_, err = stopStateConf.WaitForStateContext(ctx)
-			if err != nil {
-				return diag.Errorf("Error waiting for instance (%s) to become inactive(stopped): %s", d.Id(), err)
-			}
+			opts.Action = typesV2.InstanceActionTypeStop
+		}
+
+		results, err := instancesV2.Action(clientV2, instanceID, opts).Extract()
+		if err != nil {
+			return diag.FromErr(err)
+		}
+
+		taskID := results.Tasks[0]
+		if err := waitInstanceOperation(client, taskID); err != nil {
+			return diag.FromErr(err)
 		}
 	}
 
@@ -1004,4 +1012,15 @@ func attachNewInterface(i interface{}, client *gcorecloud.ServiceClient, instanc
 		return err
 	}
 	return nil
+}
+
+func waitInstanceOperation(client *gcorecloud.ServiceClient, taskID tasks.TaskID) error {
+	_, err := tasks.WaitTaskAndReturnResult(client, taskID, true, instanceOperationTimeout, func(task tasks.TaskID) (interface{}, error) {
+		_, err := tasks.Get(client, string(task)).Extract()
+		if err != nil {
+			return nil, fmt.Errorf("cannot get task with ID: %s. Error: %w", task, err)
+		}
+		return nil, nil
+	})
+	return err
 }
