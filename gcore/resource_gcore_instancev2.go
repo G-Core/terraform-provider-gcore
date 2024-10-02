@@ -645,7 +645,7 @@ func resourceInstanceV2Update(ctx context.Context, d *schema.ResourceData, m int
 		return diag.FromErr(err)
 	}
 
-	clientV2, err := CreateClient(provider, d, InstancePoint, versionPointV1)
+	clientV2, err := CreateClient(provider, d, InstancePoint, versionPointV2)
 	if err != nil {
 		return diag.FromErr(err)
 	}
