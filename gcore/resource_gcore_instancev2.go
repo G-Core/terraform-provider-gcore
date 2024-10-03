@@ -13,7 +13,6 @@ import (
 	"time"
 
 	gcorecloud "github.com/G-Core/gcorelabscloud-go"
-	"github.com/G-Core/gcorelabscloud-go/gcore/floatingip/v1/floatingips"
 	"github.com/G-Core/gcorelabscloud-go/gcore/instance/v1/instances"
 	"github.com/G-Core/gcorelabscloud-go/gcore/instance/v1/types"
 	instancesV2 "github.com/G-Core/gcorelabscloud-go/gcore/instance/v2/instances"
@@ -222,7 +221,7 @@ inside an instance resource.`,
 							Optional:    true,
 						},
 						"security_groups": {
-							Type:        schema.TypeList,
+							Type:        schema.TypeSet,
 							Required:    true,
 							Description: "list of security group IDs, they will be attached to exact interface",
 							Elem:        &schema.Schema{Type: schema.TypeString},
@@ -590,7 +589,7 @@ func resourceInstanceV2Read(ctx context.Context, d *schema.ResourceData, m inter
 				for i, sg := range port.SecurityGroups {
 					sgs[i] = sg.ID
 				}
-				i["security_groups"] = sgs
+				i["security_groups"] = schema.NewSet(sgUniqueIDs, sgs)
 			}
 
 			cleanInterfaces = append(cleanInterfaces, i)
@@ -650,10 +649,6 @@ func resourceInstanceV2Update(ctx context.Context, d *schema.ResourceData, m int
 		return diag.FromErr(err)
 	}
 
-	clientFip, err := CreateClient(provider, d, floatingIPsPoint, versionPointV1)
-	if err != nil {
-		return diag.FromErr(err)
-	}
 	clientSg, err := CreateClient(provider, d, securityGroupPoint, versionPointV1)
 	if err != nil {
 		return diag.FromErr(err)
@@ -821,9 +816,7 @@ func resourceInstanceV2Update(ctx context.Context, d *schema.ResourceData, m int
 			// detach what should be detached
 			sgToDetach := make([]string, 0)
 			for _, sg := range port.SecurityGroups {
-				if !slices.ContainsFunc(iface["security_groups"].([]interface{}), func(s interface{}) bool {
-					return s.(string) == sg.ID
-				}) {
+				if !iface["security_groups"].(*schema.Set).Contains(sg.ID) {
 					sgToDetach = append(sgToDetach, sg.Name)
 				}
 			}
@@ -839,7 +832,7 @@ func resourceInstanceV2Update(ctx context.Context, d *schema.ResourceData, m int
 
 			// attach what should be attached
 			sgToAttach := make([]string, 0)
-			for _, sg := range iface["security_groups"].([]interface{}) {
+			for _, sg := range iface["security_groups"].(*schema.Set).List() {
 				if !slices.ContainsFunc(port.SecurityGroups, func(s gcorecloud.ItemIDName) bool {
 					return s.ID == sg.(string)
 				}) {
@@ -860,24 +853,6 @@ func resourceInstanceV2Update(ctx context.Context, d *schema.ResourceData, m int
 			}
 			if err := instances.AssignSecurityGroup(client, instanceID, attachOpts).ExtractErr(); err != nil {
 				log.Printf("[WARNING] Cannot attach security groups: %v", err)
-			}
-		}
-
-		for _, fip := range fips {
-			log.Printf("[DEBUG] Reassign floatin IP %s to fixed IP %s port id %s", fip.FloatingIPAddress, fip.FixedIPAddress, fip.PortID)
-			mm := make(map[string]string)
-			for _, i := range fip.Metadata {
-				mm[i.Key] = i.Value
-			}
-
-			_, err := floatingips.Assign(clientFip, fip.ID, floatingips.CreateOpts{
-				PortID:         fip.PortID,
-				FixedIPAddress: fip.FixedIPAddress,
-				Metadata:       mm,
-			}).Extract()
-
-			if err != nil {
-				return diag.Errorf("cannot reassign floating IP %s to fixed IP %s port id %s. Error: %v", fip.FloatingIPAddress, fip.FixedIPAddress, fip.PortID, err)
 			}
 		}
 	}
@@ -955,7 +930,7 @@ func resourceInstanceV2Update(ctx context.Context, d *schema.ResourceData, m int
 func instanceInterfaceUniqueID(i interface{}) int {
 	e := i.(map[string]interface{})
 	h := md5.New()
-	securitygroupsRaw := e["security_groups"].([]interface{})
+	securitygroupsRaw := e["security_groups"].(*schema.Set).List()
 	var securitygroups string
 	for _, sg := range securitygroupsRaw {
 		securitygroups += sg.(string)
@@ -969,6 +944,13 @@ func instanceInterfaceUniqueIDByName(i interface{}) int {
 	e := i.(map[string]interface{})
 	h := md5.New()
 	io.WriteString(h, e["name"].(string))
+	return int(binary.BigEndian.Uint64(h.Sum(nil)))
+}
+
+func sgUniqueIDs(i interface{}) int {
+	e := i.(string)
+	h := md5.New()
+	io.WriteString(h, e)
 	return int(binary.BigEndian.Uint64(h.Sum(nil)))
 }
 
@@ -993,7 +975,7 @@ func attachNewInterface(i interface{}, client *gcorecloud.ServiceClient, instanc
 		opts.PortID = iface["port_id"].(string)
 	}
 
-	rawSgsID := iface["security_groups"].([]interface{})
+	rawSgsID := iface["security_groups"].(*schema.Set).List()
 	sgs := make([]gcorecloud.ItemID, len(rawSgsID))
 	for i, sgID := range rawSgsID {
 		sgs[i] = gcorecloud.ItemID{ID: sgID.(string)}
