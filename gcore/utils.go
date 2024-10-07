@@ -250,7 +250,7 @@ func extractInstanceInterfacesMapV2(interfaces []interface{}) ([]instances.Inter
 			I.FloatingIP = &fip
 		}
 
-		rawSgsID := inter["security_groups"].([]interface{})
+		rawSgsID := inter["security_groups"].(*schema.Set).List()
 		sgs := make([]gcorecloud.ItemID, len(rawSgsID))
 		for i, sgID := range rawSgsID {
 			sgs[i] = gcorecloud.ItemID{ID: sgID.(string)}

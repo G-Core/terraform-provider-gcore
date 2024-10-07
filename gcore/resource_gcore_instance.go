@@ -604,11 +604,6 @@ func resourceInstanceRead(ctx context.Context, d *schema.ResourceData, m interfa
 				i["type"] = iOpts.Type.String()
 			}
 
-			var name string
-			if iface.Name != nil {
-				name = *iface.Name
-			}
-			i["name"] = name
 			i["network_id"] = iface.NetworkID
 			i["subnet_id"] = subnetID
 			i["port_id"] = iface.PortID
