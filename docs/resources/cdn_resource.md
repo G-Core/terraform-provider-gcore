@@ -112,10 +112,8 @@ Optional:
 - `allowed_http_methods` (Block List, Max: 1) Specify allowed HTTP methods. (see [below for nested schema](#nestedblock--options--allowed_http_methods))
 - `brotli_compression` (Block List, Max: 1) Brotli compression option allows to compress content with brotli on the CDN's end. CDN servers will request only uncompressed content from the origin. (see [below for nested schema](#nestedblock--options--brotli_compression))
 - `browser_cache_settings` (Block List, Max: 1) Specify the cache expiration time for customers' browsers in seconds. (see [below for nested schema](#nestedblock--options--browser_cache_settings))
-- `cache_http_headers` (Block List, Max: 1, Deprecated) Legacy option. Use the response_headers_hiding_policy option instead. (see [below for nested schema](#nestedblock--options--cache_http_headers))
 - `cors` (Block List, Max: 1) CORS header support option adds the Access-Control-Allow-Origin header to responses from CDN servers. (see [below for nested schema](#nestedblock--options--cors))
 - `country_acl` (Block List, Max: 1) Country access policy enables control access to content for specified countries. (see [below for nested schema](#nestedblock--options--country_acl))
-- `disable_cache` (Block List, Max: 1, Deprecated) Legacy option. Use the edge_cache_settings option instead. (see [below for nested schema](#nestedblock--options--disable_cache))
 - `disable_proxy_force_ranges` (Block List, Max: 1) The option allows getting 206 responses regardless settings of an origin source. Enabled by default. (see [below for nested schema](#nestedblock--options--disable_proxy_force_ranges))
 - `edge_cache_settings` (Block List, Max: 1) The cache expiration time for CDN servers. (see [below for nested schema](#nestedblock--options--edge_cache_settings))
 - `fastedge` (Block List, Max: 1) Allows to configure FastEdge app to be called on different request/response phases. (see [below for nested schema](#nestedblock--options--fastedge))
@@ -147,7 +145,6 @@ Optional:
 - `slice` (Block List, Max: 1) When enabled, files larger than 10 MB are requested and cached in parts (no larger than 10 MB each). It reduces time to first byte. The origin must support HTTP Range requests. (see [below for nested schema](#nestedblock--options--slice))
 - `sni` (Block List, Max: 1) Specify the SNI (Server Name Indication). SNI (Server Name Indication) is generally only required if your origin is using shared hosting or does not have a dedicated IP address. If the origin server presents multiple certificates, SNI allows the origin server to know which certificate to use for the connection. The option works only if originProtocol parameter is HTTPS or MATCH. (see [below for nested schema](#nestedblock--options--sni))
 - `stale` (Block List, Max: 1) The list of errors which Always Online option is applied for. (see [below for nested schema](#nestedblock--options--stale))
-- `static_headers` (Block List, Max: 1, Deprecated) Legacy option. Use the static_response_headers option instead. (see [below for nested schema](#nestedblock--options--static_headers))
 - `static_request_headers` (Block List, Max: 1) Specify custom HTTP Headers for a CDN server to add to request. (see [below for nested schema](#nestedblock--options--static_request_headers))
 - `static_response_headers` (Block List, Max: 1) Specify custom HTTP Headers that a CDN server adds to a response. (see [below for nested schema](#nestedblock--options--static_response_headers))
 - `tls_versions` (Block List, Max: 1) The option specifies a list of allowed SSL/TLS protocol versions. The list cannot be empty. By default, the option is disabled (all protocols versions are allowed). (see [below for nested schema](#nestedblock--options--tls_versions))
@@ -190,18 +187,6 @@ Optional:
 - `value` (String) Use '0s' to disable caching. The value applies for a response with codes 200, 201, 204, 206, 301, 302, 303, 304, 307, 308.
 
 
-<a id="nestedblock--options--cache_http_headers"></a>
-### Nested Schema for `options.cache_http_headers`
-
-Required:
-
-- `value` (Set of String) List HTTP Headers that must be included in the response.
-
-Optional:
-
-- `enabled` (Boolean)
-
-
 <a id="nestedblock--options--cors"></a>
 ### Nested Schema for `options.cors`
 
@@ -222,18 +207,6 @@ Required:
 
 - `excepted_values` (Set of String) List of countries according to ISO-3166-1.
 - `policy_type` (String) Possible values: allow, deny.
-
-Optional:
-
-- `enabled` (Boolean)
-
-
-<a id="nestedblock--options--disable_cache"></a>
-### Nested Schema for `options.disable_cache`
-
-Required:
-
-- `value` (Boolean)
 
 Optional:
 
@@ -630,18 +603,6 @@ Optional:
 Required:
 
 - `value` (Set of String) Possible values: error, http_403, http_404, http_429, http_500, http_502, http_503, http_504, invalid_header, timeout, updating.
-
-Optional:
-
-- `enabled` (Boolean)
-
-
-<a id="nestedblock--options--static_headers"></a>
-### Nested Schema for `options.static_headers`
-
-Required:
-
-- `value` (Map of String)
 
 Optional:
 

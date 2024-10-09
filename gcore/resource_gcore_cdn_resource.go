@@ -244,14 +244,6 @@ func listToOptions(l []interface{}) *gcdn.Options {
 			Value:   opt["value"].(string),
 		}
 	}
-	if opt, ok := getOptByName(fields, "cache_http_headers"); ok {
-		opts.CacheHttpHeaders = &gcdn.CacheHttpHeaders{
-			Enabled: opt["enabled"].(bool),
-		}
-		for _, v := range opt["value"].(*schema.Set).List() {
-			opts.CacheHttpHeaders.Value = append(opts.CacheHttpHeaders.Value, v.(string))
-		}
-	}
 	if opt, ok := getOptByName(fields, "cors"); ok {
 		opts.Cors = &gcdn.Cors{
 			Enabled: opt["enabled"].(bool),
@@ -270,12 +262,6 @@ func listToOptions(l []interface{}) *gcdn.Options {
 		}
 		for _, v := range opt["excepted_values"].(*schema.Set).List() {
 			opts.CountryACL.ExceptedValues = append(opts.CountryACL.ExceptedValues, v.(string))
-		}
-	}
-	if opt, ok := getOptByName(fields, "disable_cache"); ok {
-		opts.DisableCache = &gcdn.DisableCache{
-			Enabled: opt["enabled"].(bool),
-			Value:   opt["value"].(bool),
 		}
 	}
 	if opt, ok := getOptByName(fields, "disable_proxy_force_ranges"); ok {
@@ -517,15 +503,6 @@ func listToOptions(l []interface{}) *gcdn.Options {
 			opts.Stale.Value = append(opts.Stale.Value, v.(string))
 		}
 	}
-	if opt, ok := getOptByName(fields, "static_headers"); ok {
-		opts.StaticHeaders = &gcdn.StaticHeaders{
-			Enabled: opt["enabled"].(bool),
-			Value:   map[string]string{},
-		}
-		for k, v := range opt["value"].(map[string]interface{}) {
-			opts.StaticHeaders.Value[k] = v.(string)
-		}
-	}
 	if opt, ok := getOptByName(fields, "static_request_headers"); ok {
 		opts.StaticRequestHeaders = &gcdn.StaticRequestHeaders{
 			Enabled: opt["enabled"].(bool),
@@ -634,10 +611,6 @@ func optionsToList(options *gcdn.Options) []interface{} {
 		m := structToMap(options.BrowserCacheSettings)
 		result["browser_cache_settings"] = []interface{}{m}
 	}
-	if options.CacheHttpHeaders != nil {
-		m := structToMap(options.CacheHttpHeaders)
-		result["cache_http_headers"] = []interface{}{m}
-	}
 	if options.Cors != nil {
 		m := structToMap(options.Cors)
 		result["cors"] = []interface{}{m}
@@ -645,10 +618,6 @@ func optionsToList(options *gcdn.Options) []interface{} {
 	if options.CountryACL != nil {
 		m := structToMap(options.CountryACL)
 		result["country_acl"] = []interface{}{m}
-	}
-	if options.DisableCache != nil {
-		m := structToMap(options.DisableCache)
-		result["disable_cache"] = []interface{}{m}
 	}
 	if options.DisableProxyForceRanges != nil {
 		m := structToMap(options.DisableProxyForceRanges)
@@ -776,10 +745,6 @@ func optionsToList(options *gcdn.Options) []interface{} {
 	if options.Stale != nil {
 		m := structToMap(options.Stale)
 		result["stale"] = []interface{}{m}
-	}
-	if options.StaticHeaders != nil {
-		m := structToMap(options.StaticHeaders)
-		result["static_headers"] = []interface{}{m}
 	}
 	if options.StaticRequestHeaders != nil {
 		m := structToMap(options.StaticRequestHeaders)
