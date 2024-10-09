@@ -72,29 +72,6 @@ var (
 				},
 			},
 		},
-		"cache_http_headers": { // deprecated in favor of response_headers_hiding_policy
-			Type:        schema.TypeList,
-			MaxItems:    1,
-			Optional:    true,
-			Computed:    true,
-			Deprecated:  "Use the response_headers_hiding_policy option instead.",
-			Description: "Legacy option. Use the response_headers_hiding_policy option instead.",
-			Elem: &schema.Resource{
-				Schema: map[string]*schema.Schema{
-					"enabled": {
-						Type:     schema.TypeBool,
-						Optional: true,
-						Default:  true,
-					},
-					"value": {
-						Type:        schema.TypeSet,
-						Elem:        &schema.Schema{Type: schema.TypeString},
-						Required:    true,
-						Description: "List HTTP Headers that must be included in the response.",
-					},
-				},
-			},
-		},
 		"cors": {
 			Type:        schema.TypeList,
 			MaxItems:    1,
@@ -144,26 +121,6 @@ var (
 						Elem:        &schema.Schema{Type: schema.TypeString},
 						Required:    true,
 						Description: "List of countries according to ISO-3166-1.",
-					},
-				},
-			},
-		},
-		"disable_cache": { // deprecated in favor of edge_cache_settings
-			Type:        schema.TypeList,
-			MaxItems:    1,
-			Optional:    true,
-			Deprecated:  "Use the edge_cache_settings option instead.",
-			Description: "Legacy option. Use the edge_cache_settings option instead.",
-			Elem: &schema.Resource{
-				Schema: map[string]*schema.Schema{
-					"enabled": {
-						Type:     schema.TypeBool,
-						Optional: true,
-						Default:  true,
-					},
-					"value": {
-						Type:     schema.TypeBool,
-						Required: true,
 					},
 				},
 			},
@@ -880,27 +837,6 @@ var (
 						Elem:        &schema.Schema{Type: schema.TypeString},
 						Required:    true,
 						Description: "Possible values: error, http_403, http_404, http_429, http_500, http_502, http_503, http_504, invalid_header, timeout, updating.",
-					},
-				},
-			},
-		},
-		"static_headers": { // deprecated in favor of static_response_headers
-			Type:        schema.TypeList,
-			MaxItems:    1,
-			Optional:    true,
-			Deprecated:  "Use the static_response_headers option instead.",
-			Description: "Legacy option. Use the static_response_headers option instead.",
-			Elem: &schema.Resource{
-				Schema: map[string]*schema.Schema{
-					"enabled": {
-						Type:     schema.TypeBool,
-						Optional: true,
-						Default:  true,
-					},
-					"value": {
-						Type:     schema.TypeMap,
-						Elem:     &schema.Schema{Type: schema.TypeString},
-						Required: true,
 					},
 				},
 			},
