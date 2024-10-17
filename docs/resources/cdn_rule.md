@@ -151,7 +151,6 @@ Optional:
 - `allowed_http_methods` (Block List, Max: 1) Specify allowed HTTP methods. (see [below for nested schema](#nestedblock--options--allowed_http_methods))
 - `brotli_compression` (Block List, Max: 1) Brotli compression option allows to compress content with brotli on the CDN's end. CDN servers will request only uncompressed content from the origin. (see [below for nested schema](#nestedblock--options--brotli_compression))
 - `browser_cache_settings` (Block List, Max: 1) Specify the cache expiration time for customers' browsers in seconds. (see [below for nested schema](#nestedblock--options--browser_cache_settings))
-- `cache_http_headers` (Block List, Max: 1, Deprecated) Legacy option. Use the response_headers_hiding_policy option instead. (see [below for nested schema](#nestedblock--options--cache_http_headers))
 - `cors` (Block List, Max: 1) CORS header support option adds the Access-Control-Allow-Origin header to responses from CDN servers. (see [below for nested schema](#nestedblock--options--cors))
 - `country_acl` (Block List, Max: 1) Country access policy enables control access to content for specified countries. (see [below for nested schema](#nestedblock--options--country_acl))
 - `disable_proxy_force_ranges` (Block List, Max: 1) The option allows getting 206 responses regardless settings of an origin source. Enabled by default. (see [below for nested schema](#nestedblock--options--disable_proxy_force_ranges))
@@ -222,18 +221,6 @@ Optional:
 
 - `enabled` (Boolean)
 - `value` (String) Use '0s' to disable caching. The value applies for a response with codes 200, 201, 204, 206, 301, 302, 303, 304, 307, 308.
-
-
-<a id="nestedblock--options--cache_http_headers"></a>
-### Nested Schema for `options.cache_http_headers`
-
-Required:
-
-- `value` (Set of String) List HTTP Headers that must be included in the response.
-
-Optional:
-
-- `enabled` (Boolean)
 
 
 <a id="nestedblock--options--cors"></a>

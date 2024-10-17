@@ -72,29 +72,6 @@ var (
 				},
 			},
 		},
-		"cache_http_headers": { // deprecated in favor of response_headers_hiding_policy
-			Type:        schema.TypeList,
-			MaxItems:    1,
-			Optional:    true,
-			Computed:    true,
-			Deprecated:  "Use the response_headers_hiding_policy option instead.",
-			Description: "Legacy option. Use the response_headers_hiding_policy option instead.",
-			Elem: &schema.Resource{
-				Schema: map[string]*schema.Schema{
-					"enabled": {
-						Type:     schema.TypeBool,
-						Optional: true,
-						Default:  true,
-					},
-					"value": {
-						Type:        schema.TypeSet,
-						Elem:        &schema.Schema{Type: schema.TypeString},
-						Required:    true,
-						Description: "List HTTP Headers that must be included in the response.",
-					},
-				},
-			},
-		},
 		"cors": {
 			Type:        schema.TypeList,
 			MaxItems:    1,

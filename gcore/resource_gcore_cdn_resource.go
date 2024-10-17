@@ -244,14 +244,6 @@ func listToOptions(l []interface{}) *gcdn.Options {
 			Value:   opt["value"].(string),
 		}
 	}
-	if opt, ok := getOptByName(fields, "cache_http_headers"); ok {
-		opts.CacheHttpHeaders = &gcdn.CacheHttpHeaders{
-			Enabled: opt["enabled"].(bool),
-		}
-		for _, v := range opt["value"].(*schema.Set).List() {
-			opts.CacheHttpHeaders.Value = append(opts.CacheHttpHeaders.Value, v.(string))
-		}
-	}
 	if opt, ok := getOptByName(fields, "cors"); ok {
 		opts.Cors = &gcdn.Cors{
 			Enabled: opt["enabled"].(bool),
@@ -627,10 +619,6 @@ func optionsToList(options *gcdn.Options) []interface{} {
 	if options.BrowserCacheSettings != nil {
 		m := structToMap(options.BrowserCacheSettings)
 		result["browser_cache_settings"] = []interface{}{m}
-	}
-	if options.CacheHttpHeaders != nil {
-		m := structToMap(options.CacheHttpHeaders)
-		result["cache_http_headers"] = []interface{}{m}
 	}
 	if options.Cors != nil {
 		m := structToMap(options.Cors)
