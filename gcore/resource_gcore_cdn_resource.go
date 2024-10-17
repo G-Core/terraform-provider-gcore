@@ -272,12 +272,6 @@ func listToOptions(l []interface{}) *gcdn.Options {
 			opts.CountryACL.ExceptedValues = append(opts.CountryACL.ExceptedValues, v.(string))
 		}
 	}
-	if opt, ok := getOptByName(fields, "disable_cache"); ok {
-		opts.DisableCache = &gcdn.DisableCache{
-			Enabled: opt["enabled"].(bool),
-			Value:   opt["value"].(bool),
-		}
-	}
 	if opt, ok := getOptByName(fields, "disable_proxy_force_ranges"); ok {
 		opts.DisableProxyForceRanges = &gcdn.DisableProxyForceRanges{
 			Enabled: opt["enabled"].(bool),
@@ -645,10 +639,6 @@ func optionsToList(options *gcdn.Options) []interface{} {
 	if options.CountryACL != nil {
 		m := structToMap(options.CountryACL)
 		result["country_acl"] = []interface{}{m}
-	}
-	if options.DisableCache != nil {
-		m := structToMap(options.DisableCache)
-		result["disable_cache"] = []interface{}{m}
 	}
 	if options.DisableProxyForceRanges != nil {
 		m := structToMap(options.DisableProxyForceRanges)

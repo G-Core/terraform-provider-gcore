@@ -148,26 +148,6 @@ var (
 				},
 			},
 		},
-		"disable_cache": { // deprecated in favor of edge_cache_settings
-			Type:        schema.TypeList,
-			MaxItems:    1,
-			Optional:    true,
-			Deprecated:  "Use the edge_cache_settings option instead.",
-			Description: "Legacy option. Use the edge_cache_settings option instead.",
-			Elem: &schema.Resource{
-				Schema: map[string]*schema.Schema{
-					"enabled": {
-						Type:     schema.TypeBool,
-						Optional: true,
-						Default:  true,
-					},
-					"value": {
-						Type:     schema.TypeBool,
-						Required: true,
-					},
-				},
-			},
-		},
 		"disable_proxy_force_ranges": {
 			Type:        schema.TypeList,
 			MaxItems:    1,
