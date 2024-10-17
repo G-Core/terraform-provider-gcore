@@ -841,27 +841,6 @@ var (
 				},
 			},
 		},
-		"static_headers": { // deprecated in favor of static_response_headers
-			Type:        schema.TypeList,
-			MaxItems:    1,
-			Optional:    true,
-			Deprecated:  "Use the static_response_headers option instead.",
-			Description: "Legacy option. Use the static_response_headers option instead.",
-			Elem: &schema.Resource{
-				Schema: map[string]*schema.Schema{
-					"enabled": {
-						Type:     schema.TypeBool,
-						Optional: true,
-						Default:  true,
-					},
-					"value": {
-						Type:     schema.TypeMap,
-						Elem:     &schema.Schema{Type: schema.TypeString},
-						Required: true,
-					},
-				},
-			},
-		},
 		"static_request_headers": {
 			Type:        schema.TypeList,
 			MaxItems:    1,

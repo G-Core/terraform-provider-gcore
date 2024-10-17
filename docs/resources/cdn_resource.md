@@ -145,7 +145,6 @@ Optional:
 - `slice` (Block List, Max: 1) When enabled, files larger than 10 MB are requested and cached in parts (no larger than 10 MB each). It reduces time to first byte. The origin must support HTTP Range requests. (see [below for nested schema](#nestedblock--options--slice))
 - `sni` (Block List, Max: 1) Specify the SNI (Server Name Indication). SNI (Server Name Indication) is generally only required if your origin is using shared hosting or does not have a dedicated IP address. If the origin server presents multiple certificates, SNI allows the origin server to know which certificate to use for the connection. The option works only if originProtocol parameter is HTTPS or MATCH. (see [below for nested schema](#nestedblock--options--sni))
 - `stale` (Block List, Max: 1) The list of errors which Always Online option is applied for. (see [below for nested schema](#nestedblock--options--stale))
-- `static_headers` (Block List, Max: 1, Deprecated) Legacy option. Use the static_response_headers option instead. (see [below for nested schema](#nestedblock--options--static_headers))
 - `static_request_headers` (Block List, Max: 1) Specify custom HTTP Headers for a CDN server to add to request. (see [below for nested schema](#nestedblock--options--static_request_headers))
 - `static_response_headers` (Block List, Max: 1) Specify custom HTTP Headers that a CDN server adds to a response. (see [below for nested schema](#nestedblock--options--static_response_headers))
 - `tls_versions` (Block List, Max: 1) The option specifies a list of allowed SSL/TLS protocol versions. The list cannot be empty. By default, the option is disabled (all protocols versions are allowed). (see [below for nested schema](#nestedblock--options--tls_versions))
@@ -604,18 +603,6 @@ Optional:
 Required:
 
 - `value` (Set of String) Possible values: error, http_403, http_404, http_429, http_500, http_502, http_503, http_504, invalid_header, timeout, updating.
-
-Optional:
-
-- `enabled` (Boolean)
-
-
-<a id="nestedblock--options--static_headers"></a>
-### Nested Schema for `options.static_headers`
-
-Required:
-
-- `value` (Map of String)
 
 Optional:
 

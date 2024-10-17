@@ -503,15 +503,6 @@ func listToOptions(l []interface{}) *gcdn.Options {
 			opts.Stale.Value = append(opts.Stale.Value, v.(string))
 		}
 	}
-	if opt, ok := getOptByName(fields, "static_headers"); ok {
-		opts.StaticHeaders = &gcdn.StaticHeaders{
-			Enabled: opt["enabled"].(bool),
-			Value:   map[string]string{},
-		}
-		for k, v := range opt["value"].(map[string]interface{}) {
-			opts.StaticHeaders.Value[k] = v.(string)
-		}
-	}
 	if opt, ok := getOptByName(fields, "static_request_headers"); ok {
 		opts.StaticRequestHeaders = &gcdn.StaticRequestHeaders{
 			Enabled: opt["enabled"].(bool),
@@ -754,10 +745,6 @@ func optionsToList(options *gcdn.Options) []interface{} {
 	if options.Stale != nil {
 		m := structToMap(options.Stale)
 		result["stale"] = []interface{}{m}
-	}
-	if options.StaticHeaders != nil {
-		m := structToMap(options.StaticHeaders)
-		result["static_headers"] = []interface{}{m}
 	}
 	if options.StaticRequestHeaders != nil {
 		m := structToMap(options.StaticRequestHeaders)
