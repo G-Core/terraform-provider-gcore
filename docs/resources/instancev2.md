@@ -468,7 +468,7 @@ instances, 'username' cannot be specified. Use 'password' field to set the passw
 Required:
 
 - `name` (String) Name of interface, should be unique for the instance
-- `security_groups` (Set of String) list of security group IDs, they will be attached to exact interface
+- `security_groups` (List of String) list of security group IDs, they will be attached to exact interface
 
 Optional:
 
