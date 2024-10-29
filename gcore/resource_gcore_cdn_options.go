@@ -928,6 +928,25 @@ var (
 				},
 			},
 		},
+		"waap": {
+			Type:        schema.TypeList,
+			MaxItems:    1,
+			Optional:    true,
+			Description: "Option allows to enable WAAP (Web Application and API Protection).",
+			Elem: &schema.Resource{
+				Schema: map[string]*schema.Schema{
+					"enabled": {
+						Type:     schema.TypeBool,
+						Optional: true,
+						Default:  true,
+					},
+					"value": {
+						Type:     schema.TypeBool,
+						Required: true,
+					},
+				},
+			},
+		},
 		"waf": {
 			Type:        schema.TypeList,
 			MaxItems:    1,
