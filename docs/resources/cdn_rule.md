@@ -186,6 +186,7 @@ Optional:
 - `static_request_headers` (Block List, Max: 1) Specify custom HTTP Headers for a CDN server to add to request. (see [below for nested schema](#nestedblock--options--static_request_headers))
 - `static_response_headers` (Block List, Max: 1) Specify custom HTTP Headers that a CDN server adds to a response. (see [below for nested schema](#nestedblock--options--static_response_headers))
 - `user_agent_acl` (Block List, Max: 1) User agents policy option allows to control access to the content for specified user-agent. (see [below for nested schema](#nestedblock--options--user_agent_acl))
+- `waap` (Block List, Max: 1) Option allows to enable WAAP (Web Application and API Protection). (see [below for nested schema](#nestedblock--options--waap))
 - `waf` (Block List, Max: 1) Option allows to enable Basic WAF to protect you against the most common threats. (see [below for nested schema](#nestedblock--options--waf))
 - `websockets` (Block List, Max: 1) WebSockets option allows WebSockets connections to an origin server. (see [below for nested schema](#nestedblock--options--websockets))
 
@@ -676,6 +677,18 @@ Required:
 
 - `excepted_values` (Set of String) List of User-Agents. Use "" to allow/deny access when the User-Agent header is empty.
 - `policy_type` (String) Possible values: allow, deny.
+
+Optional:
+
+- `enabled` (Boolean)
+
+
+<a id="nestedblock--options--waap"></a>
+### Nested Schema for `options.waap`
+
+Required:
+
+- `value` (Boolean)
 
 Optional:
 
