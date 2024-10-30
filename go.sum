@@ -11,6 +11,8 @@ github.com/G-Core/gcore-storage-sdk-go v0.1.34 h1:0GPQfz1kA6mQi6fiisGsh0Um4H9PZe
 github.com/G-Core/gcore-storage-sdk-go v0.1.34/go.mod h1:BUAEZZZJJt/+luRFunqziv3+JnbVMLbQXDWz9kV8Te8=
 github.com/G-Core/gcorelabscdn-go v1.0.17 h1:g5i53mzPpg513qcXzxuEdL1v/rK3yiAd8LOVjMh/noM=
 github.com/G-Core/gcorelabscdn-go v1.0.17/go.mod h1:iSGXaTvZBzDHQW+rKFS918BgFVpONcyLEijwh8WsXpE=
+github.com/G-Core/gcorelabscdn-go v1.0.19 h1:P4qYP+cnO+0DrVftGnL1gt7En8/RYsl20zw4wud9Krs=
+github.com/G-Core/gcorelabscdn-go v1.0.19/go.mod h1:iSGXaTvZBzDHQW+rKFS918BgFVpONcyLEijwh8WsXpE=
 github.com/G-Core/gcorelabscloud-go v0.8.0 h1:6w+Mikiz+GbHJs1PD+tPD1gIR88Xl3UPkJuvQVuG7bs=
 github.com/G-Core/gcorelabscloud-go v0.8.0/go.mod h1:13Z1USxlxPbDFuYQyWqfNexlk4kUvOYTXbnvV/Z1lZo=
 github.com/G-Core/gcorelabscloud-go v0.8.4 h1:Yf0c0ZFOTxu0VjMgMVooHp2k2fYYKLLU5jqFRuEVEcg=

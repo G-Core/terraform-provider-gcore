@@ -559,6 +559,12 @@ func listToOptions(l []interface{}) *gcdn.Options {
 			Value:   opt["value"].(bool),
 		}
 	}
+	if opt, ok := getOptByName(fields, "waap"); ok {
+		opts.WAAP = &gcdn.WAAP{
+			Enabled: opt["enabled"].(bool),
+			Value:   opt["value"].(bool),
+		}
+	}
 	if opt, ok := getOptByName(fields, "waf"); ok {
 		opts.WAF = &gcdn.WAF{
 			Enabled: opt["enabled"].(bool),
@@ -774,6 +780,10 @@ func optionsToList(options *gcdn.Options) []interface{} {
 	if options.UseRSALECert != nil {
 		m := structToMap(options.UseRSALECert)
 		result["use_rsa_le_cert"] = []interface{}{m}
+	}
+	if options.WAAP != nil {
+		m := structToMap(options.WAAP)
+		result["waap"] = []interface{}{m}
 	}
 	if options.WAF != nil {
 		m := structToMap(options.WAF)
