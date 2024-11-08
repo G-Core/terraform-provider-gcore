@@ -166,9 +166,9 @@ resource "gcore_instancev2" "instance2" {
   }
 
   volume {
-  	source = "existing-volume"
-  	volume_id = gcore_volume.third_volume.id
-  	boot_index = 1
+    source = "existing-volume"
+    volume_id = gcore_volume.third_volume.id
+    boot_index = 1
   }
 
   interface {

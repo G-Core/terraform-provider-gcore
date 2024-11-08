@@ -37,7 +37,8 @@ func Provider() *schema.Provider {
 				// commented because it's broke all tests
 				//AtLeastOneOf: []string{ProviderOptPermanentToken, "user_name"},
 				//RequiredWith: []string{"user_name", "password"},
-				Deprecated:  fmt.Sprintf("Use %s instead", ProviderOptPermanentToken),
+				Deprecated:  fmt.Sprintf("Use `%s` instead", ProviderOptPermanentToken),
+				Description: "Gcore account username. Can also be set with the GCORE_USERNAME environment variable.",
 				DefaultFunc: schema.EnvDefaultFunc("GCORE_USERNAME", nil),
 			},
 			"password": {
@@ -45,7 +46,8 @@ func Provider() *schema.Provider {
 				Optional: true,
 				// commented because it's broke all tests
 				//RequiredWith: []string{"user_name", "password"},
-				Deprecated:  fmt.Sprintf("Use %s instead", ProviderOptPermanentToken),
+				Deprecated:  fmt.Sprintf("Use `%s` instead", ProviderOptPermanentToken),
+				Description: "Gcore account password. Can also be set with the GCORE_PASSWORD environment variable.",
 				DefaultFunc: schema.EnvDefaultFunc("GCORE_PASSWORD", nil),
 			},
 			ProviderOptPermanentToken: {
@@ -54,71 +56,71 @@ func Provider() *schema.Provider {
 				// commented because it's broke all tests
 				//AtLeastOneOf: []string{ProviderOptPermanentToken, "user_name"},
 				Sensitive:   true,
-				Description: "A permanent [API-token](https://gcore.com/docs/account-settings/create-use-or-delete-a-permanent-api-token)",
+				Description: "A permanent [API-token](https://gcore.com/docs/account-settings/create-use-or-delete-a-permanent-api-token). Can also be set with the GCORE_PERMANENT_TOKEN environment variable.",
 				DefaultFunc: schema.EnvDefaultFunc("GCORE_PERMANENT_TOKEN", nil),
 			},
 			ProviderOptSingleApiEndpoint: {
 				Type:        schema.TypeString,
 				Optional:    true,
-				Description: "A single API endpoint for all products. Will be used when specific product API url is not defined.",
+				Description: "A single API endpoint for all products. Will be used when specific product API url is not defined. Can also be set with the GCORE_API_ENDPOINT environment variable.",
 				DefaultFunc: schema.EnvDefaultFunc("GCORE_API_ENDPOINT", "https://api.gcore.com"),
 			},
 			ProviderOptSkipCredsAuthErr: {
 				Type:        schema.TypeBool,
 				Optional:    true,
-				Deprecated:  "It doesn't make any effect anymore",
+				Deprecated:  "Does not have any effect anymore.",
 				Description: "Should be set to true when you are gonna to use storage resource with permanent API-token only.",
 			},
 			"gcore_platform": {
 				Type:          schema.TypeString,
 				Optional:      true,
-				Deprecated:    "Use gcore_platform_api instead",
+				Deprecated:    "Use `gcore_platform_api` instead.",
 				ConflictsWith: []string{"gcore_platform_api"},
-				Description:   "Platform URL is used for generate JWT",
+				Description:   "Platform URL is used for generate JWT.",
 				DefaultFunc:   schema.EnvDefaultFunc("GCORE_PLATFORM", nil),
 			},
 			"gcore_platform_api": {
 				Type:        schema.TypeString,
 				Optional:    true,
-				Description: "Platform URL is used for generate JWT (define only if you want to override Platform API endpoint)",
+				Description: "Platform URL is used for generate JWT (define only if you want to override Platform API endpoint). Can also be set with the GCORE_PLATFORM_API environment variable.",
 				DefaultFunc: schema.EnvDefaultFunc("GCORE_PLATFORM_API", nil),
 			},
 			"gcore_api": {
 				Type:          schema.TypeString,
 				Optional:      true,
-				Deprecated:    "Use gcore_cloud_api instead",
+				Deprecated:    "Use `gcore_cloud_api` instead.",
 				ConflictsWith: []string{"gcore_cloud_api"},
-				Description:   "Region API",
+				Description:   "Region API.",
 				DefaultFunc:   schema.EnvDefaultFunc("GCORE_API", nil),
 			},
 			"gcore_cloud_api": {
 				Type:        schema.TypeString,
 				Optional:    true,
-				Description: "Region API (define only if you want to override Region API endpoint)",
+				Description: "Region API (define only if you want to override Region API endpoint). Can also be set with the GCORE_CLOUD_API environment variable.",
 				DefaultFunc: schema.EnvDefaultFunc("GCORE_CLOUD_API", nil),
 			},
 			"gcore_cdn_api": {
 				Type:        schema.TypeString,
 				Optional:    true,
-				Description: "CDN API (define only if you want to override CDN API endpoint)",
+				Description: "CDN API (define only if you want to override CDN API endpoint). Can also be set with the GCORE_CDN_API environment variable.",
 				DefaultFunc: schema.EnvDefaultFunc("GCORE_CDN_API", ""),
 			},
 			"gcore_storage_api": {
 				Type:        schema.TypeString,
 				Optional:    true,
-				Description: "Storage API (define only if you want to override Storage API endpoint)",
+				Description: "Storage API (define only if you want to override Storage API endpoint). Can also be set with the GCORE_STORAGE_API environment variable.",
 				DefaultFunc: schema.EnvDefaultFunc("GCORE_STORAGE_API", ""),
 			},
 			"gcore_dns_api": {
 				Type:        schema.TypeString,
 				Optional:    true,
-				Description: "DNS API (define only if you want to override DNS API endpoint)",
+				Description: "DNS API (define only if you want to override DNS API endpoint). Can also be set with the GCORE_DNS_API environment variable.",
 				DefaultFunc: schema.EnvDefaultFunc("GCORE_DNS_API", ""),
 			},
 			"gcore_client_id": {
 				Type:        schema.TypeString,
 				Optional:    true,
-				Description: "Client id",
+				Description: "Client ID. Can also be set with the GCORE_CLIENT_ID environment variable.",
 				DefaultFunc: schema.EnvDefaultFunc("GCORE_CLIENT_ID", ""),
 			},
 		},
@@ -212,7 +214,7 @@ func providerConfigure(_ context.Context, d *schema.ResourceData) (interface{}, 
 		(username == "" || password == "") {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  fmt.Sprintf("Field 'permanent_api_token' or 'username' and 'password' are required."),
+			Summary:  "Field 'permanent_api_token' or 'username' and 'password' are required.",
 			Detail:   "To use provider your should fill field 'permanent_api_token' or 'username' and 'password'.",
 		})
 	}
