@@ -1,0 +1,77 @@
+---
+page_title: "Provider: Gcore"
+description: |-
+  Gcore Terraform Provider is used to manage Gcore resources.
+---
+
+# Gcore Provider
+
+Gcore Terraform Provider allows you to automate the provisioning, management, and testing of your Gcore resources programatically.
+
+## Authentication and Configuration
+
+To start using the Gcore Terraform Provider you need to configure the provider with the proper credentials.
+
+Configuration for the provider can be derived from multiple sources, which are applied in the following order:
+
+1. Parameters in the provider configuration
+2. Environment variables
+
+### Provider Configuration
+
+!> Warning: Hard-coded credentials are not recommended in any Terraform configuration and risk secret leakage should it ever be committed to a public version control system.
+
+The [permanent API token](https://gcore.com/docs/account-settings/create-use-or-delete-a-permanent-api-token) can be provided by adding a `permanent_api_token` argument to the `gcore` provider block.
+
+Example:
+
+```terraform
+provider "gcore" {
+  permanent_api_token = "251$d3361.............1b35f26d8"
+}
+```
+
+If needed, the **deprecated** `username` and `password` arguments can be added to the `gcore` provider block instead of a permanent API token.
+
+Other settings that can be configured include:
+
+- `api_endpoint`
+- `gcore_cdn_api`
+- `gcore_client_id`
+- `gcore_cloud_api`
+- `gcore_dns_api`
+- `gcore_platform_api`
+- `gcore_storage_api`
+
+### Environment Variables
+
+The [permanent API token](https://gcore.com/docs/account-settings/create-use-or-delete-a-permanent-api-token) can be provided by setting the `GCORE_PERMANENT_TOKEN` environment variable.
+
+For example:
+
+```terraform
+provider "gcore" {}
+```
+
+```shell
+export GCORE_PERMANENT_TOKEN='251$d3361.............1b35f26d8'
+terraform plan
+```
+
+If needed, the **deprecated** username / password authentication can be used by setting the `GCORE_USERNAME` and `GCORE_PASSWORD` environment variables.
+
+Other supported environment variables include:
+
+- `GCORE_API_ENDPOINT`
+- `GCORE_CDN_API`
+- `GCORE_CLIENT_ID`
+- `GCORE_CLOUD_API`
+- `GCORE_DNS_API`
+- `GCORE_PLATFORM_API`
+- `GCORE_STORAGE_API`
+
+## Example Usage
+
+{{ tffile "examples/provider/provider.tf" }}
+
+{{ .SchemaMarkdown | trimspace }}
