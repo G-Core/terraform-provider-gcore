@@ -314,6 +314,7 @@ func resourceK8sV2() *schema.Resource {
 				Type:        schema.TypeString,
 				Description: "Name of the keypair used for SSH access to nodes.",
 				Required:    true,
+				ForceNew:    true,
 			},
 			"version": {
 				Type:        schema.TypeString,
