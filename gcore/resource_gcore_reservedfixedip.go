@@ -8,7 +8,8 @@ import (
 	"time"
 
 	gcorecloud "github.com/G-Core/gcorelabscloud-go"
-	"github.com/G-Core/gcorelabscloud-go/gcore/port/v1/ports"
+	ports1 "github.com/G-Core/gcorelabscloud-go/gcore/port/v1/ports"
+	ports2 "github.com/G-Core/gcorelabscloud-go/gcore/port/v2/ports"
 	"github.com/G-Core/gcorelabscloud-go/gcore/reservedfixedip/v1/reservedfixedips"
 	"github.com/G-Core/gcorelabscloud-go/gcore/task/v1/tasks"
 	"github.com/hashicorp/go-cty/cty"
@@ -360,13 +361,27 @@ func resourceReservedFixedIPUpdate(ctx context.Context, d *schema.ResourceData, 
 			}
 		}
 
-		clientPort, err := CreateClient(provider, d, portsPoint, versionPointV1)
+		clientPort, err := CreateClient(provider, d, portsPoint, versionPointV2)
 		if err != nil {
 			return diag.FromErr(err)
 		}
 
-		opts := ports.AllowAddressPairsOpts{AllowedAddressPairs: allowedAddressPairs}
-		if _, err := ports.AllowAddressPairs(clientPort, id, opts).Extract(); err != nil {
+		opts := ports1.AllowAddressPairsOpts{AllowedAddressPairs: allowedAddressPairs}
+		results, err := ports2.AllowAddressPairs(clientPort, id, opts).Extract()
+		if err != nil {
+			return diag.FromErr(err)
+		}
+		taskID := results.Tasks[0]
+		_, err = tasks.WaitTaskAndReturnResult(
+			client, taskID, true, int(d.Timeout(schema.TimeoutUpdate).Seconds()), func(task tasks.TaskID) (interface{}, error) {
+				_, err := tasks.Get(client, string(task)).Extract()
+				if err != nil {
+					return nil, fmt.Errorf("cannot get task with ID: %s. Error: %w", task, err)
+				}
+				return nil, nil
+			})
+
+		if err != nil {
 			return diag.FromErr(err)
 		}
 	}
