@@ -97,6 +97,7 @@ func resourceCDNCertRead(ctx context.Context, d *schema.ResourceData, m interfac
 		return diag.FromErr(err)
 	}
 
+	d.Set("name", result.Name)
 	d.Set("has_related_resources", result.HasRelatedResources)
 	d.Set("automated", result.Automated)
 
