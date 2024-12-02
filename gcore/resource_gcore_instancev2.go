@@ -474,6 +474,11 @@ func resourceInstanceV2Read(ctx context.Context, d *schema.ResourceData, m inter
 		return diag.FromErr(err)
 	}
 
+	clientV2, err := CreateClient(provider, d, InstancePoint, versionPointV2)
+	if err != nil {
+		return diag.FromErr(err)
+	}
+
 	clientVol, err := CreateClient(provider, d, volumesPoint, versionPointV1)
 	if err != nil {
 		return diag.FromErr(err)
@@ -602,7 +607,7 @@ func resourceInstanceV2Read(ctx context.Context, d *schema.ResourceData, m inter
 	metadata := d.Get("metadata_map").(map[string]interface{})
 	newMetadata := make(map[string]interface{}, len(metadata))
 	for k := range metadata {
-		md, err := instances.MetadataGet(client, instanceID, k).Extract()
+		md, err := instancesV2.MetadataItemGet(clientV2, instanceID, instancesV2.MetadataItemOpts{Key: k}).Extract()
 		if err != nil {
 			return diag.Errorf("cannot get metadata with key: %s. Error: %s", instanceID, err)
 		}
@@ -692,7 +697,7 @@ func resourceInstanceV2Update(ctx context.Context, d *schema.ResourceData, m int
 		omd, nmd := d.GetChange("metadata_map")
 		if len(omd.(map[string]interface{})) > 0 {
 			for k := range omd.(map[string]interface{}) {
-				err := instances.MetadataDelete(client, instanceID, k).Err
+				err := instancesV2.MetadataItemDelete(clientV2, instanceID, instancesV2.MetadataItemOpts{Key: k}).Err
 				if err != nil {
 					return diag.Errorf("cannot delete metadata key: %s. Error: %s", k, err)
 				}
