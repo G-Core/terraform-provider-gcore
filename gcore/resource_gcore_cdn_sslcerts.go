@@ -20,7 +20,6 @@ func resourceCDNCert() *schema.Resource {
 			"name": {
 				Type:        schema.TypeString,
 				Required:    true,
-				ForceNew:    true,
 				Description: "Name of the SSL certificate. Must be unique.",
 			},
 			"cert": {
@@ -51,6 +50,7 @@ func resourceCDNCert() *schema.Resource {
 		},
 		CreateContext: resourceCDNCertCreate,
 		ReadContext:   resourceCDNCertRead,
+		UpdateContext: resourceCDNCertUpdate,
 		DeleteContext: resourceCDNCertDelete,
 	}
 }
@@ -97,11 +97,34 @@ func resourceCDNCertRead(ctx context.Context, d *schema.ResourceData, m interfac
 		return diag.FromErr(err)
 	}
 
+	d.Set("name", result.Name)
 	d.Set("has_related_resources", result.HasRelatedResources)
 	d.Set("automated", result.Automated)
 
 	log.Println("[DEBUG] Finish CDN Cert reading")
 	return nil
+}
+
+func resourceCDNCertUpdate(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
+	certID := d.Id()
+	log.Printf("[DEBUG] Start CDN Cert updating (id=%s)\n", certID)
+	config := m.(*Config)
+	client := config.CDNClient
+
+	id, err := strconv.ParseInt(certID, 10, 64)
+	if err != nil {
+		return diag.FromErr(err)
+	}
+
+	var req sslcerts.UpdateRequest
+	req.Name = d.Get("name").(string)
+
+	if _, err := client.SSLCerts().Update(ctx, id, &req); err != nil {
+		return diag.FromErr(err)
+	}
+
+	log.Println("[DEBUG] Finish CDN Cert updating")
+	return resourceCDNCertRead(ctx, d, m)
 }
 
 func resourceCDNCertDelete(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
