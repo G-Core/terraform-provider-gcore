@@ -87,6 +87,12 @@ func resourceCDNResource() *schema.Resource {
 				Computed:    true,
 				Description: "Status of a CDN resource content availability. Possible values are: Active, Suspended, Processed.",
 			},
+			"primary_resource": {
+				Type:        schema.TypeInt,
+				Optional:    true,
+				ForceNew:    true,
+				Description: "Specify the ID of the main CDN resource that shares a caching zone with a reserve resource.",
+			},
 			"options": resourceOptionsSchema,
 		},
 		CreateContext: resourceCDNResourceCreate,
@@ -110,6 +116,7 @@ func resourceCDNResourceCreate(ctx context.Context, d *schema.ResourceData, m in
 	req.OriginProtocol = resources.Protocol(d.Get("origin_protocol").(string))
 	req.SSlEnabled = d.Get("ssl_enabled").(bool)
 	req.SSLData = d.Get("ssl_data").(int)
+	req.PrimaryResource = d.Get("primary_resource").(int)
 
 	req.Options = listToOptions(d.Get("options").([]interface{}))
 
@@ -154,6 +161,7 @@ func resourceCDNResourceRead(ctx context.Context, d *schema.ResourceData, m inte
 	d.Set("ssl_data", result.SSLData)
 	d.Set("status", result.Status)
 	d.Set("active", result.Active)
+	d.Set("primary_resource", result.PrimaryResource)
 	if err := d.Set("options", optionsToList(result.Options)); err != nil {
 		return diag.FromErr(err)
 	}
