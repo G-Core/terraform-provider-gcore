@@ -544,6 +544,12 @@ func listToOptions(l []interface{}) *gcdn.Options {
 			Value:   opt["value"].(bool),
 		}
 	}
+	if opt, ok := getOptByName(fields, "use_dns01_le_challenge"); ok {
+		opts.UseDNS01LEChallenge = &gcdn.UseDNS01LEChallenge{
+			Enabled: opt["enabled"].(bool),
+			Value:   opt["value"].(bool),
+		}
+	}
 	if opt, ok := getOptByName(fields, "user_agent_acl"); ok {
 		opts.UserAgentACL = &gcdn.UserAgentACL{
 			Enabled:    opt["enabled"].(bool),
@@ -772,6 +778,10 @@ func optionsToList(options *gcdn.Options) []interface{} {
 	if options.UseDefaultLEChain != nil {
 		m := structToMap(options.UseDefaultLEChain)
 		result["use_default_le_chain"] = []interface{}{m}
+	}
+	if options.UseDNS01LEChallenge != nil {
+		m := structToMap(options.UseDNS01LEChallenge)
+		result["use_dns01_le_challenge"] = []interface{}{m}
 	}
 	if options.UserAgentACL != nil {
 		m := structToMap(options.UserAgentACL)
