@@ -93,6 +93,23 @@ func resourceCDNResource() *schema.Resource {
 				ForceNew:    true,
 				Description: "Specify the ID of the main CDN resource that shares a caching zone with a reserve resource.",
 			},
+			"proxy_ssl_enabled": {
+				Type:        schema.TypeBool,
+				Optional:    true,
+				Description: "Enables or disables SSL certificate validation of the origin server before completing any connection.",
+			},
+			"proxy_ssl_ca": {
+				Type:         schema.TypeInt,
+				Optional:     true,
+				RequiredWith: []string{"proxy_ssl_enabled"},
+				Description:  "Specify the ID of the trusted CA certificate used to verify an origin.",
+			},
+			"proxy_ssl_data": {
+				Type:         schema.TypeInt,
+				Optional:     true,
+				RequiredWith: []string{"proxy_ssl_enabled"},
+				Description:  "Specify the ID of the SSL certificate used to verify an origin.",
+			},
 			"options": resourceOptionsSchema,
 		},
 		CreateContext: resourceCDNResourceCreate,
@@ -117,6 +134,9 @@ func resourceCDNResourceCreate(ctx context.Context, d *schema.ResourceData, m in
 	req.SSlEnabled = d.Get("ssl_enabled").(bool)
 	req.SSLData = d.Get("ssl_data").(int)
 	req.PrimaryResource = d.Get("primary_resource").(int)
+	req.ProxySSLEnabled = d.Get("proxy_ssl_enabled").(bool)
+	req.ProxySSLCA = d.Get("proxy_ssl_ca").(int)
+	req.ProxySSLData = d.Get("proxy_ssl_data").(int)
 
 	req.Options = listToOptions(d.Get("options").([]interface{}))
 
@@ -162,6 +182,9 @@ func resourceCDNResourceRead(ctx context.Context, d *schema.ResourceData, m inte
 	d.Set("status", result.Status)
 	d.Set("active", result.Active)
 	d.Set("primary_resource", result.PrimaryResource)
+	d.Set("proxy_ssl_enabled", result.ProxySSLEnabled)
+	d.Set("proxy_ssl_ca", result.ProxySSLCA)
+	d.Set("proxy_ssl_data", result.ProxySSLData)
 	if err := d.Set("options", optionsToList(result.Options)); err != nil {
 		return diag.FromErr(err)
 	}
@@ -190,6 +213,22 @@ func resourceCDNResourceUpdate(ctx context.Context, d *schema.ResourceData, m in
 	req.OriginProtocol = resources.Protocol(d.Get("origin_protocol").(string))
 	req.Options = listToOptions(d.Get("options").([]interface{}))
 	req.SecondaryHostnames = make([]string, 0)
+	req.ProxySSLEnabled = d.Get("proxy_ssl_enabled").(bool)
+
+	if v, ok := d.GetOk("proxy_ssl_ca"); ok {
+		proxySSLCA := v.(int)
+		req.ProxySSLCA = &proxySSLCA
+	} else {
+		req.ProxySSLCA = nil
+	}
+
+	if v, ok := d.GetOk("proxy_ssl_data"); ok {
+		proxySSLData := v.(int)
+		req.ProxySSLData = &proxySSLData
+	} else {
+		req.ProxySSLData = nil
+	}
+
 	for _, hostname := range d.Get("secondary_hostnames").(*schema.Set).List() {
 		req.SecondaryHostnames = append(req.SecondaryHostnames, hostname.(string))
 	}
