@@ -153,6 +153,7 @@ Optional:
 - `static_response_headers` (Block List, Max: 1) Specify custom HTTP Headers that a CDN server adds to a response. (see [below for nested schema](#nestedblock--options--static_response_headers))
 - `tls_versions` (Block List, Max: 1) The option specifies a list of allowed SSL/TLS protocol versions. The list cannot be empty. By default, the option is disabled (all protocols versions are allowed). (see [below for nested schema](#nestedblock--options--tls_versions))
 - `use_default_le_chain` (Block List, Max: 1) The option allows choosing a Let's Encrypt certificate chain. The specified chain will be used during the next Let's Encrypt certificate issue or renewal. (see [below for nested schema](#nestedblock--options--use_default_le_chain))
+- `use_dns01_le_challenge` (Block List, Max: 1) The option allows to enable DNS-01 challenge to issue a Let's Encrypt certificate for the resource. DNS service should be activated to enable this option. (see [below for nested schema](#nestedblock--options--use_dns01_le_challenge))
 - `use_rsa_le_cert` (Block List, Max: 1) The option allows choosing the RSA Let's Encrypt certificate type for the resource. (see [below for nested schema](#nestedblock--options--use_rsa_le_cert))
 - `user_agent_acl` (Block List, Max: 1) User agents policy option allows to control access to the content for specified user-agent. (see [below for nested schema](#nestedblock--options--user_agent_acl))
 - `waap` (Block List, Max: 1) Option allows to enable WAAP (Web Application and API Protection). (see [below for nested schema](#nestedblock--options--waap))
@@ -665,6 +666,18 @@ Optional:
 
 <a id="nestedblock--options--use_default_le_chain"></a>
 ### Nested Schema for `options.use_default_le_chain`
+
+Required:
+
+- `value` (Boolean)
+
+Optional:
+
+- `enabled` (Boolean)
+
+
+<a id="nestedblock--options--use_dns01_le_challenge"></a>
+### Nested Schema for `options.use_dns01_le_challenge`
 
 Required:
 
