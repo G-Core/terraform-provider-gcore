@@ -95,6 +95,10 @@ resource "gcore_cdn_resource" "cdn_example_com" {
 - `origin` (String) A domain name or IP of your origin source. Specify a port if custom. You can use either 'origin' parameter or 'originGroup' in the resource definition.
 - `origin_group` (Number) ID of the Origins Group. Use one of your Origins Group or create a new one. You can use either 'origin' parameter or 'originGroup' in the resource definition.
 - `origin_protocol` (String) This option defines the protocol that will be used by CDN servers to request content from an origin source. If not specified, we will use HTTP to connect to an origin server. Possible values are: HTTPS, HTTP, MATCH.
+- `primary_resource` (Number) Specify the ID of the main CDN resource that shares a caching zone with a reserve resource.
+- `proxy_ssl_ca` (Number) Specify the ID of the trusted CA certificate used to verify an origin.
+- `proxy_ssl_data` (Number) Specify the ID of the SSL certificate used to verify an origin.
+- `proxy_ssl_enabled` (Boolean) Enables or disables SSL certificate validation of the origin server before completing any connection.
 - `secondary_hostnames` (Set of String) List of additional CNAMEs.
 - `ssl_data` (Number) Specify the SSL Certificate ID which should be used for the CDN Resource.
 - `ssl_enabled` (Boolean) Use HTTPS protocol for content delivery.
