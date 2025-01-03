@@ -3,12 +3,12 @@
 page_title: "gcore_cdn_rule_template Resource - terraform-provider-gcore"
 subcategory: ""
 description: |-
-  Represent CAN rule template
+  Represent CDN rule template
 ---
 
 # gcore_cdn_rule_template (Resource)
 
-Represent CAN rule template
+Represent CDN rule template
 
 ## Example Usage
 
