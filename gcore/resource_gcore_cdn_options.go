@@ -1049,6 +1049,25 @@ var (
 				},
 			},
 		},
+		"use_dns01_le_challenge": {
+			Type:        schema.TypeList,
+			MaxItems:    1,
+			Optional:    true,
+			Description: "The option allows to enable DNS-01 challenge to issue a Let's Encrypt certificate for the resource. DNS service should be activated to enable this option.",
+			Elem: &schema.Resource{
+				Schema: map[string]*schema.Schema{
+					"enabled": {
+						Type:     schema.TypeBool,
+						Optional: true,
+						Default:  true,
+					},
+					"value": {
+						Type:     schema.TypeBool,
+						Required: true,
+					},
+				},
+			},
+		},
 		"use_rsa_le_cert": {
 			Type:        schema.TypeList,
 			MaxItems:    1,
