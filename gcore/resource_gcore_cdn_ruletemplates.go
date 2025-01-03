@@ -54,6 +54,7 @@ func resourceRuleTemplate() *schema.Resource {
 		ReadContext:   resourceRuleTemplateRead,
 		UpdateContext: resourceRuleTemplateUpdate,
 		DeleteContext: resourceRuleTemplateDelete,
+		Description:   "Represent CAN rule template",
 	}
 }
 
