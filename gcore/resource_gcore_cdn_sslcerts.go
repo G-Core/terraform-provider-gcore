@@ -52,6 +52,7 @@ func resourceCDNCert() *schema.Resource {
 		ReadContext:   resourceCDNCertRead,
 		UpdateContext: resourceCDNCertUpdate,
 		DeleteContext: resourceCDNCertDelete,
+		Description:   "Represent CDN SSL Certificate",
 	}
 }
 
