@@ -24,7 +24,7 @@ func resourceCDNCACert() *schema.Resource {
 			},
 			"cert": {
 				Type:        schema.TypeString,
-				Optional:    true,
+				Required:    true,
 				Sensitive:   true,
 				ForceNew:    true,
 				Description: "The public part of the CA certificate. It must be in the PEM format.",
@@ -39,6 +39,7 @@ func resourceCDNCACert() *schema.Resource {
 		ReadContext:   resourceCDNCACertRead,
 		UpdateContext: resourceCDNCACertUpdate,
 		DeleteContext: resourceCDNCACertDelete,
+		Description:   "Represent CDN CA Certificate",
 	}
 }
 
