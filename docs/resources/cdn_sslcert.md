@@ -3,12 +3,12 @@
 page_title: "gcore_cdn_sslcert Resource - terraform-provider-gcore"
 subcategory: ""
 description: |-
-  
+  Represent CDN SSL Certificate
 ---
 
 # gcore_cdn_sslcert (Resource)
 
-
+Represent CDN SSL Certificate
 
 ## Example Usage
 
