@@ -163,6 +163,7 @@ func Provider() *schema.Provider {
 			"gcore_cdn_rule":            resourceCDNRule(),
 			"gcore_cdn_sslcert":         resourceCDNCert(),
 			"gcore_cdn_rule_template":   resourceRuleTemplate(),
+			"gcore_cdn_cacert":          resourceCDNCACert(),
 			lifecyclePolicyResource:     resourceLifecyclePolicy(),
 			"gcore_ddos_protection":     resourceDDoSProtection(),
 		},
