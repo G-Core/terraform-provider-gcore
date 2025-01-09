@@ -51,6 +51,7 @@ resource "gcore_cdn_sslcert" "lets_encrypt_cert" {
 - `automated` (Boolean) The way SSL certificate was issued.
 - `cert` (String, Sensitive) The public part of the SSL certificate. All chain of the SSL certificate should be added.
 - `private_key` (String, Sensitive) The private key of the SSL certificate.
+- `validate_root_ca` (Boolean) Defines whether to check the SSL certificate for a signature from a trusted certificate authority.
 
 ### Read-Only
 

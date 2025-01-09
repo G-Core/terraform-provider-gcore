@@ -47,6 +47,12 @@ func resourceCDNCert() *schema.Resource {
 				ForceNew:    true,
 				Description: "The way SSL certificate was issued.",
 			},
+			"validate_root_ca": {
+				Type:        schema.TypeBool,
+				Optional:    true,
+				Default:     false,
+				Description: "Defines whether to check the SSL certificate for a signature from a trusted certificate authority.",
+			},
 		},
 		CreateContext: resourceCDNCertCreate,
 		ReadContext:   resourceCDNCertRead,
@@ -65,6 +71,7 @@ func resourceCDNCertCreate(ctx context.Context, d *schema.ResourceData, m interf
 	req.Name = d.Get("name").(string)
 	req.Cert = d.Get("cert").(string)
 	req.PrivateKey = d.Get("private_key").(string)
+	req.ValidateRootCA = d.Get("validate_root_ca").(bool)
 
 	if d.Get("automated") != nil {
 		req.Automated = d.Get("automated").(bool)
