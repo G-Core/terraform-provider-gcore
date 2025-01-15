@@ -96,6 +96,11 @@ func dataSourceLoadBalancerV2() *schema.Resource {
 				Optional:     true,
 				ValidateFunc: validation.StringInSlice(types.IPFamilyType("").StringList(), false),
 			},
+			"preferred_connectivity": &schema.Schema{
+				Type:        schema.TypeString,
+				Description: fmt.Sprintf("Available values are '%s', '%s'", types.PreferredConnectivityL2, types.PreferredConnectivityL3),
+				Computed:    true,
+			},
 			"metadata_k": &schema.Schema{
 				Type:        schema.TypeString,
 				Description: "Metadata string of the load balancer.",
@@ -200,6 +205,7 @@ func dataSourceLoadBalancerV2Read(ctx context.Context, d *schema.ResourceData, m
 	d.Set("vip_port_id", lb.VipPortID)
 	d.Set("vrrp_ips", vrrpIps)
 	d.Set("vip_ip_family", lb.VipIPFamilyType)
+	d.Set("preferred_connectivity", lb.PreferredConnectivity)
 
 	log.Println("[DEBUG] Finish LoadBalancer reading")
 	return diags
