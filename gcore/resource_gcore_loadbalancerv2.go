@@ -137,6 +137,11 @@ func resourceLoadBalancerV2() *schema.Resource {
 					return diag.Errorf("wrong type %s, available values are '%s', '%s', '%s'", v, types.IPv4IPFamilyType, types.IPv6IPFamilyType, types.DualStackIPFamilyType)
 				},
 			},
+			"preferred_connectivity": &schema.Schema{
+				Type:        schema.TypeString,
+				Description: fmt.Sprintf("Available values are '%s', '%s'", types.PreferredConnectivityL2, types.PreferredConnectivityL3),
+				Optional:    true,
+			},
 			"last_updated": &schema.Schema{
 				Type:        schema.TypeString,
 				Description: "Datetime when load balancer was updated at the last time.",
@@ -190,11 +195,12 @@ func resourceLoadBalancerV2Create(ctx context.Context, d *schema.ResourceData, m
 	}
 
 	opts := loadbalancers.CreateOpts{
-		Name:         d.Get("name").(string),
-		VipNetworkID: d.Get("vip_network_id").(string),
-		VipSubnetID:  d.Get("vip_subnet_id").(string),
-		VipPortID:    d.Get("vip_port_id").(string),
-		VIPIPFamily:  types.IPFamilyType(d.Get("vip_ip_family").(string)),
+		Name:                  d.Get("name").(string),
+		VipNetworkID:          d.Get("vip_network_id").(string),
+		VipSubnetID:           d.Get("vip_subnet_id").(string),
+		VipPortID:             d.Get("vip_port_id").(string),
+		VIPIPFamily:           types.IPFamilyType(d.Get("vip_ip_family").(string)),
+		PreferredConnectivity: types.PreferredConnectivityType(d.Get("preferred_connectivity").(string)),
 	}
 
 	if metadataRaw, ok := d.GetOk("metadata_map"); ok {
@@ -265,6 +271,7 @@ func resourceLoadBalancerV2Read(ctx context.Context, d *schema.ResourceData, m i
 	d.Set("vip_port_id", lb.VipPortID)
 	d.Set("vrrp_ips", lb.VrrpIPs)
 	d.Set("vip_ip_family", lb.VipIPFamilyType)
+	d.Set("preferred_connectivity", lb.PreferredConnectivity)
 
 	if lb.VipAddress != nil {
 		d.Set("vip_address", lb.VipAddress.String())
@@ -310,11 +317,18 @@ func resourceLoadBalancerV2Update(ctx context.Context, d *schema.ResourceData, m
 		return diag.FromErr(err)
 	}
 
+	var change bool
+	updateOpts := loadbalancers.UpdateOpts{}
 	if d.HasChange("name") {
-		opts := loadbalancers.UpdateOpts{
-			Name: d.Get("name").(string),
-		}
-		_, err = loadbalancers.Update(client, d.Id(), opts).Extract()
+		updateOpts.Name = d.Get("name").(string)
+		change = true
+	}
+	if d.HasChange("preferred_connectivity") {
+		updateOpts.PreferredConnectivity = d.Get("preferred_connectivity").(types.PreferredConnectivityType)
+		change = true
+	}
+	if change {
+		_, err = loadbalancers.Update(client, d.Id(), updateOpts).Extract()
 		if err != nil {
 			return diag.FromErr(err)
 		}
