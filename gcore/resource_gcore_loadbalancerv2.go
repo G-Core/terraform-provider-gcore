@@ -324,7 +324,7 @@ func resourceLoadBalancerV2Update(ctx context.Context, d *schema.ResourceData, m
 		change = true
 	}
 	if d.HasChange("preferred_connectivity") {
-		updateOpts.PreferredConnectivity = d.Get("preferred_connectivity").(types.PreferredConnectivityType)
+		updateOpts.PreferredConnectivity = types.PreferredConnectivityType(d.Get("preferred_connectivity").(string))
 		change = true
 	}
 	if change {
