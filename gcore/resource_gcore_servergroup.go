@@ -94,18 +94,18 @@ Server group policy. Available value is 'affinity' 'anti-affinity' 'soft-anti-af
 
 **Affinity Rule**:
 
-Strictly isolates instances across different physical servers, minimizing simultaneous failures for
-critical applications. This rule is recommended for enhanced fault tolerance.
+Improves performance by grouping related instances on the same physical server to enhance communication,
+resource sharing, and faster interaction.
 
 **Soft Anti-affinity Rule**:
 
-Attempts to place instances belonging to the same server group on a single host. If this is not
-possible, instances will be scheduled on the minimum number of hosts required.
+Attempts to place instances belonging to the same server group on different hosts. If this is not
+possible, instances will be scheduled on the maximum number of different hosts available.
 
 **Anti-affinity Rule**:
 
-Improves performance by grouping related instances on the same physical server to enhance communication,
-resource sharing, and faster interaction.`,
+Strictly isolates instances across different physical servers, minimizing simultaneous failures for
+critical applications. This rule is recommended for enhanced fault tolerance.`,
 				Required: true,
 				ForceNew: true,
 			},
