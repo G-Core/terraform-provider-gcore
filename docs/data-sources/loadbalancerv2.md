@@ -62,6 +62,7 @@ output "lb_ip" {
 
 - `id` (String) The ID of this resource.
 - `metadata_read_only` (List of Object) List of metadata items. (see [below for nested schema](#nestedatt--metadata_read_only))
+- `preferred_connectivity` (String) Available values are 'L2', 'L3'
 - `vip_address` (String) Load balancer IP address.
 - `vip_port_id` (String) Load balancer Port ID.
 - `vrrp_ips` (List of Object) (see [below for nested schema](#nestedatt--vrrp_ips))
