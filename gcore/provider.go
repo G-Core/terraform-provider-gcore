@@ -24,9 +24,12 @@ const (
 	ProviderOptPermanentToken    = "permanent_api_token"
 	ProviderOptSkipCredsAuthErr  = "ignore_creds_auth_error"
 	ProviderOptSingleApiEndpoint = "api_endpoint"
+	DefaultUserAgent             = "terraform-provider/%s"
 
 	lifecyclePolicyResource = "gcore_lifecyclepolicy"
 )
+
+var AppVersion = "dev"
 
 func Provider() *schema.Provider {
 	return &schema.Provider{
@@ -275,6 +278,7 @@ func providerConfigure(_ context.Context, d *schema.ResourceData) (interface{}, 
 		provider = &gcorecloud.ProviderClient{}
 		log.Printf("[ERROR] init auth client: %s\n", err)
 	}
+	provider.UserAgent.Prepend(fmt.Sprintf(DefaultUserAgent, AppVersion))
 
 	cdnProvider := gcdnProvider.NewClient(cdnAPI, gcdnProvider.WithSignerFunc(func(req *http.Request) error {
 		for k, v := range provider.AuthenticatedHeaders() {
