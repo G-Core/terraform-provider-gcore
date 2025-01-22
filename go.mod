@@ -2,6 +2,10 @@ module github.com/terraform-providers/terraform-provider-gcore
 
 go 1.21
 
+replace (
+	github.com/G-Core/gcorelabscloud-go => /Users/ondi/go/src/github.com/G-Core/gcorelabscloud-go
+)
+
 require (
 	github.com/AlekSi/pointer v1.2.0
 	github.com/G-Core/gcore-dns-sdk-go v0.2.9

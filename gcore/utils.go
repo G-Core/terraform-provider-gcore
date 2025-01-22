@@ -43,9 +43,12 @@ import (
 const (
 	versionPointV1 = "v1"
 	versionPointV2 = "v2"
+	versionPointV3 = "v3"
 
 	projectPoint = "projects"
 	regionPoint  = "regions"
+
+	fakeRegionID = 1
 
 	ConflictRetryInterval = 10
 )
@@ -507,6 +510,22 @@ func ImportStringParser(infoStr string) (int, int, string, error) {
 	return projectID, regionID, infoStrings[2], nil
 }
 
+// ImportStringParserWithNoRegion is a helper function for the import module. It parses check and parse an input command line string (id part).
+func ImportStringParserWithNoRegion(infoStr string) (int, string, error) {
+	log.Printf("[DEBUG] Input id string: %s", infoStr)
+	infoStrings := strings.Split(infoStr, ":")
+	if len(infoStrings) != 2 {
+		return 0, "", fmt.Errorf("failed import: wrong input id: %s", infoStr)
+
+	}
+	projectID, err := strconv.Atoi(infoStrings[0])
+	if err != nil {
+		return 0, "", err
+	}
+
+	return projectID, infoStrings[1], nil
+}
+
 // ImportStringParserExtended is a helper function for the import module. It parses check and parse an input command line string (id part).
 // Uses for import where need four elements, e. g. k8s pool(cluster_id), lb_member(lbpool_id).
 func ImportStringParserExtended(infoStr string) (int, int, string, string, error) {
@@ -567,6 +586,25 @@ func CreateClient(provider *gcorecloud.ProviderClient, d *schema.ResourceData, e
 	client, err := gc.ClientServiceFromProvider(provider, gcorecloud.EndpointOpts{
 		Name:    endpoint,
 		Region:  regionID,
+		Project: projectID,
+		Version: version,
+	})
+
+	if err != nil {
+		return nil, err
+	}
+	return client, nil
+}
+
+func CreateClientWithNoRegion(provider *gcorecloud.ProviderClient, d *schema.ResourceData, endpoint string, version string) (*gcorecloud.ServiceClient, error) {
+	projectID, err := GetProject(provider, d.Get("project_id").(int), d.Get("project_name").(string))
+	if err != nil {
+		return nil, err
+	}
+
+	client, err := gc.ClientServiceFromProvider(provider, gcorecloud.EndpointOpts{
+		Name:    endpoint,
+		Region:  fakeRegionID,
 		Project: projectID,
 		Version: version,
 	})
