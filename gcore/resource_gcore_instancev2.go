@@ -556,6 +556,15 @@ func resourceInstanceV2Read(ctx context.Context, d *schema.ResourceData, m inter
 			continue
 		}
 
+		// we need to match our interfaces with api's interfaces
+		// but we don't have any unique values, that's why we use exactly that list of keys
+		ifaceName := iface.Name
+		if ifaceName == nil {
+			log.Printf("[WARN] Interface for instance %s missing name. Using PortID as identifier.", instanceID)
+			generatedName := fmt.Sprintf("interface_%s", iface.PortID)
+			ifaceName = &generatedName
+		}
+
 		for _, assignment := range iface.IPAssignments {
 			subnetID := assignment.SubnetID
 
@@ -563,12 +572,8 @@ func resourceInstanceV2Read(ctx context.Context, d *schema.ResourceData, m inter
 			var iOpts instances.InterfaceOpts
 			var orderedIOpts OrderedInterfaceOpts
 			var ok bool
-			// we need to match our interfaces with api's interfaces
-			// but we don't have any unique values, that's why we use exactly that list of keys
-			if iface.Name == nil {
-				return diag.Errorf("cannot get interface name for instance %s", instanceID)
-			}
-			if orderedIOpts, ok = interfaces[*iface.Name]; ok {
+
+			if orderedIOpts, ok = interfaces[*ifaceName]; ok {
 				iOpts = orderedIOpts.InterfaceOpts
 			}
 
@@ -582,7 +587,7 @@ func resourceInstanceV2Read(ctx context.Context, d *schema.ResourceData, m inter
 			i["network_id"] = iface.NetworkID
 			i["subnet_id"] = subnetID
 			i["port_id"] = iface.PortID
-			i["name"] = *iface.Name
+			i["name"] = *ifaceName
 			i["order"] = orderedIOpts.Order
 			if len(iface.FloatingIPDetails) > 0 {
 				i["existing_fip_id"] = iface.FloatingIPDetails[0].ID
