@@ -170,6 +170,7 @@ func Provider() *schema.Provider {
 			lifecyclePolicyResource:      resourceLifecyclePolicy(),
 			"gcore_ddos_protection":      resourceDDoSProtection(),
 			"gcore_inference_deployment": resourceInferenceDeployment(),
+			"gcore_registry_credential":  resourceRegistryCredential(),
 		},
 		DataSourcesMap: map[string]*schema.Resource{
 			"gcore_ai_cluster":             dataSourceAICluster(),
@@ -204,6 +205,7 @@ func Provider() *schema.Provider {
 			"gcore_ddos_profile_template":  dataSourceDDoSProfileTemplate(),
 			"gcore_cdn_shielding_location": dataOriginShieldingLocation(),
 			"gcore_cdn_preset":             dataPreset(),
+			"gcore_inference_flavor":       dataSourceInferenceFlavor(),
 		},
 		ConfigureContextFunc: providerConfigure,
 	}
