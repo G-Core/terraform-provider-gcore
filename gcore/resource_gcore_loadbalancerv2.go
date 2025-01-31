@@ -127,6 +127,7 @@ func resourceLoadBalancerV2() *schema.Resource {
 			"vip_ip_family": &schema.Schema{
 				Type:        schema.TypeString,
 				Optional:    true,
+				Computed:    true,
 				Description: fmt.Sprintf("Available values are '%s', '%s', '%s'", types.IPv4IPFamilyType, types.IPv6IPFamilyType, types.DualStackIPFamilyType),
 				ValidateDiagFunc: func(val interface{}, key cty.Path) diag.Diagnostics {
 					v := val.(string)
@@ -141,6 +142,7 @@ func resourceLoadBalancerV2() *schema.Resource {
 				Type:        schema.TypeString,
 				Description: fmt.Sprintf("Available values are '%s', '%s'", types.PreferredConnectivityL2, types.PreferredConnectivityL3),
 				Optional:    true,
+				Computed:    true,
 			},
 			"last_updated": &schema.Schema{
 				Type:        schema.TypeString,
