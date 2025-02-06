@@ -48,6 +48,6 @@ func dataPresetRead(ctx context.Context, d *schema.ResourceData, m interface{}) 
 
 	d.SetId(strconv.Itoa(result.ID))
 
-	log.Println("[DEBUG] Finish reading origin shielding locations")
+	log.Println("[DEBUG] Finish reading presets")
 	return nil
 }

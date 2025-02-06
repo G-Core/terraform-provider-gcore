@@ -203,6 +203,7 @@ func Provider() *schema.Provider {
 			"gcore_ddos_profile_template":  dataSourceDDoSProfileTemplate(),
 			"gcore_cdn_shielding_location": dataOriginShieldingLocation(),
 			"gcore_cdn_preset":             dataPreset(),
+			"gcore_cdn_client":             dataClient(),
 		},
 		ConfigureContextFunc: providerConfigure,
 	}
