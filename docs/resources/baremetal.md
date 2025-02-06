@@ -236,37 +236,37 @@ resource "gcore_baremetal" "baremetal_windows_with_userdata" {
 
 ### Required
 
-- `flavor_id` (String)
+- `flavor_id` (String) Flavor ID (name)
 - `interface` (Block List, Min: 1) (see [below for nested schema](#nestedblock--interface))
 
 ### Optional
 
-- `app_config` (Map of String)
-- `apptemplate_id` (String)
-- `image_id` (String)
-- `keypair_name` (String)
-- `last_updated` (String)
+- `app_config` (Map of String) Parameters for the application template from the marketplace
+- `apptemplate_id` (String) Apptemplate ID
+- `image_id` (String) Image ID
+- `keypair_name` (String) Name of the keypair to use for the baremetal
+- `last_updated` (String) Datetime when baremetal was updated at the last time
 - `metadata` (Block List, Deprecated) (see [below for nested schema](#nestedblock--metadata))
-- `metadata_map` (Map of String)
-- `name` (String)
-- `name_template` (String)
-- `name_templates` (List of String, Deprecated)
-- `password` (String)
-- `project_id` (Number)
-- `project_name` (String)
-- `region_id` (Number)
-- `region_name` (String)
+- `metadata_map` (Map of String) Create one or more metadata items for the instance
+- `name` (String) Name of the baremetal
+- `name_template` (String) Instance name template. You can use forms 'ip_octets', 'two_ip_octets', 'one_ip_octet'
+- `name_templates` (List of String, Deprecated) List of baremetal names which will be changed by template
+- `password` (String) A password for a baremetal server
+- `project_id` (Number) Project ID, only one of project_id or project_name should be set
+- `project_name` (String) Project name, only one of project_id or project_name should be set
+- `region_id` (Number) Region ID, only one of region_id or region_name should be set
+- `region_name` (String) Region name, only one of region_id or region_name should be set
 - `timeouts` (Block, Optional) (see [below for nested schema](#nestedblock--timeouts))
-- `user_data` (String)
-- `username` (String)
+- `user_data` (String) String in base64 format. Must not be passed together with 'username' or 'password'
+- `username` (String) A name of a new user in the Linux instance. It may be passed with a 'password' parameter
 
 ### Read-Only
 
 - `addresses` (List of Object) (see [below for nested schema](#nestedatt--addresses))
-- `flavor` (Map of String)
+- `flavor` (Map of String) Flavor details, RAM, vCPU, etc.
 - `id` (String) The ID of this resource.
-- `status` (String)
-- `vm_state` (String)
+- `status` (String) Status of the baremetal
+- `vm_state` (String) Virtual machine state
 
 <a id="nestedblock--interface"></a>
 ### Nested Schema for `interface`
@@ -277,9 +277,9 @@ Required:
 
 Optional:
 
-- `existing_fip_id` (String)
-- `fip_source` (String)
-- `ip_address` (String)
+- `existing_fip_id` (String) The id of the existing floating IP that will be attached to the interface
+- `fip_source` (String) Floating IP source, can be 'new' or 'existing'
+- `ip_address` (String) IP address for the interface
 - `is_parent` (Boolean) If not set will be calculated after creation. Trunk interface always attached first. Can't detach interface if is_parent true. Fields affect only on creation
 - `network_id` (String) required if type is 'subnet' or 'any_subnet'
 - `order` (Number) Order of attaching interface. Trunk interface always attached first, fields affect only on creation
@@ -292,8 +292,8 @@ Optional:
 
 Required:
 
-- `key` (String)
-- `value` (String)
+- `key` (String) Metadata key
+- `value` (String) Metadata value
 
 
 <a id="nestedblock--timeouts"></a>
