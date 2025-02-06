@@ -497,7 +497,7 @@ Read-Only:
 
 - `attachment_tag` (String) Tag for the volume attachment
 - `delete_on_termination` (Boolean) Delete volume on termination
-- `id` (String) The ID of this resource.
+- `id` (String)
 - `image_id` (String) Image ID for the volume
 - `name` (String) Name of the volume
 - `size` (Number) Size of the volume in GiB

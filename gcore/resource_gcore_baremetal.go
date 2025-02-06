@@ -60,6 +60,7 @@ func resourceBmInstance() *schema.Resource {
 					"project_name",
 				},
 				DiffSuppressFunc: suppressDiffProjectID,
+				Description:      "Project ID, only one of project_id or project_name should be set",
 			},
 			"region_id": &schema.Schema{
 				Type:     schema.TypeInt,
@@ -69,6 +70,7 @@ func resourceBmInstance() *schema.Resource {
 					"region_name",
 				},
 				DiffSuppressFunc: suppressDiffRegionID,
+				Description:      "Region ID, only one of region_id or region_name should be set",
 			},
 			"project_name": &schema.Schema{
 				Type:     schema.TypeString,
@@ -77,6 +79,7 @@ func resourceBmInstance() *schema.Resource {
 					"project_id",
 					"project_name",
 				},
+				Description: "Project name, only one of project_id or project_name should be set",
 			},
 			"region_name": &schema.Schema{
 				Type:     schema.TypeString,
@@ -85,15 +88,18 @@ func resourceBmInstance() *schema.Resource {
 					"region_id",
 					"region_name",
 				},
+				Description: "Region name, only one of region_id or region_name should be set",
 			},
 			"flavor_id": &schema.Schema{
-				Type:     schema.TypeString,
-				Required: true,
+				Type:        schema.TypeString,
+				Required:    true,
+				Description: "Flavor ID (name)",
 			},
 			"name": &schema.Schema{
-				Type:     schema.TypeString,
-				Optional: true,
-				Computed: true,
+				Type:        schema.TypeString,
+				Optional:    true,
+				Computed:    true,
+				Description: "Name of the baremetal",
 			},
 			"name_templates": &schema.Schema{
 				Type:          schema.TypeList,
@@ -101,11 +107,13 @@ func resourceBmInstance() *schema.Resource {
 				Deprecated:    "Use name_template instead",
 				ConflictsWith: []string{"name_template"},
 				Elem:          &schema.Schema{Type: schema.TypeString},
+				Description:   "List of baremetal names which will be changed by template",
 			},
 			"name_template": &schema.Schema{
 				Type:          schema.TypeString,
 				Optional:      true,
 				ConflictsWith: []string{"name_templates"},
+				Description:   "Instance name template. You can use forms 'ip_octets', 'two_ip_octets', 'one_ip_octet'",
 			},
 			"image_id": {
 				Type:     schema.TypeString,
@@ -114,6 +122,7 @@ func resourceBmInstance() *schema.Resource {
 					"image_id",
 					"apptemplate_id",
 				},
+				Description: "Image ID",
 			},
 			"apptemplate_id": {
 				Type:     schema.TypeString,
@@ -122,6 +131,7 @@ func resourceBmInstance() *schema.Resource {
 					"image_id",
 					"apptemplate_id",
 				},
+				Description: "Apptemplate ID",
 			},
 			"interface": &schema.Schema{
 				Type: schema.TypeList,
@@ -165,32 +175,38 @@ func resourceBmInstance() *schema.Resource {
 						},
 						// nested map is not supported, in this case, you do not need to use the list for the map
 						"fip_source": {
-							Type:     schema.TypeString,
-							Optional: true,
+							Type:        schema.TypeString,
+							Optional:    true,
+							Description: "Floating IP source, can be 'new' or 'existing'",
 						},
 						"existing_fip_id": {
-							Type:     schema.TypeString,
-							Optional: true,
+							Type:        schema.TypeString,
+							Optional:    true,
+							Description: "The id of the existing floating IP that will be attached to the interface",
 						},
 						"ip_address": {
-							Type:     schema.TypeString,
-							Computed: true,
-							Optional: true,
+							Type:        schema.TypeString,
+							Computed:    true,
+							Optional:    true,
+							Description: "IP address for the interface",
 						},
 					},
 				},
 			},
 			"keypair_name": &schema.Schema{
-				Type:     schema.TypeString,
-				Optional: true,
+				Type:        schema.TypeString,
+				Optional:    true,
+				Description: "Name of the keypair to use for the baremetal",
 			},
 			"password": &schema.Schema{
-				Type:     schema.TypeString,
-				Optional: true,
+				Type:        schema.TypeString,
+				Optional:    true,
+				Description: "A password for a baremetal server",
 			},
 			"username": &schema.Schema{
-				Type:     schema.TypeString,
-				Optional: true,
+				Type:        schema.TypeString,
+				Optional:    true,
+				Description: "A name of a new user in the Linux instance. It may be passed with a 'password' parameter",
 			},
 			"metadata": &schema.Schema{
 				Type:          schema.TypeList,
@@ -200,12 +216,14 @@ func resourceBmInstance() *schema.Resource {
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
 						"key": {
-							Type:     schema.TypeString,
-							Required: true,
+							Type:        schema.TypeString,
+							Required:    true,
+							Description: "Metadata key",
 						},
 						"value": {
-							Type:     schema.TypeString,
-							Required: true,
+							Type:        schema.TypeString,
+							Required:    true,
+							Description: "Metadata value",
 						},
 					},
 				},
@@ -217,26 +235,32 @@ func resourceBmInstance() *schema.Resource {
 				Elem: &schema.Schema{
 					Type: schema.TypeString,
 				},
+				Description: "Create one or more metadata items for the instance",
 			},
 			"app_config": &schema.Schema{
-				Type:     schema.TypeMap,
-				Optional: true,
+				Type:        schema.TypeMap,
+				Optional:    true,
+				Description: "Parameters for the application template from the marketplace",
 			},
 			"user_data": &schema.Schema{
-				Type:     schema.TypeString,
-				Optional: true,
+				Type:        schema.TypeString,
+				Optional:    true,
+				Description: "String in base64 format. Must not be passed together with 'username' or 'password'",
 			},
 			"flavor": &schema.Schema{
-				Type:     schema.TypeMap,
-				Computed: true,
+				Type:        schema.TypeMap,
+				Computed:    true,
+				Description: "Flavor details, RAM, vCPU, etc.",
 			},
 			"status": &schema.Schema{
-				Type:     schema.TypeString,
-				Computed: true,
+				Type:        schema.TypeString,
+				Computed:    true,
+				Description: "Status of the baremetal",
 			},
 			"vm_state": &schema.Schema{
-				Type:     schema.TypeString,
-				Computed: true,
+				Type:        schema.TypeString,
+				Computed:    true,
+				Description: "Virtual machine state",
 			},
 			"addresses": &schema.Schema{
 				Type:     schema.TypeList,
@@ -249,12 +273,14 @@ func resourceBmInstance() *schema.Resource {
 							Elem: &schema.Resource{
 								Schema: map[string]*schema.Schema{
 									"addr": {
-										Type:     schema.TypeString,
-										Required: true,
+										Type:        schema.TypeString,
+										Required:    true,
+										Description: "IP address",
 									},
 									"type": {
-										Type:     schema.TypeString,
-										Required: true,
+										Type:        schema.TypeString,
+										Required:    true,
+										Description: "IP address type",
 									},
 								},
 							},
@@ -263,9 +289,10 @@ func resourceBmInstance() *schema.Resource {
 				},
 			},
 			"last_updated": &schema.Schema{
-				Type:     schema.TypeString,
-				Optional: true,
-				Computed: true,
+				Type:        schema.TypeString,
+				Optional:    true,
+				Computed:    true,
+				Description: "Datetime when baremetal was updated at the last time",
 			},
 		},
 	}
