@@ -170,6 +170,7 @@ func Provider() *schema.Provider {
 			lifecyclePolicyResource:      resourceLifecyclePolicy(),
 			"gcore_ddos_protection":      resourceDDoSProtection(),
 			"gcore_inference_deployment": resourceInferenceDeployment(),
+			"gcore_inference_secret":     resourceInferenceSecrets(),
 			"gcore_registry_credential":  resourceRegistryCredential(),
 		},
 		DataSourcesMap: map[string]*schema.Resource{
