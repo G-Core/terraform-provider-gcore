@@ -91,52 +91,109 @@ func resourceInferenceDeployment() *schema.Resource {
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
 						"region_id": &schema.Schema{
-							Type:     schema.TypeInt,
-							Required: true,
+							Type:        schema.TypeInt,
+							Description: "Region id for the container",
+							Required:    true,
 						},
 						"ready_containers": &schema.Schema{
-							Type:     schema.TypeInt,
-							Computed: true,
+							Type:        schema.TypeInt,
+							Description: "Status of the containers deployment. Number of ready instances",
+							Computed:    true,
 						},
 						"total_containers": &schema.Schema{
-							Type:     schema.TypeInt,
-							Computed: true,
+							Type:        schema.TypeInt,
+							Description: "Status of the containers deployment. Total number of instances",
+							Computed:    true,
 						},
 						"cooldown_period": &schema.Schema{
-							Type:     schema.TypeInt,
-							Required: true,
+							Type:        schema.TypeInt,
+							Description: "Cooldown period between scaling actions in seconds",
+							Required:    true,
 						},
 						"scale_max": &schema.Schema{
-							Type:     schema.TypeInt,
-							Required: true,
+							Type:        schema.TypeInt,
+							Description: "Maximum scale for the container",
+							Required:    true,
 						},
 						"scale_min": &schema.Schema{
-							Type:     schema.TypeInt,
-							Required: true,
+							Type:        schema.TypeInt,
+							Description: "Minimum scale for the container",
+							Required:    true,
+						},
+						"polling_interval": &schema.Schema{
+							Type:        schema.TypeInt,
+							Optional:    true,
+							Description: "Polling interval for scaling triggers in seconds",
 						},
 						"triggers_cpu_threshold": &schema.Schema{
-							Type:     schema.TypeInt,
-							Optional: true,
+							Type:        schema.TypeInt,
+							Description: "CPU trigger threshold configuration",
+							Optional:    true,
 						},
 						"triggers_memory_threshold": &schema.Schema{
-							Type:     schema.TypeInt,
-							Optional: true,
+							Type:        schema.TypeInt,
+							Description: "Memory trigger threshold configuration",
+							Optional:    true,
 						},
 						"triggers_gpu_memory_threshold": &schema.Schema{
-							Type:     schema.TypeInt,
-							Optional: true,
+							Type:        schema.TypeInt,
+							Description: "GPU memory trigger threshold configuration. Calculated by DCGM_FI_DEV_MEM_COPY_UTIL metric",
+							Optional:    true,
 						},
 						"triggers_gpu_utilization_threshold": &schema.Schema{
-							Type:     schema.TypeInt,
-							Optional: true,
+							Type:        schema.TypeInt,
+							Description: "GPU utilization trigger threshold configuration. Calculated by DCGM_FI_DEV_GPU_UTIL metric",
+							Optional:    true,
 						},
 						"triggers_http_rate": &schema.Schema{
-							Type:     schema.TypeInt,
-							Optional: true,
+							Type:        schema.TypeInt,
+							Description: "Request count per 'window' seconds for the http trigger. Required if you use http trigger",
+							Optional:    true,
 						},
 						"triggers_http_window": &schema.Schema{
-							Type:     schema.TypeInt,
-							Optional: true,
+							Type:        schema.TypeInt,
+							Description: "Time window for rate calculation in seconds. Required if you use http trigger",
+							Optional:    true,
+						},
+						"triggers_sqs_secret_name": &schema.Schema{
+							Type:        schema.TypeString,
+							Description: "Name of the secret with AWS credentials. Required if you use SQS trigger",
+							Optional:    true,
+						},
+						"triggers_sqs_aws_region": &schema.Schema{
+							Type:        schema.TypeString,
+							Description: "AWS region. Required if you use SQS trigger",
+							Optional:    true,
+						},
+						"triggers_sqs_aws_endpoint": &schema.Schema{
+							Type:        schema.TypeString,
+							Description: "Custom AWS endpoint, left empty to use default aws endpoint",
+							Optional:    true,
+						},
+						"triggers_sqs_queue_url": &schema.Schema{
+							Type:        schema.TypeString,
+							Description: "URL of the SQS queue. Required if you use SQS trigger",
+							Optional:    true,
+						},
+						"triggers_sqs_queue_length": &schema.Schema{
+							Type:        schema.TypeInt,
+							Description: "Number of messages for one replica",
+							Optional:    true,
+						},
+						"triggers_sqs_activation_queue_length": &schema.Schema{
+							Type:        schema.TypeInt,
+							Description: "Number of messages for activation",
+							Optional:    true,
+						},
+						"triggers_sqs_scale_on_flight": &schema.Schema{
+							Type:        schema.TypeBool,
+							Description: "Scale on in-flight messages",
+							Optional:    true,
+						},
+						"triggers_sqs_scale_on_delayed": &schema.Schema{
+							Type:        schema.TypeBool,
+							Description: "Scale on delayed messages",
+							Optional:    true,
 						},
 					},
 				},
@@ -478,9 +535,27 @@ func containersToSchema(containers []inferences.Container) interface{} {
 			}
 		}
 
+		if c.Scale.Triggers.Sqs != nil {
+			container["triggers_sqs_secret_name"] = c.Scale.Triggers.Sqs.SecretName
+			container["triggers_sqs_aws_region"] = c.Scale.Triggers.Sqs.AwsRegion
+			container["triggers_sqs_aws_endpoint"] = c.Scale.Triggers.Sqs.AwsEndpoint
+			container["triggers_sqs_queue_url"] = c.Scale.Triggers.Sqs.QueueURL
+			container["triggers_sqs_queue_length"] = c.Scale.Triggers.Sqs.QueueLength
+			container["triggers_sqs_activation_queue_length"] = c.Scale.Triggers.Sqs.ActivationQueueLength
+			container["triggers_sqs_scale_on_flight"] = c.Scale.Triggers.Sqs.ScaleOnFlight
+			container["triggers_sqs_scale_on_delayed"] = c.Scale.Triggers.Sqs.ScaleOnDelayed
+		}
+
+		container["cooldown_period"] = 0
 		if c.Scale.CooldownPeriod != nil {
 			container["cooldown_period"] = c.Scale.CooldownPeriod
 		}
+
+		container["polling_interval"] = 0
+		if c.Scale.PollingInterval != nil {
+			container["polling_interval"] = c.Scale.PollingInterval
+		}
+
 		container["scale_max"] = c.Scale.Max
 		container["scale_min"] = c.Scale.Min
 
@@ -566,7 +641,10 @@ func resourceInferenceDeploymentUpdate(ctx context.Context, d *schema.ResourceDa
 		}
 	}
 
-	opts.Probes = &inferences.Probes{}
+	if d.HasChange("liveness_probe") || d.HasChange("readiness_probe") || d.HasChange("startup_probe") {
+		opts.Probes = &inferences.Probes{}
+	}
+
 	if d.HasChange("liveness_probe") {
 		if probe, ok := d.Get("liveness_probe").([]interface{}); ok && len(probe) > 0 {
 			probeOpts := probe[0].(map[string]interface{})
@@ -648,12 +726,31 @@ func toContainerOpts(container interface{}) inferences.CreateContainerOpts {
 	if cooldownPeriod, ok := containerOpts["cooldown_period"].(int); cooldownPeriod != 0 && ok {
 		containerScale.CooldownPeriod = &cooldownPeriod
 	}
+	if pollingInterval, ok := containerOpts["polling_interval"].(int); pollingInterval != 0 && ok {
+		containerScale.PollingInterval = &pollingInterval
+	}
 
 	if httpRate, ok := containerOpts["triggers_http_rate"].(int); httpRate != 0 && ok {
 		containerScale.Triggers.Http = &inferences.ScaleTriggerHttp{Rate: &httpRate}
 
 		if httpWindow, ok := containerOpts["triggers_http_window"].(int); httpWindow != 0 && ok {
 			containerScale.Triggers.Http.Window = &httpWindow
+		}
+	}
+
+	if secretName, ok := containerOpts["triggers_sqs_secret_name"].(string); ok && len(secretName) > 0 {
+		containerScale.Triggers.Sqs = &inferences.ScaleTriggerSqs{
+			SecretName:            secretName,
+			AwsRegion:             containerOpts["triggers_sqs_aws_region"].(string),
+			QueueURL:              containerOpts["triggers_sqs_queue_url"].(string),
+			QueueLength:           containerOpts["triggers_sqs_queue_length"].(int),
+			ActivationQueueLength: containerOpts["triggers_sqs_activation_queue_length"].(int),
+			ScaleOnFlight:         containerOpts["triggers_sqs_scale_on_flight"].(bool),
+			ScaleOnDelayed:        containerOpts["triggers_sqs_scale_on_delayed"].(bool),
+		}
+
+		if endpoint, ok := containerOpts["triggers_sqs_aws_endpoint"].(string); ok && len(endpoint) > 0 {
+			containerScale.Triggers.Sqs.AwsEndpoint = &endpoint
 		}
 	}
 
