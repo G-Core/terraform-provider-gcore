@@ -167,17 +167,17 @@ Optional:
 - `triggers_cpu_threshold` (Number) CPU trigger threshold configuration
 - `triggers_gpu_memory_threshold` (Number) GPU memory trigger threshold configuration. Calculated by DCGM_FI_DEV_MEM_COPY_UTIL metric
 - `triggers_gpu_utilization_threshold` (Number) GPU utilization trigger threshold configuration. Calculated by DCGM_FI_DEV_GPU_UTIL metric
-- `triggers_http_rate` (Number) Request count per 'window' seconds for the http trigger
-- `triggers_http_window` (Number) Time window for rate calculation in seconds
+- `triggers_http_rate` (Number) Request count per 'window' seconds for the http trigger. Required if you use http trigger
+- `triggers_http_window` (Number) Time window for rate calculation in seconds. Required if you use http trigger
 - `triggers_memory_threshold` (Number) Memory trigger threshold configuration
 - `triggers_sqs_activation_queue_length` (Number) Number of messages for activation
 - `triggers_sqs_aws_endpoint` (String) Custom AWS endpoint, left empty to use default aws endpoint
-- `triggers_sqs_aws_region` (String) AWS region
+- `triggers_sqs_aws_region` (String) AWS region. Required if you use SQS trigger
 - `triggers_sqs_queue_length` (Number) Number of messages for one replica
-- `triggers_sqs_queue_url` (String) URL of the SQS queue
+- `triggers_sqs_queue_url` (String) URL of the SQS queue. Required if you use SQS trigger
 - `triggers_sqs_scale_on_delayed` (Boolean) Scale on delayed messages
 - `triggers_sqs_scale_on_flight` (Boolean) Scale on in-flight messages
-- `triggers_sqs_secret_name` (String) Name of the secret with AWS credentials
+- `triggers_sqs_secret_name` (String) Name of the secret with AWS credentials. Required if you use SQS trigger
 
 Read-Only:
 

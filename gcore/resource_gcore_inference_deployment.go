@@ -147,22 +147,22 @@ func resourceInferenceDeployment() *schema.Resource {
 						},
 						"triggers_http_rate": &schema.Schema{
 							Type:        schema.TypeInt,
-							Description: "Request count per 'window' seconds for the http trigger",
+							Description: "Request count per 'window' seconds for the http trigger. Required if you use http trigger",
 							Optional:    true,
 						},
 						"triggers_http_window": &schema.Schema{
 							Type:        schema.TypeInt,
-							Description: "Time window for rate calculation in seconds",
+							Description: "Time window for rate calculation in seconds. Required if you use http trigger",
 							Optional:    true,
 						},
 						"triggers_sqs_secret_name": &schema.Schema{
 							Type:        schema.TypeString,
-							Description: "Name of the secret with AWS credentials",
+							Description: "Name of the secret with AWS credentials. Required if you use SQS trigger",
 							Optional:    true,
 						},
 						"triggers_sqs_aws_region": &schema.Schema{
 							Type:        schema.TypeString,
-							Description: "AWS region",
+							Description: "AWS region. Required if you use SQS trigger",
 							Optional:    true,
 						},
 						"triggers_sqs_aws_endpoint": &schema.Schema{
@@ -172,7 +172,7 @@ func resourceInferenceDeployment() *schema.Resource {
 						},
 						"triggers_sqs_queue_url": &schema.Schema{
 							Type:        schema.TypeString,
-							Description: "URL of the SQS queue",
+							Description: "URL of the SQS queue. Required if you use SQS trigger",
 							Optional:    true,
 						},
 						"triggers_sqs_queue_length": &schema.Schema{
