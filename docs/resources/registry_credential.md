@@ -22,7 +22,6 @@ data "gcore_project" "project" {
 }
 
 resource "gcore_registry_credential" "creds" {
-  name = "my-aws-iam-secret"
   name = "docker-io"
   username = "username"
   password = "passwd"
