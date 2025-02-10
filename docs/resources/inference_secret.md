@@ -3,12 +3,12 @@
 page_title: "gcore_inference_secret Resource - terraform-provider-gcore"
 subcategory: ""
 description: |-
-  Represent inference secret
+  Represent inference secret. Specify this secret if you are using an AWS SQS-based trigger for inference deployment.
 ---
 
 # gcore_inference_secret (Resource)
 
-Represent inference secret
+Represent inference secret. Specify this secret if you are using an AWS SQS-based trigger for inference deployment.
 
 ## Example Usage
 

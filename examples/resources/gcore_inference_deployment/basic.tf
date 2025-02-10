@@ -3,15 +3,17 @@ resource "gcore_inference_deployment" "inf" {
   name = "my-inference-deployment"
   image = "nginx:latest"
   listening_port = 80
-  flavor_name = "inference-1vcpu-1gib"
-  timeout = 60
+  flavor_name = "inference-4vcpu-16gib"
   containers {
     region_id  = data.gcore_region.region.id
-    cooldown_period = 60
     scale_min = 2
     scale_max = 2
     triggers_cpu_threshold = 80
   }
+
+  # If you don't specify any probe, the container may be marked as "ready" too soon,
+  # meaning it will start accepting requests before your application has fully initialized.
+  # This can lead to errors, as the app might not be prepared to handle incoming traffic yet.
   liveness_probe {
     enabled = true
     failure_threshold = 3

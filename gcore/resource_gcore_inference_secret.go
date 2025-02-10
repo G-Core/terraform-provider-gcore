@@ -15,7 +15,7 @@ func resourceInferenceSecrets() *schema.Resource {
 		ReadContext:   resourceInferenceSecretRead,
 		UpdateContext: resourceInferenceSecretUpdate,
 		DeleteContext: resourceInferenceSecretDelete,
-		Description:   "Represent inference secret",
+		Description:   "Represent inference secret. Specify this secret if you are using an AWS SQS-based trigger for inference deployment.",
 		Importer: &schema.ResourceImporter{
 			StateContext: func(ctx context.Context, d *schema.ResourceData, meta interface{}) ([]*schema.ResourceData, error) {
 				projectID, inferenceName, err := ImportStringParserWithNoRegion(d.Id())

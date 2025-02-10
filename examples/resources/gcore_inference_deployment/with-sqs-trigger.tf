@@ -10,7 +10,7 @@ resource "gcore_inference_deployment" "inf" {
   name = "my-inference-deployment"
   image = "nginx:latest"
   listening_port = 80
-  flavor_name = "inference-1vcpu-1gib"
+  flavor_name = "inference-4vcpu-16gib"
   timeout = 60
   containers {
     region_id  = data.gcore_region.region.id

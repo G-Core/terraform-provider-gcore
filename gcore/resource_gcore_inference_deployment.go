@@ -57,37 +57,43 @@ func resourceInferenceDeployment() *schema.Resource {
 				},
 			},
 			"name": &schema.Schema{
-				Type:     schema.TypeString,
-				Required: true,
-				ForceNew: true,
+				Type:        schema.TypeString,
+				Description: "The name of the deployment. This should be unique within the scope of the project.",
+				Required:    true,
+				ForceNew:    true,
 			},
 			"description": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 			},
 			"image": &schema.Schema{
-				Type:     schema.TypeString,
-				Required: true,
+				Type:        schema.TypeString,
+				Description: "The container image to be used for deployment. This should be a valid image reference, such as a public or private Docker image (registry.example.com/my-image:latest). Note: If the image is hosted in a private registry, you must specify credentials_name to provide authentication details.",
+				Required:    true,
 			},
 			"listening_port": &schema.Schema{
-				Type:     schema.TypeInt,
-				Required: true,
+				Type:        schema.TypeInt,
+				Description: "The port on which the container will accept incoming traffic. This should match the port your application is configured to listen on within the container.",
+				Required:    true,
 			},
 			"status": &schema.Schema{
 				Type:     schema.TypeString,
 				Computed: true,
 			},
 			"auth_enabled": &schema.Schema{
-				Type:     schema.TypeBool,
-				Optional: true,
+				Type:        schema.TypeBool,
+				Description: "Set to true to enable API key authentication for the inference instance. ",
+				Optional:    true,
 			},
 			"address": &schema.Schema{
-				Type:     schema.TypeString,
-				Computed: true,
+				Type:        schema.TypeString,
+				Description: "The address of the inference deployment. This is the URL that clients can use to access the inference deployment. This field is only populated when the deployment is in the RUNNING state. To retrieve the address after deployment, you may need to run terraform refresh.",
+				Computed:    true,
 			},
 			"containers": &schema.Schema{
-				Type:     schema.TypeList,
-				Required: true,
+				Type:        schema.TypeList,
+				Required:    true,
+				Description: "A required list of container definitions. Each entry represents a container configuration, and at least one container must be specified. See the nested schema below for further details.",
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
 						"region_id": &schema.Schema{
@@ -117,7 +123,7 @@ func resourceInferenceDeployment() *schema.Resource {
 						},
 						"scale_min": &schema.Schema{
 							Type:        schema.TypeInt,
-							Description: "Minimum scale for the container",
+							Description: "Minimum scale for the container. It can be set to 0, in which case the container will be downscaled to 0 when there is no load.",
 							Required:    true,
 						},
 						"polling_interval": &schema.Schema{
@@ -200,23 +206,28 @@ func resourceInferenceDeployment() *schema.Resource {
 			},
 			"timeout": &schema.Schema{
 				Type:     schema.TypeInt,
-				Required: true,
+				Optional: true,
+				Computed: true,
 			},
 			"flavor_name": &schema.Schema{
-				Type:     schema.TypeString,
-				Required: true,
+				Type:        schema.TypeString,
+				Description: "Specifies the resource flavor for the container, determining its allocated CPU, memory, and potentially GPU resources. ",
+				Required:    true,
 			},
 			"envs": &schema.Schema{
-				Type:     schema.TypeMap,
-				Optional: true,
+				Type:        schema.TypeMap,
+				Description: "Environment variables for the inference instance.",
+				Optional:    true,
 			},
 			"command": &schema.Schema{
-				Type:     schema.TypeString,
-				Optional: true,
+				Type:        schema.TypeString,
+				Description: "Command to be executed when running a container from an image.",
+				Optional:    true,
 			},
 			"credentials_name": &schema.Schema{
-				Type:     schema.TypeString,
-				Optional: true,
+				Type:        schema.TypeString,
+				Description: "Required if using a private image registry. Specifies the name of the credentials to authenticate with the registry where the container image is stored.",
+				Optional:    true,
 			},
 			"logging": &schema.Schema{
 				Type:     schema.TypeList,
@@ -424,6 +435,10 @@ func resourceInferenceDeploymentRead(ctx context.Context, d *schema.ResourceData
 	d.Set("flavor_name", inference.FlavorName)
 	d.Set("credentials_name", inference.CredentialsName)
 	d.Set("logging", []interface{}{})
+
+	if inference.CreatedAt != nil {
+		d.Set("created_at", inference.CreatedAt)
+	}
 
 	if inference.Command != nil {
 		if err := d.Set("command", inference.Command); err != nil {
@@ -806,63 +821,76 @@ func probeSchema() *schema.Resource {
 	return &schema.Resource{
 		Schema: map[string]*schema.Schema{
 			"enabled": &schema.Schema{
-				Type:     schema.TypeBool,
-				Required: true,
+				Type:        schema.TypeBool,
+				Description: "Enable or disable probe",
+				Required:    true,
 			},
 			"failure_threshold": &schema.Schema{
-				Type:     schema.TypeInt,
-				Optional: true,
-				Computed: true,
+				Type:        schema.TypeInt,
+				Description: "Number of failed probes before the container is considered unhealthy",
+				Optional:    true,
+				Computed:    true,
 			},
 			"initial_delay_seconds": &schema.Schema{
-				Type:     schema.TypeInt,
-				Optional: true,
-				Computed: true,
+				Type:        schema.TypeInt,
+				Description: "Number of seconds after the container has started before liveness probes are initiated",
+				Optional:    true,
+				Computed:    true,
 			},
 			"period_seconds": &schema.Schema{
-				Type:     schema.TypeInt,
-				Optional: true,
-				Computed: true,
+				Type:        schema.TypeInt,
+				Description: "How often (in seconds) to perform the probe",
+				Optional:    true,
+				Computed:    true,
 			},
 			"timeout_seconds": &schema.Schema{
-				Type:     schema.TypeInt,
-				Optional: true,
-				Computed: true,
+				Type:        schema.TypeInt,
+				Description: "Number of seconds after which the probe times out",
+				Optional:    true,
+				Computed:    true,
 			},
 			"success_threshold": &schema.Schema{
-				Type:     schema.TypeInt,
-				Optional: true,
-				Computed: true,
+				Type:        schema.TypeInt,
+				Description: "Minimum consecutive successes for the probe to be considered successful after having failed",
+				Optional:    true,
+				Computed:    true,
 			},
 			"exec_command": &schema.Schema{
-				Type:     schema.TypeString,
-				Optional: true,
+				Type:        schema.TypeString,
+				Description: "Command to execute in the container to determine the health",
+				Optional:    true,
 			},
 			"tcp_socket_port": &schema.Schema{
-				Type:     schema.TypeInt,
-				Optional: true,
+				Type:        schema.TypeInt,
+				Description: "Port to connect to",
+				Optional:    true,
 			},
 			"http_get_headers": &schema.Schema{
-				Type:     schema.TypeMap,
-				Optional: true,
-				Computed: true,
+				Type:        schema.TypeMap,
+				Description: "HTTP headers to use when sending a HTTP GET request, valid only for HTTP probes",
+				Optional:    true,
+				Computed:    true,
 			},
 			"http_get_host": &schema.Schema{
-				Type:     schema.TypeString,
-				Optional: true,
+				Type:        schema.TypeString,
+				Description: "Host name to connect to, valid only for HTTP probes",
+				Optional:    true,
 			},
 			"http_get_path": &schema.Schema{
-				Type:     schema.TypeString,
-				Optional: true,
+				Type:        schema.TypeString,
+				Description: "Path to access on the HTTP server, valid only for HTTP probes",
+				Optional:    true,
 			},
 			"http_get_port": &schema.Schema{
-				Type:     schema.TypeInt,
-				Optional: true,
+				Type:        schema.TypeInt,
+				Description: "Number of the port to access on the HTTP server, valid only for HTTP probes",
+				Optional:    true,
 			},
 			"http_get_schema": &schema.Schema{
-				Type:     schema.TypeString,
-				Optional: true,
-				Computed: true,
+				Type:        schema.TypeString,
+				Description: "Scheme to use for connecting to the host, valid only for HTTP probes",
+				Optional:    true,
+				Computed:    true,
 			},
 		},
 	}
