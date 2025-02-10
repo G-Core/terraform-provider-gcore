@@ -29,8 +29,9 @@ const (
 	AIClusterCreatingTimeout int = 1200
 	AIClusterSuspendTimeout  int = 300
 
-	AIClusterPoint = "ai/clusters"
-	TaskPoint      = "tasks"
+	AIClusterPoint    = "ai/clusters"
+	AIClusterGPUPoint = "ai/clusters/gpu"
+	TaskPoint         = "tasks"
 )
 
 const (
@@ -108,6 +109,11 @@ func resourceAICluster() *schema.Resource {
 				Type:        schema.TypeString,
 				Description: "AI Cluster Name",
 				Required:    true,
+			},
+			"instances_count": {
+				Type:        schema.TypeInt,
+				Description: "Number of instances to create",
+				Optional:    true,
 			},
 			"cluster_status": {
 				Type:        schema.TypeString,
@@ -190,7 +196,7 @@ func resourceAICluster() *schema.Resource {
 						"size": {
 							Type:        schema.TypeInt,
 							Description: "Volume size, GiB",
-							Computed:    true,
+							Computed:    false,
 							Optional:    true,
 						},
 						"created_at": {
@@ -212,7 +218,7 @@ func resourceAICluster() *schema.Resource {
 						"image_id": {
 							Type:        schema.TypeString,
 							Description: "Volume ID. Mandatory if volume is pre-existing volume",
-							Optional:    true,
+							Required:    true,
 						},
 						"attachments": {
 							Type:        schema.TypeSet,
@@ -538,9 +544,6 @@ func checkAIClusterStatus(client *gcorecloud.ServiceClient, clusterID string, de
 }
 
 func validateCreateOpts(createOpts *ai.CreateOpts) error {
-	if isBmFlavor(createOpts.Flavor) && len(createOpts.Volumes) > 0 {
-		return errors.New("volumes are not supported for baremetal poplar servers")
-	}
 	if !isBmFlavor(createOpts.Flavor) && len(createOpts.Volumes) == 0 {
 		return errors.New("at least one image volume is required for vm poplar cluster")
 	}
@@ -590,7 +593,7 @@ func resourceAIClusterCreate(ctx context.Context, d *schema.ResourceData, m inte
 	config := m.(*Config)
 	provider := config.Provider
 
-	client, err := CreateClient(provider, d, AIClusterPoint, versionPointV1)
+	client, err := CreateClient(provider, d, AIClusterGPUPoint, versionPointV1)
 	if err != nil {
 		return diag.FromErr(err)
 	}
@@ -608,6 +611,10 @@ func resourceAIClusterCreate(ctx context.Context, d *schema.ResourceData, m inte
 	createOpts.Username = d.Get("username").(string)
 	createOpts.Keypair = d.Get("keypair_name").(string)
 	createOpts.ImageID = d.Get("image_id").(string)
+
+	if instancesCount, ok := d.GetOk("instances_count"); ok {
+		createOpts.InstancesCount = instancesCount.(int)
+	}
 
 	if userData, ok := d.GetOk("userdata"); ok {
 		createOpts.UserData = userData.(string)
@@ -658,10 +665,8 @@ func resourceAIClusterCreate(ctx context.Context, d *schema.ResourceData, m inte
 		if err != nil {
 			return nil, fmt.Errorf("cannot get task with ID: %s. Error: %w", task, err)
 		}
-		clusterID, err := ai.ExtractAIClusterIDFromTask(taskInfo)
-		if err != nil {
-			return nil, fmt.Errorf("cannot retrieve AI cluster ID from task info: %w", err)
-		}
+		// on create task, the cluster_id matches the task_id
+		clusterID := taskInfo.ID
 		return clusterID, nil
 	},
 	)
@@ -815,6 +820,10 @@ func resourceAIClusterUpdate(ctx context.Context, d *schema.ResourceData, m inte
 	if err != nil {
 		return diag.FromErr(err)
 	}
+	clientV1GPU, err := CreateClient(provider, d, AIClusterGPUPoint, versionPointV1)
+	if err != nil {
+		return diag.FromErr(err)
+	}
 	clientV2, err := CreateClient(provider, d, AIClusterPoint, versionPointV2)
 	if err != nil {
 		return diag.FromErr(err)
@@ -866,7 +875,7 @@ func resourceAIClusterUpdate(ctx context.Context, d *schema.ResourceData, m inte
 	}
 
 	// Make resize
-	if d.HasChanges("flavor", "image_id", "keypair_name", "user_data", "username", "password") || (d.HasChanges("interface") && isBmFlavor(d.Get("flavor").(string))) {
+	if d.HasChanges("instances_count") {
 		IsResize = true
 		_, newSGs := d.GetChange("security_group")
 		securityGroupList := newSGs.(*schema.Set).List()
@@ -874,53 +883,13 @@ func resourceAIClusterUpdate(ctx context.Context, d *schema.ResourceData, m inte
 		for sgIndex, sgID := range securityGroupList {
 			securityGroupIDs[sgIndex] = gcorecloud.ItemID{ID: sgID.(map[string]interface{})["id"].(string)}
 		}
-		_, flavor := d.GetChange("flavor")
-		_, image_id := d.GetChange("image_id")
-		_, keypairName := d.GetChange("keypair_name")
-		_, userData := d.GetChange("user_data")
-		_, username := d.GetChange("username")
-		_, password := d.GetChange("password")
+		_, instancesCount := d.GetChange("instances_count")
 
-		resizeOpts := ai.ResizeAIClusterOpts{
-			Flavor:         flavor.(string),
-			ImageID:        image_id.(string),
-			Interfaces:     []instances.InterfaceInstanceCreateOpts{},
-			Volumes:        []instances.CreateVolumeOpts{},
-			SecurityGroups: securityGroupIDs,
-			Keypair:        keypairName.(string),
-			Password:       password.(string),
-			Username:       username.(string),
-			UserData:       userData.(string),
-			Metadata:       map[string]string{},
+		resizeOpts := ai.ResizeGPUAIClusterOpts{
+			InstancesCount: instancesCount.(int),
 		}
-		_, newVolumes := d.GetChange("volume")
-
-		volumeList := newVolumes.([]interface{})
-		if len(volumeList) > 0 {
-			vs, err := extractVolumesMap(volumeList)
-			if err != nil {
-				return diag.FromErr(err)
-			}
-			resizeOpts.Volumes = vs
-		}
-
-		_, newIface := d.GetChange("interface")
-		interfaceList := newIface.([]interface{})
-		if len(interfaceList) > 0 {
-			ifaces, err := extractAIClusterInterfacesMap(interfaceList)
-			if err != nil {
-				return diag.FromErr(err)
-			}
-			resizeOpts.Interfaces = ifaces
-		}
-		_, newMetadata := d.GetChange("cluster_metadata")
-
-		for metaKey, metaValue := range newMetadata.(map[string]interface{}) {
-			resizeOpts.Metadata[metaKey] = metaValue.(string)
-		}
-
 		log.Printf("[DEBUG] AI cluster resize options: %+v", resizeOpts)
-		results, err := ai.Resize(clientV1, clusterID, resizeOpts).Extract()
+		results, err := ai.Resize(clientV1GPU, clusterID, resizeOpts).Extract()
 		if err != nil {
 			return diag.FromErr(err)
 		}
@@ -943,7 +912,7 @@ func resourceAIClusterUpdate(ctx context.Context, d *schema.ResourceData, m inte
 		oldVolumeList := extractInstanceVolumesMap(oldVolumes.(*schema.Set).List())
 		newVolumeList := extractInstanceVolumesMap(newVolumes.(*schema.Set).List())
 		if isBmFlavor(d.Get("flavor").(string)) && len(newVolumeList) > 0 {
-			return diag.FromErr(errors.New("baremetal servers don't support external voluems"))
+			return diag.FromErr(errors.New("baremetal servers don't support external volumes"))
 		}
 		poplarInstances := d.Get("poplar_servers").([]interface{})
 		if len(poplarInstances) > 1 {
