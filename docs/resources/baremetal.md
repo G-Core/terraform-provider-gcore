@@ -236,55 +236,55 @@ resource "gcore_baremetal" "baremetal_windows_with_userdata" {
 
 ### Required
 
-- `flavor_id` (String)
+- `flavor_id` (String) The ID of the flavor (type of server configuration). This field is required. Example: 'bm1-hf-medium-4x1nic'
 - `interface` (Block List, Min: 1) (see [below for nested schema](#nestedblock--interface))
 
 ### Optional
 
-- `app_config` (Map of String)
-- `apptemplate_id` (String)
-- `image_id` (String)
-- `keypair_name` (String)
-- `last_updated` (String)
+- `app_config` (Map of String) Parameters for the application template from the marketplace. This could include parameters required for app setup. Example: {'shadowsocks_method': 'chacha20-ietf-poly1305', 'shadowsocks_password': '123'}
+- `apptemplate_id` (String) The ID of the application template to use. Provide either 'apptemplate_id' or 'image_id', but not both
+- `image_id` (String) The ID of the image to use. The image will be used to provision the bare metal server. Provide either 'image_id' or 'apptemplate_id', but not both
+- `keypair_name` (String) The name of the SSH keypair to use for the baremetal
+- `last_updated` (String) The date and time when the baremetal server was last updated
 - `metadata` (Block List, Deprecated) (see [below for nested schema](#nestedblock--metadata))
-- `metadata_map` (Map of String)
-- `name` (String)
-- `name_template` (String)
-- `name_templates` (List of String, Deprecated)
-- `password` (String)
-- `project_id` (Number)
-- `project_name` (String)
-- `region_id` (Number)
-- `region_name` (String)
+- `metadata_map` (Map of String) A map of metadata items. Key-value pairs for instance metadata. Example: {'environment': 'production', 'owner': 'user'}
+- `name` (String) The name of the baremetal server. If not provided, it will be generated automatically. Example: 'bm-server-01'
+- `name_template` (String) The template used to generate server names. You can use forms 'ip_octets', 'two_ip_octets', 'one_ip_octet'. Example: 'server-${ip_octets}'
+- `name_templates` (List of String, Deprecated) Deprecated. List of baremetal names which will be changed by template
+- `password` (String) The password for accessing the baremetal server. This parameter is used to set a password for the 'Admin' user on a Windows instance, a default user or a new user on a Linux instance
+- `project_id` (Number) Project ID, only one of project_id or project_name should be set
+- `project_name` (String) Project name, only one of project_id or project_name should be set
+- `region_id` (Number) Region ID, only one of region_id or region_name should be set
+- `region_name` (String) Region name, only one of region_id or region_name should be set
 - `timeouts` (Block, Optional) (see [below for nested schema](#nestedblock--timeouts))
-- `user_data` (String)
-- `username` (String)
+- `user_data` (String) User data string in base64 format. This is passed to the instance at launch. For Linux instances, 'user_data' is ignored when 'password' field is provided. For Windows instances, Admin user password is set by 'password' field and cannot be updated via 'user_data'
+- `username` (String) A name of a new user in the Linux instance. It may be passed with a 'password' parameter
 
 ### Read-Only
 
 - `addresses` (List of Object) (see [below for nested schema](#nestedatt--addresses))
-- `flavor` (Map of String)
+- `flavor` (Map of String) Details about the flavor (server configuration) including RAM, vCPU, etc.
 - `id` (String) The ID of this resource.
-- `status` (String)
-- `vm_state` (String)
+- `status` (String) The current status of the baremetal server.
+- `vm_state` (String) The state of the virtual machine
 
 <a id="nestedblock--interface"></a>
 ### Nested Schema for `interface`
 
 Required:
 
-- `type` (String) Available value is 'subnet', 'any_subnet', 'external', 'reserved_fixed_ip'
+- `type` (String) The type of the network interface. Available value is 'subnet', 'any_subnet', 'external', 'reserved_fixed_ip'
 
 Optional:
 
-- `existing_fip_id` (String)
-- `fip_source` (String)
-- `ip_address` (String)
-- `is_parent` (Boolean) If not set will be calculated after creation. Trunk interface always attached first. Can't detach interface if is_parent true. Fields affect only on creation
-- `network_id` (String) required if type is 'subnet' or 'any_subnet'
-- `order` (Number) Order of attaching interface. Trunk interface always attached first, fields affect only on creation
-- `port_id` (String) required if type is  'reserved_fixed_ip'
-- `subnet_id` (String) required if type is 'subnet'
+- `existing_fip_id` (String) The ID of the existing floating IP that will be attached to the interface
+- `fip_source` (String) The source of floating IP. Can be 'new' or 'existing'
+- `ip_address` (String) The IP address for the interface
+- `is_parent` (Boolean) Indicates whether this interface is the parent. If not set will be calculated after creation. Trunk interface always attached first. Can't detach interface if is_parent true. Fields affect only on creation
+- `network_id` (String) The network ID to attach the interface to. Required if type is 'subnet' or 'any_subnet'
+- `order` (Number) Order of attaching interface. Trunk (parent) interface always attached first, fields affect only on creation
+- `port_id` (String) The port ID for reserved fixed IP. Required if type is  'reserved_fixed_ip'
+- `subnet_id` (String) The subnet ID to attach the interface to. Required if type is 'subnet'
 
 
 <a id="nestedblock--metadata"></a>
@@ -292,8 +292,8 @@ Optional:
 
 Required:
 
-- `key` (String)
-- `value` (String)
+- `key` (String) Metadata key
+- `value` (String) Metadata value
 
 
 <a id="nestedblock--timeouts"></a>

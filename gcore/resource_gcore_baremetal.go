@@ -60,6 +60,7 @@ func resourceBmInstance() *schema.Resource {
 					"project_name",
 				},
 				DiffSuppressFunc: suppressDiffProjectID,
+				Description:      "Project ID, only one of project_id or project_name should be set",
 			},
 			"region_id": &schema.Schema{
 				Type:     schema.TypeInt,
@@ -69,6 +70,7 @@ func resourceBmInstance() *schema.Resource {
 					"region_name",
 				},
 				DiffSuppressFunc: suppressDiffRegionID,
+				Description:      "Region ID, only one of region_id or region_name should be set",
 			},
 			"project_name": &schema.Schema{
 				Type:     schema.TypeString,
@@ -77,6 +79,7 @@ func resourceBmInstance() *schema.Resource {
 					"project_id",
 					"project_name",
 				},
+				Description: "Project name, only one of project_id or project_name should be set",
 			},
 			"region_name": &schema.Schema{
 				Type:     schema.TypeString,
@@ -85,15 +88,18 @@ func resourceBmInstance() *schema.Resource {
 					"region_id",
 					"region_name",
 				},
+				Description: "Region name, only one of region_id or region_name should be set",
 			},
 			"flavor_id": &schema.Schema{
-				Type:     schema.TypeString,
-				Required: true,
+				Type:        schema.TypeString,
+				Required:    true,
+				Description: "The ID of the flavor (type of server configuration). This field is required. Example: 'bm1-hf-medium-4x1nic'",
 			},
 			"name": &schema.Schema{
-				Type:     schema.TypeString,
-				Optional: true,
-				Computed: true,
+				Type:        schema.TypeString,
+				Optional:    true,
+				Computed:    true,
+				Description: "The name of the baremetal server. If not provided, it will be generated automatically. Example: 'bm-server-01'",
 			},
 			"name_templates": &schema.Schema{
 				Type:          schema.TypeList,
@@ -101,11 +107,13 @@ func resourceBmInstance() *schema.Resource {
 				Deprecated:    "Use name_template instead",
 				ConflictsWith: []string{"name_template"},
 				Elem:          &schema.Schema{Type: schema.TypeString},
+				Description:   "Deprecated. List of baremetal names which will be changed by template",
 			},
 			"name_template": &schema.Schema{
 				Type:          schema.TypeString,
 				Optional:      true,
 				ConflictsWith: []string{"name_templates"},
+				Description:   "The template used to generate server names. You can use forms 'ip_octets', 'two_ip_octets', 'one_ip_octet'. Example: 'server-${ip_octets}'",
 			},
 			"image_id": {
 				Type:     schema.TypeString,
@@ -114,6 +122,7 @@ func resourceBmInstance() *schema.Resource {
 					"image_id",
 					"apptemplate_id",
 				},
+				Description: "The ID of the image to use. The image will be used to provision the bare metal server. Provide either 'image_id' or 'apptemplate_id', but not both",
 			},
 			"apptemplate_id": {
 				Type:     schema.TypeString,
@@ -122,6 +131,7 @@ func resourceBmInstance() *schema.Resource {
 					"image_id",
 					"apptemplate_id",
 				},
+				Description: "The ID of the application template to use. Provide either 'apptemplate_id' or 'image_id', but not both",
 			},
 			"interface": &schema.Schema{
 				Type: schema.TypeList,
@@ -132,65 +142,71 @@ func resourceBmInstance() *schema.Resource {
 						"type": {
 							Type:        schema.TypeString,
 							Required:    true,
-							Description: fmt.Sprintf("Available value is '%s', '%s', '%s', '%s'", types.SubnetInterfaceType, types.AnySubnetInterfaceType, types.ExternalInterfaceType, types.ReservedFixedIpType),
+							Description: fmt.Sprintf("The type of the network interface. Available value is '%s', '%s', '%s', '%s'", types.SubnetInterfaceType, types.AnySubnetInterfaceType, types.ExternalInterfaceType, types.ReservedFixedIpType),
 						},
 						"is_parent": {
 							Type:        schema.TypeBool,
 							Computed:    true,
 							Optional:    true,
-							Description: "If not set will be calculated after creation. Trunk interface always attached first. Can't detach interface if is_parent true. Fields affect only on creation",
+							Description: "Indicates whether this interface is the parent. If not set will be calculated after creation. Trunk interface always attached first. Can't detach interface if is_parent true. Fields affect only on creation",
 						},
 						"order": {
 							Type:        schema.TypeInt,
 							Optional:    true,
-							Description: "Order of attaching interface. Trunk interface always attached first, fields affect only on creation",
+							Description: "Order of attaching interface. Trunk (parent) interface always attached first, fields affect only on creation",
 						},
 						"network_id": {
 							Type:        schema.TypeString,
-							Description: "required if type is 'subnet' or 'any_subnet'",
+							Description: "The network ID to attach the interface to. Required if type is 'subnet' or 'any_subnet'",
 							Optional:    true,
 							Computed:    true,
 						},
 						"subnet_id": {
 							Type:        schema.TypeString,
-							Description: "required if type is 'subnet'",
+							Description: "The subnet ID to attach the interface to. Required if type is 'subnet'",
 							Optional:    true,
 							Computed:    true,
 						},
 						"port_id": {
 							Type:        schema.TypeString,
 							Computed:    true,
-							Description: "required if type is  'reserved_fixed_ip'",
+							Description: "The port ID for reserved fixed IP. Required if type is  'reserved_fixed_ip'",
 							Optional:    true,
 						},
 						// nested map is not supported, in this case, you do not need to use the list for the map
 						"fip_source": {
-							Type:     schema.TypeString,
-							Optional: true,
+							Type:        schema.TypeString,
+							Optional:    true,
+							Description: "The source of floating IP. Can be 'new' or 'existing'",
 						},
 						"existing_fip_id": {
-							Type:     schema.TypeString,
-							Optional: true,
+							Type:        schema.TypeString,
+							Optional:    true,
+							Description: "The ID of the existing floating IP that will be attached to the interface",
 						},
 						"ip_address": {
-							Type:     schema.TypeString,
-							Computed: true,
-							Optional: true,
+							Type:        schema.TypeString,
+							Computed:    true,
+							Optional:    true,
+							Description: "The IP address for the interface",
 						},
 					},
 				},
 			},
 			"keypair_name": &schema.Schema{
-				Type:     schema.TypeString,
-				Optional: true,
+				Type:        schema.TypeString,
+				Optional:    true,
+				Description: "The name of the SSH keypair to use for the baremetal",
 			},
 			"password": &schema.Schema{
-				Type:     schema.TypeString,
-				Optional: true,
+				Type:        schema.TypeString,
+				Optional:    true,
+				Description: "The password for accessing the baremetal server. This parameter is used to set a password for the 'Admin' user on a Windows instance, a default user or a new user on a Linux instance",
 			},
 			"username": &schema.Schema{
-				Type:     schema.TypeString,
-				Optional: true,
+				Type:        schema.TypeString,
+				Optional:    true,
+				Description: "A name of a new user in the Linux instance. It may be passed with a 'password' parameter",
 			},
 			"metadata": &schema.Schema{
 				Type:          schema.TypeList,
@@ -200,12 +216,14 @@ func resourceBmInstance() *schema.Resource {
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
 						"key": {
-							Type:     schema.TypeString,
-							Required: true,
+							Type:        schema.TypeString,
+							Required:    true,
+							Description: "Metadata key",
 						},
 						"value": {
-							Type:     schema.TypeString,
-							Required: true,
+							Type:        schema.TypeString,
+							Required:    true,
+							Description: "Metadata value",
 						},
 					},
 				},
@@ -217,26 +235,32 @@ func resourceBmInstance() *schema.Resource {
 				Elem: &schema.Schema{
 					Type: schema.TypeString,
 				},
+				Description: "A map of metadata items. Key-value pairs for instance metadata. Example: {'environment': 'production', 'owner': 'user'}",
 			},
 			"app_config": &schema.Schema{
-				Type:     schema.TypeMap,
-				Optional: true,
+				Type:        schema.TypeMap,
+				Optional:    true,
+				Description: "Parameters for the application template from the marketplace. This could include parameters required for app setup. Example: {'shadowsocks_method': 'chacha20-ietf-poly1305', 'shadowsocks_password': '123'}",
 			},
 			"user_data": &schema.Schema{
-				Type:     schema.TypeString,
-				Optional: true,
+				Type:        schema.TypeString,
+				Optional:    true,
+				Description: "User data string in base64 format. This is passed to the instance at launch. For Linux instances, 'user_data' is ignored when 'password' field is provided. For Windows instances, Admin user password is set by 'password' field and cannot be updated via 'user_data'",
 			},
 			"flavor": &schema.Schema{
-				Type:     schema.TypeMap,
-				Computed: true,
+				Type:        schema.TypeMap,
+				Computed:    true,
+				Description: "Details about the flavor (server configuration) including RAM, vCPU, etc.",
 			},
 			"status": &schema.Schema{
-				Type:     schema.TypeString,
-				Computed: true,
+				Type:        schema.TypeString,
+				Computed:    true,
+				Description: "The current status of the baremetal server.",
 			},
 			"vm_state": &schema.Schema{
-				Type:     schema.TypeString,
-				Computed: true,
+				Type:        schema.TypeString,
+				Computed:    true,
+				Description: "The state of the virtual machine",
 			},
 			"addresses": &schema.Schema{
 				Type:     schema.TypeList,
@@ -249,12 +273,14 @@ func resourceBmInstance() *schema.Resource {
 							Elem: &schema.Resource{
 								Schema: map[string]*schema.Schema{
 									"addr": {
-										Type:     schema.TypeString,
-										Required: true,
+										Type:        schema.TypeString,
+										Required:    true,
+										Description: "The IP address of the interface",
 									},
 									"type": {
-										Type:     schema.TypeString,
-										Required: true,
+										Type:        schema.TypeString,
+										Required:    true,
+										Description: "The type of IP address",
 									},
 								},
 							},
@@ -263,9 +289,10 @@ func resourceBmInstance() *schema.Resource {
 				},
 			},
 			"last_updated": &schema.Schema{
-				Type:     schema.TypeString,
-				Optional: true,
-				Computed: true,
+				Type:        schema.TypeString,
+				Optional:    true,
+				Computed:    true,
+				Description: "The date and time when the baremetal server was last updated",
 			},
 		},
 	}

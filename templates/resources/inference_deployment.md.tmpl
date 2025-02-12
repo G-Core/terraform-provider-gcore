@@ -1,0 +1,36 @@
+---
+page_title: "{{ .Name }} {{ .Type }} - {{ .ProviderName	}}"
+subcategory: ""
+description: |-
+  {{ .Description }}
+---
+
+# {{ .Name }} ({{ .Type }})
+
+{{ .Description }}
+
+## Example Usage
+
+##### Prerequisite
+
+{{tffile "examples/resources/gcore_inference_deployment/main.tf"}}
+
+### Basic example
+
+#### Creating inference deployment
+
+{{tffile "examples/resources/gcore_inference_deployment/basic.tf"}}
+
+#### Creating inference deployment with sqs trigger
+
+{{tffile "examples/resources/gcore_inference_deployment/with-sqs-trigger.tf"}}
+
+{{ .SchemaMarkdown }}
+
+{{ if .HasImport }}
+## Import
+
+Import is supported using the following syntax:
+
+{{ codefile "shell" .ImportFile }}
+{{ end }}
