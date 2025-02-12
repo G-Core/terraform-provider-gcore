@@ -196,7 +196,6 @@ func resourceAICluster() *schema.Resource {
 						"size": {
 							Type:        schema.TypeInt,
 							Description: "Volume size, GiB",
-							Computed:    false,
 							Optional:    true,
 						},
 						"created_at": {
@@ -810,7 +809,7 @@ func getDetachOptions(instanceInterfaces []instances.Interface, detachIface ai.A
 	}
 }
 
-var IsResize bool = false
+var IsResize = false
 
 func resourceAIClusterUpdate(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	log.Println("[DEBUG] Start AI cluster updating")
@@ -883,7 +882,12 @@ func resourceAIClusterUpdate(ctx context.Context, d *schema.ResourceData, m inte
 		for sgIndex, sgID := range securityGroupList {
 			securityGroupIDs[sgIndex] = gcorecloud.ItemID{ID: sgID.(map[string]interface{})["id"].(string)}
 		}
-		_, instancesCount := d.GetChange("instances_count")
+
+		instancesCount, ok := d.GetOk("instances_count")
+		if !ok || instancesCount.(int) == 0 {
+			// if the number of instances has been specified before, then it cannot be removed or set to 0
+			return diag.FromErr(errors.New("cannot resize cluster to 0 instances"))
+		}
 
 		resizeOpts := ai.ResizeGPUAIClusterOpts{
 			InstancesCount: instancesCount.(int),
