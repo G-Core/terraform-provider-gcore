@@ -172,6 +172,7 @@ func Provider() *schema.Provider {
 			"gcore_inference_deployment": resourceInferenceDeployment(),
 			"gcore_inference_secret":     resourceInferenceSecrets(),
 			"gcore_registry_credential":  resourceRegistryCredential(),
+			"gcore_gpu_baremetal_image":  resourceBaremetalImage(),
 		},
 		DataSourcesMap: map[string]*schema.Resource{
 			"gcore_ai_cluster":             dataSourceAICluster(),
