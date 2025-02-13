@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 	"log"
-	"regexp"
 	"time"
 
 	gcorecloud "github.com/G-Core/gcorelabscloud-go"
@@ -13,111 +12,10 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
-	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/validation"
 )
 
 func resourceBaremetalImage() *schema.Resource {
-	return &schema.Resource{
-		CreateContext: resourceBaremetalImageCreate,
-		ReadContext:   resourceBaremetalImageRead,
-		DeleteContext: resourceBaremetalImageDelete,
-		Description:   "Manages a baremetal custom image",
-
-		Schema: map[string]*schema.Schema{
-			"project_id": &schema.Schema{
-				Type:        schema.TypeInt,
-				Optional:    true,
-				ForceNew:    true,
-				Description: "Project ID",
-			},
-			"region_id": &schema.Schema{
-				Type:        schema.TypeInt,
-				Optional:    true,
-				ForceNew:    true,
-				Description: "Region ID",
-			},
-			"name": &schema.Schema{
-				Type:         schema.TypeString,
-				Required:     true,
-				ForceNew:     true,
-				Description:  "Image name",
-				ValidateFunc: validation.StringMatch(regexp.MustCompile(`^[a-zA-Z0-9][a-zA-Z 0-9._\-]{1,61}[a-zA-Z0-9]$`), "Invalid image name format"),
-			},
-			"url": &schema.Schema{
-				Type:        schema.TypeString,
-				Required:    true,
-				ForceNew:    true,
-				Description: "Image URL",
-			},
-			"ssh_key": &schema.Schema{
-				Type:         schema.TypeString,
-				Optional:     true,
-				Default:      "allow",
-				ForceNew:     true,
-				Description:  "Permission to use a ssh key in instances",
-				ValidateFunc: validation.StringInSlice([]string{"allow", "deny", "required"}, false),
-			},
-			"cow_format": &schema.Schema{
-				Type:        schema.TypeBool,
-				Optional:    true,
-				Default:     false,
-				ForceNew:    true,
-				Description: "When True, image cannot be deleted unless all volumes, created from it, are deleted",
-			},
-			"architecture": &schema.Schema{
-				Type:         schema.TypeString,
-				Optional:     true,
-				Default:      "x86_64",
-				ForceNew:     true,
-				Description:  "Image architecture type: aarch64, x86_64",
-				ValidateFunc: validation.StringInSlice([]string{"aarch64", "x86_64"}, false),
-			},
-			"os_type": &schema.Schema{
-				Type:        schema.TypeString,
-				Optional:    true,
-				ForceNew:    true,
-				Description: "The operating system installed on the image",
-			},
-			"os_distro": &schema.Schema{
-				Type:        schema.TypeString,
-				Optional:    true,
-				ForceNew:    true,
-				Description: "OS Distribution, i.e. Debian, CentOS, Ubuntu, CoreOS etc",
-			},
-			"os_version": &schema.Schema{
-				Type:        schema.TypeString,
-				Optional:    true,
-				ForceNew:    true,
-				Description: "OS version, i.e. 19.04 (for Ubuntu) or 9.4 for Debian",
-			},
-			"hw_firmware_type": &schema.Schema{
-				Type:        schema.TypeString,
-				Optional:    true,
-				ForceNew:    true,
-				Description: "Specifies the type of firmware with which to boot the guest",
-			},
-			"metadata": &schema.Schema{
-				Type:        schema.TypeMap,
-				Optional:    true,
-				Computed:    true,
-				ForceNew:    true,
-				Elem:        &schema.Schema{Type: schema.TypeString},
-				Description: "Create one or more metadata items for a cluster",
-			},
-			"project_name": &schema.Schema{
-				Type:        schema.TypeString,
-				Optional:    true,
-				ForceNew:    true,
-				Description: "Project name",
-			},
-			"region_name": &schema.Schema{
-				Type:        schema.TypeString,
-				Optional:    true,
-				ForceNew:    true,
-				Description: "Region name",
-			},
-		},
-	}
+	return resourceGPUImage(GPUImageTypeBaremetal)
 }
 
 func resourceBaremetalImageCreate(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
@@ -204,21 +102,22 @@ func resourceBaremetalImageCreate(ctx context.Context, d *schema.ResourceData, m
 
 	log.Printf("[DEBUG] Baremetal image create options: %+v", opts)
 
-	task, err := images.UploadImage(client, opts)
-	if err != nil {
-		log.Printf("[ERROR] Error uploading baremetal image: %s", err)
-		return diag.FromErr(fmt.Errorf("error uploading baremetal image: %w", err))
+	result := images.UploadImage(client, opts)
+	if result.Err != nil {
+		log.Printf("[ERROR] Error uploading baremetal image: %s", result.Err)
+		return diag.FromErr(fmt.Errorf("error uploading baremetal image: %w", result.Err))
 	}
-	log.Printf("[DEBUG] Upload task started with ID: %s", task.Tasks[0])
 
-	taskID := tasks.TaskID(task.Tasks[0])
+	taskResponse := result.Body.(map[string]interface{})
+	taskID := tasks.TaskID(taskResponse["tasks"].([]interface{})[0].(string))
+	log.Printf("[DEBUG] Upload task started with ID: %s", taskID)
 
 	taskClient, err := CreateClient(config.Provider, d, "tasks", "v1")
 	if err != nil {
 		return diag.FromErr(fmt.Errorf("error creating task client: %w", err))
 	}
 
-	result, err := tasks.WaitTaskAndReturnResult(taskClient, taskID, true, BaremetalImageCreatingTimeout, func(task tasks.TaskID) (interface{}, error) {
+	waitResult, err := tasks.WaitTaskAndReturnResult(taskClient, taskID, true, BaremetalImageCreatingTimeout, func(task tasks.TaskID) (interface{}, error) {
 		taskInfo, err := tasks.Get(taskClient, string(task)).Extract()
 		if err != nil {
 			log.Printf("[ERROR] Error getting task %s info: %s", task, err)
@@ -227,12 +126,13 @@ func resourceBaremetalImageCreate(ctx context.Context, d *schema.ResourceData, m
 		log.Printf("[DEBUG] Task %s state: %s", task, taskInfo.State)
 		return taskInfo, nil
 	})
+
 	if err != nil {
 		log.Printf("[ERROR] Error waiting for baremetal image task %s: %s", taskID, err)
 		return diag.FromErr(fmt.Errorf("error waiting for baremetal image %s to become ready: %w", taskID, err))
 	}
 
-	resultTask := result.(*tasks.Task)
+	resultTask := waitResult.(*tasks.Task)
 	imageID, err := images.ExtractImageIDFromTask(resultTask)
 	if err != nil {
 		log.Printf("[ERROR] Error extracting image ID from task: %s", err)
@@ -256,13 +156,18 @@ func resourceBaremetalImageRead(ctx context.Context, d *schema.ResourceData, m i
 	// Add retry mechanism for image retrieval
 	var image *images.Image
 	err = resource.RetryContext(ctx, 20*time.Second, func() *resource.RetryError {
-		image, err = images.Get(client, d.Id())
-		if err != nil {
-			log.Printf("[TRACE] HTTP Response Code: %d", err)
-			log.Printf("[TRACE] Response Body: %s", err)
-			if _, ok := err.(gcorecloud.ErrDefault404); ok {
-				return resource.RetryableError(fmt.Errorf("baremetal image not found, retrying: %w", err))
+		getResult := images.Get(client, d.Id())
+		if getResult.Err != nil {
+			log.Printf("[TRACE] HTTP Response Code: %d", getResult.Err)
+			log.Printf("[TRACE] Response Body: %s", getResult.Err)
+			if _, ok := getResult.Err.(gcorecloud.ErrDefault404); ok {
+				return resource.RetryableError(fmt.Errorf("baremetal image not found, retrying: %w", getResult.Err))
 			}
+			return resource.NonRetryableError(getResult.Err)
+		}
+		var err error
+		image, err = getResult.Extract()
+		if err != nil {
 			return resource.NonRetryableError(err)
 		}
 		return nil
@@ -325,10 +230,10 @@ func resourceBaremetalImageDelete(ctx context.Context, d *schema.ResourceData, m
 		return diag.FromErr(err)
 	}
 
-	_, err = images.Delete(client, d.Id())
-	if err != nil {
-		log.Printf("[ERROR] Error deleting baremetal image %s: %s", d.Id(), err)
-		return diag.FromErr(fmt.Errorf("error deleting baremetal image: %w", err))
+	deleteResult := images.Delete(client, d.Id())
+	if deleteResult.Err != nil {
+		log.Printf("[ERROR] Error deleting baremetal image %s: %s", d.Id(), deleteResult.Err)
+		return diag.FromErr(fmt.Errorf("error deleting baremetal image: %w", deleteResult.Err))
 	}
 	log.Printf("[DEBUG] Successfully deleted baremetal image: %s", d.Id())
 

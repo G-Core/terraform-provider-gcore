@@ -173,6 +173,7 @@ func Provider() *schema.Provider {
 			"gcore_inference_secret":     resourceInferenceSecrets(),
 			"gcore_registry_credential":  resourceRegistryCredential(),
 			"gcore_gpu_baremetal_image":  resourceBaremetalImage(),
+			"gcore_gpu_virtual_image":    resourceVirtualImage(),
 		},
 		DataSourcesMap: map[string]*schema.Resource{
 			"gcore_ai_cluster":             dataSourceAICluster(),
