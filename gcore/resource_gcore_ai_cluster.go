@@ -868,9 +868,55 @@ func resourceAIClusterUpdate(ctx context.Context, d *schema.ResourceData, m inte
 	// Make resize
 	if d.HasChanges("flavor", "image_id", "keypair_name", "user_data", "username", "password") || (d.HasChanges("interface") && isBmFlavor(d.Get("flavor").(string))) {
 		IsResize = true
+		_, newSGs := d.GetChange("security_group")
+		securityGroupList := newSGs.(*schema.Set).List()
+		securityGroupIDs := make([]gcorecloud.ItemID, len(securityGroupList))
+		for sgIndex, sgID := range securityGroupList {
+			securityGroupIDs[sgIndex] = gcorecloud.ItemID{ID: sgID.(map[string]interface{})["id"].(string)}
+		}
+		_, flavor := d.GetChange("flavor")
+		_, image_id := d.GetChange("image_id")
+		_, keypairName := d.GetChange("keypair_name")
+		_, userData := d.GetChange("user_data")
+		_, username := d.GetChange("username")
+		_, password := d.GetChange("password")
 
-		resizeOpts := ai.ResizeGPUAIClusterOpts{
-			InstancesCount: 1, // Default to 1 instance for now
+		resizeOpts := ai.ResizeAIClusterOpts{
+			Flavor:         flavor.(string),
+			ImageID:        image_id.(string),
+			Interfaces:     []instances.InterfaceInstanceCreateOpts{},
+			Volumes:        []instances.CreateVolumeOpts{},
+			SecurityGroups: securityGroupIDs,
+			Keypair:        keypairName.(string),
+			Password:       password.(string),
+			Username:       username.(string),
+			UserData:       userData.(string),
+			Metadata:       map[string]string{},
+		}
+		_, newVolumes := d.GetChange("volume")
+
+		volumeList := newVolumes.([]interface{})
+		if len(volumeList) > 0 {
+			vs, err := extractVolumesMap(volumeList)
+			if err != nil {
+				return diag.FromErr(err)
+			}
+			resizeOpts.Volumes = vs
+		}
+
+		_, newIface := d.GetChange("interface")
+		interfaceList := newIface.([]interface{})
+		if len(interfaceList) > 0 {
+			ifaces, err := extractAIClusterInterfacesMap(interfaceList)
+			if err != nil {
+				return diag.FromErr(err)
+			}
+			resizeOpts.Interfaces = ifaces
+		}
+		_, newMetadata := d.GetChange("cluster_metadata")
+
+		for metaKey, metaValue := range newMetadata.(map[string]interface{}) {
+			resizeOpts.Metadata[metaKey] = metaValue.(string)
 		}
 
 		log.Printf("[DEBUG] AI cluster resize options: %+v", resizeOpts)
