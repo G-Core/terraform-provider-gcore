@@ -101,3 +101,5 @@ require (
 	go.mongodb.org/mongo-driver v1.12.0 // indirect
 	golang.org/x/net v0.26.0 // indirect
 )
+
+replace github.com/G-Core/gcorelabscloud-go => github.com/algis-dumbris/gcorelabscloud-go v0.0.0-20250213093059-fd4f7f92ea13
