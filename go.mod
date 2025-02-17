@@ -53,6 +53,7 @@ require (
 	github.com/hashicorp/hcl/v2 v2.17.0 // indirect
 	github.com/hashicorp/logutils v1.0.0 // indirect
 	github.com/hashicorp/terraform-json v0.23.0 // indirect
+	github.com/hashicorp/terraform-plugin-docs v0.20.1 // indirect
 	github.com/hashicorp/terraform-plugin-go v0.16.0 // indirect
 	github.com/hashicorp/terraform-plugin-log v0.9.0 // indirect
 	github.com/hashicorp/terraform-registry-address v0.2.1 // indirect
@@ -101,5 +102,3 @@ require (
 	go.mongodb.org/mongo-driver v1.12.0 // indirect
 	golang.org/x/net v0.26.0 // indirect
 )
-
-replace github.com/G-Core/gcorelabscloud-go => github.com/algis-dumbris/gcorelabscloud-go v0.0.0-20250213093059-fd4f7f92ea13
