@@ -13,9 +13,9 @@ data "gcore_region" "region" {
 resource "gcore_gpu_baremetal_image" "example" {
   project_id   = data.gcore_project.project.id
   region_id    = data.gcore_region.region.id
-  name         = "my-ubuntu-23.10-x64"
-  url          = "https://cloud-images.ubuntu.com/releases/23.10/release/ubuntu-23.10-server-amd64.qcow2"
+  name         = "my-cirros-image"
+  url          = "http://mirror.noris.net/cirros/0.4.0/cirros-0.4.0-x86_64-disk.img"
   architecture = "x86_64"
   os_type      = "linux"
   ssh_key      = "allow"
-} 
+}
