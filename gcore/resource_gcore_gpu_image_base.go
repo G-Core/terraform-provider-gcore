@@ -209,15 +209,19 @@ func resourceGPUImageCreate(ctx context.Context, d *schema.ResourceData, m inter
 		return diag.FromErr(result.Err)
 	}
 
-	taskResponse := result.Body.(map[string]interface{})
-	taskID := tasks.TaskID(taskResponse["tasks"].([]interface{})[0].(string))
+	taskID, err := result.Extract()
+	if err != nil {
+		return diag.FromErr(err)
+	}
+
+	firstTaskID := taskID.Tasks[0]
 
 	taskClient, err := CreateClient(provider, d, "tasks", "v1")
 	if err != nil {
 		return diag.FromErr(err)
 	}
 
-	waitResult, err := tasks.WaitTaskAndReturnResult(taskClient, taskID, true, GPUImageCreatingTimeout, func(task tasks.TaskID) (interface{}, error) {
+	waitResult, err := tasks.WaitTaskAndReturnResult(taskClient, firstTaskID, true, GPUImageCreatingTimeout, func(task tasks.TaskID) (interface{}, error) {
 		taskInfo, err := tasks.Get(taskClient, string(task)).Extract()
 		if err != nil {
 			return nil, err
