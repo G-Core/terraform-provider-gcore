@@ -140,6 +140,10 @@ resource "gcore_cdn_resource" "cdn_example_com" {
         "whitelist",
       ]
     }
+    query_string_forwarding {
+      forward_from_file_types = ["m3u8", "m3u"],
+      forward_to_file_types = ["m3u8", "m3u", "ts", "m4s"]
+    }
     redirect_https_to_http {
       enabled = false
       value = false

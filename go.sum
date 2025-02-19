@@ -7,10 +7,8 @@ github.com/G-Core/gcore-dns-sdk-go v0.2.9 h1:LMMZIRX8y3aJJuAviNSpFmLbovZUw+6Om+8
 github.com/G-Core/gcore-dns-sdk-go v0.2.9/go.mod h1:35t795gOfzfVanhzkFyUXEzaBuMXwETmJldPpP28MN4=
 github.com/G-Core/gcore-storage-sdk-go v0.1.34 h1:0GPQfz1kA6mQi6fiisGsh0Um4H9PZeHWIPsc825cDrY=
 github.com/G-Core/gcore-storage-sdk-go v0.1.34/go.mod h1:BUAEZZZJJt/+luRFunqziv3+JnbVMLbQXDWz9kV8Te8=
-github.com/G-Core/gcorelabscdn-go v1.0.25 h1:OS2uTmth12GzWw2tLeUFh4n9TUOie+gmE0e2cdg0EYk=
-github.com/G-Core/gcorelabscdn-go v1.0.25/go.mod h1:iSGXaTvZBzDHQW+rKFS918BgFVpONcyLEijwh8WsXpE=
-github.com/G-Core/gcorelabscdn-go v1.0.26 h1:22SqETUw64s+It/op1T7y3ukEOU62CJOsUcsfSkhvZs=
-github.com/G-Core/gcorelabscdn-go v1.0.26/go.mod h1:iSGXaTvZBzDHQW+rKFS918BgFVpONcyLEijwh8WsXpE=
+github.com/G-Core/gcorelabscdn-go v1.0.27 h1:XglfvHLYmb1NJxATig6bdPyN9DKdGt5vUlIc+kbpu6s=
+github.com/G-Core/gcorelabscdn-go v1.0.27/go.mod h1:iSGXaTvZBzDHQW+rKFS918BgFVpONcyLEijwh8WsXpE=
 github.com/G-Core/gcorelabscloud-go v0.11.0 h1:JzlEp0Cgm3i4lQFJKhscDK76uWYH2pQNzZOwKtvrMUQ=
 github.com/G-Core/gcorelabscloud-go v0.11.0/go.mod h1:13Z1USxlxPbDFuYQyWqfNexlk4kUvOYTXbnvV/Z1lZo=
 github.com/Microsoft/go-winio v0.6.1 h1:9/kr64B9VUZrLm5YYwbGtUJnMgqWVOdUAXu6Migciow=
