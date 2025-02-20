@@ -476,6 +476,17 @@ func listToOptions(l []interface{}) *gcdn.Options {
 			opts.QueryParamsWhitelist.Value = append(opts.QueryParamsWhitelist.Value, v.(string))
 		}
 	}
+	if opt, ok := getOptByName(fields, "query_string_forwarding"); ok {
+		opts.QueryStringForwarding = &gcdn.QueryStringForwarding{
+			Enabled: opt["enabled"].(bool),
+		}
+		for _, v := range opt["forward_from_file_types"].(*schema.Set).List() {
+			opts.QueryStringForwarding.ForwardFromFileTypes = append(opts.QueryStringForwarding.ForwardFromFileTypes, v.(string))
+		}
+		for _, v := range opt["forward_to_file_types"].(*schema.Set).List() {
+			opts.QueryStringForwarding.ForwardToFileTypes = append(opts.QueryStringForwarding.ForwardToFileTypes, v.(string))
+		}
+	}
 	if opt, ok := getOptByName(fields, "redirect_https_to_http"); ok {
 		opts.RedirectHttpsToHttp = &gcdn.RedirectHttpsToHttp{
 			Enabled: opt["enabled"].(bool),
@@ -764,6 +775,10 @@ func optionsToList(options *gcdn.Options) []interface{} {
 	if options.QueryParamsWhitelist != nil {
 		m := structToMap(options.QueryParamsWhitelist)
 		result["query_params_whitelist"] = []interface{}{m}
+	}
+	if options.QueryStringForwarding != nil {
+		m := structToMap(options.QueryStringForwarding)
+		result["query_string_forwarding"] = []interface{}{m}
 	}
 	if options.RedirectHttpsToHttp != nil {
 		m := structToMap(options.RedirectHttpsToHttp)

@@ -600,6 +600,33 @@ var (
 				},
 			},
 		},
+		"query_string_forwarding": {
+			Type:        schema.TypeList,
+			MaxItems:    1,
+			Optional:    true,
+			Description: "The Query String Forwarding feature allows for the seamless transfer of parameters embedded in playlist files to the corresponding media chunk files.",
+			Elem: &schema.Resource{
+				Schema: map[string]*schema.Schema{
+					"enabled": {
+						Type:     schema.TypeBool,
+						Optional: true,
+						Default:  true,
+					},
+					"forward_from_file_types": {
+						Type:        schema.TypeSet,
+						Elem:        &schema.Schema{Type: schema.TypeString},
+						Required:    true,
+						Description: "Specify the types of playlist files from which parameters will be extracted and forwarded.",
+					},
+					"forward_to_file_types": {
+						Type:        schema.TypeSet,
+						Elem:        &schema.Schema{Type: schema.TypeString},
+						Required:    true,
+						Description: "Specify the types of media chunk files to which parameters, extracted from playlist files, will be forwarded.",
+					},
+				},
+			},
+		},
 		"redirect_https_to_http": {
 			Type:        schema.TypeList,
 			MaxItems:    1,
