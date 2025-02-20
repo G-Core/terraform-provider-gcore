@@ -35,29 +35,32 @@ resource "gcore_gpu_virtual_image" "example" {
 }
 ```
 
-## Argument Reference
+## Schema
 
-The following arguments are supported:
+### Required
 
-* `project_id` - (Optional) The ID of the project. Conflicts with `project_name`.
-* `project_name` - (Optional) The name of the project. Conflicts with `project_id`.
-* `region_id` - (Optional) The ID of the region. Conflicts with `region_name`.
-* `region_name` - (Optional) The name of the region. Conflicts with `region_id`.
-* `name` - (Required) The name of the image. Must be unique within the project.
-* `url` - (Required) The URL from which to download the image.
-* `ssh_key` - (Optional) SSH key permission setting. Valid values are:
+* `name` - The name of the image. Must be unique within the project.
+* `url` - The URL from which to download the image.
+
+### Optional
+
+* `project_id` - The ID of the project. Conflicts with `project_name`.
+* `project_name` - The name of the project. Conflicts with `project_id`.
+* `region_id` - The ID of the region. Conflicts with `region_name`.
+* `region_name` - The name of the region. Conflicts with `region_id`.
+* `ssh_key` - SSH key permission setting. Valid values are:
   * `allow` - (Default) Allow SSH key usage
   * `deny` - Deny SSH key usage
   * `required` - Require SSH key
-* `cow_format` - (Optional) When set to `true`, the image cannot be deleted until all volumes created from it are deleted.
-* `architecture` - (Optional) CPU architecture type. Valid values are:
+* `cow_format` - When set to `true`, the image cannot be deleted until all volumes created from it are deleted.
+* `architecture` - CPU architecture type. Valid values are:
   * `x86_64` - (Default) x86 64-bit architecture
   * `aarch64` - ARM 64-bit architecture
-* `os_type` - (Optional) The type of operating system.
-* `os_distro` - (Optional) The distribution of the operating system (e.g., "ubuntu", "centos").
-* `os_version` - (Optional) The version of the operating system.
-* `hw_firmware_type` - (Optional) The type of firmware used for booting.
-* `metadata` - (Optional) A map of metadata key-value pairs to associate with the image.
+* `os_type` - The type of operating system.
+* `os_distro` - The distribution of the operating system (e.g., "ubuntu", "centos").
+* `os_version` - The version of the operating system.
+* `hw_firmware_type` - The type of firmware used for booting.
+* `metadata` - A map of metadata key-value pairs to associate with the image.
 
 ## Attribute Reference
 
