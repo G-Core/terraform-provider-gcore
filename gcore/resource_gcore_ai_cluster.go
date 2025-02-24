@@ -1098,6 +1098,39 @@ func resourceAIClusterUpdate(ctx context.Context, d *schema.ResourceData, m inte
 		}
 	}
 
+	// if only the image_id has changed, then we need to rebuild the cluster
+	if d.HasChange("image_id") && !d.HasChangesExcept("image_id") {
+		_, newImageID := d.GetChange("image_id")
+		cluster, err := ai.Get(clientV2, clusterID).Extract()
+		if err != nil {
+			return diag.FromErr(err)
+		}
+		var nodesIDs []string
+		for _, instance := range cluster.PoplarServer {
+			nodesIDs = append(nodesIDs, instance.ID)
+		}
+		rebuildOpts := ai.RebuildGPUAIClusterOpts{ImageID: newImageID.(string), Nodes: nodesIDs}
+
+		log.Printf("[DEBUG] GPU cluster rebuild options: %+v", rebuildOpts)
+		results, err := ai.RebuildGPUAICluster(clientV1GPU, clusterID, rebuildOpts).Extract()
+		if err != nil {
+			return diag.FromErr(err)
+		}
+		taskClient, err := CreateClient(provider, d, TaskPoint, versionPointV1)
+		if err != nil {
+			return diag.FromErr(err)
+		}
+		taskID := results.Tasks[0]
+		log.Printf("[DEBUG] GPU cluster task_id (%s)", taskID)
+
+		_, err = tasks.WaitTaskAndReturnResult(taskClient, taskID, true, AIClusterCreatingTimeout, func(task tasks.TaskID) (interface{}, error) {
+			return nil, nil
+		})
+		if err != nil {
+			return diag.FromErr(err)
+		}
+	}
+
 	log.Println("[DEBUG] Finish AI cluster updating")
 	return resourceAIClusterRead(ctx, d, m)
 }

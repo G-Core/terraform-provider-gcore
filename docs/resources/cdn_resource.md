@@ -139,6 +139,7 @@ Optional:
 - `proxy_read_timeout` (Block List, Max: 1) The time limit for receiving a partial response from the origin. If no response is received within this time, the connection will be closed. (see [below for nested schema](#nestedblock--options--proxy_read_timeout))
 - `query_params_blacklist` (Block List, Max: 1) Specify list of query strings. Files with those query strings will be cached as one object. (see [below for nested schema](#nestedblock--options--query_params_blacklist))
 - `query_params_whitelist` (Block List, Max: 1) Specify list of query strings. Files with those query strings will be cached as different objects. (see [below for nested schema](#nestedblock--options--query_params_whitelist))
+- `query_string_forwarding` (Block List, Max: 1) The Query String Forwarding feature allows for the seamless transfer of parameters embedded in playlist files to the corresponding media chunk files. (see [below for nested schema](#nestedblock--options--query_string_forwarding))
 - `redirect_http_to_https` (Block List, Max: 1) When enabled, HTTP requests are redirected to HTTPS. (see [below for nested schema](#nestedblock--options--redirect_http_to_https))
 - `redirect_https_to_http` (Block List, Max: 1) When enabled, HTTPS requests are redirected to HTTP. (see [below for nested schema](#nestedblock--options--redirect_https_to_http))
 - `referrer_acl` (Block List, Max: 1) Referrer access policy option allows to control access to the CDN Resource content for specified domain names. (see [below for nested schema](#nestedblock--options--referrer_acl))
@@ -484,6 +485,19 @@ Optional:
 Required:
 
 - `value` (Set of String)
+
+Optional:
+
+- `enabled` (Boolean)
+
+
+<a id="nestedblock--options--query_string_forwarding"></a>
+### Nested Schema for `options.query_string_forwarding`
+
+Required:
+
+- `forward_from_file_types` (Set of String) Specify the types of playlist files from which parameters will be extracted and forwarded.
+- `forward_to_file_types` (Set of String) Specify the types of media chunk files to which parameters, extracted from playlist files, will be forwarded.
 
 Optional:
 
