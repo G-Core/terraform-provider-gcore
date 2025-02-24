@@ -216,6 +216,18 @@ var (
 									Default:     true,
 									Description: "Determines if the request execution should be interrupted when an error occurs.",
 								},
+								"execute_on_edge": {
+									Type:        schema.TypeBool,
+									Optional:    true,
+									Default:     true,
+									Description: "Determines if the request should be executed at the edge nodes.",
+								},
+								"execute_on_shield": {
+									Type:        schema.TypeBool,
+									Optional:    true,
+									Default:     false,
+									Description: "Determines if the request should be executed at the shield nodes.",
+								},
 							},
 						},
 					},
