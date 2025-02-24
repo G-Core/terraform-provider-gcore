@@ -9,6 +9,8 @@ github.com/G-Core/gcore-storage-sdk-go v0.1.34 h1:0GPQfz1kA6mQi6fiisGsh0Um4H9PZe
 github.com/G-Core/gcore-storage-sdk-go v0.1.34/go.mod h1:BUAEZZZJJt/+luRFunqziv3+JnbVMLbQXDWz9kV8Te8=
 github.com/G-Core/gcorelabscdn-go v1.0.27 h1:XglfvHLYmb1NJxATig6bdPyN9DKdGt5vUlIc+kbpu6s=
 github.com/G-Core/gcorelabscdn-go v1.0.27/go.mod h1:iSGXaTvZBzDHQW+rKFS918BgFVpONcyLEijwh8WsXpE=
+github.com/G-Core/gcorelabscdn-go v1.0.28 h1:6ymVMV3HPTICO5BWJCEcZZzgY+Pc/+/TQMzeXMN77GQ=
+github.com/G-Core/gcorelabscdn-go v1.0.28/go.mod h1:iSGXaTvZBzDHQW+rKFS918BgFVpONcyLEijwh8WsXpE=
 github.com/G-Core/gcorelabscloud-go v0.11.0 h1:JzlEp0Cgm3i4lQFJKhscDK76uWYH2pQNzZOwKtvrMUQ=
 github.com/G-Core/gcorelabscloud-go v0.11.0/go.mod h1:13Z1USxlxPbDFuYQyWqfNexlk4kUvOYTXbnvV/Z1lZo=
 github.com/Microsoft/go-winio v0.6.1 h1:9/kr64B9VUZrLm5YYwbGtUJnMgqWVOdUAXu6Migciow=
