@@ -151,16 +151,10 @@ func resourceGPUImageCreate(ctx context.Context, d *schema.ResourceData, m inter
 		return diag.FromErr(err)
 	}
 
+	// Only use metadata explicitly defined by the user
 	metadata := make(map[string]interface{})
 	if v, ok := d.GetOk("metadata"); ok {
 		metadata = v.(map[string]interface{})
-	}
-
-	// Add additional metadata from specific fields
-	for _, field := range []string{"os_type", "os_distro", "os_version", "hw_firmware_type", "ssh_key"} {
-		if v, ok := d.GetOk(field); ok {
-			metadata[field] = v.(string)
-		}
 	}
 
 	opts := images.ImageOpts{
