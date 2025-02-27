@@ -23,8 +23,7 @@ resource "gcore_ai_cluster" "cluster1" {
   image_id = "f6aa6e75-ab88-4c19-889d-79133366cb83"
   cluster_name      = "cluster1"
   keypair_name = "front"
-  instances_count = 1
-  
+
   volume {
     source     = "image"
     image_id = "f6aa6e75-ab88-4c19-889d-79133366cb83"
@@ -60,6 +59,7 @@ resource "gcore_ai_cluster" "cluster1" {
 
 - `cluster_metadata` (Map of String) Cluster metadata (simple key-value pairs)
 - `cluster_status` (String) AI Cluster status
+- `instances_count` (Number) Number of instances to create
 - `keypair_name` (String) Ssh keypair name
 - `password` (String) A password for baremetal instance. This parameter is used to set a password for the Admin user on a Windows instance, a default user or a new user on a Linux instance
 - `project_id` (Number)
@@ -70,7 +70,6 @@ resource "gcore_ai_cluster" "cluster1" {
 - `user_data` (String) String in base64 format. Must not be passed together with 'username' or 'password'. Examples of the user_data: https://cloudinit.readthedocs.io/en/latest/topics/examples.html
 - `username` (String) A name of a new user in the Linux instance. It may be passed with a 'password' parameter
 - `volume` (Block Set) List of volumes attached to the cluster (see [below for nested schema](#nestedblock--volume))
-- `instances_count` (Number) Number of instances in the cluster
 
 ### Read-Only
 
@@ -104,9 +103,12 @@ Optional:
 <a id="nestedblock--volume"></a>
 ### Nested Schema for `volume`
 
-Optional:
+Required:
 
 - `image_id` (String) Volume ID. Mandatory if volume is pre-existing volume
+
+Optional:
+
 - `name` (String) Volume name
 - `size` (Number) Volume size, GiB
 - `source` (String) Currently available only value
