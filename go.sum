@@ -15,6 +15,8 @@ github.com/G-Core/gcorelabscdn-go v1.0.28 h1:6ymVMV3HPTICO5BWJCEcZZzgY+Pc/+/TQMz
 github.com/G-Core/gcorelabscdn-go v1.0.28/go.mod h1:iSGXaTvZBzDHQW+rKFS918BgFVpONcyLEijwh8WsXpE=
 github.com/G-Core/gcorelabscloud-go v0.11.0 h1:JzlEp0Cgm3i4lQFJKhscDK76uWYH2pQNzZOwKtvrMUQ=
 github.com/G-Core/gcorelabscloud-go v0.11.0/go.mod h1:13Z1USxlxPbDFuYQyWqfNexlk4kUvOYTXbnvV/Z1lZo=
+github.com/G-Core/gcorelabscloud-go v0.13.0 h1:3/xR+SNfqohI+93cJ8gZEFpBmJvSBu1PL8HpMdT1Uc4=
+github.com/G-Core/gcorelabscloud-go v0.13.0/go.mod h1:13Z1USxlxPbDFuYQyWqfNexlk4kUvOYTXbnvV/Z1lZo=
 github.com/Kunde21/markdownfmt/v3 v3.1.0 h1:KiZu9LKs+wFFBQKhrZJrFZwtLnCCWJahL+S+E/3VnM0=
 github.com/Kunde21/markdownfmt/v3 v3.1.0/go.mod h1:tPXN1RTyOzJwhfHoon9wUr4HGYmWgVxSQN6VBJDkrVc=
 github.com/Masterminds/goutils v1.1.1 h1:5nUrii3FMTL5diU80unEVvNevw1nH4+ZV4DSLVJLSYI=
