@@ -129,6 +129,7 @@ func resourceInferenceDeployment() *schema.Resource {
 						"polling_interval": &schema.Schema{
 							Type:        schema.TypeInt,
 							Optional:    true,
+							Computed:    true,
 							Description: "Polling interval for scaling triggers in seconds",
 						},
 						"triggers_cpu_threshold": &schema.Schema{
@@ -308,8 +309,12 @@ func resourceInferenceDeploymentCreate(ctx context.Context, d *schema.ResourceDa
 		opts.Timeout = &timeout
 	}
 
-	if v, ok := d.GetOk("envs"); ok {
-		envs := v.(map[string]string)
+	if val, ok := d.GetOk("envs"); ok {
+		envsRaw := val.(map[string]interface{})
+		envs := make(map[string]string, len(envsRaw))
+		for k, v := range envsRaw {
+			envs[k] = v.(string)
+		}
 		opts.Envs = envs
 	}
 
@@ -624,7 +629,11 @@ func resourceInferenceDeploymentUpdate(ctx context.Context, d *schema.ResourceDa
 	}
 
 	if d.HasChange("envs") {
-		envs := d.Get("envs").(map[string]string)
+		envsRaw := d.Get("envs").(map[string]interface{})
+		envs := make(map[string]string, len(envsRaw))
+		for k, v := range envsRaw {
+			envs[k] = v.(string)
+		}
 		opts.Envs = envs
 	}
 
