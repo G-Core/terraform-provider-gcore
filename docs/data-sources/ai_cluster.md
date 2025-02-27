@@ -3,12 +3,12 @@
 page_title: "gcore_ai_cluster Data Source - terraform-provider-gcore"
 subcategory: ""
 description: |-
-  Represent AI Cluster
+  Represent GPU Cluster
 ---
 
 # gcore_ai_cluster (Data Source)
 
-Represent AI Cluster
+Represent GPU Cluster
 
 ## Example Usage
 
@@ -64,7 +64,7 @@ output "view" {
 - `interface` (List of Object) Networks managed by user and associated with the cluster (see [below for nested schema](#nestedatt--interface))
 - `keypair_name` (String) Ssh keypair name
 - `password` (String) A password for baremetal instance. This parameter is used to set a password for the Admin user on a Windows instance, a default user or a new user on a Linux instance
-- `poplar_servers` (List of Object) Poplar servers (see [below for nested schema](#nestedatt--poplar_servers))
+- `poplar_servers` (List of Object) GPU cluster servers list (see [below for nested schema](#nestedatt--poplar_servers))
 - `security_group` (Set of Object) Security groups attached to the cluster (see [below for nested schema](#nestedatt--security_group))
 - `task_id` (String) Task ID associated with the cluster
 - `task_status` (String) Task status

@@ -54,7 +54,7 @@ func resourceAICluster() *schema.Resource {
 		ReadContext:   resourceAIClusterRead,
 		UpdateContext: resourceAIClusterUpdate,
 		DeleteContext: resourceAIClusterDelete,
-		Description:   "Represent instance",
+		Description:   "Represent GPU cluster",
 		Importer: &schema.ResourceImporter{
 			StateContext: func(ctx context.Context, d *schema.ResourceData, meta interface{}) ([]*schema.ResourceData, error) {
 				projectID, regionID, clusterID, err := ImportStringParser(d.Id())
@@ -78,6 +78,7 @@ func resourceAICluster() *schema.Resource {
 					"project_name",
 				},
 				DiffSuppressFunc: suppressDiffProjectID,
+				Description:      "Project ID, only one of project_id or project_name should be set",
 			},
 			"region_id": {
 				Type:     schema.TypeInt,
@@ -87,6 +88,7 @@ func resourceAICluster() *schema.Resource {
 					"region_name",
 				},
 				DiffSuppressFunc: suppressDiffRegionID,
+				Description:      "Region ID, only one of region_id or region_name should be set",
 			},
 			"project_name": {
 				Type:     schema.TypeString,
@@ -95,6 +97,7 @@ func resourceAICluster() *schema.Resource {
 					"project_id",
 					"project_name",
 				},
+				Description: "Project name, only one of project_id or project_name should be set",
 			},
 			"region_name": {
 				Type:     schema.TypeString,
@@ -104,20 +107,21 @@ func resourceAICluster() *schema.Resource {
 					"region_id",
 					"region_name",
 				},
+				Description: "Region name, only one of region_id or region_name should be set",
 			},
 			"cluster_name": {
 				Type:        schema.TypeString,
-				Description: "AI Cluster Name",
+				Description: "GPU Cluster Name",
 				Required:    true,
 			},
 			"instances_count": {
 				Type:        schema.TypeInt,
-				Description: "Number of instances to create",
+				Description: "Number of servers in the GPU cluster",
 				Optional:    true,
 			},
 			"cluster_status": {
 				Type:        schema.TypeString,
-				Description: "AI Cluster status",
+				Description: "GPU Cluster status",
 				Optional:    true,
 				Computed:    true,
 			},
@@ -138,7 +142,7 @@ func resourceAICluster() *schema.Resource {
 			},
 			"created_at": {
 				Type:        schema.TypeString,
-				Description: "Datetime when the cluster was created",
+				Description: "Datetime when the GPU cluster was created",
 				Computed:    true,
 			},
 			"flavor": {
@@ -330,12 +334,12 @@ func resourceAICluster() *schema.Resource {
 			},
 			"keypair_name": {
 				Type:        schema.TypeString,
-				Description: "Ssh keypair name",
+				Description: "The name of the SSH keypair to use for the GPU servers",
 				Optional:    true,
 			},
 			"user_data": {
 				Type:        schema.TypeString,
-				Description: "String in base64 format. Must not be passed together with 'username' or 'password'. Examples of the user_data: https://cloudinit.readthedocs.io/en/latest/topics/examples.html",
+				Description: "User data string in base64 format. This is passed to the instance at launch. For Linux instances, 'user_data' is ignored when 'password' field is provided. For Windows instances, Admin user password is set by 'password' field and cannot be updated via 'user_data'",
 				Optional:    true,
 				Computed:    true,
 			},
@@ -347,13 +351,13 @@ func resourceAICluster() *schema.Resource {
 			},
 			"password": {
 				Type:        schema.TypeString,
-				Description: "A password for baremetal instance. This parameter is used to set a password for the Admin user on a Windows instance, a default user or a new user on a Linux instance",
+				Description: "A password for servers in GPU cluster. This parameter is used to set a password for the Admin user on a Windows instance, a default user or a new user on a Linux instance",
 				Optional:    true,
 				Computed:    true,
 			},
 			"cluster_metadata": {
 				Type:        schema.TypeMap,
-				Description: "Cluster metadata (simple key-value pairs)",
+				Description: "A map of metadata items. Key-value pairs for GPU cluster metadata. Example: {'environment': 'production', 'owner': 'user'}",
 				Optional:    true,
 				Computed:    true,
 				Elem: &schema.Schema{
@@ -362,27 +366,28 @@ func resourceAICluster() *schema.Resource {
 			},
 			"poplar_servers": {
 				Type:        schema.TypeList,
-				Description: "Poplar servers",
+				Description: "GPU cluster servers list",
 				Computed:    true,
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
 						"instance_id": {
 							Type:        schema.TypeString,
-							Description: "Instance ID",
+							Description: "GPU Server ID",
 							Computed:    true,
 						},
 						"flavor_id": {
 							Type:        schema.TypeString,
-							Description: "",
+							Description: "Flavor id",
 							Computed:    true,
 						},
 						"flavor": {
-							Type:     schema.TypeMap,
-							Computed: true,
+							Type:        schema.TypeMap,
+							Description: "GPU flavor map",
+							Computed:    true,
 						},
 						"metadata": {
 							Type:        schema.TypeMap,
-							Description: "VM metadata",
+							Description: "GPU server metadata",
 							Computed:    true,
 							Elem: &schema.Schema{
 								Type: schema.TypeString,
@@ -390,27 +395,27 @@ func resourceAICluster() *schema.Resource {
 						},
 						"instance_name": {
 							Type:        schema.TypeString,
-							Description: "Instance name",
+							Description: "GPU server name",
 							Computed:    true,
 						},
 						"instance_description": {
 							Type:        schema.TypeString,
-							Description: "Instance description",
+							Description: "GPU server description",
 							Computed:    true,
 						},
 						"instance_created": {
 							Type:        schema.TypeString,
-							Description: "Datetime when instance was created",
+							Description: "Datetime when GPU server was created",
 							Computed:    true,
 						},
 						"status": {
 							Type:        schema.TypeString,
-							Description: "VM status",
+							Description: "GPU server status",
 							Computed:    true,
 						},
 						"vm_state": {
 							Type:        schema.TypeString,
-							Description: "Virtual machine state (active)",
+							Description: "GPU server state (active)",
 							Computed:    true,
 						},
 						"task_state": {
@@ -420,7 +425,7 @@ func resourceAICluster() *schema.Resource {
 						},
 						"volumes": {
 							Type:        schema.TypeSet,
-							Description: "List of volumes",
+							Description: "List of volumes (for virtual GPU clusters)",
 							Computed:    true,
 							Elem: &schema.Resource{
 								Schema: map[string]*schema.Schema{
@@ -438,8 +443,9 @@ func resourceAICluster() *schema.Resource {
 							},
 						},
 						"addresses": {
-							Type:     schema.TypeSet,
-							Computed: true,
+							Type:        schema.TypeSet,
+							Computed:    true,
+							Description: "List of server addresses",
 							Elem: &schema.Resource{
 								Schema: map[string]*schema.Schema{
 									"network_name": {
@@ -453,12 +459,14 @@ func resourceAICluster() *schema.Resource {
 										Elem: &schema.Resource{
 											Schema: map[string]*schema.Schema{
 												"addr": {
-													Type:     schema.TypeString,
-													Computed: true,
+													Type:        schema.TypeString,
+													Computed:    true,
+													Description: "The IP address of the interface",
 												},
 												"type": {
-													Type:     schema.TypeString,
-													Computed: true,
+													Type:        schema.TypeString,
+													Computed:    true,
+													Description: "The type of IP address",
 												},
 											},
 										},
@@ -543,24 +551,6 @@ func checkAIClusterStatus(client *gcorecloud.ServiceClient, clusterID string, de
 }
 
 func validateCreateOpts(createOpts *ai.CreateOpts) error {
-	if !isBmFlavor(createOpts.Flavor) && len(createOpts.Volumes) == 0 {
-		return errors.New("at least one image volume is required for vm poplar cluster")
-	}
-	if !isBmFlavor(createOpts.Flavor) && len(createOpts.Volumes) > 0 && createOpts.Volumes[0].Source != types.Image {
-		return errors.New("the first volume must be image volume for vm poplar cluster")
-	}
-	var imageSourceCount int
-	for _, volume := range createOpts.Volumes {
-		if volume.Source == types.Image {
-			imageSourceCount++
-			if volume.ImageID != createOpts.ImageID {
-				return fmt.Errorf("cluster image '%s' is not equal boot bolume image '%s'", createOpts.ImageID, volume.ImageID)
-			}
-		}
-	}
-	if !isBmFlavor(createOpts.Flavor) && imageSourceCount > 1 {
-		return errors.New("only one image volume is allowed")
-	}
 	if len(createOpts.Interfaces) == 0 {
 		return errors.New("At least one interface is required")
 	}
@@ -574,15 +564,6 @@ func validateCreateOpts(createOpts *ai.CreateOpts) error {
 		return errors.New("only one external interface is allowed")
 	}
 
-	return nil
-}
-
-func validateAttachVolumes(volumes []interface{}) error {
-	for _, volume := range volumes {
-		if volume.(map[string]interface{})["type"].(string) != string(types.ExistingVolume) {
-			return fmt.Errorf("Only '%s' volume type is allowed", types.ExistingVolume)
-		}
-	}
 	return nil
 }
 

@@ -25,7 +25,7 @@ const (
 func dataSourceAICluster() *schema.Resource {
 	return &schema.Resource{
 		ReadContext: dataSourceAIClusterRead,
-		Description: "Represent AI Cluster",
+		Description: "Represent GPU Cluster",
 		Schema: map[string]*schema.Schema{
 			"project_id": &schema.Schema{
 				Type:     schema.TypeInt,
@@ -297,7 +297,7 @@ func dataSourceAICluster() *schema.Resource {
 			},
 			"poplar_servers": {
 				Type:        schema.TypeList,
-				Description: "Poplar servers",
+				Description: "GPU cluster servers list",
 				Computed:    true,
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
