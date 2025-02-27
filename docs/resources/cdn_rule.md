@@ -294,6 +294,8 @@ Required:
 Optional:
 
 - `enabled` (Boolean) Determines if the FastEdge application should be called whenever HTTP request headers are received.
+- `execute_on_edge` (Boolean) Determines if the request should be executed at the edge nodes.
+- `execute_on_shield` (Boolean) Determines if the request should be executed at the shield nodes.
 - `interrupt_on_error` (Boolean) Determines if the request execution should be interrupted when an error occurs.
 
 

@@ -340,6 +340,8 @@ func listToOptions(l []interface{}) *gcdn.Options {
 				Enabled:          onRequestHeaders["enabled"].(bool),
 				AppID:            onRequestHeaders["app_id"].(string),
 				InterruptOnError: onRequestHeaders["interrupt_on_error"].(bool),
+				ExecuteOnEdge:    onRequestHeaders["execute_on_edge"].(bool),
+				ExecuteOnShield:  onRequestHeaders["execute_on_shield"].(bool),
 			}
 		}
 	}
