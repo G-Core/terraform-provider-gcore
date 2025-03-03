@@ -181,6 +181,11 @@ func resourceSecurityGroup() *schema.Resource {
 							Optional: true,
 							Default:  "",
 						},
+						"remote_group_id": &schema.Schema{
+							Type:     schema.TypeString,
+							Optional: true,
+							Default:  "",
+						},
 						"updated_at": &schema.Schema{
 							Type:     schema.TypeString,
 							Computed: true,
@@ -465,6 +470,11 @@ func convertSecurityGroupRules(rules []securitygroups.SecurityGroupRule) []inter
 			r["remote_ip_prefix"] = *sgr.RemoteIPPrefix
 		}
 
+		r["remote_group_id"] = ""
+		if sgr.RemoteGroupID != nil {
+			r["remote_group_id"] = *sgr.RemoteGroupID
+		}
+
 		r["updated_at"] = sgr.UpdatedAt.String()
 		r["created_at"] = sgr.CreatedAt.String()
 
@@ -482,6 +492,7 @@ func convertToSecurityGroupRules(rawRules []interface{}) []securitygroups.Create
 		portRangeMin := rule["port_range_min"].(int)
 		descr := rule["description"].(string)
 		remoteIPPrefix := rule["remote_ip_prefix"].(string)
+		remoteGroupID := rule["remote_group_id"].(string)
 
 		sgrOpts := securitygroups.CreateSecurityGroupRuleOpts{
 			Direction:   types.RuleDirection(rule["direction"].(string)),
@@ -492,6 +503,10 @@ func convertToSecurityGroupRules(rawRules []interface{}) []securitygroups.Create
 
 		if remoteIPPrefix != "" {
 			sgrOpts.RemoteIPPrefix = &remoteIPPrefix
+		}
+
+		if remoteGroupID != "" {
+			sgrOpts.RemoteGroupID = &remoteGroupID
 		}
 
 		if portRangeMax != 0 && portRangeMin != 0 {

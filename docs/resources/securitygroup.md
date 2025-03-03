@@ -83,6 +83,7 @@ Optional:
 - `description` (String)
 - `port_range_max` (Number)
 - `port_range_min` (Number)
+- `remote_group_id` (String)
 - `remote_ip_prefix` (String)
 
 Read-Only:

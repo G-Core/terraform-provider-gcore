@@ -132,6 +132,10 @@ func dataSourceSecurityGroup() *schema.Resource {
 							Type:     schema.TypeString,
 							Computed: true,
 						},
+						"remote_group_id": &schema.Schema{
+							Type:     schema.TypeString,
+							Computed: true,
+						},
 						"updated_at": &schema.Schema{
 							Type:     schema.TypeString,
 							Computed: true,
@@ -244,6 +248,11 @@ func dataSourceSecurityGroupRead(ctx context.Context, d *schema.ResourceData, m 
 		r["remote_ip_prefix"] = ""
 		if sgr.RemoteIPPrefix != nil {
 			r["remote_ip_prefix"] = *sgr.RemoteIPPrefix
+		}
+
+		r["remote_group_id"] = ""
+		if sgr.RemoteGroupID != nil {
+			r["remote_group_id"] = *sgr.RemoteGroupID
 		}
 
 		r["updated_at"] = sgr.UpdatedAt.String()
