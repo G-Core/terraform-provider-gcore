@@ -286,6 +286,9 @@ func providerConfigure(_ context.Context, d *schema.ResourceData) (interface{}, 
 		log.Printf("[ERROR] init auth client: %s\n", err)
 	}
 	provider.UserAgent.Prepend(fmt.Sprintf(DefaultUserAgent, AppVersion))
+	// enable retries on Get requests with 5XX status codes using exponential backoff strategy with a maximum of 3
+	// retries and a base interval of 2 seconds
+	provider.EnableGetRetriesOn5XX(3, 2)
 
 	cdnProvider := gcdnProvider.NewClient(cdnAPI, gcdnProvider.WithSignerFunc(func(req *http.Request) error {
 		for k, v := range provider.AuthenticatedHeaders() {
