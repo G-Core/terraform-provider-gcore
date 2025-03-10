@@ -61,7 +61,7 @@ func resourceStorageS3() *schema.Resource {
 				ForceNew: true,
 				ValidateDiagFunc: func(v interface{}, path cty.Path) diag.Diagnostics {
 					val := v.(string)
-					allowed := []string{"s-ed1", "s-darz1", "s-ws1", "s-dt2", "s-drc2"}
+					allowed := []string{"s-ed1", "s-darz", "s-darz1", "s-ws1", "s-dt2", "s-drc2"}
 					for _, el := range allowed {
 						if el == val {
 							return nil
@@ -69,7 +69,7 @@ func resourceStorageS3() *schema.Resource {
 					}
 					return diag.Errorf(`must be one of %+v`, allowed)
 				},
-				Description: "A location of new storage resource. One of (s-ed1, s-darz1, s-ws1, s-dt2, s-drc2)",
+				Description: "A location of new storage resource. One of (s-ed1, s-darz, s-darz1, s-ws1, s-dt2, s-drc2)",
 			},
 			StorageS3SchemaGenerateAccessKey: {
 				Type:        schema.TypeString,
