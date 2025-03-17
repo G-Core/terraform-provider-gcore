@@ -160,6 +160,7 @@ resource "gcore_reservedfixedip" "fixed_ip_by_port" {
 
 - `allowed_address_pairs` (Block List) Group of IP addresses that share the current IP as VIP (see [below for nested schema](#nestedblock--allowed_address_pairs))
 - `fixed_ip_address` (String) IP address of the port. Can be passed with type `ip_address` or retrieved after creation.
+- `ip_family` (String) IP family of the reserved fixed ip to create. Available values are 'ipv4', 'ipv6', 'dual'
 - `is_vip` (Boolean) Flag to indicate whether the port is a virtual IP address.
 - `network_id` (String) ID of the desired network. Should be used together with `subnet_id`.
 - `port_id` (String) ID of the port underlying the reserved fixed IP. Can be passed with type `port` or retrieved after creation.

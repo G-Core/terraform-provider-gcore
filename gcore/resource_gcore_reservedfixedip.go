@@ -169,6 +169,19 @@ func resourceReservedFixedIP() *schema.Resource {
 					},
 				},
 			},
+			"ip_family": &schema.Schema{
+				Type:        schema.TypeString,
+				Optional:    true,
+				Description: fmt.Sprintf("IP family of the reserved fixed ip to create. Available values are '%s', '%s', '%s'", reservedfixedips.IPv4IPFamilyType, reservedfixedips.IPv6IPFamilyType, reservedfixedips.DualStackIPFamilyType),
+				ValidateDiagFunc: func(val interface{}, key cty.Path) diag.Diagnostics {
+					v := val.(string)
+					switch reservedfixedips.IPFamilyType(v) {
+					case reservedfixedips.IPv4IPFamilyType, reservedfixedips.IPv6IPFamilyType, reservedfixedips.DualStackIPFamilyType:
+						return diag.Diagnostics{}
+					}
+					return diag.Errorf("wrong type %s, available values are '%s', '%s', '%s'", v, reservedfixedips.IPv4IPFamilyType, reservedfixedips.IPv6IPFamilyType, reservedfixedips.DualStackIPFamilyType)
+				},
+			},
 			"last_updated": &schema.Schema{
 				Type:        schema.TypeString,
 				Description: "Datetime when reserved fixed ip was updated at the last time.",
@@ -250,6 +263,7 @@ func resourceReservedFixedIPCreate(ctx context.Context, d *schema.ResourceData, 
 	}
 
 	opts.Type = reservedfixedips.ReservedFixedIPType(portType)
+	opts.IPFamily = reservedfixedips.IPFamilyType(d.Get("ip_family").(string))
 	results, err := reservedfixedips.Create(client, opts).Extract()
 	if err != nil {
 		return diag.FromErr(err)
