@@ -15,6 +15,8 @@ require (
 	github.com/mitchellh/mapstructure v1.5.0
 )
 
+replace github.com/G-Core/gcorelabscdn-go => /Users/pawel/Projects/gcore/gcorelabscdn-go
+
 require (
 	github.com/ProtonMail/go-crypto v1.1.0-alpha.2 // indirect
 	github.com/agext/levenshtein v1.2.3 // indirect
