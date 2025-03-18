@@ -144,6 +144,25 @@ func resourceLoadBalancerV2() *schema.Resource {
 				Optional:    true,
 				Computed:    true,
 			},
+			"additional_vips": &schema.Schema{
+				Type:        schema.TypeList,
+				Description: "Load Balancer additional VIPs",
+				Computed:    true,
+				Elem: &schema.Resource{
+					Schema: map[string]*schema.Schema{
+						"ip_address": {
+							Type:        schema.TypeString,
+							Description: "Load Balancer additional VIP",
+							Computed:    true,
+						},
+						"subnet_id": {
+							Type:        schema.TypeString,
+							Description: "Load Balancer additional VIP subnet ID",
+							Computed:    true,
+						},
+					},
+				},
+			},
 			"last_updated": &schema.Schema{
 				Type:        schema.TypeString,
 				Description: "Datetime when load balancer was updated at the last time.",
@@ -274,6 +293,7 @@ func resourceLoadBalancerV2Read(ctx context.Context, d *schema.ResourceData, m i
 	d.Set("vrrp_ips", lb.VrrpIPs)
 	d.Set("vip_ip_family", lb.VipIPFamilyType)
 	d.Set("preferred_connectivity", lb.PreferredConnectivity)
+	d.Set("additional_vips", lb.AdditionalVips)
 
 	if lb.VipAddress != nil {
 		d.Set("vip_address", lb.VipAddress.String())
