@@ -101,6 +101,25 @@ func dataSourceLoadBalancerV2() *schema.Resource {
 				Description: fmt.Sprintf("Available values are '%s', '%s'", types.PreferredConnectivityL2, types.PreferredConnectivityL3),
 				Computed:    true,
 			},
+			"additional_vips": &schema.Schema{
+				Type:        schema.TypeList,
+				Description: "Load Balancer additional VIPs",
+				Computed:    true,
+				Elem: &schema.Resource{
+					Schema: map[string]*schema.Schema{
+						"ip_address": {
+							Type:        schema.TypeString,
+							Description: "Load Balancer additional VIP",
+							Computed:    true,
+						},
+						"subnet_id": {
+							Type:        schema.TypeString,
+							Description: "Load Balancer additional VIP subnet ID",
+							Computed:    true,
+						},
+					},
+				},
+			},
 			"metadata_k": &schema.Schema{
 				Type:        schema.TypeString,
 				Description: "Metadata string of the load balancer.",
@@ -197,6 +216,14 @@ func dataSourceLoadBalancerV2Read(ctx context.Context, d *schema.ResourceData, m
 		vrrpIps[i] = v
 	}
 
+	additionalVIPs := make([]map[string]string, len(lb.AdditionalVips))
+	for i, vip := range lb.AdditionalVips {
+		v := map[string]string{"subnet_id": "", "ip_address": ""}
+		v["subnet_id"] = vip.SubnetID
+		v["ip_address"] = vip.IpAddress.String()
+		additionalVIPs[i] = v
+	}
+
 	d.SetId(lb.ID)
 	d.Set("project_id", lb.ProjectID)
 	d.Set("region_id", lb.RegionID)
@@ -206,6 +233,7 @@ func dataSourceLoadBalancerV2Read(ctx context.Context, d *schema.ResourceData, m
 	d.Set("vrrp_ips", vrrpIps)
 	d.Set("vip_ip_family", lb.VipIPFamilyType)
 	d.Set("preferred_connectivity", lb.PreferredConnectivity)
+	d.Set("additional_vips", additionalVIPs)
 
 	log.Println("[DEBUG] Finish LoadBalancer reading")
 	return diags
