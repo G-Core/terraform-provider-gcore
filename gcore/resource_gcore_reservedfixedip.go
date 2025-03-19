@@ -123,12 +123,22 @@ func resourceReservedFixedIP() *schema.Resource {
 					return diag.FromErr(fmt.Errorf("%q must be a valid ip, got: %s", key, v))
 				},
 			},
+			"fixed_ipv6_address": &schema.Schema{
+				Type:        schema.TypeString,
+				Description: "IPv6 address of the port.",
+				Computed:    true,
+			},
 			"subnet_id": &schema.Schema{
 				Type:        schema.TypeString,
 				Description: "ID of the desired subnet. Can be used together with `network_id`.",
 				Optional:    true,
 				Computed:    true,
 				ForceNew:    true,
+			},
+			"subnet_v6_id": &schema.Schema{
+				Type:        schema.TypeString,
+				Description: "ID of the IPv6 subnet.",
+				Computed:    true,
 			},
 			"network_id": &schema.Schema{
 				Type:        schema.TypeString,
@@ -321,7 +331,9 @@ func resourceReservedFixedIPRead(ctx context.Context, d *schema.ResourceData, m 
 	d.Set("region_id", reservedFixedIP.RegionID)
 	d.Set("status", reservedFixedIP.Status)
 	d.Set("fixed_ip_address", reservedFixedIP.FixedIPAddress.String())
+	d.Set("fixed_ipv6_address", reservedFixedIP.FixedIPv6Address.String())
 	d.Set("subnet_id", reservedFixedIP.SubnetID)
+	d.Set("subnet_v6_id", reservedFixedIP.Subnetv6ID)
 	d.Set("network_id", reservedFixedIP.NetworkID)
 	d.Set("is_vip", reservedFixedIP.IsVip)
 	d.Set("port_id", reservedFixedIP.PortID)
