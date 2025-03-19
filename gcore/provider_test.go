@@ -46,7 +46,6 @@ const (
 	GCORE_SUBNET_ID_VAR            VarName = "GCORE_SUBNET_ID"
 	GCORE_CLUSTER_ID_VAR           VarName = "GCORE_CLUSTER_ID"
 	GCORE_CLUSTER_POOL_ID_VAR      VarName = "GCORE_CLUSTER_POOL_ID"
-	GCORE_FASTEDGE_URL_VAR         VarName = "GCORE_FASTEDGE_API"
 )
 
 func getEnv(name VarName) string {
@@ -77,7 +76,6 @@ var (
 	GCORE_SUBNET_ID            = getEnv(GCORE_SUBNET_ID_VAR)
 	GCORE_CLUSTER_ID           = getEnv(GCORE_CLUSTER_ID_VAR)
 	GCORE_CLUSTER_POOL_ID      = getEnv(GCORE_CLUSTER_POOL_ID_VAR)
-	GCORE_FASTEDGE_API         = getEnv(GCORE_FASTEDGE_URL_VAR)
 )
 
 var varsMap = map[VarName]string{
@@ -104,7 +102,6 @@ var varsMap = map[VarName]string{
 	GCORE_SUBNET_ID_VAR:            GCORE_SUBNET_ID,
 	GCORE_CLUSTER_ID_VAR:           GCORE_CLUSTER_ID,
 	GCORE_CLUSTER_POOL_ID_VAR:      GCORE_CLUSTER_POOL_ID,
-	GCORE_FASTEDGE_URL_VAR:         GCORE_FASTEDGE_API,
 }
 
 func testAccPreCheckVars(t *testing.T, vars ...VarName) {

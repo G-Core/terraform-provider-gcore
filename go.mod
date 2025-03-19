@@ -16,7 +16,7 @@ require (
 )
 
 require (
-	github.com/G-Core/FastEdge-client-sdk-go v0.3.2 // indirect
+	github.com/G-Core/FastEdge-client-sdk-go v0.3.3 // indirect
 	github.com/ProtonMail/go-crypto v1.1.0-alpha.2 // indirect
 	github.com/agext/levenshtein v1.2.3 // indirect
 	github.com/apapsch/go-jsonmerge/v2 v2.0.0 // indirect

@@ -23,12 +23,12 @@ func resourceFastEdgeBinary() *schema.Resource {
 		},
 		Schema: map[string]*schema.Schema{
 			"filename": {
-				Description: "WebAssembly binary file to upload",
+				Description: "WebAssembly binary file to upload.",
 				Type:        schema.TypeString,
 				Required:    true,
 				ForceNew:    true, // new resource on filename change
 				// make sure file exists and is readable
-				ValidateFunc: func(v interface{}, k string) (ws []string, errors []error) {
+				ValidateFunc: func(v interface{}, k string) ([]string, []error) {
 					f, err := os.Open(v.(string))
 					if err != nil {
 						return nil, []error{err}
@@ -38,7 +38,7 @@ func resourceFastEdgeBinary() *schema.Resource {
 				},
 			},
 			"checksum": {
-				Description: "Binary checksum",
+				Description: "Binary checksum.",
 				Type:        schema.TypeString,
 				Computed:    true,
 				Optional:    true,
@@ -48,7 +48,7 @@ func resourceFastEdgeBinary() *schema.Resource {
 		CreateContext: resourceFastEdgeBinaryUpload,
 		ReadContext:   resourceFastEdgeBinaryRead,
 		DeleteContext: resourceFastEdgeBinaryDelete,
-		Description:   "WebAssembly binary to use in FastEdge applications",
+		Description:   "WebAssembly binary to use in FastEdge applications.",
 		// calculate file checksum to detect file content change
 		CustomizeDiff: func(_ context.Context, diff *schema.ResourceDiff, meta interface{}) error {
 			checksum, err := fileChecksum(diff.Get("filename").(string))

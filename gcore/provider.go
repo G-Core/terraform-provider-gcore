@@ -182,6 +182,7 @@ func Provider() *schema.Provider {
 			"gcore_gpu_baremetal_image":  resourceBaremetalImage(),
 			"gcore_gpu_virtual_image":    resourceVirtualImage(),
 			"gcore_fastedge_binary":      resourceFastEdgeBinary(),
+			"gcore_fastedge_app":         resourceFastEdgeApp(),
 		},
 		DataSourcesMap: map[string]*schema.Resource{
 			"gcore_ai_cluster":             dataSourceAICluster(),

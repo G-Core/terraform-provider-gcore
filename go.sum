@@ -9,6 +9,8 @@ github.com/G-Core/FastEdge-client-sdk-go v0.3.1 h1:qtBjlw0tGxztQ6PSqwGJxfo0BZ1su
 github.com/G-Core/FastEdge-client-sdk-go v0.3.1/go.mod h1:ggyUVhy8/OCMBY4nbm7n9qDoPioROCk4vHhDJq9w7qE=
 github.com/G-Core/FastEdge-client-sdk-go v0.3.2 h1:y14idg5d6b56myXf2KdwmW78U1M39qvxOc4WRKAuYfM=
 github.com/G-Core/FastEdge-client-sdk-go v0.3.2/go.mod h1:ggyUVhy8/OCMBY4nbm7n9qDoPioROCk4vHhDJq9w7qE=
+github.com/G-Core/FastEdge-client-sdk-go v0.3.3 h1:HnJTL4y5VhRSVZtWMfy0325SpcS3OEg4njEOkS+BHaY=
+github.com/G-Core/FastEdge-client-sdk-go v0.3.3/go.mod h1:ggyUVhy8/OCMBY4nbm7n9qDoPioROCk4vHhDJq9w7qE=
 github.com/G-Core/gcore-dns-sdk-go v0.2.9 h1:LMMZIRX8y3aJJuAviNSpFmLbovZUw+6Om+8VElp1F90=
 github.com/G-Core/gcore-dns-sdk-go v0.2.9/go.mod h1:35t795gOfzfVanhzkFyUXEzaBuMXwETmJldPpP28MN4=
 github.com/G-Core/gcore-storage-sdk-go v0.1.34 h1:0GPQfz1kA6mQi6fiisGsh0Um4H9PZeHWIPsc825cDrY=
