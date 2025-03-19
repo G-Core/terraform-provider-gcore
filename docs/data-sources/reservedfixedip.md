@@ -53,12 +53,14 @@ output "view" {
 ### Read-Only
 
 - `allowed_address_pairs` (List of Object) (see [below for nested schema](#nestedatt--allowed_address_pairs))
+- `fixed_ipv6_address` (String)
 - `id` (String) The ID of this resource.
 - `is_vip` (Boolean)
 - `network_id` (String)
 - `port_id` (String) ID of the port_id underlying the reserved fixed IP
 - `status` (String)
 - `subnet_id` (String)
+- `subnet_v6_id` (String)
 
 <a id="nestedatt--allowed_address_pairs"></a>
 ### Nested Schema for `allowed_address_pairs`
