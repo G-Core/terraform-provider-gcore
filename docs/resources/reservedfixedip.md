@@ -172,9 +172,11 @@ resource "gcore_reservedfixedip" "fixed_ip_by_port" {
 
 ### Read-Only
 
+- `fixed_ipv6_address` (String) IPv6 address of the port.
 - `id` (String) The ID of this resource.
 - `last_updated` (String) Datetime when reserved fixed ip was updated at the last time.
 - `status` (String) Underlying port status
+- `subnet_v6_id` (String) ID of the IPv6 subnet.
 
 <a id="nestedblock--allowed_address_pairs"></a>
 ### Nested Schema for `allowed_address_pairs`
