@@ -10,25 +10,38 @@ import (
 	sdk "github.com/G-Core/FastEdge-client-sdk-go"
 )
 
-type mock struct {
+type mockBin struct {
 	sdk.ClientSDKmock
 }
 
-func (mock) GetBinary(ctx context.Context, id int64, reqEditors ...sdk.RequestEditorFn) (*http.Response, error) {
-	return sdk.NewJsonHttpResponse(http.StatusOK, `{"id": 1, "checksum":"1234567890"}`), nil
+func (mockBin) GetBinary(ctx context.Context, id int64, reqEditors ...sdk.RequestEditorFn) (*http.Response, error) {
+	compare(contextTesting(ctx), id, contextExpected[int64](ctx))
+	return contextReturn(ctx), nil
 }
 
-var mockClient *sdk.ClientWithResponses = &sdk.ClientWithResponses{ClientInterface: &mock{}}
+var mockBinClient *sdk.ClientWithResponses = &sdk.ClientWithResponses{ClientInterface: &mockBin{}}
 
 func TestReadBinary(t *testing.T) {
 	resourceData := schema.TestResourceDataRaw(t, resourceFastEdgeBinary().Schema, nil)
-	resourceData.SetId("1")
+	resourceData.SetId("42")
 
-	diag := resourceFastEdgeBinaryRead(context.Background(), resourceData, &Config{FastEdgeClient: mockClient})
+	ctx := contextWithTesting(context.Background(), t)
+	ctx = contextWithExpected(ctx, int64(42))
+	ctx = contextWithReturn(ctx,
+		sdk.NewJsonHttpResponse(
+			http.StatusOK,
+			`{
+				"id": 42,
+				"checksum":"1234567890"
+			}`,
+		),
+	)
+
+	diag := resourceFastEdgeBinaryRead(ctx, resourceData, &Config{FastEdgeClient: mockBinClient})
 
 	if diag.HasError() {
 		t.Error("unexpected error", diag[0].Summary)
-	} else if resourceData.Get("checksum").(string) != "1234567890" {
-		t.Error("unexpected checksum", resourceData.Get("checksum"))
+	} else {
+		compare(t, resourceData.Get("checksum"), "1234567890")
 	}
 }
