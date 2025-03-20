@@ -54,10 +54,7 @@ func resourceFastEdgeApp() *schema.Resource {
 				Description: "Environment variables.",
 				Type:        schema.TypeMap,
 				Optional:    true,
-				//Elem:        schema.TypeString,
-				Elem: &schema.Schema{
-					Type: schema.TypeString,
-				},
+				Elem:        schema.TypeString,
 			},
 			"rsp_headers": {
 				Description: "Response headers.",

@@ -1,6 +1,12 @@
 package gcore
 
-import "testing"
+import (
+	"context"
+	"net/http"
+	"testing"
+
+	"github.com/google/go-cmp/cmp"
+)
 
 func TestExtractHosAndPath(t *testing.T) {
 	type args struct {
@@ -55,5 +61,40 @@ func TestExtractHosAndPath(t *testing.T) {
 				t.Errorf("ExtractHostAndPath() gotPath = %v, want %v", gotPath, tt.wantPath)
 			}
 		})
+	}
+}
+
+type contextKey string
+
+const (
+	contextKeyExpected contextKey = "expected"
+	contextKeyTesting  contextKey = "testing"
+	contextKeyReturn   contextKey = "return"
+)
+
+func contextWithExpected[T any](ctx context.Context, expected T) context.Context {
+	return context.WithValue(ctx, contextKeyExpected, expected)
+}
+func contextWithTesting(ctx context.Context, t *testing.T) context.Context {
+	return context.WithValue(ctx, contextKeyTesting, t)
+}
+func contextWithReturn(ctx context.Context, ret *http.Response) context.Context {
+	return context.WithValue(ctx, contextKeyReturn, ret)
+}
+
+func contextExpected[T any](ctx context.Context) T {
+	return ctx.Value(contextKeyExpected).(T)
+}
+func contextTesting(ctx context.Context) *testing.T {
+	return ctx.Value(contextKeyTesting).(*testing.T)
+}
+func contextReturn(ctx context.Context) *http.Response {
+	return ctx.Value(contextKeyReturn).(*http.Response)
+}
+
+func compare[T any](t *testing.T, actual, expected T) {
+	t.Helper()
+	if !cmp.Equal(actual, expected) {
+		t.Errorf("unexpected value, got: %v, expected: %v", actual, expected)
 	}
 }
