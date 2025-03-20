@@ -124,6 +124,24 @@ func resourceLoadBalancerV2() *schema.Resource {
 				Computed: true,
 				ForceNew: true,
 			},
+			"vrrp_ips": &schema.Schema{
+				Type:     schema.TypeList,
+				Computed: true,
+				Elem: &schema.Resource{
+					Schema: map[string]*schema.Schema{
+						"ip_address": {
+							Type:        schema.TypeString,
+							Description: "IP address of the LB instance.",
+							Computed:    true,
+						},
+						"subnet_id": {
+							Type:        schema.TypeString,
+							Description: "Subnet ID of the LB instance.",
+							Computed:    true,
+						},
+					},
+				},
+			},
 			"vip_ip_family": &schema.Schema{
 				Type:        schema.TypeString,
 				Optional:    true,
@@ -293,7 +311,6 @@ func resourceLoadBalancerV2Read(ctx context.Context, d *schema.ResourceData, m i
 	d.Set("vrrp_ips", lb.VrrpIPs)
 	d.Set("vip_ip_family", lb.VipIPFamilyType)
 	d.Set("preferred_connectivity", lb.PreferredConnectivity)
-	d.Set("additional_vips", lb.AdditionalVips)
 
 	if lb.VipAddress != nil {
 		d.Set("vip_address", lb.VipAddress.String())
@@ -301,6 +318,24 @@ func resourceLoadBalancerV2Read(ctx context.Context, d *schema.ResourceData, m i
 
 	fields := []string{"vip_network_id", "vip_subnet_id"}
 	revertState(d, &fields)
+
+	vrrpIps := make([]map[string]string, len(lb.VrrpIPs))
+	for i, vrrpIp := range lb.VrrpIPs {
+		v := map[string]string{"subnet_id": "", "ip_address": ""}
+		v["subnet_id"] = vrrpIp.SubnetID
+		v["ip_address"] = vrrpIp.IpAddress.String()
+		vrrpIps[i] = v
+	}
+	d.Set("vrrp_ips", vrrpIps)
+
+	additionalVIPs := make([]map[string]string, len(lb.AdditionalVips))
+	for i, vip := range lb.AdditionalVips {
+		v := map[string]string{"subnet_id": "", "ip_address": ""}
+		v["subnet_id"] = vip.SubnetID
+		v["ip_address"] = vip.IpAddress.String()
+		additionalVIPs[i] = v
+	}
+	d.Set("additional_vips", additionalVIPs)
 
 	metadataMap := make(map[string]string)
 	metadataReadOnly := make([]map[string]interface{}, 0, len(lb.Metadata))
