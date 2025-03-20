@@ -186,6 +186,7 @@ resource "gcore_loadbalancerv2" "private_lb_dualstack" {
 
 ### Read-Only
 
+- `additional_vips` (List of Object) Load Balancer additional VIPs (see [below for nested schema](#nestedatt--additional_vips))
 - `id` (String) The ID of this resource.
 - `last_updated` (String) Datetime when load balancer was updated at the last time.
 - `metadata_read_only` (List of Object) List of metadata items. (see [below for nested schema](#nestedatt--metadata_read_only))
@@ -199,6 +200,15 @@ Optional:
 - `create` (String)
 - `delete` (String)
 - `update` (String)
+
+
+<a id="nestedatt--additional_vips"></a>
+### Nested Schema for `additional_vips`
+
+Read-Only:
+
+- `ip_address` (String)
+- `subnet_id` (String)
 
 
 <a id="nestedatt--metadata_read_only"></a>
