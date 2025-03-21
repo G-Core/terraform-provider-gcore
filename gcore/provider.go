@@ -9,6 +9,7 @@ import (
 	"os"
 	"sync"
 
+	fastedge "github.com/G-Core/FastEdge-client-sdk-go"
 	dnssdk "github.com/G-Core/gcore-dns-sdk-go"
 	storageSDK "github.com/G-Core/gcore-storage-sdk-go"
 	gcdn "github.com/G-Core/gcorelabscdn-go"
@@ -120,6 +121,12 @@ func Provider() *schema.Provider {
 				Description: "DNS API (define only if you want to override DNS API endpoint). Can also be set with the GCORE_DNS_API environment variable.",
 				DefaultFunc: schema.EnvDefaultFunc("GCORE_DNS_API", ""),
 			},
+			"gcore_fastedge_api": {
+				Type:        schema.TypeString,
+				Optional:    true,
+				Description: "FastEdge API (define only if you want to override FastEdge API endpoint). Can also be set with the GCORE_FASTEDGE_API environment variable.",
+				DefaultFunc: schema.EnvDefaultFunc("GCORE_FASTEDGE_API", ""),
+			},
 			"gcore_client_id": {
 				Type:        schema.TypeString,
 				Optional:    true,
@@ -174,6 +181,8 @@ func Provider() *schema.Provider {
 			"gcore_registry_credential":  resourceRegistryCredential(),
 			"gcore_gpu_baremetal_image":  resourceBaremetalImage(),
 			"gcore_gpu_virtual_image":    resourceVirtualImage(),
+			"gcore_fastedge_binary":      resourceFastEdgeBinary(),
+			"gcore_fastedge_app":         resourceFastEdgeApp(),
 		},
 		DataSourcesMap: map[string]*schema.Resource{
 			"gcore_ai_cluster":             dataSourceAICluster(),
@@ -252,6 +261,11 @@ func providerConfigure(_ context.Context, d *schema.ResourceData) (interface{}, 
 	dnsAPI := d.Get("gcore_dns_api").(string)
 	if dnsAPI == "" {
 		dnsAPI = apiEndpoint + "/dns"
+	}
+
+	fastedgeAPI := d.Get("gcore_fastedge_api").(string)
+	if fastedgeAPI == "" {
+		fastedgeAPI = apiEndpoint + "/fastedge"
 	}
 
 	platform := d.Get("gcore_platform_api").(string)
@@ -338,6 +352,27 @@ func providerConfigure(_ context.Context, d *schema.ResourceData) (interface{}, 
 			func(client *dnssdk.Client) {
 				client.UserAgent = userAgent
 			})
+	}
+
+	if fastedgeAPI != "" {
+		authFunc := func(ctx context.Context, req *http.Request) error {
+			if permanentToken != "" {
+				req.Header.Set("Authorization", "APIKey "+permanentToken)
+			} else {
+				req.Header.Set("Authorization", "Bearer "+provider.AccessToken())
+			}
+			return nil
+		}
+
+		client, err := fastedge.NewClientWithResponses(
+			fastedgeAPI,
+			fastedge.WithRequestEditorFn(authFunc),
+			fastedge.WithRequestEditorFn(fastedge.AddVersionHeader),
+		)
+		if err != nil {
+			return nil, diag.FromErr(fmt.Errorf("fastedge api init: %w", err))
+		}
+		config.FastEdgeClient = client
 	}
 
 	return &config, diags
