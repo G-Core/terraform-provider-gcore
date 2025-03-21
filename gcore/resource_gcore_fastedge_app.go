@@ -127,8 +127,14 @@ func resourceFastEdgeAppRead(ctx context.Context, d *schema.ResourceData, m inte
 		return diag.FromErr(err)
 	}
 	if !statusOK(rsp.StatusCode()) {
+		if rsp.StatusCode() == http.StatusNotFound {
+			log.Printf("[WARN] FastEdge app (%d) was not found, removing from TF state", id)
+			d.SetId("")
+			return nil
+		}
 		return diag.FromErr(errors.New(extractErrorMessage(rsp.Body)))
 	}
+
 	app := rsp.JSON200
 	setField(d, "name", app.Name)
 	setField(d, "binary", app.Binary)
