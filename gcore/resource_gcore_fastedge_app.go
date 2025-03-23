@@ -261,19 +261,19 @@ func convertMap(in map[string]interface{}) map[string]string {
 }
 
 func fieldValueIfChanged[T any](d *schema.ResourceData, name string) *T {
-	newVal, oldVal := d.GetChange(name)
+	oldVal, newVal := d.GetChange(name)
 	if cmp.Equal(newVal, oldVal) {
 		return nil
 	}
-	intVal, ok := newVal.(T)
+	val, ok := newVal.(T)
 	if !ok {
 		return nil
 	}
-	return &intVal
+	return &val
 }
 
 func fieldValueIfChangedInt64(d *schema.ResourceData, name string) *int64 {
-	newVal, oldVal := d.GetChange(name)
+	oldVal, newVal := d.GetChange(name)
 	if cmp.Equal(newVal, oldVal) {
 		return nil
 	}
@@ -286,7 +286,7 @@ func fieldValueIfChangedInt64(d *schema.ResourceData, name string) *int64 {
 }
 
 func fieldValueIfChangedMap(d *schema.ResourceData, name string) *map[string]string {
-	newVal, oldVal := d.GetChange(name)
+	oldVal, newVal := d.GetChange(name)
 	if cmp.Equal(newVal, oldVal) {
 		return nil
 	}

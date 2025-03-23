@@ -2,110 +2,76 @@ package gcore
 
 import (
 	"context"
-	"io"
 	"net/http"
 	"os"
 	"testing"
 
+	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 
 	sdk "github.com/G-Core/FastEdge-client-sdk-go"
 )
 
-type mockBin struct {
-	sdk.ClientSDKmock
-}
-
-func (mockBin) GetBinary(ctx context.Context, id int64, reqEditors ...sdk.RequestEditorFn) (*http.Response, error) {
-	compare(contextTesting(ctx), id, contextExpected[int64](ctx))
-	return contextReturn(ctx), nil
-}
-
-func (mockBin) StoreBinaryWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...sdk.RequestEditorFn) (*http.Response, error) {
-	return contextReturn(ctx), nil
-}
-
-var mockBinClient *sdk.ClientWithResponses = &sdk.ClientWithResponses{ClientInterface: &mockBin{}}
-
-func TestReadBinary(t *testing.T) {
-	resourceData := schema.TestResourceDataRaw(t, resourceFastEdgeBinary().Schema, nil)
-	resourceData.SetId("42")
-
-	ctx := contextWithTesting(context.Background(), t)
-	ctx = contextWithExpected(ctx, int64(42))
-	ctx = contextWithReturn(ctx,
-		sdk.NewJsonHttpResponse(
-			http.StatusOK,
-			`{
-				"id": 42,
-				"checksum":"1234567890"
-			}`,
-		),
-	)
-
-	diag := resourceFastEdgeBinaryRead(ctx, resourceData, &Config{FastEdgeClient: mockBinClient})
-
-	if diag.HasError() {
-		t.Error("unexpected error", diag[0].Summary)
-	} else {
-		compare(t, resourceData.Get("checksum"), "1234567890")
+func TestAddBinary(t *testing.T) {
+	checksum, _ := fileChecksum(os.Args[0])
+	addBinMock := &mockSdk{
+		t: t,
+		getBin: []mockParams{
+			{
+				expectId:  42,
+				retStatus: http.StatusOK,
+				retBody: `{
+					"id": 42,
+					"checksum": "` + checksum + `"
+				}`,
+			},
+		},
+		addBin: []mockParams{
+			{
+				retStatus: http.StatusOK,
+				retBody: `{
+					"id": 42,
+					"checksum": "` + checksum + `"
+				}`,
+			},
+		},
+		delBin: []mockParams{
+			{
+				expectId:  42,
+				retStatus: http.StatusNoContent,
+			},
+		},
 	}
-}
-
-func TestReadBinaryNotFound(t *testing.T) {
-	resourceData := schema.TestResourceDataRaw(t, resourceFastEdgeBinary().Schema, nil)
-	resourceData.SetId("42")
-
-	ctx := contextWithTesting(context.Background(), t)
-	ctx = contextWithExpected(ctx, int64(42))
-	ctx = contextWithReturn(ctx, sdk.NewJsonHttpResponse(http.StatusNotFound, "Not found"))
-
-	diag := resourceFastEdgeBinaryRead(ctx, resourceData, &Config{FastEdgeClient: mockBinClient})
-
-	if diag.HasError() {
-		t.Error("unexpected error", diag[0].Summary)
-	} else {
-		compare(t, resourceData.Id(), "")
+	providers := map[string]func() (*schema.Provider, error){
+		"gcore": func() (*schema.Provider, error) {
+			return &schema.Provider{
+				ResourcesMap: map[string]*schema.Resource{
+					"gcore_fastedge_binary": resourceFastEdgeBinary(),
+					"gcore_fastedge_app":    resourceFastEdgeApp(),
+				},
+				ConfigureContextFunc: func(ctx context.Context, d *schema.ResourceData) (interface{}, diag.Diagnostics) {
+					config := Config{FastEdgeClient: &sdk.ClientWithResponses{ClientInterface: addBinMock}}
+					return &config, nil
+				},
+			}, nil
+		},
 	}
-}
 
-func TestReadBinaryError(t *testing.T) {
-	resourceData := schema.TestResourceDataRaw(t, resourceFastEdgeBinary().Schema, nil)
-	resourceData.SetId("42")
+	resource.Test(t, resource.TestCase{
+		ProviderFactories: providers,
+		IsUnitTest:        true,
+		Steps: []resource.TestStep{
+			{
+				Config: `resource "gcore_fastedge_binary" "test" {	filename = "` + os.Args[0] + `"}`,
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr("gcore_fastedge_binary.test", "checksum", checksum),
+				),
+			},
+		},
+	})
 
-	ctx := contextWithTesting(context.Background(), t)
-	ctx = contextWithExpected(ctx, int64(42))
-	ctx = contextWithReturn(ctx, sdk.NewJsonHttpResponse(http.StatusBadRequest, `{"error": "Something is wrong"}`))
-
-	diag := resourceFastEdgeBinaryRead(ctx, resourceData, &Config{FastEdgeClient: mockBinClient})
-
-	if diag.HasError() {
-		if diag[0].Summary != "Something is wrong" {
-			t.Error("unexpected error", diag[0].Summary)
-		}
-	}
-	compare(t, resourceData.Id(), "42") // State is not cleaned
-}
-
-func TestUpload(t *testing.T) {
-	resourceData := schema.TestResourceDataRaw(t, resourceFastEdgeBinary().Schema, nil)
-	resourceData.Set("filename", os.Args[0])
-
-	ctx := contextWithTesting(context.Background(), t)
-	ctx = contextWithReturn(ctx,
-		sdk.NewJsonHttpResponse(
-			http.StatusOK,
-			`{
-				"id": 42
-			}`,
-		),
-	)
-
-	diag := resourceFastEdgeBinaryUpload(ctx, resourceData, &Config{FastEdgeClient: mockBinClient})
-
-	if diag.HasError() {
-		t.Error("unexpected error", diag[0].Summary)
-	} else {
-		compare(t, resourceData.Id(), "42")
-	}
+	compare(t, addBinMock.getBinCount, 1)
+	compare(t, addBinMock.addBinCount, 1)
+	compare(t, addBinMock.delBinCount, 1)
 }
