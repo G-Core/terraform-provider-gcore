@@ -33,8 +33,13 @@ data "gcore_region" "region" {
 resource "gcore_loadbalancerv2" "public_lb" {
   project_id = data.gcore_project.project.id
   region_id  = data.gcore_region.region.id
+
   name       = "My first public load balancer"
   flavor     = "lb1-1-2"
+
+  metadata_map = {
+    managed_by = "terraform"
+  }
 }
 
 output "public_lb_ip" {
@@ -186,10 +191,12 @@ resource "gcore_loadbalancerv2" "private_lb_dualstack" {
 
 ### Read-Only
 
+- `additional_vips` (List of Object) Load Balancer additional VIPs (see [below for nested schema](#nestedatt--additional_vips))
 - `id` (String) The ID of this resource.
 - `last_updated` (String) Datetime when load balancer was updated at the last time.
 - `metadata_read_only` (List of Object) List of metadata items. (see [below for nested schema](#nestedatt--metadata_read_only))
 - `vip_address` (String) Load balancer IP address. IP address will be changed when load balancer will be recreated if `vip_port_id` is not specified.
+- `vrrp_ips` (List of Object) (see [below for nested schema](#nestedatt--vrrp_ips))
 
 <a id="nestedblock--timeouts"></a>
 ### Nested Schema for `timeouts`
@@ -201,6 +208,15 @@ Optional:
 - `update` (String)
 
 
+<a id="nestedatt--additional_vips"></a>
+### Nested Schema for `additional_vips`
+
+Read-Only:
+
+- `ip_address` (String)
+- `subnet_id` (String)
+
+
 <a id="nestedatt--metadata_read_only"></a>
 ### Nested Schema for `metadata_read_only`
 
@@ -209,6 +225,15 @@ Read-Only:
 - `key` (String)
 - `read_only` (Boolean)
 - `value` (String)
+
+
+<a id="nestedatt--vrrp_ips"></a>
+### Nested Schema for `vrrp_ips`
+
+Read-Only:
+
+- `ip_address` (String)
+- `subnet_id` (String)
 
 
 

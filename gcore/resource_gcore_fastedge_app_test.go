@@ -249,6 +249,6 @@ func TestFastEdgeApp_import(t *testing.T) {
 			},
 		},
 	})
-	
+
 	mock.ExpectationsWereMet(t)
 }

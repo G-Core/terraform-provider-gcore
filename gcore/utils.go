@@ -750,6 +750,7 @@ func secGroupUniqueID(i interface{}) int {
 	io.WriteString(h, strconv.Itoa(e["port_range_max"].(int)))
 	io.WriteString(h, e["description"].(string))
 	io.WriteString(h, e["remote_ip_prefix"].(string))
+	io.WriteString(h, e["remote_group_id"].(string))
 
 	return int(binary.BigEndian.Uint64(h.Sum(nil)))
 }
@@ -782,6 +783,10 @@ func extractSecurityGroupRuleMap(r interface{}, gid string) securitygroups.Creat
 	remoteIPPrefix := rule["remote_ip_prefix"].(string)
 	if remoteIPPrefix != "" {
 		opts.RemoteIPPrefix = &remoteIPPrefix
+	}
+	remoteGroupID := rule["remote_group_id"].(string)
+	if remoteGroupID != "" {
+		opts.RemoteGroupID = &remoteGroupID
 	}
 	return opts
 }

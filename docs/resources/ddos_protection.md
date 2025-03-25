@@ -55,7 +55,7 @@ Read-Only:
 - `default` (String)
 - `description` (String) Field description
 - `field_type` (String)
-- `id` (Number)
+- `id` (Number) The ID of this resource.
 - `name` (String)
 - `required` (Boolean)
 - `validation_schema` (String) Json schema to validate field_values

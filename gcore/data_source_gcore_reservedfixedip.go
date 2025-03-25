@@ -64,11 +64,19 @@ func dataSourceReservedFixedIP() *schema.Resource {
 					return diag.FromErr(fmt.Errorf("%q must be a valid ip, got: %s", key, v))
 				},
 			},
+			"fixed_ipv6_address": &schema.Schema{
+				Type:     schema.TypeString,
+				Computed: true,
+			},
 			"status": &schema.Schema{
 				Type:     schema.TypeString,
 				Computed: true,
 			},
 			"subnet_id": &schema.Schema{
+				Type:     schema.TypeString,
+				Computed: true,
+			},
+			"subnet_v6_id": &schema.Schema{
 				Type:     schema.TypeString,
 				Computed: true,
 			},
@@ -142,7 +150,9 @@ func dataSourceReservedFixedIPRead(ctx context.Context, d *schema.ResourceData, 
 	d.Set("region_id", reservedFixedIP.RegionID)
 	d.Set("status", reservedFixedIP.Status)
 	d.Set("fixed_ip_address", reservedFixedIP.FixedIPAddress.String())
+	d.Set("fixed_ipv6_address", reservedFixedIP.FixedIPv6Address.String())
 	d.Set("subnet_id", reservedFixedIP.SubnetID)
+	d.Set("subnet_v6_id", reservedFixedIP.Subnetv6ID)
 	d.Set("network_id", reservedFixedIP.NetworkID)
 	d.Set("is_vip", reservedFixedIP.IsVip)
 	d.Set("port_id", reservedFixedIP.PortID)

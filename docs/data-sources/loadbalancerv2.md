@@ -60,12 +60,22 @@ output "lb_ip" {
 
 ### Read-Only
 
+- `additional_vips` (List of Object) Load Balancer additional VIPs (see [below for nested schema](#nestedatt--additional_vips))
 - `id` (String) The ID of this resource.
 - `metadata_read_only` (List of Object) List of metadata items. (see [below for nested schema](#nestedatt--metadata_read_only))
 - `preferred_connectivity` (String) Available values are 'L2', 'L3'
 - `vip_address` (String) Load balancer IP address.
 - `vip_port_id` (String) Load balancer Port ID.
 - `vrrp_ips` (List of Object) (see [below for nested schema](#nestedatt--vrrp_ips))
+
+<a id="nestedatt--additional_vips"></a>
+### Nested Schema for `additional_vips`
+
+Read-Only:
+
+- `ip_address` (String)
+- `subnet_id` (String)
+
 
 <a id="nestedatt--metadata_read_only"></a>
 ### Nested Schema for `metadata_read_only`
