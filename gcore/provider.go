@@ -181,6 +181,7 @@ func Provider() *schema.Provider {
 			"gcore_cdn_sslcert":                   resourceCDNCert(),
 			"gcore_cdn_rule_template":             resourceRuleTemplate(),
 			"gcore_cdn_cacert":                    resourceCDNCACert(),
+			"gcore_cdn_logs_uploader_config":      resourceCDNLogsUploaderConfig(),
 			"gcore_cdn_logs_uploader_policy":      resourceCDNLogsUploaderPolicy(),
 			"gcore_cdn_logs_uploader_target":      resourceCDNLogsUploaderTarget(),
 			lifecyclePolicyResource:               resourceLifecyclePolicy(),
