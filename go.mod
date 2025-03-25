@@ -6,17 +6,18 @@ toolchain go1.23.3
 
 require (
 	github.com/AlekSi/pointer v1.2.0
+	github.com/G-Core/FastEdge-client-sdk-go v0.3.5
 	github.com/G-Core/gcore-dns-sdk-go v0.2.9
 	github.com/G-Core/gcore-storage-sdk-go v0.1.34
 	github.com/G-Core/gcorelabscdn-go v1.0.28
 	github.com/G-Core/gcorelabscloud-go v0.15.0
+	github.com/google/go-cmp v0.6.0
 	github.com/hashicorp/go-cty v1.4.1-0.20200414143053-d3edf31b6320
 	github.com/hashicorp/terraform-plugin-sdk/v2 v2.27.0
 	github.com/mitchellh/mapstructure v1.5.0
 )
 
 require (
-	github.com/G-Core/FastEdge-client-sdk-go v0.3.4 // indirect
 	github.com/ProtonMail/go-crypto v1.1.0-alpha.2 // indirect
 	github.com/agext/levenshtein v1.2.3 // indirect
 	github.com/apapsch/go-jsonmerge/v2 v2.0.0 // indirect
@@ -42,7 +43,6 @@ require (
 	github.com/go-playground/universal-translator v0.18.1 // indirect
 	github.com/go-playground/validator/v10 v10.14.1 // indirect
 	github.com/golang/protobuf v1.5.3 // indirect
-	github.com/google/go-cmp v0.6.0 // indirect
 	github.com/google/uuid v1.6.0 // indirect
 	github.com/hashicorp/errwrap v1.1.0 // indirect
 	github.com/hashicorp/go-checkpoint v0.5.0 // indirect
@@ -62,7 +62,6 @@ require (
 	github.com/hashicorp/terraform-registry-address v0.2.1 // indirect
 	github.com/hashicorp/terraform-svchost v0.1.1 // indirect
 	github.com/hashicorp/yamux v0.1.1 // indirect
-	github.com/invopop/yaml v0.3.1 // indirect
 	github.com/josharian/intern v1.0.0 // indirect
 	github.com/ladydascalie/currency v1.6.0 // indirect
 	github.com/leodido/go-urn v1.2.4 // indirect

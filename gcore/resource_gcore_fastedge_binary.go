@@ -5,7 +5,7 @@ import (
 	"crypto/md5"
 	"encoding/hex"
 	"encoding/json"
-	"errors"
+	"fmt"
 	"io"
 	"log"
 	"net/http"
@@ -41,7 +41,6 @@ func resourceFastEdgeBinary() *schema.Resource {
 				Description: "Binary checksum.",
 				Type:        schema.TypeString,
 				Computed:    true,
-				Optional:    true,
 				ForceNew:    true, // new resource on file content change
 			},
 		},
@@ -65,19 +64,27 @@ func resourceFastEdgeBinaryUpload(ctx context.Context, d *schema.ResourceData, m
 	config := m.(*Config)
 	client := config.FastEdgeClient
 
-	wasmFile, err := os.Open(d.Get("filename").(string))
+	filename := d.Get("filename").(string)
+	wasmFile, err := os.Open(filename)
 	if err != nil {
-		return diag.FromErr(err)
+		return diag.Errorf("opening file %s: %v", filename, err)
 	}
 	defer wasmFile.Close()
 
 	rsp, err := client.StoreBinaryWithBodyWithResponse(ctx, "application/octet-stream", wasmFile)
 	if err != nil {
-		return diag.FromErr(err)
+		return diag.Errorf("calling StoreBinary API: %v", err)
 	}
 	if !statusOK(rsp.StatusCode()) {
-		return diag.FromErr(errors.New(extractErrorMessage(rsp.Body)))
+		return diag.Errorf("calling StoreBinary API: %s", extractErrorMessage(rsp.Body))
 	}
+
+	// make sure binary was not damaged in transit
+	expectedChecksum := d.Get("checksum").(string)
+	if *rsp.JSON200.Checksum != expectedChecksum {
+		return diag.Errorf("uploaded binary checksum (%s) does not match expected (%s)", *rsp.JSON200.Checksum, expectedChecksum)
+	}
+
 	d.SetId(strconv.FormatInt(rsp.JSON200.Id, 10))
 
 	log.Printf("[DEBUG] Finish FastEdge binary upload (id=%d)\n", rsp.JSON200.Id)
@@ -85,29 +92,36 @@ func resourceFastEdgeBinaryUpload(ctx context.Context, d *schema.ResourceData, m
 }
 
 func resourceFastEdgeBinaryDelete(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
+	var diags diag.Diagnostics
 	log.Println("[DEBUG] Start FastEdge binary deletion")
 	config := m.(*Config)
 	client := config.FastEdgeClient
 
 	id, err := strconv.ParseInt(d.Id(), 10, 64)
 	if err != nil {
-		return diag.FromErr(err)
+		return diag.Errorf("converting id to number: %v", err)
 	}
 
 	rsp, err := client.DelBinaryWithResponse(ctx, id)
 	if err != nil {
-		return diag.FromErr(err)
+		return diag.Errorf("calling DelBinary API: %v", err)
 	}
 	if !statusOK(rsp.StatusCode()) {
-		if rsp.StatusCode() != http.StatusConflict {
-			return diag.FromErr(errors.New(extractErrorMessage(rsp.Body)))
+		if rsp.StatusCode() == http.StatusConflict {
+			diags = diag.Diagnostics{
+				{
+					Severity: diag.Warning,
+					Summary:  fmt.Sprintf("Wasm binary (%d) is referenced so cannot be deleted, but removed from TF state", id),
+				},
+			}
+		} else {
+			return diag.Errorf("calling DelBinary API: %s", extractErrorMessage(rsp.Body))
 		}
-		log.Printf("[WARN] FastEdge binary (%d) is referenced, cannot delete but removing from TF state", id)
 	}
 
 	d.SetId("")
 	log.Println("[DEBUG] Finish FastEdge binary deletion")
-	return nil
+	return diags
 }
 
 func resourceFastEdgeBinaryRead(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
@@ -117,20 +131,24 @@ func resourceFastEdgeBinaryRead(ctx context.Context, d *schema.ResourceData, m i
 
 	id, err := strconv.ParseInt(d.Id(), 10, 64)
 	if err != nil {
-		return diag.FromErr(err)
+		return diag.Errorf("converting id to number: %v", err)
 	}
 
 	rsp, err := client.GetBinaryWithResponse(ctx, id)
 	if err != nil {
-		return diag.FromErr(err)
+		return diag.Errorf("calling GetBinary API: %v", err)
 	}
 	if !statusOK(rsp.StatusCode()) {
 		if rsp.StatusCode() == http.StatusNotFound {
-			log.Printf("[WARN] FastEdge binary (%d) was not found, removing from TF state", id)
 			d.SetId("")
-			return nil
+			return diag.Diagnostics{
+				{
+					Severity: diag.Warning,
+					Summary:  fmt.Sprintf("[FastEdge binary (%d) was not found, removed from TF state", id),
+				},
+			}
 		}
-		return diag.FromErr(errors.New(extractErrorMessage(rsp.Body)))
+		return diag.Errorf("calling GetBinary API: %s", extractErrorMessage(rsp.Body))
 	}
 	d.Set("checksum", rsp.JSON200.Checksum)
 

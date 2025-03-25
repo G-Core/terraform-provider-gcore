@@ -3,12 +3,12 @@ package gcore
 import (
 	"context"
 	"errors"
+	"fmt"
 	"log"
 	"net/http"
 	"strconv"
 	"strings"
 
-	"github.com/google/go-cmp/cmp"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 
@@ -99,11 +99,12 @@ func resourceFastEdgeAppCreate(ctx context.Context, d *schema.ResourceData, m in
 	}
 	rsp, err := client.AddAppWithResponse(ctx, app)
 	if err != nil {
-		return diag.FromErr(err)
+		return diag.Errorf("calling AddApp API: %v", err)
 	}
 	if !statusOK(rsp.StatusCode()) {
-		return diag.FromErr(errors.New(extractErrorMessage(rsp.Body)))
+		return diag.Errorf("calling AddApp API: %s", extractErrorMessage(rsp.Body))
 	}
+
 	d.SetId(strconv.FormatInt(rsp.JSON200.Id, 10))
 	d.Set("name", rsp.JSON200.Name)
 	d.Set("binary", rsp.JSON200.Binary)
@@ -119,20 +120,24 @@ func resourceFastEdgeAppRead(ctx context.Context, d *schema.ResourceData, m inte
 
 	id, err := strconv.ParseInt(d.Id(), 10, 64)
 	if err != nil {
-		return diag.FromErr(err)
+		return diag.Errorf("converting id to number: %v", err)
 	}
 
 	rsp, err := client.GetAppWithResponse(ctx, id)
 	if err != nil {
-		return diag.FromErr(err)
+		return diag.Errorf("calling GetApp API: %v", err)
 	}
 	if !statusOK(rsp.StatusCode()) {
 		if rsp.StatusCode() == http.StatusNotFound {
-			log.Printf("[WARN] FastEdge app (%d) was not found, removing from TF state", id)
 			d.SetId("")
-			return nil
+			return diag.Diagnostics{
+				{
+					Severity: diag.Warning,
+					Summary:  fmt.Sprintf("[FastEdge app (%d) was not found, removed from TF state", id),
+				},
+			}
 		}
-		return diag.FromErr(errors.New(extractErrorMessage(rsp.Body)))
+		return diag.Errorf("calling GetApp API: %s", extractErrorMessage(rsp.Body))
 	}
 
 	app := rsp.JSON200
@@ -156,62 +161,75 @@ func resourceFastEdgeAppUpdate(ctx context.Context, d *schema.ResourceData, m in
 
 	id, err := strconv.ParseInt(d.Id(), 10, 64)
 	if err != nil {
-		return diag.FromErr(err)
+		return diag.Errorf("converting id to number: %v", err)
 	}
 
-	var statusCode *int
-	status := fieldValueIfChanged[string](d, "status")
-	if status != nil {
-		statusCode = new(int)
-		*statusCode = statusToInt(*status)
-	}
+	status := statusToInt(d.Get("status").(string))
 	app := sdk.App{
-		Name:       fieldValueIfChanged[string](d, "name"),
-		Binary:     fieldValueIfChangedInt64(d, "binary"),
-		Template:   fieldValueIfChangedInt64(d, "template"),
-		Debug:      fieldValueIfChanged[bool](d, "debug"),
-		Env:        fieldValueIfChangedMap(d, "env"),
-		RspHeaders: fieldValueIfChangedMap(d, "rsp_headers"),
-		Comment:    fieldValueIfChanged[string](d, "comment"),
-		Status:     statusCode,
+		Name:       fieldValue[string](d, "name"),
+		Binary:     fieldValueInt64(d, "binary"),
+		Template:   fieldValueInt64(d, "template"),
+		Debug:      fieldValue[bool](d, "debug"),
+		Env:        fieldValueMap(d, "env"),
+		RspHeaders: fieldValueMap(d, "rsp_headers"),
+		Comment:    fieldValue[string](d, "comment"),
+		Status:     &status,
 	}
-	rsp, err := client.PatchAppWithResponse(ctx, id, app)
+	rsp, err := client.UpdateAppWithResponse(ctx, id, sdk.UpdateAppJSONRequestBody{App: app})
 	if err != nil {
-		return diag.FromErr(err)
+		return diag.Errorf("calling UpdateApp API: %v", err)
 	}
 	if !statusOK(rsp.StatusCode()) {
-		return diag.FromErr(errors.New(extractErrorMessage(rsp.Body)))
+		if rsp.StatusCode() == http.StatusNotFound {
+			d.SetId("")
+			return diag.Diagnostics{
+				{
+					Severity: diag.Warning,
+					Summary:  fmt.Sprintf("[FastEdge app (%d) was not found, removed from TF state", id),
+				},
+			}
+		}
+		return diag.Errorf("calling UpdateApp API: %s", extractErrorMessage(rsp.Body))
 	}
-	d.Set("name", rsp.JSON200.Name) // name may change as a result of the update
+
+	d.Set("name", rsp.JSON200.Name)                     // name may change as a result of the update
+	d.Set("status", statusToString(rsp.JSON200.Status)) // return status may differ from the one set by the user
 
 	log.Println("[DEBUG] Finish FastEdge app update")
 	return nil
 }
 
 func resourceFastEdgeAppDelete(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
+	var diags diag.Diagnostics
 	log.Println("[DEBUG] Start FastEdge app deletion")
 	config := m.(*Config)
 	client := config.FastEdgeClient
 
 	id, err := strconv.ParseInt(d.Id(), 10, 64)
 	if err != nil {
-		return diag.FromErr(err)
+		return diag.Errorf("converting id to number: %v", err)
 	}
 
 	rsp, err := client.DelAppWithResponse(ctx, id)
 	if err != nil {
-		return diag.FromErr(err)
+		return diag.Errorf("calling DelApp API: %v", err)
 	}
 	if !statusOK(rsp.StatusCode()) {
-		if rsp.StatusCode() != http.StatusConflict {
-			return diag.FromErr(errors.New(extractErrorMessage(rsp.Body)))
+		if rsp.StatusCode() == http.StatusConflict {
+			diags = diag.Diagnostics{
+				{
+					Severity: diag.Warning,
+					Summary:  fmt.Sprintf("App (%d) is referenced so cannot be deleted, but removed from TF state", id),
+				},
+			}
+		} else {
+			return diag.Errorf("calling DelApp API: %s", extractErrorMessage(rsp.Body))
 		}
-		return diag.FromErr(errors.New("FastEdge app is referenced, cannot delete"))
 	}
 
 	d.SetId("")
 	log.Println("[DEBUG] Finish FastEdge app deletion")
-	return nil
+	return diags
 }
 
 func fieldValue[T any](d *schema.ResourceData, name string) *T {
@@ -258,44 +276,6 @@ func convertMap(in map[string]interface{}) map[string]string {
 		out[k] = v.(string)
 	}
 	return out
-}
-
-func fieldValueIfChanged[T any](d *schema.ResourceData, name string) *T {
-	oldVal, newVal := d.GetChange(name)
-	if cmp.Equal(newVal, oldVal) {
-		return nil
-	}
-	val, ok := newVal.(T)
-	if !ok {
-		return nil
-	}
-	return &val
-}
-
-func fieldValueIfChangedInt64(d *schema.ResourceData, name string) *int64 {
-	oldVal, newVal := d.GetChange(name)
-	if cmp.Equal(newVal, oldVal) {
-		return nil
-	}
-	intVal, ok := newVal.(int)
-	if !ok {
-		return nil
-	}
-	val := int64(intVal)
-	return &val
-}
-
-func fieldValueIfChangedMap(d *schema.ResourceData, name string) *map[string]string {
-	oldVal, newVal := d.GetChange(name)
-	if cmp.Equal(newVal, oldVal) {
-		return nil
-	}
-	tmpVal, ok := newVal.(map[string]interface{})
-	if !ok {
-		return nil
-	}
-	val := convertMap(tmpVal)
-	return &val
 }
 
 func setField[T any](d *schema.ResourceData, name string, value *T) {
