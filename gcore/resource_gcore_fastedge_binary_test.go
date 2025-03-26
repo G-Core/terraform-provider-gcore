@@ -68,7 +68,7 @@ func TestFastEdgeBinary_corrupted(t *testing.T) {
 		Steps: []resource.TestStep{
 			{
 				Config:      `resource "gcore_fastedge_binary" "test" {	filename = "` + os.Args[0] + `"}`,
-				ExpectError: regexp.MustCompile(`uploaded binary checksum \(xyz\) does not match expected \(.*\)`),
+				ExpectError: regexp.MustCompile(`uploaded binary checksum \(xyz\) does not match expected \(.*\), please retry`),
 			},
 		},
 	})

@@ -108,6 +108,7 @@ func resourceFastEdgeAppCreate(ctx context.Context, d *schema.ResourceData, m in
 	d.SetId(strconv.FormatInt(rsp.JSON200.Id, 10))
 	d.Set("name", rsp.JSON200.Name)
 	d.Set("binary", rsp.JSON200.Binary)
+	d.Set("status", statusToString(rsp.JSON200.Status)) // return status may differ from the one set by the user
 
 	log.Printf("[DEBUG] Finish FastEdge app creation (id=%d)\n", rsp.JSON200.Id)
 	return nil

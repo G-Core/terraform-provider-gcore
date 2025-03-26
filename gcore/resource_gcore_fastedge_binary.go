@@ -82,7 +82,8 @@ func resourceFastEdgeBinaryUpload(ctx context.Context, d *schema.ResourceData, m
 	// make sure binary was not damaged in transit
 	expectedChecksum := d.Get("checksum").(string)
 	if *rsp.JSON200.Checksum != expectedChecksum {
-		return diag.Errorf("uploaded binary checksum (%s) does not match expected (%s)", *rsp.JSON200.Checksum, expectedChecksum)
+		// binary damaged in transit
+		return diag.Errorf("uploaded binary checksum (%s) does not match expected (%s), please retry", *rsp.JSON200.Checksum, expectedChecksum)
 	}
 
 	d.SetId(strconv.FormatInt(rsp.JSON200.Id, 10))
