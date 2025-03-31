@@ -53,8 +53,8 @@ resource "gcore_cdn_logs_uploader_target" "target_2" {
 
 ### Optional
 
-- `description` (String) Description of the target.
-- `name` (String) Name of the target.
+- `description` (String) Description of the target. Default value is empty string.
+- `name` (String) Name of the target. Default value is "Target".
 
 ### Read-Only
 
@@ -86,7 +86,7 @@ Required:
 Optional:
 
 - `directory` (String)
-- `timeout_seconds` (Number)
+- `timeout_seconds` (Number) Default value is 10.
 
 
 <a id="nestedblock--config--http"></a>
@@ -100,7 +100,7 @@ Required:
 Optional:
 
 - `append` (Block List) (see [below for nested schema](#nestedblock--config--http--append))
-- `payload_type` (String)
+- `payload_type` (String) Default value is text.
 - `retry` (Block List) (see [below for nested schema](#nestedblock--config--http--retry))
 
 <a id="nestedblock--config--http--auth"></a>
@@ -131,10 +131,10 @@ Required:
 Optional:
 
 - `headers` (Map of String)
-- `method` (String)
+- `method` (String) Default value is POST.
 - `response_actions` (Block List) (see [below for nested schema](#nestedblock--config--http--upload--response_actions))
-- `timeout_seconds` (Number)
-- `use_compression` (Boolean)
+- `timeout_seconds` (Number) Default value is 30.
+- `use_compression` (Boolean) Default value is false.
 
 <a id="nestedblock--config--http--upload--response_actions"></a>
 ### Nested Schema for `config.http.upload.response_actions`
@@ -145,9 +145,9 @@ Required:
 
 Optional:
 
-- `description` (String)
-- `match_payload` (String)
-- `match_status_code` (Number)
+- `description` (String) Default value is empty string.
+- `match_payload` (String) Default value is empty string.
+- `match_status_code` (Number) Default value is 0.
 
 
 
@@ -161,10 +161,10 @@ Required:
 Optional:
 
 - `headers` (Map of String)
-- `method` (String)
+- `method` (String) Default value is POST.
 - `response_actions` (Block List) (see [below for nested schema](#nestedblock--config--http--append--response_actions))
-- `timeout_seconds` (Number)
-- `use_compression` (Boolean)
+- `timeout_seconds` (Number) Default value is 30.
+- `use_compression` (Boolean) Default value is false.
 
 <a id="nestedblock--config--http--append--response_actions"></a>
 ### Nested Schema for `config.http.append.response_actions`
@@ -175,9 +175,9 @@ Required:
 
 Optional:
 
-- `description` (String)
-- `match_payload` (String)
-- `match_status_code` (Number)
+- `description` (String) Default value is empty string.
+- `match_payload` (String) Default value is empty string.
+- `match_status_code` (Number) Default value is 0.
 
 
 
@@ -191,10 +191,10 @@ Required:
 Optional:
 
 - `headers` (Map of String)
-- `method` (String)
+- `method` (String) Default value is POST.
 - `response_actions` (Block List) (see [below for nested schema](#nestedblock--config--http--retry--response_actions))
-- `timeout_seconds` (Number)
-- `use_compression` (Boolean)
+- `timeout_seconds` (Number) Default value is 30.
+- `use_compression` (Boolean) Default value is false.
 
 <a id="nestedblock--config--http--retry--response_actions"></a>
 ### Nested Schema for `config.http.retry.response_actions`
@@ -205,9 +205,9 @@ Required:
 
 Optional:
 
-- `description` (String)
-- `match_payload` (String)
-- `match_status_code` (Number)
+- `description` (String) Default value is empty string.
+- `match_payload` (String) Default value is empty string.
+- `match_status_code` (Number) Default value is 0.
 
 
 
@@ -241,7 +241,7 @@ Required:
 Optional:
 
 - `directory` (String)
-- `use_path_style` (Boolean)
+- `use_path_style` (Boolean) Default value is true.
 
 
 <a id="nestedblock--config--s3_oss"></a>
@@ -273,7 +273,7 @@ Required:
 Optional:
 
 - `directory` (String)
-- `use_path_style` (Boolean)
+- `use_path_style` (Boolean) Default value is true.
 
 
 <a id="nestedblock--config--s3_v1"></a>
@@ -290,7 +290,7 @@ Required:
 Optional:
 
 - `directory` (String)
-- `use_path_style` (Boolean)
+- `use_path_style` (Boolean) Default value is true.
 
 
 <a id="nestedblock--config--sftp"></a>
@@ -307,4 +307,4 @@ Optional:
 - `key_passphrase` (String, Sensitive)
 - `password` (String, Sensitive)
 - `private_key` (String, Sensitive)
-- `timeout_seconds` (Number)
+- `timeout_seconds` (Number) Default value is 10.

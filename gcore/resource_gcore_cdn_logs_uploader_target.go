@@ -15,9 +15,10 @@ func schemaForHTTPAction() *schema.Resource {
 	return &schema.Resource{
 		Schema: map[string]*schema.Schema{
 			"method": {
-				Type:     schema.TypeString,
-				Optional: true,
-				Default:  "POST",
+				Type:        schema.TypeString,
+				Optional:    true,
+				Description: "Default value is POST.",
+				Default:     "POST",
 			},
 			"url": {
 				Type:     schema.TypeString,
@@ -29,14 +30,16 @@ func schemaForHTTPAction() *schema.Resource {
 				Elem:     &schema.Schema{Type: schema.TypeString},
 			},
 			"timeout_seconds": {
-				Type:     schema.TypeInt,
-				Optional: true,
-				Default:  30,
+				Type:        schema.TypeInt,
+				Optional:    true,
+				Description: "Default value is 30.",
+				Default:     30,
 			},
 			"use_compression": {
-				Type:     schema.TypeBool,
-				Optional: true,
-				Default:  false,
+				Type:        schema.TypeBool,
+				Optional:    true,
+				Description: "Default value is false.",
+				Default:     false,
 			},
 			"response_actions": {
 				Type:     schema.TypeList,
@@ -44,19 +47,22 @@ func schemaForHTTPAction() *schema.Resource {
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
 						"match_status_code": {
-							Type:     schema.TypeInt,
-							Optional: true,
-							Default:  0,
+							Type:        schema.TypeInt,
+							Optional:    true,
+							Description: "Default value is 0.",
+							Default:     0,
 						},
 						"match_payload": {
-							Type:     schema.TypeString,
-							Optional: true,
-							Default:  "",
+							Type:        schema.TypeString,
+							Optional:    true,
+							Description: "Default value is empty string.",
+							Default:     "",
 						},
 						"description": {
-							Type:     schema.TypeString,
-							Optional: true,
-							Default:  "",
+							Type:        schema.TypeString,
+							Optional:    true,
+							Description: "Default value is empty string.",
+							Default:     "",
 						},
 						"action": {
 							Type:     schema.TypeString,
@@ -165,9 +171,10 @@ func schemaForS3Other() *schema.Schema {
 					Required: true,
 				},
 				"use_path_style": {
-					Type:     schema.TypeBool,
-					Optional: true,
-					Default:  true,
+					Type:        schema.TypeBool,
+					Optional:    true,
+					Description: "Default value is true.",
+					Default:     true,
 				},
 			},
 		},
@@ -189,9 +196,10 @@ func schemaForFTP() *schema.Schema {
 					Required: true,
 				},
 				"timeout_seconds": {
-					Type:     schema.TypeInt,
-					Optional: true,
-					Default:  10,
+					Type:        schema.TypeInt,
+					Optional:    true,
+					Description: "Default value is 10.",
+					Default:     10,
 				},
 				"directory": {
 					Type:     schema.TypeString,
@@ -222,9 +230,10 @@ func schemaForSFTP() *schema.Schema {
 					Required: true,
 				},
 				"timeout_seconds": {
-					Type:     schema.TypeInt,
-					Optional: true,
-					Default:  10,
+					Type:        schema.TypeInt,
+					Optional:    true,
+					Description: "Default value is 10.",
+					Default:     10,
 				},
 				"directory": {
 					Type:     schema.TypeString,
@@ -301,9 +310,10 @@ func schemaForHTTP() *schema.Schema {
 					},
 				},
 				"payload_type": {
-					Type:     schema.TypeString,
-					Optional: true,
-					Default:  "text",
+					Type:        schema.TypeString,
+					Optional:    true,
+					Description: "Default value is text.",
+					Default:     "text",
 				},
 			},
 		},
@@ -319,13 +329,13 @@ func resourceCDNLogsUploaderTarget() *schema.Resource {
 			"name": {
 				Type:        schema.TypeString,
 				Optional:    true,
-				Description: "Name of the target.",
+				Description: "Name of the target. Default value is \"Target\".",
 				Default:     "Target",
 			},
 			"description": {
 				Type:        schema.TypeString,
 				Optional:    true,
-				Description: "Description of the target.",
+				Description: "Description of the target. Default value is empty string.",
 				Default:     "",
 			},
 			"config": {
