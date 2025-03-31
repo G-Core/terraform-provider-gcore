@@ -20,7 +20,7 @@ func resourceCDNLogsUploaderConfig() *schema.Resource {
 			"enabled": {
 				Type:        schema.TypeBool,
 				Optional:    true,
-				Description: "Enables or disables the config.",
+				Description: "Enables or disables the config. Default value is true.",
 				Default:     true,
 			},
 			"name": {
@@ -41,7 +41,7 @@ func resourceCDNLogsUploaderConfig() *schema.Resource {
 			"for_all_resources": {
 				Type:        schema.TypeBool,
 				Optional:    true,
-				Description: "If set to true, the config will be applied to all CDN resources. If set to false, the config will be applied to the resources specified in the resources field.",
+				Description: "If set to true, the config will be applied to all CDN resources. If set to false, the config will be applied to the resources specified in the resources field. Default value is false.",
 				Default:     false,
 			},
 			"resources": {

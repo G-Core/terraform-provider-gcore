@@ -53,8 +53,8 @@ resource "gcore_cdn_logs_uploader_config" "config_1" {
 
 ### Optional
 
-- `enabled` (Boolean) Enables or disables the config.
-- `for_all_resources` (Boolean) If set to true, the config will be applied to all CDN resources. If set to false, the config will be applied to the resources specified in the resources field.
+- `enabled` (Boolean) Enables or disables the config. Default value is true.
+- `for_all_resources` (Boolean) If set to true, the config will be applied to all CDN resources. If set to false, the config will be applied to the resources specified in the resources field. Default value is false.
 - `resources` (List of Number) List of resource IDs to which the config should be applied.
 
 ### Read-Only
