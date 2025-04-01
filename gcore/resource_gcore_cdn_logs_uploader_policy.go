@@ -124,54 +124,18 @@ func resourceCDNLogsUploaderPolicyCreate(ctx context.Context, d *schema.Resource
 	client := config.CDNClient
 
 	var req logsuploader.PolicyCreateRequest
-
-	if v, ok := d.GetOk("include_empty_logs"); ok {
-		req.IncludeEmptyLogs = v.(bool)
-	}
-
-	if v, ok := d.GetOk("include_shield_logs"); ok {
-		req.IncludeShieldLogs = v.(bool)
-	}
-
-	if v, ok := d.GetOk("name"); ok {
-		req.Name = v.(string)
-	}
-
-	if v, ok := d.GetOk("description"); ok {
-		req.Description = v.(string)
-	}
-
-	if v, ok := d.GetOk("retry_interval_minutes"); ok {
-		req.RetryIntervalMinutes = v.(int)
-	}
-
-	if v, ok := d.GetOk("rotate_interval_minutes"); ok {
-		req.RotateIntervalMinutes = v.(int)
-	}
-
-	if v, ok := d.GetOk("rotate_threshold_lines"); ok {
-		req.RotateThresholdLines = v.(int)
-	}
-
-	if v, ok := d.GetOk("date_format"); ok {
-		req.DateFormat = v.(string)
-	}
-
-	if v, ok := d.GetOk("field_delimiter"); ok {
-		req.FieldDelimiter = v.(string)
-	}
-
-	if v, ok := d.GetOk("field_separator"); ok {
-		req.FieldSeparator = v.(string)
-	}
-
-	if v, ok := d.GetOk("file_name_template"); ok {
-		req.FileNameTemplate = v.(string)
-	}
-
-	if v, ok := d.GetOk("format_type"); ok {
-		req.FormatType = v.(string)
-	}
+	req.IncludeEmptyLogs = d.Get("include_empty_logs").(bool)
+	req.IncludeShieldLogs = d.Get("include_shield_logs").(bool)
+	req.Name = d.Get("name").(string)
+	req.Description = d.Get("description").(string)
+	req.RetryIntervalMinutes = d.Get("retry_interval_minutes").(int)
+	req.RotateIntervalMinutes = d.Get("rotate_interval_minutes").(int)
+	req.RotateThresholdLines = d.Get("rotate_threshold_lines").(int)
+	req.DateFormat = d.Get("date_format").(string)
+	req.FieldDelimiter = d.Get("field_delimiter").(string)
+	req.FieldSeparator = d.Get("field_separator").(string)
+	req.FileNameTemplate = d.Get("file_name_template").(string)
+	req.FormatType = d.Get("format_type").(string)
 
 	if v, ok := d.GetOk("rotate_threshold_mb"); ok {
 		req.RotateThresholdMB = pointer.ToInt(v.(int))
@@ -256,53 +220,18 @@ func resourceCDNLogsUploaderPolicyUpdate(ctx context.Context, d *schema.Resource
 	}
 
 	var req logsuploader.PolicyUpdateRequest
-	if v, ok := d.GetOk("include_empty_logs"); ok {
-		req.IncludeEmptyLogs = v.(bool)
-	}
-
-	if v, ok := d.GetOk("include_shield_logs"); ok {
-		req.IncludeShieldLogs = v.(bool)
-	}
-
-	if v, ok := d.GetOk("name"); ok {
-		req.Name = v.(string)
-	}
-
-	if v, ok := d.GetOk("description"); ok {
-		req.Description = v.(string)
-	}
-
-	if v, ok := d.GetOk("retry_interval_minutes"); ok {
-		req.RetryIntervalMinutes = v.(int)
-	}
-
-	if v, ok := d.GetOk("rotate_interval_minutes"); ok {
-		req.RotateIntervalMinutes = v.(int)
-	}
-
-	if v, ok := d.GetOk("rotate_threshold_lines"); ok {
-		req.RotateThresholdLines = v.(int)
-	}
-
-	if v, ok := d.GetOk("date_format"); ok {
-		req.DateFormat = v.(string)
-	}
-
-	if v, ok := d.GetOk("field_delimiter"); ok {
-		req.FieldDelimiter = v.(string)
-	}
-
-	if v, ok := d.GetOk("field_separator"); ok {
-		req.FieldSeparator = v.(string)
-	}
-
-	if v, ok := d.GetOk("file_name_template"); ok {
-		req.FileNameTemplate = v.(string)
-	}
-
-	if v, ok := d.GetOk("format_type"); ok {
-		req.FormatType = v.(string)
-	}
+	req.IncludeEmptyLogs = d.Get("include_empty_logs").(bool)
+	req.IncludeShieldLogs = d.Get("include_shield_logs").(bool)
+	req.Name = d.Get("name").(string)
+	req.Description = d.Get("description").(string)
+	req.RetryIntervalMinutes = d.Get("retry_interval_minutes").(int)
+	req.RotateIntervalMinutes = d.Get("rotate_interval_minutes").(int)
+	req.RotateThresholdLines = d.Get("rotate_threshold_lines").(int)
+	req.DateFormat = d.Get("date_format").(string)
+	req.FieldDelimiter = d.Get("field_delimiter").(string)
+	req.FieldSeparator = d.Get("field_separator").(string)
+	req.FileNameTemplate = d.Get("file_name_template").(string)
+	req.FormatType = d.Get("format_type").(string)
 
 	if v, ok := d.GetOk("rotate_threshold_mb"); ok {
 		req.RotateThresholdMB = pointer.ToInt(v.(int))
