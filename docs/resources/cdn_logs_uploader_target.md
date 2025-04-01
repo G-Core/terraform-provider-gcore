@@ -65,14 +65,14 @@ resource "gcore_cdn_logs_uploader_target" "target_2" {
 
 Optional:
 
-- `ftp` (Block List) (see [below for nested schema](#nestedblock--config--ftp))
-- `http` (Block List) (see [below for nested schema](#nestedblock--config--http))
-- `s3_amazon` (Block List) (see [below for nested schema](#nestedblock--config--s3_amazon))
-- `s3_gcore` (Block List) (see [below for nested schema](#nestedblock--config--s3_gcore))
-- `s3_oss` (Block List) (see [below for nested schema](#nestedblock--config--s3_oss))
-- `s3_other` (Block List) (see [below for nested schema](#nestedblock--config--s3_other))
-- `s3_v1` (Block List) (see [below for nested schema](#nestedblock--config--s3_v1))
-- `sftp` (Block List) (see [below for nested schema](#nestedblock--config--sftp))
+- `ftp` (Block List, Max: 1) (see [below for nested schema](#nestedblock--config--ftp))
+- `http` (Block List, Max: 1) (see [below for nested schema](#nestedblock--config--http))
+- `s3_amazon` (Block List, Max: 1) (see [below for nested schema](#nestedblock--config--s3_amazon))
+- `s3_gcore` (Block List, Max: 1) (see [below for nested schema](#nestedblock--config--s3_gcore))
+- `s3_oss` (Block List, Max: 1) (see [below for nested schema](#nestedblock--config--s3_oss))
+- `s3_other` (Block List, Max: 1) (see [below for nested schema](#nestedblock--config--s3_other))
+- `s3_v1` (Block List, Max: 1) (see [below for nested schema](#nestedblock--config--s3_v1))
+- `sftp` (Block List, Max: 1) (see [below for nested schema](#nestedblock--config--sftp))
 
 <a id="nestedblock--config--ftp"></a>
 ### Nested Schema for `config.ftp`
@@ -94,21 +94,21 @@ Optional:
 
 Required:
 
-- `auth` (Block List, Min: 1) (see [below for nested schema](#nestedblock--config--http--auth))
-- `upload` (Block List, Min: 1) (see [below for nested schema](#nestedblock--config--http--upload))
+- `auth` (Block List, Min: 1, Max: 1) (see [below for nested schema](#nestedblock--config--http--auth))
+- `upload` (Block List, Min: 1, Max: 1) (see [below for nested schema](#nestedblock--config--http--upload))
 
 Optional:
 
-- `append` (Block List) (see [below for nested schema](#nestedblock--config--http--append))
+- `append` (Block List, Max: 1) (see [below for nested schema](#nestedblock--config--http--append))
 - `payload_type` (String) Default value is text.
-- `retry` (Block List) (see [below for nested schema](#nestedblock--config--http--retry))
+- `retry` (Block List, Max: 1) (see [below for nested schema](#nestedblock--config--http--retry))
 
 <a id="nestedblock--config--http--auth"></a>
 ### Nested Schema for `config.http.auth`
 
 Required:
 
-- `config` (Block List, Min: 1) (see [below for nested schema](#nestedblock--config--http--auth--config))
+- `config` (Block List, Min: 1, Max: 1) (see [below for nested schema](#nestedblock--config--http--auth--config))
 - `type` (String)
 
 <a id="nestedblock--config--http--auth--config"></a>

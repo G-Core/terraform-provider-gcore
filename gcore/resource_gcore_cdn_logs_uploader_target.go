@@ -79,6 +79,7 @@ func schemaForS3Amazon() *schema.Schema {
 	return &schema.Schema{
 		Type:     schema.TypeList,
 		Optional: true,
+		MaxItems: 1,
 		Elem: &schema.Resource{
 			Schema: map[string]*schema.Schema{
 				"access_key_id": {
@@ -111,6 +112,7 @@ func schemaForS3Oss() *schema.Schema {
 	return &schema.Schema{
 		Type:     schema.TypeList,
 		Optional: true,
+		MaxItems: 1,
 		Elem: &schema.Resource{
 			Schema: map[string]*schema.Schema{
 				"access_key_id": {
@@ -143,6 +145,7 @@ func schemaForS3Other() *schema.Schema {
 	return &schema.Schema{
 		Type:     schema.TypeList,
 		Optional: true,
+		MaxItems: 1,
 		Elem: &schema.Resource{
 			Schema: map[string]*schema.Schema{
 				"access_key_id": {
@@ -185,6 +188,7 @@ func schemaForFTP() *schema.Schema {
 	return &schema.Schema{
 		Type:     schema.TypeList,
 		Optional: true,
+		MaxItems: 1,
 		Elem: &schema.Resource{
 			Schema: map[string]*schema.Schema{
 				"user": {
@@ -219,6 +223,7 @@ func schemaForSFTP() *schema.Schema {
 	return &schema.Schema{
 		Type:     schema.TypeList,
 		Optional: true,
+		MaxItems: 1,
 		Elem: &schema.Resource{
 			Schema: map[string]*schema.Schema{
 				"user": {
@@ -263,26 +268,33 @@ func schemaForHTTP() *schema.Schema {
 	return &schema.Schema{
 		Type:     schema.TypeList,
 		Optional: true,
+		MaxItems: 1,
 		Elem: &schema.Resource{
 			Schema: map[string]*schema.Schema{
 				"upload": {
 					Type:     schema.TypeList,
 					Required: true,
+					MinItems: 1,
+					MaxItems: 1,
 					Elem:     schemaForHTTPAction(),
 				},
 				"append": {
 					Type:     schema.TypeList,
 					Optional: true,
+					MaxItems: 1,
 					Elem:     schemaForHTTPAction(),
 				},
 				"retry": {
 					Type:     schema.TypeList,
 					Optional: true,
+					MaxItems: 1,
 					Elem:     schemaForHTTPAction(),
 				},
 				"auth": {
 					Type:     schema.TypeList,
 					Required: true,
+					MinItems: 1,
+					MaxItems: 1,
 					Elem: &schema.Resource{
 						Schema: map[string]*schema.Schema{
 							"type": {
@@ -292,6 +304,8 @@ func schemaForHTTP() *schema.Schema {
 							"config": {
 								Type:     schema.TypeList,
 								Required: true,
+								MinItems: 1,
+								MaxItems: 1,
 								Elem: &schema.Resource{
 									Schema: map[string]*schema.Schema{
 										"header_name": {
