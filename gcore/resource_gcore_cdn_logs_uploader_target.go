@@ -392,14 +392,8 @@ func resourceCDNLogsUploaderTargetCreate(ctx context.Context, d *schema.Resource
 	client := config.CDNClient
 
 	var req logsuploader.TargetCreateRequest
-
-	if v, ok := d.GetOk("name"); ok {
-		req.Name = v.(string)
-	}
-
-	if v, ok := d.GetOk("description"); ok {
-		req.Description = v.(string)
-	}
+	req.Name = d.Get("name").(string)
+	req.Description = d.Get("description").(string)
 
 	configList := d.Get("config").([]interface{})
 	configAttr := configList[0].(map[string]interface{})
@@ -473,14 +467,8 @@ func resourceCDNLogsUploaderTargetUpdate(ctx context.Context, d *schema.Resource
 	}
 
 	var req logsuploader.TargetUpdateRequest
-
-	if v, ok := d.GetOk("name"); ok {
-		req.Name = v.(string)
-	}
-
-	if v, ok := d.GetOk("description"); ok {
-		req.Description = v.(string)
-	}
+	req.Name = d.Get("name").(string)
+	req.Description = d.Get("description").(string)
 
 	configList := d.Get("config").([]interface{})
 	configAttr := configList[0].(map[string]interface{})
