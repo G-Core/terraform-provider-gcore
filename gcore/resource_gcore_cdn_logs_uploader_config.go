@@ -65,26 +65,11 @@ func resourceCDNLogsUploaderConfigCreate(ctx context.Context, d *schema.Resource
 	client := config.CDNClient
 
 	var req logsuploader.ConfigCreateRequest
-
-	if v, ok := d.GetOk("enabled"); ok {
-		req.Enabled = v.(bool)
-	}
-
-	if v, ok := d.GetOk("name"); ok {
-		req.Name = v.(string)
-	}
-
-	if v, ok := d.GetOk("policy"); ok {
-		req.Policy = int64(v.(int))
-	}
-
-	if v, ok := d.GetOk("target"); ok {
-		req.Target = int64(v.(int))
-	}
-
-	if v, ok := d.GetOk("for_all_resources"); ok {
-		req.ForAllResources = v.(bool)
-	}
+	req.Enabled = d.Get("enabled").(bool)
+	req.Name = d.Get("name").(string)
+	req.Policy = int64(d.Get("policy").(int))
+	req.Target = int64(d.Get("target").(int))
+	req.ForAllResources = d.Get("for_all_resources").(bool)
 
 	if v, ok := d.GetOk("resources"); ok {
 		resources := make([]int64, len(v.([]interface{})))
@@ -147,26 +132,11 @@ func resourceCDNLogsUploaderConfigUpdate(ctx context.Context, d *schema.Resource
 	}
 
 	var req logsuploader.ConfigUpdateRequest
-
-	if v, ok := d.GetOk("enabled"); ok {
-		req.Enabled = v.(bool)
-	}
-
-	if v, ok := d.GetOk("name"); ok {
-		req.Name = v.(string)
-	}
-
-	if v, ok := d.GetOk("policy"); ok {
-		req.Policy = int64(v.(int))
-	}
-
-	if v, ok := d.GetOk("target"); ok {
-		req.Target = int64(v.(int))
-	}
-
-	if v, ok := d.GetOk("for_all_resources"); ok {
-		req.ForAllResources = v.(bool)
-	}
+	req.Enabled = d.Get("enabled").(bool)
+	req.Name = d.Get("name").(string)
+	req.Policy = int64(d.Get("policy").(int))
+	req.Target = int64(d.Get("target").(int))
+	req.ForAllResources = d.Get("for_all_resources").(bool)
 
 	if v, ok := d.GetOk("resources"); ok {
 		resources := make([]int64, len(v.([]interface{})))
