@@ -383,9 +383,12 @@ func resourceCDNLogsUploaderTarget() *schema.Resource {
 
 func customizeDiffStorageTypeConfig(ctx context.Context, diff *schema.ResourceDiff, v interface{}) error {
 	configList := diff.Get("config").([]interface{})
+	if configList[0] == nil {
+		return fmt.Errorf("he 'config' field must contain at least one configuration")
+	}
+
 	config := configList[0].(map[string]interface{})
 	counter := 0
-
 	for _, value := range config {
 		value := value.([]interface{})
 		if len(value) != 0 {
@@ -394,7 +397,7 @@ func customizeDiffStorageTypeConfig(ctx context.Context, diff *schema.ResourceDi
 	}
 
 	if counter != 1 {
-		return fmt.Errorf("Only one storage type should be provided in the 'config' field.")
+		return fmt.Errorf("only one storage type should be provided in the 'config' field")
 	}
 
 	return nil
