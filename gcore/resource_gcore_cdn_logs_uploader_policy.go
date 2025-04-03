@@ -166,10 +166,8 @@ func resourceCDNLogsUploaderPolicyCreate(ctx context.Context, d *schema.Resource
 	}
 
 	d.SetId(fmt.Sprintf("%d", result.ID))
-	resourceCDNLogsUploaderPolicyRead(ctx, d, m)
-
 	log.Printf("[DEBUG] Finish CDN Logs Uploader Policy creating (id=%d)\n", result.ID)
-	return nil
+	return resourceCDNLogsUploaderPolicyRead(ctx, d, m)
 }
 
 func resourceCDNLogsUploaderPolicyRead(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {

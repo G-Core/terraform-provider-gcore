@@ -87,10 +87,8 @@ func resourceCDNLogsUploaderConfigCreate(ctx context.Context, d *schema.Resource
 	}
 
 	d.SetId(fmt.Sprintf("%d", result.ID))
-	resourceCDNLogsUploaderConfigRead(ctx, d, m)
-
 	log.Printf("[DEBUG] Finish CDN Logs Uploader Config creating (id=%d)\n", result.ID)
-	return nil
+	return resourceCDNLogsUploaderConfigRead(ctx, d, m)
 }
 
 func resourceCDNLogsUploaderConfigRead(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
