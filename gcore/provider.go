@@ -183,6 +183,7 @@ func Provider() *schema.Provider {
 			"gcore_gpu_virtual_image":    resourceVirtualImage(),
 			"gcore_fastedge_binary":      resourceFastEdgeBinary(),
 			"gcore_fastedge_app":         resourceFastEdgeApp(),
+			"gcore_fastedge_template":    resourceFastEdgeTemplate(),
 		},
 		DataSourcesMap: map[string]*schema.Resource{
 			"gcore_ai_cluster":             dataSourceAICluster(),
@@ -364,15 +365,15 @@ func providerConfigure(_ context.Context, d *schema.ResourceData) (interface{}, 
 			return nil
 		}
 
-		client, err := fastedge.NewClientWithResponses(
+		config.FastEdgeClient, err = fastedge.NewClientWithVersionCheck(
 			fastedgeAPI,
+			userAgent,
+			"Terraform provider",
 			fastedge.WithRequestEditorFn(authFunc),
-			fastedge.WithRequestEditorFn(fastedge.AddVersionHeader),
 		)
 		if err != nil {
 			return nil, diag.FromErr(fmt.Errorf("fastedge api init: %w", err))
 		}
-		config.FastEdgeClient = client
 	}
 
 	return &config, diags

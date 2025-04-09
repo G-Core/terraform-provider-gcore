@@ -17,6 +17,7 @@ import (
 
 func resourceFastEdgeApp() *schema.Resource {
 	return &schema.Resource{
+		Description: "FastEdge application.",
 		Importer: &schema.ResourceImporter{
 			StateContext: schema.ImportStatePassthroughContext,
 		},
@@ -42,7 +43,7 @@ func resourceFastEdgeApp() *schema.Resource {
 				Description: "Status code. Possible values are: enabled, disabled, suspended.",
 				Type:        schema.TypeString,
 				Required:    true,
-				ValidateFunc: func(v interface{}, k string) ([]string, []error) {
+				ValidateFunc: func(v any, k string) ([]string, []error) {
 					status := strings.ToLower(v.(string))
 					if status != "enabled" && status != "disabled" {
 						return nil, []error{errors.New("only 'enabled' or 'disabled' status can be set by the user")}
@@ -77,11 +78,10 @@ func resourceFastEdgeApp() *schema.Resource {
 		ReadContext:   resourceFastEdgeAppRead,
 		UpdateContext: resourceFastEdgeAppUpdate,
 		DeleteContext: resourceFastEdgeAppDelete,
-		Description:   "FastEdge application.",
 	}
 }
 
-func resourceFastEdgeAppCreate(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
+func resourceFastEdgeAppCreate(ctx context.Context, d *schema.ResourceData, m any) diag.Diagnostics {
 	log.Println("[DEBUG] Start FastEdge app creation")
 	config := m.(*Config)
 	client := config.FastEdgeClient
@@ -114,7 +114,7 @@ func resourceFastEdgeAppCreate(ctx context.Context, d *schema.ResourceData, m in
 	return nil
 }
 
-func resourceFastEdgeAppRead(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
+func resourceFastEdgeAppRead(ctx context.Context, d *schema.ResourceData, m any) diag.Diagnostics {
 	log.Println("[DEBUG] Start FastEdge app read")
 	config := m.(*Config)
 	client := config.FastEdgeClient
@@ -155,7 +155,7 @@ func resourceFastEdgeAppRead(ctx context.Context, d *schema.ResourceData, m inte
 	return nil
 }
 
-func resourceFastEdgeAppUpdate(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
+func resourceFastEdgeAppUpdate(ctx context.Context, d *schema.ResourceData, m any) diag.Diagnostics {
 	log.Println("[DEBUG] Start FastEdge app update")
 	config := m.(*Config)
 	client := config.FastEdgeClient
@@ -200,7 +200,7 @@ func resourceFastEdgeAppUpdate(ctx context.Context, d *schema.ResourceData, m in
 	return nil
 }
 
-func resourceFastEdgeAppDelete(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
+func resourceFastEdgeAppDelete(ctx context.Context, d *schema.ResourceData, m any) diag.Diagnostics {
 	var diags diag.Diagnostics
 	log.Println("[DEBUG] Start FastEdge app deletion")
 	config := m.(*Config)
@@ -263,7 +263,7 @@ func fieldValueMap(d *schema.ResourceData, name string) *map[string]string {
 	if v == nil {
 		return nil
 	}
-	tmpVal, ok := v.(map[string]interface{})
+	tmpVal, ok := v.(map[string]any)
 	if !ok {
 		return nil
 	}
@@ -271,7 +271,7 @@ func fieldValueMap(d *schema.ResourceData, name string) *map[string]string {
 	return &val
 }
 
-func convertMap(in map[string]interface{}) map[string]string {
+func convertMap(in map[string]any) map[string]string {
 	out := make(map[string]string, len(in))
 	for k, v := range in {
 		out[k] = v.(string)

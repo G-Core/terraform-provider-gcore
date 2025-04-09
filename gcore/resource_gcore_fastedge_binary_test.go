@@ -11,25 +11,33 @@ import (
 
 func TestFastEdgeBinary_basic(t *testing.T) {
 	checksum, _ := fileChecksum(os.Args[0])
-	mock := &mockSdk{
+	mock := &mockSDK{
 		t: t,
-		getBin: []mockParams{
-			{
-				expectId:  42,
-				retStatus: http.StatusOK,
-				retBody:   `{"id": 42, "checksum": "` + checksum + `"}`,
+		mocks: map[string]*funcMock{
+			"GetBinary": &funcMock{
+				params: []mockParams{
+					{
+						expectId:  42,
+						retStatus: http.StatusOK,
+						retBody:   `{"id": 42, "checksum": "` + checksum + `"}`,
+					},
+				},
 			},
-		},
-		addBin: []mockParams{
-			{
-				retStatus: http.StatusOK,
-				retBody:   `{"id": 42, "checksum": "` + checksum + `"}`,
+			"StoreBinary": &funcMock{
+				params: []mockParams{
+					{
+						retStatus: http.StatusOK,
+						retBody:   `{"id": 42, "checksum": "` + checksum + `"}`,
+					},
+				},
 			},
-		},
-		delBin: []mockParams{
-			{
-				expectId:  42,
-				retStatus: http.StatusNoContent,
+			"DelBinary": &funcMock{
+				params: []mockParams{
+					{
+						expectId:  42,
+						retStatus: http.StatusNoContent,
+					},
+				},
 			},
 		},
 	}
@@ -52,12 +60,16 @@ func TestFastEdgeBinary_basic(t *testing.T) {
 }
 
 func TestFastEdgeBinary_corrupted(t *testing.T) {
-	mock := &mockSdk{
+	mock := &mockSDK{
 		t: t,
-		addBin: []mockParams{
-			{
-				retStatus: http.StatusOK,
-				retBody:   `{"id": 42, "checksum": "xyz"}`, // checksum cannot possibly match the real one
+		mocks: map[string]*funcMock{
+			"StoreBinary": &funcMock{
+				params: []mockParams{
+					{
+						retStatus: http.StatusOK,
+						retBody:   `{"id": 42, "checksum": "xyz"}`, // checksum cannot possibly match the real one
+					},
+				},
 			},
 		},
 	}
@@ -78,38 +90,46 @@ func TestFastEdgeBinary_corrupted(t *testing.T) {
 
 func TestFastEdgeBinary_disappear(t *testing.T) {
 	checksum, _ := fileChecksum(os.Args[0])
-	mock := &mockSdk{
+	mock := &mockSDK{
 		t: t,
-		getBin: []mockParams{
-			{
-				expectId:  42,
-				retStatus: http.StatusOK,
-				retBody:   `{"id": 42, "checksum": "` + checksum + `"}`,
+		mocks: map[string]*funcMock{
+			"GetBinary": &funcMock{
+				params: []mockParams{
+					{
+						expectId:  42,
+						retStatus: http.StatusOK,
+						retBody:   `{"id": 42, "checksum": "` + checksum + `"}`,
+					},
+					{
+						expectId:  42,
+						retStatus: http.StatusNotFound, // resource disappeared from the backend
+					},
+					{
+						expectId:  42,
+						retStatus: http.StatusOK,
+						retBody:   `{"id": 42, "checksum": "` + checksum + `"}`,
+					},
+				},
 			},
-			{
-				expectId:  42,
-				retStatus: http.StatusNotFound, // resource disappeared from the backend
+			"StoreBinary": &funcMock{
+				params: []mockParams{
+					{
+						retStatus: http.StatusOK,
+						retBody:   `{"id": 42, "checksum": "` + checksum + `"}`,
+					},
+					{
+						retStatus: http.StatusOK,
+						retBody:   `{"id": 42, "checksum": "` + checksum + `"}`,
+					},
+				},
 			},
-			{
-				expectId:  42,
-				retStatus: http.StatusOK,
-				retBody:   `{"id": 42, "checksum": "` + checksum + `"}`,
-			},
-		},
-		addBin: []mockParams{
-			{
-				retStatus: http.StatusOK,
-				retBody:   `{"id": 42, "checksum": "` + checksum + `"}`,
-			},
-			{
-				retStatus: http.StatusOK,
-				retBody:   `{"id": 42, "checksum": "` + checksum + `"}`,
-			},
-		},
-		delBin: []mockParams{
-			{
-				expectId:  42,
-				retStatus: http.StatusNoContent,
+			"DelBinary": &funcMock{
+				params: []mockParams{
+					{
+						expectId:  42,
+						retStatus: http.StatusNoContent,
+					},
+				},
 			},
 		},
 	}
@@ -140,13 +160,17 @@ func TestFastEdgeBinary_disappear(t *testing.T) {
 
 func TestFastEdgeBinary_import(t *testing.T) {
 	checksum, _ := fileChecksum(os.Args[0])
-	mock := &mockSdk{
+	mock := &mockSDK{
 		t: t,
-		getBin: []mockParams{
-			{
-				expectId:  42,
-				retStatus: http.StatusOK,
-				retBody:   `{"id": 42, "checksum": "` + checksum + `"}`,
+		mocks: map[string]*funcMock{
+			"GetBinary": &funcMock{
+				params: []mockParams{
+					{
+						expectId:  42,
+						retStatus: http.StatusOK,
+						retBody:   `{"id": 42, "checksum": "` + checksum + `"}`,
+					},
+				},
 			},
 		},
 	}
