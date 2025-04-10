@@ -84,7 +84,7 @@ Optional:
 
 Read-Only:
 
-- `id` (String)
+- `id` (String) The ID of this resource.
 - `type` (String)
 
 <a id="nestedblock--schedule--cron"></a>
@@ -127,12 +127,9 @@ Optional:
 <a id="nestedblock--volume"></a>
 ### Nested Schema for `volume`
 
-Required:
-
-- `id` (String)
-
 Read-Only:
 
+- `id` (String) The ID of this resource.
 - `name` (String)
 
 ## Import
