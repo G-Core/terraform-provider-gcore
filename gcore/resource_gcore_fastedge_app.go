@@ -33,11 +33,19 @@ func resourceFastEdgeApp() *schema.Resource {
 				Type:        schema.TypeInt,
 				Computed:    true, // if template is specified, binary id is returned
 				Optional:    true,
+				ExactlyOneOf: []string{
+					"binary",
+					"template",
+				},
 			},
 			"template": {
 				Description: "Application template id.",
 				Type:        schema.TypeInt,
 				Optional:    true,
+				ExactlyOneOf: []string{
+					"binary",
+					"template",
+				},
 			},
 			"status": {
 				Description: "Status code. Possible values are: enabled, disabled, suspended.",
