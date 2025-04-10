@@ -20,15 +20,10 @@ var baseTemplateJson string = `
 			"mandatory": true,
 			"descr": "param1 description"
 		}
+	]
+}
 `
-var extraParamJson string = `,
-		{
-			"name": "param2",
-			"data_type": "number",
-			"mandatory": false,
-			"descr": "param2 description"
-		}
-`
+
 var baseTemplate sdk.Template = sdk.Template{
 	Name:       "test-template",
 	BinaryId:   314,
@@ -54,22 +49,10 @@ var baseTfFastEdgeTemplConfig string = `resource "gcore_fastedge_template" "test
 		descr = "param1 description"
 	}
 `
-var extraParamTf string = `param {
-		name = "param2"
-		type = "number"
-		descr = "param2 description"
-	}
-`
 
 func TestFastEdgeTemplate_basic(t *testing.T) {
 	updatedTemplate := baseTemplate
 	updatedTemplate.Name = "test-template1"
-	/*	updatedTemplate.Params = append(updatedTemplate.Params, sdk.TemplateParam{
-		Name:      "param2",
-		DataType:  "number",
-		Mandatory: false,
-		Descr:     ptr("param2 description"),
-	}) */
 
 	mock := &mockSDK{
 		t: t,
@@ -79,17 +62,17 @@ func TestFastEdgeTemplate_basic(t *testing.T) {
 					{
 						expectId:  42,
 						retStatus: http.StatusOK,
-						retBody:   `{"id": 42, "name": "test-template", ` + baseTemplateJson + `]}`,
+						retBody:   `{"id": 42, "name": "test-template", ` + baseTemplateJson,
 					},
 					{
 						expectId:  42,
 						retStatus: http.StatusOK,
-						retBody:   `{"id": 42, "name": "test-template", ` + baseTemplateJson + `]}`,
+						retBody:   `{"id": 42, "name": "test-template", ` + baseTemplateJson,
 					},
 					{
 						expectId:  42,
 						retStatus: http.StatusOK,
-						retBody:   `{"id": 42, "name": "test-template1", ` + baseTemplateJson /*+ extraParamJson*/ + `]}`,
+						retBody:   `{"id": 42, "name": "test-template1", ` + baseTemplateJson,
 					},
 				},
 			},
@@ -98,7 +81,7 @@ func TestFastEdgeTemplate_basic(t *testing.T) {
 					{
 						expectPayload: baseTemplate,
 						retStatus:     http.StatusOK,
-						retBody:       `{"id": 42, "name": "test-template", ` + baseTemplateJson + `]}`,
+						retBody:       `{"id": 42, "name": "test-template", ` + baseTemplateJson,
 					},
 				},
 			},
@@ -108,7 +91,7 @@ func TestFastEdgeTemplate_basic(t *testing.T) {
 						expectId:      42,
 						expectPayload: updatedTemplate,
 						retStatus:     http.StatusOK,
-						retBody:       `{"id": 42, "name": "test-template1", ` + baseTemplateJson /* + extraParamJson*/ + `]}`,
+						retBody:       `{"id": 42, "name": "test-template1", ` + baseTemplateJson,
 					},
 				},
 			},
@@ -131,22 +114,169 @@ func TestFastEdgeTemplate_basic(t *testing.T) {
 				Config: baseTfFastEdgeTemplConfig + `name = "test-template"
 				}`,
 				Check: resource.ComposeTestCheckFunc(
-				//					testAccCheckResourceExists("gcore_fastedge_template.test"),
-				/*					resource.TestCheckResourceAttr("gcore_fastedge_app.test", "id", "42"),
-									resource.TestCheckResourceAttr("gcore_fastedge_app.test", "name", "test-app"),
-									resource.TestCheckResourceAttr("gcore_fastedge_app.test", "binary", "314"),
-									resource.TestCheckResourceAttr("gcore_fastedge_app.test", "status", "enabled"),
-									resource.TestCheckResourceAttr("gcore_fastedge_app.test", "env.key", "value"),
-									resource.TestCheckResourceAttr("gcore_fastedge_app.test", "rsp_headers.key1", "value1"),
-									resource.TestCheckResourceAttr("gcore_fastedge_app.test", "comment", "test application"),
-									resource.TestCheckResourceAttr("gcore_fastedge_app.test", "debug", "true"), */
+					testAccCheckResourceExists("gcore_fastedge_template.test"),
+					resource.TestCheckResourceAttr("gcore_fastedge_template.test", "id", "42"),
+					resource.TestCheckResourceAttr("gcore_fastedge_template.test", "name", "test-template"),
+					resource.TestCheckResourceAttr("gcore_fastedge_template.test", "binary", "314"),
+					resource.TestCheckResourceAttr("gcore_fastedge_template.test", "short_descr", "short description"),
+					resource.TestCheckResourceAttr("gcore_fastedge_template.test", "long_descr", "long description"),
+					resource.TestCheckResourceAttr("gcore_fastedge_template.test", "param.0.name", "param1"),
+					resource.TestCheckResourceAttr("gcore_fastedge_template.test", "param.0.type", "string"),
+					resource.TestCheckResourceAttr("gcore_fastedge_template.test", "param.0.mandatory", "true"),
+					resource.TestCheckResourceAttr("gcore_fastedge_template.test", "param.0.descr", "param1 description"),
 				),
 			},
 			{ // update resource
-				Config: baseTfFastEdgeTemplConfig + /*extraParamTf +*/ `name = "test-template1"
+				Config: baseTfFastEdgeTemplConfig + `name = "test-template1"
 				}`,
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckResourceExists("gcore_fastedge_template.test"),
+					resource.TestCheckResourceAttr("gcore_fastedge_template.test", "id", "42"),
+					resource.TestCheckResourceAttr("gcore_fastedge_template.test", "name", "test-template1"),
+					resource.TestCheckResourceAttr("gcore_fastedge_template.test", "binary", "314"),
+					resource.TestCheckResourceAttr("gcore_fastedge_template.test", "short_descr", "short description"),
+					resource.TestCheckResourceAttr("gcore_fastedge_template.test", "long_descr", "long description"),
+					resource.TestCheckResourceAttr("gcore_fastedge_template.test", "param.0.name", "param1"),
+					resource.TestCheckResourceAttr("gcore_fastedge_template.test", "param.0.type", "string"),
+					resource.TestCheckResourceAttr("gcore_fastedge_template.test", "param.0.mandatory", "true"),
+					resource.TestCheckResourceAttr("gcore_fastedge_template.test", "param.0.descr", "param1 description"),
+				),
+			},
+		},
+	})
+
+	mock.ExpectationsWereMet(t)
+}
+
+func TestFastEdgeTemplate_disappear(t *testing.T) {
+	updatedTemplate := baseTemplate
+	updatedTemplate.Name = "test-template1"
+
+	mock := &mockSDK{
+		t: t,
+		mocks: map[string]*funcMock{
+			"GetTemplate": {
+				params: []mockParams{
+					{
+						expectId:  42,
+						retStatus: http.StatusOK,
+						retBody:   `{"id": 42, "name": "test-template", ` + baseTemplateJson,
+					},
+					{
+						expectId:  42,
+						retStatus: http.StatusNotFound, // resource disappeared from the backend
+					},
+					{
+						expectId:  43,
+						retStatus: http.StatusOK,
+						retBody:   `{"id": 43, "name": "test-template1", ` + baseTemplateJson,
+					},
+				},
+			},
+			"AddTemplate": {
+				params: []mockParams{
+					{
+						expectPayload: baseTemplate,
+						retStatus:     http.StatusOK,
+						retBody:       `{"id": 42, "name": "test-template", ` + baseTemplateJson,
+					},
+					{
+						expectPayload: updatedTemplate,
+						retStatus:     http.StatusOK,
+						retBody:       `{"id": 43, "name": "test-template1", ` + baseTemplateJson,
+					},
+				},
+			},
+			"DelTemplate": {
+				params: []mockParams{
+					{
+						expectId:  43,
+						retStatus: http.StatusNoContent,
+					},
+				},
+			},
+		},
+	}
+
+	resource.Test(t, resource.TestCase{
+		ProviderFactories: fastedgeMockProvider(mock),
+		IsUnitTest:        true,
+		Steps: []resource.TestStep{
+			{ // create resource
+				Config: baseTfFastEdgeTemplConfig + `name = "test-template"
+				}`,
+				Check: resource.ComposeTestCheckFunc(
+					testAccCheckResourceExists("gcore_fastedge_template.test"),
+					resource.TestCheckResourceAttr("gcore_fastedge_template.test", "id", "42"),
+					resource.TestCheckResourceAttr("gcore_fastedge_template.test", "name", "test-template"),
+					resource.TestCheckResourceAttr("gcore_fastedge_template.test", "binary", "314"),
+					resource.TestCheckResourceAttr("gcore_fastedge_template.test", "short_descr", "short description"),
+					resource.TestCheckResourceAttr("gcore_fastedge_template.test", "long_descr", "long description"),
+					resource.TestCheckResourceAttr("gcore_fastedge_template.test", "param.0.name", "param1"),
+					resource.TestCheckResourceAttr("gcore_fastedge_template.test", "param.0.type", "string"),
+					resource.TestCheckResourceAttr("gcore_fastedge_template.test", "param.0.mandatory", "true"),
+					resource.TestCheckResourceAttr("gcore_fastedge_template.test", "param.0.descr", "param1 description"),
+				),
+			},
+			{ // resource disappeared - re-create
+				Config: baseTfFastEdgeTemplConfig + `name = "test-template1"
+				}`,
+				Check: resource.ComposeTestCheckFunc(
+					testAccCheckResourceExists("gcore_fastedge_template.test"),
+					resource.TestCheckResourceAttr("gcore_fastedge_template.test", "id", "43"),
+					resource.TestCheckResourceAttr("gcore_fastedge_template.test", "name", "test-template1"),
+					resource.TestCheckResourceAttr("gcore_fastedge_template.test", "binary", "314"),
+					resource.TestCheckResourceAttr("gcore_fastedge_template.test", "short_descr", "short description"),
+					resource.TestCheckResourceAttr("gcore_fastedge_template.test", "long_descr", "long description"),
+					resource.TestCheckResourceAttr("gcore_fastedge_template.test", "param.0.name", "param1"),
+					resource.TestCheckResourceAttr("gcore_fastedge_template.test", "param.0.type", "string"),
+					resource.TestCheckResourceAttr("gcore_fastedge_template.test", "param.0.mandatory", "true"),
+					resource.TestCheckResourceAttr("gcore_fastedge_template.test", "param.0.descr", "param1 description"),
+				),
+			},
+		},
+	})
+
+	mock.ExpectationsWereMet(t)
+}
+
+func TestFastEdgeTemplate_import(t *testing.T) {
+	mock := &mockSDK{
+		t: t,
+		mocks: map[string]*funcMock{
+			"GetTemplate": {
+				params: []mockParams{
+					{
+						expectId:  42,
+						retStatus: http.StatusOK,
+						retBody:   `{"id": 42, "name": "test-template", ` + baseTemplateJson,
+					},
+				},
+			},
+		},
+	}
+
+	resource.Test(t, resource.TestCase{
+		ProviderFactories: fastedgeMockProvider(mock),
+		IsUnitTest:        true,
+		Steps: []resource.TestStep{
+			{ // import resource
+				Config: baseTfFastEdgeTemplConfig + `name = "test-template"
+				}`,
+				ImportState:   true,
+				ImportStateId: "42",
+				ResourceName:  "gcore_fastedge_template.test",
+				Check: resource.ComposeTestCheckFunc(
+					testAccCheckResourceExists("gcore_fastedge_template.test"),
+					resource.TestCheckResourceAttr("gcore_fastedge_template.test", "id", "42"),
+					resource.TestCheckResourceAttr("gcore_fastedge_template.test", "name", "test-template"),
+					resource.TestCheckResourceAttr("gcore_fastedge_template.test", "binary", "314"),
+					resource.TestCheckResourceAttr("gcore_fastedge_template.test", "short_descr", "short description"),
+					resource.TestCheckResourceAttr("gcore_fastedge_template.test", "long_descr", "long description"),
+					resource.TestCheckResourceAttr("gcore_fastedge_template.test", "param.0.name", "param1"),
+					resource.TestCheckResourceAttr("gcore_fastedge_template.test", "param.0.type", "string"),
+					resource.TestCheckResourceAttr("gcore_fastedge_template.test", "param.0.mandatory", "true"),
+					resource.TestCheckResourceAttr("gcore_fastedge_template.test", "param.0.descr", "param1 description"),
 				),
 			},
 		},

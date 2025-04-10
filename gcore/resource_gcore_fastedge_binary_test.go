@@ -14,7 +14,7 @@ func TestFastEdgeBinary_basic(t *testing.T) {
 	mock := &mockSDK{
 		t: t,
 		mocks: map[string]*funcMock{
-			"GetBinary": &funcMock{
+			"GetBinary": {
 				params: []mockParams{
 					{
 						expectId:  42,
@@ -23,7 +23,7 @@ func TestFastEdgeBinary_basic(t *testing.T) {
 					},
 				},
 			},
-			"StoreBinary": &funcMock{
+			"StoreBinary": {
 				params: []mockParams{
 					{
 						retStatus: http.StatusOK,
@@ -31,7 +31,7 @@ func TestFastEdgeBinary_basic(t *testing.T) {
 					},
 				},
 			},
-			"DelBinary": &funcMock{
+			"DelBinary": {
 				params: []mockParams{
 					{
 						expectId:  42,
@@ -63,7 +63,7 @@ func TestFastEdgeBinary_corrupted(t *testing.T) {
 	mock := &mockSDK{
 		t: t,
 		mocks: map[string]*funcMock{
-			"StoreBinary": &funcMock{
+			"StoreBinary": {
 				params: []mockParams{
 					{
 						retStatus: http.StatusOK,
@@ -93,7 +93,7 @@ func TestFastEdgeBinary_disappear(t *testing.T) {
 	mock := &mockSDK{
 		t: t,
 		mocks: map[string]*funcMock{
-			"GetBinary": &funcMock{
+			"GetBinary": {
 				params: []mockParams{
 					{
 						expectId:  42,
@@ -105,13 +105,13 @@ func TestFastEdgeBinary_disappear(t *testing.T) {
 						retStatus: http.StatusNotFound, // resource disappeared from the backend
 					},
 					{
-						expectId:  42,
+						expectId:  43,
 						retStatus: http.StatusOK,
 						retBody:   `{"id": 42, "checksum": "` + checksum + `"}`,
 					},
 				},
 			},
-			"StoreBinary": &funcMock{
+			"StoreBinary": {
 				params: []mockParams{
 					{
 						retStatus: http.StatusOK,
@@ -119,14 +119,14 @@ func TestFastEdgeBinary_disappear(t *testing.T) {
 					},
 					{
 						retStatus: http.StatusOK,
-						retBody:   `{"id": 42, "checksum": "` + checksum + `"}`,
+						retBody:   `{"id": 43, "checksum": "` + checksum + `"}`,
 					},
 				},
 			},
-			"DelBinary": &funcMock{
+			"DelBinary": {
 				params: []mockParams{
 					{
-						expectId:  42,
+						expectId:  43,
 						retStatus: http.StatusNoContent,
 					},
 				},
@@ -148,7 +148,7 @@ func TestFastEdgeBinary_disappear(t *testing.T) {
 			{
 				Config: `resource "gcore_fastedge_binary" "test" {	filename = "` + os.Args[0] + `"}`,
 				Check: resource.ComposeTestCheckFunc(
-					resource.TestCheckResourceAttr("gcore_fastedge_binary.test", "id", "42"),
+					resource.TestCheckResourceAttr("gcore_fastedge_binary.test", "id", "43"),
 					resource.TestCheckResourceAttr("gcore_fastedge_binary.test", "checksum", checksum),
 				),
 			},
@@ -163,7 +163,7 @@ func TestFastEdgeBinary_import(t *testing.T) {
 	mock := &mockSDK{
 		t: t,
 		mocks: map[string]*funcMock{
-			"GetBinary": &funcMock{
+			"GetBinary": {
 				params: []mockParams{
 					{
 						expectId:  42,

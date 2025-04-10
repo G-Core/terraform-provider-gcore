@@ -160,9 +160,9 @@ func TestFastEdgeApp_disappear(t *testing.T) {
 						retStatus: http.StatusNotFound, // resource disappeared from the backend
 					},
 					{
-						expectId:  42,
+						expectId:  43,
 						retStatus: http.StatusOK,
-						retBody:   `{"id": 42, "name": "test-app1", ` + baseAppJson + `}`,
+						retBody:   `{"id": 43, "name": "test-app1", ` + baseAppJson + `}`,
 					},
 				},
 			},
@@ -176,14 +176,14 @@ func TestFastEdgeApp_disappear(t *testing.T) {
 					{
 						expectPayload: updatedApp,
 						retStatus:     http.StatusOK,
-						retBody:       `{"id": 42, "name": "test-app1", ` + baseAppJson + `}`,
+						retBody:       `{"id": 43, "name": "test-app1", ` + baseAppJson + `}`,
 					},
 				},
 			},
 			"DelApp": {
 				params: []mockParams{
 					{
-						expectId:  42,
+						expectId:  43,
 						retStatus: http.StatusNoContent,
 					},
 				},
@@ -215,7 +215,7 @@ func TestFastEdgeApp_disappear(t *testing.T) {
 						}`,
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckResourceExists("gcore_fastedge_app.test"),
-					resource.TestCheckResourceAttr("gcore_fastedge_app.test", "id", "42"),
+					resource.TestCheckResourceAttr("gcore_fastedge_app.test", "id", "43"),
 					resource.TestCheckResourceAttr("gcore_fastedge_app.test", "name", "test-app1"),
 					resource.TestCheckResourceAttr("gcore_fastedge_app.test", "binary", "314"),
 					resource.TestCheckResourceAttr("gcore_fastedge_app.test", "status", "enabled"),
