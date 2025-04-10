@@ -45,7 +45,7 @@ func (m *mockSDK) mock(name string, id int64, body any) (*http.Response, error) 
 	if params.expectPayload != nil {
 		compare(m.t, body, params.expectPayload, name, mock.count)
 	}
-	return sdk.NewJsonHttpResponse(mock.params[mock.count].retStatus, mock.params[mock.count].retBody), nil
+	return sdk.NewJsonHttpResponse(params.retStatus, params.retBody), nil
 }
 
 func (m *mockSDK) GetApp(ctx context.Context, id int64, reqEditors ...sdk.RequestEditorFn) (*http.Response, error) {
@@ -111,7 +111,7 @@ func fastedgeMockProvider(mock sdk.ClientInterface) map[string]func() (*schema.P
 					"gcore_fastedge_app":      resourceFastEdgeApp(),
 					"gcore_fastedge_template": resourceFastEdgeTemplate(),
 				},
-				ConfigureContextFunc: func(ctx context.Context, d *schema.ResourceData) (interface{}, diag.Diagnostics) {
+				ConfigureContextFunc: func(ctx context.Context, d *schema.ResourceData) (any, diag.Diagnostics) {
 					config := Config{FastEdgeClient: &sdk.ClientWithResponses{ClientInterface: mock}}
 					return &config, nil
 				},
