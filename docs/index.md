@@ -42,6 +42,7 @@ Other settings that can be configured include:
 - `gcore_dns_api`
 - `gcore_platform_api`
 - `gcore_storage_api`
+- `gcore_fastedge_api`
 
 ### Environment Variables
 
@@ -69,6 +70,7 @@ Other supported environment variables include:
 - `GCORE_DNS_API`
 - `GCORE_PLATFORM_API`
 - `GCORE_STORAGE_API`
+- `GCORE_FASTEDGE_API`
 
 ## Example Usage
 

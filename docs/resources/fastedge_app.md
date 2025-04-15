@@ -72,6 +72,7 @@ resource "gcore_fastedge_app" "app_from_template" {
 - `env` (Map of String) Environment variables.
 - `name` (String) Application name.
 - `rsp_headers` (Map of String) Response headers.
+- `secrets` (Map of Number) Secret variables.
 - `template` (Number) Application template id.
 
 ### Read-Only
