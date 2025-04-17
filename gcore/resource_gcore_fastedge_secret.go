@@ -1,6 +1,7 @@
 package gcore
 
 import (
+	"bytes"
 	"context"
 	"crypto/sha256"
 	"encoding/hex"
@@ -38,6 +39,17 @@ func resourceFastEdgeSecret() *schema.Resource {
 				Description: "Secret slot.",
 				Type:        schema.TypeSet,
 				Optional:    true,
+				Computed:    true,
+				Set: func(val any) int {
+					// for existing resources old secret value (from state) is empty while new
+					// is not therefore default hash differs even for unchanged value, so
+					// exclude 'value' from hash calcuilation
+					var buf bytes.Buffer
+					slot := val.(map[string]any)
+					buf.WriteString(strconv.Itoa(slot["id"].(int)))
+					buf.WriteString(slot["checksum"].(string))
+					return schema.HashString(buf.String())
+				},
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
 						"id": {
@@ -57,11 +69,6 @@ func resourceFastEdgeSecret() *schema.Resource {
 							Computed:    true,
 						},
 					},
-					// if value is set, calculate secret slot checksum to detect value change
-					CustomizeDiff: func(_ context.Context, diff *schema.ResourceDiff, meta any) error {
-						val := diff.Get("value")
-						return diff.SetNew("checksum", secretChecksum(val.(string)))
-					},
 				},
 			},
 		},
@@ -69,6 +76,27 @@ func resourceFastEdgeSecret() *schema.Resource {
 		ReadContext:   resourceFastEdgeSecretRead,
 		UpdateContext: resourceFastEdgeSecretUpdate,
 		DeleteContext: resourceFastEdgeSecretDelete,
+		CustomizeDiff: func(_ context.Context, diff *schema.ResourceDiff, meta any) error {
+			if diff.GetRawState().IsNull() { // adding new resource - not need for checksum
+				return nil
+			}
+			if v, ok := diff.Get("slot").(*schema.Set); ok {
+				res := schema.NewSet(v.F, nil)
+				list := v.List()
+				for _, v := range list {
+					p := v.(map[string]any)
+					value := p["value"].(string)
+					checksum := secretChecksum(value)
+					res.Add(map[string]any{
+						"id":       p["id"],
+						"checksum": checksum,
+						"value":    value,
+					})
+				}
+				diff.SetNew("slot", res)
+			}
+			return nil
+		},
 	}
 }
 
