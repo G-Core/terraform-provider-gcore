@@ -144,7 +144,7 @@ func resourceSubnet() *schema.Resource {
 			},
 			"gateway_ip": &schema.Schema{
 				Type:        schema.TypeString,
-				Description: "Desired IP address of the subnet's gateway.",
+				Description: "Desired IP address of the subnet's gateway. Use `disable` value to disable gateway ip.",
 				Optional:    true,
 				Computed:    true,
 				ValidateDiagFunc: func(val interface{}, key cty.Path) diag.Diagnostics {
