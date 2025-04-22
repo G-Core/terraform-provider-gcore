@@ -223,15 +223,16 @@ func resourceFastEdgeSecretDelete(ctx context.Context, d *schema.ResourceData, m
 			diags = diag.Diagnostics{
 				{
 					Severity: diag.Warning,
-					Summary:  fmt.Sprintf("Secret (%d) is referenced so cannot be deleted, but removed from TF state", id),
+					Summary:  fmt.Sprintf("Secret (%d) is referenced so cannot be deleted", id),
 				},
 			}
 		} else {
 			return diag.Errorf("calling DeleteSecret API: %s", extractErrorMessage(rsp.Body))
 		}
+	} else {
+		d.SetId("")
 	}
 
-	d.SetId("")
 	log.Println("[DEBUG] Finish FastEdge secret deletion")
 	return diags
 }
