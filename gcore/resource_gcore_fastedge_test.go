@@ -81,6 +81,18 @@ func (m *mockSDK) UpdateTemplate(ctx context.Context, id int64, body sdk.UpdateT
 func (m *mockSDK) DelTemplate(ctx context.Context, id int64, reqEditors ...sdk.RequestEditorFn) (*http.Response, error) {
 	return m.mock("DelTemplate", id, nil)
 }
+func (m *mockSDK) GetSecret(ctx context.Context, id int64, reqEditors ...sdk.RequestEditorFn) (*http.Response, error) {
+	return m.mock("GetSecret", id, nil)
+}
+func (m *mockSDK) AddSecret(ctx context.Context, body sdk.AddSecretJSONRequestBody, reqEditors ...sdk.RequestEditorFn) (*http.Response, error) {
+	return m.mock("AddSecret", 0, body)
+}
+func (m *mockSDK) UpdateSecret(ctx context.Context, id int64, body sdk.UpdateSecretJSONRequestBody, reqEditors ...sdk.RequestEditorFn) (*http.Response, error) {
+	return m.mock("UpdateSecret", id, body)
+}
+func (m *mockSDK) DeleteSecret(ctx context.Context, id int64, params *sdk.DeleteSecretParams, reqEditors ...sdk.RequestEditorFn) (*http.Response, error) {
+	return m.mock("DeleteSecret", id, nil)
+}
 
 func (m mockSDK) ExpectationsWereMet(t *testing.T) {
 	t.Helper()
@@ -110,6 +122,7 @@ func fastedgeMockProvider(mock sdk.ClientInterface) map[string]func() (*schema.P
 					"gcore_fastedge_binary":   resourceFastEdgeBinary(),
 					"gcore_fastedge_app":      resourceFastEdgeApp(),
 					"gcore_fastedge_template": resourceFastEdgeTemplate(),
+					"gcore_fastedge_secret":   resourceFastEdgeSecret(),
 				},
 				ConfigureContextFunc: func(ctx context.Context, d *schema.ResourceData) (any, diag.Diagnostics) {
 					config := Config{FastEdgeClient: &sdk.ClientWithResponses{ClientInterface: mock}}

@@ -19,7 +19,12 @@ var baseAppJson string = `
 		"key1": "value1"
 	},
 	"debug": true,
-	"comment": "test application"
+	"comment": "test application",
+	"secrets": {
+	    "foo": {
+			"id": 1
+		}
+	}
 `
 var baseApp sdk.App = sdk.App{
 	Name:    ptr("test-app"),
@@ -33,6 +38,11 @@ var baseApp sdk.App = sdk.App{
 	RspHeaders: ptr(map[string]string{
 		"key1": "value1",
 	}),
+	Secrets: &map[string]sdk.AppSecretShort{
+		"foo": {
+			Id: 1,
+		},
+	},
 }
 var baseTfFastEdgeAppConfig string = `resource "gcore_fastedge_app" "test" {
 	binary = 314
@@ -45,6 +55,9 @@ var baseTfFastEdgeAppConfig string = `resource "gcore_fastedge_app" "test" {
 	}
 	debug = true
 	comment = "test application"
+	secrets = {
+		"foo" = "1"
+	}
 `
 
 func TestFastEdgeApp_basic(t *testing.T) {
@@ -119,6 +132,7 @@ func TestFastEdgeApp_basic(t *testing.T) {
 					resource.TestCheckResourceAttr("gcore_fastedge_app.test", "rsp_headers.key1", "value1"),
 					resource.TestCheckResourceAttr("gcore_fastedge_app.test", "comment", "test application"),
 					resource.TestCheckResourceAttr("gcore_fastedge_app.test", "debug", "true"),
+					resource.TestCheckResourceAttr("gcore_fastedge_app.test", "secrets.foo", "1"),
 				),
 			},
 			{ // update resource
@@ -134,6 +148,7 @@ func TestFastEdgeApp_basic(t *testing.T) {
 					resource.TestCheckResourceAttr("gcore_fastedge_app.test", "rsp_headers.key1", "value1"),
 					resource.TestCheckResourceAttr("gcore_fastedge_app.test", "comment", "test application"),
 					resource.TestCheckResourceAttr("gcore_fastedge_app.test", "debug", "true"),
+					resource.TestCheckResourceAttr("gcore_fastedge_app.test", "secrets.foo", "1"),
 				),
 			},
 		},
@@ -208,6 +223,7 @@ func TestFastEdgeApp_disappear(t *testing.T) {
 					resource.TestCheckResourceAttr("gcore_fastedge_app.test", "rsp_headers.key1", "value1"),
 					resource.TestCheckResourceAttr("gcore_fastedge_app.test", "comment", "test application"),
 					resource.TestCheckResourceAttr("gcore_fastedge_app.test", "debug", "true"),
+					resource.TestCheckResourceAttr("gcore_fastedge_app.test", "secrets.foo", "1"),
 				),
 			},
 			{ // resource disappeared - re-create
@@ -223,6 +239,7 @@ func TestFastEdgeApp_disappear(t *testing.T) {
 					resource.TestCheckResourceAttr("gcore_fastedge_app.test", "rsp_headers.key1", "value1"),
 					resource.TestCheckResourceAttr("gcore_fastedge_app.test", "comment", "test application"),
 					resource.TestCheckResourceAttr("gcore_fastedge_app.test", "debug", "true"),
+					resource.TestCheckResourceAttr("gcore_fastedge_app.test", "secrets.foo", "1"),
 				),
 			},
 		},
@@ -267,6 +284,7 @@ func TestFastEdgeApp_import(t *testing.T) {
 					resource.TestCheckResourceAttr("gcore_fastedge_app.test", "rsp_headers.key1", "value1"),
 					resource.TestCheckResourceAttr("gcore_fastedge_app.test", "comment", "test application"),
 					resource.TestCheckResourceAttr("gcore_fastedge_app.test", "debug", "true"),
+					resource.TestCheckResourceAttr("gcore_fastedge_app.test", "secrets.foo", "1"),
 				),
 			},
 		},

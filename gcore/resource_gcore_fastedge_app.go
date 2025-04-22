@@ -65,6 +65,12 @@ func resourceFastEdgeApp() *schema.Resource {
 				Optional:    true,
 				Elem:        schema.TypeString,
 			},
+			"secrets": {
+				Description: "Secret variables.",
+				Type:        schema.TypeMap,
+				Optional:    true,
+				Elem:        schema.TypeInt,
+			},
 			"rsp_headers": {
 				Description: "Response headers.",
 				Type:        schema.TypeMap,
@@ -100,8 +106,9 @@ func resourceFastEdgeAppCreate(ctx context.Context, d *schema.ResourceData, m an
 		Binary:     fieldValueInt64(d, "binary"),
 		Template:   fieldValueInt64(d, "template"),
 		Debug:      fieldValue[bool](d, "debug"),
-		Env:        fieldValueMap(d, "env"),
-		RspHeaders: fieldValueMap(d, "rsp_headers"),
+		Env:        fieldValueStringMap(d, "env"),
+		RspHeaders: fieldValueStringMap(d, "rsp_headers"),
+		Secrets:    fieldValueSecretMap(d, "secrets"),
 		Comment:    fieldValue[string](d, "comment"),
 		Status:     &status,
 	}
@@ -158,6 +165,13 @@ func resourceFastEdgeAppRead(ctx context.Context, d *schema.ResourceData, m any)
 	setField(d, "rsp_headers", app.RspHeaders)
 	setField(d, "comment", app.Comment)
 	d.Set("status", statusToString(*app.Status))
+	if app.Secrets != nil {
+		secrets := make(map[string]any, len(*app.Secrets))
+		for k, v := range *app.Secrets {
+			secrets[k] = v.Id
+		}
+		d.Set("secrets", secrets)
+	}
 
 	log.Println("[DEBUG] Finish FastEdge app read")
 	return nil
@@ -179,8 +193,9 @@ func resourceFastEdgeAppUpdate(ctx context.Context, d *schema.ResourceData, m an
 		Binary:     fieldValueInt64(d, "binary"),
 		Template:   fieldValueInt64(d, "template"),
 		Debug:      fieldValue[bool](d, "debug"),
-		Env:        fieldValueMap(d, "env"),
-		RspHeaders: fieldValueMap(d, "rsp_headers"),
+		Env:        fieldValueStringMap(d, "env"),
+		RspHeaders: fieldValueStringMap(d, "rsp_headers"),
+		Secrets:    fieldValueSecretMap(d, "secrets"),
 		Comment:    fieldValue[string](d, "comment"),
 		Status:     &status,
 	}
@@ -228,15 +243,16 @@ func resourceFastEdgeAppDelete(ctx context.Context, d *schema.ResourceData, m an
 			diags = diag.Diagnostics{
 				{
 					Severity: diag.Warning,
-					Summary:  fmt.Sprintf("App (%d) is referenced so cannot be deleted, but removed from TF state", id),
+					Summary:  fmt.Sprintf("App (%d) is referenced so cannot be deleted", id),
 				},
 			}
 		} else {
 			return diag.Errorf("calling DelApp API: %s", extractErrorMessage(rsp.Body))
 		}
+	} else {
+		d.SetId("")
 	}
 
-	d.SetId("")
 	log.Println("[DEBUG] Finish FastEdge app deletion")
 	return diags
 }
@@ -266,7 +282,7 @@ func fieldValueInt64(d *schema.ResourceData, name string) *int64 {
 	return &val
 }
 
-func fieldValueMap(d *schema.ResourceData, name string) *map[string]string {
+func fieldValueStringMap(d *schema.ResourceData, name string) *map[string]string {
 	v := d.Get(name)
 	if v == nil {
 		return nil
@@ -275,11 +291,29 @@ func fieldValueMap(d *schema.ResourceData, name string) *map[string]string {
 	if !ok {
 		return nil
 	}
-	val := convertMap(tmpVal)
+	val := convertStringMap(tmpVal)
 	return &val
 }
 
-func convertMap(in map[string]any) map[string]string {
+func fieldValueSecretMap(d *schema.ResourceData, name string) *map[string]sdk.AppSecretShort {
+	v := d.Get(name)
+	if v == nil {
+		return nil
+	}
+	tmpVal, ok := v.(map[string]any)
+	if !ok {
+		return nil
+	}
+	val := make(map[string]sdk.AppSecretShort, len(tmpVal))
+	for k, v := range tmpVal {
+		val[k] = sdk.AppSecretShort{
+			Id: int64(v.(int)),
+		}
+	}
+	return &val
+}
+
+func convertStringMap(in map[string]any) map[string]string {
 	out := make(map[string]string, len(in))
 	for k, v := range in {
 		out[k] = v.(string)

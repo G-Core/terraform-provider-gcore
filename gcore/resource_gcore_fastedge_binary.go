@@ -112,15 +112,16 @@ func resourceFastEdgeBinaryDelete(ctx context.Context, d *schema.ResourceData, m
 			diags = diag.Diagnostics{
 				{
 					Severity: diag.Warning,
-					Summary:  fmt.Sprintf("Wasm binary (%d) is referenced so cannot be deleted, but removed from TF state", id),
+					Summary:  fmt.Sprintf("Wasm binary (%d) is referenced so cannot be deleted", id),
 				},
 			}
 		} else {
 			return diag.Errorf("calling DelBinary API: %s", extractErrorMessage(rsp.Body))
 		}
+	} else {
+		d.SetId("")
 	}
 
-	d.SetId("")
 	log.Println("[DEBUG] Finish FastEdge binary deletion")
 	return diags
 }
