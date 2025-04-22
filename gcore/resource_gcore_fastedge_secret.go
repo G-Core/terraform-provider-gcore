@@ -62,6 +62,10 @@ func resourceFastEdgeSecret() *schema.Resource {
 							Type:        schema.TypeString,
 							Required:    true,
 							Sensitive:   true,
+							// prevent writing secret value to state
+							StateFunc: func(val any) string {
+								return ""
+							},
 						},
 						"checksum": {
 							Description: "Secret value checksum.",
