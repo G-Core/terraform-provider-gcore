@@ -117,11 +117,135 @@ func TestFastEdgeSecret_basic(t *testing.T) {
 				}`,
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckResourceExists("gcore_fastedge_secret.test"),
+					resource.TestCheckResourceAttr("gcore_fastedge_secret.test", "id", "42"),
+					resource.TestCheckResourceAttr("gcore_fastedge_secret.test", "comment", "Super-duper secret"),
+					resource.TestCheckResourceAttr("gcore_fastedge_secret.test", "slot.0.id", "0"),
+					resource.TestCheckResourceAttr("gcore_fastedge_secret.test", "slot.0.value", ""),
+					resource.TestCheckResourceAttr("gcore_fastedge_secret.test", "slot.0.checksum", "669b7529549384204b205a264c0b1df025905092478cbc2e2c421ab85b9d1c12"),
 				),
 			},
 			{ // update resource
 				Config: baseTfFastEdgeSecretConfig + slotTf(0, secret1) + `
 				}`,
+				Check: resource.ComposeTestCheckFunc(
+					testAccCheckResourceExists("gcore_fastedge_secret.test"),
+					resource.TestCheckResourceAttr("gcore_fastedge_secret.test", "id", "42"),
+					resource.TestCheckResourceAttr("gcore_fastedge_secret.test", "comment", "Super-duper secret"),
+					resource.TestCheckResourceAttr("gcore_fastedge_secret.test", "slot.0.id", "0"),
+//					resource.TestCheckResourceAttr("gcore_fastedge_secret.test", "slot.0.value", ""),
+					resource.TestCheckResourceAttr("gcore_fastedge_secret.test", "slot.0.checksum", "e5727128c402caf486633d235da4728e4f9fdeed402adf8f1794887faa0680ce"),
+				),
+			},
+		},
+	})
+
+	mock.ExpectationsWereMet(t)
+}
+
+func TestFastEdgeSecret_disappear(t *testing.T) {
+	updatedSecret := baseSecret
+	baseSecret.SecretSlots = &[]sdk.SecretSlot{
+		secretSlot(0, secret0),
+	}
+	updatedSecret.SecretSlots = &[]sdk.SecretSlot{
+		secretSlot(0, secret1),
+	}
+	mock := &mockSDK{
+		t: t,
+		mocks: map[string]*funcMock{
+			"GetSecret": {
+				params: []mockParams{
+					{
+						expectId:  42,
+						retStatus: http.StatusOK,
+						retBody:   `{"id": 42, ` + baseSecretJson + slotJsonRsp(0, checksum0) + `]}`,
+					},
+					{
+						expectId:  42,
+						retStatus: http.StatusNotFound, // resource disappeared from the backend
+					},
+					{
+						expectId:  42,
+						retStatus: http.StatusOK,
+						retBody:   `{"id": 42, ` + baseSecretJson + slotJsonRsp(0, checksum1) + `]}`,
+					},
+				},
+			},
+			"AddSecret": {
+				params: []mockParams{
+					{
+						expectPayload: sdk.AddSecretJSONRequestBody{Secret: baseSecret},
+						retStatus:     http.StatusOK,
+						retBody:       `{"id": 42, ` + baseSecretJson + slotJsonRsp(0, checksum0) + `]}`,
+					},
+					{
+						expectPayload: sdk.AddSecretJSONRequestBody{Secret: updatedSecret},
+						retStatus:     http.StatusOK,
+						retBody:       `{"id": 42, ` + baseSecretJson + slotJsonRsp(0, checksum1) + `]}`,
+					},
+				},
+			},
+			"DeleteSecret": {
+				params: []mockParams{
+					{
+						expectId:  42,
+						retStatus: http.StatusNoContent,
+					},
+				},
+			},
+		},
+	}
+
+	resource.Test(t, resource.TestCase{
+		ProviderFactories: fastedgeMockProvider(mock),
+		IsUnitTest:        true,
+		Steps: []resource.TestStep{
+			{ // create resource
+				Config: baseTfFastEdgeSecretConfig + slotTf(0, secret0) + `
+				}`,
+				Check: resource.ComposeTestCheckFunc(
+					testAccCheckResourceExists("gcore_fastedge_secret.test"),
+				),
+			},
+			{ // update resource
+				Config: baseTfFastEdgeSecretConfig + slotTf(0, secret1) + `
+				}`,
+				Check: resource.ComposeTestCheckFunc(
+					testAccCheckResourceExists("gcore_fastedge_secret.test"),
+				),
+			},
+		},
+	})
+
+	mock.ExpectationsWereMet(t)
+}
+
+func TestFastEdgeSecret_import(t *testing.T) {
+	mock := &mockSDK{
+		t: t,
+		mocks: map[string]*funcMock{
+			"GetSecret": {
+				params: []mockParams{
+					{
+						expectId:  42,
+						retStatus: http.StatusOK,
+						retBody:   `{"id": 42, ` + baseSecretJson + slotJsonRsp(0, checksum0) + `]}`,
+					},
+				},
+			},
+		},
+	}
+
+	resource.Test(t, resource.TestCase{
+		ProviderFactories: fastedgeMockProvider(mock),
+		IsUnitTest:        true,
+		Steps: []resource.TestStep{
+			{ // import resource
+				Config: baseTfFastEdgeSecretConfig + slotTf(0, secret0) + `
+				}`,
+				ImportState:   true,
+				ImportStateId: "42",
+				ResourceName:  "gcore_fastedge_secret.test",
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckResourceExists("gcore_fastedge_secret.test"),
 				),

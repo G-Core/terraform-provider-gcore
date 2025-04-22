@@ -140,9 +140,6 @@ func resourceFastEdgeSecretRead(ctx context.Context, d *schema.ResourceData, m a
 		return diag.Errorf("calling GetSecret API: %v", err)
 	}
 	if !statusOK(rsp.StatusCode()) {
-		return diag.Errorf("calling GetSecret API: %s", extractErrorMessage(rsp.Body))
-	}
-	if !statusOK(rsp.StatusCode()) {
 		if rsp.StatusCode() == http.StatusNotFound {
 			d.SetId("")
 			return diag.Diagnostics{
