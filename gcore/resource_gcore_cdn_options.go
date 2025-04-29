@@ -10,7 +10,7 @@ func fastedgeTriggerSchema(description string) *schema.Schema {
 	return &schema.Schema{
 		Type:        schema.TypeList,
 		MaxItems:    1,
-		Required:    true,
+		Optional:    true,
 		Description: description,
 		Elem: &schema.Resource{
 			Schema: map[string]*schema.Schema{
@@ -234,7 +234,10 @@ var (
 						Optional: true,
 						Default:  true,
 					},
-					"on_request_headers": fastedgeTriggerSchema("Allows to configure FastEdge application that will be called to handle request headers as soon as CDN receives incoming HTTP request."),
+					"on_request_headers":  fastedgeTriggerSchema("Allows to configure FastEdge application that will be called to handle request headers as soon as CDN receives incoming HTTP request."),
+					"on_request_body":     fastedgeTriggerSchema("Allows to configure FastEdge application that will be called to handle request body as soon as CDN receives incoming HTTP request."),
+					"on_response_headers": fastedgeTriggerSchema("Allows to configure FastEdge application that will be called to handle response headers before CDN sends the HTTP response."),
+					"on_response_body":    fastedgeTriggerSchema("Allows to configure FastEdge application that will be called to handle response body before CDN sends the HTTP response."),
 				},
 			},
 		},
