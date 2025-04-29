@@ -23,6 +23,13 @@ resource "gcore_cdn_resource" "cdn_example_com" {
         enabled = true
         app_id = "1001"
         interrupt_on_error = true
+        execute_on_edge    = true
+        execute_on_shield  = false
+      }
+      on_response_headers {
+        enabled = true
+        app_id = "1002"
+        interrupt_on_error = true
       }
     }
     edge_cache_settings {

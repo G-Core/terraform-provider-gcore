@@ -80,6 +80,13 @@ resource "gcore_cdn_rule" "cdn_example_com_rule_3" {
         enabled = true
         app_id = "1001"
         interrupt_on_error = true
+        execute_on_edge    = true
+        execute_on_shield  = false
+      }
+      on_response_headers {
+        enabled = true
+        app_id = "1002"
+        interrupt_on_error = true
       }
     }
     force_return {
