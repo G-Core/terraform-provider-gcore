@@ -91,6 +91,7 @@ func resourceCDNRule() *schema.Resource {
 		ReadContext:   resourceCDNRuleRead,
 		UpdateContext: resourceCDNRuleUpdate,
 		DeleteContext: resourceCDNRuleDelete,
+		CustomizeDiff: validateCDNOptions,
 		Description:   "Represent cdn resource rule",
 	}
 }
