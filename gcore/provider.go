@@ -185,6 +185,7 @@ func Provider() *schema.Provider {
 			"gcore_fastedge_app":         resourceFastEdgeApp(),
 			"gcore_fastedge_template":    resourceFastEdgeTemplate(),
 			"gcore_fastedge_secret":      resourceFastEdgeSecret(),
+			"gcore_waap_domain":          resourceWaapDomain(),
 		},
 		DataSourcesMap: map[string]*schema.Resource{
 			"gcore_ai_cluster":             dataSourceAICluster(),
