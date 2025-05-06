@@ -8,7 +8,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 
-	waap "waap"
+	waap "github.com/G-Core/gcore-waap-sdk-go"
 )
 
 func resourceWaapDomain() *schema.Resource {
