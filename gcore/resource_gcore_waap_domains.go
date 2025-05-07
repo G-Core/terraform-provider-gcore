@@ -3,7 +3,6 @@ package gcore
 import (
 	"context"
 	"fmt"
-	"net/http"
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
@@ -102,27 +101,12 @@ func resourceGcoreDomainCreate(ctx context.Context, d *schema.ResourceData, m in
 func resourceGcoreDomainRead(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	var diags diag.Diagnostics
 	var domainID int
+
+	client := m.(*Config).WaapClient
 	domainName := d.Get("name").(string)
 
-	authToken := m.(*Config).Provider.APIToken
-	apiURL := m.(*Config).Provider.IdentityEndpoint
-
-	// Create a new client
-	client, err := waap.NewClient(
-		apiURL,
-		waap.WithRequestEditorFn(func(ctx context.Context, req *http.Request) error {
-			req.Header.Add("Authorization", authToken)
-			return nil
-		}),
-	)
-	if err != nil {
-		return diag.FromErr(fmt.Errorf("error creating client: %v", err))
-	}
-
-	clientWithResponses := &waap.ClientWithResponses{ClientInterface: client}
-
 	// List domains
-	resp, err := clientWithResponses.GetDomainsV1DomainsGetWithResponse(context.Background(), &waap.GetDomainsV1DomainsGetParams{})
+	resp, err := client.GetDomainsV1DomainsGetWithResponse(context.Background(), &waap.GetDomainsV1DomainsGetParams{})
 	if err != nil {
 		return diag.FromErr(fmt.Errorf("error listing domains: %v", err))
 	}
@@ -148,7 +132,7 @@ func resourceGcoreDomainRead(ctx context.Context, d *schema.ResourceData, m inte
 		}
 
 		// Get domain settings
-		settingsResp, err := clientWithResponses.GetDomainSettingsV1DomainsDomainIdSettingsGetWithResponse(
+		settingsResp, err := client.GetDomainSettingsV1DomainsDomainIdSettingsGetWithResponse(
 			context.Background(),
 			domainID,
 		)
@@ -197,25 +181,11 @@ func resourceGcoreDomainRead(ctx context.Context, d *schema.ResourceData, m inte
 }
 
 func resourceGcoreDomainUpdate(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
+	client := m.(*Config).WaapClient
 	domainName := d.Get("name").(string)
-	authToken := m.(*Config).Provider.APIToken
-	apiURL := m.(*Config).Provider.IdentityEndpoint
-
-	client, err := waap.NewClient(
-		apiURL,
-		waap.WithRequestEditorFn(func(ctx context.Context, req *http.Request) error {
-			req.Header.Add("Authorization", authToken)
-			return nil
-		}),
-	)
-	if err != nil {
-		return diag.FromErr(fmt.Errorf("error creating client: %v", err))
-	}
-
-	clientWithResponses := &waap.ClientWithResponses{ClientInterface: client}
 
 	// List domains
-	resp, err := clientWithResponses.GetDomainsV1DomainsGetWithResponse(context.Background(), &waap.GetDomainsV1DomainsGetParams{})
+	resp, err := client.GetDomainsV1DomainsGetWithResponse(context.Background(), &waap.GetDomainsV1DomainsGetParams{})
 	if err != nil {
 		return diag.FromErr(fmt.Errorf("error listing domains: %v", err))
 	}
@@ -255,7 +225,7 @@ func resourceGcoreDomainUpdate(ctx context.Context, d *schema.ResourceData, m in
 				}
 
 				// Update domain status
-				updateResp, err := clientWithResponses.UpdateDomainV1DomainsDomainIdPatchWithResponse(
+				updateResp, err := client.UpdateDomainV1DomainsDomainIdPatchWithResponse(
 					context.Background(),
 					domainID,
 					updateRequest,
@@ -324,7 +294,7 @@ func resourceGcoreDomainUpdate(ctx context.Context, d *schema.ResourceData, m in
 					}
 
 					// Update domain settings
-					updateSettingsResp, err := clientWithResponses.UpdateDomainSettingsV1DomainsDomainIdSettingsPatchWithResponse(
+					updateSettingsResp, err := client.UpdateDomainSettingsV1DomainsDomainIdSettingsPatchWithResponse(
 						context.Background(),
 						domainID,
 						domainSettingsUpdate,
