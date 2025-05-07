@@ -6,6 +6,7 @@ import (
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/validation"
 
 	waap "github.com/G-Core/gcore-waap-sdk-go"
 )
@@ -29,10 +30,14 @@ func resourceWaapDomain() *schema.Resource {
 				Description: "Name of the domain.",
 			},
 			"status": {
-				Type:        schema.TypeString,
-				Optional:    true,
-				Computed:    true,
-				Description: "Status of the domain. If not provided, the current status will be read from the API.",
+				Type:     schema.TypeString,
+				Optional: true,
+				Computed: true,
+				ValidateFunc: validation.StringInSlice([]string{
+					"active",
+					"monitor",
+				}, false),
+				Description: "Status of the domain. It must be one of these values {active, monitor}.",
 			},
 			"settings": {
 				Type:     schema.TypeList,
@@ -199,31 +204,26 @@ func resourceGcoreDomainUpdate(ctx context.Context, d *schema.ResourceData, m in
 		}
 
 		newStatus := d.Get("status")
-		if newStatus == "protect" {
-			newStatus = "active"
-		}
 
-		if newStatus == "active" || newStatus == "monitor" {
-			if newStatus != domainStatus {
-				newStatusStr, _ := newStatus.(waap.DomainUpdateStatus)
-				updateRequest := waap.UpdateDomainV1DomainsDomainIdPatchJSONRequestBody{
-					Status: &struct {
-						waap.DomainUpdateStatus `yaml:",inline"`
-					}{
-						DomainUpdateStatus: newStatusStr,
-					},
-				}
+		if newStatus != domainStatus {
+			newStatusStr, _ := newStatus.(waap.DomainUpdateStatus)
+			updateRequest := waap.UpdateDomainV1DomainsDomainIdPatchJSONRequestBody{
+				Status: &struct {
+					waap.DomainUpdateStatus `yaml:",inline"`
+				}{
+					DomainUpdateStatus: newStatusStr,
+				},
+			}
 
-				// Update domain status
-				updateResp, err := client.UpdateDomainV1DomainsDomainIdPatchWithResponse(
-					context.Background(),
-					domainID,
-					updateRequest,
-				)
+			// Update domain status
+			updateResp, err := client.UpdateDomainV1DomainsDomainIdPatchWithResponse(
+				context.Background(),
+				domainID,
+				updateRequest,
+			)
 
-				if err != nil || updateResp.StatusCode() != 204 {
-					return diag.FromErr(fmt.Errorf("failed to update domain. Status code: %d with error: %v", updateResp.StatusCode(), err))
-				}
+			if err != nil || updateResp.StatusCode() != 204 {
+				return diag.FromErr(fmt.Errorf("failed to update domain. Status code: %d with error: %v", updateResp.StatusCode(), err))
 			}
 		}
 
