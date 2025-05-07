@@ -60,12 +60,6 @@ func resourceWaapDomain() *schema.Resource {
 										Computed:    true,
 										Description: "Burst threshold for DDoS protection",
 									},
-									"sub_second_threshold": {
-										Type:        schema.TypeInt,
-										Optional:    true,
-										Computed:    true,
-										Description: "Sub-second threshold for DDoS protection",
-									},
 								},
 							},
 						},
@@ -152,10 +146,6 @@ func resourceGcoreDomainRead(ctx context.Context, d *schema.ResourceData, m inte
 
 				if settingsResp.JSON200.Ddos.BurstThreshold != nil {
 					ddosSettings["burst_threshold"] = *settingsResp.JSON200.Ddos.BurstThreshold
-				}
-
-				if settingsResp.JSON200.Ddos.SubSecondThreshold != nil {
-					ddosSettings["sub_second_threshold"] = *settingsResp.JSON200.Ddos.SubSecondThreshold
 				}
 
 				if len(ddosSettings) > 0 {
