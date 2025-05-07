@@ -13,10 +13,10 @@ import (
 
 func resourceWaapDomain() *schema.Resource {
 	return &schema.Resource{
-		CreateContext: resourceGcoreDomainCreate,
-		ReadContext:   resourceGcoreDomainRead,
-		UpdateContext: resourceGcoreDomainUpdate,
-		DeleteContext: resourceGcoreDomainDelete,
+		CreateContext: resourceWaapDomainCreate,
+		ReadContext:   resourceWaapDomainRead,
+		UpdateContext: resourceWaapDomainUpdate,
+		DeleteContext: resourceWaapDomainDelete,
 
 		Schema: map[string]*schema.Schema{
 			"id": {
@@ -93,11 +93,11 @@ func resourceWaapDomain() *schema.Resource {
 	}
 }
 
-func resourceGcoreDomainCreate(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
-	return resourceGcoreDomainUpdate(ctx, d, m)
+func resourceWaapDomainCreate(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
+	return resourceWaapDomainUpdate(ctx, d, m)
 }
 
-func resourceGcoreDomainRead(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
+func resourceWaapDomainRead(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	var diags diag.Diagnostics
 	var domainID int
 
@@ -175,7 +175,7 @@ func resourceGcoreDomainRead(ctx context.Context, d *schema.ResourceData, m inte
 	return diags
 }
 
-func resourceGcoreDomainUpdate(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
+func resourceWaapDomainUpdate(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	client := m.(*Config).WaapClient
 	domainName := d.Get("name").(string)
 
@@ -297,9 +297,9 @@ func resourceGcoreDomainUpdate(ctx context.Context, d *schema.ResourceData, m in
 			}
 		}
 	}
-	return resourceGcoreDomainRead(ctx, d, m)
+	return resourceWaapDomainRead(ctx, d, m)
 }
 
-func resourceGcoreDomainDelete(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
+func resourceWaapDomainDelete(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	return nil
 }
