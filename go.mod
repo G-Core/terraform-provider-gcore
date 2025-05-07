@@ -1,22 +1,21 @@
 module github.com/terraform-providers/terraform-provider-gcore
 
-go 1.22.7
+go 1.24.1
 
-toolchain go1.23.3
+toolchain go1.24.3
 
 require (
 	github.com/AlekSi/pointer v1.2.0
 	github.com/G-Core/FastEdge-client-sdk-go v0.3.6
 	github.com/G-Core/gcore-dns-sdk-go v0.2.9
 	github.com/G-Core/gcore-storage-sdk-go v0.1.34
+	github.com/G-Core/gcore-waap-sdk-go v0.1.0
 	github.com/G-Core/gcorelabscdn-go v1.0.31
 	github.com/G-Core/gcorelabscloud-go v0.16.0
 	github.com/google/go-cmp v0.6.0
 	github.com/hashicorp/go-cty v1.4.1-0.20200414143053-d3edf31b6320
 	github.com/hashicorp/terraform-plugin-sdk/v2 v2.27.0
 	github.com/mitchellh/mapstructure v1.5.0
-	// waap v0.0.0-00010101000000-000000000000
-	github.com/G-Core/gcore-waap-sdk-go v0.3.6
 )
 
 require (
@@ -112,5 +111,3 @@ require (
 	go.mongodb.org/mongo-driver v1.12.0 // indirect
 	golang.org/x/net v0.33.0 // indirect
 )
-
-// replace waap => ../gcore-waap-sdk-go
