@@ -3,6 +3,8 @@ package gcore
 import (
 	"context"
 	"fmt"
+	"net/http"
+	"strconv"
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
@@ -94,41 +96,50 @@ func resourceWaapDomain() *schema.Resource {
 }
 
 func resourceWaapDomainCreate(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
-	return resourceWaapDomainUpdate(ctx, d, m)
-}
-
-func resourceWaapDomainRead(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
-	var diags diag.Diagnostics
-	var domainID int
-
 	client := m.(*Config).WaapClient
 	domainName := d.Get("name").(string)
 
-	// List domains
-	resp, err := client.GetDomainsV1DomainsGetWithResponse(context.Background(), &waap.GetDomainsV1DomainsGetParams{})
+	resp, err := client.GetDomainsV1DomainsGetWithResponse(
+		context.Background(),
+		nil,
+		func(ctx context.Context, req *http.Request) error {
+			req.URL.RawQuery = "name=" + domainName
+			return nil
+		},
+	)
 	if err != nil {
 		return diag.FromErr(fmt.Errorf("error listing domains: %v", err))
 	}
 
 	if resp.JSON200 != nil {
-		found := false
-		for _, domain := range resp.JSON200.Results {
-			id := fmt.Sprintf("%v", domain.Id)
-			name := domain.Name
-
-			if name == domainName {
-				d.SetId(id)
-				_ = d.Set("status", domain.Status)
-				domainID = domain.Id
-				found = true
-				break
-			}
-		}
-
-		if !found {
-			d.SetId("")
+		if resp.JSON200.Count != 0 {
+			id := fmt.Sprintf("%v", resp.JSON200.Results[0].Id)
+			d.SetId(id)
+		} else {
 			return diag.FromErr(fmt.Errorf("domain with name '%s' not found", domainName))
 		}
+	}
+
+	return resourceWaapDomainUpdate(ctx, d, m)
+}
+
+func resourceWaapDomainRead(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
+	var diags diag.Diagnostics
+	client := m.(*Config).WaapClient
+
+	domainID, _ := strconv.Atoi(d.Get("id").(string))
+
+	// Get domain details
+	resp, err := client.GetDomainV1DomainsDomainIdGetWithResponse(
+		context.Background(),
+		domainID,
+	)
+	if err != nil {
+		return diag.FromErr(fmt.Errorf("error getting domain details: %v", err))
+	}
+
+	if resp.JSON200 != nil {
+		_ = d.Set("status", string(resp.JSON200.Status))
 
 		// Get domain settings
 		settingsResp, err := client.GetDomainSettingsV1DomainsDomainIdSettingsGetWithResponse(
@@ -177,42 +188,26 @@ func resourceWaapDomainRead(ctx context.Context, d *schema.ResourceData, m inter
 
 func resourceWaapDomainUpdate(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	client := m.(*Config).WaapClient
-	domainName := d.Get("name").(string)
+	domainID, _ := strconv.Atoi(d.Get("id").(string))
 
-	// List domains
-	resp, err := client.GetDomainsV1DomainsGetWithResponse(context.Background(), &waap.GetDomainsV1DomainsGetParams{})
+	// Get domain details
+	resp, err := client.GetDomainV1DomainsDomainIdGetWithResponse(
+		context.Background(),
+		domainID,
+	)
 	if err != nil {
-		return diag.FromErr(fmt.Errorf("error listing domains: %v", err))
+		return diag.FromErr(fmt.Errorf("error getting domain details: %v", err))
 	}
 
-	var domainID int
 	var domainStatus string
 	if resp.JSON200 != nil {
-
-		for _, domain := range resp.JSON200.Results {
-			if domain.Name == domainName {
-				id := fmt.Sprintf("%v", domain.Id)
-				domainID = domain.Id
-				domainStatus = string(domain.Status)
-				d.SetId(id)
-				break
-			}
-		}
-
-		if domainID == 0 {
-			return diag.FromErr(fmt.Errorf("domain with name '%s' not found", domainName))
-		}
-
-		newStatus := d.Get("status")
+		domainStatus = string(resp.JSON200.Status)
+		newStatus := d.Get("status").(string)
 
 		if newStatus != domainStatus {
-			newStatusStr, _ := newStatus.(waap.DomainUpdateStatus)
+			domainStatusUpdate := waap.DomainUpdateStatus(newStatus)
 			updateRequest := waap.UpdateDomainV1DomainsDomainIdPatchJSONRequestBody{
-				Status: &struct {
-					waap.DomainUpdateStatus `yaml:",inline"`
-				}{
-					DomainUpdateStatus: newStatusStr,
-				},
+				Status: &domainStatusUpdate,
 			}
 
 			// Update domain status
@@ -253,13 +248,9 @@ func resourceWaapDomainUpdate(ctx context.Context, d *schema.ResourceData, m int
 							ddosSettings.BurstThreshold = &val
 						}
 
-						domainSettingsUpdate.Ddos = &struct {
-							waap.UpdateDomainDdosSettings `yaml:",inline"`
-						}{
-							UpdateDomainDdosSettings: waap.UpdateDomainDdosSettings{
-								GlobalThreshold: ddosSettings.GlobalThreshold,
-								BurstThreshold:  ddosSettings.BurstThreshold,
-							},
+						domainSettingsUpdate.Ddos = &waap.UpdateDomainDdosSettings{
+							GlobalThreshold: ddosSettings.GlobalThreshold,
+							BurstThreshold:  ddosSettings.BurstThreshold,
 						}
 					}
 
@@ -273,12 +264,8 @@ func resourceWaapDomainUpdate(ctx context.Context, d *schema.ResourceData, m int
 								urls[i] = url.(string)
 							}
 
-							domainSettingsUpdate.Api = &struct {
-								waap.AppModelsDomainSettingsUpdateApiUrls `yaml:",inline"`
-							}{
-								AppModelsDomainSettingsUpdateApiUrls: waap.AppModelsDomainSettingsUpdateApiUrls{
-									ApiUrls: &urls,
-								},
+							domainSettingsUpdate.Api = &waap.AppModelsDomainSettingsUpdateApiUrls{
+								ApiUrls: &urls,
 							}
 						}
 					}
