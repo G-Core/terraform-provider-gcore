@@ -1,10 +1,17 @@
 provider gcore {
   permanent_api_token = "768660$.............a43f91f"
-  gcore_waap_api = "https://api.cdb-staging.cdn.orange.com/waap"
+}
+
+resource "gcore_cdn_resource" "example" {
+  cname  = "api.example.com"
+  origin = "origin.example.com"
+  options {
+    waap { value = true }
+  }
 }
 
 resource "gcore_waap_domain" "domain" {
-  name   = "nsf-demo.cdb-staging.cdn.orange.com"
+  name   = gcore_cdn_resource.example.cname
   status = "monitor"
 
   settings {
