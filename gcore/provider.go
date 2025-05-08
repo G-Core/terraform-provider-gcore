@@ -9,6 +9,8 @@ import (
 	"os"
 	"sync"
 
+	waap "github.com/G-Core/gcore-waap-sdk-go"
+
 	fastedge "github.com/G-Core/FastEdge-client-sdk-go"
 	dnssdk "github.com/G-Core/gcore-dns-sdk-go"
 	storageSDK "github.com/G-Core/gcore-storage-sdk-go"
@@ -127,6 +129,12 @@ func Provider() *schema.Provider {
 				Description: "FastEdge API (define only if you want to override FastEdge API endpoint). Can also be set with the GCORE_FASTEDGE_API environment variable.",
 				DefaultFunc: schema.EnvDefaultFunc("GCORE_FASTEDGE_API", ""),
 			},
+			"gcore_waap_api": {
+				Type:        schema.TypeString,
+				Optional:    true,
+				Description: "WAAP API (define only if you want to override WAAP API endpoint). Can also be set with the GCORE_WAAP_API environment variable.",
+				DefaultFunc: schema.EnvDefaultFunc("GCORE_WAAP_API", ""),
+			},
 			"gcore_client_id": {
 				Type:        schema.TypeString,
 				Optional:    true,
@@ -185,6 +193,7 @@ func Provider() *schema.Provider {
 			"gcore_fastedge_app":         resourceFastEdgeApp(),
 			"gcore_fastedge_template":    resourceFastEdgeTemplate(),
 			"gcore_fastedge_secret":      resourceFastEdgeSecret(),
+			"gcore_waap_domain":          resourceWaapDomain(),
 		},
 		DataSourcesMap: map[string]*schema.Resource{
 			"gcore_ai_cluster":             dataSourceAICluster(),
@@ -268,6 +277,11 @@ func providerConfigure(_ context.Context, d *schema.ResourceData) (interface{}, 
 	fastedgeAPI := d.Get("gcore_fastedge_api").(string)
 	if fastedgeAPI == "" {
 		fastedgeAPI = apiEndpoint + "/fastedge"
+	}
+
+	waapAPI := d.Get("gcore_waap_api").(string)
+	if waapAPI == "" {
+		waapAPI = apiEndpoint + "/waap"
 	}
 
 	platform := d.Get("gcore_platform_api").(string)
@@ -374,6 +388,25 @@ func providerConfigure(_ context.Context, d *schema.ResourceData) (interface{}, 
 		)
 		if err != nil {
 			return nil, diag.FromErr(fmt.Errorf("fastedge api init: %w", err))
+		}
+	}
+
+	if waapAPI != "" {
+		authFunc := func(ctx context.Context, req *http.Request) error {
+			if permanentToken != "" {
+				req.Header.Set("Authorization", "APIKey "+permanentToken)
+			} else {
+				req.Header.Set("Authorization", "Bearer "+provider.AccessToken())
+			}
+			return nil
+		}
+
+		config.WaapClient, err = waap.NewClientWithResponses(
+			waapAPI,
+			waap.WithRequestEditorFn(authFunc),
+		)
+		if err != nil {
+			return nil, diag.FromErr(fmt.Errorf("error creating waap client: %w", err))
 		}
 	}
 
