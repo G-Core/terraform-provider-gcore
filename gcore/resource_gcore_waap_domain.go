@@ -19,6 +19,7 @@ func resourceWaapDomain() *schema.Resource {
 		ReadContext:   resourceWaapDomainRead,
 		UpdateContext: resourceWaapDomainUpdate,
 		DeleteContext: resourceWaapDomainDelete,
+		Description:   "Represent WAAP domain",
 
 		Schema: map[string]*schema.Schema{
 			"id": {
@@ -152,24 +153,21 @@ func resourceWaapDomainRead(ctx context.Context, d *schema.ResourceData, m inter
 
 		if settingsResp.JSON200 != nil {
 			settings := make(map[string]interface{})
+			ddosSettings := make(map[string]interface{})
 
-			if settingsResp.JSON200 != nil {
-				ddosSettings := make(map[string]interface{})
-
-				if settingsResp.JSON200.Ddos.GlobalThreshold != nil {
-					ddosSettings["global_threshold"] = *settingsResp.JSON200.Ddos.GlobalThreshold
-				}
-
-				if settingsResp.JSON200.Ddos.BurstThreshold != nil {
-					ddosSettings["burst_threshold"] = *settingsResp.JSON200.Ddos.BurstThreshold
-				}
-
-				if len(ddosSettings) > 0 {
-					settings["ddos"] = []interface{}{ddosSettings}
-				}
+			if settingsResp.JSON200.Ddos.GlobalThreshold != nil {
+				ddosSettings["global_threshold"] = *settingsResp.JSON200.Ddos.GlobalThreshold
 			}
 
-			if settingsResp.JSON200 != nil && settingsResp.JSON200.Api.ApiUrls != nil {
+			if settingsResp.JSON200.Ddos.BurstThreshold != nil {
+				ddosSettings["burst_threshold"] = *settingsResp.JSON200.Ddos.BurstThreshold
+			}
+
+			if len(ddosSettings) > 0 {
+				settings["ddos"] = []interface{}{ddosSettings}
+			}
+
+			if settingsResp.JSON200.Api.ApiUrls != nil {
 				apiSettings := make(map[string]interface{})
 				apiSettings["api_urls"] = *settingsResp.JSON200.Api.ApiUrls
 
@@ -202,10 +200,9 @@ func resourceWaapDomainUpdate(ctx context.Context, d *schema.ResourceData, m int
 	var domainStatus string
 	if resp.JSON200 != nil {
 		domainStatus = string(resp.JSON200.Status)
-		newStatus := d.Get("status").(string)
 
-		if newStatus != domainStatus {
-			domainStatusUpdate := waap.DomainUpdateStatus(newStatus)
+		if newStatus, ok := d.GetOk("status"); ok && newStatus != domainStatus {
+			domainStatusUpdate := waap.DomainUpdateStatus(newStatus.(string))
 			updateRequest := waap.UpdateDomainV1DomainsDomainIdPatchJSONRequestBody{
 				Status: &domainStatusUpdate,
 			}
