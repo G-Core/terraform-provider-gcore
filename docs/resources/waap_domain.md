@@ -42,6 +42,17 @@ resource "gcore_waap_domain" "domain" {
       ]
     }
   }
+
+  policies {
+    protocol_validation {
+      invalid_user_agent      = false
+      unknown_user_agent      = false
+    }
+    core_waf_owasp_top_threats{
+      sql_injection           = false
+      xss                     = false
+    }
+  }
 }
 ```
 
@@ -54,12 +65,256 @@ resource "gcore_waap_domain" "domain" {
 
 ### Optional
 
+- `policies` (Block List, Max: 1) List of policies for the domain. (see [below for nested schema](#nestedblock--policies))
 - `settings` (Block List, Max: 1) (see [below for nested schema](#nestedblock--settings))
 - `status` (String) Status of the domain. It must be one of these values {active, monitor}.
 
 ### Read-Only
 
 - `id` (String) ID of the domain.
+
+<a id="nestedblock--policies"></a>
+### Nested Schema for `policies`
+
+Optional:
+
+- `advanced_api_protection` (Block List, Max: 1) List of advanced_api_protection policies (see [below for nested schema](#nestedblock--policies--advanced_api_protection))
+- `anti_automation_bot_protection` (Block List, Max: 1) List of anti_automation_bot_protection policies (see [below for nested schema](#nestedblock--policies--anti_automation_bot_protection))
+- `behavioral_waf` (Block List, Max: 1) List of behavioral_waf policies (see [below for nested schema](#nestedblock--policies--behavioral_waf))
+- `cms_protection` (Block List, Max: 1) List of cms_protection policies (see [below for nested schema](#nestedblock--policies--cms_protection))
+- `common_automated_services` (Block List, Max: 1) List of common_automated_services policies (see [below for nested schema](#nestedblock--policies--common_automated_services))
+- `core_waf_owasp_top_threats` (Block List, Max: 1) List of core_waf_owasp_top_threats policies (see [below for nested schema](#nestedblock--policies--core_waf_owasp_top_threats))
+- `ip_reputation` (Block List, Max: 1) List of ip_reputation policies (see [below for nested schema](#nestedblock--policies--ip_reputation))
+- `protocol_validation` (Block List, Max: 1) List of protocol_validation policies (see [below for nested schema](#nestedblock--policies--protocol_validation))
+
+<a id="nestedblock--policies--advanced_api_protection"></a>
+### Nested Schema for `policies.advanced_api_protection`
+
+Optional:
+
+- `api_level_authorization` (String) Configured Policy Rule Mode for api_level_authorization
+- `auth_token_protection` (String) Configured Policy Rule Mode for auth_token_protection
+- `invalid_api_traffic` (String) Configured Policy Rule Mode for invalid_api_traffic
+- `non_baselined_api_requests` (String) Configured Policy Rule Mode for non_baselined_api_requests
+- `sensitive_data_exposure` (String) Configured Policy Rule Mode for sensitive_data_exposure
+
+
+<a id="nestedblock--policies--anti_automation_bot_protection"></a>
+### Nested Schema for `policies.anti_automation_bot_protection`
+
+Optional:
+
+- `anti_scraping` (String) Configured Policy Rule Mode for anti_scraping
+- `automated_clients` (String) Configured Policy Rule Mode for automated_clients
+- `headless_browsers` (String) Configured Policy Rule Mode for headless_browsers
+- `traffic_anomaly` (String) Configured Policy Rule Mode for traffic_anomaly
+
+
+<a id="nestedblock--policies--behavioral_waf"></a>
+### Nested Schema for `policies.behavioral_waf`
+
+Optional:
+
+- `anti_spam` (String) Configured Policy Rule Mode for anti_spam
+- `brute_force_protection` (String) Configured Policy Rule Mode for brute_force_protection
+- `obfuscated_attacks_and_zero_day_mitigation` (String) Configured Policy Rule Mode for obfuscated_attacks_and_zero_day_mitigation
+- `probing_and_forced_browsing` (String) Configured Policy Rule Mode for probing_and_forced_browsing
+- `repeated_violations` (String) Configured Policy Rule Mode for repeated_violations
+
+
+<a id="nestedblock--policies--cms_protection"></a>
+### Nested Schema for `policies.cms_protection`
+
+Optional:
+
+- `logged_in_allowlist_magento_admins` (String) Configured Policy Rule Mode for logged_in_allowlist_magento_admins
+- `logged_in_drupal_admins` (String) Configured Policy Rule Mode for logged_in_drupal_admins
+- `logged_in_joomla_admins` (String) Configured Policy Rule Mode for logged_in_joomla_admins
+- `logged_in_modx_admins` (String) Configured Policy Rule Mode for logged_in_modx_admins
+- `logged_in_pimcore_admins` (String) Configured Policy Rule Mode for logged_in_pimcore_admins
+- `logged_in_umbraco_admins` (String) Configured Policy Rule Mode for logged_in_umbraco_admins
+- `logged_in_wordpress_admins` (String) Configured Policy Rule Mode for logged_in_wordpress_admins
+- `wordpress_waf_ruleset` (String) Configured Policy Rule Mode for wordpress_waf_ruleset
+
+
+<a id="nestedblock--policies--common_automated_services"></a>
+### Nested Schema for `policies.common_automated_services`
+
+Optional:
+
+- `acquia_uptime` (String) Configured Policy Rule Mode for acquia_uptime
+- `addsearch_bot` (String) Configured Policy Rule Mode for addsearch_bot
+- `adestra_bot` (String) Configured Policy Rule Mode for adestra_bot
+- `adjust_servers` (String) Configured Policy Rule Mode for adjust_servers
+- `ahrefs_bot` (String) Configured Policy Rule Mode for ahrefs_bot
+- `alerta_bot` (String) Configured Policy Rule Mode for alerta_bot
+- `alexa_ia_archiver` (String) Configured Policy Rule Mode for alexa_ia_archiver
+- `alexa_technologies` (String) Configured Policy Rule Mode for alexa_technologies
+- `amazon_route53_health_check_service` (String) Configured Policy Rule Mode for amazon_route53_health_check_service
+- `apple_private_relay` (String) Configured Policy Rule Mode for apple_private_relay
+- `applebot` (String) Configured Policy Rule Mode for applebot
+- `applenewsbot` (String) Configured Policy Rule Mode for applenewsbot
+- `ask_jeeves_bot` (String) Configured Policy Rule Mode for ask_jeeves_bot
+- `audisto_bot` (String) Configured Policy Rule Mode for audisto_bot
+- `baidu_spider_bot` (String) Configured Policy Rule Mode for baidu_spider_bot
+- `baidu_spider_japan_bot` (String) Configured Policy Rule Mode for baidu_spider_japan_bot
+- `binarycanary` (String) Configured Policy Rule Mode for binarycanary
+- `bitbucket_webhook` (String) Configured Policy Rule Mode for bitbucket_webhook
+- `blekko_scoutjet_bot` (String) Configured Policy Rule Mode for blekko_scoutjet_bot
+- `chrome_compression_proxy` (String) Configured Policy Rule Mode for chrome_compression_proxy
+- `coccocbot` (String) Configured Policy Rule Mode for coccocbot
+- `comscore_crawler` (String) Configured Policy Rule Mode for comscore_crawler
+- `cookiebot` (String) Configured Policy Rule Mode for cookiebot
+- `cybersource` (String) Configured Policy Rule Mode for cybersource
+- `daumoa_bot` (String) Configured Policy Rule Mode for daumoa_bot
+- `detectify_scanner` (String) Configured Policy Rule Mode for detectify_scanner
+- `digicert_dcv_bot` (String) Configured Policy Rule Mode for digicert_dcv_bot
+- `dotmic_dotbot` (String) Configured Policy Rule Mode for dotmic_dotbot
+- `duckduckgo_bot` (String) Configured Policy Rule Mode for duckduckgo_bot
+- `facebook_external_hit_bot` (String) Configured Policy Rule Mode for facebook_external_hit_bot
+- `feeder_co` (String) Configured Policy Rule Mode for feeder_co
+- `feedpress` (String) Configured Policy Rule Mode for feedpress
+- `freshping_monitoring` (String) Configured Policy Rule Mode for freshping_monitoring
+- `geckoboard` (String) Configured Policy Rule Mode for geckoboard
+- `ghostinspector` (String) Configured Policy Rule Mode for ghostinspector
+- `gomez` (String) Configured Policy Rule Mode for gomez
+- `goo_japan_bot` (String) Configured Policy Rule Mode for goo_japan_bot
+- `google_bot` (String) Configured Policy Rule Mode for google_bot
+- `google_cloud_monitoring` (String) Configured Policy Rule Mode for google_cloud_monitoring
+- `google_crawler` (String) Configured Policy Rule Mode for google_crawler
+- `google_services` (String) Configured Policy Rule Mode for google_services
+- `google_user_triggered_fetchers` (String) Configured Policy Rule Mode for google_user_triggered_fetchers
+- `grafana_services` (String) Configured Policy Rule Mode for grafana_services
+- `gree_japan_bot` (String) Configured Policy Rule Mode for gree_japan_bot
+- `hetrix_tools` (String) Configured Policy Rule Mode for hetrix_tools
+- `hipay` (String) Configured Policy Rule Mode for hipay
+- `hyperspin_bot` (String) Configured Policy Rule Mode for hyperspin_bot
+- `ias_crawler` (String) Configured Policy Rule Mode for ias_crawler
+- `internet_archive_bot` (String) Configured Policy Rule Mode for internet_archive_bot
+- `jetpack_bot` (String) Configured Policy Rule Mode for jetpack_bot
+- `jikespider_bot` (String) Configured Policy Rule Mode for jikespider_bot
+- `jword_japan_bot` (String) Configured Policy Rule Mode for jword_japan_bot
+- `kakao_useragent` (String) Configured Policy Rule Mode for kakao_useragent
+- `kyoto_tohoku_crawler` (String) Configured Policy Rule Mode for kyoto_tohoku_crawler
+- `landau_media_spider` (String) Configured Policy Rule Mode for landau_media_spider
+- `lets_encrypt` (String) Configured Policy Rule Mode for lets_encrypt
+- `line_japan_bot` (String) Configured Policy Rule Mode for line_japan_bot
+- `linkedin_bot` (String) Configured Policy Rule Mode for linkedin_bot
+- `livedoor_japan_bot` (String) Configured Policy Rule Mode for livedoor_japan_bot
+- `mail_ru_bot` (String) Configured Policy Rule Mode for mail_ru_bot
+- `managewp` (String) Configured Policy Rule Mode for managewp
+- `microsoft_bing_bot` (String) Configured Policy Rule Mode for microsoft_bing_bot
+- `microsoft_bing_preview_bot` (String) Configured Policy Rule Mode for microsoft_bing_preview_bot
+- `microsoft_msn_bot` (String) Configured Policy Rule Mode for microsoft_msn_bot
+- `microsoft_skype_bot` (String) Configured Policy Rule Mode for microsoft_skype_bot
+- `mixi_japan_bot` (String) Configured Policy Rule Mode for mixi_japan_bot
+- `mobage_japan_bot` (String) Configured Policy Rule Mode for mobage_japan_bot
+- `naver_yeti_bot` (String) Configured Policy Rule Mode for naver_yeti_bot
+- `new_relic_bot` (String) Configured Policy Rule Mode for new_relic_bot
+- `ocn_japan_bot` (String) Configured Policy Rule Mode for ocn_japan_bot
+- `outbrain_bot` (String) Configured Policy Rule Mode for outbrain_bot
+- `panopta_bot` (String) Configured Policy Rule Mode for panopta_bot
+- `parse_ly_scraper` (String) Configured Policy Rule Mode for parse_ly_scraper
+- `paypal_ipn` (String) Configured Policy Rule Mode for paypal_ipn
+- `petal_bot` (String) Configured Policy Rule Mode for petal_bot
+- `pingdom` (String) Configured Policy Rule Mode for pingdom
+- `pinterest_bot` (String) Configured Policy Rule Mode for pinterest_bot
+- `qwantify_bot` (String) Configured Policy Rule Mode for qwantify_bot
+- `requests_from_origins_ip` (String) Configured Policy Rule Mode for requests_from_origins_ip
+- `roger_bot` (String) Configured Policy Rule Mode for roger_bot
+- `sagepay` (String) Configured Policy Rule Mode for sagepay
+- `sectigo_bot` (String) Configured Policy Rule Mode for sectigo_bot
+- `semrush_bot` (String) Configured Policy Rule Mode for semrush_bot
+- `server_density_service_monitoring_bot` (String) Configured Policy Rule Mode for server_density_service_monitoring_bot
+- `seznam_bot` (String) Configured Policy Rule Mode for seznam_bot
+- `shareaholic_bot` (String) Configured Policy Rule Mode for shareaholic_bot
+- `site24x7_bot` (String) Configured Policy Rule Mode for site24x7_bot
+- `siteimprove_bot` (String) Configured Policy Rule Mode for siteimprove_bot
+- `sitelock_spider` (String) Configured Policy Rule Mode for sitelock_spider
+- `slack_bot` (String) Configured Policy Rule Mode for slack_bot
+- `smart_plugin_manager_bot` (String) Configured Policy Rule Mode for smart_plugin_manager_bot
+- `sogou_bot` (String) Configured Policy Rule Mode for sogou_bot
+- `soso_spider_bot` (String) Configured Policy Rule Mode for soso_spider_bot
+- `spatineo` (String) Configured Policy Rule Mode for spatineo
+- `spring_bot` (String) Configured Policy Rule Mode for spring_bot
+- `stackify` (String) Configured Policy Rule Mode for stackify
+- `statuscake_bot` (String) Configured Policy Rule Mode for statuscake_bot
+- `stripe` (String) Configured Policy Rule Mode for stripe
+- `sucuri_uptime_monitor_bot` (String) Configured Policy Rule Mode for sucuri_uptime_monitor_bot
+- `telegram_bot` (String) Configured Policy Rule Mode for telegram_bot
+- `test_domain_static_rule` (String) Configured Policy Rule Mode for test_domain_static_rule
+- `testomato_bot` (String) Configured Policy Rule Mode for testomato_bot
+- `thefind_crawler` (String) Configured Policy Rule Mode for thefind_crawler
+- `twitter_bot` (String) Configured Policy Rule Mode for twitter_bot
+- `uptime_robot` (String) Configured Policy Rule Mode for uptime_robot
+- `vkontakte_external_hit_bot` (String) Configured Policy Rule Mode for vkontakte_external_hit_bot
+- `w3c` (String) Configured Policy Rule Mode for w3c
+- `wordfence_central` (String) Configured Policy Rule Mode for wordfence_central
+- `workato` (String) Configured Policy Rule Mode for workato
+- `xml_sitemaps` (String) Configured Policy Rule Mode for xml_sitemaps
+- `yahoo_inktomi_slurp_bot` (String) Configured Policy Rule Mode for yahoo_inktomi_slurp_bot
+- `yahoo_japan_bot` (String) Configured Policy Rule Mode for yahoo_japan_bot
+- `yahoo_link_preview` (String) Configured Policy Rule Mode for yahoo_link_preview
+- `yahoo_seeker_bot` (String) Configured Policy Rule Mode for yahoo_seeker_bot
+- `yahoo_slurp_bot` (String) Configured Policy Rule Mode for yahoo_slurp_bot
+- `yandex_bot` (String) Configured Policy Rule Mode for yandex_bot
+- `yisouspider` (String) Configured Policy Rule Mode for yisouspider
+- `yodao_bot` (String) Configured Policy Rule Mode for yodao_bot
+- `zendesk_bot` (String) Configured Policy Rule Mode for zendesk_bot
+- `zoho_bot` (String) Configured Policy Rule Mode for zoho_bot
+- `zum_bot` (String) Configured Policy Rule Mode for zum_bot
+
+
+<a id="nestedblock--policies--core_waf_owasp_top_threats"></a>
+### Nested Schema for `policies.core_waf_owasp_top_threats`
+
+Optional:
+
+- `apache_struts_exploit` (String) Configured Policy Rule Mode for apache_struts_exploit
+- `code_injection` (String) Configured Policy Rule Mode for code_injection
+- `common_web_application_vulnerabilities` (String) Configured Policy Rule Mode for common_web_application_vulnerabilities
+- `csrf` (String) Configured Policy Rule Mode for csrf
+- `lfi` (String) Configured Policy Rule Mode for lfi
+- `open_redirect` (String) Configured Policy Rule Mode for open_redirect
+- `personally_identifiable_information` (String) Configured Policy Rule Mode for personally_identifiable_information
+- `protocol_attack` (String) Configured Policy Rule Mode for protocol_attack
+- `rfi` (String) Configured Policy Rule Mode for rfi
+- `sensitive_data_exposure` (String) Configured Policy Rule Mode for sensitive_data_exposure
+- `server_side_template_injection` (String) Configured Policy Rule Mode for server_side_template_injection
+- `shell_injection` (String) Configured Policy Rule Mode for shell_injection
+- `shellshock_exploit` (String) Configured Policy Rule Mode for shellshock_exploit
+- `sql_injection` (String) Configured Policy Rule Mode for sql_injection
+- `web_shell_execution_prevention` (String) Configured Policy Rule Mode for web_shell_execution_prevention
+- `xss` (String) Configured Policy Rule Mode for xss
+- `xxe` (String) Configured Policy Rule Mode for xxe
+
+
+<a id="nestedblock--policies--ip_reputation"></a>
+### Nested Schema for `policies.ip_reputation`
+
+Optional:
+
+- `bot_traffic` (String) Configured Policy Rule Mode for bot_traffic
+- `external_reputation_block_list` (String) Configured Policy Rule Mode for external_reputation_block_list
+- `traffic_from_hosting_services` (String) Configured Policy Rule Mode for traffic_from_hosting_services
+- `traffic_from_suspicious_nat_ranges` (String) Configured Policy Rule Mode for traffic_from_suspicious_nat_ranges
+- `traffic_via_cdns` (String) Configured Policy Rule Mode for traffic_via_cdns
+- `traffic_via_proxy_networks` (String) Configured Policy Rule Mode for traffic_via_proxy_networks
+- `traffic_via_tor_network` (String) Configured Policy Rule Mode for traffic_via_tor_network
+- `traffic_via_vpns` (String) Configured Policy Rule Mode for traffic_via_vpns
+
+
+<a id="nestedblock--policies--protocol_validation"></a>
+### Nested Schema for `policies.protocol_validation`
+
+Optional:
+
+- `invalid_user_agent` (String) Configured Policy Rule Mode for invalid_user_agent
+- `prevent_malformed_request_methods` (String) Configured Policy Rule Mode for prevent_malformed_request_methods
+- `service_protocol_validation` (String) Configured Policy Rule Mode for service_protocol_validation
+- `unknown_user_agent` (String) Configured Policy Rule Mode for unknown_user_agent
+
+
 
 <a id="nestedblock--settings"></a>
 ### Nested Schema for `settings`

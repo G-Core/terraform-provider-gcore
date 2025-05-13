@@ -27,4 +27,15 @@ resource "gcore_waap_domain" "domain" {
       ]
     }
   }
+
+  policies {
+    protocol_validation {
+      invalid_user_agent      = false
+      unknown_user_agent      = false
+    }
+    core_waf_owasp_top_threats{
+      sql_injection           = false
+      xss                     = false
+    }
+  }
 }
