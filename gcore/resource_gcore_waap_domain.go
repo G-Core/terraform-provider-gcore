@@ -31,6 +31,7 @@ func resourceWaapDomain() *schema.Resource {
 				Type:        schema.TypeString,
 				Required:    true,
 				Description: "Name of the domain.",
+				ForceNew:    true,
 			},
 			"status": {
 				Type:     schema.TypeString,
