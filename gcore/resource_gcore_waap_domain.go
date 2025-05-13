@@ -1,0 +1,290 @@
+package gcore
+
+import (
+	"context"
+	"fmt"
+	"net/http"
+	"strconv"
+
+	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/validation"
+
+	waap "github.com/G-Core/gcore-waap-sdk-go"
+)
+
+func resourceWaapDomain() *schema.Resource {
+	return &schema.Resource{
+		CreateContext: resourceWaapDomainCreate,
+		ReadContext:   resourceWaapDomainRead,
+		UpdateContext: resourceWaapDomainUpdate,
+		DeleteContext: resourceWaapDomainDelete,
+		Description:   "Represent WAAP domain",
+
+		Schema: map[string]*schema.Schema{
+			"id": {
+				Type:        schema.TypeString,
+				Computed:    true,
+				Description: "ID of the domain.",
+			},
+			"name": {
+				Type:        schema.TypeString,
+				Required:    true,
+				Description: "Name of the domain.",
+				ForceNew:    true,
+			},
+			"status": {
+				Type:     schema.TypeString,
+				Optional: true,
+				Computed: true,
+				ValidateFunc: validation.StringInSlice([]string{
+					"active",
+					"monitor",
+				}, false),
+				Description: "Status of the domain. It must be one of these values {active, monitor}.",
+			},
+			"settings": {
+				Type:     schema.TypeList,
+				Optional: true,
+				MaxItems: 1,
+				Computed: true,
+				Elem: &schema.Resource{
+					Schema: map[string]*schema.Schema{
+						"ddos": {
+							Type:     schema.TypeList,
+							Optional: true,
+							Computed: true,
+							MaxItems: 1,
+							Elem: &schema.Resource{
+								Schema: map[string]*schema.Schema{
+									"global_threshold": {
+										Type:        schema.TypeInt,
+										Optional:    true,
+										Computed:    true,
+										Description: "Global threshold for DDoS protection",
+									},
+									"burst_threshold": {
+										Type:        schema.TypeInt,
+										Optional:    true,
+										Computed:    true,
+										Description: "Burst threshold for DDoS protection",
+									},
+								},
+							},
+						},
+						"api": {
+							Type:     schema.TypeList,
+							Optional: true,
+							Computed: true,
+							MaxItems: 1,
+							Elem: &schema.Resource{
+								Schema: map[string]*schema.Schema{
+									"api_urls": {
+										Type:        schema.TypeList,
+										Optional:    true,
+										Description: "List of API URL patterns",
+										Elem: &schema.Schema{
+											Type: schema.TypeString,
+										},
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+		},
+	}
+}
+
+func resourceWaapDomainCreate(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
+	client := m.(*Config).WaapClient
+	domainName := d.Get("name").(string)
+
+	resp, err := client.GetDomainsV1DomainsGetWithResponse(
+		context.Background(),
+		nil,
+		func(ctx context.Context, req *http.Request) error {
+			req.URL.RawQuery = "name=" + domainName
+			return nil
+		},
+	)
+	if err != nil {
+		return diag.FromErr(fmt.Errorf("error listing domains: %v", err))
+	}
+
+	if resp.JSON200 != nil {
+		if resp.JSON200.Count != 0 {
+			id := fmt.Sprintf("%v", resp.JSON200.Results[0].Id)
+			d.SetId(id)
+		} else {
+			return diag.FromErr(fmt.Errorf("domain with name '%s' not found", domainName))
+		}
+	}
+
+	return resourceWaapDomainUpdate(ctx, d, m)
+}
+
+func resourceWaapDomainRead(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
+	var diags diag.Diagnostics
+	client := m.(*Config).WaapClient
+
+	domainID, _ := strconv.Atoi(d.Get("id").(string))
+
+	// Get domain details
+	resp, err := client.GetDomainV1DomainsDomainIdGetWithResponse(
+		context.Background(),
+		domainID,
+	)
+	if err != nil {
+		return diag.FromErr(fmt.Errorf("error getting domain details: %v", err))
+	}
+
+	if resp.JSON200 != nil {
+		_ = d.Set("status", string(resp.JSON200.Status))
+
+		// Get domain settings
+		settingsResp, err := client.GetDomainSettingsV1DomainsDomainIdSettingsGetWithResponse(
+			context.Background(),
+			domainID,
+		)
+		if err != nil {
+			return diag.FromErr(fmt.Errorf("error getting domain settings: %v", err))
+		}
+
+		if settingsResp.JSON200 != nil {
+			settings := make(map[string]interface{})
+			ddosSettings := make(map[string]interface{})
+
+			if settingsResp.JSON200.Ddos.GlobalThreshold != nil {
+				ddosSettings["global_threshold"] = *settingsResp.JSON200.Ddos.GlobalThreshold
+			}
+
+			if settingsResp.JSON200.Ddos.BurstThreshold != nil {
+				ddosSettings["burst_threshold"] = *settingsResp.JSON200.Ddos.BurstThreshold
+			}
+
+			if len(ddosSettings) > 0 {
+				settings["ddos"] = []interface{}{ddosSettings}
+			}
+
+			if settingsResp.JSON200.Api.ApiUrls != nil {
+				apiSettings := make(map[string]interface{})
+				apiSettings["api_urls"] = *settingsResp.JSON200.Api.ApiUrls
+
+				if len(apiSettings) > 0 {
+					settings["api"] = []interface{}{apiSettings}
+				}
+			}
+
+			if len(settings) > 0 {
+				_ = d.Set("settings", []interface{}{settings})
+			}
+		}
+	}
+	return diags
+}
+
+func resourceWaapDomainUpdate(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
+	client := m.(*Config).WaapClient
+	domainID, _ := strconv.Atoi(d.Get("id").(string))
+
+	// Get domain details
+	resp, err := client.GetDomainV1DomainsDomainIdGetWithResponse(
+		context.Background(),
+		domainID,
+	)
+	if err != nil {
+		return diag.FromErr(fmt.Errorf("error getting domain details: %v", err))
+	}
+
+	var domainStatus string
+	if resp.JSON200 != nil {
+		domainStatus = string(resp.JSON200.Status)
+
+		if newStatus, ok := d.GetOk("status"); ok && newStatus != domainStatus {
+			domainStatusUpdate := waap.DomainUpdateStatus(newStatus.(string))
+			updateRequest := waap.UpdateDomainV1DomainsDomainIdPatchJSONRequestBody{
+				Status: &domainStatusUpdate,
+			}
+
+			// Update domain status
+			updateResp, err := client.UpdateDomainV1DomainsDomainIdPatchWithResponse(
+				context.Background(),
+				domainID,
+				updateRequest,
+			)
+
+			if err != nil || updateResp.StatusCode() != 204 {
+				return diag.FromErr(fmt.Errorf("failed to update domain. Status code: %d with error: %v", updateResp.StatusCode(), err))
+			}
+		}
+
+		if d.HasChange("settings") {
+			var domainSettingsUpdate waap.UpdateDomainSettingsV1DomainsDomainIdSettingsPatchJSONRequestBody
+
+			if v, ok := d.GetOk("settings"); ok {
+				settingsList := v.([]interface{})
+				if len(settingsList) > 0 && settingsList[0] != nil {
+					settingsMap := settingsList[0].(map[string]interface{})
+
+					// Process DDOS settings
+					if ddosList, ok := settingsMap["ddos"].([]interface{}); ok && len(ddosList) > 0 {
+						ddosMap := ddosList[0].(map[string]interface{})
+						ddosSettings := struct {
+							GlobalThreshold *int `json:"global_threshold,omitempty"`
+							BurstThreshold  *int `json:"burst_threshold,omitempty"`
+						}{}
+
+						if v, ok := ddosMap["global_threshold"]; ok {
+							val := v.(int)
+							ddosSettings.GlobalThreshold = &val
+						}
+
+						if v, ok := ddosMap["burst_threshold"]; ok {
+							val := v.(int)
+							ddosSettings.BurstThreshold = &val
+						}
+
+						domainSettingsUpdate.Ddos = &waap.UpdateDomainDdosSettings{
+							GlobalThreshold: ddosSettings.GlobalThreshold,
+							BurstThreshold:  ddosSettings.BurstThreshold,
+						}
+					}
+
+					// Process API settings
+					if apiList, ok := settingsMap["api"].([]interface{}); ok && len(apiList) > 0 {
+						apiMap := apiList[0].(map[string]interface{})
+
+						if apiUrls, ok := apiMap["api_urls"].([]interface{}); ok {
+							urls := make([]string, len(apiUrls))
+							for i, url := range apiUrls {
+								urls[i] = url.(string)
+							}
+
+							domainSettingsUpdate.Api = &waap.AppModelsDomainSettingsUpdateApiUrls{
+								ApiUrls: &urls,
+							}
+						}
+					}
+
+					// Update domain settings
+					updateSettingsResp, err := client.UpdateDomainSettingsV1DomainsDomainIdSettingsPatchWithResponse(
+						context.Background(),
+						domainID,
+						domainSettingsUpdate,
+					)
+
+					if err != nil || updateSettingsResp.StatusCode() != 204 {
+						return diag.FromErr(fmt.Errorf("failed to update domain settings. Status code: %d with error: %v", updateSettingsResp.StatusCode(), err))
+					}
+				}
+			}
+		}
+	}
+	return resourceWaapDomainRead(ctx, d, m)
+}
+
+func resourceWaapDomainDelete(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
+	return nil
+}

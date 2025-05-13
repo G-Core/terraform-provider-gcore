@@ -39,6 +39,8 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/mitchellh/mapstructure"
+
+	waap "github.com/G-Core/gcore-waap-sdk-go"
 )
 
 const (
@@ -61,6 +63,7 @@ type Config struct {
 	StorageClient  *storageSDK.SDK
 	DNSClient      *dnssdk.Client
 	FastEdgeClient *fastedge.ClientWithResponses
+	WaapClient     *waap.ClientWithResponses
 }
 
 type Project struct {
