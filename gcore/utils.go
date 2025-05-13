@@ -18,6 +18,7 @@ import (
 	fastedge "github.com/G-Core/FastEdge-client-sdk-go"
 	dnssdk "github.com/G-Core/gcore-dns-sdk-go"
 	storageSDK "github.com/G-Core/gcore-storage-sdk-go"
+	waap "github.com/G-Core/gcore-waap-sdk-go"
 	gcdn "github.com/G-Core/gcorelabscdn-go"
 	gcorecloud "github.com/G-Core/gcorelabscloud-go"
 	gc "github.com/G-Core/gcorelabscloud-go/gcore"
@@ -61,6 +62,7 @@ type Config struct {
 	StorageClient  *storageSDK.SDK
 	DNSClient      *dnssdk.Client
 	FastEdgeClient *fastedge.ClientWithResponses
+	WaapClient     *waap.ClientWithResponses
 }
 
 type Project struct {
