@@ -98,6 +98,7 @@ func resourceWaapDomain() *schema.Resource {
 				Type:     schema.TypeList,
 				Optional: true,
 				MaxItems: 1,
+				Description: "List of policies for the domain.",
 				Elem: &schema.Resource{
 					Schema: generatePolicySchema(),
 				},
@@ -203,26 +204,7 @@ func resourceWaapDomainRead(ctx context.Context, d *schema.ResourceData, m inter
 
 	if policiesResp.JSON200 != nil {
 		policies := make(map[string]interface{})
-		for resourceSlug := range policiesMap {
-			policies[resourceSlug] = []interface{}{}
-		}
-
-		for _, policy := range *policiesResp.JSON200 {
-			resourceSlug := strings.ReplaceAll(*policy.ResourceSlug, "-", "_")
-			ruleValues := make(map[string]interface{})
-
-			for _, rule := range *policy.Rules {
-				for ruleName, ruleID := range policiesMap[resourceSlug] {
-					if ruleID == rule.Id {
-						ruleValues[ruleName] = strconv.FormatBool(rule.Mode)
-						break
-					}
-				}
-			}
-			if len(ruleValues) > 0 {
-				policies[resourceSlug] = []interface{}{ruleValues}
-			}
-		}
+		processDomainPoliciesFromAPI(&policies, policiesResp)
 
 		_ = d.Set("policies", []interface{}{policies})
 	}
@@ -329,85 +311,62 @@ func resourceWaapDomainUpdate(ctx context.Context, d *schema.ResourceData, m int
 	}
 
 	// Process policies
-	definedPolicies := make(map[string]map[string]string)
-	if v, ok := d.GetOk("policies"); ok {
-		rawList := v.([]interface{})
-		if len(rawList) > 0 && rawList[0] != nil {
-			rawMap := rawList[0].(map[string]interface{})
-			for resourceSlug, rulesMap := range rawMap {
-				definedPolicies[resourceSlug] = make(map[string]string)
-				rulesList := rulesMap.([]interface{})
-				if len(rulesList) > 0 && rulesList[0] != nil {
-					rules := rulesList[0].(map[string]interface{})
-					for ruleName, ruleValue := range rules {
-						definedPolicies[resourceSlug][ruleName] = ruleValue.(string)
+	if d.HasChange("policies") {
+		definedPolicies := make(map[string]map[string]string)
+		if v, ok := d.GetOk("policies"); ok {
+			rawList := v.([]interface{})
+			if len(rawList) > 0 && rawList[0] != nil {
+				rawMap := rawList[0].(map[string]interface{})
+				for resourceSlug, rulesMap := range rawMap {
+					definedPolicies[resourceSlug] = make(map[string]string)
+					rulesList := rulesMap.([]interface{})
+					if len(rulesList) > 0 && rulesList[0] != nil {
+						rules := rulesList[0].(map[string]interface{})
+						for ruleName, ruleValue := range rules {
+							definedPolicies[resourceSlug][ruleName] = ruleValue.(string)
+						}
 					}
 				}
 			}
 		}
-	}
 
-	// Get domain policies
-	policiesResp, err := client.GetRuleSetListV1DomainsDomainIdRuleSetsGetWithResponse(
-		context.Background(),
-		domainID,
-	)
-	if err != nil {
-		return diag.FromErr(fmt.Errorf("error getting domain policies: %v", err))
-	}
-
-	if policiesResp.JSON200 != nil {
-		policies := make(map[string]interface{})
-		for resourceSlug := range policiesMap {
-			policies[resourceSlug] = []interface{}{}
+		// Get domain policies
+		policiesResp, err := client.GetRuleSetListV1DomainsDomainIdRuleSetsGetWithResponse(
+			context.Background(),
+			domainID,
+		)
+		if err != nil {
+			return diag.FromErr(fmt.Errorf("error getting domain policies: %v", err))
 		}
 
-		for _, policy := range *policiesResp.JSON200 {
-			resourceSlug := strings.ReplaceAll(*policy.ResourceSlug, "-", "_")
-			ruleValues := make(map[string]interface{})
+		if policiesResp.JSON200 != nil {
+			policies := make(map[string]interface{})
+			processDomainPoliciesFromAPI(&policies, policiesResp)
 
-			for _, rule := range *policy.Rules {
-				for ruleName, ruleID := range policiesMap[resourceSlug] {
-					if ruleID == rule.Id {
-						ruleValues[ruleName] = strconv.FormatBool(rule.Mode)
-						break
-					}
-				}
-			}
-			if len(ruleValues) > 0 {
-				policies[resourceSlug] = []interface{}{ruleValues}
-			}
-		}
-
-		// Compare existing policies with defined policies
-		for resourceSlug, rules := range definedPolicies {
-			existingRulesList, ok := policies[resourceSlug].([]interface{})
-			if !ok || len(existingRulesList) == 0 {
-				continue
-			}
-
-			existingRules := existingRulesList[0].(map[string]interface{})
-
-			for ruleName, ruleValue := range rules {
-				existingRuleValue, exists := existingRules[ruleName]
-				if !exists {
+			// Compare existing policies with defined policies
+			for resourceSlug, rules := range definedPolicies {
+				existingRulesList := policies[resourceSlug].([]interface{})
+				if len(existingRulesList) == 0 {
 					continue
 				}
 
-				if existingRuleValue != ruleValue {
-					ruleID, ok := policiesMap[resourceSlug][ruleName].(string)
-					if !ok {
-						continue
-					}
+				existingRules := existingRulesList[0].(map[string]interface{})
 
-					updateResp, err := client.ToggleDomainPolicyV1DomainsDomainIdPoliciesPolicyIdTogglePatchWithResponse(
-						context.Background(),
-						domainID,
-						ruleID,
-					)
+				for ruleName, ruleValue := range rules {
+					existingRuleValue := existingRules[ruleName]
 
-					if err != nil || updateResp.StatusCode() != 200 {
-						return diag.FromErr(fmt.Errorf("failed to update policy rule %s. Status code: %d with error: %v", ruleName, updateResp.StatusCode(), err))
+					if existingRuleValue != ruleValue {
+						ruleID := policiesMap[resourceSlug][ruleName].(string)
+
+						updateResp, err := client.ToggleDomainPolicyV1DomainsDomainIdPoliciesPolicyIdTogglePatchWithResponse(
+							context.Background(),
+							domainID,
+							ruleID,
+						)
+
+						if err != nil || updateResp.StatusCode() != 200 {
+							return diag.FromErr(fmt.Errorf("failed to update policy rule %s. Status code: %d with error: %v", ruleName, updateResp.StatusCode(), err))
+						}
 					}
 				}
 			}
@@ -421,6 +380,29 @@ func resourceWaapDomainDelete(ctx context.Context, d *schema.ResourceData, m int
 	return nil
 }
 
+func processDomainPoliciesFromAPI(policies *map[string]interface{}, policiesResp *waap.GetRuleSetListV1DomainsDomainIdRuleSetsGetResponse) {
+	for resourceSlug := range policiesMap {
+		(*policies)[resourceSlug] = []interface{}{}
+	}
+
+	for _, policy := range *policiesResp.JSON200 {
+		resourceSlug := strings.ReplaceAll(*policy.ResourceSlug, "-", "_")
+		ruleValues := make(map[string]interface{})
+
+		for _, rule := range *policy.Rules {
+			for ruleName, ruleID := range policiesMap[resourceSlug] {
+				if ruleID == rule.Id {
+					ruleValues[ruleName] = strconv.FormatBool(rule.Mode)
+					break
+				}
+			}
+		}
+		if len(ruleValues) > 0 {
+			(*policies)[resourceSlug] = []interface{}{ruleValues}
+		}
+	}
+}
+
 func generatePolicySchema() map[string]*schema.Schema {
 	policySchema := make(map[string]*schema.Schema)
 
@@ -432,7 +414,7 @@ func generatePolicySchema() map[string]*schema.Schema {
 				Type:        schema.TypeString,
 				Optional:    true,
 				Computed:    true,
-				Description: fmt.Sprintf("Enable %s rule", ruleName),
+				Description: fmt.Sprintf("Configured Policy Rule Mode for %s", ruleName),
 			}
 		}
 
@@ -441,6 +423,7 @@ func generatePolicySchema() map[string]*schema.Schema {
 			Optional: true,
 			Computed: true,
 			MaxItems: 1,
+			Description: fmt.Sprintf("List of %s policies", resourceSlug),
 			Elem: &schema.Resource{
 				Schema: ruleSchema,
 			},
@@ -448,10 +431,6 @@ func generatePolicySchema() map[string]*schema.Schema {
 	}
 
 	return policySchema
-}
-
-func replaceHyphenWithUnderscore(s string) string {
-	return strings.ReplaceAll(s, "-", "_")
 }
 
 var policiesMap = map[string]map[string]interface{}{
