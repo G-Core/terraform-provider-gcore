@@ -94,7 +94,11 @@ func resourceSecurityInsightSilenceCreate(ctx context.Context, d *schema.Resourc
 	}
 	req.Labels = labels
 
-	if expireAt, ok := d.GetOk("expire_at"); ok {
+	if expireAtStr, ok := d.GetOk("expire_at"); ok {
+		expireAt, err := time.Parse(time.RFC3339, expireAtStr.(string))
+		if err != nil {
+			return diag.Errorf("Error parsing time: %s", err)
+		}
 		req.ExpireAt = &expireAt
 	}
 
@@ -105,7 +109,7 @@ func resourceSecurityInsightSilenceCreate(ctx context.Context, d *schema.Resourc
 	}
 
 	if result.StatusCode() != http.StatusOK {
-		return diag.Errorf("failed to create Insight Silence. Status code: %d with error: %s", result.StatusCode(), result.Body)
+		return diag.Errorf("Failed to create Insight Silence. Status code: %d with error: %s", result.StatusCode(), result.Body)
 	}
 
 	d.SetId(result.JSON200.Id.String())
@@ -165,7 +169,11 @@ func resourceSecurityInsightSilenceUpdate(ctx context.Context, d *schema.Resourc
 		Author:  d.Get("author").(string),
 	}
 
-	if expireAt, ok := d.GetOk("expire_at"); ok {
+	if expireAtStr, ok := d.GetOk("expire_at"); ok {
+		expireAt, err := time.Parse(time.RFC3339, expireAtStr.(string))
+		if err != nil {
+			return diag.Errorf("Error parsing time: %s", err)
+		}
 		req.ExpireAt = &expireAt
 	}
 

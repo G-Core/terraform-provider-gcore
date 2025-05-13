@@ -31,7 +31,7 @@ func dataWaapSecurityInsightTypeRead(ctx context.Context, d *schema.ResourceData
 	config := m.(*Config)
 	client := config.WaapClient
 
-	name := d.Get("name")
+	name := d.Get("name").(string)
 	params := waap.GetInsightTypesV1SecurityInsightsTypesGetParams{
 		Name: &name,
 	}
@@ -45,8 +45,7 @@ func dataWaapSecurityInsightTypeRead(ctx context.Context, d *schema.ResourceData
 		return diag.Errorf("Failed to read Insight Types. Status code: %d with error: %s", result.StatusCode(), result.Body)
 	}
 
-	// todo: iterate results
-	insightType := findInsightTypeByName(*result.JSON200, name.(string))
+	insightType := findInsightTypeByName(*result.JSON200, name)
 
 	if insightType == nil {
 		return diag.Errorf("Insight type with name '%s' not found.", name)
