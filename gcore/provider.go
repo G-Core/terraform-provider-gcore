@@ -9,11 +9,10 @@ import (
 	"os"
 	"sync"
 
-	waap "github.com/G-Core/gcore-waap-sdk-go"
-
 	fastedge "github.com/G-Core/FastEdge-client-sdk-go"
 	dnssdk "github.com/G-Core/gcore-dns-sdk-go"
 	storageSDK "github.com/G-Core/gcore-storage-sdk-go"
+	waap "github.com/G-Core/gcore-waap-sdk-go"
 	gcdn "github.com/G-Core/gcorelabscdn-go"
 	gcdnProvider "github.com/G-Core/gcorelabscdn-go/gcore/provider"
 	gcorecloud "github.com/G-Core/gcorelabscloud-go"
