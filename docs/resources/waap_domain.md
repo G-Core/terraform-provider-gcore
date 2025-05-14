@@ -59,7 +59,7 @@ resource "gcore_waap_domain" "domain" {
 
 ### Read-Only
 
-- `id` (String) ID of the domain.
+- `id` (String) The ID of this resource.
 
 <a id="nestedblock--settings"></a>
 ### Nested Schema for `settings`

@@ -22,11 +22,6 @@ func resourceWaapSecurityInsightSilence() *schema.Resource {
 		Description:   "Represent Security Insight Silence for a specific WAAP domain",
 
 		Schema: map[string]*schema.Schema{
-			"id": {
-				Type:        schema.TypeString,
-				Computed:    true,
-				Description: "A generated unique identifier for the silence.",
-			},
 			"domain_id": {
 				Type:        schema.TypeInt,
 				Required:    true,
