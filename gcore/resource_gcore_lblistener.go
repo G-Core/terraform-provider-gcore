@@ -447,13 +447,27 @@ func resourceLBListenerUpdate(ctx context.Context, d *schema.ResourceData, m int
 
 	if changed {
 		rc := GetConflictRetryConfig(int(d.Timeout(schema.TimeoutUpdate).Seconds()))
-		_, err = listeners.Update(clientV2, d.Id(), updateOpts, &gcorecloud.RequestOpts{
+		results, err := listeners.Update(clientV2, d.Id(), updateOpts, &gcorecloud.RequestOpts{
 			ConflictRetryAmount:   rc.Amount,
 			ConflictRetryInterval: rc.Interval,
 		}).Extract()
 		if err != nil {
 			return diag.FromErr(err)
 		}
+
+		timeout := int(d.Timeout(schema.TimeoutUpdate).Seconds())
+		taskID := results.Tasks[0]
+		_, err = tasks.WaitTaskAndReturnResult(clientV1, taskID, true, timeout, func(task tasks.TaskID) (interface{}, error) {
+			taskInfo, err := tasks.Get(clientV1, string(task)).Extract()
+			if err != nil {
+				return nil, fmt.Errorf("cannot get task with ID: %s. Error: %w", task, err)
+			}
+			listenerID, err := listeners.ExtractListenerIDFromTask(taskInfo)
+			if err != nil {
+				return nil, fmt.Errorf("cannot retrieve LoadBalancer ID from task info: %w", err)
+			}
+			return listenerID, nil
+		})
 
 		if toUnset {
 			stopWaitConf := retry.StateChangeConf{
@@ -467,13 +481,25 @@ func resourceLBListenerUpdate(ctx context.Context, d *schema.ResourceData, m int
 			if err != nil {
 				return diag.Errorf("Error waiting for loadbalancer (%s): %s", d.Get("loadbalancer_id").(string), err)
 			}
-			_, err := listeners.Unset(clientV2, d.Id(), unsetOpts, &gcorecloud.RequestOpts{
+			results, err := listeners.Unset(clientV2, d.Id(), unsetOpts, &gcorecloud.RequestOpts{
 				ConflictRetryAmount:   rc.Amount,
 				ConflictRetryInterval: rc.Interval,
 			}).Extract()
 			if err != nil {
 				return diag.FromErr(err)
 			}
+			taskID := results.Tasks[0]
+			_, err = tasks.WaitTaskAndReturnResult(clientV1, taskID, true, timeout, func(task tasks.TaskID) (interface{}, error) {
+				taskInfo, err := tasks.Get(clientV1, string(task)).Extract()
+				if err != nil {
+					return nil, fmt.Errorf("cannot get task with ID: %s. Error: %w", task, err)
+				}
+				listenerID, err := listeners.ExtractListenerIDFromTask(taskInfo)
+				if err != nil {
+					return nil, fmt.Errorf("cannot retrieve LoadBalancer ID from task info: %w", err)
+				}
+				return listenerID, nil
+			})
 		}
 
 		d.Set("last_updated", time.Now().Format(time.RFC850))
