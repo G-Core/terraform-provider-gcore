@@ -63,4 +63,4 @@ resource "gcore_waap_security_insight_silence" "insight_silence" {
 
 ### Read-Only
 
-- `id` (String) A generated unique identifier for the silence.
+- `id` (String) The ID of this resource.
