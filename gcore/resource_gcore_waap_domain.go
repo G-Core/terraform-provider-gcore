@@ -221,101 +221,45 @@ func resourceWaapDomainRead(ctx context.Context, d *schema.ResourceData, m inter
 
 func resourceWaapDomainUpdate(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	client := m.(*Config).WaapClient
-	domainID, _ := strconv.Atoi(d.Id())
-
-	// Get domain details
-	resp, err := client.GetDomainV1DomainsDomainIdGetWithResponse(
-		context.Background(),
-		domainID,
-	)
+	domainID, err := strconv.Atoi(d.Id())
 	if err != nil {
-		return diag.FromErr(fmt.Errorf("error getting domain details: %v", err))
+		return diag.FromErr(err)
 	}
 
-	var domainStatus string
-	if resp.JSON200 != nil {
-		domainStatus = string(resp.JSON200.Status)
-
-		if newStatus, ok := d.GetOk("status"); ok && newStatus != domainStatus {
-			domainStatusUpdate := waap.DomainUpdateStatus(newStatus.(string))
-			updateRequest := waap.UpdateDomainV1DomainsDomainIdPatchJSONRequestBody{
+	// Update domain status
+	if d.HasChange("status") {
+		if status, ok := d.GetOk("status"); ok {
+			domainStatusUpdate := waap.DomainUpdateStatus(status.(string))
+			updateStatusReq := waap.UpdateDomain{
 				Status: &domainStatusUpdate,
 			}
+			updateResp, err := client.UpdateDomainV1DomainsDomainIdPatchWithResponse(ctx, domainID, updateStatusReq)
 
-			// Update domain status
-			updateResp, err := client.UpdateDomainV1DomainsDomainIdPatchWithResponse(
-				context.Background(),
-				domainID,
-				updateRequest,
-			)
-
-			if err != nil || updateResp.StatusCode() != 204 {
-				return diag.FromErr(fmt.Errorf("failed to update domain. Status code: %d with error: %v", updateResp.StatusCode(), err))
+			if err != nil {
+				return diag.Errorf("Failed to update Domain status: %w", err)
 			}
-		}
 
-		if d.HasChange("settings") {
-			var domainSettingsUpdate waap.UpdateDomainSettingsV1DomainsDomainIdSettingsPatchJSONRequestBody
-
-			if v, ok := d.GetOk("settings"); ok {
-				settingsList := v.([]interface{})
-				if len(settingsList) > 0 && settingsList[0] != nil {
-					settingsMap := settingsList[0].(map[string]interface{})
-
-					// Process DDOS settings
-					if ddosList, ok := settingsMap["ddos"].([]interface{}); ok && len(ddosList) > 0 {
-						ddosMap := ddosList[0].(map[string]interface{})
-						ddosSettings := struct {
-							GlobalThreshold *int `json:"global_threshold,omitempty"`
-							BurstThreshold  *int `json:"burst_threshold,omitempty"`
-						}{}
-
-						if v, ok := ddosMap["global_threshold"]; ok {
-							val := v.(int)
-							ddosSettings.GlobalThreshold = &val
-						}
-
-						if v, ok := ddosMap["burst_threshold"]; ok {
-							val := v.(int)
-							ddosSettings.BurstThreshold = &val
-						}
-
-						domainSettingsUpdate.Ddos = &waap.UpdateDomainDdosSettings{
-							GlobalThreshold: ddosSettings.GlobalThreshold,
-							BurstThreshold:  ddosSettings.BurstThreshold,
-						}
-					}
-
-					// Process API settings
-					if apiList, ok := settingsMap["api"].([]interface{}); ok && len(apiList) > 0 {
-						apiMap := apiList[0].(map[string]interface{})
-
-						if apiUrls, ok := apiMap["api_urls"].([]interface{}); ok {
-							urls := make([]string, len(apiUrls))
-							for i, url := range apiUrls {
-								urls[i] = url.(string)
-							}
-
-							domainSettingsUpdate.Api = &waap.AppModelsDomainSettingsUpdateApiUrls{
-								ApiUrls: &urls,
-							}
-						}
-					}
-
-					// Update domain settings
-					updateSettingsResp, err := client.UpdateDomainSettingsV1DomainsDomainIdSettingsPatchWithResponse(
-						context.Background(),
-						domainID,
-						domainSettingsUpdate,
-					)
-
-					if err != nil || updateSettingsResp.StatusCode() != 204 {
-						return diag.FromErr(fmt.Errorf("failed to update domain settings. Status code: %d with error: %v", updateSettingsResp.StatusCode(), err))
-					}
-				}
+			if updateResp.StatusCode() != http.StatusNoContent {
+				return diag.Errorf("Failed to update Domain status. Status code: %d with error: %s", updateResp.StatusCode(), updateResp.Body)
 			}
 		}
 	}
+
+	// Update domain settings
+	if d.HasChange("settings") {
+		if settings, ok := d.GetOk("settings"); ok {
+			updateSettingsResp, err := updateDomainSettings(ctx, client, settings, domainID)
+
+			if err != nil {
+				return diag.Errorf("Failed to update Domain settings: %w", err)
+			}
+
+			if updateSettingsResp.StatusCode() != http.StatusNoContent {
+				return diag.Errorf("Failed to update Domain settings. Status code: %d with error: %s", updateSettingsResp.StatusCode(), updateSettingsResp.Body)
+			}
+		}
+	}
+
 	return resourceWaapDomainRead(ctx, d, m)
 }
 
