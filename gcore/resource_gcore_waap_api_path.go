@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"strconv"
+	"strings"
 
 	waap "github.com/G-Core/gcore-waap-sdk-go"
 	"github.com/google/uuid"
@@ -15,6 +17,24 @@ import (
 
 func resourceWaapApiPath() *schema.Resource {
 	return &schema.Resource{
+		Importer: &schema.ResourceImporter{
+			State: func(d *schema.ResourceData, meta any) ([]*schema.ResourceData, error) {
+				domainIdStr, pathId, err := resourceApiPathImportParseId(d.Id())
+				if err != nil {
+					return nil, err
+				}
+
+				domainId, err := strconv.ParseInt(domainIdStr, 10, 64)
+				if err != nil {
+					return nil, fmt.Errorf("unexpected format of resource_id (%s), expected number", domainIdStr)
+				}
+
+				d.Set("domain_id", domainId)
+				d.SetId(pathId)
+
+				return []*schema.ResourceData{d}, nil
+			},
+		},
 		CreateContext: resourceWaapApiPathCreate,
 		ReadContext:   resourceWaapApiPathRead,
 		UpdateContext: resourceWaapApiPathUpdate,
@@ -276,4 +296,14 @@ func convertStringList(v []interface{}) []string {
 		result = append(result, item.(string))
 	}
 	return result
+}
+
+func resourceApiPathImportParseId(id string) (string, string, error) {
+	parts := strings.SplitN(id, ":", 2)
+
+	if len(parts) != 2 || parts[0] == "" || parts[1] == "" {
+		return "", "", fmt.Errorf("unexpected format of ID (%s), expected domain_id:path_id", id)
+	}
+
+	return parts[0], parts[1], nil
 }
