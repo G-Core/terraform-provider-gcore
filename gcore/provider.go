@@ -194,6 +194,7 @@ func Provider() *schema.Provider {
 			"gcore_fastedge_secret":               resourceFastEdgeSecret(),
 			"gcore_waap_domain":                   resourceWaapDomain(),
 			"gcore_waap_security_insight_silence": resourceWaapSecurityInsightSilence(),
+			"gcore_waap_api_path":                 resourceWaapApiPath(),
 		},
 		DataSourcesMap: map[string]*schema.Resource{
 			"gcore_ai_cluster":                 dataSourceAICluster(),
