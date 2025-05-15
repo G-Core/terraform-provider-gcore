@@ -108,11 +108,11 @@ func resourceWaapApiPathCreate(ctx context.Context, d *schema.ResourceData, m in
 		req.ApiVersion = &version
 	}
 
-	if tags := ConvertStringList(d.Get("tags").([]interface{})); tags != nil && len(tags) > 0 {
+	if tags := convertStringList(d.Get("tags").([]interface{})); tags != nil && len(tags) > 0 {
 		req.Tags = &tags
 	}
 
-	if apiGroups := ConvertStringList(d.Get("api_groups").([]interface{})); apiGroups != nil && len(apiGroups) > 0 {
+	if apiGroups := convertStringList(d.Get("api_groups").([]interface{})); apiGroups != nil && len(apiGroups) > 0 {
 		req.ApiGroups = &apiGroups
 	}
 
@@ -223,11 +223,11 @@ func resourceWaapApiPathUpdate(ctx context.Context, d *schema.ResourceData, m in
 		req.Status = &status
 	}
 
-	if apiGroups := ConvertStringList(d.Get("api_groups").([]interface{})); apiGroups != nil && len(apiGroups) > 0 {
+	if apiGroups := convertStringList(d.Get("api_groups").([]interface{})); apiGroups != nil && len(apiGroups) > 0 {
 		req.ApiGroups = &apiGroups
 	}
 
-	if tags := ConvertStringList(d.Get("tags").([]interface{})); tags != nil && len(tags) > 0 {
+	if tags := convertStringList(d.Get("tags").([]interface{})); tags != nil && len(tags) > 0 {
 		req.Tags = &tags
 	}
 
@@ -270,7 +270,7 @@ func resourceWaapApiPathDelete(ctx context.Context, d *schema.ResourceData, m in
 	return nil
 }
 
-func ConvertStringList(v []interface{}) []string {
+func convertStringList(v []interface{}) []string {
 	var result []string
 	for _, item := range v {
 		result = append(result, item.(string))
