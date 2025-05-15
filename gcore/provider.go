@@ -230,6 +230,7 @@ func Provider() *schema.Provider {
 			"gcore_cdn_preset":                 dataPreset(),
 			"gcore_cdn_client":                 dataClient(),
 			"gcore_inference_flavor":           dataSourceInferenceFlavor(),
+			"gcore_waap_policy":                dataSourceWaapPolicy(),
 			"gcore_waap_security_insight_type": dataWaapSecurityInsightType(),
 		},
 		ConfigureContextFunc: providerConfigure,
