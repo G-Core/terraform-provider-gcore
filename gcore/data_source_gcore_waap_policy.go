@@ -22,17 +22,20 @@ func dataSourceWaapPolicy() *schema.Resource {
 				Required:    true,
 			},
 			"policies": {
-				Type:     schema.TypeList,
-				Computed: true,
+				Type:        schema.TypeList,
+				Computed:    true,
+				Description: "Policy Rules List -- Data retrieved from the WAAP API",
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
-						"resource_slug": {
-							Type:     schema.TypeString,
-							Computed: true,
+						"policy_name": {
+							Type:        schema.TypeString,
+							Computed:    true,
+							Description: "Formatted Policy Name in snake_case format.",
 						},
 						"rules": {
-							Type:     schema.TypeMap,
-							Computed: true,
+							Type:        schema.TypeList,
+							Computed:    true,
+							Description: "List of Formatted Rule Names in snake_case format for the corresponding policy",
 							Elem: &schema.Schema{
 								Type: schema.TypeString,
 							},
@@ -64,18 +67,17 @@ func dataSourceWaapPoliciesRead(ctx context.Context, d *schema.ResourceData, m i
 	var policies []map[string]interface{}
 
 	for _, policy := range *policiesResp.JSON200 {
-		resourceSlug := strings.ReplaceAll(*policy.ResourceSlug, "-", "_")
-		rulesMap := make(map[string]interface{})
-
+		policyName := strings.ReplaceAll(*policy.ResourceSlug, "-", "_")
+		var rules []string
 		for _, rule := range *policy.Rules {
 			ruleName := formatRuleName(rule.Name)
-			rulesMap[ruleName] = rule.Id
+			rules = append(rules, ruleName)
 		}
 
-		if len(rulesMap) > 0 {
+		if len(rules) > 0 {
 			policyGroup := map[string]interface{}{
-				"resource_slug": resourceSlug,
-				"rules":         rulesMap,
+				"policy_name": policyName,
+				"rules":       rules,
 			}
 			policies = append(policies, policyGroup)
 		}
