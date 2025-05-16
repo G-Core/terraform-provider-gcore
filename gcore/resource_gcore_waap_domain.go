@@ -157,7 +157,6 @@ func resourceWaapDomainCreate(ctx context.Context, d *schema.ResourceData, m int
 }
 
 func resourceWaapDomainRead(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
-	var diags diag.Diagnostics
 	client := m.(*Config).WaapClient
 
 	domainID, err := strconv.Atoi(d.Id())
@@ -171,22 +170,32 @@ func resourceWaapDomainRead(ctx context.Context, d *schema.ResourceData, m inter
 		domainID,
 	)
 	if err != nil {
-		return diag.FromErr(fmt.Errorf("error getting domain details: %v", err))
+		return diag.Errorf("Failed to read Domain details: %w", err)
 	}
 
-	if resp.JSON200 != nil {
-		_ = d.Set("status", string(resp.JSON200.Status))
+	if resp.StatusCode() == http.StatusNotFound {
+		d.SetId("") // Resource not found, remove from state
+		return diag.Diagnostics{
+			{Summary: fmt.Sprintf("Domain (%s) was not found, removed from TF state", d.Id())},
+		}
+	}
+
+	if resp.StatusCode() != http.StatusOK {
+		return diag.Errorf("Failed to read Domain details. Status code: %d with error: %s", resp.StatusCode(), resp.Body)
+	}
+
+	d.Set("status", string(resp.JSON200.Status))
 
 		// Get domain settings
-		settingsResp, err := client.GetDomainSettingsV1DomainsDomainIdSettingsGetWithResponse(
-			context.Background(),
-			domainID,
-		)
+	settingsResp, err := client.GetDomainSettingsV1DomainsDomainIdSettingsGetWithResponse(ctx, domainID)
 		if err != nil {
-			return diag.FromErr(fmt.Errorf("error getting domain settings: %v", err))
+		return diag.Errorf("Failed to read Domain settings: %w", err)
 		}
 
-		if settingsResp.JSON200 != nil {
+	if settingsResp.StatusCode() != http.StatusOK {
+		return diag.Errorf("Failed to read Domain settings. Status code: %d with error: %s", settingsResp.StatusCode(), settingsResp.Body)
+	}
+
 			settings := make(map[string]interface{})
 			ddosSettings := make(map[string]interface{})
 
@@ -214,9 +223,8 @@ func resourceWaapDomainRead(ctx context.Context, d *schema.ResourceData, m inter
 			if len(settings) > 0 {
 				d.Set("settings", []interface{}{settings})
 			}
-		}
-	}
-	return diags
+
+	return nil
 }
 
 func resourceWaapDomainUpdate(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
