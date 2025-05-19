@@ -200,7 +200,7 @@ func resourceWaapApiPathRead(ctx context.Context, d *schema.ResourceData, m inte
 	if result.StatusCode() == http.StatusNotFound {
 		d.SetId("") // Resource not found, remove from state
 		return diag.Diagnostics{
-			{Summary: fmt.Sprintf("API Path (%s) was not found, removed from TF state", apiPathUUID)},
+			{Severity: diag.Warning, Summary: fmt.Sprintf("API Path (%s) was not found, removed from TF state", apiPathUUID)},
 		}
 	}
 
@@ -281,7 +281,7 @@ func resourceWaapApiPathDelete(ctx context.Context, d *schema.ResourceData, m in
 	}
 
 	if result.StatusCode() != http.StatusNoContent {
-		return diag.Errorf("Failed to delete API PAth. Status code: %d with error: %s", result.StatusCode(), result.Body)
+		return diag.Errorf("Failed to delete API Path. Status code: %d with error: %s", result.StatusCode(), result.Body)
 	}
 
 	log.Printf("[DEBUG] Finish WAAP API Path deleting (id=%s)\n", d.Id())
