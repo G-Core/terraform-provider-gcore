@@ -58,6 +58,3 @@ resource "gcore_waap_custom_page_set" "example" {
     enabled = true
   }
 }
-
-# Import an existing WAAP custom page set
-# terraform import gcore_waap_custom_page_set.example 12345
