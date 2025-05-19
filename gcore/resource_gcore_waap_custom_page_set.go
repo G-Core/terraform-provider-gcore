@@ -19,6 +19,9 @@ func resourceWaapCustomPageSet() *schema.Resource {
 		UpdateContext: resourceWaapCustomPageSetUpdate,
 		DeleteContext: resourceWaapCustomPageSetDelete,
 		Description:   "Represent WAAP custom page set",
+		Importer: &schema.ResourceImporter{
+			StateContext: schema.ImportStatePassthroughContext,
+		},
 
 		Schema: map[string]*schema.Schema{
 			"name": {
