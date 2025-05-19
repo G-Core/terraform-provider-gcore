@@ -217,10 +217,7 @@ func resourceWaapDomainRead(ctx context.Context, d *schema.ResourceData, m inter
 	}
 
 	// Get domain details
-	resp, err := client.GetDomainV1DomainsDomainIdGetWithResponse(
-		context.Background(),
-		domainID,
-	)
+	resp, err := client.GetDomainV1DomainsDomainIdGetWithResponse(ctx, domainID)
 	if err != nil {
 		return diag.Errorf("Failed to read Domain details: %w", err)
 	}
