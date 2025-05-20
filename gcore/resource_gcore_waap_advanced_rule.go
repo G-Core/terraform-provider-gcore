@@ -91,7 +91,7 @@ func resourceWaapAdvancedRule() *schema.Resource {
 											"Can be specified in seconds or by using a numeral followed by 's', 'm', 'h', or 'd' " +
 											"to represent time format (seconds, minutes, hours, or days). Example: 12h. Must match the pattern ^[0-9]*[smhd]?$",
 										ValidateFunc: validation.StringMatch(
-											regexp.MustCompile(`^[0-9]*[smhd]?$/`),
+											regexp.MustCompile(`^[0-9]+[smhd]?$`),
 											"Must be a number optionally followed by 's', 'm', 'h', or 'd' (e.g., 60, 5m, 12h, 1d)",
 										),
 									},
