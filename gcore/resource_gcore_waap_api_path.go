@@ -26,7 +26,7 @@ func resourceWaapApiPath() *schema.Resource {
 
 				domainId, err := strconv.ParseInt(domainIdStr, 10, 64)
 				if err != nil {
-					return nil, fmt.Errorf("unexpected format of resource_id (%s), expected number", domainIdStr)
+					return nil, fmt.Errorf("unexpected format of domain_id (%s), expected number", domainIdStr)
 				}
 
 				d.Set("domain_id", domainId)
