@@ -225,7 +225,7 @@ func resourceWaapDomainRead(ctx context.Context, d *schema.ResourceData, m inter
 	if resp.StatusCode() == http.StatusNotFound {
 		d.SetId("") // Resource not found, remove from state
 		return diag.Diagnostics{
-			{Summary: fmt.Sprintf("Domain (%s) was not found, removed from TF state", d.Id())},
+			{Severity: diag.Warning, Summary: fmt.Sprintf("Domain (%s) was not found, removed from TF state", d.Id())},
 		}
 	}
 

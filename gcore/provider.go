@@ -195,6 +195,7 @@ func Provider() *schema.Provider {
 			"gcore_waap_domain":                   resourceWaapDomain(),
 			"gcore_waap_security_insight_silence": resourceWaapSecurityInsightSilence(),
 			"gcore_waap_api_path":                 resourceWaapApiPath(),
+			"gcore_waap_advanced_rule":            resourceWaapAdvancedRule(),
 		},
 		DataSourcesMap: map[string]*schema.Resource{
 			"gcore_ai_cluster":                 dataSourceAICluster(),
