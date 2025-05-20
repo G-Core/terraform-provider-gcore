@@ -544,11 +544,19 @@ func resourceWaapCustomPageSetUpdate(ctx context.Context, d *schema.ResourceData
 	if err != nil {
 		return diag.Errorf("failed to convert custom page set ID: %s", err)
 	}
+	previousPageSet, err := client.GetCustomPageSetV1CustomPageSetsSetIdGetWithResponse(ctx, setID)
+	if err != nil {
+		return diag.Errorf("failed to get custom page set: %s", err)
+	}
 
 	updateReq := waap.UpdateCustomPageSetV1CustomPageSetsSetIdPatchJSONRequestBody{}
 
-	name := d.Get("name").(string)
-	updateReq.Name = &name
+	if d.HasChange("name") {
+		name := d.Get("name").(string)
+		updateReq.Name = &name
+	} else {
+		updateReq.Name = &previousPageSet.JSON200.Name
+	}
 
 	if d.HasChange("domains") {
 		if domains, ok := d.GetOk("domains"); ok {
@@ -558,6 +566,8 @@ func resourceWaapCustomPageSetUpdate(ctx context.Context, d *schema.ResourceData
 			emptyList := []int{}
 			updateReq.Domains = &emptyList
 		}
+	} else {
+		updateReq.Domains = previousPageSet.JSON200.Domains
 	}
 
 	if d.HasChange("block") {
@@ -582,9 +592,9 @@ func resourceWaapCustomPageSetUpdate(ctx context.Context, d *schema.ResourceData
 			}
 
 			updateReq.Block = &block
-		} else {
-			updateReq.Block = nil
 		}
+	} else {
+		updateReq.Block = previousPageSet.JSON200.Block
 	}
 
 	if d.HasChange("block_csrf") {
@@ -609,9 +619,9 @@ func resourceWaapCustomPageSetUpdate(ctx context.Context, d *schema.ResourceData
 			}
 
 			updateReq.BlockCsrf = &blockCsrf
-		} else {
-			updateReq.BlockCsrf = nil
 		}
+	} else {
+		updateReq.BlockCsrf = previousPageSet.JSON200.BlockCsrf
 	}
 
 	if d.HasChange("captcha") {
@@ -639,9 +649,9 @@ func resourceWaapCustomPageSetUpdate(ctx context.Context, d *schema.ResourceData
 			}
 
 			updateReq.Captcha = &captcha
-		} else {
-			updateReq.Captcha = nil
 		}
+	} else {
+		updateReq.Captcha = previousPageSet.JSON200.Captcha
 	}
 
 	if d.HasChange("cookie_disabled") {
@@ -660,9 +670,9 @@ func resourceWaapCustomPageSetUpdate(ctx context.Context, d *schema.ResourceData
 			}
 
 			updateReq.CookieDisabled = &cookieDisabled
-		} else {
-			updateReq.CookieDisabled = nil
 		}
+	} else {
+		updateReq.CookieDisabled = previousPageSet.JSON200.CookieDisabled
 	}
 
 	if d.HasChange("handshake") {
@@ -684,9 +694,9 @@ func resourceWaapCustomPageSetUpdate(ctx context.Context, d *schema.ResourceData
 			}
 
 			updateReq.Handshake = &handshake
-		} else {
-			updateReq.Handshake = nil
 		}
+	} else {
+		updateReq.Handshake = previousPageSet.JSON200.Handshake
 	}
 
 	if d.HasChange("javascript_disabled") {
@@ -705,9 +715,9 @@ func resourceWaapCustomPageSetUpdate(ctx context.Context, d *schema.ResourceData
 			}
 
 			updateReq.JavascriptDisabled = &jsDisabled
-		} else {
-			updateReq.JavascriptDisabled = nil
 		}
+	} else {
+		updateReq.JavascriptDisabled = previousPageSet.JSON200.JavascriptDisabled
 	}
 
 	resp, err := client.UpdateCustomPageSetV1CustomPageSetsSetIdPatchWithResponse(ctx, setID, updateReq)
