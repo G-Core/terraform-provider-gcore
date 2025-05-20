@@ -544,180 +544,144 @@ func resourceWaapCustomPageSetUpdate(ctx context.Context, d *schema.ResourceData
 	if err != nil {
 		return diag.Errorf("failed to convert custom page set ID: %s", err)
 	}
-	previousPageSet, err := client.GetCustomPageSetV1CustomPageSetsSetIdGetWithResponse(ctx, setID)
-	if err != nil {
-		return diag.Errorf("failed to get custom page set: %s", err)
-	}
 
 	updateReq := waap.UpdateCustomPageSetV1CustomPageSetsSetIdPatchJSONRequestBody{}
 
-	if d.HasChange("name") {
-		name := d.Get("name").(string)
-		updateReq.Name = &name
+	name := d.Get("name").(string)
+	updateReq.Name = &name
+
+	if domains, ok := d.GetOk("domains"); ok {
+		domainsList := expandIntList(domains.([]interface{}))
+		updateReq.Domains = &domainsList
 	} else {
-		updateReq.Name = &previousPageSet.JSON200.Name
+		emptyList := []int{}
+		updateReq.Domains = &emptyList
 	}
 
-	if d.HasChange("domains") {
-		if domains, ok := d.GetOk("domains"); ok {
-			domainsList := expandIntList(domains.([]interface{}))
-			updateReq.Domains = &domainsList
-		} else {
-			emptyList := []int{}
-			updateReq.Domains = &emptyList
+	if blockConfigs, ok := d.GetOk("block"); ok && len(blockConfigs.([]interface{})) > 0 {
+		blockConfig := blockConfigs.([]interface{})[0].(map[string]interface{})
+		block := waap.BlockPageData{}
+
+		if v, ok := blockConfig["logo"].(string); ok && v != "" {
+			block.Logo = &v
 		}
-	} else {
-		updateReq.Domains = previousPageSet.JSON200.Domains
+		if v, ok := blockConfig["header"].(string); ok && v != "" {
+			block.Header = &v
+		}
+		if v, ok := blockConfig["title"].(string); ok && v != "" {
+			block.Title = &v
+		}
+		if v, ok := blockConfig["text"].(string); ok && v != "" {
+			block.Text = &v
+		}
+		if v, ok := blockConfig["enabled"].(bool); ok {
+			block.Enabled = v
+		}
+
+		updateReq.Block = &block
 	}
 
-	if d.HasChange("block") {
-		if blockConfigs, ok := d.GetOk("block"); ok && len(blockConfigs.([]interface{})) > 0 {
-			blockConfig := blockConfigs.([]interface{})[0].(map[string]interface{})
-			block := waap.BlockPageData{}
+	if blockCsrfConfigs, ok := d.GetOk("block_csrf"); ok && len(blockCsrfConfigs.([]interface{})) > 0 {
+		blockCsrfConfig := blockCsrfConfigs.([]interface{})[0].(map[string]interface{})
+		blockCsrf := waap.BlockCsrfPageData{}
 
-			if v, ok := blockConfig["logo"].(string); ok && v != "" {
-				block.Logo = &v
-			}
-			if v, ok := blockConfig["header"].(string); ok && v != "" {
-				block.Header = &v
-			}
-			if v, ok := blockConfig["title"].(string); ok && v != "" {
-				block.Title = &v
-			}
-			if v, ok := blockConfig["text"].(string); ok && v != "" {
-				block.Text = &v
-			}
-			if v, ok := blockConfig["enabled"].(bool); ok {
-				block.Enabled = v
-			}
-
-			updateReq.Block = &block
+		if v, ok := blockCsrfConfig["logo"].(string); ok && v != "" {
+			blockCsrf.Logo = &v
 		}
-	} else {
-		updateReq.Block = previousPageSet.JSON200.Block
+		if v, ok := blockCsrfConfig["header"].(string); ok && v != "" {
+			blockCsrf.Header = &v
+		}
+		if v, ok := blockCsrfConfig["title"].(string); ok && v != "" {
+			blockCsrf.Title = &v
+		}
+		if v, ok := blockCsrfConfig["text"].(string); ok && v != "" {
+			blockCsrf.Text = &v
+		}
+		if v, ok := blockCsrfConfig["enabled"].(bool); ok {
+			blockCsrf.Enabled = v
+		}
+
+		updateReq.BlockCsrf = &blockCsrf
 	}
 
-	if d.HasChange("block_csrf") {
-		if blockCsrfConfigs, ok := d.GetOk("block_csrf"); ok && len(blockCsrfConfigs.([]interface{})) > 0 {
-			blockCsrfConfig := blockCsrfConfigs.([]interface{})[0].(map[string]interface{})
-			blockCsrf := waap.BlockCsrfPageData{}
+	if captchaConfigs, ok := d.GetOk("captcha"); ok && len(captchaConfigs.([]interface{})) > 0 {
+		captchaConfig := captchaConfigs.([]interface{})[0].(map[string]interface{})
+		captcha := waap.CaptchaPageData{}
 
-			if v, ok := blockCsrfConfig["logo"].(string); ok && v != "" {
-				blockCsrf.Logo = &v
-			}
-			if v, ok := blockCsrfConfig["header"].(string); ok && v != "" {
-				blockCsrf.Header = &v
-			}
-			if v, ok := blockCsrfConfig["title"].(string); ok && v != "" {
-				blockCsrf.Title = &v
-			}
-			if v, ok := blockCsrfConfig["text"].(string); ok && v != "" {
-				blockCsrf.Text = &v
-			}
-			if v, ok := blockCsrfConfig["enabled"].(bool); ok {
-				blockCsrf.Enabled = v
-			}
-
-			updateReq.BlockCsrf = &blockCsrf
+		if v, ok := captchaConfig["logo"].(string); ok && v != "" {
+			captcha.Logo = &v
 		}
-	} else {
-		updateReq.BlockCsrf = previousPageSet.JSON200.BlockCsrf
+		if v, ok := captchaConfig["header"].(string); ok && v != "" {
+			captcha.Header = &v
+		}
+		if v, ok := captchaConfig["title"].(string); ok && v != "" {
+			captcha.Title = &v
+		}
+		if v, ok := captchaConfig["text"].(string); ok && v != "" {
+			captcha.Text = &v
+		}
+		if v, ok := captchaConfig["error"].(string); ok && v != "" {
+			captcha.Error = &v
+		}
+		if v, ok := captchaConfig["enabled"].(bool); ok {
+			captcha.Enabled = v
+		}
+
+		updateReq.Captcha = &captcha
 	}
 
-	if d.HasChange("captcha") {
-		if captchaConfigs, ok := d.GetOk("captcha"); ok && len(captchaConfigs.([]interface{})) > 0 {
-			captchaConfig := captchaConfigs.([]interface{})[0].(map[string]interface{})
-			captcha := waap.CaptchaPageData{}
+	if cookieDisabledConfigs, ok := d.GetOk("cookie_disabled"); ok && len(cookieDisabledConfigs.([]interface{})) > 0 {
+		cookieDisabledConfig := cookieDisabledConfigs.([]interface{})[0].(map[string]interface{})
+		cookieDisabled := waap.CookieDisabledPageData{}
 
-			if v, ok := captchaConfig["logo"].(string); ok && v != "" {
-				captcha.Logo = &v
-			}
-			if v, ok := captchaConfig["header"].(string); ok && v != "" {
-				captcha.Header = &v
-			}
-			if v, ok := captchaConfig["title"].(string); ok && v != "" {
-				captcha.Title = &v
-			}
-			if v, ok := captchaConfig["text"].(string); ok && v != "" {
-				captcha.Text = &v
-			}
-			if v, ok := captchaConfig["error"].(string); ok && v != "" {
-				captcha.Error = &v
-			}
-			if v, ok := captchaConfig["enabled"].(bool); ok {
-				captcha.Enabled = v
-			}
-
-			updateReq.Captcha = &captcha
+		if v, ok := cookieDisabledConfig["header"].(string); ok && v != "" {
+			cookieDisabled.Header = &v
 		}
-	} else {
-		updateReq.Captcha = previousPageSet.JSON200.Captcha
+		if v, ok := cookieDisabledConfig["text"].(string); ok && v != "" {
+			cookieDisabled.Text = &v
+		}
+		if v, ok := cookieDisabledConfig["enabled"].(bool); ok {
+			cookieDisabled.Enabled = v
+		}
+
+		updateReq.CookieDisabled = &cookieDisabled
 	}
 
-	if d.HasChange("cookie_disabled") {
-		if cookieDisabledConfigs, ok := d.GetOk("cookie_disabled"); ok && len(cookieDisabledConfigs.([]interface{})) > 0 {
-			cookieDisabledConfig := cookieDisabledConfigs.([]interface{})[0].(map[string]interface{})
-			cookieDisabled := waap.CookieDisabledPageData{}
+	if handshakeConfigs, ok := d.GetOk("handshake"); ok && len(handshakeConfigs.([]interface{})) > 0 {
+		handshakeConfig := handshakeConfigs.([]interface{})[0].(map[string]interface{})
+		handshake := waap.HandshakePageData{}
 
-			if v, ok := cookieDisabledConfig["header"].(string); ok && v != "" {
-				cookieDisabled.Header = &v
-			}
-			if v, ok := cookieDisabledConfig["text"].(string); ok && v != "" {
-				cookieDisabled.Text = &v
-			}
-			if v, ok := cookieDisabledConfig["enabled"].(bool); ok {
-				cookieDisabled.Enabled = v
-			}
-
-			updateReq.CookieDisabled = &cookieDisabled
+		if v, ok := handshakeConfig["logo"].(string); ok && v != "" {
+			handshake.Logo = &v
 		}
-	} else {
-		updateReq.CookieDisabled = previousPageSet.JSON200.CookieDisabled
+		if v, ok := handshakeConfig["header"].(string); ok && v != "" {
+			handshake.Header = &v
+		}
+		if v, ok := handshakeConfig["title"].(string); ok && v != "" {
+			handshake.Title = &v
+		}
+		if v, ok := handshakeConfig["enabled"].(bool); ok {
+			handshake.Enabled = v
+		}
+
+		updateReq.Handshake = &handshake
 	}
 
-	if d.HasChange("handshake") {
-		if handshakeConfigs, ok := d.GetOk("handshake"); ok && len(handshakeConfigs.([]interface{})) > 0 {
-			handshakeConfig := handshakeConfigs.([]interface{})[0].(map[string]interface{})
-			handshake := waap.HandshakePageData{}
+	if jsDisabledConfigs, ok := d.GetOk("javascript_disabled"); ok && len(jsDisabledConfigs.([]interface{})) > 0 {
+		jsDisabledConfig := jsDisabledConfigs.([]interface{})[0].(map[string]interface{})
+		jsDisabled := waap.JavascriptDisabledPageData{}
 
-			if v, ok := handshakeConfig["logo"].(string); ok && v != "" {
-				handshake.Logo = &v
-			}
-			if v, ok := handshakeConfig["header"].(string); ok && v != "" {
-				handshake.Header = &v
-			}
-			if v, ok := handshakeConfig["title"].(string); ok && v != "" {
-				handshake.Title = &v
-			}
-			if v, ok := handshakeConfig["enabled"].(bool); ok {
-				handshake.Enabled = v
-			}
-
-			updateReq.Handshake = &handshake
+		if v, ok := jsDisabledConfig["header"].(string); ok && v != "" {
+			jsDisabled.Header = &v
 		}
-	} else {
-		updateReq.Handshake = previousPageSet.JSON200.Handshake
-	}
-
-	if d.HasChange("javascript_disabled") {
-		if jsDisabledConfigs, ok := d.GetOk("javascript_disabled"); ok && len(jsDisabledConfigs.([]interface{})) > 0 {
-			jsDisabledConfig := jsDisabledConfigs.([]interface{})[0].(map[string]interface{})
-			jsDisabled := waap.JavascriptDisabledPageData{}
-
-			if v, ok := jsDisabledConfig["header"].(string); ok && v != "" {
-				jsDisabled.Header = &v
-			}
-			if v, ok := jsDisabledConfig["text"].(string); ok && v != "" {
-				jsDisabled.Text = &v
-			}
-			if v, ok := jsDisabledConfig["enabled"].(bool); ok {
-				jsDisabled.Enabled = v
-			}
-
-			updateReq.JavascriptDisabled = &jsDisabled
+		if v, ok := jsDisabledConfig["text"].(string); ok && v != "" {
+			jsDisabled.Text = &v
 		}
-	} else {
-		updateReq.JavascriptDisabled = previousPageSet.JSON200.JavascriptDisabled
+		if v, ok := jsDisabledConfig["enabled"].(bool); ok {
+			jsDisabled.Enabled = v
+		}
+
+		updateReq.JavascriptDisabled = &jsDisabled
 	}
 
 	resp, err := client.UpdateCustomPageSetV1CustomPageSetsSetIdPatchWithResponse(ctx, setID, updateReq)
