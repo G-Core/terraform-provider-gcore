@@ -6,6 +6,7 @@ import (
 	"log"
 	"net/http"
 	"strconv"
+	"strings"
 
 	waap "github.com/G-Core/gcore-waap-sdk-go"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
@@ -19,6 +20,7 @@ func resourceWaapPolicy() *schema.Resource {
 		UpdateContext: resourceWaapPolicyUpdate,
 		DeleteContext: resourceWaapPolicyDelete,
 		Description:   "Represent WAAP Policy",
+		CustomizeDiff: validateRules,
 
 		Schema: map[string]*schema.Schema{
 			"domain_id": {
@@ -34,7 +36,6 @@ func resourceWaapPolicy() *schema.Resource {
 				Elem: &schema.Schema{
 					Type: schema.TypeBool,
 				},
-				// todo: validate if there are rules with provided IDs for the domain
 			},
 		},
 	}
@@ -148,4 +149,31 @@ func getRulesFromApi(ctx context.Context, waapClient *waap.ClientWithResponses, 
 	}
 
 	return rules, statusCode, nil
+}
+
+func validateRules(ctx context.Context, d *schema.ResourceDiff, m interface{}) error {
+	domainID, err := strconv.Atoi(d.Get("domain_id").(string))
+	if err != nil {
+		return fmt.Errorf("invalid domain ID: %s", err)
+	}
+	rulesFromConfig := d.Get("rules").(map[string]interface{})
+
+	client := m.(*Config).WaapClient
+	rulesFromApi, _, diagErr := getRulesFromApi(ctx, client, domainID)
+	if diagErr != nil {
+		return fmt.Errorf("failed to get policy rules for validation: %s", diagErr)
+	}
+
+	// Validate that all specified rule IDs exist
+	var nonExistentRules []string
+	for ruleID := range rulesFromConfig {
+		if _, exists := rulesFromApi[ruleID]; !exists {
+			nonExistentRules = append(nonExistentRules, ruleID)
+		}
+	}
+	if len(nonExistentRules) > 0 {
+		return fmt.Errorf("the following rule IDs do not exist for domain %d: %s", domainID, strings.Join(nonExistentRules, ", "))
+	}
+
+	return nil
 }
