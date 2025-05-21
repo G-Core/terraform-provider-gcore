@@ -20,7 +20,7 @@ func resourceWaapPolicy() *schema.Resource {
 		UpdateContext: resourceWaapPolicyUpdate,
 		DeleteContext: resourceWaapPolicyDelete,
 		Description:   "Represent WAAP Policy",
-		CustomizeDiff: validateRules,
+		CustomizeDiff: validatePolicies,
 
 		Schema: map[string]*schema.Schema{
 			"domain_id": {
@@ -29,10 +29,11 @@ func resourceWaapPolicy() *schema.Resource {
 				ForceNew:    true,
 				Description: "The WAAP domain ID for which the Policy is configured.",
 			},
-			"rules": {
-				Type:        schema.TypeMap,
-				Required:    true,
-				Description: "A map of rules where each key is a rule ID and the value is a boolean indicating whether the rule is enabled (true) or disabled (false).",
+			"policies": {
+				Type:     schema.TypeMap,
+				Required: true,
+				Description: "A map of policies where each key is a policy ID and the value is a boolean indicating whether the policy is enabled (true) or disabled (false). " +
+					"Policy IDs can be obtained from the API endpoint /v1/domains/{domain_id}/rule-sets (the 'rules' field).",
 				Elem: &schema.Schema{
 					Type: schema.TypeBool,
 				},
@@ -53,10 +54,10 @@ func resourceWaapPolicyRead(ctx context.Context, d *schema.ResourceData, m inter
 	client := m.(*Config).WaapClient
 	domainID, _ := strconv.Atoi(d.Get("domain_id").(string))
 
-	rulesFromConfig := d.Get("rules").(map[string]interface{})
+	policiesFromConfig := d.Get("policies").(map[string]interface{})
 
-	// Get policy rules from API
-	rulesFromApi, statusCode, err := getRulesFromApi(ctx, client, domainID)
+	// Get policies from API
+	policiesFromApi, statusCode, err := getPoliciesFromApi(ctx, client, domainID)
 	if err != nil {
 		if statusCode == http.StatusNotFound {
 			d.SetId("") // Resource not found, remove from state
@@ -65,13 +66,13 @@ func resourceWaapPolicyRead(ctx context.Context, d *schema.ResourceData, m inter
 	}
 
 	// Update state
-	for ruleID, _ := range rulesFromConfig {
-		if apiState, exists := rulesFromApi[ruleID]; exists {
-			rulesFromConfig[ruleID] = apiState
+	for policyID, _ := range policiesFromConfig {
+		if apiState, exists := policiesFromApi[policyID]; exists {
+			policiesFromConfig[policyID] = apiState
 		}
 	}
 
-	d.Set("rules", rulesFromConfig)
+	d.Set("policies", policiesFromConfig)
 
 	log.Printf("[DEBUG] Finish WAAP Policy reading (id=%s)\n", domainID)
 	return nil
@@ -83,34 +84,34 @@ func resourceWaapPolicyUpdate(ctx context.Context, d *schema.ResourceData, m int
 	client := m.(*Config).WaapClient
 	domainID, _ := strconv.Atoi(d.Get("domain_id").(string))
 
-	// Get policy rules from API
-	rulesFromApi, _, err := getRulesFromApi(ctx, client, domainID)
+	// Get policies from API
+	policiesFromApi, _, err := getPoliciesFromApi(ctx, client, domainID)
 	if err != nil {
 		return err
 	}
 
-	// Get rules from TF config
-	rulesFromConfig := d.Get("rules").(map[string]interface{})
+	// Get policies from TF config
+	policiesFromConfig := d.Get("policies").(map[string]interface{})
 
-	// Compare rules from API with rules from TF config and create a map of rules to be updated
-	rulesToUpdate := make(map[string]bool)
-	for ruleID, expectedState := range rulesFromConfig {
-		apiState, exists := rulesFromApi[ruleID]
+	// Compare policies from API with policies from TF config and create a map of policies to be updated
+	policiesToUpdate := make(map[string]bool)
+	for policyID, expectedState := range policiesFromConfig {
+		apiState, exists := policiesFromApi[policyID]
 		if exists && apiState != expectedState {
-			rulesToUpdate[ruleID] = expectedState.(bool)
+			policiesToUpdate[policyID] = expectedState.(bool)
 		}
 	}
 
-	// Update rules
-	for ruleID, _ := range rulesToUpdate {
-		updateResp, err := client.ToggleDomainPolicyV1DomainsDomainIdPoliciesPolicyIdTogglePatchWithResponse(ctx, domainID, ruleID)
+	// Update policies
+	for policyID, _ := range policiesToUpdate {
+		updateResp, err := client.ToggleDomainPolicyV1DomainsDomainIdPoliciesPolicyIdTogglePatchWithResponse(ctx, domainID, policyID)
 
 		if err != nil {
-			return diag.Errorf("Failed to update Policy Rule: %w", err)
+			return diag.Errorf("Failed to update Policy state: %w", err)
 		}
 
 		if updateResp.StatusCode() != http.StatusOK {
-			return diag.Errorf("Failed to update Policy Rule. Status code: %d with error: %s", updateResp.StatusCode(), updateResp.Body)
+			return diag.Errorf("Failed to update Policy state. Status code: %d with error: %s", updateResp.StatusCode(), updateResp.Body)
 		}
 	}
 
@@ -122,7 +123,7 @@ func resourceWaapPolicyDelete(ctx context.Context, d *schema.ResourceData, m int
 	return nil
 }
 
-func getRulesFromApi(ctx context.Context, waapClient *waap.ClientWithResponses, domainID int) (map[string]interface{}, int, diag.Diagnostics) {
+func getPoliciesFromApi(ctx context.Context, waapClient *waap.ClientWithResponses, domainID int) (map[string]interface{}, int, diag.Diagnostics) {
 	policiesResp, err := waapClient.GetRuleSetListV1DomainsDomainIdRuleSetsGetWithResponse(ctx, domainID)
 	if err != nil {
 		return nil, 0, diag.Errorf("Failed to read Policy: %w", err)
@@ -140,39 +141,39 @@ func getRulesFromApi(ctx context.Context, waapClient *waap.ClientWithResponses, 
 		return nil, statusCode, diag.Errorf("Failed to read Policy. Status code: %d with error: %s", policiesResp.StatusCode(), policiesResp.Body)
 	}
 
-	// Get flat list of rules from API with their states
-	rules := make(map[string]interface{})
-	for _, ruleSet := range *policiesResp.JSON200 {
-		for _, rule := range *ruleSet.Rules {
-			rules[rule.Id] = rule.Mode
+	// Get flat list of policies from API with their states
+	policies := make(map[string]interface{})
+	for _, policySet := range *policiesResp.JSON200 {
+		for _, policy := range *policySet.Rules {
+			policies[policy.Id] = policy.Mode
 		}
 	}
 
-	return rules, statusCode, nil
+	return policies, statusCode, nil
 }
 
-func validateRules(ctx context.Context, d *schema.ResourceDiff, m interface{}) error {
+func validatePolicies(ctx context.Context, d *schema.ResourceDiff, m interface{}) error {
 	domainID, err := strconv.Atoi(d.Get("domain_id").(string))
 	if err != nil {
 		return fmt.Errorf("invalid domain ID: %s", err)
 	}
-	rulesFromConfig := d.Get("rules").(map[string]interface{})
+	policiesFromConfig := d.Get("policies").(map[string]interface{})
 
 	client := m.(*Config).WaapClient
-	rulesFromApi, _, diagErr := getRulesFromApi(ctx, client, domainID)
+	policiesFromApi, _, diagErr := getPoliciesFromApi(ctx, client, domainID)
 	if diagErr != nil {
-		return fmt.Errorf("failed to get policy rules for validation: %s", diagErr)
+		return fmt.Errorf("failed to get policies for validation: %s", diagErr)
 	}
 
-	// Validate that all specified rule IDs exist
-	var nonExistentRules []string
-	for ruleID := range rulesFromConfig {
-		if _, exists := rulesFromApi[ruleID]; !exists {
-			nonExistentRules = append(nonExistentRules, ruleID)
+	// Validate that all specified policy IDs exist
+	var nonExistentPolicies []string
+	for policyID := range policiesFromConfig {
+		if _, exists := policiesFromApi[policyID]; !exists {
+			nonExistentPolicies = append(nonExistentPolicies, policyID)
 		}
 	}
-	if len(nonExistentRules) > 0 {
-		return fmt.Errorf("the following rule IDs do not exist for domain %d: %s", domainID, strings.Join(nonExistentRules, ", "))
+	if len(nonExistentPolicies) > 0 {
+		return fmt.Errorf("the following policy IDs do not exist for domain %d: %s", domainID, strings.Join(nonExistentPolicies, ", "))
 	}
 
 	return nil
