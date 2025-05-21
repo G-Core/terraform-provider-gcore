@@ -381,7 +381,6 @@ func resourceWaapCustomPageSetCreate(ctx context.Context, d *schema.ResourceData
 }
 
 func resourceWaapCustomPageSetRead(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
-
 	client := m.(*Config).WaapClient
 
 	setID, err := strconv.Atoi(d.Id())
@@ -411,8 +410,11 @@ func resourceWaapCustomPageSetRead(ctx context.Context, d *schema.ResourceData, 
 
 	d.Set("name", resp.JSON200.Name)
 
+	domains := []interface{}{}
 	if resp.JSON200.Domains != nil {
 		d.Set("domains", resp.JSON200.Domains)
+	} else {
+		d.Set("domains", domains)
 	}
 
 	if resp.JSON200.Block != nil {
@@ -432,9 +434,9 @@ func resourceWaapCustomPageSetRead(ctx context.Context, d *schema.ResourceData, 
 		}
 		blockMap["enabled"] = resp.JSON200.Block.Enabled
 
-		if len(blockMap) > 0 {
-			d.Set("block", []interface{}{blockMap})
-		}
+		d.Set("block", []interface{}{blockMap})
+	} else {
+		d.Set("block", []interface{}{})
 	}
 
 	if resp.JSON200.BlockCsrf != nil {
@@ -454,9 +456,9 @@ func resourceWaapCustomPageSetRead(ctx context.Context, d *schema.ResourceData, 
 		}
 		blockCsrfMap["enabled"] = resp.JSON200.BlockCsrf.Enabled
 
-		if len(blockCsrfMap) > 0 {
-			d.Set("block_csrf", []interface{}{blockCsrfMap})
-		}
+		d.Set("block_csrf", []interface{}{blockCsrfMap})
+	} else {
+		d.Set("block_csrf", []interface{}{})
 	}
 
 	if resp.JSON200.Captcha != nil {
@@ -479,9 +481,9 @@ func resourceWaapCustomPageSetRead(ctx context.Context, d *schema.ResourceData, 
 		}
 		captchaMap["enabled"] = resp.JSON200.Captcha.Enabled
 
-		if len(captchaMap) > 0 {
-			d.Set("captcha", []interface{}{captchaMap})
-		}
+		d.Set("captcha", []interface{}{captchaMap})
+	} else {
+		d.Set("captcha", []interface{}{})
 	}
 
 	if resp.JSON200.CookieDisabled != nil {
@@ -495,9 +497,9 @@ func resourceWaapCustomPageSetRead(ctx context.Context, d *schema.ResourceData, 
 		}
 		cookieDisabledMap["enabled"] = resp.JSON200.CookieDisabled.Enabled
 
-		if len(cookieDisabledMap) > 0 {
-			d.Set("cookie_disabled", []interface{}{cookieDisabledMap})
-		}
+		d.Set("cookie_disabled", []interface{}{cookieDisabledMap})
+	} else {
+		d.Set("cookie_disabled", []interface{}{})
 	}
 
 	if resp.JSON200.Handshake != nil {
@@ -514,9 +516,9 @@ func resourceWaapCustomPageSetRead(ctx context.Context, d *schema.ResourceData, 
 		}
 		handshakeMap["enabled"] = resp.JSON200.Handshake.Enabled
 
-		if len(handshakeMap) > 0 {
-			d.Set("handshake", []interface{}{handshakeMap})
-		}
+		d.Set("handshake", []interface{}{handshakeMap})
+	} else {
+		d.Set("handshake", []interface{}{})
 	}
 
 	if resp.JSON200.JavascriptDisabled != nil {
@@ -530,10 +532,11 @@ func resourceWaapCustomPageSetRead(ctx context.Context, d *schema.ResourceData, 
 		}
 		jsDisabledMap["enabled"] = resp.JSON200.JavascriptDisabled.Enabled
 
-		if len(jsDisabledMap) > 0 {
-			d.Set("javascript_disabled", []interface{}{jsDisabledMap})
-		}
+		d.Set("javascript_disabled", []interface{}{jsDisabledMap})
+	} else {
+		d.Set("javascript_disabled", []interface{}{})
 	}
+
 	return nil
 }
 
