@@ -1,1 +1,0 @@
-{"name":"hosru","enabled":true,"action":{"block":{}},"conditions":[{"ip":{"negation":false,"ip_address":"192.168.1.1"}},{"header":{"negation":false,"header":"x-block-header","value":"gg","match_type":"Contains"}}],"description":"sdse","ruleType":"waf"}
