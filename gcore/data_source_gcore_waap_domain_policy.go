@@ -15,6 +15,11 @@ func dataWaapDomainPolicy() *schema.Resource {
 		ReadContext: dataWaapDomainPolicyRead,
 		Description: "Represent WAAP domain policy",
 		Schema: map[string]*schema.Schema{
+			"id": {
+				Type:        schema.TypeString,
+				Description: "The ID of the Domain Policy",
+				Computed:    true,
+			},
 			"domain_id": {
 				Type:        schema.TypeInt,
 				Required:    true,
