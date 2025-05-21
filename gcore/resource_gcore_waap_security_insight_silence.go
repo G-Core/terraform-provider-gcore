@@ -22,11 +22,6 @@ func resourceWaapSecurityInsightSilence() *schema.Resource {
 		Description:   "Represent Security Insight Silence for a specific WAAP domain",
 
 		Schema: map[string]*schema.Schema{
-			"id": {
-				Type:        schema.TypeString,
-				Computed:    true,
-				Description: "A generated unique identifier for the silence.",
-			},
 			"domain_id": {
 				Type:        schema.TypeInt,
 				Required:    true,
@@ -136,7 +131,7 @@ func resourceSecurityInsightSilenceRead(ctx context.Context, d *schema.ResourceD
 	if result.StatusCode() == http.StatusNotFound {
 		d.SetId("") // Resource not found, remove from state
 		return diag.Diagnostics{
-			{Summary: fmt.Sprintf("Insight Silence (%s) was not found, removed from TF state", d.Id())},
+			{Severity: diag.Warning, Summary: fmt.Sprintf("Insight Silence (%s) was not found, removed from TF state", d.Id())},
 		}
 	}
 

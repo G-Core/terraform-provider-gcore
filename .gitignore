@@ -11,3 +11,4 @@ modules-dev/
 .idea
 local_debug.tf
 dump
+.DS_Store
