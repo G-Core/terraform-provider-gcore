@@ -27,4 +27,12 @@ resource "gcore_waap_domain" "domain" {
       ]
     }
   }
+
+  api_discovery_settings {
+    description_file_location = "https://api.example.com/v1/openapi.json"
+    description_file_scan_enabled = true
+    description_file_scan_interval_hours = 24
+    traffic_scan_enabled = true
+    traffic_scan_interval_hours = 6
+  }
 }
