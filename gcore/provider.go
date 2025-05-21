@@ -196,6 +196,7 @@ func Provider() *schema.Provider {
 			"gcore_waap_security_insight_silence": resourceWaapSecurityInsightSilence(),
 			"gcore_waap_api_path":                 resourceWaapApiPath(),
 			"gcore_waap_advanced_rule":            resourceWaapAdvancedRule(),
+			"gcore_waap_policy":                   resourceWaapPolicy(),
 		},
 		DataSourcesMap: map[string]*schema.Resource{
 			"gcore_ai_cluster":                 dataSourceAICluster(),
@@ -233,6 +234,7 @@ func Provider() *schema.Provider {
 			"gcore_cdn_client":                 dataClient(),
 			"gcore_inference_flavor":           dataSourceInferenceFlavor(),
 			"gcore_waap_security_insight_type": dataWaapSecurityInsightType(),
+			"gcore_waap_domain_policy":         dataWaapDomainPolicy(),
 		},
 		ConfigureContextFunc: providerConfigure,
 	}
