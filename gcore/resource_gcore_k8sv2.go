@@ -712,10 +712,17 @@ func resourceK8sV2Create(ctx context.Context, d *schema.ResourceData, m interfac
 						opts.DDoSProfile.Fields[i] = clusters.DDoSProfileField{
 							BaseField: fieldMap["base_field"].(int),
 						}
-						if value, ok := fieldMap["value"].(string); ok {
+						value, valueOk := fieldMap["value"].(string)
+						if valueOk && value != "" {
 							opts.DDoSProfile.Fields[i].Value = &value
 						}
-						if fieldValue, ok := fieldMap["field_value"].(string); ok {
+						fieldValueStr, fieldValueOk := fieldMap["field_value"]
+						if fieldValueOk {
+							var fieldValue interface{}
+							err := json.Unmarshal([]byte(fieldValueStr.(string)), &fieldValue)
+							if err != nil {
+								return diag.FromErr(fmt.Errorf("failed to unmarshal field_value: %w", err))
+							}
 							opts.DDoSProfile.Fields[i].FieldValue = &fieldValue
 						}
 					}
@@ -974,8 +981,9 @@ func resourceK8sV2Read(ctx context.Context, d *schema.ResourceData, m interface{
 			v["fields"] = []interface{}{}
 			for _, field := range cluster.DDoSProfile.Fields {
 				v["fields"] = append(v["fields"].([]interface{}), map[string]interface{}{
-					"base_field": field.BaseField,
-					"value":      field.Value,
+					"base_field":  field.BaseField,
+					"value":       field.Value,
+					"field_value": field.FieldValue,
 				})
 			}
 		}
@@ -1279,6 +1287,7 @@ func resourceK8sV2UpdateCluster(client, tasksClient *gcorecloud.ServiceClient, c
 					Enabled: profile["enabled"].(bool),
 				}
 				if fields, ok := profile["fields"].([]interface{}); ok {
+					log.Printf("[DEBUG] fields: %v", fields)
 					if len(fields) != 0 {
 						opts.DDoSProfile.Fields = make([]clusters.DDoSProfileField, len(fields))
 						for i, field := range fields {
@@ -1286,10 +1295,18 @@ func resourceK8sV2UpdateCluster(client, tasksClient *gcorecloud.ServiceClient, c
 							opts.DDoSProfile.Fields[i] = clusters.DDoSProfileField{
 								BaseField: fieldMap["base_field"].(int),
 							}
-							if value, ok := fieldMap["value"].(string); ok {
+							value, valueOk := fieldMap["value"].(string)
+							if valueOk && value != "" {
 								opts.DDoSProfile.Fields[i].Value = &value
 							}
-							if fieldValue, ok := fieldMap["field_value"].(string); ok {
+							fieldValueStr, fieldValueOk := fieldMap["field_value"]
+							if fieldValueOk {
+								var fieldValue interface{}
+								err := json.Unmarshal([]byte(fieldValueStr.(string)), &fieldValue)
+								if err != nil {
+									return fmt.Errorf("failed to unmarshal field_value: %w", err)
+								}
+								log.Printf("[DEBUG] DDoS profile field value: %v, %v", fieldValue, reflect.TypeOf(fieldValue))
 								opts.DDoSProfile.Fields[i].FieldValue = &fieldValue
 							}
 						}

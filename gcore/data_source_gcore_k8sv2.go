@@ -2,6 +2,7 @@ package gcore
 
 import (
 	"context"
+	"encoding/json"
 	"log"
 	"time"
 
@@ -197,7 +198,6 @@ func dataSourceK8sV2() *schema.Resource {
 				Type:        schema.TypeList,
 				Description: "DDoS profile configuration.",
 				Computed:    true,
-				MaxItems:    1,
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
 						"enabled": {
@@ -506,13 +506,26 @@ func dataSourceK8sV2Read(ctx context.Context, d *schema.ResourceData, m interfac
 	}
 
 	if cluster.DDoSProfile != nil {
+		var fields []interface{}
+		for _, f := range cluster.DDoSProfile.Fields {
+			field := map[string]interface{}{
+				"base_field": f.BaseField,
+				"value":      f.Value,
+			}
+			if f.FieldValue != nil {
+				b, err := json.Marshal(f.FieldValue)
+				if err != nil {
+					return diag.FromErr(err)
+				}
+				field["field_value"] = string(b)
+			}
+			fields = append(fields, field)
+		}
 		v := map[string]interface{}{
-			"enabled": cluster.DDoSProfile.Enabled,
-			"fields":  cluster.DDoSProfile.Fields,
-			"profile_template": []map[string]interface{}{{
-				"profile_template":      cluster.DDoSProfile.ProfileTemplate,
-				"profile_template_name": cluster.DDoSProfile.ProfileTemplateName,
-			}},
+			"enabled":               cluster.DDoSProfile.Enabled,
+			"fields":                fields,
+			"profile_template":      cluster.DDoSProfile.ProfileTemplate,
+			"profile_template_name": cluster.DDoSProfile.ProfileTemplateName,
 		}
 		if err := d.Set("ddos_profile", []interface{}{v}); err != nil {
 			return diag.FromErr(err)
