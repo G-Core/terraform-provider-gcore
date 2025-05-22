@@ -10,6 +10,7 @@ import (
 	waap "github.com/G-Core/gcore-waap-sdk-go"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/validation"
 )
 
 func resourceWaapCustomRules() *schema.Resource {
@@ -84,60 +85,76 @@ func resourceWaapCustomRules() *schema.Resource {
 				Optional: true,
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
-						"ip":                     conditionField("ip_address"),
-						"ip_range":               conditionRangeFields("lower_bound", "upper_bound"),
-						"url":                    conditionMatch("url"),
-						"user_agent":             conditionMatch("user_agent"),
-						"header":                 conditionHeader("header", "value"),
-						"header_exists":          conditionExists("header"),
-						"response_header":        conditionHeader("header", "value"),
-						"response_header_exists": conditionExists("header"),
-						"http_method":            conditionExists("http_method"),
-						"file_extension":         conditionList("file_extension"),
-						"content_type":           conditionList("content_type"),
-						"country":                conditionList("country_code"),
-						"organization":           conditionMatch("organization"),
+						"ip":                     conditionField("ip_address", "A single IPv4 or IPv6 address"),
+						"ip_range" :			  {
+							Type:     schema.TypeList,
+							Optional: true,
+							Elem: &schema.Resource{
+								Schema: map[string]*schema.Schema{
+									"negation": {Type: schema.TypeBool, Optional: true, Default: false, Description: "Whether or not to apply a boolean NOT operation to the rule's condition"},
+									"lower_bound":      {Type: schema.TypeString, Required: true, Description: "The lower bound IPv4 or IPv6 address to match against"},
+									"upper_bound":      {Type: schema.TypeString, Required: true, Description: "The upper bound IPv4 or IPv6 address to match against"},
+								},
+							},
+						},
+						"url":                    conditionMatch("url", "The URL to match", []string{"Exact", "Contains", "Regex"}),
+						"user_agent":             conditionMatch("user_agent", "The user agent value to match", []string{"Exact", "Contains"}),
+						"header":                 conditionHeader("header", "value", []string{"Exact", "Contains"}),
+						"header_exists":          conditionExists("header", "The request header name"),
+						"response_header":        conditionHeader("header", "value", []string{"Exact", "Contains"}),
+						"response_header_exists": conditionExists("header", "The response header name"),
+						"http_method":    conditionExistsWithValidation("http_method", "HTTP methods of a request", validation.StringInSlice([]string{"CONNECT", "DELETE", "GET", "HEAD", "OPTIONS", "PATCH", "POST", "PUT", "TRACE"}, false)),
+						"file_extension": conditionList("file_extension", "The list of file extensions to match against"),
+						"content_type":   conditionList("content_type", "The list of content types to match against"),
+						"country":        conditionList("country_code", "A list of ISO 3166-1 alpha-2 formatted strings representing the countries to match against"),
+						"organization":   conditionExists("organization", "The organization to match against"),
 						"request_rate": {
 							Type:     schema.TypeList,
 							MaxItems: 1,
 							Optional: true,
 							Elem: &schema.Resource{
 								Schema: map[string]*schema.Schema{
-									"negation":         {Type: schema.TypeBool, Optional: true, Default: false},
-									"ips":              listString("List of IP addresses."),
-									"http_methods":     listString("List of HTTP methods."),
-									"path_pattern":     stringField("Path pattern."),
-									"requests":         intField("Request count."),
-									"time":             intField("Time window."),
-									"user_defined_tag": stringField("User-defined tag."),
+									"negation":         {Type: schema.TypeBool, Optional: true, Default: false, Description: "Whether or not to apply a boolean NOT operation to the rule's condition"},
+									"ips":              listString("A list of source IPs that can trigger a request rate condition"),
+									"http_methods":     listStringWithValidation("Possible HTTP request methods that can trigger a request rate condition", validation.StringInSlice([]string{"CONNECT", "DELETE", "GET", "HEAD", "OPTIONS", "PATCH", "POST", "PUT", "TRACE"}, false)),
+									"path_pattern":     stringField("A regular expression matching the URL path of the incoming request"),
+									"requests":         intField("The number of incoming requests over the given time that can trigger a request rate condition"),
+									"time":             intField("The number of seconds that the WAAP measures incoming requests over before triggering a request rate condition"),
+									"user_defined_tag": stringField("A user-defined tag that can be included in incoming requests and used to trigger a request rate condition"),
 								},
 							},
 						},
-						"owner_types": conditionList("owner_types"),
-						"tags":        conditionList("tags"),
+						"owner_types": {
+							Type:     schema.TypeList,
+							Optional: true,
+							Elem: &schema.Resource{
+								Schema: map[string]*schema.Schema{
+									"negation": {Type: schema.TypeBool, Optional: true, Default: false, Description: "Whether or not to apply a boolean NOT operation to the rule's condition"},
+									"owner_types": {
+										Type:        schema.TypeList,
+										MaxItems: 1,
+										Elem:        &schema.Schema{Type: schema.TypeString, Default: "COMMERCIAL"},
+										Description: "Match the type of organization that owns the IP address making an incoming request",
+										Required:    true,
+										ValidateFunc: validation.StringInSlice([]string{"COMMERCIAL", "EDUCATIONAL", "GOVERNMENT", "HOSTING_SERVICES", "ISP", "MOBILE_NETWORK", "NETWORK", "RESERVED"}, false),
+									},
+								},
+							},
+						},
+						"tags":        conditionList("tags", "A list of tags to match against the request tags"),
 						"session_request_count": {
 							Type:     schema.TypeList,
 							Optional: true,
 							Elem: &schema.Resource{
 								Schema: map[string]*schema.Schema{
 									"negation":      {Type: schema.TypeBool, Optional: true, Default: false},
-									"request_count": {Type: schema.TypeInt, Required: true},
+									"request_count": {Type: schema.TypeInt, Required: true, Description: "The number of dynamic requests in the session"},
 								},
 							},
 						},
-						"user_defined_tags": conditionList("tags"),
+						"user_defined_tags": conditionList("tags", "A list of user-defined tags to match against the request tags"),
 					},
 				},
-			},
-			"id": {
-				Type:        schema.TypeString,
-				Computed:    true,
-				Description: "ID of the created rule.",
-			},
-			"rule_type": {
-				Type:        schema.TypeString,
-				Required:    true,
-				Description: "Type of the rule.",
 			},
 			"domain_id": {
 				Type:     schema.TypeString,
@@ -161,11 +178,10 @@ func parseInput(d *schema.ResourceData) (ParsedInput, error) {
 	name := d.Get("name").(string)
 	description := d.Get("description").(string)
 	enabled := d.Get("enabled").(bool)
-	rule_type := d.Get("rule_type").(string)
 	actionInput := d.Get("action").([]interface{})
 	conditionsInput := d.Get("conditions").([]interface{})
 
-	log.Printf("[DEBUG] Input: name=%s, description=%s, enabled=%v, type=%+v", name, description, enabled, rule_type)
+	log.Printf("[DEBUG] Input: name=%s, description=%s, enabled=%v", name, description, enabled)
 	log.Printf("[DEBUG] Input: action=%+v", actionInput)
 	log.Printf("[DEBUG] Input: conditions=%+v", conditionsInput)
 
@@ -563,7 +579,6 @@ func parseInput(d *schema.ResourceData) (ParsedInput, error) {
 		Description: &description,
 		Enabled:     &enabled,
 		Name:        &name,
-		RuleType:    &rule_type,
 	}
 
 	return parsed, nil

@@ -2,88 +2,89 @@ package gcore
 
 import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/validation"
 )
 
-func conditionField(fieldName string) *schema.Schema {
+func conditionField(fieldName, desc string) *schema.Schema {
 	return &schema.Schema{
 		Type:     schema.TypeList,
 		Optional: true,
 		Elem: &schema.Resource{
 			Schema: map[string]*schema.Schema{
-				"negation": {Type: schema.TypeBool, Optional: true, Default: false},
-				fieldName:  {Type: schema.TypeString, Required: true},
+				"negation": {Type: schema.TypeBool, Optional: true, Default: false, Description: "Whether or not to apply a boolean NOT operation to the rule's condition"},
+				fieldName:  {Type: schema.TypeString, Required: true, Description: desc},
 			},
 		},
 	}
 }
 
-func conditionRangeFields(lower, upper string) *schema.Schema {
+func conditionMatch(field, desc string, match_types []string) *schema.Schema {
 	return &schema.Schema{
 		Type:     schema.TypeList,
 		Optional: true,
 		Elem: &schema.Resource{
 			Schema: map[string]*schema.Schema{
-				"negation": {Type: schema.TypeBool, Optional: true, Default: false},
-				lower:      {Type: schema.TypeString, Required: true},
-				upper:      {Type: schema.TypeString, Required: true},
+				"negation":   {Type: schema.TypeBool, Optional: true, Default: false, Description: "Whether or not to apply a boolean NOT operation to the rule's condition"},
+				field:        {Type: schema.TypeString, Required: true, Description: desc},
+				"match_type": {Type: schema.TypeString, Required: true, Description: "The type of matching condition", ValidateFunc: validation.StringInSlice(match_types, false)},
 			},
 		},
 	}
 }
 
-func conditionMatch(field string) *schema.Schema {
+func conditionHeader(header, value string, match_types []string) *schema.Schema {
 	return &schema.Schema{
 		Type:     schema.TypeList,
 		Optional: true,
 		Elem: &schema.Resource{
 			Schema: map[string]*schema.Schema{
-				"negation":   {Type: schema.TypeBool, Optional: true, Default: false},
-				field:        {Type: schema.TypeString, Required: true},
-				"match_type": {Type: schema.TypeString, Required: true},
+				"negation":   {Type: schema.TypeBool, Optional: true, Default: false, Description: "Whether or not to apply a boolean NOT operation to the rule's condition"},
+				header:       {Type: schema.TypeString, Required: true, Description: "The request header name"},
+				value:        {Type: schema.TypeString, Required: true, Description: "The request header value"},
+				"match_type": {Type: schema.TypeString, Required: true, MaxItems: 1, Description: "The type of matching condition", ValidateFunc: validation.StringInSlice(match_types, false)},
 			},
 		},
 	}
 }
 
-func conditionHeader(header, value string) *schema.Schema {
+func conditionExists(field, desc string) *schema.Schema {
 	return &schema.Schema{
 		Type:     schema.TypeList,
 		Optional: true,
 		Elem: &schema.Resource{
 			Schema: map[string]*schema.Schema{
-				"negation":   {Type: schema.TypeBool, Optional: true, Default: false},
-				header:       {Type: schema.TypeString, Required: true},
-				value:        {Type: schema.TypeString, Required: true},
-				"match_type": {Type: schema.TypeString, Required: true},
+				"negation": {Type: schema.TypeBool, Optional: true, Default: false, Description: "Whether or not to apply a boolean NOT operation to the rule's condition"},
+				field:      {Type: schema.TypeString, Required: true, Description: desc},
 			},
 		},
 	}
 }
 
-func conditionExists(field string) *schema.Schema {
+func conditionExistsWithValidation(field, desc string, validation schema.SchemaValidateFunc) *schema.Schema {
 	return &schema.Schema{
 		Type:     schema.TypeList,
 		Optional: true,
 		Elem: &schema.Resource{
 			Schema: map[string]*schema.Schema{
-				"negation": {Type: schema.TypeBool, Optional: true, Default: false},
-				field:      {Type: schema.TypeString, Required: true},
+				"negation": {Type: schema.TypeBool, Optional: true, Default: false, Description: "Whether or not to apply a boolean NOT operation to the rule's condition"},
+				field:      {Type: schema.TypeString, Required: true, Description: desc, ValidateFunc: validation},
 			},
 		},
 	}
 }
 
-func conditionList(field string) *schema.Schema {
+func conditionList(field, desc string) *schema.Schema {
 	return &schema.Schema{
 		Type:     schema.TypeList,
 		Optional: true,
 		Elem: &schema.Resource{
 			Schema: map[string]*schema.Schema{
-				"negation": {Type: schema.TypeBool, Optional: true, Default: false},
+				"negation": {Type: schema.TypeBool, Optional: true, Default: false, Description: "Whether or not to apply a boolean NOT operation to the rule's condition"},
 				field: {
-					Type:     schema.TypeList,
-					Elem:     &schema.Schema{Type: schema.TypeString},
-					Required: true,
+					Type:        schema.TypeList,
+					Elem:        &schema.Schema{Type: schema.TypeString},
+					Description: desc,
+					Required:    true,
 				},
 			},
 		},
@@ -104,5 +105,15 @@ func listString(desc string) *schema.Schema {
 		Elem:        &schema.Schema{Type: schema.TypeString},
 		Required:    true,
 		Description: desc,
+	}
+}
+
+func listStringWithValidation(desc string, validation schema.SchemaValidateFunc) *schema.Schema {
+	return &schema.Schema{
+		Type:        schema.TypeList,
+		Elem:        &schema.Schema{Type: schema.TypeString},
+		Required:    true,
+		Description: desc,
+		ValidateFunc: validation,
 	}
 }
