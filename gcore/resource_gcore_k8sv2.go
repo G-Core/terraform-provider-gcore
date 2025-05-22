@@ -270,6 +270,55 @@ func resourceK8sV2() *schema.Resource {
 						}},
 				},
 			},
+			"ddos_profile": {
+				Type:        schema.TypeList,
+				Description: "DDoS profile configuration.",
+				Optional:    true,
+				MaxItems:    1,
+				Elem: &schema.Resource{
+					Schema: map[string]*schema.Schema{
+						"enabled": {
+							Type:        schema.TypeBool,
+							Description: "Indicates if the DDoS profile is enabled.",
+							Required:    true,
+						},
+						"fields": {
+							Type:        schema.TypeList,
+							Description: "List of fields for the DDoS profile.",
+							Optional:    true,
+							Elem: &schema.Resource{
+								Schema: map[string]*schema.Schema{
+									"base_field": {
+										Type:        schema.TypeInt,
+										Description: "Base field ID.",
+										Required:    true,
+									},
+									"field_value": {
+										Type:        schema.TypeString,
+										Optional:    true,
+										Description: "Complex value. Only one of 'value' or 'field_value' must be specified.",
+									},
+									"value": {
+										Type:        schema.TypeString,
+										Optional:    true,
+										Description: "Basic type value. Only one of 'value' or 'field_value' must be specified.",
+									},
+								},
+							},
+						},
+						"profile_template": {
+							Type:        schema.TypeInt,
+							Description: "Profile template ID.",
+							Optional:    true,
+						},
+						"profile_template_name": {
+							Type:        schema.TypeString,
+							Description: "Profile template name.",
+							Optional:    true,
+						},
+					},
+				},
+			},
 			"fixed_network": {
 				Type:        schema.TypeString,
 				Description: "Fixed network used to allocate network addresses for cluster nodes.",
@@ -648,6 +697,46 @@ func resourceK8sV2Create(ctx context.Context, d *schema.ResourceData, m interfac
 		}
 	}
 
+	if ddosProfileI, ok := d.GetOk("ddos_profile"); ok {
+		ddosProfile := ddosProfileI.([]interface{})
+		if len(ddosProfile) != 0 {
+			profile := ddosProfile[0].(map[string]interface{})
+			opts.DDoSProfile = &clusters.DDoSProfileCreateOpts{
+				Enabled: profile["enabled"].(bool),
+			}
+			if fields, ok := profile["fields"].([]interface{}); ok {
+				if len(fields) != 0 {
+					opts.DDoSProfile.Fields = make([]clusters.DDoSProfileField, len(fields))
+					for i, field := range fields {
+						fieldMap := field.(map[string]interface{})
+						opts.DDoSProfile.Fields[i] = clusters.DDoSProfileField{
+							BaseField: fieldMap["base_field"].(int),
+						}
+						value, valueOk := fieldMap["value"].(string)
+						if valueOk && value != "" {
+							opts.DDoSProfile.Fields[i].Value = &value
+						}
+						fieldValueStr, fieldValueOk := fieldMap["field_value"]
+						if fieldValueOk {
+							var fieldValue interface{}
+							err := json.Unmarshal([]byte(fieldValueStr.(string)), &fieldValue)
+							if err != nil {
+								return diag.FromErr(fmt.Errorf("failed to unmarshal field_value: %w", err))
+							}
+							opts.DDoSProfile.Fields[i].FieldValue = &fieldValue
+						}
+					}
+				}
+			}
+			if profileTemplate, ok := profile["profile_template"].(int); ok {
+				opts.DDoSProfile.ProfileTemplate = &profileTemplate
+			}
+			if profileTemplateName, ok := profile["profile_template_name"].(string); ok {
+				opts.DDoSProfile.ProfileTemplateName = &profileTemplateName
+			}
+		}
+	}
+
 	if podsIP, ok := d.GetOk("pods_ip_pool"); ok {
 		gccidr, err := parseCIDRFromString(podsIP.(string))
 		if err != nil {
@@ -884,6 +973,28 @@ func resourceK8sV2Read(ctx context.Context, d *schema.ResourceData, m interface{
 		}
 	}
 
+	if cluster.DDoSProfile != nil {
+		v := map[string]interface{}{
+			"enabled": cluster.DDoSProfile.Enabled,
+		}
+		if cluster.DDoSProfile.Fields != nil {
+			v["fields"] = []interface{}{}
+			for _, field := range cluster.DDoSProfile.Fields {
+				v["fields"] = append(v["fields"].([]interface{}), map[string]interface{}{
+					"base_field":  field.BaseField,
+					"value":       field.Value,
+					"field_value": field.FieldValue,
+				})
+			}
+		}
+		if cluster.DDoSProfile.ProfileTemplate != nil {
+			v["profile_template"] = *cluster.DDoSProfile.ProfileTemplate
+		}
+		if cluster.DDoSProfile.ProfileTemplateName != nil {
+			v["profile_template_name"] = *cluster.DDoSProfile.ProfileTemplateName
+		}
+	}
+
 	poolMap := map[string]pools.ClusterPool{}
 	for _, pool := range cluster.Pools {
 		poolMap[pool.Name] = pool
@@ -959,7 +1070,7 @@ func resourceK8sV2Update(ctx context.Context, d *schema.ResourceData, m interfac
 		}
 	}
 
-	if d.HasChanges("authentication", "autoscaler_config", "cni") {
+	if d.HasChanges("authentication", "autoscaler_config", "cni", "ddos_profile") {
 		if err := resourceK8sV2UpdateCluster(client, tasksClient, clusterName, d); err != nil {
 			return diag.FromErr(err)
 		}
@@ -1162,6 +1273,50 @@ func resourceK8sV2UpdateCluster(client, tasksClient *gcorecloud.ServiceClient, c
 							HubbleUI:                 cilium["hubble_ui"].(bool),
 						}
 					}
+				}
+			}
+		}
+	}
+
+	if d.HasChange("ddos_profile") {
+		if ddosProfileI, ok := d.GetOk("ddos_profile"); ok {
+			ddosProfile := ddosProfileI.([]interface{})
+			if len(ddosProfile) != 0 {
+				profile := ddosProfile[0].(map[string]interface{})
+				opts.DDoSProfile = &clusters.DDoSProfileCreateOpts{
+					Enabled: profile["enabled"].(bool),
+				}
+				if fields, ok := profile["fields"].([]interface{}); ok {
+					log.Printf("[DEBUG] fields: %v", fields)
+					if len(fields) != 0 {
+						opts.DDoSProfile.Fields = make([]clusters.DDoSProfileField, len(fields))
+						for i, field := range fields {
+							fieldMap := field.(map[string]interface{})
+							opts.DDoSProfile.Fields[i] = clusters.DDoSProfileField{
+								BaseField: fieldMap["base_field"].(int),
+							}
+							value, valueOk := fieldMap["value"].(string)
+							if valueOk && value != "" {
+								opts.DDoSProfile.Fields[i].Value = &value
+							}
+							fieldValueStr, fieldValueOk := fieldMap["field_value"]
+							if fieldValueOk {
+								var fieldValue interface{}
+								err := json.Unmarshal([]byte(fieldValueStr.(string)), &fieldValue)
+								if err != nil {
+									return fmt.Errorf("failed to unmarshal field_value: %w", err)
+								}
+								log.Printf("[DEBUG] DDoS profile field value: %v, %v", fieldValue, reflect.TypeOf(fieldValue))
+								opts.DDoSProfile.Fields[i].FieldValue = &fieldValue
+							}
+						}
+					}
+				}
+				if profileTemplate, ok := profile["profile_template"].(int); ok {
+					opts.DDoSProfile.ProfileTemplate = &profileTemplate
+				}
+				if profileTemplateName, ok := profile["profile_template_name"].(string); ok {
+					opts.DDoSProfile.ProfileTemplateName = &profileTemplateName
 				}
 			}
 		}
