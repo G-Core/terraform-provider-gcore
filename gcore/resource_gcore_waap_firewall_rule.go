@@ -69,13 +69,13 @@ func resourceWaapFirewallRule() *schema.Resource {
 				Type:        schema.TypeList,
 				Required:    true,
 				MaxItems:    1,
-				Description: "Action to take when the rule conditions are met",
+				Description: "The action that the rule takes when triggered",
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
 						"allow": {
 							Type:        schema.TypeBool,
 							Optional:    true,
-							Description: "Allow the request",
+							Description: "The WAAP allows the request",
 							ExactlyOneOf: []string{
 								"action.0.allow",
 								"action.0.block",
@@ -89,7 +89,7 @@ func resourceWaapFirewallRule() *schema.Resource {
 							Type:        schema.TypeList,
 							Optional:    true,
 							MaxItems:    1,
-							Description: "Block the request",
+							Description: "The WAAP blocks the request",
 							ExactlyOneOf: []string{
 								"action.0.allow",
 								"action.0.block",
@@ -103,81 +103,18 @@ func resourceWaapFirewallRule() *schema.Resource {
 									"status_code": {
 										Type:        schema.TypeInt,
 										Optional:    true,
-										Description: "HTTP status code to return for blocked requests",
+										Description: "A custom HTTP status code that the WAAP returns if a rule blocks a request",
 									},
 									"action_duration": {
 										Type:        schema.TypeString,
 										Optional:    true,
-										Description: "Duration for which the block is effective (e.g. 12h)",
+										Description: "How long a rule's block action will apply to subsequent requests. " +
+											"Can be specified in seconds or by using a numeral followed by 's', 'm', 'h', or 'd' " +
+											"to represent time format (seconds, minutes, hours, or days). Example: 12h. Must match the pattern ^[0-9]*[smhd]?$",
 										ValidateFunc: validation.StringMatch(
 											regexp.MustCompile(`^[0-9]+[smhd]?$`),
 											"Must be a number optionally followed by 's', 'm', 'h', or 'd' (e.g., 60, 5m, 12h, 1d)",
 										),
-									},
-								},
-							},
-						},
-						"captcha": {
-							Type:        schema.TypeBool,
-							Optional:    true,
-							Description: "Show captcha challenge",
-							ExactlyOneOf: []string{
-								"action.0.allow",
-								"action.0.block",
-								"action.0.captcha",
-								"action.0.handshake",
-								"action.0.monitor",
-								"action.0.tag",
-							},
-						},
-						"handshake": {
-							Type:        schema.TypeBool,
-							Optional:    true,
-							Description: "Perform handshake verification",
-							ExactlyOneOf: []string{
-								"action.0.allow",
-								"action.0.block",
-								"action.0.captcha",
-								"action.0.handshake",
-								"action.0.monitor",
-								"action.0.tag",
-							},
-						},
-						"monitor": {
-							Type:        schema.TypeBool,
-							Optional:    true,
-							Description: "Monitor the request without blocking",
-							ExactlyOneOf: []string{
-								"action.0.allow",
-								"action.0.block",
-								"action.0.captcha",
-								"action.0.handshake",
-								"action.0.monitor",
-								"action.0.tag",
-							},
-						},
-						"tag": {
-							Type:        schema.TypeList,
-							Optional:    true,
-							MaxItems:    1,
-							Description: "Add tags to the request",
-							ExactlyOneOf: []string{
-								"action.0.allow",
-								"action.0.block",
-								"action.0.captcha",
-								"action.0.handshake",
-								"action.0.monitor",
-								"action.0.tag",
-							},
-							Elem: &schema.Resource{
-								Schema: map[string]*schema.Schema{
-									"tags": {
-										Type:        schema.TypeList,
-										Required:    true,
-										Description: "List of tags to apply",
-										Elem: &schema.Schema{
-											Type: schema.TypeString,
-										},
 									},
 								},
 							},
@@ -189,7 +126,7 @@ func resourceWaapFirewallRule() *schema.Resource {
 				Type:        schema.TypeList,
 				Required:    true,
 				MaxItems:    1,
-				Description: "Conditions that trigger the rule",
+				Description: "The condition required for the WAAP engine to trigger the rule",
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
 						"ip": {
@@ -206,12 +143,13 @@ func resourceWaapFirewallRule() *schema.Resource {
 									"negation": {
 										Type:        schema.TypeBool,
 										Optional:    true,
-										Description: "Whether to negate the condition",
+										Default:      false,
+										Description: "Whether or not to apply a boolean NOT operation to the rule's condition",
 									},
 									"ip_address": {
 										Type:        schema.TypeString,
 										Required:    true,
-										Description: "IP address to match",
+										Description: "A single IPv4 or IPv6 address to match",
 									},
 								},
 							},
@@ -230,17 +168,18 @@ func resourceWaapFirewallRule() *schema.Resource {
 									"negation": {
 										Type:        schema.TypeBool,
 										Optional:    true,
-										Description: "Whether to negate the condition",
+										Default:      false,
+										Description: "Whether or not to apply a boolean NOT operation to the rule's condition",
 									},
 									"lower_bound": {
 										Type:        schema.TypeString,
 										Required:    true,
-										Description: "Lower bound IP address of the range",
+										Description: "The lower bound IPv4 or IPv6 address to match against",
 									},
 									"upper_bound": {
 										Type:        schema.TypeString,
 										Required:    true,
-										Description: "Upper bound IP address of the range",
+										Description: "The upper bound IPv4 or IPv6 address to match against",
 									},
 								},
 							},
@@ -291,9 +230,17 @@ func resourceWaapFirewallRuleRead(ctx context.Context, d *schema.ResourceData, m
 	ruleID, _ := strconv.Atoi(d.Id())
 
 	resp, err := client.GetFirewallRuleV1DomainsDomainIdFirewallRulesRuleIdGetWithResponse(ctx, domainID, ruleID)
-	if err != nil || resp.StatusCode() != http.StatusOK {
-		return diag.FromErr(fmt.Errorf("error reading WAAP firewall rule with status code: %d, response: %s",
-			resp.StatusCode(), string(resp.Body)))
+	if err != nil {
+		return diag.Errorf("Failed to read Firewall Rule: %w", err)
+	}
+	if resp.StatusCode() == http.StatusNotFound {
+		d.SetId("") // Resource not found, remove from state
+		return diag.Diagnostics{
+			{Severity: diag.Warning, Summary: fmt.Sprintf("Firewall Rule (%s) was not found, removed from TF state", ruleID)},
+		}
+	}
+	if resp.StatusCode() != http.StatusOK {
+		return diag.Errorf("Failed to read Firewall Rule. Status code: %d with error: %s", resp.StatusCode(), resp.Body)
 	}
 
 	d.Set("name", resp.JSON200.Name)
