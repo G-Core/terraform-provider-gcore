@@ -79,10 +79,6 @@ func resourceWaapFirewallRule() *schema.Resource {
 							ExactlyOneOf: []string{
 								"action.0.allow",
 								"action.0.block",
-								"action.0.captcha",
-								"action.0.handshake",
-								"action.0.monitor",
-								"action.0.tag",
 							},
 						},
 						"block": {
@@ -93,10 +89,6 @@ func resourceWaapFirewallRule() *schema.Resource {
 							ExactlyOneOf: []string{
 								"action.0.allow",
 								"action.0.block",
-								"action.0.captcha",
-								"action.0.handshake",
-								"action.0.monitor",
-								"action.0.tag",
 							},
 							Elem: &schema.Resource{
 								Schema: map[string]*schema.Schema{
@@ -106,8 +98,8 @@ func resourceWaapFirewallRule() *schema.Resource {
 										Description: "A custom HTTP status code that the WAAP returns if a rule blocks a request",
 									},
 									"action_duration": {
-										Type:        schema.TypeString,
-										Optional:    true,
+										Type:     schema.TypeString,
+										Optional: true,
 										Description: "How long a rule's block action will apply to subsequent requests. " +
 											"Can be specified in seconds or by using a numeral followed by 's', 'm', 'h', or 'd' " +
 											"to represent time format (seconds, minutes, hours, or days). Example: 12h. Must match the pattern ^[0-9]*[smhd]?$",
@@ -143,7 +135,7 @@ func resourceWaapFirewallRule() *schema.Resource {
 									"negation": {
 										Type:        schema.TypeBool,
 										Optional:    true,
-										Default:      false,
+										Default:     false,
 										Description: "Whether or not to apply a boolean NOT operation to the rule's condition",
 									},
 									"ip_address": {
@@ -168,7 +160,7 @@ func resourceWaapFirewallRule() *schema.Resource {
 									"negation": {
 										Type:        schema.TypeBool,
 										Optional:    true,
-										Default:      false,
+										Default:     false,
 										Description: "Whether or not to apply a boolean NOT operation to the rule's condition",
 									},
 									"lower_bound": {
@@ -206,7 +198,7 @@ func resourceWaapFirewallRuleCreate(ctx context.Context, d *schema.ResourceData,
 	}
 
 	if v, ok := d.GetOk("action"); ok {
-		reqBody.Action = parseFirewallActionBlock(v.([]interface{}), false).(waap.FirewallRuleActionInput)
+		reqBody.Action = parseFirewallActionBlock(v.([]interface{}))
 	}
 
 	if v, ok := d.GetOk("conditions"); ok {
@@ -313,7 +305,10 @@ func resourceWaapFirewallRuleUpdate(ctx context.Context, d *schema.ResourceData,
 
 	if d.HasChange("action") {
 		if v, ok := d.GetOk("action"); ok {
-			updateAction := parseFirewallActionBlock(v.([]interface{}), true).(waap.CustomerRuleActionInput)
+			actionStruct := parseFirewallActionBlock(v.([]interface{}))
+			var updateAction waap.CustomerRuleActionInput
+			updateAction.Allow = actionStruct.Allow
+			updateAction.Block = actionStruct.Block
 			reqBody.Action = &updateAction
 		}
 	}
@@ -349,14 +344,14 @@ func resourceWaapFirewallRuleDelete(ctx context.Context, d *schema.ResourceData,
 	return nil
 }
 
-func parseFirewallActionBlock(actionCfg []interface{}, isUpdate bool) interface{} {
-	var createStruct waap.FirewallRuleActionInput
+func parseFirewallActionBlock(actionCfg []interface{}) waap.FirewallRuleActionInput {
+	var actionStruct waap.FirewallRuleActionInput
 
 	if len(actionCfg) > 0 && actionCfg[0] != nil {
 		actionsMap := actionCfg[0].(map[string]interface{})
 
 		if v, exists := actionsMap["allow"]; exists && v.(bool) {
-			createStruct.Allow = &waap.RuleAllowAction{}
+			actionStruct.Allow = &waap.RuleAllowAction{}
 		}
 
 		if v, exists := actionsMap["block"].([]interface{}); exists && len(v) > 0 {
@@ -373,38 +368,11 @@ func parseFirewallActionBlock(actionCfg []interface{}, isUpdate bool) interface{
 					blockAction.ActionDuration = &val
 				}
 			}
-			createStruct.Block = &blockAction
-		}
-
-		if isUpdate {
-			var updateStruct waap.CustomerRuleActionInput
-			updateStruct.Allow = createStruct.Allow
-			updateStruct.Block = createStruct.Block
-
-			if v, exists := actionsMap["captcha"]; exists && v.(bool) {
-				updateStruct.Captcha = &waap.RuleCaptchaAction{}
-			}
-
-			if v, exists := actionsMap["handshake"]; exists && v.(bool) {
-				updateStruct.Handshake = &waap.RuleHandshakeAction{}
-			}
-
-			if v, exists := actionsMap["monitor"]; exists && v.(bool) {
-				updateStruct.Monitor = &waap.RuleMonitorAction{}
-			}
-
-			if v, exists := actionsMap["tag"].([]interface{}); exists && len(v) > 0 {
-				tagMap := v[0].(map[string]interface{})
-
-				updateStruct.Tag = &waap.RuleTagAction{
-					Tags: convertStringList(tagMap["tags"].([]interface{})),
-				}
-			}
-			return updateStruct
+			actionStruct.Block = &blockAction
 		}
 	}
 
-	return createStruct
+	return actionStruct
 }
 
 func parseFirewallConditionBlock(conditionCfg []interface{}) []waap.FirewallRuleCondition {
