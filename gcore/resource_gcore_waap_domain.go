@@ -57,13 +57,13 @@ func resourceWaapDomain() *schema.Resource {
 										Type:        schema.TypeInt,
 										Optional:    true,
 										Computed:    true,
-										Description: "Global threshold for DDoS protection",
+										Description: "Global threshold for DDoS protection.",
 									},
 									"burst_threshold": {
 										Type:        schema.TypeInt,
 										Optional:    true,
 										Computed:    true,
-										Description: "Burst threshold for DDoS protection",
+										Description: "Burst threshold for DDoS protection.",
 									},
 								},
 							},
@@ -78,10 +78,18 @@ func resourceWaapDomain() *schema.Resource {
 									"api_urls": {
 										Type:        schema.TypeList,
 										Optional:    true,
-										Description: "List of API URL patterns",
+										Description: "List of API URL patterns.",
 										Elem: &schema.Schema{
 											Type: schema.TypeString,
 										},
+									},
+									"is_api": {
+										Type:     schema.TypeBool,
+										Optional: true,
+										Default:  false,
+										Description: "Indicates if the domain is an API domain. " +
+											"All requests to an API domain are treated as API requests. " +
+											"If this is set to true then the api_urls field is ignored.",
 									},
 								},
 							},
@@ -263,10 +271,8 @@ func resourceWaapDomainRead(ctx context.Context, d *schema.ResourceData, m inter
 	if settingsResp.JSON200.Api.ApiUrls != nil {
 		apiSettings := make(map[string]interface{})
 		apiSettings["api_urls"] = *settingsResp.JSON200.Api.ApiUrls
-
-		if len(apiSettings) > 0 {
-			settings["api"] = []interface{}{apiSettings}
-		}
+		apiSettings["is_api"] = *settingsResp.JSON200.Api.IsApi
+		settings["api"] = []interface{}{apiSettings}
 	}
 
 	if len(settings) > 0 {
@@ -397,10 +403,7 @@ func updateDomainSettings(ctx context.Context, waapClient *waap.ClientWithRespon
 	// Process DDOS settings
 	if ddosList, ok := settingsMap["ddos"].([]interface{}); ok && len(ddosList) > 0 {
 		ddosMap := ddosList[0].(map[string]interface{})
-		ddosSettings := struct {
-			GlobalThreshold *int `json:"global_threshold,omitempty"`
-			BurstThreshold  *int `json:"burst_threshold,omitempty"`
-		}{}
+		ddosSettings := waap.UpdateDomainDdosSettings{}
 
 		if v, ok := ddosMap["global_threshold"]; ok {
 			val := v.(int)
@@ -412,26 +415,28 @@ func updateDomainSettings(ctx context.Context, waapClient *waap.ClientWithRespon
 			ddosSettings.BurstThreshold = &val
 		}
 
-		updateReq.Ddos = &waap.UpdateDomainDdosSettings{
-			GlobalThreshold: ddosSettings.GlobalThreshold,
-			BurstThreshold:  ddosSettings.BurstThreshold,
-		}
+		updateReq.Ddos = &ddosSettings
 	}
 
 	// Process API settings
 	if apiList, ok := settingsMap["api"].([]interface{}); ok && len(apiList) > 0 {
 		apiMap := apiList[0].(map[string]interface{})
+		apiSettings := waap.UpdateApiSettings{}
 
-		if apiUrls, ok := apiMap["api_urls"].([]interface{}); ok {
-			urls := make([]string, len(apiUrls))
-			for i, url := range apiUrls {
+		if v, ok := apiMap["api_urls"].([]interface{}); ok {
+			urls := make([]string, len(v))
+			for i, url := range v {
 				urls[i] = url.(string)
 			}
-
-			updateReq.Api = &waap.UpdateApiSettings{
-				ApiUrls: &urls,
-			}
+			apiSettings.ApiUrls = &urls
 		}
+
+		if v, ok := apiMap["is_api"]; ok {
+			val := v.(bool)
+			apiSettings.IsApi = &val
+		}
+
+		updateReq.Api = &apiSettings
 	}
 
 	// Update domain settings
