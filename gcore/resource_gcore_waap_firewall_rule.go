@@ -306,10 +306,7 @@ func resourceWaapFirewallRuleUpdate(ctx context.Context, d *schema.ResourceData,
 	if d.HasChange("action") {
 		if v, ok := d.GetOk("action"); ok {
 			actionStruct := parseFirewallActionBlock(v.([]interface{}))
-			var updateAction waap.CustomerRuleActionInput
-			updateAction.Allow = actionStruct.Allow
-			updateAction.Block = actionStruct.Block
-			reqBody.Action = &updateAction
+			reqBody.Action = &actionStruct
 		}
 	}
 
