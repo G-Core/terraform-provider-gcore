@@ -19,6 +19,7 @@ resource "gcore_waap_custom_page_set" "example" {
   domains = [gcore_waap_domain.mydomain.id]
 
   block {
+    logo    = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAACXBIWXMAAA7EAAAOxAGVKw4bAAAA0ElEQVQ4y62TMQ6DMAxFH1GlDkgsbJXYOAecowsnYO4F2DpxGdZeghEpS4+QqerS5YOiNEVtwZKl6Nvfib+dhM92BAqd78CDL60GBsABk9wJq9eIBugBCzRA6sVSYVY5JlagB25AtnJJppw+9mzrkU/BLUbYXMSG7Qx64kx+Aq0Xb4XNRRpxFrWd17MRofAKFMKMp4kTl1JK/2oTUB7YwcIWzkAXEbFT7K2FUMRcoxqBq3wUlsdEjI0RoAIu8irYBRvbyk2LtMsq//WZkq3f+QXg4Ta9dWcCCAAAAABJRU5ErkJggg=="
     header  = "Initial Block Header"
     title   = "Initial Block Title"
     text    = "This is the initial block page text."

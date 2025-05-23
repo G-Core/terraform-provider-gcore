@@ -34,6 +34,7 @@ resource "gcore_waap_custom_page_set" "example" {
   domains = [gcore_waap_domain.mydomain.id]
 
   block {
+    logo    = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAACXBIWXMAAA7EAAAOxAGVKw4bAAAA0ElEQVQ4y62TMQ6DMAxFH1GlDkgsbJXYOAecowsnYO4F2DpxGdZeghEpS4+QqerS5YOiNEVtwZKl6Nvfib+dhM92BAqd78CDL60GBsABk9wJq9eIBugBCzRA6sVSYVY5JlagB25AtnJJppw+9mzrkU/BLUbYXMSG7Qx64kx+Aq0Xb4XNRRpxFrWd17MRofAKFMKMp4kTl1JK/2oTUB7YwcIWzkAXEbFT7K2FUMRcoxqBq3wUlsdEjI0RoAIu8irYBRvbyk2LtMsq//WZkq3f+QXg4Ta9dWcCCAAAAABJRU5ErkJggg=="
     header  = "Initial Block Header"
     title   = "Initial Block Title"
     text    = "This is the initial block page text."
@@ -101,14 +102,14 @@ resource "gcore_waap_custom_page_set" "example" {
 
 Required:
 
-- `enabled` (Boolean) Indicates whether the custom custom page is active or inactive
+- `enabled` (Boolean) Indicates whether the custom custom page is active or inactive.
 
 Optional:
 
-- `header` (String) The text to display in the header of the custom page
-- `logo` (String) A base64 encoded image of the logo to present
-- `text` (String) The text to display in the body of the custom page
-- `title` (String) The text to display in the title of the custom page
+- `header` (String) The text to display in the header of the custom page.
+- `logo` (String) A base64 encoded image of the logo to present. Supported image types are JPEG, PNG and JPG, size is limited to width 450px, height 130px. This should be a base 64 encoding of the full HTML img tag compatible image, with the header included.
+- `text` (String) The text to display in the body of the custom page.
+- `title` (String) The text to display in the title of the custom page.
 
 
 <a id="nestedblock--block_csrf"></a>
@@ -116,14 +117,14 @@ Optional:
 
 Required:
 
-- `enabled` (Boolean) Indicates whether the custom custom page is active or inactive
+- `enabled` (Boolean) Indicates whether the custom custom page is active or inactive.
 
 Optional:
 
-- `header` (String) The text to display in the header of the custom page
-- `logo` (String) A base64 encoded image of the logo to present
-- `text` (String) The text to display in the body of the custom page
-- `title` (String) The text to display in the title of the custom page
+- `header` (String) The text to display in the header of the custom page.
+- `logo` (String) A base64 encoded image of the logo to present. Supported image types are JPEG, PNG and JPG, size is limited to width 450px, height 130px. This should be a base 64 encoding of the full HTML img tag compatible image, with the header included.
+- `text` (String) The text to display in the body of the custom page.
+- `title` (String) The text to display in the title of the custom page.
 
 
 <a id="nestedblock--captcha"></a>
@@ -131,15 +132,15 @@ Optional:
 
 Required:
 
-- `enabled` (Boolean) Indicates whether the custom custom page is active or inactive
+- `enabled` (Boolean) Indicates whether the custom custom page is active or inactive.
 
 Optional:
 
-- `error` (String) Error message
-- `header` (String) The text to display in the header of the custom page
-- `logo` (String) A base64 encoded image of the logo to present
-- `text` (String) The text to display in the body of the custom page
-- `title` (String) The text to display in the title of the custom page
+- `error` (String) Error message.
+- `header` (String) The text to display in the header of the custom page.
+- `logo` (String) A base64 encoded image of the logo to present. Supported image types are JPEG, PNG and JPG, size is limited to width 450px, height 130px. This should be a base 64 encoding of the full HTML img tag compatible image, with the header included.
+- `text` (String) The text to display in the body of the custom page.
+- `title` (String) The text to display in the title of the custom page.
 
 
 <a id="nestedblock--cookie_disabled"></a>
@@ -147,12 +148,12 @@ Optional:
 
 Required:
 
-- `enabled` (Boolean) Indicates whether the custom custom page is active or inactive
+- `enabled` (Boolean) Indicates whether the custom custom page is active or inactive.
 
 Optional:
 
-- `header` (String) The text to display in the header of the custom page
-- `text` (String) The text to display in the body of the custom page
+- `header` (String) The text to display in the header of the custom page.
+- `text` (String) The text to display in the body of the custom page.
 
 
 <a id="nestedblock--handshake"></a>
@@ -160,13 +161,13 @@ Optional:
 
 Required:
 
-- `enabled` (Boolean) Indicates whether the custom custom page is active or inactive
+- `enabled` (Boolean) Indicates whether the custom custom page is active or inactive.
 
 Optional:
 
-- `header` (String) The text to display in the header of the custom page
-- `logo` (String) A base64 encoded image of the logo to present
-- `title` (String) The text to display in the title of the custom page
+- `header` (String) The text to display in the header of the custom page.
+- `logo` (String) A base64 encoded image of the logo to present. Supported image types are JPEG, PNG and JPG, size is limited to width 450px, height 130px. This should be a base 64 encoding of the full HTML img tag compatible image, with the header included.
+- `title` (String) The text to display in the title of the custom page.
 
 
 <a id="nestedblock--javascript_disabled"></a>
@@ -174,12 +175,12 @@ Optional:
 
 Required:
 
-- `enabled` (Boolean) Indicates whether the custom custom page is active or inactive
+- `enabled` (Boolean) Indicates whether the custom custom page is active or inactive.
 
 Optional:
 
-- `header` (String) The text to display in the header of the custom page
-- `text` (String) The text to display in the body of the custom page
+- `header` (String) The text to display in the header of the custom page.
+- `text` (String) The text to display in the body of the custom page.
 
 ## Import
 

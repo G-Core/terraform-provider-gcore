@@ -44,29 +44,31 @@ func resourceWaapCustomPageSet() *schema.Resource {
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
 						"logo": {
-							Type:        schema.TypeString,
-							Optional:    true,
-							Description: "A base64 encoded image of the logo to present",
+							Type:     schema.TypeString,
+							Optional: true,
+							Description: "A base64 encoded image of the logo to present. " +
+								"Supported image types are JPEG, PNG and JPG, size is limited to width 450px, height 130px. " +
+								"This should be a base 64 encoding of the full HTML img tag compatible image, with the header included.",
 						},
 						"header": {
 							Type:        schema.TypeString,
 							Optional:    true,
-							Description: "The text to display in the header of the custom page",
+							Description: "The text to display in the header of the custom page.",
 						},
 						"title": {
 							Type:        schema.TypeString,
 							Optional:    true,
-							Description: "The text to display in the title of the custom page",
+							Description: "The text to display in the title of the custom page.",
 						},
 						"text": {
 							Type:        schema.TypeString,
 							Optional:    true,
-							Description: "The text to display in the body of the custom page",
+							Description: "The text to display in the body of the custom page.",
 						},
 						"enabled": {
 							Type:        schema.TypeBool,
 							Required:    true,
-							Description: "Indicates whether the custom custom page is active or inactive",
+							Description: "Indicates whether the custom custom page is active or inactive.",
 						},
 					},
 				},
@@ -78,29 +80,31 @@ func resourceWaapCustomPageSet() *schema.Resource {
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
 						"logo": {
-							Type:        schema.TypeString,
-							Optional:    true,
-							Description: "A base64 encoded image of the logo to present",
+							Type:     schema.TypeString,
+							Optional: true,
+							Description: "A base64 encoded image of the logo to present. " +
+								"Supported image types are JPEG, PNG and JPG, size is limited to width 450px, height 130px. " +
+								"This should be a base 64 encoding of the full HTML img tag compatible image, with the header included.",
 						},
 						"header": {
 							Type:        schema.TypeString,
 							Optional:    true,
-							Description: "The text to display in the header of the custom page",
+							Description: "The text to display in the header of the custom page.",
 						},
 						"title": {
 							Type:        schema.TypeString,
 							Optional:    true,
-							Description: "The text to display in the title of the custom page",
+							Description: "The text to display in the title of the custom page.",
 						},
 						"text": {
 							Type:        schema.TypeString,
 							Optional:    true,
-							Description: "The text to display in the body of the custom page",
+							Description: "The text to display in the body of the custom page.",
 						},
 						"enabled": {
 							Type:        schema.TypeBool,
 							Required:    true,
-							Description: "Indicates whether the custom custom page is active or inactive",
+							Description: "Indicates whether the custom custom page is active or inactive.",
 						},
 					},
 				},
@@ -112,34 +116,36 @@ func resourceWaapCustomPageSet() *schema.Resource {
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
 						"logo": {
-							Type:        schema.TypeString,
-							Optional:    true,
-							Description: "A base64 encoded image of the logo to present",
+							Type:     schema.TypeString,
+							Optional: true,
+							Description: "A base64 encoded image of the logo to present. " +
+								"Supported image types are JPEG, PNG and JPG, size is limited to width 450px, height 130px. " +
+								"This should be a base 64 encoding of the full HTML img tag compatible image, with the header included.",
 						},
 						"header": {
 							Type:        schema.TypeString,
 							Optional:    true,
-							Description: "The text to display in the header of the custom page",
+							Description: "The text to display in the header of the custom page.",
 						},
 						"title": {
 							Type:        schema.TypeString,
 							Optional:    true,
-							Description: "The text to display in the title of the custom page",
+							Description: "The text to display in the title of the custom page.",
 						},
 						"text": {
 							Type:        schema.TypeString,
 							Optional:    true,
-							Description: "The text to display in the body of the custom page",
+							Description: "The text to display in the body of the custom page.",
 						},
 						"error": {
 							Type:        schema.TypeString,
 							Optional:    true,
-							Description: "Error message",
+							Description: "Error message.",
 						},
 						"enabled": {
 							Type:        schema.TypeBool,
 							Required:    true,
-							Description: "Indicates whether the custom custom page is active or inactive",
+							Description: "Indicates whether the custom custom page is active or inactive.",
 						},
 					},
 				},
@@ -153,17 +159,17 @@ func resourceWaapCustomPageSet() *schema.Resource {
 						"header": {
 							Type:        schema.TypeString,
 							Optional:    true,
-							Description: "The text to display in the header of the custom page",
+							Description: "The text to display in the header of the custom page.",
 						},
 						"text": {
 							Type:        schema.TypeString,
 							Optional:    true,
-							Description: "The text to display in the body of the custom page",
+							Description: "The text to display in the body of the custom page.",
 						},
 						"enabled": {
 							Type:        schema.TypeBool,
 							Required:    true,
-							Description: "Indicates whether the custom custom page is active or inactive",
+							Description: "Indicates whether the custom custom page is active or inactive.",
 						},
 					},
 				},
@@ -175,24 +181,26 @@ func resourceWaapCustomPageSet() *schema.Resource {
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
 						"logo": {
-							Type:        schema.TypeString,
-							Optional:    true,
-							Description: "A base64 encoded image of the logo to present",
+							Type:     schema.TypeString,
+							Optional: true,
+							Description: "A base64 encoded image of the logo to present. " +
+								"Supported image types are JPEG, PNG and JPG, size is limited to width 450px, height 130px. " +
+								"This should be a base 64 encoding of the full HTML img tag compatible image, with the header included.",
 						},
 						"header": {
 							Type:        schema.TypeString,
 							Optional:    true,
-							Description: "The text to display in the header of the custom page",
+							Description: "The text to display in the header of the custom page.",
 						},
 						"title": {
 							Type:        schema.TypeString,
 							Optional:    true,
-							Description: "The text to display in the title of the custom page",
+							Description: "The text to display in the title of the custom page.",
 						},
 						"enabled": {
 							Type:        schema.TypeBool,
 							Required:    true,
-							Description: "Indicates whether the custom custom page is active or inactive",
+							Description: "Indicates whether the custom custom page is active or inactive.",
 						},
 					},
 				},
@@ -206,17 +214,17 @@ func resourceWaapCustomPageSet() *schema.Resource {
 						"header": {
 							Type:        schema.TypeString,
 							Optional:    true,
-							Description: "The text to display in the header of the custom page",
+							Description: "The text to display in the header of the custom page.",
 						},
 						"text": {
 							Type:        schema.TypeString,
 							Optional:    true,
-							Description: "The text to display in the body of the custom page",
+							Description: "The text to display in the body of the custom page.",
 						},
 						"enabled": {
 							Type:        schema.TypeBool,
 							Required:    true,
-							Description: "Indicates whether the custom custom page is active or inactive",
+							Description: "Indicates whether the custom custom page is active or inactive.",
 						},
 					},
 				},
