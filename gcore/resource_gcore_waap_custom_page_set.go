@@ -511,16 +511,16 @@ func prepareWaapCustomPageSetPayload(d *schema.ResourceData) (
 		blockConfig := blockConfigs.([]interface{})[0].(map[string]interface{})
 		blockData := waap.BlockPageData{}
 
-		if v, ok := blockConfig["logo"].(string); ok && v != "" {
+		if v, ok := blockConfig["logo"].(string); ok {
 			blockData.Logo = &v
 		}
-		if v, ok := blockConfig["header"].(string); ok && v != "" {
+		if v, ok := blockConfig["header"].(string); ok {
 			blockData.Header = &v
 		}
-		if v, ok := blockConfig["title"].(string); ok && v != "" {
+		if v, ok := blockConfig["title"].(string); ok {
 			blockData.Title = &v
 		}
-		if v, ok := blockConfig["text"].(string); ok && v != "" {
+		if v, ok := blockConfig["text"].(string); ok {
 			blockData.Text = &v
 		}
 		if v, ok := blockConfig["enabled"].(bool); ok {
@@ -535,16 +535,16 @@ func prepareWaapCustomPageSetPayload(d *schema.ResourceData) (
 		blockCsrfConfig := blockCsrfConfigs.([]interface{})[0].(map[string]interface{})
 		blockCsrfData := waap.BlockCsrfPageData{}
 
-		if v, ok := blockCsrfConfig["logo"].(string); ok && v != "" {
+		if v, ok := blockCsrfConfig["logo"].(string); ok {
 			blockCsrfData.Logo = &v
 		}
-		if v, ok := blockCsrfConfig["header"].(string); ok && v != "" {
+		if v, ok := blockCsrfConfig["header"].(string); ok {
 			blockCsrfData.Header = &v
 		}
-		if v, ok := blockCsrfConfig["title"].(string); ok && v != "" {
+		if v, ok := blockCsrfConfig["title"].(string); ok {
 			blockCsrfData.Title = &v
 		}
-		if v, ok := blockCsrfConfig["text"].(string); ok && v != "" {
+		if v, ok := blockCsrfConfig["text"].(string); ok {
 			blockCsrfData.Text = &v
 		}
 		if v, ok := blockCsrfConfig["enabled"].(bool); ok {
@@ -559,19 +559,19 @@ func prepareWaapCustomPageSetPayload(d *schema.ResourceData) (
 		captchaConfig := captchaConfigs.([]interface{})[0].(map[string]interface{})
 		captchaData := waap.CaptchaPageData{}
 
-		if v, ok := captchaConfig["logo"].(string); ok && v != "" {
+		if v, ok := captchaConfig["logo"].(string); ok {
 			captchaData.Logo = &v
 		}
-		if v, ok := captchaConfig["header"].(string); ok && v != "" {
+		if v, ok := captchaConfig["header"].(string); ok {
 			captchaData.Header = &v
 		}
-		if v, ok := captchaConfig["title"].(string); ok && v != "" {
+		if v, ok := captchaConfig["title"].(string); ok {
 			captchaData.Title = &v
 		}
-		if v, ok := captchaConfig["text"].(string); ok && v != "" {
+		if v, ok := captchaConfig["text"].(string); ok {
 			captchaData.Text = &v
 		}
-		if v, ok := captchaConfig["error"].(string); ok && v != "" {
+		if v, ok := captchaConfig["error"].(string); ok {
 			captchaData.Error = &v
 		}
 		if v, ok := captchaConfig["enabled"].(bool); ok {
@@ -586,10 +586,10 @@ func prepareWaapCustomPageSetPayload(d *schema.ResourceData) (
 		cookieDisabledConfig := cookieDisabledConfigs.([]interface{})[0].(map[string]interface{})
 		cookieDisabledData := waap.CookieDisabledPageData{}
 
-		if v, ok := cookieDisabledConfig["header"].(string); ok && v != "" {
+		if v, ok := cookieDisabledConfig["header"].(string); ok {
 			cookieDisabledData.Header = &v
 		}
-		if v, ok := cookieDisabledConfig["text"].(string); ok && v != "" {
+		if v, ok := cookieDisabledConfig["text"].(string); ok {
 			cookieDisabledData.Text = &v
 		}
 		if v, ok := cookieDisabledConfig["enabled"].(bool); ok {
@@ -604,13 +604,13 @@ func prepareWaapCustomPageSetPayload(d *schema.ResourceData) (
 		handshakeConfig := handshakeConfigs.([]interface{})[0].(map[string]interface{})
 		handshakeData := waap.HandshakePageData{}
 
-		if v, ok := handshakeConfig["logo"].(string); ok && v != "" {
+		if v, ok := handshakeConfig["logo"].(string); ok {
 			handshakeData.Logo = &v
 		}
-		if v, ok := handshakeConfig["header"].(string); ok && v != "" {
+		if v, ok := handshakeConfig["header"].(string); ok {
 			handshakeData.Header = &v
 		}
-		if v, ok := handshakeConfig["title"].(string); ok && v != "" {
+		if v, ok := handshakeConfig["title"].(string); ok {
 			handshakeData.Title = &v
 		}
 		if v, ok := handshakeConfig["enabled"].(bool); ok {
@@ -625,10 +625,10 @@ func prepareWaapCustomPageSetPayload(d *schema.ResourceData) (
 		jsDisabledConfig := jsDisabledConfigs.([]interface{})[0].(map[string]interface{})
 		jsDisabledData := waap.JavascriptDisabledPageData{}
 
-		if v, ok := jsDisabledConfig["header"].(string); ok && v != "" {
+		if v, ok := jsDisabledConfig["header"].(string); ok {
 			jsDisabledData.Header = &v
 		}
-		if v, ok := jsDisabledConfig["text"].(string); ok && v != "" {
+		if v, ok := jsDisabledConfig["text"].(string); ok {
 			jsDisabledData.Text = &v
 		}
 		if v, ok := jsDisabledConfig["enabled"].(bool); ok {
