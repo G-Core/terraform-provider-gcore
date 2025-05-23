@@ -236,8 +236,7 @@ func resourceWaapCustomPageSet() *schema.Resource {
 func resourceWaapCustomPageSetCreate(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	client := m.(*Config).WaapClient
 
-	name, domains, block, blockCsrf, captcha, cookieDisabled, handshake, javascriptDisabled :=
-		prepareWaapCustomPageSetPayload(d)
+	name, domains, block, blockCsrf, captcha, cookieDisabled, handshake, javascriptDisabled := prepareWaapCustomPageSetPayload(d)
 
 	createReq := waap.CreateCustomPageSetV1CustomPageSetsPostJSONRequestBody{
 		Name:               name,
@@ -298,11 +297,10 @@ func resourceWaapCustomPageSetRead(ctx context.Context, d *schema.ResourceData, 
 
 	d.Set("name", resp.JSON200.Name)
 
-	domains := []interface{}{}
 	if resp.JSON200.Domains != nil {
 		d.Set("domains", resp.JSON200.Domains)
 	} else {
-		d.Set("domains", domains)
+		d.Set("domains", []interface{}{})
 	}
 
 	if resp.JSON200.Block != nil {
@@ -427,6 +425,7 @@ func resourceWaapCustomPageSetRead(ctx context.Context, d *schema.ResourceData, 
 
 	return nil
 }
+
 func resourceWaapCustomPageSetUpdate(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	client := m.(*Config).WaapClient
 
@@ -435,10 +434,9 @@ func resourceWaapCustomPageSetUpdate(ctx context.Context, d *schema.ResourceData
 		return diag.Errorf("failed to convert custom page set ID: %s", err)
 	}
 
-	name, domains, block, blockCsrf, captcha, cookieDisabled, handshake, javascriptDisabled :=
-		prepareWaapCustomPageSetPayload(d)
+	name, domains, block, blockCsrf, captcha, cookieDisabled, handshake, javascriptDisabled := prepareWaapCustomPageSetPayload(d)
 
-	updateReq := waap.UpdateCustomPageSetV1CustomPageSetsSetIdPatchJSONRequestBody{
+	updateReq := waap.CustomPageSetUpdate{
 		Name:               &name,
 		Domains:            domains,
 		Block:              block,
@@ -468,6 +466,7 @@ func resourceWaapCustomPageSetUpdate(ctx context.Context, d *schema.ResourceData
 
 func resourceWaapCustomPageSetDelete(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	client := m.(*Config).WaapClient
+
 	setID, err := strconv.Atoi(d.Id())
 	if err != nil {
 		return diag.Errorf("failed to convert custom page set ID: %s", err)
