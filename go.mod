@@ -9,7 +9,7 @@ require (
 	github.com/G-Core/FastEdge-client-sdk-go v0.3.6
 	github.com/G-Core/gcore-dns-sdk-go v0.2.9
 	github.com/G-Core/gcore-storage-sdk-go v0.1.34
-	github.com/G-Core/gcore-waap-sdk-go v0.2.0
+	github.com/G-Core/gcore-waap-sdk-go v0.3.0
 	github.com/G-Core/gcorelabscdn-go v1.0.31
 	github.com/G-Core/gcorelabscloud-go v0.16.0
 	github.com/google/go-cmp v0.6.0

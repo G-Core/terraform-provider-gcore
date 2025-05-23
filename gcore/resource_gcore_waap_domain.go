@@ -428,7 +428,7 @@ func updateDomainSettings(ctx context.Context, waapClient *waap.ClientWithRespon
 				urls[i] = url.(string)
 			}
 
-			updateReq.Api = &waap.AppModelsDomainSettingsUpdateApiUrls{
+			updateReq.Api = &waap.UpdateApiSettings{
 				ApiUrls: &urls,
 			}
 		}
