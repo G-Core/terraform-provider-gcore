@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"log"
+	"reflect"
 	"strconv"
 
 	"github.com/G-Core/gcorelabscdn-go/logsuploader"
@@ -292,7 +293,7 @@ func schemaForHTTP() *schema.Schema {
 				},
 				"auth": {
 					Type:     schema.TypeList,
-					Required: true,
+					Optional: true,
 					MinItems: 1,
 					MaxItems: 1,
 					Elem: &schema.Resource{
@@ -417,13 +418,41 @@ func resourceCDNLogsUploaderTargetCreate(ctx context.Context, d *schema.Resource
 	for key, value := range configAttr {
 		value := value.([]interface{})
 		if len(value) != 0 {
+			configDict := value[0].(map[string]interface{})
 			req.StorageType = logsuploader.StorageType(key)
-			req.Config = sanitizeConfig(value[0].(map[string]interface{}))
+			if key == "http" {
+				log.Printf("[DEBUG] HTTP config: %v\n", value)
+				// Convert each list under "http" to a dict (take first element if list is not empty)
+				for nestedKey, nestedValue := range configDict {
+					// log.Printf("[DEBUG] HTTP config nested key: %s, value: %v\n", nestedKey, nestedValue)
+					// log.Printf("[DEBUG] HTTP config nested value type: %s\n", reflect.TypeOf(nestedValue).Kind())
+					// if reflect.TypeOf(nestedValue).Kind() == reflect.Slice {
+					// 	extractedValue := nestedValue.([]interface{})
+					// 	if len(extractedValue) > 0 {
+					// 		configDict[nestedKey] = extractedValue[0]
+					// 	} else {
+					// 		configDict[nestedKey] = nil
+					// 	}
+					// }
+					configDict[nestedKey] = listToDict(nestedValue)
+					// if nestedKey == "auth" {
+					// 	authConfig := configDict[nestedKey].(map[string]interface{})
+					// 	for authNestedKey, authNestedValue := range authConfig {
+					// 		authConfig[authNestedKey] = listToDict(authNestedValue)
+					// 	}
+					// 	configDict[nestedKey] = authConfig
+					// }
+				}
+				// value[0] = configDict
+				log.Printf("[DEBUG] HTTP config after conversion: %v\n", value)
+			}
+			req.Config = sanitizeConfig(configDict)
 			break
 		}
 	}
 
 	result, err := client.LogsUploader().TargetCreate(ctx, &req)
+	log.Printf("[DEBUG] CDN Logs Uploader Target creating error: %v\n", err)
 	if err != nil {
 		return diag.FromErr(err)
 	}
@@ -457,16 +486,31 @@ func resourceCDNLogsUploaderTargetRead(ctx context.Context, d *schema.ResourceDa
 	storageTypes := []string{"s3_gcore", "s3_amazon", "s3_oss", "s3_other", "s3_v1", "ftp", "sftp", "http"}
 	for _, storageType := range storageTypes {
 		if storageType == string(result.StorageType) {
+			if storageType == "http" {
+				// Convert each dict under "http" to a list (take first element if list is not empty)
+				for nestedKey, nestedValue := range mergedConfig {
+					// if nestedKey == "auth" {
+					// 	authConfig := nestedValue.(map[string]interface{})
+					// 	for authNestedKey, authNestedValue := range authConfig {
+					// 		authConfig[authNestedKey] = dictToList(authNestedValue)
+					// 	}
+					// }
+					mergedConfig[nestedKey] = dictToList(nestedValue)
+				}
+			}
 			configData[storageType] = []interface{}{mergedConfig}
 		} else {
 			configData[storageType] = []interface{}{}
 		}
 	}
-	configList := make([]interface{}, 1)
-	configList[0] = configData
-	d.Set("config", configList)
+	d.Set("config", []interface{}{configData})
+	// configList := make([]interface{}, 1)
+	// configList[0] = configData
+	// d.Set("config", dictToList(configData))
 
 	log.Println("[DEBUG] Finish CDN Logs Uploader Target reading")
+	log.Printf("[DEBUG] CDN Logs Uploader Target read result: %v\n", configData)
+	log.Printf("[DEBUG] CDN Logs Uploader Target merged config: %v\n", mergedConfig)
 	return nil
 }
 
@@ -558,3 +602,44 @@ func mergeStateConfig(result *logsuploader.Target, d *schema.ResourceData) map[s
 	}
 	return cleanedConfig
 }
+
+func listToDict(nestedValue interface{}) interface{} {
+	if reflect.TypeOf(nestedValue).Kind() == reflect.Slice {
+		extractedValue := nestedValue.([]interface{})
+		if len(extractedValue) > 0 {
+			return listToDict(extractedValue[0])
+		} else {
+			return nil
+		}
+	}
+	return nestedValue
+}
+
+func dictToList(value interface{}) interface{} {
+	log.Printf("[DEBUG] dictToList value: %v\n", value)
+	// log.Printf("[DEBUG] dictToList value type: %s\n", reflect.TypeOf(value).Kind())
+	if value != nil && reflect.TypeOf(value).Kind() == reflect.Map {
+		configList := make([]interface{}, 1)
+		configList[0] = value
+		return configList
+		// valueList := []interface{}{value}
+		// return []interface{}{value}
+	}
+	return value
+}
+
+// func listToDict(configDict map[string]interface{}) map[string]interface{}  {
+// 	for nestedKey, nestedValue := range configDict {
+// 		log.Printf("[DEBUG] HTTP config nested key: %s, value: %v\n", nestedKey, nestedValue)
+// 		log.Printf("[DEBUG] HTTP config nested value type: %s\n", reflect.TypeOf(nestedValue).Kind())
+// 		if reflect.TypeOf(nestedValue).Kind() == reflect.Slice {
+// 			extractedValue := nestedValue.([]interface{})
+// 			if len(extractedValue) > 0 {
+// 				configDict[nestedKey] = extractedValue[0]
+// 			} else {
+// 				configDict[nestedKey] = nil
+// 			}
+// 		}
+// 	}
+// 	return configDict
+// }
