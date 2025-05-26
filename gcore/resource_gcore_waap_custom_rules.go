@@ -124,7 +124,7 @@ func resourceWaapCustomRules() *schema.Resource {
 							Elem: &schema.Resource{
 								Schema: map[string]*schema.Schema{
 									"negation":   {Type: schema.TypeBool, Optional: true, Default: false, Description: "Whether or not to apply a boolean NOT operation to the rule's condition"},
-									"url_agent":        {Type: schema.TypeString, Required: true, Description: "The user agent value to match"},
+									"url_agent":  {Type: schema.TypeString, Required: true, Description: "The user agent value to match"},
 									"match_type": {Type: schema.TypeString, Required: true, Description: "The type of matching condition", ValidateFunc: validation.StringInSlice([]string{"Exact", "Contains"}, false)},
 								},
 							},
