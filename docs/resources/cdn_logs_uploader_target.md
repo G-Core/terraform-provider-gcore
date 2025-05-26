@@ -100,7 +100,7 @@ Required:
 Optional:
 
 - `append` (Block List, Max: 1) (see [below for nested schema](#nestedblock--config--http--append))
-- `payload_type` (String) Default value is text.
+- `content_type` (String) Default value is text.
 - `retry` (Block List, Max: 1) (see [below for nested schema](#nestedblock--config--http--retry))
 
 <a id="nestedblock--config--http--auth"></a>

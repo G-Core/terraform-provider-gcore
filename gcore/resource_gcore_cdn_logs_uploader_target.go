@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"log"
+	"reflect"
 	"strconv"
 
 	"github.com/G-Core/gcorelabscdn-go/logsuploader"
@@ -292,7 +293,7 @@ func schemaForHTTP() *schema.Schema {
 				},
 				"auth": {
 					Type:     schema.TypeList,
-					Required: true,
+					Optional: true,
 					MinItems: 1,
 					MaxItems: 1,
 					Elem: &schema.Resource{
@@ -323,7 +324,7 @@ func schemaForHTTP() *schema.Schema {
 						},
 					},
 				},
-				"payload_type": {
+				"content_type": {
 					Type:        schema.TypeString,
 					Optional:    true,
 					Description: "Default value is text.",
@@ -417,8 +418,12 @@ func resourceCDNLogsUploaderTargetCreate(ctx context.Context, d *schema.Resource
 	for key, value := range configAttr {
 		value := value.([]interface{})
 		if len(value) != 0 {
+			configDict := value[0].(map[string]interface{})
+			if key == "http" {
+				configDict = convertHttpConfigToDict(configDict)
+			}
+			req.Config = sanitizeConfig(configDict)
 			req.StorageType = logsuploader.StorageType(key)
-			req.Config = sanitizeConfig(value[0].(map[string]interface{}))
 			break
 		}
 	}
@@ -459,14 +464,24 @@ func resourceCDNLogsUploaderTargetRead(ctx context.Context, d *schema.ResourceDa
 	storageTypes := []string{"s3_gcore", "s3_amazon", "s3_oss", "s3_other", "s3_v1", "ftp", "sftp", "http"}
 	for _, storageType := range storageTypes {
 		if storageType == string(result.StorageType) {
+			if storageType == "http" {
+				// Convert each dict under "http" to a list (as provider sdk doesn't support dicts)
+				for nestedKey, nestedValue := range mergedConfig {
+					if nestedKey == "auth" {
+						authConfig := nestedValue.(map[string]interface{})
+						for authNestedKey, authNestedValue := range authConfig {
+							authConfig[authNestedKey] = dictToList(authNestedValue)
+						}
+					}
+					mergedConfig[nestedKey] = dictToList(nestedValue)
+				}
+			}
 			configData[storageType] = []interface{}{mergedConfig}
 		} else {
 			configData[storageType] = []interface{}{}
 		}
 	}
-	configList := make([]interface{}, 1)
-	configList[0] = configData
-	d.Set("config", configList)
+	d.Set("config", []interface{}{configData})
 
 	log.Println("[DEBUG] Finish CDN Logs Uploader Target reading")
 	return nil
@@ -492,8 +507,12 @@ func resourceCDNLogsUploaderTargetUpdate(ctx context.Context, d *schema.Resource
 	for key, value := range configAttr {
 		value := value.([]interface{})
 		if len(value) != 0 {
+			configDict := value[0].(map[string]interface{})
+			if key == "http" {
+				configDict = convertHttpConfigToDict(configDict)
+			}
+			req.Config = sanitizeConfig(configDict)
 			req.StorageType = logsuploader.StorageType(key)
-			req.Config = sanitizeConfig(value[0].(map[string]interface{}))
 			break
 		}
 	}
@@ -549,14 +568,55 @@ func mergeStateConfig(result *logsuploader.Target, d *schema.ResourceData) map[s
 	cleanedConfig := make(map[string]interface{})
 	if configList, ok := d.Get("config").([]interface{}); ok && len(configList) > 0 {
 		if configMap, ok := configList[0].(map[string]interface{}); ok {
-			stateConfig := configMap[string(result.StorageType)].([]interface{})[0].(map[string]interface{})
-			for k, v := range stateConfig {
-				cleanedConfig[k] = v
+			stateConfigList := configMap[string(result.StorageType)].([]interface{})
+			if len(stateConfigList) > 0 {
+				stateConfig := stateConfigList[0].(map[string]interface{})
+				for k, v := range stateConfig {
+					cleanedConfig[k] = v
+				}
 			}
 		}
 	}
 	for k, v := range result.Config {
-		cleanedConfig[k] = v
+		// Sensitive values like passwords are returned as "*****" from the API. We want to use values from
+		// the state instead to avoid unnecessary diffs.
+		if v != "*****" {
+			cleanedConfig[k] = v
+		}
 	}
 	return cleanedConfig
+}
+
+func listToDict(nestedValue interface{}) interface{} {
+	if reflect.TypeOf(nestedValue).Kind() == reflect.Slice {
+		extractedValue := nestedValue.([]interface{})
+		if len(extractedValue) > 0 {
+			return listToDict(extractedValue[0])
+		} else {
+			return nil
+		}
+	}
+	return nestedValue
+}
+
+func dictToList(value interface{}) interface{} {
+	if value != nil && reflect.TypeOf(value).Kind() == reflect.Map {
+		return []interface{}{value}
+	}
+	return value
+}
+
+func convertHttpConfigToDict(configDict map[string]interface{}) map[string]interface{} {
+	// Convert each list under "http" to a dict (as provider sdk uses lists, but API expects dict structure).
+	for nestedKey, nestedValue := range configDict {
+		configDict[nestedKey] = listToDict(nestedValue)
+		if nestedKey == "auth" {
+			authConfig := configDict[nestedKey].(map[string]interface{})
+			for authNestedKey, authNestedValue := range authConfig {
+				authConfig[authNestedKey] = listToDict(authNestedValue)
+			}
+			configDict[nestedKey] = authConfig
+		}
+	}
+	return configDict
 }
