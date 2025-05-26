@@ -48,34 +48,34 @@ func resourceWaapFirewallRule() *schema.Resource {
 				Type:        schema.TypeInt,
 				Required:    true,
 				ForceNew:    true,
-				Description: "The ID of the domain",
+				Description: "The WAAP domain ID for which the Firewall Rule is configured.",
 			},
 			"name": {
 				Type:        schema.TypeString,
 				Required:    true,
-				Description: "Name of the firewall rule",
+				Description: "Name of the firewall rule.",
 			},
 			"description": {
 				Type:        schema.TypeString,
 				Optional:    true,
-				Description: "Description of the firewall rule",
+				Description: "Description of the firewall rule.",
 			},
 			"enabled": {
 				Type:        schema.TypeBool,
 				Required:    true,
-				Description: "Whether the rule is enabled",
+				Description: "Whether the rule is enabled.",
 			},
 			"action": {
 				Type:        schema.TypeList,
 				Required:    true,
 				MaxItems:    1,
-				Description: "The action that the rule takes when triggered",
+				Description: "The action that the rule takes when triggered.",
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
 						"allow": {
 							Type:        schema.TypeBool,
 							Optional:    true,
-							Description: "The WAAP allows the request",
+							Description: "The WAAP allows the request.",
 							ExactlyOneOf: []string{
 								"action.0.allow",
 								"action.0.block",
@@ -85,7 +85,7 @@ func resourceWaapFirewallRule() *schema.Resource {
 							Type:        schema.TypeList,
 							Optional:    true,
 							MaxItems:    1,
-							Description: "The WAAP blocks the request",
+							Description: "The WAAP blocks the request.",
 							ExactlyOneOf: []string{
 								"action.0.allow",
 								"action.0.block",
@@ -95,7 +95,7 @@ func resourceWaapFirewallRule() *schema.Resource {
 									"status_code": {
 										Type:        schema.TypeInt,
 										Optional:    true,
-										Description: "A custom HTTP status code that the WAAP returns if a rule blocks a request",
+										Description: "A custom HTTP status code that the WAAP returns if a rule blocks a request.",
 									},
 									"action_duration": {
 										Type:     schema.TypeString,
@@ -118,14 +118,14 @@ func resourceWaapFirewallRule() *schema.Resource {
 				Type:        schema.TypeList,
 				Required:    true,
 				MaxItems:    1,
-				Description: "The condition required for the WAAP engine to trigger the rule",
+				Description: "The condition required for the WAAP engine to trigger the rule.",
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
 						"ip": {
 							Type:        schema.TypeList,
 							Optional:    true,
 							MaxItems:    1,
-							Description: "IP address condition",
+							Description: "IP address condition. This condition matches a single IP address.",
 							ExactlyOneOf: []string{
 								"conditions.0.ip",
 								"conditions.0.ip_range",
@@ -136,12 +136,12 @@ func resourceWaapFirewallRule() *schema.Resource {
 										Type:        schema.TypeBool,
 										Optional:    true,
 										Default:     false,
-										Description: "Whether or not to apply a boolean NOT operation to the rule's condition",
+										Description: "Whether or not to apply a boolean NOT operation to the rule's condition.",
 									},
 									"ip_address": {
 										Type:        schema.TypeString,
 										Required:    true,
-										Description: "A single IPv4 or IPv6 address to match",
+										Description: "A single IPv4 or IPv6 address to match.",
 									},
 								},
 							},
@@ -150,7 +150,7 @@ func resourceWaapFirewallRule() *schema.Resource {
 							Type:        schema.TypeList,
 							Optional:    true,
 							MaxItems:    1,
-							Description: "IP range condition",
+							Description: "IP range condition. This condition matches a range of IP addresses.",
 							ExactlyOneOf: []string{
 								"conditions.0.ip",
 								"conditions.0.ip_range",
@@ -161,17 +161,17 @@ func resourceWaapFirewallRule() *schema.Resource {
 										Type:        schema.TypeBool,
 										Optional:    true,
 										Default:     false,
-										Description: "Whether or not to apply a boolean NOT operation to the rule's condition",
+										Description: "Whether or not to apply a boolean NOT operation to the rule's condition.",
 									},
 									"lower_bound": {
 										Type:        schema.TypeString,
 										Required:    true,
-										Description: "The lower bound IPv4 or IPv6 address to match against",
+										Description: "The lower bound IPv4 or IPv6 address to match against.",
 									},
 									"upper_bound": {
 										Type:        schema.TypeString,
 										Required:    true,
-										Description: "The upper bound IPv4 or IPv6 address to match against",
+										Description: "The upper bound IPv4 or IPv6 address to match against.",
 									},
 								},
 							},

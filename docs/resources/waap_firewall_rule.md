@@ -57,15 +57,15 @@ resource "gcore_waap_firewall_rule" "firewall_rule" {
 
 ### Required
 
-- `action` (Block List, Min: 1, Max: 1) Action to take when the rule conditions are met (see [below for nested schema](#nestedblock--action))
-- `conditions` (Block List, Min: 1, Max: 1) Conditions that trigger the rule (see [below for nested schema](#nestedblock--conditions))
-- `domain_id` (Number) The ID of the domain
-- `enabled` (Boolean) Whether the rule is enabled
-- `name` (String) Name of the firewall rule
+- `action` (Block List, Min: 1, Max: 1) The action that the rule takes when triggered. (see [below for nested schema](#nestedblock--action))
+- `conditions` (Block List, Min: 1, Max: 1) The condition required for the WAAP engine to trigger the rule. (see [below for nested schema](#nestedblock--conditions))
+- `domain_id` (Number) The WAAP domain ID for which the Firewall Rule is configured.
+- `enabled` (Boolean) Whether the rule is enabled.
+- `name` (String) Name of the firewall rule.
 
 ### Optional
 
-- `description` (String) Description of the firewall rule
+- `description` (String) Description of the firewall rule.
 
 ### Read-Only
 
@@ -76,28 +76,16 @@ resource "gcore_waap_firewall_rule" "firewall_rule" {
 
 Optional:
 
-- `allow` (Boolean) Allow the request
-- `block` (Block List, Max: 1) Block the request (see [below for nested schema](#nestedblock--action--block))
-- `captcha` (Boolean) Show captcha challenge
-- `handshake` (Boolean) Perform handshake verification
-- `monitor` (Boolean) Monitor the request without blocking
-- `tag` (Block List, Max: 1) Add tags to the request (see [below for nested schema](#nestedblock--action--tag))
+- `allow` (Boolean) The WAAP allows the request.
+- `block` (Block List, Max: 1) The WAAP blocks the request. (see [below for nested schema](#nestedblock--action--block))
 
 <a id="nestedblock--action--block"></a>
 ### Nested Schema for `action.block`
 
 Optional:
 
-- `action_duration` (String) Duration for which the block is effective (e.g. 12h)
-- `status_code` (Number) HTTP status code to return for blocked requests
-
-
-<a id="nestedblock--action--tag"></a>
-### Nested Schema for `action.tag`
-
-Required:
-
-- `tags` (List of String) List of tags to apply
+- `action_duration` (String) How long a rule's block action will apply to subsequent requests. Can be specified in seconds or by using a numeral followed by 's', 'm', 'h', or 'd' to represent time format (seconds, minutes, hours, or days). Example: 12h. Must match the pattern ^[0-9]*[smhd]?$
+- `status_code` (Number) A custom HTTP status code that the WAAP returns if a rule blocks a request.
 
 
 
@@ -106,19 +94,19 @@ Required:
 
 Optional:
 
-- `ip` (Block List, Max: 1) IP address condition (see [below for nested schema](#nestedblock--conditions--ip))
-- `ip_range` (Block List, Max: 1) IP range condition (see [below for nested schema](#nestedblock--conditions--ip_range))
+- `ip` (Block List, Max: 1) IP address condition. This condition matches a single IP address. (see [below for nested schema](#nestedblock--conditions--ip))
+- `ip_range` (Block List, Max: 1) IP range condition. This condition matches a range of IP addresses. (see [below for nested schema](#nestedblock--conditions--ip_range))
 
 <a id="nestedblock--conditions--ip"></a>
 ### Nested Schema for `conditions.ip`
 
 Required:
 
-- `ip_address` (String) IP address to match
+- `ip_address` (String) A single IPv4 or IPv6 address to match.
 
 Optional:
 
-- `negation` (Boolean) Whether to negate the condition
+- `negation` (Boolean) Whether or not to apply a boolean NOT operation to the rule's condition.
 
 
 <a id="nestedblock--conditions--ip_range"></a>
@@ -126,12 +114,12 @@ Optional:
 
 Required:
 
-- `lower_bound` (String) Lower bound IP address of the range
-- `upper_bound` (String) Upper bound IP address of the range
+- `lower_bound` (String) The lower bound IPv4 or IPv6 address to match against.
+- `upper_bound` (String) The upper bound IPv4 or IPv6 address to match against.
 
 Optional:
 
-- `negation` (Boolean) Whether to negate the condition
+- `negation` (Boolean) Whether or not to apply a boolean NOT operation to the rule's condition.
 
 ## Import
 
