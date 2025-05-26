@@ -99,10 +99,11 @@ func resourceWaapAdvancedRule() *schema.Resource {
 							Elem: &schema.Resource{
 								Schema: map[string]*schema.Schema{
 									"status_code": {
-										Type:         schema.TypeInt,
-										Optional:     true,
-										Default:      403,
-										Description:  "A custom HTTP status code that the WAAP returns if a rule blocks a request. Default is 403.",
+										Type:     schema.TypeInt,
+										Optional: true,
+										Default:  403,
+										Description: "A custom HTTP status code that the WAAP returns if a rule blocks a request. " +
+											"It must be one of these values {403, 405, 418, 429}. Default is 403.",
 										ValidateFunc: validation.IntInSlice([]int{403, 405, 418, 429}),
 									},
 									"action_duration": {
