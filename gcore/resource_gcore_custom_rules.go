@@ -1045,13 +1045,15 @@ func resourceCustomRulesRead(ctx context.Context, d *schema.ResourceData, m inte
 				}
 			}
 
-			if len(condition.Tags.Tags) > 0 {
-				tagMaps := map[string]interface{}{}
-				tagMaps["tags"] = condition.Tags.Tags
-				tagMaps["negation"] = condition.Tags.Negation
-				conditionMap["tags"] = []interface{}{tagMaps}
-			} else {
-				conditionMap["tags"] = []interface{}{}
+			if condition.Tags != nil {
+				if len(condition.Tags.Tags) > 0 {
+					tagMaps := map[string]interface{}{}
+					tagMaps["tags"] = condition.Tags.Tags
+					tagMaps["negation"] = condition.Tags.Negation
+					conditionMap["tags"] = []interface{}{tagMaps}
+				} else {
+					conditionMap["tags"] = []interface{}{}
+				}
 			}
 
 			if condition.SessionRequestCount != nil {
@@ -1063,13 +1065,15 @@ func resourceCustomRulesRead(ctx context.Context, d *schema.ResourceData, m inte
 				conditionMap["session_request_count"] = []interface{}{}
 			}
 
-			if len(condition.UserDefinedTags.Tags) > 0 {
-				tagMaps := map[string]interface{}{}
-				tagMaps["tags"] = condition.Tags.Tags
-				tagMaps["negation"] = condition.Tags.Negation
-				conditionMap["user_defined_tags"] = []interface{}{tagMaps}
-			} else {
-				conditionMap["user_defined_tags"] = []interface{}{}
+			if condition.UserDefinedTags != nil {
+				if len(condition.UserDefinedTags.Tags) > 0 {
+					tagMaps := map[string]interface{}{}
+					tagMaps["tags"] = condition.Tags.Tags
+					tagMaps["negation"] = condition.Tags.Negation
+					conditionMap["user_defined_tags"] = []interface{}{tagMaps}
+				} else {
+					conditionMap["user_defined_tags"] = []interface{}{}
+				}
 			}
 
 			conditionsList = append(conditionsList, conditionMap)
