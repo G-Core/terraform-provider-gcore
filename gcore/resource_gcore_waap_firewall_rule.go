@@ -58,6 +58,7 @@ func resourceWaapFirewallRule() *schema.Resource {
 			"description": {
 				Type:        schema.TypeString,
 				Optional:    true,
+				Default:     "",
 				Description: "Description of the firewall rule.",
 			},
 			"enabled": {
@@ -93,9 +94,11 @@ func resourceWaapFirewallRule() *schema.Resource {
 							Elem: &schema.Resource{
 								Schema: map[string]*schema.Schema{
 									"status_code": {
-										Type:        schema.TypeInt,
-										Optional:    true,
-										Description: "A custom HTTP status code that the WAAP returns if a rule blocks a request.",
+										Type:         schema.TypeInt,
+										Optional:     true,
+										Default:      403,
+										Description:  "A custom HTTP status code that the WAAP returns if a rule blocks a request. Default is 403.",
+										ValidateFunc: validation.IntInSlice([]int{403, 405, 418, 429}),
 									},
 									"action_duration": {
 										Type:     schema.TypeString,
@@ -185,30 +188,36 @@ func resourceWaapFirewallRule() *schema.Resource {
 
 func resourceWaapFirewallRuleCreate(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	client := m.(*Config).WaapClient
-	domainID := d.Get("domain_id").(int)
 
-	reqBody := waap.CreateFirewallRuleV1DomainsDomainIdFirewallRulesPostJSONRequestBody{
+	req := waap.FirewallRule{
 		Name:    d.Get("name").(string),
 		Enabled: d.Get("enabled").(bool),
 	}
 
 	if v, ok := d.GetOk("description"); ok {
 		description := v.(string)
-		reqBody.Description = &description
+		req.Description = &description
+	} else {
+		description := ""
+		req.Description = &description
 	}
 
 	if v, ok := d.GetOk("action"); ok {
-		reqBody.Action = parseFirewallActionBlock(v.([]interface{}))
+		req.Action = parseFirewallActionBlock(v.([]interface{}))
 	}
 
 	if v, ok := d.GetOk("conditions"); ok {
-		reqBody.Conditions = parseFirewallConditionBlock(v.([]interface{}))
+		req.Conditions = parseFirewallConditionBlock(v.([]interface{}))
 	}
 
-	resp, err := client.CreateFirewallRuleV1DomainsDomainIdFirewallRulesPostWithResponse(ctx, domainID, reqBody)
-	if err != nil || resp.StatusCode() != http.StatusCreated {
-		return diag.FromErr(fmt.Errorf("error creating WAAP firewall rule with status code: %d, response: %s",
-			resp.StatusCode(), string(resp.Body)))
+	resp, err := client.CreateFirewallRuleV1DomainsDomainIdFirewallRulesPostWithResponse(ctx, d.Get("domain_id").(int), req)
+
+	if err != nil {
+		return diag.Errorf("Failed to create Firewall Rule: %w", err)
+	}
+
+	if resp.StatusCode() != http.StatusCreated {
+		return diag.Errorf("Failed to create Firewall Rule. Status code: %d with error: %s", resp.StatusCode(), resp.Body)
 	}
 
 	d.SetId(strconv.Itoa(resp.JSON201.Id))
@@ -218,19 +227,24 @@ func resourceWaapFirewallRuleCreate(ctx context.Context, d *schema.ResourceData,
 
 func resourceWaapFirewallRuleRead(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	client := m.(*Config).WaapClient
-	domainID := d.Get("domain_id").(int)
-	ruleID, _ := strconv.Atoi(d.Id())
 
-	resp, err := client.GetFirewallRuleV1DomainsDomainIdFirewallRulesRuleIdGetWithResponse(ctx, domainID, ruleID)
+	ruleID, err := strconv.Atoi(d.Id())
+	if err != nil {
+		return diag.FromErr(err)
+	}
+
+	resp, err := client.GetFirewallRuleV1DomainsDomainIdFirewallRulesRuleIdGetWithResponse(ctx, d.Get("domain_id").(int), ruleID)
 	if err != nil {
 		return diag.Errorf("Failed to read Firewall Rule: %w", err)
 	}
+
 	if resp.StatusCode() == http.StatusNotFound {
 		d.SetId("") // Resource not found, remove from state
 		return diag.Diagnostics{
 			{Severity: diag.Warning, Summary: fmt.Sprintf("Firewall Rule (%s) was not found, removed from TF state", ruleID)},
 		}
 	}
+
 	if resp.StatusCode() != http.StatusOK {
 		return diag.Errorf("Failed to read Firewall Rule. Status code: %d with error: %s", resp.StatusCode(), resp.Body)
 	}
@@ -287,40 +301,45 @@ func resourceWaapFirewallRuleRead(ctx context.Context, d *schema.ResourceData, m
 
 func resourceWaapFirewallRuleUpdate(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	client := m.(*Config).WaapClient
-	domainID := d.Get("domain_id").(int)
-	ruleID, _ := strconv.Atoi(d.Id())
+
+	ruleID, err := strconv.Atoi(d.Id())
+	if err != nil {
+		return diag.FromErr(err)
+	}
 
 	name := d.Get("name").(string)
 	enabled := d.Get("enabled").(bool)
 
-	reqBody := waap.UpdateFirewallRuleV1DomainsDomainIdFirewallRulesRuleIdPatchJSONRequestBody{
+	req := waap.UpdateFirewallRule{
 		Name:    &name,
 		Enabled: &enabled,
 	}
 
 	if v, ok := d.GetOk("description"); ok {
 		description := v.(string)
-		reqBody.Description = &description
+		req.Description = &description
+	} else {
+		description := ""
+		req.Description = &description
 	}
 
-	if d.HasChange("action") {
-		if v, ok := d.GetOk("action"); ok {
-			actionStruct := parseFirewallActionBlock(v.([]interface{}))
-			reqBody.Action = &actionStruct
-		}
+	if v, ok := d.GetOk("action"); ok {
+		actionStruct := parseFirewallActionBlock(v.([]interface{}))
+		req.Action = &actionStruct
 	}
 
-	if d.HasChange("conditions") {
-		if v, ok := d.GetOk("conditions"); ok {
-			conditions := parseFirewallConditionBlock(v.([]interface{}))
-			reqBody.Conditions = &conditions
-		}
+	if v, ok := d.GetOk("conditions"); ok {
+		conditions := parseFirewallConditionBlock(v.([]interface{}))
+		req.Conditions = &conditions
 	}
 
-	resp, err := client.UpdateFirewallRuleV1DomainsDomainIdFirewallRulesRuleIdPatchWithResponse(ctx, domainID, ruleID, reqBody)
-	if err != nil || (resp.StatusCode() != http.StatusNoContent) {
-		return diag.FromErr(fmt.Errorf("error updating WAAP firewall rule '%s', status code: %d, Error: %s",
-			name, resp.StatusCode(), string(resp.Body)))
+	resp, err := client.UpdateFirewallRuleV1DomainsDomainIdFirewallRulesRuleIdPatchWithResponse(ctx, d.Get("domain_id").(int), ruleID, req)
+	if err != nil {
+		return diag.Errorf("Failed to update Firewall Rule: %w", err)
+	}
+
+	if resp.StatusCode() != http.StatusNoContent {
+		return diag.Errorf("Failed to update Firewall Rule. Status code: %d with error: %s", resp.StatusCode(), resp.Body)
 	}
 
 	return resourceWaapFirewallRuleRead(ctx, d, m)
@@ -328,16 +347,23 @@ func resourceWaapFirewallRuleUpdate(ctx context.Context, d *schema.ResourceData,
 
 func resourceWaapFirewallRuleDelete(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	client := m.(*Config).WaapClient
-	domainID := d.Get("domain_id").(int)
-	ruleID, _ := strconv.Atoi(d.Id())
 
-	resp, err := client.DeleteFirewallRuleV1DomainsDomainIdFirewallRulesRuleIdDeleteWithResponse(ctx, domainID, ruleID)
-	if err != nil || (resp.StatusCode() != http.StatusNoContent) {
-		return diag.FromErr(fmt.Errorf("error deleting WAAP firewall rule ID '%s', status code: %d, Error: %s",
-			ruleID, resp.StatusCode(), resp.Body))
+	ruleID, err := strconv.Atoi(d.Id())
+	if err != nil {
+		return diag.FromErr(err)
+	}
+
+	resp, err := client.DeleteFirewallRuleV1DomainsDomainIdFirewallRulesRuleIdDeleteWithResponse(ctx, d.Get("domain_id").(int), ruleID)
+	if err != nil {
+		return diag.FromErr(err)
+	}
+
+	if resp.StatusCode() != http.StatusNoContent {
+		return diag.Errorf("Failed to delete Firewall Rule. Status code: %d with error: %s", resp.StatusCode(), resp.Body)
 	}
 
 	d.SetId("")
+
 	return nil
 }
 

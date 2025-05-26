@@ -85,7 +85,7 @@ Optional:
 Optional:
 
 - `action_duration` (String) How long a rule's block action will apply to subsequent requests. Can be specified in seconds or by using a numeral followed by 's', 'm', 'h', or 'd' to represent time format (seconds, minutes, hours, or days). Example: 12h. Must match the pattern ^[0-9]*[smhd]?$
-- `status_code` (Number) A custom HTTP status code that the WAAP returns if a rule blocks a request.
+- `status_code` (Number) A custom HTTP status code that the WAAP returns if a rule blocks a request. Default is 403.
 
 
 
