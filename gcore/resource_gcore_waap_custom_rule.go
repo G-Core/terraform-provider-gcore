@@ -13,13 +13,13 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/validation"
 )
 
-func resourceWaapCustomRules() *schema.Resource {
-
+func resourceWaapCustomRule() *schema.Resource {
 	return &schema.Resource{
 		CreateContext: resourceCustomRulesCreate,
 		ReadContext:   resourceCustomRulesRead,
 		UpdateContext: resourceCustomRulesUpdate,
 		DeleteContext: resourceCustomRulesDelete,
+		Description:   "Represent Custom Rules for a specific WAAP domain",
 		Schema: map[string]*schema.Schema{
 			"domain_id": {
 				Type:        schema.TypeInt,
@@ -30,130 +30,176 @@ func resourceWaapCustomRules() *schema.Resource {
 			"name": {
 				Type:        schema.TypeString,
 				Required:    true,
-				Description: "Name of the rule.",
+				Description: "The name assigned to the rule.",
 			},
 			"description": {
 				Type:        schema.TypeString,
 				Optional:    true,
-				Description: "Optional description of the rule.",
+				Default:     "",
+				Description: "The description assigned to the rule.",
 			},
 			"enabled": {
 				Type:        schema.TypeBool,
 				Required:    true,
 				Description: "Whether the rule is enabled.",
 			},
-			"action": {
-				Type:     schema.TypeList,
-				MaxItems: 1,
-				Required: true,
-				Elem: &schema.Resource{
-					Schema: map[string]*schema.Schema{
-						// "captcha":   {Type: schema.TypeMap, Optional: true, Elem: &schema.Schema{Type: schema.TypeString}},
-						"allow":     {Type: schema.TypeList, MaxItems: 0, Optional: true, Elem: &schema.Resource{Schema: map[string]*schema.Schema{}}},
-						"captcha":   {Type: schema.TypeList, MaxItems: 0, Optional: true, Elem: &schema.Resource{Schema: map[string]*schema.Schema{}}},
-						"handshake": {Type: schema.TypeList, MaxItems: 0, Optional: true, Elem: &schema.Resource{Schema: map[string]*schema.Schema{}}},
-						"monitor":   {Type: schema.TypeList, MaxItems: 0, Optional: true, Elem: &schema.Resource{Schema: map[string]*schema.Schema{}}},
-						"tag": {
-							Type:     schema.TypeList,
-							Optional: true,
-							Elem: &schema.Resource{
-								Schema: map[string]*schema.Schema{
-									"tags": {
-										Type:     schema.TypeList,
-										Required: true,
-										Elem:     &schema.Schema{Type: schema.TypeString},
-									},
-								},
-							},
-						},
-						"block": {
-							Type:     schema.TypeList,
-							MaxItems: 1,
-							Optional: true,
-							Elem: &schema.Resource{
-								Schema: map[string]*schema.Schema{
-									"status_code": {
-										Type:     schema.TypeInt,
-										Optional: true,
-									},
-									"action_duration": {
-										Type:     schema.TypeString,
-										Optional: true,
-									},
-								},
-							},
-						},
-					},
-				},
-			},
+			"action": waapActionSchema,
 			"conditions": {
 				Type:     schema.TypeList,
-				Optional: true,
+				Required: true,
+				MaxItems: 1,
+				Description: "The conditions required for the WAAP engine to trigger the rule. " +
+					"Rules may have between 1 and 5 conditions. All conditions must pass for the rule to trigger.",
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
-
 						"ip": {
-							Type:     schema.TypeList,
-							Optional: true,
+							Type:        schema.TypeList,
+							Optional:    true,
+							Description: "IP address condition. This condition matches a single IP address.",
 							Elem: &schema.Resource{
 								Schema: map[string]*schema.Schema{
-									"negation":   {Type: schema.TypeBool, Optional: true, Default: false, Description: "Whether or not to apply a boolean NOT operation to the rule's condition"},
-									"ip_address": {Type: schema.TypeString, Required: true, Description: "A single IPv4 or IPv6 address"},
+									"negation": {
+										Type:        schema.TypeBool,
+										Optional:    true,
+										Default:     false,
+										Description: "Whether or not to apply a boolean NOT operation to the rule's condition.",
+									},
+									"ip_address": {
+										Type:        schema.TypeString,
+										Required:    true,
+										Description: "A single IPv4 or IPv6 address",
+									},
 								},
 							},
 						},
 						"ip_range": {
-							Type:     schema.TypeList,
-							Optional: true,
+							Type:        schema.TypeList,
+							Optional:    true,
+							Description: "IP range condition. This condition matches a range of IP addresses.",
 							Elem: &schema.Resource{
 								Schema: map[string]*schema.Schema{
-									"negation":    {Type: schema.TypeBool, Optional: true, Default: false, Description: "Whether or not to apply a boolean NOT operation to the rule's condition"},
-									"lower_bound": {Type: schema.TypeString, Required: true, Description: "The lower bound IPv4 or IPv6 address to match against"},
-									"upper_bound": {Type: schema.TypeString, Required: true, Description: "The upper bound IPv4 or IPv6 address to match against"},
+									"negation": {
+										Type:        schema.TypeBool,
+										Optional:    true,
+										Default:     false,
+										Description: "Whether or not to apply a boolean NOT operation to the rule's condition.",
+									},
+									"lower_bound": {
+										Type:        schema.TypeString,
+										Required:    true,
+										Description: "The lower bound IPv4 or IPv6 address to match against.",
+									},
+									"upper_bound": {
+										Type:        schema.TypeString,
+										Required:    true,
+										Description: "The upper bound IPv4 or IPv6 address to match against.",
+									},
 								},
 							},
 						},
 						"url": {
-							Type:     schema.TypeList,
-							Optional: true,
+							Type:        schema.TypeList,
+							Optional:    true,
+							Description: "URL condition. This condition matches a URL path.",
 							Elem: &schema.Resource{
 								Schema: map[string]*schema.Schema{
-									"negation":   {Type: schema.TypeBool, Optional: true, Default: false, Description: "Whether or not to apply a boolean NOT operation to the rule's condition"},
-									"url":        {Type: schema.TypeString, Required: true, Description: "The URL to match"},
-									"match_type": {Type: schema.TypeString, Required: true, Description: "The type of matching condition", ValidateFunc: validation.StringInSlice([]string{"Exact", "Contains", "Regex"}, false)},
+									"negation": {
+										Type:        schema.TypeBool,
+										Optional:    true,
+										Default:     false,
+										Description: "Whether or not to apply a boolean NOT operation to the rule's condition.",
+									},
+									"url": {
+										Type:        schema.TypeString,
+										Required:    true,
+										Description: "The URL to match.",
+									},
+									"match_type": {
+										Type:         schema.TypeString,
+										Optional:     true,
+										Default:      "Contains",
+										Description:  "The type of matching condition. Valid values are 'Exact', 'Contains', and 'Regex'. Default is 'Contains'.",
+										ValidateFunc: validation.StringInSlice([]string{"Exact", "Contains", "Regex"}, false),
+									},
 								},
 							},
 						},
-						"url_agent": {
-							Type:     schema.TypeList,
-							Optional: true,
+						"user_agent": {
+							Type:        schema.TypeList,
+							Optional:    true,
+							Description: "User agent condition. This condition matches the user agent of the request.",
 							Elem: &schema.Resource{
 								Schema: map[string]*schema.Schema{
-									"negation":   {Type: schema.TypeBool, Optional: true, Default: false, Description: "Whether or not to apply a boolean NOT operation to the rule's condition"},
-									"url_agent":  {Type: schema.TypeString, Required: true, Description: "The user agent value to match"},
-									"match_type": {Type: schema.TypeString, Required: true, Description: "The type of matching condition", ValidateFunc: validation.StringInSlice([]string{"Exact", "Contains"}, false)},
+									"negation": {
+										Type:        schema.TypeBool,
+										Optional:    true,
+										Default:     false,
+										Description: "Whether or not to apply a boolean NOT operation to the rule's condition.",
+									},
+									"user_agent": {
+										Type:        schema.TypeString,
+										Required:    true,
+										Description: "The user agent value to match.",
+									},
+									"match_type": {
+										Type:         schema.TypeString,
+										Optional:     true,
+										Default:      "Contains",
+										Description:  "The type of matching condition. Valid values are 'Exact', 'Contains'. Default is 'Contains'.",
+										ValidateFunc: validation.StringInSlice([]string{"Exact", "Contains"}, false),
+									},
 								},
 							},
 						},
 						"header": {
-							Type:     schema.TypeList,
-							Optional: true,
+							Type:        schema.TypeList,
+							Optional:    true,
+							Description: "Request header condition. This condition matches a request header and its value.",
 							Elem: &schema.Resource{
 								Schema: map[string]*schema.Schema{
-									"negation":   {Type: schema.TypeBool, Optional: true, Default: false, Description: "Whether or not to apply a boolean NOT operation to the rule's condition"},
-									"header":     {Type: schema.TypeString, Required: true, Description: "The request header name"},
-									"value":      {Type: schema.TypeString, Required: true, Description: "The request header value"},
-									"match_type": {Type: schema.TypeString, Required: true, Description: "The type of matching condition", ValidateFunc: validation.StringInSlice([]string{"Exact", "Contains"}, false)},
+									"negation": {
+										Type:        schema.TypeBool,
+										Optional:    true,
+										Default:     false,
+										Description: "Whether or not to apply a boolean NOT operation to the rule's condition.",
+									},
+									"header": {
+										Type:        schema.TypeString,
+										Required:    true,
+										Description: "The request header name.",
+									},
+									"value": {
+										Type:        schema.TypeString,
+										Required:    true,
+										Description: "The request header value.",
+									},
+									"match_type": {
+										Type:         schema.TypeString,
+										Optional:     true,
+										Default:      "Contains",
+										Description:  "The type of matching condition. Valid values are 'Exact', 'Contains'. Default is 'Contains'.",
+										ValidateFunc: validation.StringInSlice([]string{"Exact", "Contains"}, false),
+									},
 								},
 							},
 						},
 						"header_exists": {
-							Type:     schema.TypeList,
-							Optional: true,
+							Type:        schema.TypeList,
+							Optional:    true,
+							Description: "Request header exists condition. This condition checks if a request header exists.",
 							Elem: &schema.Resource{
 								Schema: map[string]*schema.Schema{
-									"negation": {Type: schema.TypeBool, Optional: true, Default: false, Description: "Whether or not to apply a boolean NOT operation to the rule's condition"},
-									"header":   {Type: schema.TypeString, Required: true, Description: "The request header name"},
+									"negation": {
+										Type:        schema.TypeBool,
+										Optional:    true,
+										Default:     false,
+										Description: "Whether or not to apply a boolean NOT operation to the rule's condition.",
+									},
+									"header": {
+										Type:        schema.TypeString,
+										Required:    true,
+										Description: "The request header name.",
+									},
 								},
 							},
 						},
@@ -162,111 +208,231 @@ func resourceWaapCustomRules() *schema.Resource {
 							Optional: true,
 							Elem: &schema.Resource{
 								Schema: map[string]*schema.Schema{
-									"negation":   {Type: schema.TypeBool, Optional: true, Default: false, Description: "Whether or not to apply a boolean NOT operation to the rule's condition"},
-									"header":     {Type: schema.TypeString, Required: true, Description: "The request header name"},
-									"value":      {Type: schema.TypeString, Required: true, Description: "The request header value"},
-									"match_type": {Type: schema.TypeString, Required: true, Description: "The type of matching condition", ValidateFunc: validation.StringInSlice([]string{"Exact", "Contains"}, false)},
-								},
+									"negation": {
+										Type:        schema.TypeBool,
+										Optional:    true,
+										Default:     false,
+										Description: "Whether or not to apply a boolean NOT operation to the rule's condition.",
+									},
+									"header": {
+										Type:        schema.TypeString,
+										Required:    true,
+										Description: "The request header name.",
+									},
+									"value": {
+										Type:        schema.TypeString,
+										Required:    true,
+										Description: "The request header value.",
+									},
+									"match_type": {
+										Type:         schema.TypeString,
+										Optional:     true,
+										Default:      "Contains",
+										Description:  "The type of matching condition. Valid values are 'Exact', 'Contains'. Default is 'Contains'.",
+										ValidateFunc: validation.StringInSlice([]string{"Exact", "Contains"}, false),
+									}},
 							},
 						},
 						"response_header_exists": {
-							Type:     schema.TypeList,
-							Optional: true,
+							Type:        schema.TypeList,
+							Optional:    true,
+							Description: "Response header exists condition. This condition checks if a response header exists.",
 							Elem: &schema.Resource{
 								Schema: map[string]*schema.Schema{
-									"negation": {Type: schema.TypeBool, Optional: true, Default: false, Description: "Whether or not to apply a boolean NOT operation to the rule's condition"},
-									"header":   {Type: schema.TypeString, Required: true, Description: "The request header name"},
+									"negation": {
+										Type:        schema.TypeBool,
+										Optional:    true,
+										Default:     false,
+										Description: "Whether or not to apply a boolean NOT operation to the rule's condition.",
+									},
+									"header": {
+										Type:        schema.TypeString,
+										Required:    true,
+										Description: "The request header name.",
+									},
 								},
 							},
 						},
 						"http_method": {
-							Type:     schema.TypeList,
-							Optional: true,
+							Type:        schema.TypeList,
+							Optional:    true,
+							Description: "HTTP method condition. This condition matches the HTTP method of the request.",
 							Elem: &schema.Resource{
 								Schema: map[string]*schema.Schema{
-									"negation":    {Type: schema.TypeBool, Optional: true, Default: false, Description: "Whether or not to apply a boolean NOT operation to the rule's condition"},
-									"http_method": {Type: schema.TypeString, Required: true, Description: "HTTP methods of a request", ValidateFunc: validation.StringInSlice([]string{"CONNECT", "DELETE", "GET", "HEAD", "OPTIONS", "PATCH", "POST", "PUT", "TRACE"}, false)},
+									"negation": {
+										Type:        schema.TypeBool,
+										Optional:    true,
+										Default:     false,
+										Description: "Whether or not to apply a boolean NOT operation to the rule's condition.",
+									},
+									"http_method": {
+										Type:     schema.TypeString,
+										Required: true,
+										Description: "The HTTP method to match against. " +
+											"Valid values are 'CONNECT', 'DELETE', 'GET', 'HEAD', 'OPTIONS', 'PATCH', 'POST', 'PUT', and 'TRACE'.",
+										ValidateFunc: validation.StringInSlice([]string{
+											"CONNECT",
+											"DELETE",
+											"GET",
+											"HEAD",
+											"OPTIONS",
+											"PATCH",
+											"POST",
+											"PUT",
+											"TRACE",
+										}, false),
+									},
 								},
 							},
 						},
 						"file_extension": {
-							Type:     schema.TypeList,
-							Optional: true,
+							Type:        schema.TypeList,
+							Optional:    true,
+							Description: "File extension condition. This condition matches the file extension of the request.",
 							Elem: &schema.Resource{
 								Schema: map[string]*schema.Schema{
-									"negation": {Type: schema.TypeBool, Optional: true, Default: false, Description: "Whether or not to apply a boolean NOT operation to the rule's condition"},
+									"negation": {
+										Type:        schema.TypeBool,
+										Optional:    true,
+										Default:     false,
+										Description: "Whether or not to apply a boolean NOT operation to the rule's condition.",
+									},
 									"file_extension": {
 										Type:        schema.TypeList,
-										Elem:        &schema.Schema{Type: schema.TypeString},
-										Description: "The list of file extensions to match against",
 										Required:    true,
+										MaxItems:    1,
+										Elem:        &schema.Schema{Type: schema.TypeString},
+										Description: "The list of file extensions to match against.",
 									},
 								},
 							},
 						},
 						"content_type": {
-							Type:     schema.TypeList,
-							Optional: true,
+							Type:        schema.TypeList,
+							Optional:    true,
+							Description: "Content type condition. This condition matches the content type of the request.",
 							Elem: &schema.Resource{
 								Schema: map[string]*schema.Schema{
-									"negation": {Type: schema.TypeBool, Optional: true, Default: false, Description: "Whether or not to apply a boolean NOT operation to the rule's condition"},
+									"negation": {
+										Type:        schema.TypeBool,
+										Optional:    true,
+										Default:     false,
+										Description: "Whether or not to apply a boolean NOT operation to the rule's condition.",
+									},
 									"content_type": {
 										Type:        schema.TypeList,
-										Elem:        &schema.Schema{Type: schema.TypeString},
-										Description: "The list of content types to match against",
 										Required:    true,
+										MaxItems:    1,
+										Elem:        &schema.Schema{Type: schema.TypeString},
+										Description: "The list of content types to match against.",
 									},
 								},
 							},
 						},
 						"country": {
-							Type:     schema.TypeList,
-							Optional: true,
+							Type:        schema.TypeList,
+							Optional:    true,
+							Description: "Country condition. This condition matches the country of the request based on the source IP address.",
 							Elem: &schema.Resource{
 								Schema: map[string]*schema.Schema{
-									"negation": {Type: schema.TypeBool, Optional: true, Default: false, Description: "Whether or not to apply a boolean NOT operation to the rule's condition"},
+									"negation": {
+										Type:        schema.TypeBool,
+										Optional:    true,
+										Default:     false,
+										Description: "Whether or not to apply a boolean NOT operation to the rule's condition.",
+									},
 									"country": {
 										Type:        schema.TypeList,
-										Elem:        &schema.Schema{Type: schema.TypeString},
-										Description: "A list of ISO 3166-1 alpha-2 formatted strings representing the countries to match against",
 										Required:    true,
+										MaxItems:    1,
+										Elem:        &schema.Schema{Type: schema.TypeString},
+										Description: "A list of ISO 3166-1 alpha-2 formatted strings representing the countries to match against.",
 									},
 								},
 							},
 						},
 						"organization": {
-							Type:     schema.TypeList,
-							Optional: true,
+							Type:        schema.TypeList,
+							Optional:    true,
+							Description: "Organization condition. This condition matches the organization of the request based on the source IP address.",
 							Elem: &schema.Resource{
 								Schema: map[string]*schema.Schema{
-									"negation":     {Type: schema.TypeBool, Optional: true, Default: false, Description: "Whether or not to apply a boolean NOT operation to the rule's condition"},
-									"organization": {Type: schema.TypeString, Required: true, Description: "The organization to match against"},
+									"negation": {
+										Type:        schema.TypeBool,
+										Optional:    true,
+										Default:     false,
+										Description: "Whether or not to apply a boolean NOT operation to the rule's condition.",
+									},
+									"organization": {
+										Type:        schema.TypeString,
+										Required:    true,
+										Description: "The organization to match against.",
+									},
 								},
 							},
 						},
 						"request_rate": {
-							Type:     schema.TypeList,
-							MaxItems: 1,
-							Optional: true,
+							Type:        schema.TypeList,
+							Optional:    true,
+							Description: "Request rate condition. This condition matches the request rate.",
 							Elem: &schema.Resource{
 								Schema: map[string]*schema.Schema{
-									"negation": {Type: schema.TypeBool, Optional: true, Default: false, Description: "Whether or not to apply a boolean NOT operation to the rule's condition"},
+									"negation": {
+										Type:        schema.TypeBool,
+										Optional:    true,
+										Default:     false,
+										Description: "Whether or not to apply a boolean NOT operation to the rule's condition.",
+									},
 									"ips": {
 										Type:        schema.TypeList,
-										Elem:        &schema.Schema{Type: schema.TypeString},
 										Required:    true,
-										Description: "A list of source IPs that can trigger a request rate condition",
+										MaxItems:    1,
+										Elem:        &schema.Schema{Type: schema.TypeString},
+										Description: "A list of source IPs that can trigger a request rate condition.",
 									},
 									"http_methods": {
-										Type:        schema.TypeList,
-										Elem:        &schema.Schema{Type: schema.TypeString, ValidateFunc: validation.StringInSlice([]string{"CONNECT", "DELETE", "GET", "HEAD", "OPTIONS", "PATCH", "POST", "PUT", "TRACE"}, false)},
-										Required:    true,
-										Description: "Possible HTTP request methods that can trigger a request rate condition",
+										Type:     schema.TypeList,
+										Required: true,
+										MaxItems: 1,
+										Description: "Possible HTTP request methods that can trigger a request rate condition. " +
+											"Valid values are 'CONNECT', 'DELETE', 'GET', 'HEAD', 'OPTIONS', 'PATCH', 'POST', 'PUT', and 'TRACE'.",
+										Elem: &schema.Schema{
+											Type: schema.TypeString,
+											ValidateFunc: validation.StringInSlice([]string{
+												"CONNECT",
+												"DELETE",
+												"GET",
+												"HEAD",
+												"OPTIONS",
+												"PATCH",
+												"POST",
+												"PUT",
+												"TRACE",
+											}, false),
+										},
 									},
-									"path_pattern":     {Type: schema.TypeString, Required: true, Description: "A regular expression matching the URL path of the incoming request"},
-									"requests":         {Type: schema.TypeInt, Required: true, Description: "The number of incoming requests over the given time that can trigger a request rate condition"},
-									"time":             {Type: schema.TypeInt, Required: true, Description: "The number of seconds that the WAAP measures incoming requests over before triggering a request rate condition"},
-									"user_defined_tag": {Type: schema.TypeString, Required: true, Description: "A user-defined tag that can be included in incoming requests and used to trigger a request rate condition"},
+									"path_pattern": {
+										Type:        schema.TypeString,
+										Required:    true,
+										Description: "A regular expression matching the URL path of the incoming request.",
+									},
+									"requests": {
+										Type:         schema.TypeInt,
+										Required:     true,
+										Description:  "The number of incoming requests over the given time that can trigger a request rate condition.",
+										ValidateFunc: validation.IntAtLeast(20),
+									},
+									"time": {
+										Type:         schema.TypeInt,
+										Required:     true,
+										Description:  "The number of seconds that the WAAP measures incoming requests over before triggering a request rate condition.",
+										ValidateFunc: validation.IntAtLeast(1),
+									},
+									"user_defined_tag": {
+										Type:        schema.TypeString,
+										Optional:    true,
+										Description: "A user-defined tag that can be included in incoming requests and used to trigger a request rate condition.",
+									},
 								},
 							},
 						},
@@ -275,39 +441,77 @@ func resourceWaapCustomRules() *schema.Resource {
 							Optional: true,
 							Elem: &schema.Resource{
 								Schema: map[string]*schema.Schema{
-									"negation": {Type: schema.TypeBool, Optional: true, Default: false, Description: "Whether or not to apply a boolean NOT operation to the rule's condition"},
+									"negation": {
+										Type:        schema.TypeBool,
+										Optional:    true,
+										Default:     false,
+										Description: "Whether or not to apply a boolean NOT operation to the rule's condition.",
+									},
 									"owner_types": {
-										Type:        schema.TypeList,
-										MaxItems:    1,
-										Elem:        &schema.Schema{Type: schema.TypeString, Default: "COMMERCIAL", ValidateFunc: validation.StringInSlice([]string{"COMMERCIAL", "EDUCATIONAL", "GOVERNMENT", "HOSTING_SERVICES", "ISP", "MOBILE_NETWORK", "NETWORK", "RESERVED"}, false)},
-										Description: "Match the type of organization that owns the IP address making an incoming request",
-										Required:    true,
+										Type:     schema.TypeList,
+										Optional: true,
+										MaxItems: 1,
+										Default:  []string{"COMMERCIAL"},
+										Description: "Match the type of organization that owns the IP address making an incoming request. " +
+											"Valid values are 'COMMERCIAL', 'EDUCATIONAL', 'GOVERNMENT', 'HOSTING_SERVICES', 'ISP', 'MOBILE_NETWORK', 'NETWORK', and 'RESERVED'. " +
+											"Default is 'COMMERCIAL'.",
+										Elem: &schema.Schema{
+											Type: schema.TypeString,
+											ValidateFunc: validation.StringInSlice([]string{
+												"COMMERCIAL",
+												"EDUCATIONAL",
+												"GOVERNMENT",
+												"HOSTING_SERVICES",
+												"ISP",
+												"MOBILE_NETWORK",
+												"NETWORK",
+												"RESERVED",
+											}, false),
+										},
 									},
 								},
 							},
 						},
 						"tags": {
-							Type:     schema.TypeList,
-							Optional: true,
+							Type:        schema.TypeList,
+							Optional:    true,
+							Description: "Tags condition. This condition matches the request tags.",
 							Elem: &schema.Resource{
 								Schema: map[string]*schema.Schema{
-									"negation": {Type: schema.TypeBool, Optional: true, Default: false, Description: "Whether or not to apply a boolean NOT operation to the rule's condition"},
+									"negation": {
+										Type:        schema.TypeBool,
+										Optional:    true,
+										Default:     false,
+										Description: "Whether or not to apply a boolean NOT operation to the rule's condition.",
+									},
 									"tags": {
 										Type:        schema.TypeList,
-										Elem:        &schema.Schema{Type: schema.TypeString},
-										Description: "A list of tags to match against the request tags",
 										Required:    true,
+										MaxItems:    1,
+										Elem:        &schema.Schema{Type: schema.TypeString},
+										Description: "A list of tags to match against the request tags.",
 									},
 								},
 							},
 						},
 						"session_request_count": {
-							Type:     schema.TypeList,
-							Optional: true,
+							Type:        schema.TypeList,
+							Optional:    true,
+							Description: "Session request count condition. This condition matches the number of dynamic requests in the session.",
 							Elem: &schema.Resource{
 								Schema: map[string]*schema.Schema{
-									"negation":      {Type: schema.TypeBool, Optional: true, Default: false},
-									"request_count": {Type: schema.TypeInt, Required: true, Description: "The number of dynamic requests in the session"},
+									"negation": {
+										Type:        schema.TypeBool,
+										Optional:    true,
+										Default:     false,
+										Description: "Whether or not to apply a boolean NOT operation to the rule's condition.",
+									},
+									"request_count": {
+										Type:         schema.TypeInt,
+										Required:     true,
+										Description:  "The number of dynamic requests in the session.",
+										ValidateFunc: validation.IntAtLeast(1),
+									},
 								},
 							},
 						},
@@ -316,12 +520,18 @@ func resourceWaapCustomRules() *schema.Resource {
 							Optional: true,
 							Elem: &schema.Resource{
 								Schema: map[string]*schema.Schema{
-									"negation": {Type: schema.TypeBool, Optional: true, Default: false, Description: "Whether or not to apply a boolean NOT operation to the rule's condition"},
+									"negation": {
+										Type:        schema.TypeBool,
+										Optional:    true,
+										Default:     false,
+										Description: "Whether or not to apply a boolean NOT operation to the rule's condition.",
+									},
 									"tags": {
 										Type:        schema.TypeList,
-										Elem:        &schema.Schema{Type: schema.TypeString},
-										Description: "A list of tags to match against the request tags",
 										Required:    true,
+										MaxItems:    1,
+										Elem:        &schema.Schema{Type: schema.TypeString},
+										Description: "A list of tags to match against the request tags.",
 									},
 								},
 							},
@@ -641,7 +851,7 @@ func parseInput(d *schema.ResourceData) (ParsedInput, error) {
 				if key == "request_rate" {
 					conditionRequest := waap.CustomRuleConditionInput{}
 					obj := item.(map[string]interface{})
-					negation := obj["negation"].(bool)
+					// negation := obj["negation"].(bool)
 					pattern := obj["path_pattern"].(string)
 					requests := obj["requests"].(int)
 					time := obj["time"].(int)
@@ -660,8 +870,8 @@ func parseInput(d *schema.ResourceData) (ParsedInput, error) {
 					}
 
 					condition := waap.RequestRateCondition{
-						HttpMethods:    &methods,
-						Negation:       &negation,
+						HttpMethods: &methods,
+						// Negation:       &negation,
 						PathPattern:    pattern,
 						Requests:       requests,
 						Time:           time,
@@ -1014,7 +1224,7 @@ func resourceCustomRulesRead(ctx context.Context, d *schema.ResourceData, m inte
 			if condition.RequestRate != nil {
 
 				requestRateMap := map[string]interface{}{}
-				requestRateMap["negation"] = condition.RequestRate.Negation
+				// requestRateMap["negation"] = condition.RequestRate.Negation
 
 				if len(*condition.RequestRate.Ips) > 0 {
 					requestRateMap["ips"] = condition.RequestRate.Ips
