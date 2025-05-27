@@ -98,7 +98,8 @@ Optional:
 
 Optional:
 
-- `api_urls` (List of String) List of API URL patterns
+- `api_urls` (List of String) List of API URL patterns.
+- `is_api` (Boolean) Indicates if the domain is an API domain. All requests to an API domain are treated as API requests. If this is set to true then the api_urls field is ignored.
 
 
 <a id="nestedblock--settings--ddos"></a>
@@ -106,5 +107,5 @@ Optional:
 
 Optional:
 
-- `burst_threshold` (Number) Burst threshold for DDoS protection
-- `global_threshold` (Number) Global threshold for DDoS protection
+- `burst_threshold` (Number) Burst threshold for DDoS protection.
+- `global_threshold` (Number) Global threshold for DDoS protection.
