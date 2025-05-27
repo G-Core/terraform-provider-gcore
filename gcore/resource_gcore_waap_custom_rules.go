@@ -21,6 +21,12 @@ func resourceWaapCustomRules() *schema.Resource {
 		UpdateContext: resourceCustomRulesUpdate,
 		DeleteContext: resourceCustomRulesDelete,
 		Schema: map[string]*schema.Schema{
+			"domain_id": {
+				Type:        schema.TypeInt,
+				Required:    true,
+				ForceNew:    true,
+				Description: "The WAAP domain ID for which the Custom Rule is configured.",
+			},
 			"name": {
 				Type:        schema.TypeString,
 				Required:    true,
@@ -322,10 +328,6 @@ func resourceWaapCustomRules() *schema.Resource {
 						},
 					},
 				},
-			},
-			"domain_id": {
-				Type:     schema.TypeString,
-				Required: true,
 			},
 		},
 	}
