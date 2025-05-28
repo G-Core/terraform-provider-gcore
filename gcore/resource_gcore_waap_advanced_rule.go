@@ -7,7 +7,6 @@ import (
 	"net/http"
 	"regexp"
 	"strconv"
-	"strings"
 
 	waap "github.com/G-Core/gcore-waap-sdk-go"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
@@ -147,24 +146,7 @@ var (
 
 func resourceWaapAdvancedRule() *schema.Resource {
 	return &schema.Resource{
-		Importer: &schema.ResourceImporter{
-			State: func(d *schema.ResourceData, meta any) ([]*schema.ResourceData, error) {
-				domainIdStr, ruleId, err := resourceAdvancedRuleImportParseId(d.Id())
-				if err != nil {
-					return nil, err
-				}
-
-				domainId, err := strconv.ParseInt(domainIdStr, 10, 64)
-				if err != nil {
-					return nil, fmt.Errorf("unexpected format of domain_id (%s), expected number", domainIdStr)
-				}
-
-				d.Set("domain_id", domainId)
-				d.SetId(ruleId)
-
-				return []*schema.ResourceData{d}, nil
-			},
-		},
+		Importer:      &schema.ResourceImporter{State: importWaapRule},
 		CreateContext: resourceWaapAdvancedRuleCreate,
 		ReadContext:   resourceWaapAdvancedRuleRead,
 		UpdateContext: resourceWaapAdvancedRuleUpdate,
@@ -460,14 +442,4 @@ func readWaapActionFromResponse(action waap.CustomerRuleActionOutput) []interfac
 	}
 
 	return []interface{}{actionMap}
-}
-
-func resourceAdvancedRuleImportParseId(id string) (string, string, error) {
-	parts := strings.SplitN(id, ":", 2)
-
-	if len(parts) != 2 || parts[0] == "" || parts[1] == "" {
-		return "", "", fmt.Errorf("unexpected format of ID (%s), expected domain_id:rule_id", id)
-	}
-
-	return parts[0], parts[1], nil
 }

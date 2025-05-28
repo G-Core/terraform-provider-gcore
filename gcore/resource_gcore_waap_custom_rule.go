@@ -15,7 +15,7 @@ import (
 
 func resourceWaapCustomRule() *schema.Resource {
 	return &schema.Resource{
-		// todo: add import support
+		Importer:      &schema.ResourceImporter{State: importWaapRule},
 		CreateContext: resourceCustomRulesCreate,
 		ReadContext:   resourceCustomRulesRead,
 		UpdateContext: resourceCustomRulesUpdate,
