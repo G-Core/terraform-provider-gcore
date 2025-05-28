@@ -294,37 +294,7 @@ func resourceWaapAdvancedRuleRead(ctx context.Context, d *schema.ResourceData, m
 	d.Set("enabled", result.JSON200.Enabled)
 	d.Set("source", result.JSON200.Source)
 	d.Set("phase", result.JSON200.Phase)
-
-	// Handle the action field
-	actionMap := map[string]interface{}{
-		"allow":     result.JSON200.Action.Allow != nil,
-		"captcha":   result.JSON200.Action.Captcha != nil,
-		"handshake": result.JSON200.Action.Handshake != nil,
-		"monitor":   result.JSON200.Action.Monitor != nil,
-	}
-	// Block
-	if result.JSON200.Action.Block != nil {
-		actionMap["block"] = []interface{}{
-			map[string]interface{}{
-				"status_code":     result.JSON200.Action.Block.StatusCode,
-				"action_duration": result.JSON200.Action.Block.ActionDuration,
-			},
-		}
-	} else {
-		actionMap["block"] = []interface{}{}
-	}
-	// Tag
-	if result.JSON200.Action.Tag != nil {
-		actionMap["tag"] = []interface{}{
-			map[string]interface{}{
-				"tags": result.JSON200.Action.Tag.Tags,
-			},
-		}
-	} else {
-		actionMap["tag"] = []interface{}{}
-	}
-
-	d.Set("action", []interface{}{actionMap})
+	d.Set("action", readWaapActionFromResponse(result.JSON200.Action))
 
 	log.Printf("[DEBUG] Finish WAAP Advanced Rule reading (id=%s)\n", ruleID)
 	return nil
@@ -458,6 +428,38 @@ func getWaapActionPayload(actionRaw any) *waap.CustomerRuleActionInput {
 	}
 
 	return nil
+}
+
+func readWaapActionFromResponse(action waap.CustomerRuleActionOutput) []interface{} {
+	actionMap := map[string]interface{}{
+		"allow":     action.Allow != nil,
+		"captcha":   action.Captcha != nil,
+		"handshake": action.Handshake != nil,
+		"monitor":   action.Monitor != nil,
+	}
+
+	if action.Block != nil {
+		actionMap["block"] = []interface{}{
+			map[string]interface{}{
+				"status_code":     action.Block.StatusCode,
+				"action_duration": action.Block.ActionDuration,
+			},
+		}
+	} else {
+		actionMap["block"] = []interface{}{}
+	}
+
+	if action.Tag != nil {
+		actionMap["tag"] = []interface{}{
+			map[string]interface{}{
+				"tags": action.Tag.Tags,
+			},
+		}
+	} else {
+		actionMap["tag"] = []interface{}{}
+	}
+
+	return []interface{}{actionMap}
 }
 
 func resourceAdvancedRuleImportParseId(id string) (string, string, error) {
