@@ -143,7 +143,7 @@ Optional:
 
 Required:
 
-- `country` (List of String) A list of ISO 3166-1 alpha-2 formatted strings representing the countries to match against.
+- `country_code` (List of String) A list of ISO 3166-1 alpha-2 formatted strings representing the countries to match against.
 
 Optional:
 
@@ -240,10 +240,13 @@ Optional:
 <a id="nestedblock--conditions--owner_types"></a>
 ### Nested Schema for `conditions.owner_types`
 
+Required:
+
+- `owner_types` (List of String) Match the type of organization that owns the IP address making an incoming request. Valid values are 'COMMERCIAL', 'EDUCATIONAL', 'GOVERNMENT', 'HOSTING_SERVICES', 'ISP', 'MOBILE_NETWORK', 'NETWORK', and 'RESERVED'.
+
 Optional:
 
 - `negation` (Boolean) Whether or not to apply a boolean NOT operation to the rule's condition.
-- `owner_types` (List of String) Match the type of organization that owns the IP address making an incoming request. Valid values are 'COMMERCIAL', 'EDUCATIONAL', 'GOVERNMENT', 'HOSTING_SERVICES', 'ISP', 'MOBILE_NETWORK', 'NETWORK', and 'RESERVED'. Default is 'COMMERCIAL'.
 
 
 <a id="nestedblock--conditions--request_rate"></a>
@@ -251,15 +254,14 @@ Optional:
 
 Required:
 
-- `http_methods` (List of String) Possible HTTP request methods that can trigger a request rate condition. Valid values are 'CONNECT', 'DELETE', 'GET', 'HEAD', 'OPTIONS', 'PATCH', 'POST', 'PUT', and 'TRACE'.
-- `ips` (List of String) A list of source IPs that can trigger a request rate condition.
 - `path_pattern` (String) A regular expression matching the URL path of the incoming request.
 - `requests` (Number) The number of incoming requests over the given time that can trigger a request rate condition.
 - `time` (Number) The number of seconds that the WAAP measures incoming requests over before triggering a request rate condition.
 
 Optional:
 
-- `negation` (Boolean) Whether or not to apply a boolean NOT operation to the rule's condition.
+- `http_methods` (List of String) Possible HTTP request methods that can trigger a request rate condition. Valid values are 'CONNECT', 'DELETE', 'GET', 'HEAD', 'OPTIONS', 'PATCH', 'POST', 'PUT', and 'TRACE'.
+- `ips` (List of String) A list of source IPs that can trigger a request rate condition.
 - `user_defined_tag` (String) A user-defined tag that can be included in incoming requests and used to trigger a request rate condition.
 
 
@@ -344,7 +346,7 @@ Optional:
 
 Required:
 
-- `tags` (List of String) A list of tags to match against the request tags.
+- `tags` (List of String) A list of user-defined tags to match against the request tags.
 
 Optional:
 

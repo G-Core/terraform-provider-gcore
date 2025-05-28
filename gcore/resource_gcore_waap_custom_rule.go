@@ -15,6 +15,7 @@ import (
 
 func resourceWaapCustomRule() *schema.Resource {
 	return &schema.Resource{
+		// todo: add import support
 		CreateContext: resourceCustomRulesCreate,
 		ReadContext:   resourceCustomRulesRead,
 		UpdateContext: resourceCustomRulesUpdate,
@@ -300,7 +301,7 @@ func resourceWaapCustomRule() *schema.Resource {
 									"file_extension": {
 										Type:        schema.TypeList,
 										Required:    true,
-										MaxItems:    1,
+										MinItems:    1,
 										Elem:        &schema.Schema{Type: schema.TypeString},
 										Description: "The list of file extensions to match against.",
 									},
@@ -322,7 +323,7 @@ func resourceWaapCustomRule() *schema.Resource {
 									"content_type": {
 										Type:        schema.TypeList,
 										Required:    true,
-										MaxItems:    1,
+										MinItems:    1,
 										Elem:        &schema.Schema{Type: schema.TypeString},
 										Description: "The list of content types to match against.",
 									},
@@ -341,10 +342,10 @@ func resourceWaapCustomRule() *schema.Resource {
 										Default:     false,
 										Description: "Whether or not to apply a boolean NOT operation to the rule's condition.",
 									},
-									"country": {
+									"country_code": {
 										Type:        schema.TypeList,
 										Required:    true,
-										MaxItems:    1,
+										MinItems:    1,
 										Elem:        &schema.Schema{Type: schema.TypeString},
 										Description: "A list of ISO 3166-1 alpha-2 formatted strings representing the countries to match against.",
 									},
@@ -377,23 +378,15 @@ func resourceWaapCustomRule() *schema.Resource {
 							Description: "Request rate condition. This condition matches the request rate.",
 							Elem: &schema.Resource{
 								Schema: map[string]*schema.Schema{
-									"negation": {
-										Type:        schema.TypeBool,
-										Optional:    true,
-										Default:     false,
-										Description: "Whether or not to apply a boolean NOT operation to the rule's condition.",
-									},
 									"ips": {
 										Type:        schema.TypeList,
-										Required:    true,
-										MaxItems:    1,
+										Optional:    true,
 										Elem:        &schema.Schema{Type: schema.TypeString},
 										Description: "A list of source IPs that can trigger a request rate condition.",
 									},
 									"http_methods": {
 										Type:     schema.TypeList,
-										Required: true,
-										MaxItems: 1,
+										Optional: true,
 										Description: "Possible HTTP request methods that can trigger a request rate condition. " +
 											"Valid values are 'CONNECT', 'DELETE', 'GET', 'HEAD', 'OPTIONS', 'PATCH', 'POST', 'PUT', and 'TRACE'.",
 										Elem: &schema.Schema{
@@ -449,12 +442,10 @@ func resourceWaapCustomRule() *schema.Resource {
 									},
 									"owner_types": {
 										Type:     schema.TypeList,
-										Optional: true,
-										MaxItems: 1,
-										Default:  []string{"COMMERCIAL"},
+										Required: true,
+										MinItems: 1,
 										Description: "Match the type of organization that owns the IP address making an incoming request. " +
-											"Valid values are 'COMMERCIAL', 'EDUCATIONAL', 'GOVERNMENT', 'HOSTING_SERVICES', 'ISP', 'MOBILE_NETWORK', 'NETWORK', and 'RESERVED'. " +
-											"Default is 'COMMERCIAL'.",
+											"Valid values are 'COMMERCIAL', 'EDUCATIONAL', 'GOVERNMENT', 'HOSTING_SERVICES', 'ISP', 'MOBILE_NETWORK', 'NETWORK', and 'RESERVED'.",
 										Elem: &schema.Schema{
 											Type: schema.TypeString,
 											ValidateFunc: validation.StringInSlice([]string{
@@ -485,10 +476,13 @@ func resourceWaapCustomRule() *schema.Resource {
 										Description: "Whether or not to apply a boolean NOT operation to the rule's condition.",
 									},
 									"tags": {
-										Type:        schema.TypeList,
-										Required:    true,
-										MaxItems:    1,
-										Elem:        &schema.Schema{Type: schema.TypeString},
+										Type:     schema.TypeList,
+										Required: true,
+										MinItems: 1,
+										Elem:     &schema.Schema{Type: schema.TypeString},
+										// todo: add data source
+										// todo: upd description to include info where to get tags
+										// GET https://api.preprod.world/waap/v1/tags?show_all=1
 										Description: "A list of tags to match against the request tags.",
 									},
 								},
@@ -529,9 +523,9 @@ func resourceWaapCustomRule() *schema.Resource {
 									"tags": {
 										Type:        schema.TypeList,
 										Required:    true,
-										MaxItems:    1,
+										MinItems:    1,
 										Elem:        &schema.Schema{Type: schema.TypeString},
-										Description: "A list of tags to match against the request tags.",
+										Description: "A list of user-defined tags to match against the request tags.",
 									},
 								},
 							},
@@ -543,820 +537,694 @@ func resourceWaapCustomRule() *schema.Resource {
 	}
 }
 
-type ParsedInput struct {
-	Action      *waap.CustomerRuleActionInput
-	Conditions  *[]waap.CustomRuleConditionInput
-	Description *string
-	Enabled     *bool
-	Name        *string
-	RuleType    *string
-}
-
-func parseInput(d *schema.ResourceData) (ParsedInput, error) {
-
-	name := d.Get("name").(string)
-	description := d.Get("description").(string)
-	enabled := d.Get("enabled").(bool)
-	actionInput := d.Get("action").([]interface{})
-	conditionsInput := d.Get("conditions").([]interface{})
-
-	log.Printf("[DEBUG] Input: name=%s, description=%s, enabled=%v", name, description, enabled)
-	log.Printf("[DEBUG] Input: action=%+v", actionInput)
-	log.Printf("[DEBUG] Input: conditions=%+v", conditionsInput)
-
-	actionRequest := waap.CustomerRuleActionInput{}
-
-	if len(actionInput) > 0 {
-		for key, value := range actionInput[0].(map[string]interface{}) {
-			v := value.([]interface{})
-			if len(v) != 0 {
-				if key == "tag" {
-					tags := []string{}
-					for _, tag := range v[0].(map[string]interface{})["tags"].([]interface{}) {
-						tags = append(tags, tag.(string))
-					}
-
-					actionRequest.Tag = &waap.RuleTagAction{
-						Tags: tags,
-					}
-				}
-
-				if key == "block" {
-					blockRequest := &waap.RuleBlockAction{}
-					if v[0] != nil {
-						block := v[0].(map[string]interface{})           // max 1 item
-						duration, _ := block["action_duration"].(string) // check if it's a string
-						code := waap.RuleBlockStatusCode(block["status_code"].(int))
-						blockRequest.ActionDuration = &duration
-						blockRequest.StatusCode = &code
-					}
-					actionRequest.Block = blockRequest
-				}
-
-				if key == "allow" {
-					actionRequest.Allow = &waap.RuleAllowAction{}
-				}
-
-				if key == "captcha" {
-					actionRequest.Captcha = &waap.RuleCaptchaAction{}
-				}
-
-				if key == "handshake" {
-					actionRequest.Handshake = &waap.RuleHandshakeAction{}
-				}
-
-				if key == "monitor" {
-					actionRequest.Monitor = &waap.RuleMonitorAction{}
-				}
-			}
-		}
-	}
-
-	log.Printf("[DEBUG] Parsed: Action: %+v", actionRequest)
-
-	conditions := make([]waap.CustomRuleConditionInput, 0)
-
-	for _, condition := range conditionsInput {
-
-		for key, value := range condition.(map[string]interface{}) {
-
-			for _, item := range value.([]interface{}) {
-
-				if key == "ip" {
-
-					conditionRequest := waap.CustomRuleConditionInput{}
-					ip_obj := item.(map[string]interface{})
-
-					var ipAddress waap.IpCondition_IpAddress
-					ipAddress.FromIpConditionIpAddress1(ip_obj["ip_address"].(string))
-
-					negation := ip_obj["negation"].(bool)
-					ipCondition := waap.IpCondition{
-						IpAddress: ipAddress,
-						Negation:  &negation,
-					}
-
-					conditionRequest.Ip = &ipCondition
-					conditions = append(conditions, conditionRequest)
-				}
-
-				if key == "http_method" {
-					conditionRequest := waap.CustomRuleConditionInput{}
-					httpMethodObj := item.(map[string]interface{})
-
-					method, _ := httpMethodObj["http_method"].(string)
-					negation := httpMethodObj["negation"].(bool)
-
-					httpMethod := waap.HttpMethodCondition{
-						HttpMethod: waap.HTTPMethod(method),
-						Negation:   &negation,
-					}
-
-					conditionRequest.HttpMethod = &httpMethod
-					conditions = append(conditions, conditionRequest)
-				}
-
-				if key == "ip_range" {
-					conditionRequest := waap.CustomRuleConditionInput{}
-					ipRangeObj := item.(map[string]interface{})
-					lowerBound := ipRangeObj["lower_bound"].(string)
-					upperBound := ipRangeObj["upper_bound"].(string)
-					negation := ipRangeObj["negation"].(bool)
-
-					var lowerObj waap.IpRangeCondition_LowerBound
-					lowerObj.FromIpRangeConditionLowerBound0(lowerBound)
-
-					var upperObj waap.IpRangeCondition_UpperBound
-					upperObj.FromIpRangeConditionUpperBound0(upperBound)
-
-					ipRange := waap.IpRangeCondition{
-						LowerBound: lowerObj,
-						UpperBound: upperObj,
-						Negation:   &negation,
-					}
-
-					conditionRequest.IpRange = &ipRange
-					conditions = append(conditions, conditionRequest)
-				}
-
-				if key == "url" {
-					conditionRequest := waap.CustomRuleConditionInput{}
-					urlObj := item.(map[string]interface{})
-
-					url := urlObj["url"].(string)
-					negation := urlObj["negation"].(bool)
-					match_type := waap.UrlConditionMatchType(urlObj["match_type"].(string))
-
-					urlCondition := waap.UrlCondition{
-						Url:       url,
-						Negation:  &negation,
-						MatchType: &match_type,
-					}
-
-					conditionRequest.Url = &urlCondition
-					conditions = append(conditions, conditionRequest)
-				}
-
-				if key == "user_agent" {
-					conditionRequest := waap.CustomRuleConditionInput{}
-					agentObj := item.(map[string]interface{})
-
-					userAgent := agentObj["user_agent"].(string)
-					negation := agentObj["negation"].(bool)
-					match_type := waap.UserAgentConditionMatchType(agentObj["match_type"].(string))
-
-					agentCondition := waap.UserAgentCondition{
-						UserAgent: userAgent,
-						Negation:  &negation,
-						MatchType: &match_type,
-					}
-
-					conditionRequest.UserAgent = &agentCondition
-					conditions = append(conditions, conditionRequest)
-				}
-
-				if key == "header" {
-					conditionRequest := waap.CustomRuleConditionInput{}
-					obj := item.(map[string]interface{})
-
-					header := obj["header"].(string)
-					value := obj["value"].(string)
-					negation := obj["negation"].(bool)
-					match_type := waap.HeaderConditionMatchType(obj["match_type"].(string))
-
-					condition := waap.HeaderCondition{
-						Header:    header,
-						Value:     value,
-						Negation:  &negation,
-						MatchType: &match_type,
-					}
-
-					conditionRequest.Header = &condition
-					conditions = append(conditions, conditionRequest)
-				}
-
-				if key == "header_exists" {
-					conditionRequest := waap.CustomRuleConditionInput{}
-					obj := item.(map[string]interface{})
-
-					header := obj["header"].(string)
-					negation := obj["negation"].(bool)
-
-					condition := waap.HeaderExistsCondition{
-						Header:   header,
-						Negation: &negation,
-					}
-
-					conditionRequest.HeaderExists = &condition
-					conditions = append(conditions, conditionRequest)
-				}
-
-				if key == "response_header" {
-					conditionRequest := waap.CustomRuleConditionInput{}
-					obj := item.(map[string]interface{})
-
-					header := obj["header"].(string)
-					value := obj["value"].(string)
-					negation := obj["negation"].(bool)
-					match_type := waap.ResponseHeaderConditionMatchType(obj["match_type"].(string))
-
-					condition := waap.ResponseHeaderCondition{
-						Header:    header,
-						Value:     value,
-						Negation:  &negation,
-						MatchType: &match_type,
-					}
-
-					conditionRequest.ResponseHeader = &condition
-					conditions = append(conditions, conditionRequest)
-				}
-
-				if key == "response_header_exists" {
-					conditionRequest := waap.CustomRuleConditionInput{}
-					obj := item.(map[string]interface{})
-
-					header := obj["header"].(string)
-					negation := obj["negation"].(bool)
-
-					condition := waap.ResponseHeaderExistsCondition{
-						Header:   header,
-						Negation: &negation,
-					}
-
-					conditionRequest.ResponseHeaderExists = &condition
-					conditions = append(conditions, conditionRequest)
-				}
-
-				if key == "file_extension" {
-					conditionRequest := waap.CustomRuleConditionInput{}
-					obj := item.(map[string]interface{})
-					negation := obj["negation"].(bool)
-					extensions := []string{}
-					for _, ext := range obj["file_extension"].([]interface{}) {
-						extensions = append(extensions, ext.(string))
-					}
-					condition := waap.FileExtensionCondition{
-						FileExtension: extensions,
-						Negation:      &negation,
-					}
-					conditionRequest.FileExtension = &condition
-					conditions = append(conditions, conditionRequest)
-				}
-
-				if key == "content_type" {
-					conditionRequest := waap.CustomRuleConditionInput{}
-					obj := item.(map[string]interface{})
-					negation := obj["negation"].(bool)
-					contentTypes := []string{}
-					for _, ct := range obj["content_type"].([]interface{}) {
-						contentTypes = append(contentTypes, ct.(string))
-					}
-					condition := waap.ContentTypeCondition{
-						ContentType: contentTypes,
-						Negation:    &negation,
-					}
-					conditionRequest.ContentType = &condition
-					conditions = append(conditions, conditionRequest)
-				}
-
-				if key == "country" {
-					conditionRequest := waap.CustomRuleConditionInput{}
-					obj := item.(map[string]interface{})
-					negation := obj["negation"].(bool)
-					countries := []string{}
-					for _, country := range obj["country"].([]interface{}) {
-						countries = append(countries, country.(string))
-					}
-					condition := waap.CountryCondition{
-						CountryCode: countries,
-						Negation:    &negation,
-					}
-					conditionRequest.Country = &condition
-					conditions = append(conditions, conditionRequest)
-				}
-
-				if key == "organization" {
-					conditionRequest := waap.CustomRuleConditionInput{}
-					obj := item.(map[string]interface{})
-					negation := obj["negation"].(bool)
-					organization := obj["organization"].(string)
-					condition := waap.OrganizationCondition{
-						Organization: organization,
-						Negation:     &negation,
-					}
-					conditionRequest.Organization = &condition
-					conditions = append(conditions, conditionRequest)
-				}
-
-				if key == "request_rate" {
-					conditionRequest := waap.CustomRuleConditionInput{}
-					obj := item.(map[string]interface{})
-					// negation := obj["negation"].(bool)
-					pattern := obj["path_pattern"].(string)
-					requests := obj["requests"].(int)
-					time := obj["time"].(int)
-					userDefinedTag := obj["user_defined_tag"].(string)
-
-					ips := make([]waap.RequestRateCondition_Ips_Item, 0)
-					for _, ip := range obj["ips"].([]interface{}) {
-						var ipAddress waap.RequestRateCondition_Ips_Item
-						ipAddress.FromRequestRateConditionIps0(ip.(string))
-						ips = append(ips, ipAddress)
-					}
-
-					methods := make([]waap.HTTPMethod, 0)
-					for _, method := range obj["http_methods"].([]interface{}) {
-						methods = append(methods, waap.HTTPMethod(method.(string)))
-					}
-
-					condition := waap.RequestRateCondition{
-						HttpMethods: &methods,
-						// Negation:       &negation,
-						PathPattern:    pattern,
-						Requests:       requests,
-						Time:           time,
-						UserDefinedTag: &userDefinedTag,
-						Ips:            &ips,
-					}
-
-					conditionRequest.RequestRate = &condition
-					conditions = append(conditions, conditionRequest)
-				}
-
-				if key == "owner_types" {
-					conditionRequest := waap.CustomRuleConditionInput{}
-					obj := item.(map[string]interface{})
-					negation := obj["negation"].(bool)
-					ownerTypes := []waap.OwnerTypesConditionOwnerTypes{}
-					for _, ownerType := range obj["owner_types"].([]interface{}) {
-						ownerTypes = append(ownerTypes, waap.OwnerTypesConditionOwnerTypes(ownerType.(string)))
-					}
-					condition := waap.OwnerTypesCondition{
-						OwnerTypes: &ownerTypes,
-						Negation:   &negation,
-					}
-					conditionRequest.OwnerTypes = &condition
-					conditions = append(conditions, conditionRequest)
-				}
-
-				if key == "tags" {
-					conditionRequest := waap.CustomRuleConditionInput{}
-					obj := item.(map[string]interface{})
-					negation := obj["negation"].(bool)
-					tags := []string{}
-					for _, tag := range obj["tags"].([]interface{}) {
-						tags = append(tags, tag.(string))
-					}
-					condition := waap.TagsCondition{
-						Tags:     tags,
-						Negation: &negation,
-					}
-					conditionRequest.Tags = &condition
-					conditions = append(conditions, conditionRequest)
-				}
-
-				if key == "session_request_count" {
-					conditionRequest := waap.CustomRuleConditionInput{}
-					obj := item.(map[string]interface{})
-					negation := obj["negation"].(bool)
-					requestCount := obj["request_count"].(int)
-					condition := waap.SessionRequestCountCondition{
-						RequestCount: requestCount,
-						Negation:     &negation,
-					}
-					conditionRequest.SessionRequestCount = &condition
-					conditions = append(conditions, conditionRequest)
-				}
-
-				if key == "user_defined_tags" {
-					conditionRequest := waap.CustomRuleConditionInput{}
-					obj := item.(map[string]interface{})
-					negation := obj["negation"].(bool)
-					tags := []string{}
-					for _, tag := range obj["tags"].([]interface{}) {
-						tags = append(tags, tag.(string))
-					}
-					condition := waap.UserDefinedTagsCondition{
-						Tags:     tags,
-						Negation: &negation,
-					}
-					conditionRequest.UserDefinedTags = &condition
-					conditions = append(conditions, conditionRequest)
-				}
-
-				fmt.Printf("[DEBUG] Condition Key: %+v, Value: %+v\n", key, item)
-			}
-
-		}
-	}
-
-	log.Printf("[DEBUG] Parsed: Conditions: %+v", conditions)
-
-	parsed := ParsedInput{
-		Action:      &actionRequest,
-		Conditions:  &conditions,
-		Description: &description,
-		Enabled:     &enabled,
-		Name:        &name,
-	}
-
-	return parsed, nil
-}
-
 func resourceCustomRulesCreate(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
-
-	log.Println("[DEBUG] Creating security rule")
+	log.Println("[DEBUG] Start WAAP Custom Rule creating")
 
 	client := m.(*Config).WaapClient
-	domainID, _ := strconv.Atoi(d.Get("domain_id").(string))
-	parsed, _ := parseInput(d)
 
-	createRequestParams := waap.CreateCustomRuleV1DomainsDomainIdCustomRulesPostJSONRequestBody{
-		Name:        *parsed.Name,
-		Description: parsed.Description,
-		Enabled:     *parsed.Enabled,
-		Action:      *parsed.Action,
-		Conditions:  *parsed.Conditions,
+	req := waap.CustomRule{
+		Name:    d.Get("name").(string),
+		Enabled: d.Get("enabled").(bool),
 	}
 
-	resp, err := client.CreateCustomRuleV1DomainsDomainIdCustomRulesPostWithResponse(ctx, domainID, createRequestParams)
+	if v, ok := d.GetOk("description"); ok {
+		description := v.(string)
+		req.Description = &description
+	}
 
+	if v, ok := d.GetOk("action"); ok {
+		if action := getWaapActionPayload(v); action != nil {
+			req.Action = *action
+		}
+	}
+
+	if v, ok := d.GetOk("conditions"); ok {
+		req.Conditions = getConditionsPaylod(v)
+	}
+
+	resp, err := client.CreateCustomRuleV1DomainsDomainIdCustomRulesPostWithResponse(ctx, d.Get("domain_id").(int), req)
 	if err != nil {
-		return diag.Errorf("Error while creating rule '%+v'", err)
+		return diag.Errorf("Failed to create Custom Rule: %w", err)
 	}
 
 	if resp.StatusCode() != http.StatusCreated {
-		return diag.Errorf("Failed to create custom rule. Status code: %d with error: %s", resp.StatusCode(), resp.Body)
+		return diag.Errorf("Failed to create Custom Rule. Status code: %d with error: %s", resp.StatusCode(), resp.Body)
 	}
 
-	log.Printf("[DEBUG] Parsed: Response: %+v, err %+v", resp.JSON201, err)
-
 	d.SetId(strconv.Itoa(resp.JSON201.Id))
-	return nil
+
+	log.Printf("[DEBUG] Finish WAAP Custom Rule creating (id=%s)\n", d.Id())
+
+	return resourceCustomRulesRead(ctx, d, m)
 }
 
 func resourceCustomRulesRead(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
+	log.Println("[DEBUG] Start WAAP Custom Rule reading (id=%s)", d.Id())
 
 	client := m.(*Config).WaapClient
-	domainID, _ := strconv.Atoi(d.Get("domain_id").(string))
+
 	ruleId, err := strconv.Atoi(d.Id())
 	if err != nil {
-		return diag.Errorf("Failed to load rule ID %s", err)
+		return diag.Errorf("Failed to convert rule ID %s", err)
 	}
 
-	log.Printf("[DEBUG] Reading custom rule: ID: %+v | Domain ID: %+v", ruleId, domainID)
-
-	resp, err := client.GetCustomRuleV1DomainsDomainIdCustomRulesRuleIdGetWithResponse(ctx, domainID, ruleId)
-
+	resp, err := client.GetCustomRuleV1DomainsDomainIdCustomRulesRuleIdGetWithResponse(ctx, d.Get("domain_id").(int), ruleId)
 	if err != nil {
-		return diag.Errorf("Error while updating rule '%+v'", err)
+		return diag.Errorf("Failed to read Custom Rule: %w", err)
+	}
+
+	if resp.StatusCode() == http.StatusNotFound {
+		d.SetId("") // Resource not found, remove from state
+		return diag.Diagnostics{
+			{Severity: diag.Warning, Summary: fmt.Sprintf("Custom Rule (%s) was not found, removed from TF state", ruleId)},
+		}
 	}
 
 	if resp.StatusCode() != http.StatusOK {
-		return diag.Errorf("Failed to Update custom rule. Status code: %d with error: %s", resp.StatusCode(), string(resp.Body))
+		return diag.Errorf("Failed to read Custom Rule. Status code: %d with error: %s", resp.StatusCode(), resp.Body)
 	}
 
 	d.Set("name", resp.JSON200.Name)
-
-	if resp.JSON200.Description != nil {
-		d.Set("description", resp.JSON200.Description)
-	}
-
+	d.Set("description", resp.JSON200.Description)
 	d.Set("enabled", resp.JSON200.Enabled)
+	d.Set("action", readWaapActionFromResponse(resp.JSON200.Action))
 
-	// jsonBytes, _ := json.Marshal(resp.JSON200.Action)
-
-	// log.Printf("[DEBUG] Actionsss: ID: %+v", string(jsonBytes))
-	// log.Printf("[DEBUG] YYYYY: ID: %+v", d.Get("action"))
-	// log.Printf("[DEBUG] YYYYY: ID: %+v", d.Get("conditions"))
-
-	// Handle actions
-	actionMap := map[string]interface{}{}
-
-	// Handle action.block
-	if resp.JSON200.Action.Block != nil {
-		blockMap := map[string]interface{}{}
-
-		if resp.JSON200.Action.Block.StatusCode != nil {
-			blockMap["status_code"] = *resp.JSON200.Action.Block.StatusCode
-		}
-		if resp.JSON200.Action.Block.ActionDuration != nil {
-			blockMap["action_duration"] = *resp.JSON200.Action.Block.ActionDuration
-		}
-
-		actionMap["block"] = []interface{}{blockMap}
+	err = d.Set("conditions", readConditionsFromResponse(resp.JSON200.Conditions))
+	if err != nil {
+		return diag.Errorf("Failed to save conditions to the state: %s", err)
 	}
 
-	if resp.JSON200.Action.Allow != nil {
-		actionMap["allow"] = []interface{}{nil}
-	} else {
-		actionMap["allow"] = []interface{}{}
-	}
-
-	if resp.JSON200.Action.Captcha != nil {
-		actionMap["captcha"] = []interface{}{nil}
-	} else {
-		actionMap["captcha"] = []interface{}{}
-	}
-
-	if resp.JSON200.Action.Handshake != nil {
-		actionMap["handshake"] = []interface{}{nil}
-	} else {
-		actionMap["handshake"] = []interface{}{}
-	}
-
-	if resp.JSON200.Action.Monitor != nil {
-		actionMap["monitor"] = []interface{}{nil}
-	} else {
-		actionMap["monitor"] = []interface{}{}
-	}
-
-	if resp.JSON200.Action.Tag != nil {
-		obj := []map[string]interface{}{}
-		obj = append(obj, map[string]interface{}{
-			"tags": resp.JSON200.Action.Tag.Tags,
-		})
-		actionMap["tag"] = obj
-	} else {
-		actionMap["tag"] = []interface{}{}
-	}
-
-	d.Set("action", []interface{}{actionMap})
-
-	if resp.JSON200.Conditions != nil {
-
-		var conditionsList []map[string]interface{}
-
-		for _, condition := range resp.JSON200.Conditions {
-
-			conditionMap := map[string]interface{}{}
-
-			if condition.Ip != nil {
-				ipMap := map[string]interface{}{}
-				ipMap["ip"] = condition.Ip.IpAddress
-				ipMap["negation"] = condition.Ip.Negation
-				conditionMap["ip"] = []interface{}{ipMap}
-			} else {
-				conditionMap["ip"] = []interface{}{}
-			}
-
-			if condition.IpRange != nil {
-				ipRangeMap := map[string]interface{}{}
-				ipRangeMap["lower_bound"] = condition.IpRange.LowerBound
-				ipRangeMap["upper_bound"] = condition.IpRange.UpperBound
-				ipRangeMap["negation"] = condition.IpRange.Negation
-				conditionMap["ip_range"] = []interface{}{ipRangeMap}
-			} else {
-				conditionMap["ip_range"] = []interface{}{}
-			}
-
-			if condition.Url != nil {
-				urlMap := map[string]interface{}{}
-				urlMap["url"] = condition.Url.Url
-				urlMap["negation"] = condition.Url.Negation
-				urlMap["match_type"] = condition.Url.MatchType
-				conditionMap["url"] = []interface{}{urlMap}
-			} else {
-				conditionMap["url"] = []interface{}{}
-			}
-
-			if condition.UserAgent != nil {
-				userAgentMap := map[string]interface{}{}
-				userAgentMap["user_agent"] = condition.UserAgent.UserAgent
-				userAgentMap["match_type"] = condition.UserAgent.MatchType
-				userAgentMap["negation"] = condition.UserAgent.Negation
-				conditionMap["user_agnet"] = []interface{}{userAgentMap}
-			} else {
-				conditionMap["user_agnet"] = []interface{}{}
-			}
-
-			if condition.Header != nil {
-				headerMap := map[string]interface{}{}
-				headerMap["header"] = condition.Header.Header
-				headerMap["value"] = condition.Header.Value
-				headerMap["negation"] = condition.Header.Negation
-				headerMap["match_type"] = condition.Header.MatchType
-				conditionMap["header"] = []interface{}{headerMap}
-			} else {
-				conditionMap["header"] = []interface{}{}
-			}
-
-			if condition.HeaderExists != nil {
-				headerExistsMap := map[string]interface{}{}
-				headerExistsMap["header"] = condition.HeaderExists.Header
-				headerExistsMap["negation"] = condition.HeaderExists.Negation
-				conditionMap["header_exists"] = []interface{}{headerExistsMap}
-			} else {
-				conditionMap["header_exists"] = []interface{}{}
-			}
-
-			if condition.ResponseHeader != nil {
-				respHeaderMap := map[string]interface{}{}
-				respHeaderMap["header"] = condition.ResponseHeader.Header
-				respHeaderMap["value"] = condition.ResponseHeader.Value
-				respHeaderMap["negation"] = condition.ResponseHeader.Negation
-				respHeaderMap["match_type"] = condition.ResponseHeader.MatchType
-				conditionMap["response_header"] = []interface{}{respHeaderMap}
-			} else {
-				conditionMap["response_header"] = []interface{}{}
-			}
-
-			if condition.ResponseHeaderExists != nil {
-				responseExistsMap := map[string]interface{}{}
-				responseExistsMap["header"] = condition.ResponseHeaderExists.Header
-				responseExistsMap["negation"] = condition.ResponseHeaderExists.Negation
-				conditionMap["response_header_exists"] = []interface{}{responseExistsMap}
-			} else {
-				conditionMap["response_header_exists"] = []interface{}{}
-			}
-
-			if condition.HttpMethod != nil {
-				httpMethodMap := map[string]interface{}{}
-				httpMethodMap["http_method"] = condition.HttpMethod.HttpMethod
-				httpMethodMap["negation"] = condition.HttpMethod.Negation
-				conditionMap["http_method"] = []interface{}{httpMethodMap}
-			} else {
-				conditionMap["http_method"] = []interface{}{}
-			}
-
-			if condition.FileExtension != nil {
-				if len(condition.FileExtension.FileExtension) > 0 {
-					fileExtensionMap := map[string]interface{}{}
-					fileExtensionMap["file_extension"] = condition.FileExtension.FileExtension
-					fileExtensionMap["negation"] = condition.FileExtension.Negation
-					conditionMap["file_extension"] = []interface{}{fileExtensionMap}
-				} else {
-					conditionMap["file_extension"] = []interface{}{}
-				}
-			}
-
-			if condition.ContentType != nil {
-				if len(condition.ContentType.ContentType) > 0 {
-					contentTypeMap := map[string]interface{}{}
-					contentTypeMap["content_type"] = condition.ContentType.ContentType
-					contentTypeMap["negation"] = condition.ContentType.Negation
-					conditionMap["content_type"] = []interface{}{contentTypeMap}
-				} else {
-					conditionMap["content_type"] = []interface{}{}
-				}
-			}
-
-			if condition.Country != nil {
-				if len(condition.Country.CountryCode) > 0 {
-					countryMap := map[string]interface{}{}
-					countryMap["country_code"] = condition.Country.CountryCode
-					countryMap["negation"] = condition.Country.Negation
-					conditionMap["country"] = []interface{}{countryMap}
-				} else {
-					conditionMap["country"] = []interface{}{}
-				}
-			}
-
-			if condition.Organization != nil {
-				orgMap := map[string]interface{}{}
-				orgMap["organization"] = condition.Organization.Organization
-				orgMap["negation"] = condition.Organization.Negation
-				conditionMap["organization"] = []interface{}{orgMap}
-			} else {
-				conditionMap["organization"] = []interface{}{}
-			}
-
-			if condition.RequestRate != nil {
-
-				requestRateMap := map[string]interface{}{}
-				// requestRateMap["negation"] = condition.RequestRate.Negation
-
-				if len(*condition.RequestRate.Ips) > 0 {
-					requestRateMap["ips"] = condition.RequestRate.Ips
-				}
-				if len(*condition.RequestRate.HttpMethods) > 0 {
-					requestRateMap["http_methods"] = condition.RequestRate.HttpMethods
-				}
-
-				requestRateMap["path_pattern"] = condition.RequestRate.PathPattern
-				requestRateMap["requests"] = condition.RequestRate.Requests
-				requestRateMap["time"] = condition.RequestRate.Time
-
-				if condition.RequestRate.UserDefinedTag != nil {
-					requestRateMap["user_defined_tag"] = *condition.RequestRate.UserDefinedTag
-				}
-
-				conditionMap["request_rate"] = []interface{}{requestRateMap}
-			} else {
-				conditionMap["request_rate"] = []interface{}{}
-			}
-
-			if condition.OwnerTypes != nil {
-				if len(*condition.OwnerTypes.OwnerTypes) > 0 {
-					ownerMap := map[string]interface{}{}
-					ownerMap["owner_types"] = condition.OwnerTypes.OwnerTypes
-					ownerMap["negation"] = condition.OwnerTypes.Negation
-					conditionMap["owner_types"] = []interface{}{ownerMap}
-				} else {
-					conditionMap["owner_types"] = []interface{}{}
-				}
-			}
-
-			if condition.Tags != nil {
-				if len(condition.Tags.Tags) > 0 {
-					tagMaps := map[string]interface{}{}
-					tagMaps["tags"] = condition.Tags.Tags
-					tagMaps["negation"] = condition.Tags.Negation
-					conditionMap["tags"] = []interface{}{tagMaps}
-				} else {
-					conditionMap["tags"] = []interface{}{}
-				}
-			}
-
-			if condition.SessionRequestCount != nil {
-				sessReqMap := map[string]interface{}{}
-				sessReqMap["negation"] = condition.SessionRequestCount.Negation
-				sessReqMap["request_count"] = condition.SessionRequestCount.RequestCount
-				conditionMap["session_request_count"] = []interface{}{sessReqMap}
-			} else {
-				conditionMap["session_request_count"] = []interface{}{}
-			}
-
-			if condition.UserDefinedTags != nil {
-				if len(condition.UserDefinedTags.Tags) > 0 {
-					tagMaps := map[string]interface{}{}
-					tagMaps["tags"] = condition.Tags.Tags
-					tagMaps["negation"] = condition.Tags.Negation
-					conditionMap["user_defined_tags"] = []interface{}{tagMaps}
-				} else {
-					conditionMap["user_defined_tags"] = []interface{}{}
-				}
-			}
-
-			conditionsList = append(conditionsList, conditionMap)
-		}
-
-		if len(conditionsList) > 0 {
-			d.Set("conditions", conditionsList)
-		}
-
-	}
-
-	log.Printf("[DEBUG] curr state: %+v", string(resp.Body))
+	log.Println("[DEBUG] Finish WAAP Custom Rule reading (id=%s)", ruleId)
 
 	return nil
 }
 
 func resourceCustomRulesUpdate(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
+	log.Println("[DEBUG] Start WAAP Custom Rule updating (id=%s)", d.Id())
 
 	client := m.(*Config).WaapClient
-	parsed, _ := parseInput(d)
-	domainID, _ := strconv.Atoi(d.Get("domain_id").(string))
+
 	ruleId, err := strconv.Atoi(d.Id())
 	if err != nil {
-		return diag.Errorf("Failed to load rule ID %s", err)
+		return diag.Errorf("Failed to convert rule ID %s", err)
 	}
 
-	log.Printf("[DEBUG] Updating custom rule: ID: %+v | Domain ID: %+v", ruleId, domainID)
-
-	updateRequest := waap.UpdateCustomRuleV1DomainsDomainIdCustomRulesRuleIdPatchJSONRequestBody{
-		Action:      parsed.Action,
-		Conditions:  parsed.Conditions,
-		Description: parsed.Description,
-		Enabled:     parsed.Enabled,
-		Name:        parsed.Name,
+	name := d.Get("name").(string)
+	enabled := d.Get("enabled").(bool)
+	description := d.Get("description").(string)
+	req := waap.UpdateCustomRule{
+		Name:        &name,
+		Enabled:     &enabled,
+		Description: &description,
 	}
 
-	resp, err := client.UpdateCustomRuleV1DomainsDomainIdCustomRulesRuleIdPatchWithResponse(ctx, domainID, ruleId, updateRequest)
+	if d.HasChange("action") {
+		if action := getWaapActionPayload(d.Get("action")); action != nil {
+			req.Action = action
+		}
+	}
 
+	if d.HasChange("conditions") {
+		conditions := getConditionsPaylod(d.Get("conditions"))
+		req.Conditions = &conditions
+	}
+
+	resp, err := client.UpdateCustomRuleV1DomainsDomainIdCustomRulesRuleIdPatchWithResponse(ctx, d.Get("domain_id").(int), ruleId, req)
 	if err != nil {
-		return diag.Errorf("Error while updating rule '%+v'", err)
+		return diag.Errorf("Failed to update Custom Rule: %w", err)
 	}
 
 	if resp.StatusCode() != http.StatusNoContent {
-		return diag.Errorf("Failed to Update custom rule. Status code: %d with error: %s", resp.StatusCode(), string(resp.Body))
+		return diag.Errorf("Failed to update Custom Rule. Status code: %d with error: %s", resp.StatusCode(), resp.Body)
 	}
 
-	return resourceCustomRulesRead(ctx, d, m) // Refresh state
+	log.Printf("[DEBUG] Finish WAAP Custom Rule updating (id=%s)", ruleId)
+	return resourceCustomRulesRead(ctx, d, m)
 }
 
 func resourceCustomRulesDelete(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
+	log.Printf("[DEBUG] Start WAAP Custom Rule deleting (id=%s)\n", d.Id())
 
 	client := m.(*Config).WaapClient
 
 	ruleId, err := strconv.Atoi(d.Id())
 	if err != nil {
-		return diag.Errorf("Failed to load rule ID %s", err)
+		return diag.Errorf("Failed to convert rule ID %s", err)
 	}
 
-	domainID, _ := strconv.Atoi(d.Get("domain_id").(string))
-	log.Printf("[DEBUG] Deleting custom rule: ID: %+v | Domain ID: %+v", ruleId, domainID)
-
-	resp, err := client.DeleteCustomRuleV1DomainsDomainIdCustomRulesRuleIdDeleteWithResponse(ctx, domainID, ruleId)
-
+	resp, err := client.DeleteCustomRuleV1DomainsDomainIdCustomRulesRuleIdDeleteWithResponse(ctx, d.Get("domain_id").(int), ruleId)
 	if err != nil {
-		return diag.Errorf("Error while deleting rule '%+v'", err)
+		return diag.FromErr(err)
 	}
 
 	if resp.StatusCode() != http.StatusNoContent {
-		return diag.Errorf("Failed to Delete custom rule. Status code: %d with error: %s", resp.StatusCode(), resp.Body)
+		return diag.Errorf("Failed to delete Custom Rule. Status code: %d with error: %s", resp.StatusCode(), resp.Body)
 	}
 
+	log.Printf("[DEBUG] Finish WAAP Custom Rule deleting (id=%s)\n", d.Id())
 	d.SetId("")
+
 	return nil
+}
+
+func getConditionsPaylod(conditionsRaw any) []waap.CustomRuleConditionInput {
+	conditions := conditionsRaw.([]interface{})
+	result := []waap.CustomRuleConditionInput{}
+
+	if len(conditions) == 0 || conditions[0] == nil {
+		return result
+	}
+
+	for key, value := range conditions[0].(map[string]interface{}) {
+		for _, item := range value.([]interface{}) {
+
+			if key == "ip" {
+				conditionRequest := waap.CustomRuleConditionInput{}
+				ip_obj := item.(map[string]interface{})
+
+				var ipAddress waap.IpCondition_IpAddress
+				ipAddress.FromIpConditionIpAddress1(ip_obj["ip_address"].(string))
+
+				negation := ip_obj["negation"].(bool)
+				ipCondition := waap.IpCondition{
+					IpAddress: ipAddress,
+					Negation:  &negation,
+				}
+
+				conditionRequest.Ip = &ipCondition
+				result = append(result, conditionRequest)
+			}
+
+			if key == "ip_range" {
+				conditionRequest := waap.CustomRuleConditionInput{}
+				ipRangeObj := item.(map[string]interface{})
+				lowerBound := ipRangeObj["lower_bound"].(string)
+				upperBound := ipRangeObj["upper_bound"].(string)
+				negation := ipRangeObj["negation"].(bool)
+
+				var lowerObj waap.IpRangeCondition_LowerBound
+				lowerObj.FromIpRangeConditionLowerBound0(lowerBound)
+
+				var upperObj waap.IpRangeCondition_UpperBound
+				upperObj.FromIpRangeConditionUpperBound0(upperBound)
+
+				ipRange := waap.IpRangeCondition{
+					LowerBound: lowerObj,
+					UpperBound: upperObj,
+					Negation:   &negation,
+				}
+
+				conditionRequest.IpRange = &ipRange
+				result = append(result, conditionRequest)
+			}
+
+			if key == "url" {
+				conditionRequest := waap.CustomRuleConditionInput{}
+				urlObj := item.(map[string]interface{})
+
+				url := urlObj["url"].(string)
+				negation := urlObj["negation"].(bool)
+				match_type := waap.UrlConditionMatchType(urlObj["match_type"].(string))
+
+				urlCondition := waap.UrlCondition{
+					Url:       url,
+					Negation:  &negation,
+					MatchType: &match_type,
+				}
+
+				conditionRequest.Url = &urlCondition
+				result = append(result, conditionRequest)
+			}
+
+			if key == "user_agent" {
+				conditionRequest := waap.CustomRuleConditionInput{}
+				agentObj := item.(map[string]interface{})
+
+				userAgent := agentObj["user_agent"].(string)
+				negation := agentObj["negation"].(bool)
+				match_type := waap.UserAgentConditionMatchType(agentObj["match_type"].(string))
+
+				agentCondition := waap.UserAgentCondition{
+					UserAgent: userAgent,
+					Negation:  &negation,
+					MatchType: &match_type,
+				}
+
+				conditionRequest.UserAgent = &agentCondition
+				result = append(result, conditionRequest)
+			}
+
+			if key == "header" {
+				conditionRequest := waap.CustomRuleConditionInput{}
+				obj := item.(map[string]interface{})
+
+				header := obj["header"].(string)
+				value := obj["value"].(string)
+				negation := obj["negation"].(bool)
+				match_type := waap.HeaderConditionMatchType(obj["match_type"].(string))
+
+				condition := waap.HeaderCondition{
+					Header:    header,
+					Value:     value,
+					Negation:  &negation,
+					MatchType: &match_type,
+				}
+
+				conditionRequest.Header = &condition
+				result = append(result, conditionRequest)
+			}
+
+			if key == "header_exists" {
+				conditionRequest := waap.CustomRuleConditionInput{}
+				obj := item.(map[string]interface{})
+
+				header := obj["header"].(string)
+				negation := obj["negation"].(bool)
+
+				condition := waap.HeaderExistsCondition{
+					Header:   header,
+					Negation: &negation,
+				}
+
+				conditionRequest.HeaderExists = &condition
+				result = append(result, conditionRequest)
+			}
+
+			if key == "response_header" {
+				conditionRequest := waap.CustomRuleConditionInput{}
+				obj := item.(map[string]interface{})
+
+				header := obj["header"].(string)
+				value := obj["value"].(string)
+				negation := obj["negation"].(bool)
+				match_type := waap.ResponseHeaderConditionMatchType(obj["match_type"].(string))
+
+				condition := waap.ResponseHeaderCondition{
+					Header:    header,
+					Value:     value,
+					Negation:  &negation,
+					MatchType: &match_type,
+				}
+
+				conditionRequest.ResponseHeader = &condition
+				result = append(result, conditionRequest)
+			}
+
+			if key == "response_header_exists" {
+				conditionRequest := waap.CustomRuleConditionInput{}
+				obj := item.(map[string]interface{})
+
+				header := obj["header"].(string)
+				negation := obj["negation"].(bool)
+
+				condition := waap.ResponseHeaderExistsCondition{
+					Header:   header,
+					Negation: &negation,
+				}
+
+				conditionRequest.ResponseHeaderExists = &condition
+				result = append(result, conditionRequest)
+			}
+
+			if key == "http_method" {
+				conditionRequest := waap.CustomRuleConditionInput{}
+				httpMethodObj := item.(map[string]interface{})
+
+				method := httpMethodObj["http_method"].(string)
+				negation := httpMethodObj["negation"].(bool)
+
+				httpMethod := waap.HttpMethodCondition{
+					HttpMethod: waap.HTTPMethod(method),
+					Negation:   &negation,
+				}
+
+				conditionRequest.HttpMethod = &httpMethod
+				result = append(result, conditionRequest)
+			}
+
+			if key == "file_extension" {
+				conditionRequest := waap.CustomRuleConditionInput{}
+				obj := item.(map[string]interface{})
+
+				negation := obj["negation"].(bool)
+				extensions := []string{}
+				for _, ext := range obj["file_extension"].([]interface{}) {
+					extensions = append(extensions, ext.(string))
+				}
+
+				condition := waap.FileExtensionCondition{
+					FileExtension: extensions,
+					Negation:      &negation,
+				}
+
+				conditionRequest.FileExtension = &condition
+				result = append(result, conditionRequest)
+			}
+
+			if key == "content_type" {
+				conditionRequest := waap.CustomRuleConditionInput{}
+				obj := item.(map[string]interface{})
+
+				negation := obj["negation"].(bool)
+				contentTypes := []string{}
+				for _, ct := range obj["content_type"].([]interface{}) {
+					contentTypes = append(contentTypes, ct.(string))
+				}
+
+				condition := waap.ContentTypeCondition{
+					ContentType: contentTypes,
+					Negation:    &negation,
+				}
+
+				conditionRequest.ContentType = &condition
+				result = append(result, conditionRequest)
+			}
+
+			if key == "country" {
+				conditionRequest := waap.CustomRuleConditionInput{}
+				obj := item.(map[string]interface{})
+
+				negation := obj["negation"].(bool)
+				countries := []string{}
+				for _, country := range obj["country_code"].([]interface{}) {
+					countries = append(countries, country.(string))
+				}
+
+				condition := waap.CountryCondition{
+					CountryCode: countries,
+					Negation:    &negation,
+				}
+
+				conditionRequest.Country = &condition
+				result = append(result, conditionRequest)
+			}
+
+			if key == "organization" {
+				conditionRequest := waap.CustomRuleConditionInput{}
+				obj := item.(map[string]interface{})
+
+				negation := obj["negation"].(bool)
+				organization := obj["organization"].(string)
+
+				condition := waap.OrganizationCondition{
+					Organization: organization,
+					Negation:     &negation,
+				}
+
+				conditionRequest.Organization = &condition
+				result = append(result, conditionRequest)
+			}
+
+			if key == "request_rate" {
+				conditionRequest := waap.CustomRuleConditionInput{}
+				obj := item.(map[string]interface{})
+
+				pattern := obj["path_pattern"].(string)
+				requests := obj["requests"].(int)
+				time := obj["time"].(int)
+
+				ips := make([]waap.RequestRateCondition_Ips_Item, 0)
+				for _, ip := range obj["ips"].([]interface{}) {
+					var ipAddress waap.RequestRateCondition_Ips_Item
+					ipAddress.FromRequestRateConditionIps0(ip.(string))
+					ips = append(ips, ipAddress)
+				}
+
+				methods := make([]waap.HTTPMethod, 0)
+				for _, method := range obj["http_methods"].([]interface{}) {
+					methods = append(methods, waap.HTTPMethod(method.(string)))
+				}
+
+				condition := waap.RequestRateCondition{
+					HttpMethods: &methods,
+					PathPattern: pattern,
+					Requests:    requests,
+					Time:        time,
+					Ips:         &ips,
+				}
+
+				if v, exists := obj["user_defined_tag"]; exists && v != "" {
+					userDefinedTag := v.(string)
+					condition.UserDefinedTag = &userDefinedTag
+				}
+
+				conditionRequest.RequestRate = &condition
+				result = append(result, conditionRequest)
+			}
+
+			if key == "owner_types" {
+				conditionRequest := waap.CustomRuleConditionInput{}
+				obj := item.(map[string]interface{})
+
+				negation := obj["negation"].(bool)
+				ownerTypes := []waap.OwnerTypesConditionOwnerTypes{}
+				for _, ownerType := range obj["owner_types"].([]interface{}) {
+					ownerTypes = append(ownerTypes, waap.OwnerTypesConditionOwnerTypes(ownerType.(string)))
+				}
+
+				condition := waap.OwnerTypesCondition{
+					OwnerTypes: &ownerTypes,
+					Negation:   &negation,
+				}
+
+				conditionRequest.OwnerTypes = &condition
+				result = append(result, conditionRequest)
+			}
+
+			if key == "tags" {
+				conditionRequest := waap.CustomRuleConditionInput{}
+				obj := item.(map[string]interface{})
+
+				negation := obj["negation"].(bool)
+				tags := []string{}
+				for _, tag := range obj["tags"].([]interface{}) {
+					tags = append(tags, tag.(string))
+				}
+
+				condition := waap.TagsCondition{
+					Tags:     tags,
+					Negation: &negation,
+				}
+
+				conditionRequest.Tags = &condition
+				result = append(result, conditionRequest)
+			}
+
+			if key == "session_request_count" {
+				conditionRequest := waap.CustomRuleConditionInput{}
+				obj := item.(map[string]interface{})
+
+				negation := obj["negation"].(bool)
+				requestCount := obj["request_count"].(int)
+
+				condition := waap.SessionRequestCountCondition{
+					RequestCount: requestCount,
+					Negation:     &negation,
+				}
+
+				conditionRequest.SessionRequestCount = &condition
+				result = append(result, conditionRequest)
+			}
+
+			if key == "user_defined_tags" {
+				conditionRequest := waap.CustomRuleConditionInput{}
+				obj := item.(map[string]interface{})
+
+				negation := obj["negation"].(bool)
+				tags := []string{}
+				for _, tag := range obj["tags"].([]interface{}) {
+					tags = append(tags, tag.(string))
+				}
+
+				condition := waap.UserDefinedTagsCondition{
+					Tags:     tags,
+					Negation: &negation,
+				}
+
+				conditionRequest.UserDefinedTags = &condition
+				result = append(result, conditionRequest)
+			}
+		}
+	}
+
+	return result
+}
+
+func readConditionsFromResponse(conditions []waap.CustomRuleConditionOutput) []interface{} {
+	conditionMap := map[string]interface{}{
+		"ip":                     []interface{}{},
+		"ip_range":               []interface{}{},
+		"url":                    []interface{}{},
+		"user_agent":             []interface{}{},
+		"header":                 []interface{}{},
+		"header_exists":          []interface{}{},
+		"response_header":        []interface{}{},
+		"response_header_exists": []interface{}{},
+		"http_method":            []interface{}{},
+		"file_extension":         []interface{}{},
+		"content_type":           []interface{}{},
+		"country":                []interface{}{},
+		"organization":           []interface{}{},
+		"request_rate":           []interface{}{},
+		"owner_types":            []interface{}{},
+		"tags":                   []interface{}{},
+		"session_request_count":  []interface{}{},
+		"user_defined_tags":      []interface{}{},
+	}
+
+	for _, condition := range conditions {
+		if condition.Ip != nil {
+			ipMap := map[string]interface{}{}
+			ipMap["ip_address"] = marshalStructToJSONString(condition.Ip.IpAddress)
+			ipMap["negation"] = condition.Ip.Negation
+			conditionMap["ip"] = append(conditionMap["ip"].([]interface{}), ipMap)
+		}
+
+		if condition.IpRange != nil {
+			ipRangeMap := map[string]interface{}{}
+			ipRangeMap["lower_bound"] = marshalStructToJSONString(condition.IpRange.LowerBound)
+			ipRangeMap["upper_bound"] = marshalStructToJSONString(condition.IpRange.UpperBound)
+			ipRangeMap["negation"] = condition.IpRange.Negation
+			conditionMap["ip_range"] = append(conditionMap["ip_range"].([]interface{}), ipRangeMap)
+		}
+
+		if condition.Url != nil {
+			urlMap := map[string]interface{}{}
+			urlMap["url"] = condition.Url.Url
+			urlMap["negation"] = condition.Url.Negation
+			urlMap["match_type"] = condition.Url.MatchType
+			conditionMap["url"] = append(conditionMap["url"].([]interface{}), urlMap)
+		}
+
+		if condition.UserAgent != nil {
+			userAgentMap := map[string]interface{}{}
+			userAgentMap["user_agent"] = condition.UserAgent.UserAgent
+			userAgentMap["match_type"] = condition.UserAgent.MatchType
+			userAgentMap["negation"] = condition.UserAgent.Negation
+			conditionMap["user_agent"] = append(conditionMap["user_agent"].([]interface{}), userAgentMap)
+		}
+
+		if condition.Header != nil {
+			headerMap := map[string]interface{}{}
+			headerMap["header"] = condition.Header.Header
+			headerMap["value"] = condition.Header.Value
+			headerMap["negation"] = condition.Header.Negation
+			headerMap["match_type"] = condition.Header.MatchType
+			conditionMap["header"] = append(conditionMap["header"].([]interface{}), headerMap)
+		}
+
+		if condition.HeaderExists != nil {
+			headerExistsMap := map[string]interface{}{}
+			headerExistsMap["header"] = condition.HeaderExists.Header
+			headerExistsMap["negation"] = condition.HeaderExists.Negation
+			conditionMap["header_exists"] = append(conditionMap["header_exists"].([]interface{}), headerExistsMap)
+		}
+
+		if condition.ResponseHeader != nil {
+			respHeaderMap := map[string]interface{}{}
+			respHeaderMap["header"] = condition.ResponseHeader.Header
+			respHeaderMap["value"] = condition.ResponseHeader.Value
+			respHeaderMap["negation"] = condition.ResponseHeader.Negation
+			respHeaderMap["match_type"] = condition.ResponseHeader.MatchType
+			conditionMap["response_header"] = append(conditionMap["response_header"].([]interface{}), respHeaderMap)
+		}
+
+		if condition.ResponseHeaderExists != nil {
+			responseExistsMap := map[string]interface{}{}
+			responseExistsMap["header"] = condition.ResponseHeaderExists.Header
+			responseExistsMap["negation"] = condition.ResponseHeaderExists.Negation
+			conditionMap["response_header_exists"] = append(conditionMap["response_header_exists"].([]interface{}), responseExistsMap)
+		}
+
+		if condition.HttpMethod != nil {
+			httpMethodMap := map[string]interface{}{}
+			httpMethodMap["http_method"] = condition.HttpMethod.HttpMethod
+			httpMethodMap["negation"] = condition.HttpMethod.Negation
+			conditionMap["http_method"] = append(conditionMap["http_method"].([]interface{}), httpMethodMap)
+		}
+
+		if condition.FileExtension != nil && len(condition.FileExtension.FileExtension) > 0 {
+			fileExtensionMap := map[string]interface{}{}
+			fileExtensionMap["file_extension"] = condition.FileExtension.FileExtension
+			fileExtensionMap["negation"] = condition.FileExtension.Negation
+			conditionMap["file_extension"] = append(conditionMap["file_extension"].([]interface{}), fileExtensionMap)
+		}
+
+		if condition.ContentType != nil && len(condition.ContentType.ContentType) > 0 {
+			contentTypeMap := map[string]interface{}{}
+			contentTypeMap["content_type"] = condition.ContentType.ContentType
+			contentTypeMap["negation"] = condition.ContentType.Negation
+			conditionMap["content_type"] = append(conditionMap["content_type"].([]interface{}), contentTypeMap)
+		}
+
+		if condition.Country != nil && len(condition.Country.CountryCode) > 0 {
+			countryMap := map[string]interface{}{}
+			countryMap["country_code"] = condition.Country.CountryCode
+			countryMap["negation"] = condition.Country.Negation
+			conditionMap["country"] = append(conditionMap["country"].([]interface{}), countryMap)
+		}
+
+		if condition.Organization != nil {
+			orgMap := map[string]interface{}{}
+			orgMap["organization"] = condition.Organization.Organization
+			orgMap["negation"] = condition.Organization.Negation
+			conditionMap["organization"] = append(conditionMap["organization"].([]interface{}), orgMap)
+		}
+
+		if condition.RequestRate != nil {
+			requestRateMap := map[string]interface{}{}
+
+			if condition.RequestRate.Ips != nil && len(*condition.RequestRate.Ips) > 0 {
+				var marshaledIps []string
+				for _, ip := range *condition.RequestRate.Ips {
+					marshaledIps = append(marshaledIps, marshalStructToJSONString(ip))
+				}
+				requestRateMap["ips"] = marshaledIps
+			}
+
+			if condition.RequestRate.HttpMethods != nil && len(*condition.RequestRate.HttpMethods) > 0 {
+				requestRateMap["http_methods"] = condition.RequestRate.HttpMethods
+			}
+
+			requestRateMap["path_pattern"] = condition.RequestRate.PathPattern
+			requestRateMap["requests"] = condition.RequestRate.Requests
+			requestRateMap["time"] = condition.RequestRate.Time
+
+			if condition.RequestRate.UserDefinedTag != nil {
+				requestRateMap["user_defined_tag"] = *condition.RequestRate.UserDefinedTag
+			}
+
+			conditionMap["request_rate"] = append(conditionMap["request_rate"].([]interface{}), requestRateMap)
+		}
+
+		if condition.OwnerTypes != nil && len(*condition.OwnerTypes.OwnerTypes) > 0 {
+			ownerMap := map[string]interface{}{}
+			ownerMap["owner_types"] = condition.OwnerTypes.OwnerTypes
+			ownerMap["negation"] = condition.OwnerTypes.Negation
+			conditionMap["owner_types"] = append(conditionMap["owner_types"].([]interface{}), ownerMap)
+		}
+
+		if condition.Tags != nil && len(condition.Tags.Tags) > 0 {
+			tagMaps := map[string]interface{}{}
+			tagMaps["tags"] = condition.Tags.Tags
+			tagMaps["negation"] = condition.Tags.Negation
+			conditionMap["tags"] = append(conditionMap["tags"].([]interface{}), tagMaps)
+		}
+
+		if condition.SessionRequestCount != nil {
+			sessReqMap := map[string]interface{}{}
+			sessReqMap["negation"] = condition.SessionRequestCount.Negation
+			sessReqMap["request_count"] = condition.SessionRequestCount.RequestCount
+			conditionMap["session_request_count"] = append(conditionMap["session_request_count"].([]interface{}), sessReqMap)
+		}
+
+		if condition.UserDefinedTags != nil && len(condition.UserDefinedTags.Tags) > 0 {
+			tagMaps := map[string]interface{}{}
+			tagMaps["tags"] = condition.UserDefinedTags.Tags
+			tagMaps["negation"] = condition.UserDefinedTags.Negation
+			conditionMap["user_defined_tags"] = append(conditionMap["user_defined_tags"].([]interface{}), tagMaps)
+		}
+	}
+
+	return []interface{}{conditionMap}
 }
