@@ -54,7 +54,7 @@ resource "gcore_waap_security_insight_silence" "insight_silence" {
 - `author` (String) The author of the silence.
 - `comment` (String) A comment explaining the reason for the silence.
 - `domain_id` (Number) The WAAP domain ID for which the insight silence is configured.
-- `insight_type` (String) The slug of the insight type.
+- `insight_type` (String) The slug of the insight type. The insight type can be obtained from the API endpoint /v1/security-insights/types or you can use the gcore_waap_security_insight_type data source.
 - `labels` (Map of String) A hash table of label names and values that apply to the insight silence.
 
 ### Optional

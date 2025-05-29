@@ -33,7 +33,7 @@ func resourceWaapPolicy() *schema.Resource {
 				Type:     schema.TypeMap,
 				Required: true,
 				Description: "A map of policies where each key is a policy ID and the value is a boolean indicating whether the policy is enabled (true) or disabled (false). " +
-					"Policy IDs can be obtained from the API endpoint /v1/domains/{domain_id}/rule-sets (the 'rules' field).",
+					"Policy IDs can be obtained from the API endpoint /v1/domains/{domain_id}/rule-sets (the 'rules' field) or you can use the gcore_waap_domain_policy data source.",
 				Elem: &schema.Schema{
 					Type: schema.TypeBool,
 				},

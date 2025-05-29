@@ -480,10 +480,8 @@ func resourceWaapCustomRule() *schema.Resource {
 										Required: true,
 										MinItems: 1,
 										Elem:     &schema.Schema{Type: schema.TypeString},
-										// todo: add data source
-										// todo: upd description to include info where to get tags
-										// GET https://api.preprod.world/waap/v1/tags?show_all=1
-										Description: "A list of tags to match against the request tags.",
+										Description: "A list of tags to match against the request tags. " +
+											"Tags can be obtained from the API endpoint /v1/tags or you can use the gcore_waap_tag data source.",
 									},
 								},
 							},
