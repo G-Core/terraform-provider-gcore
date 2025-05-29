@@ -29,10 +29,11 @@ func resourceWaapSecurityInsightSilence() *schema.Resource {
 				Description: "The WAAP domain ID for which the insight silence is configured.",
 			},
 			"insight_type": {
-				Type:        schema.TypeString,
-				Required:    true,
-				ForceNew:    true,
-				Description: "The slug of the insight type.",
+				Type:     schema.TypeString,
+				Required: true,
+				ForceNew: true,
+				Description: "The slug of the insight type. The insight type can be obtained from the " +
+					"API endpoint /v1/security-insights/types or you can use the gcore_waap_security_insight_type data source.",
 			},
 			"labels": {
 				Type:        schema.TypeMap,

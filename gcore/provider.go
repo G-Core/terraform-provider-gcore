@@ -193,6 +193,7 @@ func Provider() *schema.Provider {
 			"gcore_fastedge_template":             resourceFastEdgeTemplate(),
 			"gcore_fastedge_secret":               resourceFastEdgeSecret(),
 			"gcore_waap_domain":                   resourceWaapDomain(),
+			"gcore_waap_custom_rule":              resourceWaapCustomRule(),
 			"gcore_waap_security_insight_silence": resourceWaapSecurityInsightSilence(),
 			"gcore_waap_api_path":                 resourceWaapApiPath(),
 			"gcore_waap_advanced_rule":            resourceWaapAdvancedRule(),
@@ -237,6 +238,7 @@ func Provider() *schema.Provider {
 			"gcore_inference_flavor":           dataSourceInferenceFlavor(),
 			"gcore_waap_security_insight_type": dataWaapSecurityInsightType(),
 			"gcore_waap_domain_policy":         dataWaapDomainPolicy(),
+			"gcore_waap_tag":                   dataWaapTag(),
 		},
 		ConfigureContextFunc: providerConfigure,
 	}

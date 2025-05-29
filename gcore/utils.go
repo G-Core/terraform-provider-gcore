@@ -1086,3 +1086,22 @@ func GetConflictRetryConfig(resourceTimeoutSeconds int) ConflictRetryConfig {
 		Interval: interval,
 	}
 }
+
+func importWaapRule(d *schema.ResourceData, meta any) ([]*schema.ResourceData, error) {
+	ids := strings.SplitN(d.Id(), ":", 2)
+
+	if len(ids) != 2 || ids[0] == "" || ids[1] == "" {
+		return nil, fmt.Errorf("unexpected format of ID (%s), expected domain_id:rule_id", d.Id())
+	}
+
+	domainIdStr, ruleId := ids[0], ids[1]
+	domainId, err := strconv.ParseInt(domainIdStr, 10, 64)
+	if err != nil {
+		return nil, fmt.Errorf("unexpected format of domain_id (%s), expected number", domainIdStr)
+	}
+
+	d.Set("domain_id", domainId)
+	d.SetId(ruleId)
+
+	return []*schema.ResourceData{d}, nil
+}

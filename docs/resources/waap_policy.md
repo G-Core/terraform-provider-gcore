@@ -64,7 +64,7 @@ resource "gcore_waap_policy" "domain_policy" {
 ### Required
 
 - `domain_id` (String) The WAAP domain ID for which the Policy is configured.
-- `policies` (Map of Boolean) A map of policies where each key is a policy ID and the value is a boolean indicating whether the policy is enabled (true) or disabled (false). Policy IDs can be obtained from the API endpoint /v1/domains/{domain_id}/rule-sets (the 'rules' field).
+- `policies` (Map of Boolean) A map of policies where each key is a policy ID and the value is a boolean indicating whether the policy is enabled (true) or disabled (false). Policy IDs can be obtained from the API endpoint /v1/domains/{domain_id}/rule-sets (the 'rules' field) or you can use the gcore_waap_domain_policy data source.
 
 ### Read-Only
 

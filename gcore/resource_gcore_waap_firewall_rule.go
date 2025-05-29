@@ -18,30 +18,12 @@ import (
 
 func resourceWaapFirewallRule() *schema.Resource {
 	return &schema.Resource{
+		Importer:      &schema.ResourceImporter{State: importWaapRule},
 		CreateContext: resourceWaapFirewallRuleCreate,
 		ReadContext:   resourceWaapFirewallRuleRead,
 		UpdateContext: resourceWaapFirewallRuleUpdate,
 		DeleteContext: resourceWaapFirewallRuleDelete,
 		Description:   "Represent WAAP Firewall Rule",
-
-		Importer: &schema.ResourceImporter{
-			State: func(d *schema.ResourceData, meta any) ([]*schema.ResourceData, error) {
-				domainIdStr, ruleId, err := resourceFirewallRuleImportParseId(d.Id())
-				if err != nil {
-					return nil, err
-				}
-
-				domainId, err := strconv.ParseInt(domainIdStr, 10, 64)
-				if err != nil {
-					return nil, fmt.Errorf("unexpected format of domain_id (%s), expected number", domainIdStr)
-				}
-
-				d.Set("domain_id", domainId)
-				d.SetId(ruleId)
-
-				return []*schema.ResourceData{d}, nil
-			},
-		},
 
 		Schema: map[string]*schema.Schema{
 			"domain_id": {
@@ -463,14 +445,4 @@ func marshalStructToJSONString[T any](input T) string {
 	ipAddr := string(jsonBytes)
 	ipAddr = strings.ReplaceAll(ipAddr, "\"", "")
 	return ipAddr
-}
-
-func resourceFirewallRuleImportParseId(id string) (string, string, error) {
-	parts := strings.SplitN(id, ":", 2)
-
-	if len(parts) != 2 || parts[0] == "" || parts[1] == "" {
-		return "", "", fmt.Errorf("unexpected format of ID (%s), expected domain_id:rule_id", id)
-	}
-
-	return parts[0], parts[1], nil
 }

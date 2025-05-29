@@ -7,7 +7,6 @@ import (
 	"net/http"
 	"regexp"
 	"strconv"
-	"strings"
 
 	waap "github.com/G-Core/gcore-waap-sdk-go"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
@@ -15,26 +14,139 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/validation"
 )
 
-func resourceWaapAdvancedRule() *schema.Resource {
-	return &schema.Resource{
-		Importer: &schema.ResourceImporter{
-			State: func(d *schema.ResourceData, meta any) ([]*schema.ResourceData, error) {
-				domainIdStr, ruleId, err := resourceAdvancedRuleImportParseId(d.Id())
-				if err != nil {
-					return nil, err
-				}
-
-				domainId, err := strconv.ParseInt(domainIdStr, 10, 64)
-				if err != nil {
-					return nil, fmt.Errorf("unexpected format of domain_id (%s), expected number", domainIdStr)
-				}
-
-				d.Set("domain_id", domainId)
-				d.SetId(ruleId)
-
-				return []*schema.ResourceData{d}, nil
+// This also used for the WAAP Custom Rule resource
+var (
+	waapActionSchema = &schema.Schema{
+		Type:        schema.TypeList,
+		Required:    true,
+		MaxItems:    1,
+		Description: "The action that the rule takes when triggered.",
+		Elem: &schema.Resource{
+			Schema: map[string]*schema.Schema{
+				"allow": {
+					Type:        schema.TypeBool,
+					Optional:    true,
+					Description: "The WAAP allows the request.",
+					ExactlyOneOf: []string{
+						"action.0.allow",
+						"action.0.block",
+						"action.0.captcha",
+						"action.0.handshake",
+						"action.0.monitor",
+						"action.0.tag",
+					},
+				},
+				"block": {
+					Type:        schema.TypeList,
+					Optional:    true,
+					MaxItems:    1,
+					Description: "The WAAP blocks the request.",
+					ExactlyOneOf: []string{
+						"action.0.allow",
+						"action.0.block",
+						"action.0.captcha",
+						"action.0.handshake",
+						"action.0.monitor",
+						"action.0.tag",
+					},
+					Elem: &schema.Resource{
+						Schema: map[string]*schema.Schema{
+							"status_code": {
+								Type:     schema.TypeInt,
+								Optional: true,
+								Default:  403,
+								Description: "A custom HTTP status code that the WAAP returns if a rule blocks a request. " +
+									"It must be one of these values {403, 405, 418, 429}. Default is 403.",
+								ValidateFunc: validation.IntInSlice([]int{403, 405, 418, 429}),
+							},
+							"action_duration": {
+								Type:     schema.TypeString,
+								Optional: true,
+								Description: "How long a rule's block action will apply to subsequent requests. " +
+									"Can be specified in seconds or by using a numeral followed by 's', 'm', 'h', or 'd' " +
+									"to represent time format (seconds, minutes, hours, or days). Example: 12h. Must match the pattern ^[0-9]*[smhd]?$",
+								ValidateFunc: validation.StringMatch(
+									regexp.MustCompile(`^[0-9]+[smhd]?$`),
+									"Must be a number optionally followed by 's', 'm', 'h', or 'd' (e.g., 60, 5m, 12h, 1d)",
+								),
+							},
+						},
+					},
+				},
+				"captcha": {
+					Type:        schema.TypeBool,
+					Optional:    true,
+					Description: "The WAAP requires the user to solve a CAPTCHA challenge.",
+					ExactlyOneOf: []string{
+						"action.0.allow",
+						"action.0.block",
+						"action.0.captcha",
+						"action.0.handshake",
+						"action.0.monitor",
+						"action.0.tag",
+					},
+				},
+				"handshake": {
+					Type:        schema.TypeBool,
+					Optional:    true,
+					Description: "The WAAP performs automatic browser validation.",
+					ExactlyOneOf: []string{
+						"action.0.allow",
+						"action.0.block",
+						"action.0.captcha",
+						"action.0.handshake",
+						"action.0.monitor",
+						"action.0.tag",
+					},
+				},
+				"monitor": {
+					Type:        schema.TypeBool,
+					Optional:    true,
+					Description: "The WAAP monitors the request but took no action.",
+					ExactlyOneOf: []string{
+						"action.0.allow",
+						"action.0.block",
+						"action.0.captcha",
+						"action.0.handshake",
+						"action.0.monitor",
+						"action.0.tag",
+					},
+				},
+				"tag": {
+					Type:        schema.TypeList,
+					Optional:    true,
+					MaxItems:    1,
+					Description: "The WAAP tags the request.",
+					ExactlyOneOf: []string{
+						"action.0.allow",
+						"action.0.block",
+						"action.0.captcha",
+						"action.0.handshake",
+						"action.0.monitor",
+						"action.0.tag",
+					},
+					Elem: &schema.Resource{
+						Schema: map[string]*schema.Schema{
+							"tags": {
+								Type:        schema.TypeList,
+								Required:    true,
+								Description: "The list of user defined tags to tag the request with.",
+								MinItems:    1,
+								Elem: &schema.Schema{
+									Type: schema.TypeString,
+								},
+							},
+						},
+					},
+				},
 			},
 		},
+	}
+)
+
+func resourceWaapAdvancedRule() *schema.Resource {
+	return &schema.Resource{
+		Importer:      &schema.ResourceImporter{State: importWaapRule},
 		CreateContext: resourceWaapAdvancedRuleCreate,
 		ReadContext:   resourceWaapAdvancedRuleRead,
 		UpdateContext: resourceWaapAdvancedRuleUpdate,
@@ -63,132 +175,7 @@ func resourceWaapAdvancedRule() *schema.Resource {
 				Required:    true,
 				Description: "Whether the rule is enabled.",
 			},
-			"action": {
-				Type:        schema.TypeList,
-				Required:    true,
-				MaxItems:    1,
-				Description: "The action that the rule takes when triggered.",
-				Elem: &schema.Resource{
-					Schema: map[string]*schema.Schema{
-						"allow": {
-							Type:        schema.TypeBool,
-							Optional:    true,
-							Description: "The WAAP allows the request.",
-							ExactlyOneOf: []string{
-								"action.0.allow",
-								"action.0.block",
-								"action.0.captcha",
-								"action.0.handshake",
-								"action.0.monitor",
-								"action.0.tag",
-							},
-						},
-						"block": {
-							Type:        schema.TypeList,
-							Optional:    true,
-							MaxItems:    1,
-							Description: "The WAAP blocks the request.",
-							ExactlyOneOf: []string{
-								"action.0.allow",
-								"action.0.block",
-								"action.0.captcha",
-								"action.0.handshake",
-								"action.0.monitor",
-								"action.0.tag",
-							},
-							Elem: &schema.Resource{
-								Schema: map[string]*schema.Schema{
-									"status_code": {
-										Type:     schema.TypeInt,
-										Optional: true,
-										Default:  403,
-										Description: "A custom HTTP status code that the WAAP returns if a rule blocks a request. " +
-											"It must be one of these values {403, 405, 418, 429}. Default is 403.",
-										ValidateFunc: validation.IntInSlice([]int{403, 405, 418, 429}),
-									},
-									"action_duration": {
-										Type:     schema.TypeString,
-										Optional: true,
-										Description: "How long a rule's block action will apply to subsequent requests. " +
-											"Can be specified in seconds or by using a numeral followed by 's', 'm', 'h', or 'd' " +
-											"to represent time format (seconds, minutes, hours, or days). Example: 12h. Must match the pattern ^[0-9]*[smhd]?$",
-										ValidateFunc: validation.StringMatch(
-											regexp.MustCompile(`^[0-9]+[smhd]?$`),
-											"Must be a number optionally followed by 's', 'm', 'h', or 'd' (e.g., 60, 5m, 12h, 1d)",
-										),
-									},
-								},
-							},
-						},
-						"captcha": {
-							Type:        schema.TypeBool,
-							Optional:    true,
-							Description: "The WAAP requires the user to solve a CAPTCHA challenge.",
-							ExactlyOneOf: []string{
-								"action.0.allow",
-								"action.0.block",
-								"action.0.captcha",
-								"action.0.handshake",
-								"action.0.monitor",
-								"action.0.tag",
-							},
-						},
-						"handshake": {
-							Type:        schema.TypeBool,
-							Optional:    true,
-							Description: "The WAAP performs automatic browser validation.",
-							ExactlyOneOf: []string{
-								"action.0.allow",
-								"action.0.block",
-								"action.0.captcha",
-								"action.0.handshake",
-								"action.0.monitor",
-								"action.0.tag",
-							},
-						},
-						"monitor": {
-							Type:        schema.TypeBool,
-							Optional:    true,
-							Description: "The WAAP monitors the request but took no action.",
-							ExactlyOneOf: []string{
-								"action.0.allow",
-								"action.0.block",
-								"action.0.captcha",
-								"action.0.handshake",
-								"action.0.monitor",
-								"action.0.tag",
-							},
-						},
-						"tag": {
-							Type:        schema.TypeList,
-							Optional:    true,
-							MaxItems:    1,
-							Description: "The WAAP tags the request.",
-							ExactlyOneOf: []string{
-								"action.0.allow",
-								"action.0.block",
-								"action.0.captcha",
-								"action.0.handshake",
-								"action.0.monitor",
-								"action.0.tag",
-							},
-							Elem: &schema.Resource{
-								Schema: map[string]*schema.Schema{
-									"tags": {
-										Type:        schema.TypeList,
-										Required:    true,
-										Description: "The list of user defined tags to tag the request with.",
-										MinItems:    1,
-										Elem: &schema.Schema{
-											Type: schema.TypeString,
-										},
-									},
-								},
-							},
-						},
-					},
-				},
-			},
+			"action": waapActionSchema,
 			"source": {
 				Type:     schema.TypeString,
 				Required: true,
@@ -202,7 +189,7 @@ func resourceWaapAdvancedRule() *schema.Resource {
 				Description: "The WAAP request/response phase for applying the rule. " +
 					"The 'access' phase is responsible for modifying the request before it is sent to the origin server. " +
 					"The 'header_filter' phase is responsible for modifying the HTTP headers of a response before they are sent back to the client." +
-					"The 'body_filter' phase is responsible for modifying the body of a response before it is sent back to the client.",
+					"The 'body_filter' phase is responsible for modifying the body of a response before it is sent back to the client. Default is 'access'.",
 				Default: "access",
 				ValidateFunc: validation.StringInSlice([]string{
 					"access",
@@ -236,7 +223,7 @@ func resourceWaapAdvancedRuleCreate(ctx context.Context, d *schema.ResourceData,
 	}
 
 	if v, ok := d.GetOk("action"); ok {
-		if action := getActionPayload(v); action != nil {
+		if action := getWaapActionPayload(v); action != nil {
 			req.Action = *action
 		}
 	}
@@ -289,37 +276,7 @@ func resourceWaapAdvancedRuleRead(ctx context.Context, d *schema.ResourceData, m
 	d.Set("enabled", result.JSON200.Enabled)
 	d.Set("source", result.JSON200.Source)
 	d.Set("phase", result.JSON200.Phase)
-
-	// Handle the action field
-	actionMap := map[string]interface{}{
-		"allow":     result.JSON200.Action.Allow != nil,
-		"captcha":   result.JSON200.Action.Captcha != nil,
-		"handshake": result.JSON200.Action.Handshake != nil,
-		"monitor":   result.JSON200.Action.Monitor != nil,
-	}
-	// Block
-	if result.JSON200.Action.Block != nil {
-		actionMap["block"] = []interface{}{
-			map[string]interface{}{
-				"status_code":     result.JSON200.Action.Block.StatusCode,
-				"action_duration": result.JSON200.Action.Block.ActionDuration,
-			},
-		}
-	} else {
-		actionMap["block"] = []interface{}{}
-	}
-	// Tag
-	if result.JSON200.Action.Tag != nil {
-		actionMap["tag"] = []interface{}{
-			map[string]interface{}{
-				"tags": result.JSON200.Action.Tag.Tags,
-			},
-		}
-	} else {
-		actionMap["tag"] = []interface{}{}
-	}
-
-	d.Set("action", []interface{}{actionMap})
+	d.Set("action", readWaapActionFromResponse(result.JSON200.Action))
 
 	log.Printf("[DEBUG] Finish WAAP Advanced Rule reading (id=%s)\n", ruleID)
 	return nil
@@ -355,7 +312,7 @@ func resourceWaapAdvancedRuleUpdate(ctx context.Context, d *schema.ResourceData,
 	}
 
 	if d.HasChange("action") {
-		if action := getActionPayload(d.Get("action")); action != nil {
+		if action := getWaapActionPayload(d.Get("action")); action != nil {
 			req.Action = action
 		}
 	}
@@ -399,7 +356,8 @@ func resourceWaapAdvancedRuleDelete(ctx context.Context, d *schema.ResourceData,
 	return nil
 }
 
-func getActionPayload(actionRaw any) *waap.CustomerRuleActionInput {
+// This also used for the WAAP Custom Rule resource
+func getWaapActionPayload(actionRaw any) *waap.CustomerRuleActionInput {
 	actions := actionRaw.([]interface{})
 
 	if len(actions) > 0 && actions[0] != nil {
@@ -454,12 +412,34 @@ func getActionPayload(actionRaw any) *waap.CustomerRuleActionInput {
 	return nil
 }
 
-func resourceAdvancedRuleImportParseId(id string) (string, string, error) {
-	parts := strings.SplitN(id, ":", 2)
-
-	if len(parts) != 2 || parts[0] == "" || parts[1] == "" {
-		return "", "", fmt.Errorf("unexpected format of ID (%s), expected domain_id:rule_id", id)
+func readWaapActionFromResponse(action waap.CustomerRuleActionOutput) []interface{} {
+	actionMap := map[string]interface{}{
+		"allow":     action.Allow != nil,
+		"captcha":   action.Captcha != nil,
+		"handshake": action.Handshake != nil,
+		"monitor":   action.Monitor != nil,
 	}
 
-	return parts[0], parts[1], nil
+	if action.Block != nil {
+		actionMap["block"] = []interface{}{
+			map[string]interface{}{
+				"status_code":     action.Block.StatusCode,
+				"action_duration": action.Block.ActionDuration,
+			},
+		}
+	} else {
+		actionMap["block"] = []interface{}{}
+	}
+
+	if action.Tag != nil {
+		actionMap["tag"] = []interface{}{
+			map[string]interface{}{
+				"tags": action.Tag.Tags,
+			},
+		}
+	} else {
+		actionMap["tag"] = []interface{}{}
+	}
+
+	return []interface{}{actionMap}
 }
