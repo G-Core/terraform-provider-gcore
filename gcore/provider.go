@@ -238,6 +238,7 @@ func Provider() *schema.Provider {
 			"gcore_inference_flavor":           dataSourceInferenceFlavor(),
 			"gcore_waap_security_insight_type": dataWaapSecurityInsightType(),
 			"gcore_waap_domain_policy":         dataWaapDomainPolicy(),
+			"gcore_waap_tag":                   dataWaapTag(),
 		},
 		ConfigureContextFunc: providerConfigure,
 	}

@@ -2,6 +2,10 @@ provider gcore {
     permanent_api_token = "768660$.............a43f91f"
 }
 
+data "gcore_waap_tag" "proxy_network" {
+  name = "Proxy Network"
+}
+
 resource "gcore_cdn_resource" "cdn_resource" {
     cname  = "api.example.com"
     origin = "origin.example.com"
@@ -33,6 +37,9 @@ resource "gcore_waap_custom_rule" "custom_rule" {
         http_method {
             negation     = false
             http_method  = "POST"
+        }
+        tags {
+            tags = [data.gcore_waap_tag.proxy_network.id]
         }
     }
 }
