@@ -31,11 +31,10 @@ resource "gcore_waap_custom_rule" "custom_rule" {
     }
     conditions {
         ip {
-            negation    = false
+            negation    = true
             ip_address = "192.168.0.6"
         }
         http_method {
-            negation     = false
             http_method  = "POST"
         }
         tags {
