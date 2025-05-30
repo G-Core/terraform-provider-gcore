@@ -83,14 +83,15 @@ func resourceWaapDomain() *schema.Resource {
 											Type: schema.TypeString,
 										},
 									},
-									"is_api": {
-										Type:     schema.TypeBool,
-										Optional: true,
-										Default:  false,
-										Description: "Indicates if the domain is an API domain. " +
-											"All requests to an API domain are treated as API requests. " +
-											"If this is set to true then the api_urls field is ignored.",
-									},
+									// todo: uncomment when the field is available in the production
+									// "is_api": {
+									// 	Type:     schema.TypeBool,
+									// 	Optional: true,
+									// 	Default:  false,
+									// 	Description: "Indicates if the domain is an API domain. " +
+									// 		"All requests to an API domain are treated as API requests. " +
+									// 		"If this is set to true then the api_urls field is ignored.",
+									// },
 								},
 							},
 						},
@@ -271,7 +272,8 @@ func resourceWaapDomainRead(ctx context.Context, d *schema.ResourceData, m inter
 	if settingsResp.JSON200.Api.ApiUrls != nil {
 		apiSettings := make(map[string]interface{})
 		apiSettings["api_urls"] = *settingsResp.JSON200.Api.ApiUrls
-		apiSettings["is_api"] = *settingsResp.JSON200.Api.IsApi
+		// todo: uncomment when the field is available in the production
+		// apiSettings["is_api"] = *settingsResp.JSON200.Api.IsApi
 		settings["api"] = []interface{}{apiSettings}
 	}
 
@@ -431,10 +433,11 @@ func updateDomainSettings(ctx context.Context, waapClient *waap.ClientWithRespon
 			apiSettings.ApiUrls = &urls
 		}
 
-		if v, ok := apiMap["is_api"]; ok {
-			val := v.(bool)
-			apiSettings.IsApi = &val
-		}
+		// todo: uncomment when the field is available in the production
+		// if v, ok := apiMap["is_api"]; ok {
+		// 	val := v.(bool)
+		// 	apiSettings.IsApi = &val
+		// }
 
 		updateReq.Api = &apiSettings
 	}
