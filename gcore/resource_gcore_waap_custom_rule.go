@@ -299,7 +299,7 @@ func resourceWaapCustomRule() *schema.Resource {
 										Description: "Whether or not to apply a boolean NOT operation to the rule's condition.",
 									},
 									"file_extension": {
-										Type:        schema.TypeList,
+										Type:        schema.TypeSet,
 										Required:    true,
 										MinItems:    1,
 										Elem:        &schema.Schema{Type: schema.TypeString},
@@ -321,7 +321,7 @@ func resourceWaapCustomRule() *schema.Resource {
 										Description: "Whether or not to apply a boolean NOT operation to the rule's condition.",
 									},
 									"content_type": {
-										Type:        schema.TypeList,
+										Type:        schema.TypeSet,
 										Required:    true,
 										MinItems:    1,
 										Elem:        &schema.Schema{Type: schema.TypeString},
@@ -343,7 +343,7 @@ func resourceWaapCustomRule() *schema.Resource {
 										Description: "Whether or not to apply a boolean NOT operation to the rule's condition.",
 									},
 									"country_code": {
-										Type:        schema.TypeList,
+										Type:        schema.TypeSet,
 										Required:    true,
 										MinItems:    1,
 										Elem:        &schema.Schema{Type: schema.TypeString},
@@ -379,13 +379,13 @@ func resourceWaapCustomRule() *schema.Resource {
 							Elem: &schema.Resource{
 								Schema: map[string]*schema.Schema{
 									"ips": {
-										Type:        schema.TypeList,
+										Type:        schema.TypeSet,
 										Optional:    true,
 										Elem:        &schema.Schema{Type: schema.TypeString},
 										Description: "A list of source IPs that can trigger a request rate condition.",
 									},
 									"http_methods": {
-										Type:     schema.TypeList,
+										Type:     schema.TypeSet,
 										Optional: true,
 										Description: "Possible HTTP request methods that can trigger a request rate condition. " +
 											"Valid values are 'CONNECT', 'DELETE', 'GET', 'HEAD', 'OPTIONS', 'PATCH', 'POST', 'PUT', and 'TRACE'.",
@@ -441,7 +441,7 @@ func resourceWaapCustomRule() *schema.Resource {
 										Description: "Whether or not to apply a boolean NOT operation to the rule's condition.",
 									},
 									"owner_types": {
-										Type:     schema.TypeList,
+										Type:     schema.TypeSet,
 										Required: true,
 										MinItems: 1,
 										Description: "Match the type of organization that owns the IP address making an incoming request. " +
@@ -476,7 +476,7 @@ func resourceWaapCustomRule() *schema.Resource {
 										Description: "Whether or not to apply a boolean NOT operation to the rule's condition.",
 									},
 									"tags": {
-										Type:     schema.TypeList,
+										Type:     schema.TypeSet,
 										Required: true,
 										MinItems: 1,
 										Elem:     &schema.Schema{Type: schema.TypeString},
@@ -519,7 +519,7 @@ func resourceWaapCustomRule() *schema.Resource {
 										Description: "Whether or not to apply a boolean NOT operation to the rule's condition.",
 									},
 									"tags": {
-										Type:        schema.TypeList,
+										Type:        schema.TypeSet,
 										Required:    true,
 										MinItems:    1,
 										Elem:        &schema.Schema{Type: schema.TypeString},
@@ -865,13 +865,8 @@ func getConditionsPaylod(conditionsRaw any) []waap.CustomRuleConditionInput {
 				obj := item.(map[string]interface{})
 
 				negation := obj["negation"].(bool)
-				extensions := []string{}
-				for _, ext := range obj["file_extension"].([]interface{}) {
-					extensions = append(extensions, ext.(string))
-				}
-
 				condition := waap.FileExtensionCondition{
-					FileExtension: extensions,
+					FileExtension: convertSchemaSetToStringList(obj["file_extension"].(*schema.Set)),
 					Negation:      &negation,
 				}
 
@@ -884,13 +879,8 @@ func getConditionsPaylod(conditionsRaw any) []waap.CustomRuleConditionInput {
 				obj := item.(map[string]interface{})
 
 				negation := obj["negation"].(bool)
-				contentTypes := []string{}
-				for _, ct := range obj["content_type"].([]interface{}) {
-					contentTypes = append(contentTypes, ct.(string))
-				}
-
 				condition := waap.ContentTypeCondition{
-					ContentType: contentTypes,
+					ContentType: convertSchemaSetToStringList(obj["content_type"].(*schema.Set)),
 					Negation:    &negation,
 				}
 
@@ -903,13 +893,8 @@ func getConditionsPaylod(conditionsRaw any) []waap.CustomRuleConditionInput {
 				obj := item.(map[string]interface{})
 
 				negation := obj["negation"].(bool)
-				countries := []string{}
-				for _, country := range obj["country_code"].([]interface{}) {
-					countries = append(countries, country.(string))
-				}
-
 				condition := waap.CountryCondition{
-					CountryCode: countries,
+					CountryCode: convertSchemaSetToStringList(obj["country_code"].(*schema.Set)),
 					Negation:    &negation,
 				}
 
@@ -942,14 +927,14 @@ func getConditionsPaylod(conditionsRaw any) []waap.CustomRuleConditionInput {
 				time := obj["time"].(int)
 
 				ips := make([]waap.RequestRateCondition_Ips_Item, 0)
-				for _, ip := range obj["ips"].([]interface{}) {
+				for _, ip := range obj["ips"].(*schema.Set).List() {
 					var ipAddress waap.RequestRateCondition_Ips_Item
 					ipAddress.FromRequestRateConditionIps0(ip.(string))
 					ips = append(ips, ipAddress)
 				}
 
 				methods := make([]waap.HTTPMethod, 0)
-				for _, method := range obj["http_methods"].([]interface{}) {
+				for _, method := range obj["http_methods"].(*schema.Set).List() {
 					methods = append(methods, waap.HTTPMethod(method.(string)))
 				}
 
@@ -976,7 +961,7 @@ func getConditionsPaylod(conditionsRaw any) []waap.CustomRuleConditionInput {
 
 				negation := obj["negation"].(bool)
 				ownerTypes := []waap.OwnerTypesConditionOwnerTypes{}
-				for _, ownerType := range obj["owner_types"].([]interface{}) {
+				for _, ownerType := range obj["owner_types"].(*schema.Set).List() {
 					ownerTypes = append(ownerTypes, waap.OwnerTypesConditionOwnerTypes(ownerType.(string)))
 				}
 
@@ -994,13 +979,8 @@ func getConditionsPaylod(conditionsRaw any) []waap.CustomRuleConditionInput {
 				obj := item.(map[string]interface{})
 
 				negation := obj["negation"].(bool)
-				tags := []string{}
-				for _, tag := range obj["tags"].([]interface{}) {
-					tags = append(tags, tag.(string))
-				}
-
 				condition := waap.TagsCondition{
-					Tags:     tags,
+					Tags:     convertSchemaSetToStringList(obj["tags"].(*schema.Set)),
 					Negation: &negation,
 				}
 
@@ -1029,13 +1009,8 @@ func getConditionsPaylod(conditionsRaw any) []waap.CustomRuleConditionInput {
 				obj := item.(map[string]interface{})
 
 				negation := obj["negation"].(bool)
-				tags := []string{}
-				for _, tag := range obj["tags"].([]interface{}) {
-					tags = append(tags, tag.(string))
-				}
-
 				condition := waap.UserDefinedTagsCondition{
-					Tags:     tags,
+					Tags:     convertSchemaSetToStringList(obj["tags"].(*schema.Set)),
 					Negation: &negation,
 				}
 
@@ -1181,7 +1156,11 @@ func readConditionsFromResponse(conditions []waap.CustomRuleConditionOutput) []i
 			}
 
 			if condition.RequestRate.HttpMethods != nil && len(*condition.RequestRate.HttpMethods) > 0 {
-				requestRateMap["http_methods"] = condition.RequestRate.HttpMethods
+				var httpMethods []string
+				for _, httpMethod := range *condition.RequestRate.HttpMethods {
+					httpMethods = append(httpMethods, string(httpMethod))
+				}
+				requestRateMap["http_methods"] = httpMethods
 			}
 
 			requestRateMap["path_pattern"] = condition.RequestRate.PathPattern
@@ -1197,7 +1176,11 @@ func readConditionsFromResponse(conditions []waap.CustomRuleConditionOutput) []i
 
 		if condition.OwnerTypes != nil && len(*condition.OwnerTypes.OwnerTypes) > 0 {
 			ownerMap := map[string]interface{}{}
-			ownerMap["owner_types"] = condition.OwnerTypes.OwnerTypes
+			var ownerTypes []string
+			for _, ownerType := range *condition.OwnerTypes.OwnerTypes {
+				ownerTypes = append(ownerTypes, string(ownerType))
+			}
+			ownerMap["owner_types"] = ownerTypes
 			ownerMap["negation"] = condition.OwnerTypes.Negation
 			conditionMap["owner_types"] = append(conditionMap["owner_types"].([]interface{}), ownerMap)
 		}

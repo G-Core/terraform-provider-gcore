@@ -104,7 +104,7 @@ Optional:
 
 Required:
 
-- `tags` (List of String) The list of user defined tags to tag the request with.
+- `tags` (Set of String) The list of user defined tags to tag the request with.
 
 
 
@@ -137,7 +137,7 @@ Optional:
 
 Required:
 
-- `content_type` (List of String) The list of content types to match against.
+- `content_type` (Set of String) The list of content types to match against.
 
 Optional:
 
@@ -149,7 +149,7 @@ Optional:
 
 Required:
 
-- `country_code` (List of String) A list of ISO 3166-1 alpha-2 formatted strings representing the countries to match against.
+- `country_code` (Set of String) A list of ISO 3166-1 alpha-2 formatted strings representing the countries to match against.
 
 Optional:
 
@@ -161,7 +161,7 @@ Optional:
 
 Required:
 
-- `file_extension` (List of String) The list of file extensions to match against.
+- `file_extension` (Set of String) The list of file extensions to match against.
 
 Optional:
 
@@ -248,7 +248,7 @@ Optional:
 
 Required:
 
-- `owner_types` (List of String) Match the type of organization that owns the IP address making an incoming request. Valid values are 'COMMERCIAL', 'EDUCATIONAL', 'GOVERNMENT', 'HOSTING_SERVICES', 'ISP', 'MOBILE_NETWORK', 'NETWORK', and 'RESERVED'.
+- `owner_types` (Set of String) Match the type of organization that owns the IP address making an incoming request. Valid values are 'COMMERCIAL', 'EDUCATIONAL', 'GOVERNMENT', 'HOSTING_SERVICES', 'ISP', 'MOBILE_NETWORK', 'NETWORK', and 'RESERVED'.
 
 Optional:
 
@@ -266,8 +266,8 @@ Required:
 
 Optional:
 
-- `http_methods` (List of String) Possible HTTP request methods that can trigger a request rate condition. Valid values are 'CONNECT', 'DELETE', 'GET', 'HEAD', 'OPTIONS', 'PATCH', 'POST', 'PUT', and 'TRACE'.
-- `ips` (List of String) A list of source IPs that can trigger a request rate condition.
+- `http_methods` (Set of String) Possible HTTP request methods that can trigger a request rate condition. Valid values are 'CONNECT', 'DELETE', 'GET', 'HEAD', 'OPTIONS', 'PATCH', 'POST', 'PUT', and 'TRACE'.
+- `ips` (Set of String) A list of source IPs that can trigger a request rate condition.
 - `user_defined_tag` (String) A user-defined tag that can be included in incoming requests and used to trigger a request rate condition.
 
 
@@ -314,7 +314,7 @@ Optional:
 
 Required:
 
-- `tags` (List of String) A list of tags to match against the request tags. Tags can be obtained from the API endpoint /v1/tags or you can use the gcore_waap_tag data source.
+- `tags` (Set of String) A list of tags to match against the request tags. Tags can be obtained from the API endpoint /v1/tags or you can use the gcore_waap_tag data source.
 
 Optional:
 
@@ -352,7 +352,7 @@ Optional:
 
 Required:
 
-- `tags` (List of String) A list of user-defined tags to match against the request tags.
+- `tags` (Set of String) A list of user-defined tags to match against the request tags.
 
 Optional:
 
