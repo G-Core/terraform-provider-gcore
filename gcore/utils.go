@@ -18,6 +18,7 @@ import (
 	fastedge "github.com/G-Core/FastEdge-client-sdk-go"
 	dnssdk "github.com/G-Core/gcore-dns-sdk-go"
 	storageSDK "github.com/G-Core/gcore-storage-sdk-go"
+	waap "github.com/G-Core/gcore-waap-sdk-go"
 	gcdn "github.com/G-Core/gcorelabscdn-go"
 	gcorecloud "github.com/G-Core/gcorelabscloud-go"
 	gc "github.com/G-Core/gcorelabscloud-go/gcore"
@@ -61,6 +62,7 @@ type Config struct {
 	StorageClient  *storageSDK.SDK
 	DNSClient      *dnssdk.Client
 	FastEdgeClient *fastedge.ClientWithResponses
+	WaapClient     *waap.ClientWithResponses
 }
 
 type Project struct {
@@ -1083,4 +1085,39 @@ func GetConflictRetryConfig(resourceTimeoutSeconds int) ConflictRetryConfig {
 		Amount:   amount,
 		Interval: interval,
 	}
+}
+
+func importWaapRule(d *schema.ResourceData, meta any) ([]*schema.ResourceData, error) {
+	ids := strings.SplitN(d.Id(), ":", 2)
+
+	if len(ids) != 2 || ids[0] == "" || ids[1] == "" {
+		return nil, fmt.Errorf("unexpected format of ID (%s), expected domain_id:rule_id", d.Id())
+	}
+
+	domainIdStr, ruleId := ids[0], ids[1]
+	domainId, err := strconv.ParseInt(domainIdStr, 10, 64)
+	if err != nil {
+		return nil, fmt.Errorf("unexpected format of domain_id (%s), expected number", domainIdStr)
+	}
+
+	d.Set("domain_id", domainId)
+	d.SetId(ruleId)
+
+	return []*schema.ResourceData{d}, nil
+}
+
+func convertSchemaSetToStringList(v *schema.Set) []string {
+	result := make([]string, 0)
+	for _, item := range v.List() {
+		result = append(result, item.(string))
+	}
+	return result
+}
+
+func convertSchemaSetToIntList(v *schema.Set) []int {
+	result := make([]int, 0)
+	for _, item := range v.List() {
+		result = append(result, item.(int))
+	}
+	return result
 }

@@ -12,6 +12,7 @@ import (
 	fastedge "github.com/G-Core/FastEdge-client-sdk-go"
 	dnssdk "github.com/G-Core/gcore-dns-sdk-go"
 	storageSDK "github.com/G-Core/gcore-storage-sdk-go"
+	waap "github.com/G-Core/gcore-waap-sdk-go"
 	gcdn "github.com/G-Core/gcorelabscdn-go"
 	gcdnProvider "github.com/G-Core/gcorelabscdn-go/gcore/provider"
 	gcorecloud "github.com/G-Core/gcorelabscloud-go"
@@ -127,6 +128,12 @@ func Provider() *schema.Provider {
 				Description: "FastEdge API (define only if you want to override FastEdge API endpoint). Can also be set with the GCORE_FASTEDGE_API environment variable.",
 				DefaultFunc: schema.EnvDefaultFunc("GCORE_FASTEDGE_API", ""),
 			},
+			"gcore_waap_api": {
+				Type:        schema.TypeString,
+				Optional:    true,
+				Description: "WAAP API (define only if you want to override WAAP API endpoint). Can also be set with the GCORE_WAAP_API environment variable.",
+				DefaultFunc: schema.EnvDefaultFunc("GCORE_WAAP_API", ""),
+			},
 			"gcore_client_id": {
 				Type:        schema.TypeString,
 				Optional:    true,
@@ -135,92 +142,103 @@ func Provider() *schema.Provider {
 			},
 		},
 		ResourcesMap: map[string]*schema.Resource{
-			"gcore_ai_cluster":           resourceAICluster(),
-			"gcore_volume":               resourceVolume(),
-			"gcore_network":              resourceNetwork(),
-			"gcore_subnet":               resourceSubnet(),
-			"gcore_router":               resourceRouter(),
-			"gcore_instance":             resourceInstance(),
-			"gcore_instancev2":           resourceInstanceV2(),
-			"gcore_keypair":              resourceKeypair(),
-			"gcore_reservedfixedip":      resourceReservedFixedIP(),
-			"gcore_floatingip":           resourceFloatingIP(),
-			"gcore_loadbalancer":         resourceLoadBalancer(),
-			"gcore_loadbalancerv2":       resourceLoadBalancerV2(),
-			"gcore_lblistener":           resourceLbListener(),
-			"gcore_lbpool":               resourceLBPool(),
-			"gcore_lbmember":             resourceLBMember(),
-			"gcore_securitygroup":        resourceSecurityGroup(),
-			"gcore_baremetal":            resourceBmInstance(),
-			"gcore_snapshot":             resourceSnapshot(),
-			"gcore_servergroup":          resourceServerGroup(),
-			"gcore_k8sv2":                resourceK8sV2(),
-			"gcore_secret":               resourceSecret(),
-			"gcore_laas_topic":           resourceLaaSTopic(),
-			"gcore_faas_namespace":       resourceFaaSNamespace(),
-			"gcore_faas_function":        resourceFaaSFunction(),
-			"gcore_faas_key":             resourceFaaSKey(),
-			"gcore_storage_s3":           resourceStorageS3(),
-			"gcore_storage_s3_bucket":    resourceStorageS3Bucket(),
-			DNSZoneResource:              resourceDNSZone(),
-			DNSZoneRecordResource:        resourceDNSZoneRecord(),
-			"gcore_storage_sftp":         resourceStorageSFTP(),
-			"gcore_storage_sftp_key":     resourceStorageSFTPKey(),
-			"gcore_cdn_resource":         resourceCDNResource(),
-			"gcore_cdn_origingroup":      resourceCDNOriginGroup(),
-			"gcore_cdn_originshielding":  resourceCDNOriginShielding(),
-			"gcore_cdn_applied_preset":   resourceCDNAppliedPreset(),
-			"gcore_cdn_rule":             resourceCDNRule(),
-			"gcore_cdn_sslcert":          resourceCDNCert(),
-			"gcore_cdn_rule_template":    resourceRuleTemplate(),
-			"gcore_cdn_cacert":           resourceCDNCACert(),
-			lifecyclePolicyResource:      resourceLifecyclePolicy(),
-			"gcore_ddos_protection":      resourceDDoSProtection(),
-			"gcore_inference_deployment": resourceInferenceDeployment(),
-			"gcore_inference_secret":     resourceInferenceSecrets(),
-			"gcore_registry_credential":  resourceRegistryCredential(),
-			"gcore_gpu_baremetal_image":  resourceBaremetalImage(),
-			"gcore_gpu_virtual_image":    resourceVirtualImage(),
-			"gcore_fastedge_binary":      resourceFastEdgeBinary(),
-			"gcore_fastedge_app":         resourceFastEdgeApp(),
-			"gcore_fastedge_template":    resourceFastEdgeTemplate(),
-			"gcore_fastedge_secret":      resourceFastEdgeSecret(),
+			"gcore_ai_cluster":                    resourceAICluster(),
+			"gcore_volume":                        resourceVolume(),
+			"gcore_network":                       resourceNetwork(),
+			"gcore_subnet":                        resourceSubnet(),
+			"gcore_router":                        resourceRouter(),
+			"gcore_instance":                      resourceInstance(),
+			"gcore_instancev2":                    resourceInstanceV2(),
+			"gcore_keypair":                       resourceKeypair(),
+			"gcore_reservedfixedip":               resourceReservedFixedIP(),
+			"gcore_floatingip":                    resourceFloatingIP(),
+			"gcore_loadbalancer":                  resourceLoadBalancer(),
+			"gcore_loadbalancerv2":                resourceLoadBalancerV2(),
+			"gcore_lblistener":                    resourceLbListener(),
+			"gcore_lbpool":                        resourceLBPool(),
+			"gcore_lbmember":                      resourceLBMember(),
+			"gcore_securitygroup":                 resourceSecurityGroup(),
+			"gcore_baremetal":                     resourceBmInstance(),
+			"gcore_snapshot":                      resourceSnapshot(),
+			"gcore_servergroup":                   resourceServerGroup(),
+			"gcore_k8sv2":                         resourceK8sV2(),
+			"gcore_secret":                        resourceSecret(),
+			"gcore_laas_topic":                    resourceLaaSTopic(),
+			"gcore_faas_namespace":                resourceFaaSNamespace(),
+			"gcore_faas_function":                 resourceFaaSFunction(),
+			"gcore_faas_key":                      resourceFaaSKey(),
+			"gcore_storage_s3":                    resourceStorageS3(),
+			"gcore_storage_s3_bucket":             resourceStorageS3Bucket(),
+			DNSZoneResource:                       resourceDNSZone(),
+			DNSZoneRecordResource:                 resourceDNSZoneRecord(),
+			"gcore_storage_sftp":                  resourceStorageSFTP(),
+			"gcore_storage_sftp_key":              resourceStorageSFTPKey(),
+			"gcore_cdn_resource":                  resourceCDNResource(),
+			"gcore_cdn_origingroup":               resourceCDNOriginGroup(),
+			"gcore_cdn_originshielding":           resourceCDNOriginShielding(),
+			"gcore_cdn_applied_preset":            resourceCDNAppliedPreset(),
+			"gcore_cdn_rule":                      resourceCDNRule(),
+			"gcore_cdn_sslcert":                   resourceCDNCert(),
+			"gcore_cdn_rule_template":             resourceRuleTemplate(),
+			"gcore_cdn_cacert":                    resourceCDNCACert(),
+			lifecyclePolicyResource:               resourceLifecyclePolicy(),
+			"gcore_ddos_protection":               resourceDDoSProtection(),
+			"gcore_inference_deployment":          resourceInferenceDeployment(),
+			"gcore_inference_secret":              resourceInferenceSecrets(),
+			"gcore_registry_credential":           resourceRegistryCredential(),
+			"gcore_gpu_baremetal_image":           resourceBaremetalImage(),
+			"gcore_gpu_virtual_image":             resourceVirtualImage(),
+			"gcore_fastedge_binary":               resourceFastEdgeBinary(),
+			"gcore_fastedge_app":                  resourceFastEdgeApp(),
+			"gcore_fastedge_template":             resourceFastEdgeTemplate(),
+			"gcore_fastedge_secret":               resourceFastEdgeSecret(),
+			"gcore_waap_domain":                   resourceWaapDomain(),
+			"gcore_waap_custom_rule":              resourceWaapCustomRule(),
+			"gcore_waap_security_insight_silence": resourceWaapSecurityInsightSilence(),
+			"gcore_waap_api_path":                 resourceWaapApiPath(),
+			"gcore_waap_advanced_rule":            resourceWaapAdvancedRule(),
+			"gcore_waap_custom_page_set":          resourceWaapCustomPageSet(),
+			"gcore_waap_policy":                   resourceWaapPolicy(),
+			"gcore_waap_firewall_rule":            resourceWaapFirewallRule(),
 		},
 		DataSourcesMap: map[string]*schema.Resource{
-			"gcore_ai_cluster":             dataSourceAICluster(),
-			"gcore_project":                dataSourceProject(),
-			"gcore_region":                 dataSourceRegion(),
-			"gcore_securitygroup":          dataSourceSecurityGroup(),
-			"gcore_image":                  dataSourceImage(),
-			"gcore_volume":                 dataSourceVolume(),
-			"gcore_network":                dataSourceNetwork(),
-			"gcore_subnet":                 dataSourceSubnet(),
-			"gcore_router":                 dataSourceRouter(),
-			"gcore_loadbalancer":           dataSourceLoadBalancer(),
-			"gcore_loadbalancerv2":         dataSourceLoadBalancerV2(),
-			"gcore_lblistener":             dataSourceLBListener(),
-			"gcore_lbpool":                 dataSourceLBPool(),
-			"gcore_instance":               dataSourceInstance(),
-			"gcore_floatingip":             dataSourceFloatingIP(),
-			"gcore_storage_s3":             dataSourceStorageS3(),
-			"gcore_storage_s3_bucket":      dataSourceStorageS3Bucket(),
-			"gcore_storage_sftp":           dataSourceStorageSFTP(),
-			"gcore_storage_sftp_key":       dataSourceStorageSFTPKey(),
-			"gcore_reservedfixedip":        dataSourceReservedFixedIP(),
-			"gcore_servergroup":            dataSourceServerGroup(),
-			"gcore_k8sv2":                  dataSourceK8sV2(),
-			"gcore_k8sv2_kubeconfig":       dataSourceK8sV2KubeConfig(),
-			"gcore_secret":                 dataSourceSecret(),
-			"gcore_laas_hosts":             dataSourceLaaSHosts(),
-			"gcore_laas_status":            dataSourceLaaSStatus(),
-			"gcore_faas_namespace":         dataSourceFaaSNamespace(),
-			"gcore_faas_key":               dataSourceFaaSKey(),
-			"gcore_faas_function":          dataSourceFaaSFunction(),
-			"gcore_ddos_profile_template":  dataSourceDDoSProfileTemplate(),
-			"gcore_cdn_shielding_location": dataOriginShieldingLocation(),
-			"gcore_cdn_preset":             dataPreset(),
-			"gcore_cdn_client":             dataClient(),
-			"gcore_inference_flavor":       dataSourceInferenceFlavor(),
+			"gcore_ai_cluster":                 dataSourceAICluster(),
+			"gcore_project":                    dataSourceProject(),
+			"gcore_region":                     dataSourceRegion(),
+			"gcore_securitygroup":              dataSourceSecurityGroup(),
+			"gcore_image":                      dataSourceImage(),
+			"gcore_volume":                     dataSourceVolume(),
+			"gcore_network":                    dataSourceNetwork(),
+			"gcore_subnet":                     dataSourceSubnet(),
+			"gcore_router":                     dataSourceRouter(),
+			"gcore_loadbalancer":               dataSourceLoadBalancer(),
+			"gcore_loadbalancerv2":             dataSourceLoadBalancerV2(),
+			"gcore_lblistener":                 dataSourceLBListener(),
+			"gcore_lbpool":                     dataSourceLBPool(),
+			"gcore_instance":                   dataSourceInstance(),
+			"gcore_floatingip":                 dataSourceFloatingIP(),
+			"gcore_storage_s3":                 dataSourceStorageS3(),
+			"gcore_storage_s3_bucket":          dataSourceStorageS3Bucket(),
+			"gcore_storage_sftp":               dataSourceStorageSFTP(),
+			"gcore_storage_sftp_key":           dataSourceStorageSFTPKey(),
+			"gcore_reservedfixedip":            dataSourceReservedFixedIP(),
+			"gcore_servergroup":                dataSourceServerGroup(),
+			"gcore_k8sv2":                      dataSourceK8sV2(),
+			"gcore_k8sv2_kubeconfig":           dataSourceK8sV2KubeConfig(),
+			"gcore_secret":                     dataSourceSecret(),
+			"gcore_laas_hosts":                 dataSourceLaaSHosts(),
+			"gcore_laas_status":                dataSourceLaaSStatus(),
+			"gcore_faas_namespace":             dataSourceFaaSNamespace(),
+			"gcore_faas_key":                   dataSourceFaaSKey(),
+			"gcore_faas_function":              dataSourceFaaSFunction(),
+			"gcore_ddos_profile_template":      dataSourceDDoSProfileTemplate(),
+			"gcore_cdn_shielding_location":     dataOriginShieldingLocation(),
+			"gcore_cdn_preset":                 dataPreset(),
+			"gcore_cdn_client":                 dataClient(),
+			"gcore_inference_flavor":           dataSourceInferenceFlavor(),
+			"gcore_waap_security_insight_type": dataWaapSecurityInsightType(),
+			"gcore_waap_domain_policy":         dataWaapDomainPolicy(),
+			"gcore_waap_tag":                   dataWaapTag(),
 		},
 		ConfigureContextFunc: providerConfigure,
 	}
@@ -268,6 +286,11 @@ func providerConfigure(_ context.Context, d *schema.ResourceData) (interface{}, 
 	fastedgeAPI := d.Get("gcore_fastedge_api").(string)
 	if fastedgeAPI == "" {
 		fastedgeAPI = apiEndpoint + "/fastedge"
+	}
+
+	waapAPI := d.Get("gcore_waap_api").(string)
+	if waapAPI == "" {
+		waapAPI = apiEndpoint + "/waap"
 	}
 
 	platform := d.Get("gcore_platform_api").(string)
@@ -374,6 +397,25 @@ func providerConfigure(_ context.Context, d *schema.ResourceData) (interface{}, 
 		)
 		if err != nil {
 			return nil, diag.FromErr(fmt.Errorf("fastedge api init: %w", err))
+		}
+	}
+
+	if waapAPI != "" {
+		authFunc := func(ctx context.Context, req *http.Request) error {
+			if permanentToken != "" {
+				req.Header.Set("Authorization", "APIKey "+permanentToken)
+			} else {
+				req.Header.Set("Authorization", "Bearer "+provider.AccessToken())
+			}
+			return nil
+		}
+
+		config.WaapClient, err = waap.NewClientWithResponses(
+			waapAPI,
+			waap.WithRequestEditorFn(authFunc),
+		)
+		if err != nil {
+			return nil, diag.FromErr(fmt.Errorf("error creating waap client: %w", err))
 		}
 	}
 

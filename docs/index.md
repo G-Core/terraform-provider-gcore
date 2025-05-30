@@ -287,6 +287,7 @@ resource "gcore_lbmember" "lbm2" {
 - `gcore_platform` (String, Deprecated) Platform URL is used for generate JWT.
 - `gcore_platform_api` (String) Platform URL is used for generate JWT (define only if you want to override Platform API endpoint). Can also be set with the GCORE_PLATFORM_API environment variable.
 - `gcore_storage_api` (String) Storage API (define only if you want to override Storage API endpoint). Can also be set with the GCORE_STORAGE_API environment variable.
+- `gcore_waap_api` (String) WAAP API (define only if you want to override WAAP API endpoint). Can also be set with the GCORE_WAAP_API environment variable.
 - `ignore_creds_auth_error` (Boolean, Deprecated) Should be set to true when you are gonna to use storage resource with permanent API-token only.
 - `password` (String, Deprecated) Gcore account password. Can also be set with the GCORE_PASSWORD environment variable.
 - `permanent_api_token` (String, Sensitive) A permanent [API-token](https://gcore.com/docs/account-settings/create-use-or-delete-a-permanent-api-token). Can also be set with the GCORE_PERMANENT_TOKEN environment variable.
