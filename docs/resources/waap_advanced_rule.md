@@ -92,7 +92,7 @@ Optional:
 
 Required:
 
-- `tags` (List of String) The list of user defined tags to tag the request with.
+- `tags` (Set of String) The list of user defined tags to tag the request with.
 
 ## Import
 

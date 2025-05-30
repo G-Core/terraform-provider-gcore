@@ -128,7 +128,7 @@ var (
 					Elem: &schema.Resource{
 						Schema: map[string]*schema.Schema{
 							"tags": {
-								Type:        schema.TypeList,
+								Type:        schema.TypeSet,
 								Required:    true,
 								Description: "The list of user defined tags to tag the request with.",
 								MinItems:    1,
@@ -402,7 +402,7 @@ func getWaapActionPayload(actionRaw any) *waap.CustomerRuleActionInput {
 		if v, exists := actionsMap["tag"].([]interface{}); exists && len(v) > 0 {
 			tagMap := v[0].(map[string]interface{})
 			action.Tag = &waap.RuleTagAction{
-				Tags: convertStringList(tagMap["tags"].([]interface{})),
+				Tags: convertStringSetToList(tagMap["tags"].(*schema.Set)),
 			}
 		}
 
