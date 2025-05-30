@@ -76,7 +76,7 @@ func resourceWaapDomain() *schema.Resource {
 							Elem: &schema.Resource{
 								Schema: map[string]*schema.Schema{
 									"api_urls": {
-										Type:        schema.TypeList,
+										Type:        schema.TypeSet,
 										Optional:    true,
 										Description: "List of API URL patterns.",
 										Elem: &schema.Schema{
@@ -425,10 +425,10 @@ func updateDomainSettings(ctx context.Context, waapClient *waap.ClientWithRespon
 		apiMap := apiList[0].(map[string]interface{})
 		apiSettings := waap.UpdateApiSettings{}
 
-		if v, ok := apiMap["api_urls"].([]interface{}); ok {
-			urls := make([]string, len(v))
-			for i, url := range v {
-				urls[i] = url.(string)
+		if v, ok := apiMap["api_urls"].(*schema.Set); ok {
+			urls := make([]string, 0)
+			for _, url := range v.List() {
+				urls = append(urls, url.(string))
 			}
 			apiSettings.ApiUrls = &urls
 		}

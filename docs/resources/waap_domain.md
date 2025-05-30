@@ -98,7 +98,7 @@ Optional:
 
 Optional:
 
-- `api_urls` (List of String) List of API URL patterns.
+- `api_urls` (Set of String) List of API URL patterns.
 
 
 <a id="nestedblock--settings--ddos"></a>
