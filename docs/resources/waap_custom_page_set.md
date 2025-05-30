@@ -89,7 +89,7 @@ resource "gcore_waap_custom_page_set" "example" {
 - `block_csrf` (Block List, Max: 1) (see [below for nested schema](#nestedblock--block_csrf))
 - `captcha` (Block List, Max: 1) (see [below for nested schema](#nestedblock--captcha))
 - `cookie_disabled` (Block List, Max: 1) (see [below for nested schema](#nestedblock--cookie_disabled))
-- `domains` (List of Number) List of domain IDs associated with this custom page set.
+- `domains` (Set of Number) List of domain IDs associated with this custom page set.
 - `handshake` (Block List, Max: 1) (see [below for nested schema](#nestedblock--handshake))
 - `javascript_disabled` (Block List, Max: 1) (see [below for nested schema](#nestedblock--javascript_disabled))
 

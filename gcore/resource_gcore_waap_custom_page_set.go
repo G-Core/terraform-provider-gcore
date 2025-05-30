@@ -30,7 +30,7 @@ func resourceWaapCustomPageSet() *schema.Resource {
 				Description: "Name of the custom page set.",
 			},
 			"domains": {
-				Type:        schema.TypeList,
+				Type:        schema.TypeSet,
 				Optional:    true,
 				Description: "List of domain IDs associated with this custom page set.",
 				Elem: &schema.Schema{
@@ -485,15 +485,6 @@ func resourceWaapCustomPageSetDelete(ctx context.Context, d *schema.ResourceData
 	return nil
 }
 
-// Helper function to convert []interface{} to []int
-func expandIntList(list []interface{}) []int {
-	result := make([]int, len(list))
-	for i, v := range list {
-		result[i] = v.(int)
-	}
-	return result
-}
-
 func prepareWaapCustomPageSetPayload(d *schema.ResourceData) (
 	string, // name
 	*[]int, // domains
@@ -509,7 +500,10 @@ func prepareWaapCustomPageSetPayload(d *schema.ResourceData) (
 
 	var domains *[]int
 	if domainsRaw, ok := d.GetOk("domains"); ok {
-		domainsList := expandIntList(domainsRaw.([]interface{}))
+		domainsList := make([]int, 0)
+		for _, domain := range domainsRaw.(*schema.Set).List() {
+			domainsList = append(domainsList, domain.(int))
+		}
 		domains = &domainsList
 	}
 
