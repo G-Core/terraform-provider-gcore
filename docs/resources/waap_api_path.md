@@ -53,10 +53,10 @@ resource "gcore_waap_api_path" "api_path" {
 
 ### Optional
 
-- `api_groups` (List of String) An array of API groups associated with the API path.
+- `api_groups` (Set of String) An array of API groups associated with the API path.
 - `api_version` (String) The API version.
 - `status` (String) The status of the discovered API path. It must be one of these values: CONFIRMED_API, POTENTIAL_API, NOT_API, DELISTED_API
-- `tags` (List of String) An array of tags associated with the API path.
+- `tags` (Set of String) An array of tags associated with the API path.
 
 ### Read-Only
 

@@ -86,7 +86,7 @@ func resourceWaapApiPath() *schema.Resource {
 				Description: "The API version.",
 			},
 			"tags": {
-				Type:        schema.TypeList,
+				Type:        schema.TypeSet,
 				Optional:    true,
 				Description: "An array of tags associated with the API path.",
 				Elem: &schema.Schema{
@@ -94,7 +94,7 @@ func resourceWaapApiPath() *schema.Resource {
 				},
 			},
 			"api_groups": {
-				Type:        schema.TypeList,
+				Type:        schema.TypeSet,
 				Optional:    true,
 				Description: "An array of API groups associated with the API path.",
 				Elem: &schema.Schema{
@@ -128,11 +128,11 @@ func resourceWaapApiPathCreate(ctx context.Context, d *schema.ResourceData, m in
 		req.ApiVersion = &version
 	}
 
-	if tags := convertStringList(d.Get("tags").([]interface{})); tags != nil && len(tags) > 0 {
+	if tags := convertSchemaSetToStringList(d.Get("tags").(*schema.Set)); tags != nil && len(tags) > 0 {
 		req.Tags = &tags
 	}
 
-	if apiGroups := convertStringList(d.Get("api_groups").([]interface{})); apiGroups != nil && len(apiGroups) > 0 {
+	if apiGroups := convertSchemaSetToStringList(d.Get("api_groups").(*schema.Set)); apiGroups != nil && len(apiGroups) > 0 {
 		req.ApiGroups = &apiGroups
 	}
 
@@ -243,11 +243,11 @@ func resourceWaapApiPathUpdate(ctx context.Context, d *schema.ResourceData, m in
 		req.Status = &status
 	}
 
-	if apiGroups := convertStringList(d.Get("api_groups").([]interface{})); apiGroups != nil && len(apiGroups) > 0 {
+	if apiGroups := convertSchemaSetToStringList(d.Get("api_groups").(*schema.Set)); apiGroups != nil && len(apiGroups) > 0 {
 		req.ApiGroups = &apiGroups
 	}
 
-	if tags := convertStringList(d.Get("tags").([]interface{})); tags != nil && len(tags) > 0 {
+	if tags := convertSchemaSetToStringList(d.Get("tags").(*schema.Set)); tags != nil && len(tags) > 0 {
 		req.Tags = &tags
 	}
 
@@ -288,14 +288,6 @@ func resourceWaapApiPathDelete(ctx context.Context, d *schema.ResourceData, m in
 	d.SetId("")
 
 	return nil
-}
-
-func convertStringList(v []interface{}) []string {
-	var result []string
-	for _, item := range v {
-		result = append(result, item.(string))
-	}
-	return result
 }
 
 func resourceApiPathImportParseId(id string) (string, string, error) {
