@@ -402,7 +402,7 @@ func getWaapActionPayload(actionRaw any) *waap.CustomerRuleActionInput {
 		if v, exists := actionsMap["tag"].([]interface{}); exists && len(v) > 0 {
 			tagMap := v[0].(map[string]interface{})
 			action.Tag = &waap.RuleTagAction{
-				Tags: convertStringSetToList(tagMap["tags"].(*schema.Set)),
+				Tags: convertSchemaSetToStringList(tagMap["tags"].(*schema.Set)),
 			}
 		}
 

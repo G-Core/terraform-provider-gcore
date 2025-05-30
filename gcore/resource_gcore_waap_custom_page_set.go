@@ -500,10 +500,7 @@ func prepareWaapCustomPageSetPayload(d *schema.ResourceData) (
 
 	var domains *[]int
 	if domainsRaw, ok := d.GetOk("domains"); ok {
-		domainsList := make([]int, 0)
-		for _, domain := range domainsRaw.(*schema.Set).List() {
-			domainsList = append(domainsList, domain.(int))
-		}
+		domainsList := convertSchemaSetToIntList(domainsRaw.(*schema.Set))
 		domains = &domainsList
 	}
 

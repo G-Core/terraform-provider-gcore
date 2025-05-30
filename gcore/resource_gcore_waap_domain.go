@@ -426,10 +426,7 @@ func updateDomainSettings(ctx context.Context, waapClient *waap.ClientWithRespon
 		apiSettings := waap.UpdateApiSettings{}
 
 		if v, ok := apiMap["api_urls"].(*schema.Set); ok {
-			urls := make([]string, 0)
-			for _, url := range v.List() {
-				urls = append(urls, url.(string))
-			}
+			urls := convertSchemaSetToStringList(v)
 			apiSettings.ApiUrls = &urls
 		}
 

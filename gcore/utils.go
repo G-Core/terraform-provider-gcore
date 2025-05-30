@@ -1106,10 +1106,18 @@ func importWaapRule(d *schema.ResourceData, meta any) ([]*schema.ResourceData, e
 	return []*schema.ResourceData{d}, nil
 }
 
-func convertStringSetToList(v *schema.Set) []string {
+func convertSchemaSetToStringList(v *schema.Set) []string {
 	result := make([]string, 0)
 	for _, item := range v.List() {
 		result = append(result, item.(string))
+	}
+	return result
+}
+
+func convertSchemaSetToIntList(v *schema.Set) []int {
+	result := make([]int, 0)
+	for _, item := range v.List() {
+		result = append(result, item.(int))
 	}
 	return result
 }
