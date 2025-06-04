@@ -81,6 +81,7 @@ func resourceWaapPolicyRead(ctx context.Context, d *schema.ResourceData, m inter
 func resourceWaapPolicyUpdate(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	log.Println("[DEBUG] Start WAAP Policy updating")
 
+	var diags diag.Diagnostics
 	client := m.(*Config).WaapClient
 	domainID, _ := strconv.Atoi(d.Get("domain_id").(string))
 
@@ -97,7 +98,17 @@ func resourceWaapPolicyUpdate(ctx context.Context, d *schema.ResourceData, m int
 	policiesToUpdate := make(map[string]bool)
 	for policyID, expectedState := range policiesFromConfig {
 		apiState, exists := policiesFromApi[policyID]
-		if exists && apiState != expectedState {
+
+		if !exists {
+			// add warning to diagnostics if policy ID from config does not exist in API
+			diags = append(diags, diag.Diagnostic{
+				Severity: diag.Warning,
+				Summary:  fmt.Sprintf("Policy ID '%s' specified in configuration does not exist in API for domain %d", policyID, domainID),
+			})
+			continue
+		}
+
+		if apiState != expectedState {
 			policiesToUpdate[policyID] = expectedState.(bool)
 		}
 	}
@@ -116,7 +127,9 @@ func resourceWaapPolicyUpdate(ctx context.Context, d *schema.ResourceData, m int
 	}
 
 	log.Printf("[DEBUG] Finish WAAP Policy updating (id=%s)\n", domainID)
-	return resourceWaapPolicyRead(ctx, d, m)
+
+	diags = append(diags, resourceWaapPolicyRead(ctx, d, m)...)
+	return diags
 }
 
 func resourceWaapPolicyDelete(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
@@ -153,7 +166,14 @@ func getPoliciesFromApi(ctx context.Context, waapClient *waap.ClientWithResponse
 }
 
 func validatePolicies(ctx context.Context, d *schema.ResourceDiff, m interface{}) error {
-	domainID, err := strconv.Atoi(d.Get("domain_id").(string))
+	domainIDStr := d.Get("domain_id").(string)
+
+	// Skip validation if domain ID has not been set
+	if domainIDStr == "" {
+		return nil
+	}
+
+	domainID, err := strconv.Atoi(domainIDStr)
 	if err != nil {
 		return fmt.Errorf("invalid domain ID: %s", err)
 	}
