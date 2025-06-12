@@ -37,7 +37,7 @@ data "gcore_waap_domain_policy" "invalid_user_agent" {
 }
 
 data "gcore_waap_domain_policy" "waf_sql_injection" {
-  domain_id = gcore_waap_domain.tf_waadomainp_refactored.id
+  domain_id = gcore_waap_domain.domain.id
   name = "SQL injection"
   group = "WAF"
 }
