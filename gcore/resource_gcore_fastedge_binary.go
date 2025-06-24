@@ -28,7 +28,7 @@ func resourceFastEdgeBinary() *schema.Resource {
 				Required:    true,
 				ForceNew:    true, // new resource on filename change
 				// make sure file exists and is readable
-				ValidateFunc: func(v interface{}, k string) ([]string, []error) {
+				ValidateFunc: func(v any, k string) ([]string, []error) {
 					f, err := os.Open(v.(string))
 					if err != nil {
 						return nil, []error{err}
@@ -49,7 +49,7 @@ func resourceFastEdgeBinary() *schema.Resource {
 		DeleteContext: resourceFastEdgeBinaryDelete,
 		Description:   "WebAssembly binary to use in FastEdge applications.",
 		// calculate file checksum to detect file content change
-		CustomizeDiff: func(_ context.Context, diff *schema.ResourceDiff, meta interface{}) error {
+		CustomizeDiff: func(_ context.Context, diff *schema.ResourceDiff, meta any) error {
 			checksum, err := fileChecksum(diff.Get("filename").(string))
 			if err != nil {
 				return nil
@@ -59,7 +59,7 @@ func resourceFastEdgeBinary() *schema.Resource {
 	}
 }
 
-func resourceFastEdgeBinaryUpload(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
+func resourceFastEdgeBinaryUpload(ctx context.Context, d *schema.ResourceData, m any) diag.Diagnostics {
 	log.Println("[DEBUG] Start FastEdge binary upload")
 	config := m.(*Config)
 	client := config.FastEdgeClient
@@ -92,7 +92,7 @@ func resourceFastEdgeBinaryUpload(ctx context.Context, d *schema.ResourceData, m
 	return nil
 }
 
-func resourceFastEdgeBinaryDelete(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
+func resourceFastEdgeBinaryDelete(ctx context.Context, d *schema.ResourceData, m any) diag.Diagnostics {
 	var diags diag.Diagnostics
 	log.Println("[DEBUG] Start FastEdge binary deletion")
 	config := m.(*Config)
@@ -112,20 +112,21 @@ func resourceFastEdgeBinaryDelete(ctx context.Context, d *schema.ResourceData, m
 			diags = diag.Diagnostics{
 				{
 					Severity: diag.Warning,
-					Summary:  fmt.Sprintf("Wasm binary (%d) is referenced so cannot be deleted, but removed from TF state", id),
+					Summary:  fmt.Sprintf("Wasm binary (%d) is referenced so cannot be deleted", id),
 				},
 			}
 		} else {
 			return diag.Errorf("calling DelBinary API: %s", extractErrorMessage(rsp.Body))
 		}
+	} else {
+		d.SetId("")
 	}
 
-	d.SetId("")
 	log.Println("[DEBUG] Finish FastEdge binary deletion")
 	return diags
 }
 
-func resourceFastEdgeBinaryRead(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
+func resourceFastEdgeBinaryRead(ctx context.Context, d *schema.ResourceData, m any) diag.Diagnostics {
 	log.Println("[DEBUG] Start FastEdge binary read")
 	config := m.(*Config)
 	client := config.FastEdgeClient

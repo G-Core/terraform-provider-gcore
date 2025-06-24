@@ -6,6 +6,7 @@ import (
 	"log"
 	"reflect"
 	"strconv"
+	"strings"
 
 	gcdn "github.com/G-Core/gcorelabscdn-go/gcore"
 	"github.com/G-Core/gcorelabscdn-go/resources"
@@ -116,6 +117,7 @@ func resourceCDNResource() *schema.Resource {
 		ReadContext:   resourceCDNResourceRead,
 		UpdateContext: resourceCDNResourceUpdate,
 		DeleteContext: resourceCDNResourceDelete,
+		CustomizeDiff: validateCDNOptions,
 		Description:   "Represent CDN resource",
 	}
 }
@@ -335,13 +337,21 @@ func listToOptions(l []interface{}) *gcdn.Options {
 		opts.FastEdge = &gcdn.FastEdge{
 			Enabled: opt["enabled"].(bool),
 		}
-		if onRequestHeaders, ok := getOptByName(opt, "on_request_headers"); ok {
-			opts.FastEdge.OnRequestHeaders = &gcdn.FastEdgeAppConfig{
-				Enabled:          onRequestHeaders["enabled"].(bool),
-				AppID:            onRequestHeaders["app_id"].(string),
-				InterruptOnError: onRequestHeaders["interrupt_on_error"].(bool),
-				ExecuteOnEdge:    onRequestHeaders["execute_on_edge"].(bool),
-				ExecuteOnShield:  onRequestHeaders["execute_on_shield"].(bool),
+		triggers := map[string]**gcdn.FastEdgeAppConfig{
+			"on_request_headers":  &opts.FastEdge.OnRequestHeaders,
+			"on_request_body":     &opts.FastEdge.OnRequestBody,
+			"on_response_headers": &opts.FastEdge.OnResponseHeaders,
+			"on_response_body":    &opts.FastEdge.OnResponseBody,
+		}
+		for trigger, dest := range triggers {
+			if triggerConfig, ok := getOptByName(opt, trigger); ok {
+				*dest = &gcdn.FastEdgeAppConfig{
+					Enabled:          triggerConfig["enabled"].(bool),
+					AppID:            triggerConfig["app_id"].(string),
+					InterruptOnError: triggerConfig["interrupt_on_error"].(bool),
+					ExecuteOnEdge:    triggerConfig["execute_on_edge"].(bool),
+					ExecuteOnShield:  triggerConfig["execute_on_shield"].(bool),
+				}
 			}
 		}
 	}
@@ -701,8 +711,16 @@ func optionsToList(options *gcdn.Options) []interface{} {
 	}
 	if options.FastEdge != nil {
 		m := structToMap(options.FastEdge)
-		if options.FastEdge.OnRequestHeaders != nil {
-			m["on_request_headers"] = []interface{}{structToMap(options.FastEdge.OnRequestHeaders)}
+		triggers := map[string]**gcdn.FastEdgeAppConfig{
+			"on_request_headers":  &options.FastEdge.OnRequestHeaders,
+			"on_request_body":     &options.FastEdge.OnRequestBody,
+			"on_response_headers": &options.FastEdge.OnResponseHeaders,
+			"on_response_body":    &options.FastEdge.OnResponseBody,
+		}
+		for trigger, config := range triggers {
+			if *config != nil {
+				m[trigger] = []interface{}{structToMap(*config)}
+			}
 		}
 		result["fastedge"] = []interface{}{m}
 	}
@@ -887,6 +905,7 @@ func structToMap(item interface{}) map[string]interface{} {
 		tag := v.Field(i).Tag.Get("json")
 		field := reflectValue.Field(i).Interface()
 		if tag != "" && tag != "-" {
+			tag = strings.Split(tag, ",")[0]
 			if v.Field(i).Type.Kind() == reflect.Struct {
 				res[tag] = structToMap(field)
 			} else {

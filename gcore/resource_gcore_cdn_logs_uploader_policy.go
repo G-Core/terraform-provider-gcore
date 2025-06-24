@@ -21,67 +21,67 @@ func resourceCDNLogsUploaderPolicy() *schema.Resource {
 			"include_empty_logs": {
 				Type:        schema.TypeBool,
 				Optional:    true,
-				Description: "Include empty logs in the upload.",
+				Description: "Include empty logs in the upload. Default value is false.",
 				Default:     false,
 			},
 			"include_shield_logs": {
 				Type:        schema.TypeBool,
 				Optional:    true,
-				Description: "Include logs from origin shielding in the upload.",
+				Description: "Include logs from origin shielding in the upload. Default value is false.",
 				Default:     false,
 			},
 			"name": {
 				Type:        schema.TypeString,
 				Optional:    true,
-				Description: "Name of the policy.",
+				Description: "Name of the policy. Default value is \"Policy\".",
 				Default:     "Policy",
 			},
 			"description": {
 				Type:        schema.TypeString,
 				Optional:    true,
-				Description: "Description of the policy.",
+				Description: "Description of the policy. Default value is empty string.",
 				Default:     "",
 			},
 			"retry_interval_minutes": {
 				Type:        schema.TypeInt,
 				Optional:    true,
-				Description: "Interval in minutes to retry failed uploads.",
+				Description: "Interval in minutes to retry failed uploads. Default value is 60.",
 				Default:     60,
 			},
 			"rotate_interval_minutes": {
 				Type:        schema.TypeInt,
 				Optional:    true,
-				Description: "Interval in minutes to rotate logs.",
+				Description: "Interval in minutes to rotate logs. Default value is 5.",
 				Default:     5,
 			},
 			"rotate_threshold_mb": {
 				Type:        schema.TypeInt,
 				Optional:    true,
-				Description: "Threshold in MB to rotate logs.",
+				Description: "Threshold in MB to rotate logs. Default value is nil.",
 				Default:     nil,
 			},
 			"rotate_threshold_lines": {
 				Type:        schema.TypeInt,
 				Optional:    true,
-				Description: "Threshold in lines to rotate logs.",
+				Description: "Threshold in lines to rotate logs. Default value is 0.",
 				Default:     0,
 			},
 			"date_format": {
 				Type:        schema.TypeString,
 				Optional:    true,
-				Description: "Date format for logs.",
+				Description: "Date format for logs. Default value is empty string.",
 				Default:     "",
 			},
 			"field_delimiter": {
 				Type:        schema.TypeString,
 				Optional:    true,
-				Description: "Field delimiter for logs.",
+				Description: "Field delimiter for logs. Default value is \\\".",
 				Default:     "\"",
 			},
 			"field_separator": {
 				Type:        schema.TypeString,
 				Optional:    true,
-				Description: "Field separator for logs.",
+				Description: "Field separator for logs. Default value is a space character.",
 				Default:     " ",
 			},
 			"fields": {
@@ -93,13 +93,13 @@ func resourceCDNLogsUploaderPolicy() *schema.Resource {
 			"file_name_template": {
 				Type:        schema.TypeString,
 				Optional:    true,
-				Description: "Template for log file name.",
+				Description: "Template for log file name. Default value is \"{{YYYY}}/{{MM}}/{{DD}}/{{HH}}/{{mm}}/{{ss}}/{{HOST}}_{{CNAME}}_access.log.gz\".",
 				Default:     "{{YYYY}}/{{MM}}/{{DD}}/{{HH}}/{{mm}}/{{ss}}/{{HOST}}_{{CNAME}}_access.log.gz",
 			},
 			"format_type": {
 				Type:        schema.TypeString,
 				Optional:    true,
-				Description: "Format type for logs.",
+				Description: "Format type for logs. Default value is empty string.",
 				Default:     "",
 			},
 			"tags": {
@@ -124,54 +124,18 @@ func resourceCDNLogsUploaderPolicyCreate(ctx context.Context, d *schema.Resource
 	client := config.CDNClient
 
 	var req logsuploader.PolicyCreateRequest
-
-	if v, ok := d.GetOk("include_empty_logs"); ok {
-		req.IncludeEmptyLogs = v.(bool)
-	}
-
-	if v, ok := d.GetOk("include_shield_logs"); ok {
-		req.IncludeShieldLogs = v.(bool)
-	}
-
-	if v, ok := d.GetOk("name"); ok {
-		req.Name = v.(string)
-	}
-
-	if v, ok := d.GetOk("description"); ok {
-		req.Description = v.(string)
-	}
-
-	if v, ok := d.GetOk("retry_interval_minutes"); ok {
-		req.RetryIntervalMinutes = v.(int)
-	}
-
-	if v, ok := d.GetOk("rotate_interval_minutes"); ok {
-		req.RotateIntervalMinutes = v.(int)
-	}
-
-	if v, ok := d.GetOk("rotate_threshold_lines"); ok {
-		req.RotateThresholdLines = v.(int)
-	}
-
-	if v, ok := d.GetOk("date_format"); ok {
-		req.DateFormat = v.(string)
-	}
-
-	if v, ok := d.GetOk("field_delimiter"); ok {
-		req.FieldDelimiter = v.(string)
-	}
-
-	if v, ok := d.GetOk("field_separator"); ok {
-		req.FieldSeparator = v.(string)
-	}
-
-	if v, ok := d.GetOk("file_name_template"); ok {
-		req.FileNameTemplate = v.(string)
-	}
-
-	if v, ok := d.GetOk("format_type"); ok {
-		req.FormatType = v.(string)
-	}
+	req.IncludeEmptyLogs = d.Get("include_empty_logs").(bool)
+	req.IncludeShieldLogs = d.Get("include_shield_logs").(bool)
+	req.Name = d.Get("name").(string)
+	req.Description = d.Get("description").(string)
+	req.RetryIntervalMinutes = d.Get("retry_interval_minutes").(int)
+	req.RotateIntervalMinutes = d.Get("rotate_interval_minutes").(int)
+	req.RotateThresholdLines = d.Get("rotate_threshold_lines").(int)
+	req.DateFormat = d.Get("date_format").(string)
+	req.FieldDelimiter = d.Get("field_delimiter").(string)
+	req.FieldSeparator = d.Get("field_separator").(string)
+	req.FileNameTemplate = d.Get("file_name_template").(string)
+	req.FormatType = d.Get("format_type").(string)
 
 	if v, ok := d.GetOk("rotate_threshold_mb"); ok {
 		req.RotateThresholdMB = pointer.ToInt(v.(int))
@@ -256,53 +220,18 @@ func resourceCDNLogsUploaderPolicyUpdate(ctx context.Context, d *schema.Resource
 	}
 
 	var req logsuploader.PolicyUpdateRequest
-	if v, ok := d.GetOk("include_empty_logs"); ok {
-		req.IncludeEmptyLogs = v.(bool)
-	}
-
-	if v, ok := d.GetOk("include_shield_logs"); ok {
-		req.IncludeShieldLogs = v.(bool)
-	}
-
-	if v, ok := d.GetOk("name"); ok {
-		req.Name = v.(string)
-	}
-
-	if v, ok := d.GetOk("description"); ok {
-		req.Description = v.(string)
-	}
-
-	if v, ok := d.GetOk("retry_interval_minutes"); ok {
-		req.RetryIntervalMinutes = v.(int)
-	}
-
-	if v, ok := d.GetOk("rotate_interval_minutes"); ok {
-		req.RotateIntervalMinutes = v.(int)
-	}
-
-	if v, ok := d.GetOk("rotate_threshold_lines"); ok {
-		req.RotateThresholdLines = v.(int)
-	}
-
-	if v, ok := d.GetOk("date_format"); ok {
-		req.DateFormat = v.(string)
-	}
-
-	if v, ok := d.GetOk("field_delimiter"); ok {
-		req.FieldDelimiter = v.(string)
-	}
-
-	if v, ok := d.GetOk("field_separator"); ok {
-		req.FieldSeparator = v.(string)
-	}
-
-	if v, ok := d.GetOk("file_name_template"); ok {
-		req.FileNameTemplate = v.(string)
-	}
-
-	if v, ok := d.GetOk("format_type"); ok {
-		req.FormatType = v.(string)
-	}
+	req.IncludeEmptyLogs = d.Get("include_empty_logs").(bool)
+	req.IncludeShieldLogs = d.Get("include_shield_logs").(bool)
+	req.Name = d.Get("name").(string)
+	req.Description = d.Get("description").(string)
+	req.RetryIntervalMinutes = d.Get("retry_interval_minutes").(int)
+	req.RotateIntervalMinutes = d.Get("rotate_interval_minutes").(int)
+	req.RotateThresholdLines = d.Get("rotate_threshold_lines").(int)
+	req.DateFormat = d.Get("date_format").(string)
+	req.FieldDelimiter = d.Get("field_delimiter").(string)
+	req.FieldSeparator = d.Get("field_separator").(string)
+	req.FileNameTemplate = d.Get("file_name_template").(string)
+	req.FormatType = d.Get("format_type").(string)
 
 	if v, ok := d.GetOk("rotate_threshold_mb"); ok {
 		req.RotateThresholdMB = pointer.ToInt(v.(int))

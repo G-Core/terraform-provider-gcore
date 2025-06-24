@@ -40,19 +40,19 @@ resource "gcore_cdn_logs_uploader_policy" "policy_1" {
 
 ### Optional
 
-- `date_format` (String) Date format for logs.
-- `description` (String) Description of the policy.
-- `field_delimiter` (String) Field delimiter for logs.
-- `field_separator` (String) Field separator for logs.
-- `file_name_template` (String) Template for log file name.
-- `format_type` (String) Format type for logs.
-- `include_empty_logs` (Boolean) Include empty logs in the upload.
-- `include_shield_logs` (Boolean) Include logs from origin shielding in the upload.
-- `name` (String) Name of the policy.
-- `retry_interval_minutes` (Number) Interval in minutes to retry failed uploads.
-- `rotate_interval_minutes` (Number) Interval in minutes to rotate logs.
-- `rotate_threshold_lines` (Number) Threshold in lines to rotate logs.
-- `rotate_threshold_mb` (Number) Threshold in MB to rotate logs.
+- `date_format` (String) Date format for logs. Default value is empty string.
+- `description` (String) Description of the policy. Default value is empty string.
+- `field_delimiter` (String) Field delimiter for logs. Default value is \".
+- `field_separator` (String) Field separator for logs. Default value is a space character.
+- `file_name_template` (String) Template for log file name. Default value is "{{YYYY}}/{{MM}}/{{DD}}/{{HH}}/{{mm}}/{{ss}}/{{HOST}}_{{CNAME}}_access.log.gz".
+- `format_type` (String) Format type for logs. Default value is empty string.
+- `include_empty_logs` (Boolean) Include empty logs in the upload. Default value is false.
+- `include_shield_logs` (Boolean) Include logs from origin shielding in the upload. Default value is false.
+- `name` (String) Name of the policy. Default value is "Policy".
+- `retry_interval_minutes` (Number) Interval in minutes to retry failed uploads. Default value is 60.
+- `rotate_interval_minutes` (Number) Interval in minutes to rotate logs. Default value is 5.
+- `rotate_threshold_lines` (Number) Threshold in lines to rotate logs. Default value is 0.
+- `rotate_threshold_mb` (Number) Threshold in MB to rotate logs. Default value is nil.
 - `tags` (Map of String) Tags allow for dynamic decoration of logs by adding predefined fields to the log format. These tags serve as customizable key-value pairs that can be included in log entries to enhance context and readability.
 
 ### Read-Only

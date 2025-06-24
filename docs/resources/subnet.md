@@ -111,7 +111,7 @@ resource "gcore_subnet" "subnet_ipv6" {
 - `connect_to_network_router` (Boolean) True if the network's router should get a gateway in this subnet. Must be explicitly 'false' when gateway_ip is null. Default true.
 - `dns_nameservers` (List of String) List of strings contains DNS addresses, e.g. 95.85.95.85.
 - `enable_dhcp` (Boolean) Enable DHCP for this subnet.
-- `gateway_ip` (String) Desired IP address of the subnet's gateway.
+- `gateway_ip` (String) Desired IP address of the subnet's gateway. Use `disable` value to disable gateway ip.
 - `host_routes` (Block List) (see [below for nested schema](#nestedblock--host_routes))
 - `metadata_map` (Map of String) Metadata map to apply to the subnet.
 - `project_id` (Number) ID of the desired project to create subnet in. Alternative for `project_name`. One of them should be specified.
