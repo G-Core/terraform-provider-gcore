@@ -481,7 +481,10 @@ func resourceCDNLogsUploaderTargetRead(ctx context.Context, d *schema.ResourceDa
 			configData[storageType] = []interface{}{}
 		}
 	}
-	d.Set("config", []interface{}{configData})
+	err = d.Set("config", []interface{}{configData})
+	if err != nil {
+		return diag.Errorf("failed to save 'config' field in state: %s", err)
+	}
 
 	log.Println("[DEBUG] Finish CDN Logs Uploader Target reading")
 	return nil
