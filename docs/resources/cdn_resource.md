@@ -38,6 +38,13 @@ resource "gcore_cdn_resource" "cdn_example_com" {
         enabled = true
         app_id = "1001"
         interrupt_on_error = true
+        execute_on_edge    = true
+        execute_on_shield  = false
+      }
+      on_response_headers {
+        enabled = true
+        app_id = "1002"
+        interrupt_on_error = true
       }
     }
     edge_cache_settings {
@@ -246,16 +253,61 @@ Optional:
 <a id="nestedblock--options--fastedge"></a>
 ### Nested Schema for `options.fastedge`
 
-Required:
-
-- `on_request_headers` (Block List, Min: 1, Max: 1) Allows to configure FastEdge application that will be called to handle request headers as soon as CDN receives incoming HTTP request. (see [below for nested schema](#nestedblock--options--fastedge--on_request_headers))
-
 Optional:
 
 - `enabled` (Boolean)
+- `on_request_body` (Block List, Max: 1) Allows to configure FastEdge application that will be called to handle request body as soon as CDN receives incoming HTTP request. (see [below for nested schema](#nestedblock--options--fastedge--on_request_body))
+- `on_request_headers` (Block List, Max: 1) Allows to configure FastEdge application that will be called to handle request headers as soon as CDN receives incoming HTTP request. (see [below for nested schema](#nestedblock--options--fastedge--on_request_headers))
+- `on_response_body` (Block List, Max: 1) Allows to configure FastEdge application that will be called to handle response body before CDN sends the HTTP response. (see [below for nested schema](#nestedblock--options--fastedge--on_response_body))
+- `on_response_headers` (Block List, Max: 1) Allows to configure FastEdge application that will be called to handle response headers before CDN sends the HTTP response. (see [below for nested schema](#nestedblock--options--fastedge--on_response_headers))
+
+<a id="nestedblock--options--fastedge--on_request_body"></a>
+### Nested Schema for `options.fastedge.on_request_body`
+
+Required:
+
+- `app_id` (String) The ID of the application in FastEdge.
+
+Optional:
+
+- `enabled` (Boolean) Determines if the FastEdge application should be called whenever HTTP request headers are received.
+- `execute_on_edge` (Boolean) Determines if the request should be executed at the edge nodes.
+- `execute_on_shield` (Boolean) Determines if the request should be executed at the shield nodes.
+- `interrupt_on_error` (Boolean) Determines if the request execution should be interrupted when an error occurs.
+
 
 <a id="nestedblock--options--fastedge--on_request_headers"></a>
 ### Nested Schema for `options.fastedge.on_request_headers`
+
+Required:
+
+- `app_id` (String) The ID of the application in FastEdge.
+
+Optional:
+
+- `enabled` (Boolean) Determines if the FastEdge application should be called whenever HTTP request headers are received.
+- `execute_on_edge` (Boolean) Determines if the request should be executed at the edge nodes.
+- `execute_on_shield` (Boolean) Determines if the request should be executed at the shield nodes.
+- `interrupt_on_error` (Boolean) Determines if the request execution should be interrupted when an error occurs.
+
+
+<a id="nestedblock--options--fastedge--on_response_body"></a>
+### Nested Schema for `options.fastedge.on_response_body`
+
+Required:
+
+- `app_id` (String) The ID of the application in FastEdge.
+
+Optional:
+
+- `enabled` (Boolean) Determines if the FastEdge application should be called whenever HTTP request headers are received.
+- `execute_on_edge` (Boolean) Determines if the request should be executed at the edge nodes.
+- `execute_on_shield` (Boolean) Determines if the request should be executed at the shield nodes.
+- `interrupt_on_error` (Boolean) Determines if the request execution should be interrupted when an error occurs.
+
+
+<a id="nestedblock--options--fastedge--on_response_headers"></a>
+### Nested Schema for `options.fastedge.on_response_headers`
 
 Required:
 

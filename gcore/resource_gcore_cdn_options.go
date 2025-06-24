@@ -6,6 +6,48 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 )
 
+func fastedgeTriggerSchema(description string) *schema.Schema {
+	return &schema.Schema{
+		Type:        schema.TypeList,
+		MaxItems:    1,
+		Optional:    true,
+		Description: description,
+		Elem: &schema.Resource{
+			Schema: map[string]*schema.Schema{
+				"enabled": {
+					Type:        schema.TypeBool,
+					Optional:    true,
+					Default:     true,
+					Description: "Determines if the FastEdge application should be called whenever HTTP request headers are received.",
+				},
+				"app_id": {
+					Type:        schema.TypeString,
+					Required:    true,
+					Description: "The ID of the application in FastEdge.",
+				},
+				"interrupt_on_error": {
+					Type:        schema.TypeBool,
+					Optional:    true,
+					Default:     true,
+					Description: "Determines if the request execution should be interrupted when an error occurs.",
+				},
+				"execute_on_edge": {
+					Type:        schema.TypeBool,
+					Optional:    true,
+					Default:     true,
+					Description: "Determines if the request should be executed at the edge nodes.",
+				},
+				"execute_on_shield": {
+					Type:        schema.TypeBool,
+					Optional:    true,
+					Default:     false,
+					Description: "Determines if the request should be executed at the shield nodes.",
+				},
+			},
+		},
+	}
+}
+
 var (
 	commonOptions = map[string]*schema.Schema{
 		"allowed_http_methods": {
@@ -192,45 +234,10 @@ var (
 						Optional: true,
 						Default:  true,
 					},
-					"on_request_headers": {
-						Type:        schema.TypeList,
-						MaxItems:    1,
-						Required:    true,
-						Description: "Allows to configure FastEdge application that will be called to handle request headers as soon as CDN receives incoming HTTP request.",
-						Elem: &schema.Resource{
-							Schema: map[string]*schema.Schema{
-								"enabled": {
-									Type:        schema.TypeBool,
-									Optional:    true,
-									Default:     true,
-									Description: "Determines if the FastEdge application should be called whenever HTTP request headers are received.",
-								},
-								"app_id": {
-									Type:        schema.TypeString,
-									Required:    true,
-									Description: "The ID of the application in FastEdge.",
-								},
-								"interrupt_on_error": {
-									Type:        schema.TypeBool,
-									Optional:    true,
-									Default:     true,
-									Description: "Determines if the request execution should be interrupted when an error occurs.",
-								},
-								"execute_on_edge": {
-									Type:        schema.TypeBool,
-									Optional:    true,
-									Default:     true,
-									Description: "Determines if the request should be executed at the edge nodes.",
-								},
-								"execute_on_shield": {
-									Type:        schema.TypeBool,
-									Optional:    true,
-									Default:     false,
-									Description: "Determines if the request should be executed at the shield nodes.",
-								},
-							},
-						},
-					},
+					"on_request_headers":  fastedgeTriggerSchema("Allows to configure FastEdge application that will be called to handle request headers as soon as CDN receives incoming HTTP request."),
+					"on_request_body":     fastedgeTriggerSchema("Allows to configure FastEdge application that will be called to handle request body as soon as CDN receives incoming HTTP request."),
+					"on_response_headers": fastedgeTriggerSchema("Allows to configure FastEdge application that will be called to handle response headers before CDN sends the HTTP response."),
+					"on_response_body":    fastedgeTriggerSchema("Allows to configure FastEdge application that will be called to handle response body before CDN sends the HTTP response."),
 				},
 			},
 		},

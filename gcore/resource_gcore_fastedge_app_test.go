@@ -19,7 +19,12 @@ var baseAppJson string = `
 		"key1": "value1"
 	},
 	"debug": true,
-	"comment": "test application"
+	"comment": "test application",
+	"secrets": {
+	    "foo": {
+			"id": 1
+		}
+	}
 `
 var baseApp sdk.App = sdk.App{
 	Name:    ptr("test-app"),
@@ -33,8 +38,13 @@ var baseApp sdk.App = sdk.App{
 	RspHeaders: ptr(map[string]string{
 		"key1": "value1",
 	}),
+	Secrets: &map[string]sdk.AppSecretShort{
+		"foo": {
+			Id: 1,
+		},
+	},
 }
-var baseTfConfig string = `resource "gcore_fastedge_app" "test" {
+var baseTfFastEdgeAppConfig string = `resource "gcore_fastedge_app" "test" {
 	binary = 314
 	status = "enabled"
 	env = {
@@ -45,49 +55,62 @@ var baseTfConfig string = `resource "gcore_fastedge_app" "test" {
 	}
 	debug = true
 	comment = "test application"
+	secrets = {
+		"foo" = "1"
+	}
 `
 
 func TestFastEdgeApp_basic(t *testing.T) {
 	updatedApp := baseApp
 	updatedApp.Name = ptr("test-app1")
-	mock := &mockSdk{
+	mock := &mockSDK{
 		t: t,
-		getApp: []mockParams{
-			{
-				expectId:  42,
-				retStatus: http.StatusOK,
-				retBody:   `{"id": 42, "name": "test-app", ` + baseAppJson + `}`,
+		mocks: map[string]*funcMock{
+			"GetApp": {
+				params: []mockParams{
+					{
+						expectId:  42,
+						retStatus: http.StatusOK,
+						retBody:   `{"id": 42, "name": "test-app", ` + baseAppJson + `}`,
+					},
+					{
+						expectId:  42,
+						retStatus: http.StatusOK,
+						retBody:   `{"id": 42, "name": "test-app", ` + baseAppJson + `}`,
+					},
+					{
+						expectId:  42,
+						retStatus: http.StatusOK,
+						retBody:   `{"id": 42, "name": "test-app1", ` + baseAppJson + `}`,
+					},
+				},
 			},
-			{
-				expectId:  42,
-				retStatus: http.StatusOK,
-				retBody:   `{"id": 42, "name": "test-app", ` + baseAppJson + `}`,
+			"AddApp": {
+				params: []mockParams{
+					{
+						expectPayload: baseApp,
+						retStatus:     http.StatusOK,
+						retBody:       `{"id": 42, "name": "test-app", ` + baseAppJson + `}`,
+					},
+				},
 			},
-			{
-				expectId:  42,
-				retStatus: http.StatusOK,
-				retBody:   `{"id": 42, "name": "test-app1", ` + baseAppJson + `}`,
+			"UpdateApp": {
+				params: []mockParams{
+					{
+						expectId:      42,
+						expectPayload: sdk.UpdateAppJSONRequestBody{App: updatedApp},
+						retStatus:     http.StatusOK,
+						retBody:       `{"id": 42, "name": "test-app1", ` + baseAppJson + `}`,
+					},
+				},
 			},
-		},
-		addApp: []mockParams{
-			{
-				expectPayload: baseApp,
-				retStatus:     http.StatusOK,
-				retBody:       `{"id": 42, "name": "test-app", ` + baseAppJson + `}`,
-			},
-		},
-		updApp: []mockParams{
-			{
-				expectId:      42,
-				expectPayload: updatedApp,
-				retStatus:     http.StatusOK,
-				retBody:       `{"id": 42, "name": "test-app1", ` + baseAppJson + `}`,
-			},
-		},
-		delApp: []mockParams{
-			{
-				expectId:  42,
-				retStatus: http.StatusNoContent,
+			"DelApp": {
+				params: []mockParams{
+					{
+						expectId:  42,
+						retStatus: http.StatusNoContent,
+					},
+				},
 			},
 		},
 	}
@@ -97,7 +120,7 @@ func TestFastEdgeApp_basic(t *testing.T) {
 		IsUnitTest:        true,
 		Steps: []resource.TestStep{
 			{ // create resource
-				Config: baseTfConfig + `name = "test-app"
+				Config: baseTfFastEdgeAppConfig + `name = "test-app"
 				}`,
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckResourceExists("gcore_fastedge_app.test"),
@@ -109,10 +132,11 @@ func TestFastEdgeApp_basic(t *testing.T) {
 					resource.TestCheckResourceAttr("gcore_fastedge_app.test", "rsp_headers.key1", "value1"),
 					resource.TestCheckResourceAttr("gcore_fastedge_app.test", "comment", "test application"),
 					resource.TestCheckResourceAttr("gcore_fastedge_app.test", "debug", "true"),
+					resource.TestCheckResourceAttr("gcore_fastedge_app.test", "secrets.foo", "1"),
 				),
 			},
 			{ // update resource
-				Config: baseTfConfig + `name = "test-app1"
+				Config: baseTfFastEdgeAppConfig + `name = "test-app1"
 						}`,
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckResourceExists("gcore_fastedge_app.test"),
@@ -124,6 +148,7 @@ func TestFastEdgeApp_basic(t *testing.T) {
 					resource.TestCheckResourceAttr("gcore_fastedge_app.test", "rsp_headers.key1", "value1"),
 					resource.TestCheckResourceAttr("gcore_fastedge_app.test", "comment", "test application"),
 					resource.TestCheckResourceAttr("gcore_fastedge_app.test", "debug", "true"),
+					resource.TestCheckResourceAttr("gcore_fastedge_app.test", "secrets.foo", "1"),
 				),
 			},
 		},
@@ -135,40 +160,48 @@ func TestFastEdgeApp_basic(t *testing.T) {
 func TestFastEdgeApp_disappear(t *testing.T) {
 	updatedApp := baseApp
 	updatedApp.Name = ptr("test-app1")
-	mock := &mockSdk{
+	mock := &mockSDK{
 		t: t,
-		getApp: []mockParams{
-			{
-				expectId:  42,
-				retStatus: http.StatusOK,
-				retBody:   `{"id": 42, "name": "test-app", ` + baseAppJson + `}`,
+		mocks: map[string]*funcMock{
+			"GetApp": {
+				params: []mockParams{
+					{
+						expectId:  42,
+						retStatus: http.StatusOK,
+						retBody:   `{"id": 42, "name": "test-app", ` + baseAppJson + `}`,
+					},
+					{
+						expectId:  42,
+						retStatus: http.StatusNotFound, // resource disappeared from the backend
+					},
+					{
+						expectId:  43,
+						retStatus: http.StatusOK,
+						retBody:   `{"id": 43, "name": "test-app1", ` + baseAppJson + `}`,
+					},
+				},
 			},
-			{
-				expectId:  42,
-				retStatus: http.StatusNotFound, // resource disappeared from the backend
+			"AddApp": {
+				params: []mockParams{
+					{
+						expectPayload: baseApp,
+						retStatus:     http.StatusOK,
+						retBody:       `{"id": 42, "name": "test-app", ` + baseAppJson + `}`,
+					},
+					{
+						expectPayload: updatedApp,
+						retStatus:     http.StatusOK,
+						retBody:       `{"id": 43, "name": "test-app1", ` + baseAppJson + `}`,
+					},
+				},
 			},
-			{
-				expectId:  42,
-				retStatus: http.StatusOK,
-				retBody:   `{"id": 42, "name": "test-app1", ` + baseAppJson + `}`,
-			},
-		},
-		addApp: []mockParams{
-			{
-				expectPayload: baseApp,
-				retStatus:     http.StatusOK,
-				retBody:       `{"id": 42, "name": "test-app", ` + baseAppJson + `}`,
-			},
-			{
-				expectPayload: updatedApp,
-				retStatus:     http.StatusOK,
-				retBody:       `{"id": 42, "name": "test-app1", ` + baseAppJson + `}`,
-			},
-		},
-		delApp: []mockParams{
-			{
-				expectId:  42,
-				retStatus: http.StatusNoContent,
+			"DelApp": {
+				params: []mockParams{
+					{
+						expectId:  43,
+						retStatus: http.StatusNoContent,
+					},
+				},
 			},
 		},
 	}
@@ -178,7 +211,7 @@ func TestFastEdgeApp_disappear(t *testing.T) {
 		IsUnitTest:        true,
 		Steps: []resource.TestStep{
 			{ // create resource
-				Config: baseTfConfig + `name = "test-app"
+				Config: baseTfFastEdgeAppConfig + `name = "test-app"
 				}`,
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckResourceExists("gcore_fastedge_app.test"),
@@ -190,14 +223,15 @@ func TestFastEdgeApp_disappear(t *testing.T) {
 					resource.TestCheckResourceAttr("gcore_fastedge_app.test", "rsp_headers.key1", "value1"),
 					resource.TestCheckResourceAttr("gcore_fastedge_app.test", "comment", "test application"),
 					resource.TestCheckResourceAttr("gcore_fastedge_app.test", "debug", "true"),
+					resource.TestCheckResourceAttr("gcore_fastedge_app.test", "secrets.foo", "1"),
 				),
 			},
 			{ // resource disappeared - re-create
-				Config: baseTfConfig + `name = "test-app1"
+				Config: baseTfFastEdgeAppConfig + `name = "test-app1"
 						}`,
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckResourceExists("gcore_fastedge_app.test"),
-					resource.TestCheckResourceAttr("gcore_fastedge_app.test", "id", "42"),
+					resource.TestCheckResourceAttr("gcore_fastedge_app.test", "id", "43"),
 					resource.TestCheckResourceAttr("gcore_fastedge_app.test", "name", "test-app1"),
 					resource.TestCheckResourceAttr("gcore_fastedge_app.test", "binary", "314"),
 					resource.TestCheckResourceAttr("gcore_fastedge_app.test", "status", "enabled"),
@@ -205,6 +239,7 @@ func TestFastEdgeApp_disappear(t *testing.T) {
 					resource.TestCheckResourceAttr("gcore_fastedge_app.test", "rsp_headers.key1", "value1"),
 					resource.TestCheckResourceAttr("gcore_fastedge_app.test", "comment", "test application"),
 					resource.TestCheckResourceAttr("gcore_fastedge_app.test", "debug", "true"),
+					resource.TestCheckResourceAttr("gcore_fastedge_app.test", "secrets.foo", "1"),
 				),
 			},
 		},
@@ -214,13 +249,17 @@ func TestFastEdgeApp_disappear(t *testing.T) {
 }
 
 func TestFastEdgeApp_import(t *testing.T) {
-	mock := &mockSdk{
+	mock := &mockSDK{
 		t: t,
-		getApp: []mockParams{
-			{
-				expectId:  42,
-				retStatus: http.StatusOK,
-				retBody:   `{"id": 42, "name": "test-app", ` + baseAppJson + `}`,
+		mocks: map[string]*funcMock{
+			"GetApp": {
+				params: []mockParams{
+					{
+						expectId:  42,
+						retStatus: http.StatusOK,
+						retBody:   `{"id": 42, "name": "test-app", ` + baseAppJson + `}`,
+					},
+				},
 			},
 		},
 	}
@@ -230,7 +269,7 @@ func TestFastEdgeApp_import(t *testing.T) {
 		IsUnitTest:        true,
 		Steps: []resource.TestStep{
 			{ // import resource
-				Config: baseTfConfig + `name = "test-app"
+				Config: baseTfFastEdgeAppConfig + `name = "test-app"
 				}`,
 				ImportState:   true,
 				ImportStateId: "42",
@@ -245,6 +284,7 @@ func TestFastEdgeApp_import(t *testing.T) {
 					resource.TestCheckResourceAttr("gcore_fastedge_app.test", "rsp_headers.key1", "value1"),
 					resource.TestCheckResourceAttr("gcore_fastedge_app.test", "comment", "test application"),
 					resource.TestCheckResourceAttr("gcore_fastedge_app.test", "debug", "true"),
+					resource.TestCheckResourceAttr("gcore_fastedge_app.test", "secrets.foo", "1"),
 				),
 			},
 		},

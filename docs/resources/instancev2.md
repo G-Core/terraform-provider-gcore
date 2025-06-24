@@ -460,6 +460,7 @@ instances, 'username' cannot be specified. Use 'password' field to set the passw
 - `flavor` (Map of String) Flavor details, RAM, vCPU, etc.
 - `id` (String) The ID of this resource.
 - `last_updated` (String)
+- `metadata_read_only` (List of Object) (see [below for nested schema](#nestedatt--metadata_read_only))
 - `status` (String) Status of the instance
 
 <a id="nestedblock--interface"></a>
@@ -497,7 +498,7 @@ Read-Only:
 
 - `attachment_tag` (String) Tag for the volume attachment
 - `delete_on_termination` (Boolean) Delete volume on termination
-- `id` (String) The ID of this resource.
+- `id` (String)
 - `image_id` (String) Image ID for the volume
 - `name` (String) Name of the volume
 - `size` (Number) Size of the volume in GiB
@@ -528,6 +529,16 @@ Read-Only:
 - `addr` (String)
 - `type` (String)
 
+
+
+<a id="nestedatt--metadata_read_only"></a>
+### Nested Schema for `metadata_read_only`
+
+Read-Only:
+
+- `key` (String)
+- `read_only` (Boolean)
+- `value` (String)
 
 
 

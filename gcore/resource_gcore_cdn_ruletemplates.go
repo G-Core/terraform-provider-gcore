@@ -54,6 +54,7 @@ func resourceRuleTemplate() *schema.Resource {
 		ReadContext:   resourceRuleTemplateRead,
 		UpdateContext: resourceRuleTemplateUpdate,
 		DeleteContext: resourceRuleTemplateDelete,
+		CustomizeDiff: validateCDNOptions,
 		Description:   "Represent CDN rule template",
 	}
 }

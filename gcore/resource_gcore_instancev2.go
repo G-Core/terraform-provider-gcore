@@ -271,6 +271,26 @@ instances, 'username' cannot be specified. Use 'password' field to set the passw
 					Type: schema.TypeString,
 				},
 			},
+			"metadata_read_only": &schema.Schema{
+				Type:     schema.TypeList,
+				Computed: true,
+				Elem: &schema.Resource{
+					Schema: map[string]*schema.Schema{
+						"key": {
+							Type:     schema.TypeString,
+							Computed: true,
+						},
+						"value": {
+							Type:     schema.TypeString,
+							Computed: true,
+						},
+						"read_only": {
+							Type:     schema.TypeBool,
+							Computed: true,
+						},
+					},
+				},
+			},
 			"configuration": &schema.Schema{
 				Type:        schema.TypeList,
 				Optional:    true,
@@ -474,11 +494,6 @@ func resourceInstanceV2Read(ctx context.Context, d *schema.ResourceData, m inter
 		return diag.FromErr(err)
 	}
 
-	clientV2, err := CreateClient(provider, d, InstancePoint, versionPointV2)
-	if err != nil {
-		return diag.FromErr(err)
-	}
-
 	clientVol, err := CreateClient(provider, d, volumesPoint, versionPointV1)
 	if err != nil {
 		return diag.FromErr(err)
@@ -609,16 +624,13 @@ func resourceInstanceV2Read(ctx context.Context, d *schema.ResourceData, m inter
 		return diag.FromErr(err)
 	}
 
-	metadata := d.Get("metadata_map").(map[string]interface{})
-	newMetadata := make(map[string]interface{}, len(metadata))
-	for k := range metadata {
-		md, err := instancesV2.MetadataItemGet(clientV2, instanceID, instancesV2.MetadataItemOpts{Key: k}).Extract()
-		if err != nil {
-			return diag.Errorf("cannot get metadata with key: %s. Error: %s", instanceID, err)
-		}
-		newMetadata[k] = md.Value
+	metadataMap, metadataReadOnly := PrepareMetadata(instance.MetadataDetailed)
+
+	if err = d.Set("metadata_map", metadataMap); err != nil {
+		return diag.FromErr(err)
 	}
-	if err := d.Set("metadata_map", newMetadata); err != nil {
+
+	if err = d.Set("metadata_read_only", metadataReadOnly); err != nil {
 		return diag.FromErr(err)
 	}
 

@@ -11,25 +11,33 @@ import (
 
 func TestFastEdgeBinary_basic(t *testing.T) {
 	checksum, _ := fileChecksum(os.Args[0])
-	mock := &mockSdk{
+	mock := &mockSDK{
 		t: t,
-		getBin: []mockParams{
-			{
-				expectId:  42,
-				retStatus: http.StatusOK,
-				retBody:   `{"id": 42, "checksum": "` + checksum + `"}`,
+		mocks: map[string]*funcMock{
+			"GetBinary": {
+				params: []mockParams{
+					{
+						expectId:  42,
+						retStatus: http.StatusOK,
+						retBody:   `{"id": 42, "checksum": "` + checksum + `"}`,
+					},
+				},
 			},
-		},
-		addBin: []mockParams{
-			{
-				retStatus: http.StatusOK,
-				retBody:   `{"id": 42, "checksum": "` + checksum + `"}`,
+			"StoreBinary": {
+				params: []mockParams{
+					{
+						retStatus: http.StatusOK,
+						retBody:   `{"id": 42, "checksum": "` + checksum + `"}`,
+					},
+				},
 			},
-		},
-		delBin: []mockParams{
-			{
-				expectId:  42,
-				retStatus: http.StatusNoContent,
+			"DelBinary": {
+				params: []mockParams{
+					{
+						expectId:  42,
+						retStatus: http.StatusNoContent,
+					},
+				},
 			},
 		},
 	}
@@ -52,12 +60,16 @@ func TestFastEdgeBinary_basic(t *testing.T) {
 }
 
 func TestFastEdgeBinary_corrupted(t *testing.T) {
-	mock := &mockSdk{
+	mock := &mockSDK{
 		t: t,
-		addBin: []mockParams{
-			{
-				retStatus: http.StatusOK,
-				retBody:   `{"id": 42, "checksum": "xyz"}`, // checksum cannot possibly match the real one
+		mocks: map[string]*funcMock{
+			"StoreBinary": {
+				params: []mockParams{
+					{
+						retStatus: http.StatusOK,
+						retBody:   `{"id": 42, "checksum": "xyz"}`, // checksum cannot possibly match the real one
+					},
+				},
 			},
 		},
 	}
@@ -78,38 +90,46 @@ func TestFastEdgeBinary_corrupted(t *testing.T) {
 
 func TestFastEdgeBinary_disappear(t *testing.T) {
 	checksum, _ := fileChecksum(os.Args[0])
-	mock := &mockSdk{
+	mock := &mockSDK{
 		t: t,
-		getBin: []mockParams{
-			{
-				expectId:  42,
-				retStatus: http.StatusOK,
-				retBody:   `{"id": 42, "checksum": "` + checksum + `"}`,
+		mocks: map[string]*funcMock{
+			"GetBinary": {
+				params: []mockParams{
+					{
+						expectId:  42,
+						retStatus: http.StatusOK,
+						retBody:   `{"id": 42, "checksum": "` + checksum + `"}`,
+					},
+					{
+						expectId:  42,
+						retStatus: http.StatusNotFound, // resource disappeared from the backend
+					},
+					{
+						expectId:  43,
+						retStatus: http.StatusOK,
+						retBody:   `{"id": 42, "checksum": "` + checksum + `"}`,
+					},
+				},
 			},
-			{
-				expectId:  42,
-				retStatus: http.StatusNotFound, // resource disappeared from the backend
+			"StoreBinary": {
+				params: []mockParams{
+					{
+						retStatus: http.StatusOK,
+						retBody:   `{"id": 42, "checksum": "` + checksum + `"}`,
+					},
+					{
+						retStatus: http.StatusOK,
+						retBody:   `{"id": 43, "checksum": "` + checksum + `"}`,
+					},
+				},
 			},
-			{
-				expectId:  42,
-				retStatus: http.StatusOK,
-				retBody:   `{"id": 42, "checksum": "` + checksum + `"}`,
-			},
-		},
-		addBin: []mockParams{
-			{
-				retStatus: http.StatusOK,
-				retBody:   `{"id": 42, "checksum": "` + checksum + `"}`,
-			},
-			{
-				retStatus: http.StatusOK,
-				retBody:   `{"id": 42, "checksum": "` + checksum + `"}`,
-			},
-		},
-		delBin: []mockParams{
-			{
-				expectId:  42,
-				retStatus: http.StatusNoContent,
+			"DelBinary": {
+				params: []mockParams{
+					{
+						expectId:  43,
+						retStatus: http.StatusNoContent,
+					},
+				},
 			},
 		},
 	}
@@ -128,7 +148,7 @@ func TestFastEdgeBinary_disappear(t *testing.T) {
 			{
 				Config: `resource "gcore_fastedge_binary" "test" {	filename = "` + os.Args[0] + `"}`,
 				Check: resource.ComposeTestCheckFunc(
-					resource.TestCheckResourceAttr("gcore_fastedge_binary.test", "id", "42"),
+					resource.TestCheckResourceAttr("gcore_fastedge_binary.test", "id", "43"),
 					resource.TestCheckResourceAttr("gcore_fastedge_binary.test", "checksum", checksum),
 				),
 			},
@@ -140,13 +160,17 @@ func TestFastEdgeBinary_disappear(t *testing.T) {
 
 func TestFastEdgeBinary_import(t *testing.T) {
 	checksum, _ := fileChecksum(os.Args[0])
-	mock := &mockSdk{
+	mock := &mockSDK{
 		t: t,
-		getBin: []mockParams{
-			{
-				expectId:  42,
-				retStatus: http.StatusOK,
-				retBody:   `{"id": 42, "checksum": "` + checksum + `"}`,
+		mocks: map[string]*funcMock{
+			"GetBinary": {
+				params: []mockParams{
+					{
+						expectId:  42,
+						retStatus: http.StatusOK,
+						retBody:   `{"id": 42, "checksum": "` + checksum + `"}`,
+					},
+				},
 			},
 		},
 	}
