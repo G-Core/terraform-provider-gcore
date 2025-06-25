@@ -79,14 +79,14 @@ Optional:
 
 Required:
 
-- `hostname` (String)
-- `password` (String, Sensitive)
-- `user` (String)
+- `hostname` (String) Hostname or IP address of the FTP server.
+- `password` (String, Sensitive) Password for the FTP account.
+- `user` (String) Username for the FTP account.
 
 Optional:
 
-- `directory` (String)
-- `timeout_seconds` (Number) Default value is 10.
+- `directory` (String) Directory on the FTP server where logs will be uploaded.
+- `timeout_seconds` (Number) Timeout for the FTP connection in seconds. Default value is 10.
 
 
 <a id="nestedblock--config--http"></a>
@@ -94,46 +94,28 @@ Optional:
 
 Required:
 
-- `auth` (Block List, Min: 1, Max: 1) (see [below for nested schema](#nestedblock--config--http--auth))
-- `upload` (Block List, Min: 1, Max: 1) (see [below for nested schema](#nestedblock--config--http--upload))
+- `upload` (Block List, Min: 1, Max: 1) Upload action configuration. (see [below for nested schema](#nestedblock--config--http--upload))
 
 Optional:
 
-- `append` (Block List, Max: 1) (see [below for nested schema](#nestedblock--config--http--append))
-- `content_type` (String) Default value is text.
-- `retry` (Block List, Max: 1) (see [below for nested schema](#nestedblock--config--http--retry))
-
-<a id="nestedblock--config--http--auth"></a>
-### Nested Schema for `config.http.auth`
-
-Required:
-
-- `config` (Block List, Min: 1, Max: 1) (see [below for nested schema](#nestedblock--config--http--auth--config))
-- `type` (String)
-
-<a id="nestedblock--config--http--auth--config"></a>
-### Nested Schema for `config.http.auth.config`
-
-Required:
-
-- `header_name` (String)
-- `token` (String, Sensitive)
-
-
+- `append` (Block List, Max: 1) Append action configuration. (see [below for nested schema](#nestedblock--config--http--append))
+- `auth` (Block List, Max: 1) Authentication configuration for HTTP target. (see [below for nested schema](#nestedblock--config--http--auth))
+- `content_type` (String) Content type of the logs being uploaded. Supported values are 'json' and 'text'.
+- `retry` (Block List, Max: 1) Retry action configuration. (see [below for nested schema](#nestedblock--config--http--retry))
 
 <a id="nestedblock--config--http--upload"></a>
 ### Nested Schema for `config.http.upload`
 
 Required:
 
-- `url` (String)
+- `url` (String) URL to which logs should be uploaded.
 
 Optional:
 
 - `headers` (Map of String)
-- `method` (String) Default value is POST.
-- `response_actions` (Block List) (see [below for nested schema](#nestedblock--config--http--upload--response_actions))
-- `timeout_seconds` (Number) Default value is 30.
+- `method` (String) HTTP method to use for the request. Supported values are 'POST' and 'PUT'.
+- `response_actions` (Block List) List of actions to perform based on the response from the server. (see [below for nested schema](#nestedblock--config--http--upload--response_actions))
+- `timeout_seconds` (Number) Timeout for the HTTP request in seconds. Default value is 30.
 - `use_compression` (Boolean) Default value is false.
 
 <a id="nestedblock--config--http--upload--response_actions"></a>
@@ -141,13 +123,13 @@ Optional:
 
 Required:
 
-- `action` (String)
+- `action` (String) Action to perform if the response matches the specified criteria. Supported values are 'drop', 'retry', and 'append'.
 
 Optional:
 
 - `description` (String) Default value is empty string.
-- `match_payload` (String) Default value is empty string.
-- `match_status_code` (Number) Default value is 0.
+- `match_payload` (String) Payload to match in the response. If not specified, no payload will be matched.
+- `match_status_code` (Number) HTTP status code to match. If not specified, no status code will be matched.
 
 
 
@@ -156,14 +138,14 @@ Optional:
 
 Required:
 
-- `url` (String)
+- `url` (String) URL to which logs should be uploaded.
 
 Optional:
 
 - `headers` (Map of String)
-- `method` (String) Default value is POST.
-- `response_actions` (Block List) (see [below for nested schema](#nestedblock--config--http--append--response_actions))
-- `timeout_seconds` (Number) Default value is 30.
+- `method` (String) HTTP method to use for the request. Supported values are 'POST' and 'PUT'.
+- `response_actions` (Block List) List of actions to perform based on the response from the server. (see [below for nested schema](#nestedblock--config--http--append--response_actions))
+- `timeout_seconds` (Number) Timeout for the HTTP request in seconds. Default value is 30.
 - `use_compression` (Boolean) Default value is false.
 
 <a id="nestedblock--config--http--append--response_actions"></a>
@@ -171,13 +153,31 @@ Optional:
 
 Required:
 
-- `action` (String)
+- `action` (String) Action to perform if the response matches the specified criteria. Supported values are 'drop', 'retry', and 'append'.
 
 Optional:
 
 - `description` (String) Default value is empty string.
-- `match_payload` (String) Default value is empty string.
-- `match_status_code` (Number) Default value is 0.
+- `match_payload` (String) Payload to match in the response. If not specified, no payload will be matched.
+- `match_status_code` (Number) HTTP status code to match. If not specified, no status code will be matched.
+
+
+
+<a id="nestedblock--config--http--auth"></a>
+### Nested Schema for `config.http.auth`
+
+Required:
+
+- `config` (Block List, Min: 1, Max: 1) Configuration for the authentication type. (see [below for nested schema](#nestedblock--config--http--auth--config))
+- `type` (String) Type of authentication. Supported values are 'token'.
+
+<a id="nestedblock--config--http--auth--config"></a>
+### Nested Schema for `config.http.auth.config`
+
+Required:
+
+- `header_name` (String) Name of the header to which the token will be added.
+- `token` (String, Sensitive) Token to be used for authentication.
 
 
 
@@ -186,14 +186,14 @@ Optional:
 
 Required:
 
-- `url` (String)
+- `url` (String) URL to which logs should be uploaded.
 
 Optional:
 
 - `headers` (Map of String)
-- `method` (String) Default value is POST.
-- `response_actions` (Block List) (see [below for nested schema](#nestedblock--config--http--retry--response_actions))
-- `timeout_seconds` (Number) Default value is 30.
+- `method` (String) HTTP method to use for the request. Supported values are 'POST' and 'PUT'.
+- `response_actions` (Block List) List of actions to perform based on the response from the server. (see [below for nested schema](#nestedblock--config--http--retry--response_actions))
+- `timeout_seconds` (Number) Timeout for the HTTP request in seconds. Default value is 30.
 - `use_compression` (Boolean) Default value is false.
 
 <a id="nestedblock--config--http--retry--response_actions"></a>
@@ -201,13 +201,13 @@ Optional:
 
 Required:
 
-- `action` (String)
+- `action` (String) Action to perform if the response matches the specified criteria. Supported values are 'drop', 'retry', and 'append'.
 
 Optional:
 
 - `description` (String) Default value is empty string.
-- `match_payload` (String) Default value is empty string.
-- `match_status_code` (Number) Default value is 0.
+- `match_payload` (String) Payload to match in the response. If not specified, no payload will be matched.
+- `match_status_code` (Number) HTTP status code to match. If not specified, no status code will be matched.
 
 
 
@@ -217,14 +217,14 @@ Optional:
 
 Required:
 
-- `access_key_id` (String)
-- `bucket_name` (String)
-- `region` (String)
-- `secret_access_key` (String, Sensitive)
+- `access_key_id` (String) Access key ID for the Amazon S3 account.
+- `bucket_name` (String) Name of the Amazon S3 bucket.
+- `region` (String) Region of the Amazon S3 bucket.
+- `secret_access_key` (String, Sensitive) Secret access key for the Amazon S3 account.
 
 Optional:
 
-- `directory` (String)
+- `directory` (String) Directory in the Amazon S3 bucket where logs will be uploaded.
 
 
 <a id="nestedblock--config--s3_gcore"></a>
@@ -232,15 +232,15 @@ Optional:
 
 Required:
 
-- `access_key_id` (String)
-- `bucket_name` (String)
-- `endpoint` (String)
-- `region` (String)
-- `secret_access_key` (String, Sensitive)
+- `access_key_id` (String) Access key ID for the S3-compatible storage account.
+- `bucket_name` (String) Name of the S3-compatible storage bucket.
+- `endpoint` (String) Endpoint of the S3-compatible storage service.
+- `region` (String) Region of the S3-compatible storage bucket.
+- `secret_access_key` (String, Sensitive) Secret access key for the S3-compatible storage account.
 
 Optional:
 
-- `directory` (String)
+- `directory` (String) Directory in the S3-compatible storage bucket where logs will be uploaded.
 - `use_path_style` (Boolean) Default value is true.
 
 
@@ -249,14 +249,14 @@ Optional:
 
 Required:
 
-- `access_key_id` (String)
-- `bucket_name` (String)
-- `secret_access_key` (String, Sensitive)
+- `access_key_id` (String) Access key ID for the OSS account.
+- `bucket_name` (String) Name of the OSS bucket.
+- `secret_access_key` (String, Sensitive) Secret access key for the OSS account.
 
 Optional:
 
-- `directory` (String)
-- `region` (String)
+- `directory` (String) Directory in the OSS bucket where logs will be uploaded.
+- `region` (String) Region of the OSS bucket.
 
 
 <a id="nestedblock--config--s3_other"></a>
@@ -264,15 +264,15 @@ Optional:
 
 Required:
 
-- `access_key_id` (String)
-- `bucket_name` (String)
-- `endpoint` (String)
-- `region` (String)
-- `secret_access_key` (String, Sensitive)
+- `access_key_id` (String) Access key ID for the S3-compatible storage account.
+- `bucket_name` (String) Name of the S3-compatible storage bucket.
+- `endpoint` (String) Endpoint of the S3-compatible storage service.
+- `region` (String) Region of the S3-compatible storage bucket.
+- `secret_access_key` (String, Sensitive) Secret access key for the S3-compatible storage account.
 
 Optional:
 
-- `directory` (String)
+- `directory` (String) Directory in the S3-compatible storage bucket where logs will be uploaded.
 - `use_path_style` (Boolean) Default value is true.
 
 
@@ -281,15 +281,15 @@ Optional:
 
 Required:
 
-- `access_key_id` (String)
-- `bucket_name` (String)
-- `endpoint` (String)
-- `region` (String)
-- `secret_access_key` (String, Sensitive)
+- `access_key_id` (String) Access key ID for the S3-compatible storage account.
+- `bucket_name` (String) Name of the S3-compatible storage bucket.
+- `endpoint` (String) Endpoint of the S3-compatible storage service.
+- `region` (String) Region of the S3-compatible storage bucket.
+- `secret_access_key` (String, Sensitive) Secret access key for the S3-compatible storage account.
 
 Optional:
 
-- `directory` (String)
+- `directory` (String) Directory in the S3-compatible storage bucket where logs will be uploaded.
 - `use_path_style` (Boolean) Default value is true.
 
 
@@ -298,13 +298,13 @@ Optional:
 
 Required:
 
-- `hostname` (String)
-- `user` (String)
+- `hostname` (String) Hostname or IP address of the SFTP server.
+- `user` (String) Username for the SFTP account.
 
 Optional:
 
-- `directory` (String)
-- `key_passphrase` (String, Sensitive)
-- `password` (String, Sensitive)
-- `private_key` (String, Sensitive)
-- `timeout_seconds` (Number) Default value is 10.
+- `directory` (String) Directory on the SFTP server where logs will be uploaded.
+- `key_passphrase` (String, Sensitive) Passphrase for the private key.
+- `password` (String, Sensitive) Password for the SFTP account.
+- `private_key` (String, Sensitive) Private key for the SFTP account.
+- `timeout_seconds` (Number) Timeout for the SFTP connection in seconds. Default value is 10.
