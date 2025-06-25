@@ -554,6 +554,11 @@ func resourceK8sV2() *schema.Resource {
 							Optional: true,
 							Default:  "",
 						},
+						"remote_group_id": {
+							Type:     schema.TypeString,
+							Optional: true,
+							Default:  "",
+						},
 						"updated_at": {
 							Type:     schema.TypeString,
 							Computed: true,
