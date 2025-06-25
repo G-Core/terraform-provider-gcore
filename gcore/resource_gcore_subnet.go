@@ -113,6 +113,7 @@ func resourceSubnet() *schema.Resource {
 				Type:        schema.TypeBool,
 				Description: "True if the network's router should get a gateway in this subnet. Must be explicitly 'false' when gateway_ip is null. Default true.",
 				Optional:    true,
+				Computed:    true,
 				Default:     true,
 			},
 			"dns_nameservers": &schema.Schema{
@@ -348,9 +349,7 @@ func resourceSubnetRead(ctx context.Context, d *schema.ResourceData, m interface
 	d.Set("project_id", subnet.ProjectID)
 	d.Set("gateway_ip", subnet.GatewayIP.String())
 
-	fields := []string{"connect_to_network_router"}
-	revertState(d, &fields)
-
+	d.Set("connect_to_network_router", true)
 	if subnet.GatewayIP == nil {
 		d.Set("connect_to_network_router", false)
 		d.Set("gateway_ip", "disable")
