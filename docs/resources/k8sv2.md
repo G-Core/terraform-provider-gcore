@@ -384,6 +384,6 @@ Import is supported using the following syntax:
 
 ```shell
 # import using <project_id>:<region_id>:<cluster_name> format
-terraform import gcore_k8sv2.my-k8s-cluster 1:6:my-k8s-cluster
+terraform import gcore_k8sv2.cluster 1:6:my-k8s-cluster
 ```
 
