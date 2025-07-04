@@ -211,6 +211,7 @@ output "kubeconfig" {
 - `authentication` (Block List, Max: 1) Cluster authentication configuration. (see [below for nested schema](#nestedblock--authentication))
 - `autoscaler_config` (Map of String) Cluster autoscaler configuration params. Keys and values are expected to follow the cluster-autoscaler option format.
 - `cni` (Block List, Max: 1) Cluster CNI configuration. (see [below for nested schema](#nestedblock--cni))
+- `csi` (Block List, Max: 1) Container Storage Interface (CSI) driver settings. (see [below for nested schema](#nestedblock--csi))
 - `ddos_profile` (Block List, Max: 1) DDoS profile configuration. (see [below for nested schema](#nestedblock--ddos_profile))
 - `fixed_network` (String) Fixed network used to allocate network addresses for cluster nodes.
 - `fixed_subnet` (String) Fixed subnet used to allocate network addresses for cluster nodes. Subnet should have a router.
@@ -312,6 +313,22 @@ Optional:
 - `mask_size_v6` (Number) Specifies the size allocated from pods_ipv6_pool CIDR to node.ipam.podCIDRs. The default value is 120.
 - `routing_mode` (String) Enables native-routing mode or tunneling mode. The default value is tunnel.
 - `tunnel` (String) Tunneling protocol to use in tunneling mode and for ad-hoc tunnels. The default value is geneve.
+
+
+
+<a id="nestedblock--csi"></a>
+### Nested Schema for `csi`
+
+Optional:
+
+- `nfs` (Block List, Max: 1) NFS CSI driver settings. (see [below for nested schema](#nestedblock--csi--nfs))
+
+<a id="nestedblock--csi--nfs"></a>
+### Nested Schema for `csi.nfs`
+
+Optional:
+
+- `vast_enabled` (Boolean) Enable or disable VAST NFS integration. The default value is false. When set to true, a dedicated StorageClass will be created in the cluster for each VAST NFS file share defined in the cloud. All file shares created prior to cluster creation will be available immediately, while those created afterward may take a few minutes for to appear.
 
 
 

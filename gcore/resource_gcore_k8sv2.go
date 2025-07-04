@@ -270,6 +270,39 @@ func resourceK8sV2() *schema.Resource {
 						}},
 				},
 			},
+			"csi": {
+				Type:        schema.TypeList,
+				Description: "Container Storage Interface (CSI) driver settings.",
+				Optional:    true,
+				Computed:    true,
+				MaxItems:    1,
+				Elem: &schema.Resource{
+					Schema: map[string]*schema.Schema{
+						"nfs": {
+							Type:        schema.TypeList,
+							Description: "NFS CSI driver settings.",
+							Optional:    true,
+							Computed:    true,
+							MaxItems:    1,
+							Elem: &schema.Resource{
+								Schema: map[string]*schema.Schema{
+									"vast_enabled": {
+										Type: schema.TypeBool,
+										Description: "Enable or disable VAST NFS integration. The default value is false. " +
+											"When set to true, a dedicated StorageClass will be created in the cluster " +
+											"for each VAST NFS file share defined in the cloud. All file shares created " +
+											"prior to cluster creation will be available immediately, while those created " +
+											"afterward may take a few minutes for to appear.",
+										Optional: true,
+										Computed: true,
+										ForceNew: true,
+									},
+								},
+							},
+						},
+					},
+				},
+			},
 			"ddos_profile": {
 				Type:        schema.TypeList,
 				Description: "DDoS profile configuration.",
@@ -702,6 +735,21 @@ func resourceK8sV2Create(ctx context.Context, d *schema.ResourceData, m interfac
 		}
 	}
 
+	if csiI, ok := d.GetOk("csi"); ok {
+		csiA := csiI.([]interface{})
+		csi := csiA[0].(map[string]interface{})
+		opts.CSI = &clusters.CSICreateOpts{}
+		if nfsI, ok := csi["nfs"]; ok {
+			nfsA := nfsI.([]interface{})
+			if len(nfsA) != 0 {
+				nfs := nfsA[0].(map[string]interface{})
+				opts.CSI.NFS = &clusters.NFSCreateOpts{
+					VASTEnabled: nfs["vast_enabled"].(bool),
+				}
+			}
+		}
+	}
+
 	if ddosProfileI, ok := d.GetOk("ddos_profile"); ok {
 		ddosProfile := ddosProfileI.([]interface{})
 		if len(ddosProfile) != 0 {
@@ -974,6 +1022,18 @@ func resourceK8sV2Read(ctx context.Context, d *schema.ResourceData, m interface{
 			}}
 		}
 		if err := d.Set("cni", []interface{}{v}); err != nil {
+			return diag.FromErr(err)
+		}
+	}
+
+	if cluster.CSI != nil {
+		v := map[string]interface{}{}
+		if cluster.CSI.NFS != nil {
+			v["nfs"] = []map[string]interface{}{{
+				"vast_enabled": cluster.CSI.NFS.VASTEnabled,
+			}}
+		}
+		if err := d.Set("csi", []interface{}{v}); err != nil {
 			return diag.FromErr(err)
 		}
 	}
