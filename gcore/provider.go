@@ -208,6 +208,7 @@ func Provider() *schema.Provider {
 			"gcore_waap_custom_page_set":          resourceWaapCustomPageSet(),
 			"gcore_waap_policy":                   resourceWaapPolicy(),
 			"gcore_waap_firewall_rule":            resourceWaapFirewallRule(),
+			"gcore_iam_api_token":                 resourceIamApiToken(),
 		},
 		DataSourcesMap: map[string]*schema.Resource{
 			"gcore_ai_cluster":                 dataSourceAICluster(),
