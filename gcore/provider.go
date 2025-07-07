@@ -20,6 +20,8 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/hashicorp/terraform/version"
+
+	iam "github.com/G-Core/gcore-iam-sdk-go"
 )
 
 const (
@@ -133,6 +135,12 @@ func Provider() *schema.Provider {
 				Optional:    true,
 				Description: "WAAP API (define only if you want to override WAAP API endpoint). Can also be set with the GCORE_WAAP_API environment variable.",
 				DefaultFunc: schema.EnvDefaultFunc("GCORE_WAAP_API", ""),
+			},
+			"gcore_iam_api": {
+				Type:        schema.TypeString,
+				Optional:    true,
+				Description: "IAM API (define only if you want to override IAM API endpoint). Can also be set with the GCORE_IAM_API environment variable.",
+				DefaultFunc: schema.EnvDefaultFunc("GCORE_IAM_API", ""),
 			},
 			"gcore_client_id": {
 				Type:        schema.TypeString,
@@ -293,6 +301,11 @@ func providerConfigure(_ context.Context, d *schema.ResourceData) (interface{}, 
 		waapAPI = apiEndpoint + "/waap"
 	}
 
+	iamAPI := d.Get("gcore_iam_api").(string)
+	if iamAPI == "" {
+		iamAPI = apiEndpoint + "/iam"
+	}
+
 	platform := d.Get("gcore_platform_api").(string)
 	if platform == "" {
 		platform = d.Get("gcore_platform").(string)
@@ -416,6 +429,25 @@ func providerConfigure(_ context.Context, d *schema.ResourceData) (interface{}, 
 		)
 		if err != nil {
 			return nil, diag.FromErr(fmt.Errorf("error creating waap client: %w", err))
+		}
+	}
+
+	if iamAPI != "" {
+		authFunc := func(ctx context.Context, req *http.Request) error {
+			if permanentToken != "" {
+				req.Header.Set("Authorization", "APIKey "+permanentToken)
+			} else {
+				req.Header.Set("Authorization", "Bearer "+provider.AccessToken())
+			}
+			return nil
+		}
+
+		config.IamClient, err = iam.NewClientWithResponses(
+			iamAPI,
+			iam.WithRequestEditorFn(authFunc),
+		)
+		if err != nil {
+			return nil, diag.FromErr(fmt.Errorf("error creating iam client: %w", err))
 		}
 	}
 
