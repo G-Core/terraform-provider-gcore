@@ -255,6 +255,8 @@ Optional:
 
 Import is supported using the following syntax:
 
+The [`terraform import` command](https://developer.hashicorp.com/terraform/cli/commands/import) can be used, for example:
+
 ```shell
 # import using zone:domain:type format
 terraform import gcore_dns_zone_record.example_rrset0 example.com:domain.example.com:A

@@ -36,8 +36,7 @@ vet:
 	fi
 
 doc-generate:
-	go install -mod=mod github.com/hashicorp/terraform-plugin-docs/cmd/tfplugindocs
-	tfplugindocs
+	go tool tfplugindocs
 
 fmt:
 	gofmt -w $(GOFMT_FILES)
