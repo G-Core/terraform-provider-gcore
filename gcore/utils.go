@@ -40,6 +40,8 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/mitchellh/mapstructure"
+
+	iam "github.com/G-Core/gcore-iam-sdk-go"
 )
 
 const (
@@ -63,6 +65,7 @@ type Config struct {
 	DNSClient      *dnssdk.Client
 	FastEdgeClient *fastedge.ClientWithResponses
 	WaapClient     *waap.ClientWithResponses
+	IamClient *iam.ClientWithResponses
 }
 
 type Project struct {
