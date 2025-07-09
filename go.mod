@@ -8,6 +8,7 @@ require (
 	github.com/AlekSi/pointer v1.2.0
 	github.com/G-Core/FastEdge-client-sdk-go v0.3.6
 	github.com/G-Core/gcore-dns-sdk-go v0.2.9
+	github.com/G-Core/gcore-iam-sdk-go v0.0.0-20250707101542-410c4e426b59
 	github.com/G-Core/gcore-storage-sdk-go v0.1.34
 	github.com/G-Core/gcore-waap-sdk-go v0.4.0
 	github.com/G-Core/gcorelabscdn-go v1.0.31
@@ -17,6 +18,7 @@ require (
 	github.com/hashicorp/go-cty v1.4.1-0.20200414143053-d3edf31b6320
 	github.com/hashicorp/terraform-plugin-sdk/v2 v2.27.0
 	github.com/mitchellh/mapstructure v1.5.0
+	github.com/oapi-codegen/runtime v1.1.1
 )
 
 require (
@@ -58,7 +60,6 @@ require (
 	github.com/hashicorp/hcl/v2 v2.17.0 // indirect
 	github.com/hashicorp/logutils v1.0.0 // indirect
 	github.com/hashicorp/terraform-json v0.24.0 // indirect
-	github.com/hashicorp/terraform-plugin-docs v0.21.0 // indirect
 	github.com/hashicorp/terraform-plugin-go v0.16.0 // indirect
 	github.com/hashicorp/terraform-plugin-log v0.9.0 // indirect
 	github.com/hashicorp/terraform-registry-address v0.2.1 // indirect
@@ -74,7 +75,6 @@ require (
 	github.com/mitchellh/go-wordwrap v1.0.1 // indirect
 	github.com/mitchellh/reflectwalk v1.0.2 // indirect
 	github.com/mohae/deepcopy v0.0.0-20170929034955-c48cc78d4826 // indirect
-	github.com/oapi-codegen/runtime v1.1.1 // indirect
 	github.com/oasdiff/yaml v0.0.0-20250309154309-f31be36b4037 // indirect
 	github.com/oasdiff/yaml3 v0.0.0-20250309153720-d2182401db90 // indirect
 	github.com/oklog/run v1.1.0 // indirect
