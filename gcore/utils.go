@@ -65,7 +65,7 @@ type Config struct {
 	DNSClient      *dnssdk.Client
 	FastEdgeClient *fastedge.ClientWithResponses
 	WaapClient     *waap.ClientWithResponses
-	IamClient *iam.ClientWithResponses
+	IamClient      *iam.ClientWithResponses
 }
 
 type Project struct {
