@@ -171,6 +171,7 @@ func Provider() *schema.Provider {
 			"gcore_storage_s3_bucket":             resourceStorageS3Bucket(),
 			DNSZoneResource:                       resourceDNSZone(),
 			DNSZoneRecordResource:                 resourceDNSZoneRecord(),
+			DNSNetworkMappingResource:             resourceDNSNetworkMapping(),
 			"gcore_storage_sftp":                  resourceStorageSFTP(),
 			"gcore_storage_sftp_key":              resourceStorageSFTPKey(),
 			"gcore_cdn_resource":                  resourceCDNResource(),
