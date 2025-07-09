@@ -54,6 +54,8 @@ resource "gcore_faas_namespace" "ns" {
 
 Import is supported using the following syntax:
 
+The [`terraform import` command](https://developer.hashicorp.com/terraform/cli/commands/import) can be used, for example:
+
 ```shell
 # import using <project_id>:<region_id>:<namespace_name> format
 terraform import gcore_faas_namespace.test 1:6:ns

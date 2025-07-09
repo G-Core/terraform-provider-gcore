@@ -52,6 +52,8 @@ resource "gcore_registry_credential" "creds" {
 
 Import is supported using the following syntax:
 
+The [`terraform import` command](https://developer.hashicorp.com/terraform/cli/commands/import) can be used, for example:
+
 ```shell
 # import using <project_id>:<credentials_name> format
 terraform import gcore_registry_credential.dockerio 1:docekrio

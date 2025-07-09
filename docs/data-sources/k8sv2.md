@@ -57,6 +57,8 @@ output "view" {
 - `cni` (List of Object) Cluster CNI configuration. (see [below for nested schema](#nestedatt--cni))
 - `created_at` (String)
 - `creator_task_id` (String)
+- `csi` (List of Object) Container Storage Interface (CSI) driver settings. (see [below for nested schema](#nestedatt--csi))
+- `ddos_profile` (List of Object) DDoS profile configuration. (see [below for nested schema](#nestedatt--ddos_profile))
 - `fixed_network` (String)
 - `fixed_subnet` (String)
 - `flavor_id` (String)
@@ -119,6 +121,43 @@ Read-Only:
 - `mask_size_v6` (Number)
 - `routing_mode` (String)
 - `tunnel` (String)
+
+
+
+<a id="nestedatt--csi"></a>
+### Nested Schema for `csi`
+
+Read-Only:
+
+- `nfs` (List of Object) (see [below for nested schema](#nestedobjatt--csi--nfs))
+
+<a id="nestedobjatt--csi--nfs"></a>
+### Nested Schema for `csi.nfs`
+
+Read-Only:
+
+- `vast_enabled` (Boolean)
+
+
+
+<a id="nestedatt--ddos_profile"></a>
+### Nested Schema for `ddos_profile`
+
+Read-Only:
+
+- `enabled` (Boolean)
+- `fields` (List of Object) (see [below for nested schema](#nestedobjatt--ddos_profile--fields))
+- `profile_template` (Number)
+- `profile_template_name` (String)
+
+<a id="nestedobjatt--ddos_profile--fields"></a>
+### Nested Schema for `ddos_profile.fields`
+
+Read-Only:
+
+- `base_field` (Number)
+- `field_value` (String)
+- `value` (String)
 
 
 
