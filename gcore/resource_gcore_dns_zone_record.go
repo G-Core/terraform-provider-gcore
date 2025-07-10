@@ -9,7 +9,7 @@ import (
 	"strings"
 	"time"
 
-	dnssdk "github.com/G-Core/gcore-dns-sdk-go"
+	dnssdk "dnssdk"
 	"github.com/hashicorp/go-cty/cty"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
@@ -509,7 +509,7 @@ func resourceDNSZoneRecordRead(ctx context.Context, d *schema.ResourceData, m in
 	config := m.(*Config)
 	client := config.DNSClient
 
-	result, err := client.RRSet(ctx, zone, domain, rType)
+	result, err := client.RRSet(ctx, zone, domain, rType, 0, 0)
 	if err != nil {
 		return diag.FromErr(fmt.Errorf("get zone rrset: %w", err))
 	}
