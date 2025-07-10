@@ -391,14 +391,35 @@ func resourceGPUClusterUpdate(ctx context.Context, d *schema.ResourceData, m int
 
 	if d.HasChange("tags") {
 		log.Printf("[DEBUG] Updating tags for %s GPU cluster", gpuNodeType)
-		tags := make(map[string]string)
-		if v, ok := d.GetOk("tags"); ok {
-			for k, val := range v.(map[string]interface{}) {
-				tags[k] = val.(string)
+
+		// Get old and new tag values
+		oldTags, newTags := d.GetChange("tags")
+
+		// Create a new map with new tags
+		newTagsMap := make(map[string]*string)
+		if newTags != nil {
+			for k, val := range newTags.(map[string]interface{}) {
+				newTagsMap[k] = utils.StringToPointer(val.(string))
 			}
 		}
-		log.Printf("[DEBUG] Tags sent for update %v", tags)
-		taskResult, err := clusters.UpdateTags(client, d.Id(), tags).Extract()
+
+		// Convert old tags to map[string]string for comparison
+		oldTagsMap := make(map[string]string)
+		if oldTags != nil {
+			for k, val := range oldTags.(map[string]interface{}) {
+				oldTagsMap[k] = val.(string)
+			}
+		}
+
+		// Identify tags to remove (present in old but not in new)
+		for oldKey := range oldTagsMap {
+			if _, exists := newTagsMap[oldKey]; !exists {
+				newTagsMap[oldKey] = nil // nil value indicates removal
+			}
+		}
+		log.Printf("[DEBUG] New tags sent for update: %v", newTagsMap)
+
+		taskResult, err := clusters.UpdateAndRemoveTags(client, d.Id(), newTagsMap).Extract()
 		if err != nil {
 			return diag.FromErr(err)
 		}
