@@ -15,7 +15,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 )
 
-const GPUClusterCreationTimeout = 1200
+const GPUClusterCreationTimeout = 1800
 
 type GPUNodeType string
 
