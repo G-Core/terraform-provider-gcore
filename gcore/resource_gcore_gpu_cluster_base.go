@@ -122,42 +122,50 @@ func resourceGPUClusterSchema() map[string]*schema.Schema {
 						Type:        schema.TypeSet,
 						Set:         instanceInterfaceUniqueIDByName,
 						Required:    true,
+						ForceNew:    true,
 						Description: "List of interfaces to attach to the instance",
 						Elem: &schema.Resource{
 							Schema: map[string]*schema.Schema{
 								"type": {
 									Type:        schema.TypeString,
 									Required:    true,
+									ForceNew:    true,
 									Description: "Interface type (subnet, any_subnet, external)",
 								},
 								"name": {
 									Type:        schema.TypeString,
 									Required:    true,
+									ForceNew:    true,
 									Description: "Name of interface, should be unique for the instance",
 								},
 								"network_id": {
 									Type:        schema.TypeString,
 									Optional:    true,
+									ForceNew:    true,
 									Description: "Required if type is 'subnet' or 'any_subnet'",
 								},
 								"subnet_id": {
 									Type:        schema.TypeString,
 									Optional:    true,
+									ForceNew:    true,
 									Description: "Required if type is 'subnet'",
 								},
 								"ip_family": {
 									Type:        schema.TypeString,
 									Optional:    true,
+									ForceNew:    true,
 									Description: "IP family for the interface (dual, ipv4, ipv6)",
 								},
 								"ip_address": {
 									Type:        schema.TypeString,
 									Optional:    true,
+									ForceNew:    true,
 									Description: "IP address for the interface",
 								},
 								"floating_ip": {
 									Type:        schema.TypeList,
 									Optional:    true,
+									ForceNew:    true,
 									MaxItems:    1,
 									Description: "Floating IP configuration",
 									Elem: &schema.Resource{
@@ -165,6 +173,7 @@ func resourceGPUClusterSchema() map[string]*schema.Schema {
 											"source": {
 												Type:        schema.TypeString,
 												Required:    true,
+												ForceNew:    true,
 												Description: "Source of the floating IP",
 											},
 										},
@@ -176,39 +185,46 @@ func resourceGPUClusterSchema() map[string]*schema.Schema {
 					"security_groups": {
 						Type:        schema.TypeList,
 						Optional:    true,
+						ForceNew:    true,
 						Description: "List of security group IDs to associate with the cluster",
 						Elem:        &schema.Schema{Type: schema.TypeString},
 					},
 					"volume": {
 						Type:        schema.TypeList,
 						Required:    true,
+						ForceNew:    true,
 						Description: "Volumes to attach to the cluster servers",
 						Elem: &schema.Resource{
 							Schema: map[string]*schema.Schema{
 								"source": {
 									Type:        schema.TypeString,
 									Required:    true,
+									ForceNew:    true,
 									Description: "Volume source (new, image, snapshot)",
 								},
 								"boot_index": {
 									Type:        schema.TypeInt,
 									Required:    true,
+									ForceNew:    true,
 									Description: "Boot order for the volume",
 								},
 								"delete_on_termination": {
 									Type:        schema.TypeBool,
 									Optional:    true,
+									ForceNew:    true,
 									Default:     false,
 									Description: "Whether to delete the volume when the cluster is terminated",
 								},
 								"name": {
 									Type:        schema.TypeString,
 									Required:    true,
+									ForceNew:    true,
 									Description: "Name of the volume",
 								},
 								"size": {
 									Type:        schema.TypeInt,
 									Required:    true,
+									ForceNew:    true,
 									Description: "Size of the volume in GB",
 								},
 								"image_id": {
@@ -220,18 +236,21 @@ func resourceGPUClusterSchema() map[string]*schema.Schema {
 								"snapshot_id": {
 									Type:        schema.TypeString,
 									Optional:    true,
+									ForceNew:    true,
 									Description: "ID of the snapshot to use (required if source is 'snapshot')",
 									Computed:    true,
 								},
 								"tags": {
 									Type:        schema.TypeMap,
 									Optional:    true,
+									ForceNew:    true,
 									Elem:        &schema.Schema{Type: schema.TypeString},
 									Description: "Tags to associate with the volume",
 								},
 								"type": {
 									Type:        schema.TypeString,
 									Required:    true,
+									ForceNew:    true,
 									Description: "Type of volume",
 								},
 							},
@@ -240,12 +259,14 @@ func resourceGPUClusterSchema() map[string]*schema.Schema {
 					"user_data": {
 						Type:        schema.TypeString,
 						Optional:    true,
+						ForceNew:    true,
 						Description: "User data to provide to the instance for cloud-init",
 						Computed:    true,
 					},
 					"credentials": {
 						Type:        schema.TypeList,
 						Optional:    true,
+						ForceNew:    true,
 						MaxItems:    1,
 						Description: "Credentials for accessing the instances",
 						Elem: &schema.Resource{
@@ -254,17 +275,20 @@ func resourceGPUClusterSchema() map[string]*schema.Schema {
 									Type:        schema.TypeString,
 									Optional:    true,
 									Computed:    true,
+									ForceNew:    true,
 									Description: "Username for the instance",
 								},
 								"password": {
 									Type:        schema.TypeString,
 									Optional:    true,
 									Computed:    true,
+									ForceNew:    true,
 									Description: "Password for the instance",
 								},
 								"ssh_key_name": {
 									Type:        schema.TypeString,
 									Optional:    true,
+									ForceNew:    true,
 									Description: "Name of the keypair to use for SSH access",
 								},
 							},
