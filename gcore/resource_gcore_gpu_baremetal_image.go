@@ -5,5 +5,5 @@ import (
 )
 
 func resourceBaremetalImage() *schema.Resource {
-	return resourceGPUImage(GPUImageTypeBaremetal)
+	return resourceGPUImage(GPUNodeTypeBaremetal)
 }
