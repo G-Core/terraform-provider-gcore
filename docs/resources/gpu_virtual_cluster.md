@@ -40,9 +40,10 @@ resource "gcore_gpu_virtual_cluster" "example" {
     }
     volume {
       name       = "root-volume"
-      size       = 100
-      type       = "ssd"
-      source     = "new"
+      size       = 120
+      type       = "ssd_hiiops"
+      source     = "image"
+      image_id   = "4536337d-17c7-48f4-8ac5-01a41dc06f58"
       boot_index = 0
     }
 
