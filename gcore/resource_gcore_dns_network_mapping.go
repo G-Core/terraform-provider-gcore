@@ -104,8 +104,8 @@ func resourceDNSNetworkMappingRead(ctx context.Context, d *schema.ResourceData, 
 
 	mapping, err := client.GetNetworkMapping(ctx, id)
 	if err != nil {
-		var apiErr *dnssdk.APIError
-		if errors.As(err, apiErr) && apiErr.StatusCode == http.StatusNotFound {
+		var apiErr dnssdk.APIError
+		if errors.As(err, &apiErr) && apiErr.StatusCode == http.StatusNotFound {
 			d.SetId("")
 			return nil
 		}
