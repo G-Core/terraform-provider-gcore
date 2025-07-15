@@ -43,6 +43,7 @@ func resourceDNSNetworkMapping() *schema.Resource {
 			DNSNetworkMappingSchemaMapping: {
 				Type:     schema.TypeList,
 				Required: true,
+				MinItems: 1,
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
 						DNSNetworkMappingSchemaTags: {
