@@ -201,12 +201,14 @@ func expandStringList(list []interface{}) []string {
 }
 
 func expandIPNetList(list []interface{}) []dnssdk.IPNet {
-	nets := make([]dnssdk.IPNet, len(list))
-	for i, v := range list {
-		_, ipnet, _ := net.ParseCIDR(v.(string))
-		if ipnet != nil {
-			nets[i] = dnssdk.IPNet{IPNet: *ipnet}
+	var nets []dnssdk.IPNet
+	for _, v := range list {
+		_, ipnet, err := net.ParseCIDR(v.(string))
+		if err != nil {
+			fmt.Printf("Warning: Invalid CIDR '%s' skipped: %v\n", v.(string), err)
+			continue
 		}
+		nets = append(nets, dnssdk.IPNet{IPNet: *ipnet})
 	}
 	return nets
 }
