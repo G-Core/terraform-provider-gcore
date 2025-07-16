@@ -329,29 +329,41 @@ func resourceIamUserRead(ctx context.Context, d *schema.ResourceData, m interfac
 		d.Set("is_active", *user.IsActive)
 	}
 
+	// Always set configurable fields to ensure proper drift detection
+	// Use empty string for nil string fields
+	name := ""
 	if user.Name != nil {
-		d.Set("name", *user.Name)
+		name = *user.Name
 	}
+	d.Set("name", name)
 
+	lang := "en" // default value
 	if user.Lang != nil {
-		d.Set("lang", string(*user.Lang))
+		lang = string(*user.Lang)
 	}
+	d.Set("lang", lang)
 
+	phone := ""
 	if user.Phone != nil {
-		d.Set("phone", *user.Phone)
+		phone = *user.Phone
 	}
+	d.Set("phone", phone)
 
+	company := ""
 	if user.Company != nil {
-		d.Set("company", *user.Company)
+		company = *user.Company
 	}
+	d.Set("company", company)
 
+	// Always set auth_types, use empty slice for nil
+	authTypes := []string{}
 	if user.AuthTypes != nil {
-		authTypes := make([]string, len(*user.AuthTypes))
+		authTypes = make([]string, len(*user.AuthTypes))
 		for i, authType := range *user.AuthTypes {
 			authTypes[i] = string(authType)
 		}
-		d.Set("auth_types", authTypes)
 	}
+	d.Set("auth_types", authTypes)
 
 	// Set groups from the groups array
 	if user.Groups != nil && len(*user.Groups) > 0 {
