@@ -7,7 +7,7 @@ import (
 	"strings"
 	"time"
 
-	dnssdk "dnssdk"
+	dnssdk "github.com/G-Core/gcore-dns-sdk-go"
 
 	"github.com/hashicorp/go-cty/cty"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
@@ -17,22 +17,22 @@ import (
 const (
 	DNSZoneResource = "gcore_dns_zone"
 
-	DNSZoneSchemaName              = "name"
-	DNSZoneSchemaDNSSEC            = "dnssec"
-	DNSZoneSchemaEnabled           = "enabled"
-	DNSZoneSchemaClientID          = "client_id"
-	DNSZoneSchemaContact           = "contact"
-	DNSZoneSchemaExpiry            = "expiry"
-	DNSZoneSchemaMeta              = "meta"
-	DNSZoneSchemaNX_TTL            = "nx_ttl"
-	DNSZoneSchemaPrimary_server    = "primary_server"
-	DNSZoneSchemaRecords           = "records"
-	DNSZoneSchemaRefresh           = "refresh"
-	DNSZoneSchemaRetry             = "retry"
-	DNSZoneSchemaRRSetsAmount      = "rrsets_amount"
-	DNSZoneSchemaSerial            = "serial"
-	DNSZoneSchemaStatus            = "status"
-	DNSZoneSchemaImportFileContent = "import_file_content"
+	DNSZoneSchemaName           = "name"
+	DNSZoneSchemaDNSSEC         = "dnssec"
+	DNSZoneSchemaEnabled        = "enabled"
+	DNSZoneSchemaClientID       = "client_id"
+	DNSZoneSchemaContact        = "contact"
+	DNSZoneSchemaExpiry         = "expiry"
+	DNSZoneSchemaMeta           = "meta"
+	DNSZoneSchemaNX_TTL         = "nx_ttl"
+	DNSZoneSchemaPrimary_server = "primary_server"
+	DNSZoneSchemaRecords        = "records"
+	DNSZoneSchemaRefresh        = "refresh"
+	DNSZoneSchemaRetry          = "retry"
+	DNSZoneSchemaRRSetsAmount   = "rrsets_amount"
+	DNSZoneSchemaSerial         = "serial"
+	DNSZoneSchemaStatus         = "status"
+	// DNSZoneSchemaImportFileContent = "import_file_content"
 )
 
 func resourceDNSZone() *schema.Resource {
@@ -51,11 +51,11 @@ func resourceDNSZone() *schema.Resource {
 				},
 				Description: "A name of DNS Zone resource.",
 			},
-			DNSZoneSchemaImportFileContent: {
-				Type:        schema.TypeString,
-				Optional:    true,
-				Description: "Content of the BIND file to import zone from. Zone will be imported on creation.",
-			},
+			// DNSZoneSchemaImportFileContent: {
+			// 	Type:        schema.TypeString,
+			// 	Optional:    true,
+			// 	Description: "Content of the BIND file to import zone from. Zone will be imported on creation.",
+			// },
 			DNSZoneSchemaDNSSEC: {
 				Type:     schema.TypeBool,
 				Optional: true,
@@ -170,12 +170,12 @@ func resourceDNSZoneCreate(ctx context.Context, d *schema.ResourceData, m interf
 		return diag.FromErr(fmt.Errorf("create zone: %v", err))
 	}
 
-	if importFileContent, ok := d.GetOk(DNSZoneSchemaImportFileContent); ok {
-		_, err = client.ImportZone(ctx, zoneName, importFileContent.(string))
-		if err != nil {
-			return diag.FromErr(fmt.Errorf("import zone from file content: %w", err))
-		}
-	}
+	// if importFileContent, ok := d.GetOk(DNSZoneSchemaImportFileContent); ok {
+	// 	_, err = client.ImportZone(ctx, zoneName, importFileContent.(string))
+	// 	if err != nil {
+	// 		return diag.FromErr(fmt.Errorf("import zone from file content: %w", err))
+	// 	}
+	// }
 
 	enableDnssec := d.Get(DNSZoneSchemaDNSSEC).(bool)
 	if enableDnssec {
@@ -185,7 +185,7 @@ func resourceDNSZoneCreate(ctx context.Context, d *schema.ResourceData, m interf
 		}
 	}
 
-	d.SetId(zoneName) // TODO: Shouldn't this be the ID from the response?
+	d.SetId(zoneName)
 
 	return resourceDNSZoneRead(ctx, d, m)
 }

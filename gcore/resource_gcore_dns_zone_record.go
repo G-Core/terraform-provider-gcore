@@ -9,7 +9,7 @@ import (
 	"strings"
 	"time"
 
-	dnssdk "dnssdk"
+	dnssdk "github.com/G-Core/gcore-dns-sdk-go"
 	"github.com/hashicorp/go-cty/cty"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"

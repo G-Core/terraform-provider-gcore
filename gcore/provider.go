@@ -9,8 +9,8 @@ import (
 	"os"
 	"sync"
 
-	dnssdk "dnssdk"
 	fastedge "github.com/G-Core/FastEdge-client-sdk-go"
+	dnssdk "github.com/G-Core/gcore-dns-sdk-go"
 	storageSDK "github.com/G-Core/gcore-storage-sdk-go"
 	waap "github.com/G-Core/gcore-waap-sdk-go"
 	gcdn "github.com/G-Core/gcorelabscdn-go"

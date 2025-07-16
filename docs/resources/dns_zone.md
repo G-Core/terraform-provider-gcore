@@ -17,8 +17,60 @@ provider gcore {
   permanent_api_token = "251$d3361.............1b35f26d8"
 }
 
+# Basic DNS Zone example - minimal configuration
 resource "gcore_dns_zone" "example_zone" {
   name = "example_zone.com"
+}
+
+# Advanced DNS Zone example - showcasing all available options
+resource "gcore_dns_zone" "advanced_zone" {
+  name    = "advanced-example.com"
+  dnssec  = true
+  enabled = true
+  
+  # SOA record fields
+  contact        = "admin@advanced-example.com"
+  expiry         = 604800    # 1 week
+  nx_ttl         = 3600      # 1 hour
+  primary_server = "ns1.advanced-example.com."
+  refresh        = 3600      # 1 hour
+  retry          = 1800      # 30 minutes
+  serial         = 2024010100 # YYYYMMDDNN format
+  
+  # Meta configuration with webhook
+  meta = {
+    webhook_url    = "https://hooks.example.com/dns-changes"
+    webhook_method = "POST"
+    environment    = "production"
+    managed_by     = "terraform"
+  }
+}
+
+# DNS Zone with DNSSEC disabled (explicit)
+resource "gcore_dns_zone" "simple_zone" {
+  name   = "simple-example.org"
+  dnssec = false
+  
+  # Basic SOA configuration
+  contact = "hostmaster@simple-example.org"
+  expiry  = 1209600  # 2 weeks
+  refresh = 7200     # 2 hours
+  retry   = 3600     # 1 hour
+}
+
+# DNS Zone for development/testing (disabled)
+resource "gcore_dns_zone" "test_zone" {
+  name    = "test-example.dev"
+  enabled = false  # Zone disabled, records won't resolve
+  
+  contact = "devops@test-example.dev"
+  
+  # Custom meta for testing
+  meta = {
+    environment = "testing"
+    auto_delete = "true"
+    owner       = "development-team"
+  }
 }
 ```
 
@@ -31,7 +83,17 @@ resource "gcore_dns_zone" "example_zone" {
 
 ### Optional
 
+- `contact` (String) Email address of the administrator responsible for this zone
 - `dnssec` (Boolean) Activation or deactivation of DNSSEC for the zone.Set it to true to enable DNSSEC for the zone or false to disable it.By default, DNSSEC is set to false wich means it is disabled.
+- `enabled` (Boolean) Default: true. If a zone is disabled, then its records will not be resolved on dns servers
+- `expiry` (Number) number of seconds after which secondary name servers should stop answering request for this zone
+- `import_file_content` (String) Content of the BIND file to import zone from. Zone will be imported on creation.
+- `meta` (Map of String) Arbitrary data of zone in JSON format. You can specify webhook URL and webhook_method here. Webhook will receive a map with three arrays: for created, updated, and deleted rrsets. webhook_method can be omitted; POST will be used by default.
+- `nx_ttl` (Number) Time To Live of cache
+- `primary_server` (String) Primary master name server for zone
+- `refresh` (Number) number of seconds after which secondary name servers should refresh the zone
+- `retry` (Number) number of seconds after which secondary name servers should retry to request the serial number
+- `serial` (Number) Serial number for this zone or Timestamp of zone modification moment. If a secondary name server slaved to this one observes an increase in this number, the slave will assume that the zone has been updated and initiate a zone transfer.
 - `timeouts` (Block, Optional) (see [below for nested schema](#nestedblock--timeouts))
 
 ### Read-Only
@@ -49,6 +111,8 @@ Optional:
 ## Import
 
 Import is supported using the following syntax:
+
+The [`terraform import` command](https://developer.hashicorp.com/terraform/cli/commands/import) can be used, for example:
 
 ```shell
 # import using zone name format
