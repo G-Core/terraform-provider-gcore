@@ -12,6 +12,7 @@ import (
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/validation"
 )
 
 func resourceIamUser() *schema.Resource {
@@ -37,10 +38,11 @@ func resourceIamUser() *schema.Resource {
 				Description: "User's name.",
 			},
 			"lang": {
-				Type:        schema.TypeString,
-				Optional:    true,
-				Default:     "en",
-				Description: "User's language. Defines language of the control panel and email messages.",
+				Type:         schema.TypeString,
+				Optional:     true,
+				Default:      "en",
+				ValidateFunc: validation.StringInSlice([]string{"de", "en", "ru", "zh", "az"}, false),
+				Description:  "User's language. Defines language of the control panel and email messages.",
 			},
 			"phone": {
 				Type:        schema.TypeString,
@@ -82,7 +84,8 @@ func resourceIamUser() *schema.Resource {
 				Type:     schema.TypeSet,
 				Optional: true,
 				Elem: &schema.Schema{
-					Type: schema.TypeString,
+					Type:         schema.TypeString,
+					ValidateFunc: validation.StringInSlice([]string{"password", "sso", "github", "google-oauth2"}, false),
 				},
 				Description: "List of auth types available for the account.",
 			},
