@@ -18,13 +18,6 @@ import (
 
 const GPUImageCreatingTimeout = 1200
 
-type GPUImageType string
-
-const (
-	GPUImageTypeBaremetal GPUImageType = "baremetal"
-	GPUImageTypeVirtual   GPUImageType = "virtual"
-)
-
 func resourceGPUImageSchema() map[string]*schema.Schema {
 	return map[string]*schema.Schema{
 		"project_id": {
@@ -122,31 +115,27 @@ func resourceGPUImageSchema() map[string]*schema.Schema {
 	}
 }
 
-func resourceGPUImage(imageType GPUImageType) *schema.Resource {
+func resourceGPUImage(gpuNodeType GPUNodeType) *schema.Resource {
 	return &schema.Resource{
 		CreateContext: func(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
-			return resourceGPUImageCreate(ctx, d, m, imageType)
+			return resourceGPUImageCreate(ctx, d, m, gpuNodeType)
 		},
 		ReadContext: func(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
-			return resourceGPUImageRead(ctx, d, m, imageType)
+			return resourceGPUImageRead(ctx, d, m, gpuNodeType)
 		},
 		DeleteContext: func(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
-			return resourceGPUImageDelete(ctx, d, m, imageType)
+			return resourceGPUImageDelete(ctx, d, m, gpuNodeType)
 		},
-		Description: fmt.Sprintf("Manages a %s GPU image", imageType),
+		Description: fmt.Sprintf("Manages a %s GPU image", gpuNodeType),
 		Schema:      resourceGPUImageSchema(),
 	}
 }
 
-func getGPUServicePath(imageType GPUImageType) string {
-	return fmt.Sprintf("gpu/%s", imageType)
-}
-
-func resourceGPUImageCreate(ctx context.Context, d *schema.ResourceData, m interface{}, imageType GPUImageType) diag.Diagnostics {
-	log.Printf("[DEBUG] Start %s GPU image creation", imageType)
+func resourceGPUImageCreate(ctx context.Context, d *schema.ResourceData, m interface{}, gpuNodeType GPUNodeType) diag.Diagnostics {
+	log.Printf("[DEBUG] Start %s GPU image creation", gpuNodeType)
 	config := m.(*Config)
 	provider := config.Provider
-	client, err := CreateClient(provider, d, getGPUServicePath(imageType), "v3")
+	client, err := CreateClient(provider, d, getGPUServicePath(gpuNodeType), "v3")
 	if err != nil {
 		return diag.FromErr(err)
 	}
@@ -234,14 +223,14 @@ func resourceGPUImageCreate(ctx context.Context, d *schema.ResourceData, m inter
 	}
 
 	d.SetId(imageID)
-	return resourceGPUImageRead(ctx, d, m, imageType)
+	return resourceGPUImageRead(ctx, d, m, gpuNodeType)
 }
 
-func resourceGPUImageRead(ctx context.Context, d *schema.ResourceData, m interface{}, imageType GPUImageType) diag.Diagnostics {
-	log.Printf("[DEBUG] Start %s GPU image reading", imageType)
+func resourceGPUImageRead(ctx context.Context, d *schema.ResourceData, m interface{}, gpuNodeType GPUNodeType) diag.Diagnostics {
+	log.Printf("[DEBUG] Start %s GPU image reading", gpuNodeType)
 	config := m.(*Config)
 	provider := config.Provider
-	client, err := CreateClient(provider, d, getGPUServicePath(imageType), "v3")
+	client, err := CreateClient(provider, d, getGPUServicePath(gpuNodeType), "v3")
 	if err != nil {
 		return diag.FromErr(err)
 	}
@@ -285,11 +274,11 @@ func resourceGPUImageRead(ctx context.Context, d *schema.ResourceData, m interfa
 	return nil
 }
 
-func resourceGPUImageDelete(ctx context.Context, d *schema.ResourceData, m interface{}, imageType GPUImageType) diag.Diagnostics {
-	log.Printf("[DEBUG] Start %s GPU image deletion", imageType)
+func resourceGPUImageDelete(ctx context.Context, d *schema.ResourceData, m interface{}, gpuNodeType GPUNodeType) diag.Diagnostics {
+	log.Printf("[DEBUG] Start %s GPU image deletion", gpuNodeType)
 	config := m.(*Config)
 	provider := config.Provider
-	client, err := CreateClient(provider, d, getGPUServicePath(imageType), "v3")
+	client, err := CreateClient(provider, d, getGPUServicePath(gpuNodeType), "v3")
 	if err != nil {
 		return diag.FromErr(err)
 	}
