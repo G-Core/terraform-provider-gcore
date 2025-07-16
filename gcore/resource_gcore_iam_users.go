@@ -258,10 +258,10 @@ func resourceIamUserCreate(ctx context.Context, d *schema.ResourceData, m interf
 
 	// Update user with additional details if provided
 	// Use forceUpdate=true for creation to check GetOk instead of HasChanges
-	// updateDiags := updateUserDetails(ctx, d, m, *userID, true)
-	// if updateDiags.HasError() {
-	// 	return updateDiags
-	// }
+	updateDiags := updateUserDetails(ctx, d, m, *userID, true)
+	if updateDiags.HasError() {
+		return updateDiags
+	}
 
 	return resourceIamUserRead(ctx, d, m)
 }
