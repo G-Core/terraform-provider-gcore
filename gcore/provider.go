@@ -192,6 +192,7 @@ func Provider() *schema.Provider {
 			"gcore_registry_credential":           resourceRegistryCredential(),
 			"gcore_gpu_baremetal_image":           resourceBaremetalImage(),
 			"gcore_gpu_virtual_image":             resourceVirtualImage(),
+			"gcore_gpu_virtual_cluster":           resourceVirtualGPUCluster(),
 			"gcore_fastedge_binary":               resourceFastEdgeBinary(),
 			"gcore_fastedge_app":                  resourceFastEdgeApp(),
 			"gcore_fastedge_template":             resourceFastEdgeTemplate(),
