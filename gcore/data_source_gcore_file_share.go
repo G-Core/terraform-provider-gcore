@@ -107,6 +107,12 @@ func dataSourceFileShare() *schema.Resource {
 				Computed:    true,
 				Description: "The name of the share network associated with the file share. This is only applicable for default_share_type.",
 			},
+			"tags": {
+				Type:        schema.TypeMap,
+				Computed:    true,
+				Elem:        &schema.Schema{Type: schema.TypeString},
+				Description: "Tags associated with the file share. Tags are key-value pairs.",
+			},
 		},
 	}
 }
@@ -162,6 +168,15 @@ func dataSourceFileShareRead(ctx context.Context, d *schema.ResourceData, m inte
 	d.Set("region_name", fs.Region)
 	if fs.ShareNetworkName != nil {
 		d.Set("share_network_name", *fs.ShareNetworkName)
+	}
+	if fs.Tags != nil {
+		tags := make(map[string]string)
+		for _, tag := range fs.Tags {
+			if !tag.ReadOnly {
+				tags[tag.Key] = tag.Value
+			}
+		}
+		d.Set("tags", tags)
 	}
 	return nil
 }

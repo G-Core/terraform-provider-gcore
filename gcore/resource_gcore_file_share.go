@@ -6,6 +6,8 @@ import (
 	"fmt"
 	"log"
 
+	"github.com/G-Core/gcorelabscloud-go/client/utils"
+
 	gcorecloud "github.com/G-Core/gcorelabscloud-go"
 	"github.com/G-Core/gcorelabscloud-go/gcore/file_share/v1/file_shares"
 	"github.com/G-Core/gcorelabscloud-go/gcore/task/v1/tasks"
@@ -120,19 +122,16 @@ func resourceFileShare() *schema.Resource {
 			"access": {
 				Type:     schema.TypeList,
 				Optional: true,
-				ForceNew: true,
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
 						"ip_address": {
 							Type:        schema.TypeString,
 							Required:    true,
-							ForceNew:    true,
 							Description: `The IP address of the file share.`,
 						},
 						"access_mode": {
 							Type:        schema.TypeString,
 							Required:    true,
-							ForceNew:    true,
 							Description: `The access mode of the file share (ro/rw).`,
 							ValidateFunc: func(v interface{}, k string) ([]string, []error) {
 								if v.(string) != "ro" && v.(string) != "rw" {
@@ -289,6 +288,15 @@ func resourceFileShareRead(ctx context.Context, d *schema.ResourceData, m interf
 	if fileShare.ShareNetworkName != nil {
 		d.Set("share_network_name", *fileShare.ShareNetworkName)
 	}
+	if fileShare.Tags != nil {
+		tags := make(map[string]string)
+		for _, tag := range fileShare.Tags {
+			if !tag.ReadOnly {
+				tags[tag.Key] = tag.Value
+			}
+		}
+		d.Set("tags", tags)
+	}
 	return nil
 }
 
@@ -331,17 +339,79 @@ func resourceFileShareUpdate(ctx context.Context, d *schema.ResourceData, m inte
 		}
 	}
 
-	if d.HasChange("name") {
+	if d.HasChange("name") || d.HasChange("tags") {
+		updateOpts := file_shares.UpdateOpts{}
 		newName := d.Get("name").(string)
-		if newName != "" {
-			updateOpts := file_shares.UpdateOpts{Name: newName}
-			result := file_shares.Update(client, fileShareID, updateOpts)
-			if result.Err != nil {
-				return diag.FromErr(result.Err)
+		if d.HasChange("name") && newName != "" {
+			updateOpts.Name = newName
+		}
+
+		if d.HasChange("tags") {
+			log.Println("[DEBUG] Updating tags")
+			// Get old and new tag values
+			oldTags, newTags := d.GetChange("tags")
+
+			// Create a new map with new tags
+			newTagsMap := make(map[string]*string)
+			if newTags != nil {
+				for k, val := range newTags.(map[string]interface{}) {
+					newTagsMap[k] = utils.StringToPointer(val.(string))
+				}
 			}
-			_, err := result.Extract()
-			if err != nil {
-				return diag.FromErr(err)
+
+			// Convert old tags to map[string]string for comparison
+			oldTagsMap := make(map[string]string)
+			if oldTags != nil {
+				for k, val := range oldTags.(map[string]interface{}) {
+					oldTagsMap[k] = val.(string)
+				}
+			}
+
+			// Identify tags to remove (present in old but not in new)
+			for oldKey := range oldTagsMap {
+				if _, exists := newTagsMap[oldKey]; !exists {
+					newTagsMap[oldKey] = nil // nil value indicates removal
+				}
+			}
+			updateOpts.Tags = newTagsMap
+		}
+		_, err := file_shares.Update(client, fileShareID, updateOpts).Extract()
+		if err != nil {
+			return diag.FromErr(err)
+		}
+	}
+
+	// Handle access rules update: remove all and re-create if changed
+	if d.HasChange("access") {
+		log.Println("[DEBUG] Updating access rules for file share")
+		// List all current access rules
+		pager := file_shares.ListAccessRules(client, fileShareID)
+		pages, err := pager.AllPages()
+		if err != nil {
+			return diag.FromErr(fmt.Errorf("failed to get all access rule pages for file share %s: %w", fileShareID, err))
+		}
+		rules, err := file_shares.ExtractAccessRule(pages)
+		if err != nil {
+			return diag.FromErr(fmt.Errorf("failed to extract access rules for file share %s: %w", fileShareID, err))
+		}
+		// Delete all existing access rules
+		for _, rule := range rules {
+			result := file_shares.DeleteAccessRule(client, fileShareID, rule.ID)
+			if result.Err != nil {
+				return diag.FromErr(fmt.Errorf("failed to delete access rule %s: %w", rule.ID, result.Err))
+			}
+		}
+		// Add new access rules from config
+		accessList := d.Get("access").([]interface{})
+		for _, a := range accessList {
+			amap := a.(map[string]interface{})
+			createOpts := file_shares.CreateAccessRuleOpts{
+				IPAddress:  amap["ip_address"].(string),
+				AccessMode: amap["access_mode"].(string),
+			}
+			result := file_shares.CreateAccessRule(client, fileShareID, createOpts)
+			if result.Err != nil {
+				return diag.FromErr(fmt.Errorf("failed to create access rule for file share %s: %w", fileShareID, result.Err))
 			}
 		}
 	}
