@@ -42,7 +42,7 @@ func resourceIamUser() *schema.Resource {
 				Optional:     true,
 				Default:      "en",
 				ValidateFunc: validation.StringInSlice([]string{"de", "en", "ru", "zh", "az"}, false),
-				Description:  "User's language. Defines language of the control panel and email messages.",
+				Description:  "User's language. Defines language of the control panel and email messages. Possible values: de, en, ru, zh, az.",
 			},
 			"phone": {
 				Type:        schema.TypeString,
