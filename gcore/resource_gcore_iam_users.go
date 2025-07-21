@@ -297,75 +297,107 @@ func resourceIamUserRead(ctx context.Context, d *schema.ResourceData, m interfac
 
 	user := resp.JSON200
 
-	// Set user fields
+	// Set user fields - always set to ensure proper state refresh
+	var userIDValue int
 	if user.Id != nil {
-		d.Set("user_id", *user.Id)
+		userIDValue = *user.Id
 	}
+	d.Set("user_id", userIDValue)
+
+	var currentEmailValue string
 	if user.Email != nil {
-		d.Set("current_email", string(*user.Email))
+		currentEmailValue = string(*user.Email)
 	}
+	d.Set("current_email", currentEmailValue)
+
+	var resellerValue int
 	if user.Reseller != nil {
-		d.Set("reseller", *user.Reseller)
+		resellerValue = *user.Reseller
 	}
+	d.Set("reseller", resellerValue)
+
+	var clientValue float64
 	if user.Client != nil {
-		d.Set("client", *user.Client)
+		clientValue = float64(*user.Client)
 	}
+	d.Set("client", clientValue)
+
+	var deletedValue bool
 	if user.Deleted != nil {
-		d.Set("deleted", *user.Deleted)
+		deletedValue = *user.Deleted
 	}
+	d.Set("deleted", deletedValue)
+
+	var activatedValue bool
 	if user.Activated != nil {
-		d.Set("activated", *user.Activated)
+		activatedValue = *user.Activated
 	}
+	d.Set("activated", activatedValue)
+
+	var ssoAuthValue bool
 	if user.SsoAuth != nil {
-		d.Set("sso_auth", *user.SsoAuth)
+		ssoAuthValue = *user.SsoAuth
 	}
+	d.Set("sso_auth", ssoAuthValue)
+
+	var twoFaValue bool
 	if user.TwoFa != nil {
-		d.Set("two_fa", *user.TwoFa)
+		twoFaValue = *user.TwoFa
 	}
+	d.Set("two_fa", twoFaValue)
+
+	var userTypeValue string
 	if user.UserType != nil {
-		d.Set("user_type", string(*user.UserType))
+		userTypeValue = string(*user.UserType)
 	}
+	d.Set("user_type", userTypeValue)
+
+	var isActiveValue bool
 	if user.IsActive != nil {
-		d.Set("is_active", *user.IsActive)
+		isActiveValue = *user.IsActive
 	}
+	d.Set("is_active", isActiveValue)
 
 	// Always set configurable fields to ensure proper drift detection
 	// Use empty string for nil string fields
-	name := ""
+	var nameValue string
 	if user.Name != nil {
-		name = *user.Name
+		nameValue = *user.Name
 	}
-	d.Set("name", name)
+	d.Set("name", nameValue)
 
-	lang := "en" // default value
+	langValue := "en" // default value
 	if user.Lang != nil {
-		lang = string(*user.Lang)
+		langValue = string(*user.Lang)
 	}
-	d.Set("lang", lang)
+	d.Set("lang", langValue)
 
-	phone := ""
+	var phoneValue string
 	if user.Phone != nil {
-		phone = *user.Phone
+		phoneValue = *user.Phone
 	}
-	d.Set("phone", phone)
+	d.Set("phone", phoneValue)
 
-	company := ""
+	var companyValue string
 	if user.Company != nil {
-		company = *user.Company
+		companyValue = *user.Company
 	}
-	d.Set("company", company)
+	d.Set("company", companyValue)
 
 	// Always set auth_types, use empty slice for nil
-	authTypes := []string{}
+	authTypesValue := []string{}
 	if user.AuthTypes != nil {
-		authTypes = make([]string, len(*user.AuthTypes))
+		authTypesValue = make([]string, len(*user.AuthTypes))
 		for i, authType := range *user.AuthTypes {
-			authTypes[i] = string(authType)
+			authTypesValue[i] = string(authType)
 		}
 	}
-	d.Set("auth_types", authTypes)
+	d.Set("auth_types", authTypesValue)
 
-	// Set groups from the groups array
+	// Always set groups and user_role to ensure proper state refresh
+	var userRoleValue []interface{}
+	var groupsValue []interface{}
+
 	if user.Groups != nil && len(*user.Groups) > 0 {
 		// Set primary user role (first group for the primary client)
 		group := (*user.Groups)[0]
@@ -376,10 +408,10 @@ func resourceIamUserRead(ctx context.Context, d *schema.ResourceData, m interfac
 		if group.Name != nil {
 			userRoleMap["name"] = string(*group.Name)
 		}
-		d.Set("user_role", []interface{}{userRoleMap})
+		userRoleValue = []interface{}{userRoleMap}
 
 		// Set all groups for visibility
-		groups := make([]interface{}, 0, len(*user.Groups))
+		groupsValue = make([]interface{}, 0, len(*user.Groups))
 		for _, grp := range *user.Groups {
 			groupMap := map[string]interface{}{}
 			if grp.Id != nil {
@@ -388,14 +420,16 @@ func resourceIamUserRead(ctx context.Context, d *schema.ResourceData, m interfac
 			if grp.Name != nil {
 				groupMap["name"] = string(*grp.Name)
 			}
-			groups = append(groups, groupMap)
+			groupsValue = append(groupsValue, groupMap)
 		}
-		d.Set("groups", groups)
 	}
+	d.Set("user_role", userRoleValue)
+	d.Set("groups", groupsValue)
 
-	// Set client_and_roles
+	// Always set client_and_roles to ensure proper state refresh
+	var clientRolesValue []interface{}
 	if user.ClientAndRoles != nil {
-		clientRoles := make([]interface{}, 0, len(*user.ClientAndRoles))
+		clientRolesValue = make([]interface{}, 0, len(*user.ClientAndRoles))
 		for _, cr := range *user.ClientAndRoles {
 			clientRoleMap := map[string]interface{}{
 				"client_id":           cr.ClientId,
@@ -403,10 +437,10 @@ func resourceIamUserRead(ctx context.Context, d *schema.ResourceData, m interfac
 				"user_id":             cr.UserId,
 				"user_roles":          cr.UserRoles,
 			}
-			clientRoles = append(clientRoles, clientRoleMap)
+			clientRolesValue = append(clientRolesValue, clientRoleMap)
 		}
-		d.Set("client_and_roles", clientRoles)
 	}
+	d.Set("client_and_roles", clientRolesValue)
 
 	return nil
 }
