@@ -87,7 +87,7 @@ func resourceIamUser() *schema.Resource {
 					Type:         schema.TypeString,
 					ValidateFunc: validation.StringInSlice([]string{"password", "sso", "github", "google-oauth2"}, false),
 				},
-				Description: "List of auth types available for the account.",
+				Description: "List of auth types available for the account. Possible values: password, sso, github, google-oauth2.",
 			},
 			// Read-only computed fields
 			"user_id": {
