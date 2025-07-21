@@ -23,9 +23,9 @@ Manage IAM user with complete lifecycle support
 
 ### Optional
 
-- `auth_types` (Set of String) List of auth types available for the account.
+- `auth_types` (Set of String) List of auth types available for the account. Possible values: password, sso, github, google-oauth2.
 - `company` (String) User's company.
-- `lang` (String) User's language. Defines language of the control panel and email messages.
+- `lang` (String) User's language. Defines language of the control panel and email messages. Possible values: de, en, ru, zh, az.
 - `name` (String) User's name.
 - `phone` (String) User's phone.
 
