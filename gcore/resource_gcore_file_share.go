@@ -340,7 +340,8 @@ func resourceFileShareUpdate(ctx context.Context, d *schema.ResourceData, m inte
 	}
 
 	if d.HasChange("name") || d.HasChange("tags") {
-		updateOpts := file_shares.UpdateOpts{}
+		// Tags needs to be initialized to avoid sending null to the API and removing all tags.
+		updateOpts := file_shares.UpdateWithTagsOpts{Tags: make(map[string]*string)}
 		newName := d.Get("name").(string)
 		if d.HasChange("name") && newName != "" {
 			updateOpts.Name = newName
@@ -375,7 +376,7 @@ func resourceFileShareUpdate(ctx context.Context, d *schema.ResourceData, m inte
 			}
 			updateOpts.Tags = newTagsMap
 		}
-		_, err := file_shares.Update(client, fileShareID, updateOpts).Extract()
+		_, err := file_shares.UpdateWithTags(client, fileShareID, updateOpts).Extract()
 		if err != nil {
 			return diag.FromErr(err)
 		}
@@ -472,6 +473,18 @@ func expandFileShareCreateOpts(d *schema.ResourceData) (*file_shares.CreateOpts,
 	volumeType := d.Get("volume_type").(string)
 	if volumeType != "default_share_type" && volumeType != "vast_share_type" {
 		return nil, fmt.Errorf("volume_type must be one of 'default_share_type' or 'vast_share_type'")
+	}
+
+	// check that network and access are set only for default_share_type
+	if volumeType == "vast_share_type" {
+		networkList := d.Get("network").([]interface{})
+		if len(networkList) > 0 {
+			return nil, fmt.Errorf("network block is not allowed for vast_share_type")
+		}
+		accessList := d.Get("access").([]interface{})
+		if len(accessList) > 0 {
+			return nil, fmt.Errorf("access block is not allowed for vast_share_type")
+		}
 	}
 
 	opts := file_shares.CreateOpts{
