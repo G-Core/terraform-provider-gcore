@@ -285,6 +285,7 @@ func resourceFileShareRead(ctx context.Context, d *schema.ResourceData, m interf
 	d.Set("network_name", fileShare.NetworkName)
 	d.Set("subnet_id", fileShare.SubnetID)
 	d.Set("subnet_name", fileShare.SubnetName)
+	d.Set("creator_task_id", fileShare.CreatorTaskID)
 	if fileShare.ShareNetworkName != nil {
 		d.Set("share_network_name", *fileShare.ShareNetworkName)
 	}
