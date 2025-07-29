@@ -372,7 +372,11 @@ func resourceLBPoolUpdate(ctx context.Context, d *schema.ResourceData, m interfa
 	config := m.(*Config)
 	provider := config.Provider
 
-	client, err := CreateClient(provider, d, LBPoolsPoint, versionPointV1)
+	clientV1, err := CreateClient(provider, d, LBPoolsPoint, versionPointV1)
+	if err != nil {
+		return diag.FromErr(err)
+	}
+	clientV2, err := CreateClient(provider, d, LBPoolsPoint, versionPointV2)
 	if err != nil {
 		return diag.FromErr(err)
 	}
@@ -395,7 +399,7 @@ func resourceLBPoolUpdate(ctx context.Context, d *schema.ResourceData, m interfa
 	if d.HasChange("health_monitor") {
 		opts.HealthMonitor = extractHealthMonitorMap(d)
 		if opts.HealthMonitor == nil {
-			lbpools.DeleteHealthMonitor(client, d.Id(), &gcorecloud.RequestOpts{
+			lbpools.DeleteHealthMonitor(clientV1, d.Id(), &gcorecloud.RequestOpts{
 				ConflictRetryAmount:   rc.Amount,
 				ConflictRetryInterval: rc.Interval,
 			})
@@ -407,7 +411,7 @@ func resourceLBPoolUpdate(ctx context.Context, d *schema.ResourceData, m interfa
 	if d.HasChange("session_persistence") {
 		opts.SessionPersistence = extractSessionPersistenceMap(d)
 		if opts.SessionPersistence == nil {
-			results, err := lbpools.Unset(client, d.Id(), lbpools.UnsetOpts{SessionPersistence: true}, &gcorecloud.RequestOpts{
+			results, err := lbpools.Unset(clientV2, d.Id(), lbpools.UnsetOpts{SessionPersistence: true}, &gcorecloud.RequestOpts{
 				ConflictRetryAmount:   rc.Amount,
 				ConflictRetryInterval: rc.Interval,
 			}).Extract()
@@ -415,8 +419,8 @@ func resourceLBPoolUpdate(ctx context.Context, d *schema.ResourceData, m interfa
 				return diag.FromErr(err)
 			}
 			taskID := results.Tasks[0]
-			_, err = tasks.WaitTaskAndReturnResult(client, taskID, true, timeout, func(task tasks.TaskID) (interface{}, error) {
-				_, err := tasks.Get(client, string(task)).Extract()
+			_, err = tasks.WaitTaskAndReturnResult(clientV1, taskID, true, timeout, func(task tasks.TaskID) (interface{}, error) {
+				_, err := tasks.Get(clientV1, string(task)).Extract()
 				if err != nil {
 					return nil, fmt.Errorf("cannot get task with ID: %s. Error: %w", task, err)
 				}
@@ -435,7 +439,7 @@ func resourceLBPoolUpdate(ctx context.Context, d *schema.ResourceData, m interfa
 		return resourceLBPoolRead(ctx, d, m)
 	}
 
-	results, err := lbpools.Update(client, d.Id(), opts, &gcorecloud.RequestOpts{
+	results, err := lbpools.Update(clientV2, d.Id(), opts, &gcorecloud.RequestOpts{
 		ConflictRetryAmount:   rc.Amount,
 		ConflictRetryInterval: rc.Interval,
 	}).Extract()
@@ -444,8 +448,8 @@ func resourceLBPoolUpdate(ctx context.Context, d *schema.ResourceData, m interfa
 	}
 
 	taskID := results.Tasks[0]
-	_, err = tasks.WaitTaskAndReturnResult(client, taskID, true, int(d.Timeout(schema.TimeoutUpdate).Seconds()), func(task tasks.TaskID) (interface{}, error) {
-		_, err := tasks.Get(client, string(task)).Extract()
+	_, err = tasks.WaitTaskAndReturnResult(clientV1, taskID, true, int(d.Timeout(schema.TimeoutUpdate).Seconds()), func(task tasks.TaskID) (interface{}, error) {
+		_, err := tasks.Get(clientV1, string(task)).Extract()
 		if err != nil {
 			return nil, fmt.Errorf("cannot get task with ID: %s. Error: %w", task, err)
 		}
