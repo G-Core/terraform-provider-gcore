@@ -1,0 +1,13 @@
+#!/usr/bin/env bash
+
+set -e
+
+cd "$(dirname "$0")/.."
+
+echo "==> Generating Terraform provider documentation"
+if ! command -v "tfplugindocs" &> /dev/null
+then
+  go install github.com/hashicorp/terraform-plugin-docs/cmd/tfplugindocs
+fi
+
+"$(go env GOPATH)/bin/tfplugindocs" generate -rendered-provider-name "Gcore" -provider-name="gcore"
