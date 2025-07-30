@@ -7,7 +7,6 @@ toolchain go1.24.3
 require (
 	github.com/AlekSi/pointer v1.2.0
 	github.com/G-Core/FastEdge-client-sdk-go v0.3.6
-	github.com/G-Core/gcore-dns-sdk-go v0.2.9
 	github.com/G-Core/gcore-storage-sdk-go v0.1.34
 	github.com/G-Core/gcore-waap-sdk-go v0.4.0
 	github.com/G-Core/gcorelabscdn-go v1.0.32
@@ -17,6 +16,7 @@ require (
 	github.com/hashicorp/go-cty v1.4.1-0.20200414143053-d3edf31b6320
 	github.com/hashicorp/terraform-plugin-sdk/v2 v2.27.0
 	github.com/mitchellh/mapstructure v1.5.0
+
 )
 
 require (
@@ -97,6 +97,7 @@ require (
 	github.com/olekukonko/tablewriter v0.0.4 // indirect
 	github.com/opentracing/opentracing-go v1.2.0 // indirect
 	github.com/perimeterx/marshmallow v1.1.5 // indirect
+	github.com/rogpeppe/go-internal v1.14.1 // indirect
 	github.com/posener/complete v1.2.3 // indirect
 	github.com/russross/blackfriday/v2 v2.1.0 // indirect
 	github.com/shopspring/decimal v1.3.1 // indirect
@@ -126,9 +127,11 @@ require (
 	google.golang.org/protobuf v1.33.0 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
+
 )
 
 require (
+	github.com/G-Core/gcore-dns-sdk-go v0.3.2
 	github.com/go-openapi/runtime v0.26.0 // indirect
 	github.com/hashicorp/terraform v1.5.7
 	github.com/hashicorp/terraform-exec v0.23.0 // indirect
