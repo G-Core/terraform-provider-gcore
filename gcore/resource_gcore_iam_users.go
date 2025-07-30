@@ -297,92 +297,36 @@ func resourceIamUserRead(ctx context.Context, d *schema.ResourceData, m interfac
 
 	user := resp.JSON200
 
-	// Set user fields - always set to ensure proper state refresh
-	var userIDValue int
-	if user.Id != nil {
-		userIDValue = *user.Id
-	}
-	d.Set("user_id", userIDValue)
-
-	var currentEmailValue string
+	d.Set("user_id", user.Id)
+	// Email needs string conversion, so we need nil check
 	if user.Email != nil {
-		currentEmailValue = string(*user.Email)
+		d.Set("current_email", string(*user.Email))
+	} else {
+		d.Set("current_email", "")
 	}
-	d.Set("current_email", currentEmailValue)
-
-	var resellerValue int
-	if user.Reseller != nil {
-		resellerValue = *user.Reseller
-	}
-	d.Set("reseller", resellerValue)
-
-	var clientValue float64
-	if user.Client != nil {
-		clientValue = float64(*user.Client)
-	}
-	d.Set("client", clientValue)
-
-	var deletedValue bool
-	if user.Deleted != nil {
-		deletedValue = *user.Deleted
-	}
-	d.Set("deleted", deletedValue)
-
-	var activatedValue bool
-	if user.Activated != nil {
-		activatedValue = *user.Activated
-	}
-	d.Set("activated", activatedValue)
-
-	var ssoAuthValue bool
-	if user.SsoAuth != nil {
-		ssoAuthValue = *user.SsoAuth
-	}
-	d.Set("sso_auth", ssoAuthValue)
-
-	var twoFaValue bool
-	if user.TwoFa != nil {
-		twoFaValue = *user.TwoFa
-	}
-	d.Set("two_fa", twoFaValue)
-
-	var userTypeValue string
+	d.Set("reseller", user.Reseller)
+	d.Set("client", user.Client)
+	d.Set("deleted", user.Deleted)
+	d.Set("activated", user.Activated)
+	d.Set("sso_auth", user.SsoAuth)
+	d.Set("two_fa", user.TwoFa)
+	// UserType needs string conversion, so we need nil check
 	if user.UserType != nil {
-		userTypeValue = string(*user.UserType)
+		d.Set("user_type", string(*user.UserType))
+	} else {
+		d.Set("user_type", "")
 	}
-	d.Set("user_type", userTypeValue)
+	d.Set("is_active", user.IsActive)
 
-	var isActiveValue bool
-	if user.IsActive != nil {
-		isActiveValue = *user.IsActive
-	}
-	d.Set("is_active", isActiveValue)
-
-	// Always set configurable fields to ensure proper drift detection
-	// Use empty string for nil string fields
-	var nameValue string
-	if user.Name != nil {
-		nameValue = *user.Name
-	}
-	d.Set("name", nameValue)
-
-	langValue := "en" // default value
+	d.Set("name", user.Name)
+	// Lang needs string conversion and has default "en" behavior
 	if user.Lang != nil {
-		langValue = string(*user.Lang)
+		d.Set("lang", string(*user.Lang))
+	} else {
+		d.Set("lang", "en") // maintain default behavior
 	}
-	d.Set("lang", langValue)
-
-	var phoneValue string
-	if user.Phone != nil {
-		phoneValue = *user.Phone
-	}
-	d.Set("phone", phoneValue)
-
-	var companyValue string
-	if user.Company != nil {
-		companyValue = *user.Company
-	}
-	d.Set("company", companyValue)
+	d.Set("phone", user.Phone)
+	d.Set("company", user.Company)
 
 	// Always set auth_types, use empty slice for nil
 	authTypesValue := []string{}
