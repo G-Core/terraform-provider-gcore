@@ -66,6 +66,8 @@ import (
 	"github.com/stainless-sdks/gcore-terraform/internal/services/fastedge_template"
 	"github.com/stainless-sdks/gcore-terraform/internal/services/iam_api_token"
 	"github.com/stainless-sdks/gcore-terraform/internal/services/iam_user"
+	"github.com/stainless-sdks/gcore-terraform/internal/services/security_event"
+	"github.com/stainless-sdks/gcore-terraform/internal/services/security_profile"
 	"github.com/stainless-sdks/gcore-terraform/internal/services/streaming_ai_task"
 	"github.com/stainless-sdks/gcore-terraform/internal/services/streaming_broadcast"
 	"github.com/stainless-sdks/gcore-terraform/internal/services/streaming_directory"
@@ -267,6 +269,7 @@ func (p *GcoreProvider) Resources(ctx context.Context) []func() resource.Resourc
 		streaming_stream.NewResource,
 		streaming_stream_overlay.NewResource,
 		streaming_restream.NewResource,
+		security_profile.NewResource,
 	}
 }
 
@@ -386,6 +389,8 @@ func (p *GcoreProvider) DataSources(ctx context.Context) []func() datasource.Dat
 		streaming_stream_overlay.NewStreamingStreamOverlayDataSource,
 		streaming_restream.NewStreamingRestreamDataSource,
 		streaming_restream.NewStreamingRestreamsDataSource,
+		security_event.NewSecurityEventsDataSource,
+		security_profile.NewSecurityProfileDataSource,
 	}
 }
 
