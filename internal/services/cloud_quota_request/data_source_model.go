@@ -9,7 +9,7 @@ import (
 )
 
 type CloudQuotaRequestDataSourceModel struct {
-	RequestID       types.String                                                              `tfsdk:"request_id" path:"request_id,required"`
+	RequestID       types.Int64                                                               `tfsdk:"request_id" path:"request_id,required"`
 	ClientID        types.Int64                                                               `tfsdk:"client_id" json:"client_id,computed"`
 	CreatedAt       timetypes.RFC3339                                                         `tfsdk:"created_at" json:"created_at,computed" format:"date-time"`
 	Description     types.String                                                              `tfsdk:"description" json:"description,computed"`

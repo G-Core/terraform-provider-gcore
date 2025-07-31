@@ -104,7 +104,7 @@ func (r *CloudQuotaRequestResource) Read(ctx context.Context, req resource.ReadR
 	res := new(http.Response)
 	_, err := r.client.Cloud.Quotas.Requests.Get(
 		ctx,
-		data.RequestID.ValueString(),
+		data.RequestID.ValueInt64(),
 		option.WithResponseBodyInto(&res),
 		option.WithMiddleware(logging.Middleware(ctx)),
 	)
@@ -138,7 +138,7 @@ func (r *CloudQuotaRequestResource) Delete(ctx context.Context, req resource.Del
 
 	err := r.client.Cloud.Quotas.Requests.Delete(
 		ctx,
-		data.RequestID.ValueString(),
+		data.RequestID.ValueInt64(),
 		option.WithMiddleware(logging.Middleware(ctx)),
 	)
 	if err != nil {

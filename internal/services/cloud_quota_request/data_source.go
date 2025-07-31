@@ -60,7 +60,7 @@ func (d *CloudQuotaRequestDataSource) Read(ctx context.Context, req datasource.R
 	res := new(http.Response)
 	_, err := d.client.Cloud.Quotas.Requests.Get(
 		ctx,
-		data.RequestID.ValueString(),
+		data.RequestID.ValueInt64(),
 		option.WithResponseBodyInto(&res),
 		option.WithMiddleware(logging.Middleware(ctx)),
 	)
