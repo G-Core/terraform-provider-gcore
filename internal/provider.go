@@ -257,6 +257,7 @@ func (p *GcoreProvider) Resources(ctx context.Context) []func() resource.Resourc
 		iam_user.NewResource,
 		fastedge_template.NewResource,
 		fastedge_secret.NewResource,
+		fastedge_binary.NewResource,
 		fastedge_app.NewResource,
 		fastedge_kv_store.NewResource,
 		streaming_ai_task.NewResource,
