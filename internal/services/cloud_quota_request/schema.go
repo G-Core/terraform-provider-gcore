@@ -19,10 +19,10 @@ var _ resource.ResourceWithConfigValidators = (*CloudQuotaRequestResource)(nil)
 func ResourceSchema(ctx context.Context) schema.Schema {
 	return schema.Schema{
 		Attributes: map[string]schema.Attribute{
-			"request_id": schema.StringAttribute{
+			"request_id": schema.Int64Attribute{
 				Description:   "LimitRequest ID",
 				Optional:      true,
-				PlanModifiers: []planmodifier.String{stringplanmodifier.RequiresReplace()},
+				PlanModifiers: []planmodifier.Int64{int64planmodifier.RequiresReplace()},
 			},
 			"description": schema.StringAttribute{
 				Description:   "Describe the reason, in general terms.",

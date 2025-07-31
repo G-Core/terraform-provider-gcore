@@ -16,7 +16,7 @@ var _ datasource.DataSourceWithConfigValidators = (*CloudQuotaRequestDataSource)
 func DataSourceSchema(ctx context.Context) schema.Schema {
 	return schema.Schema{
 		Attributes: map[string]schema.Attribute{
-			"request_id": schema.StringAttribute{
+			"request_id": schema.Int64Attribute{
 				Description: "LimitRequest ID",
 				Required:    true,
 			},

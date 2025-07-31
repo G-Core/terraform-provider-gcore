@@ -9,7 +9,7 @@ import (
 )
 
 type CloudQuotaRequestModel struct {
-	RequestID       types.String                           `tfsdk:"request_id" path:"request_id,optional"`
+	RequestID       types.Int64                            `tfsdk:"request_id" path:"request_id,optional"`
 	Description     types.String                           `tfsdk:"description" json:"description,required"`
 	RequestedLimits *CloudQuotaRequestRequestedLimitsModel `tfsdk:"requested_limits" json:"requested_limits,required"`
 	ClientID        types.Int64                            `tfsdk:"client_id" json:"client_id,optional"`
