@@ -123,10 +123,6 @@ func ListDataSourceSchema(ctx context.Context) schema.Schema {
 							DeprecationMessage: "This attribute is deprecated.",
 							CustomType:         timetypes.RFC3339Type{},
 						},
-						"ddos_endpoint_id": schema.Int64Attribute{
-							Description: "DDoS endpoint ID",
-							Computed:    true,
-						},
 						"display_name": schema.StringAttribute{
 							Description: "Human-readable region name",
 							Computed:    true,
@@ -175,6 +171,10 @@ func ListDataSourceSchema(ctx context.Context) schema.Schema {
 						},
 						"has_dbaas": schema.BoolAttribute{
 							Description: "Region has DBAAS service",
+							Computed:    true,
+						},
+						"has_ddos": schema.BoolAttribute{
+							Description: "Region has Advanced DDoS Protection capability",
 							Computed:    true,
 						},
 						"has_k8s": schema.BoolAttribute{
@@ -236,6 +236,11 @@ func ListDataSourceSchema(ctx context.Context) schema.Schema {
 									"RUSSIA_AND_CIS",
 								),
 							},
+						},
+						"ddos_endpoint_id": schema.Int64Attribute{
+							Description:        "DDoS endpoint ID",
+							Computed:           true,
+							DeprecationMessage: "This attribute is deprecated.",
 						},
 					},
 				},

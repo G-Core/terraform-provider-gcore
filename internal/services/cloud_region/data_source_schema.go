@@ -57,8 +57,9 @@ func DataSourceSchema(ctx context.Context) schema.Schema {
 				CustomType:         timetypes.RFC3339Type{},
 			},
 			"ddos_endpoint_id": schema.Int64Attribute{
-				Description: "DDoS endpoint ID",
-				Computed:    true,
+				Description:        "DDoS endpoint ID",
+				Computed:           true,
+				DeprecationMessage: "This attribute is deprecated.",
 			},
 			"display_name": schema.StringAttribute{
 				Description: "Human-readable region name",
@@ -97,6 +98,10 @@ func DataSourceSchema(ctx context.Context) schema.Schema {
 			},
 			"has_dbaas": schema.BoolAttribute{
 				Description: "Region has DBAAS service",
+				Computed:    true,
+			},
+			"has_ddos": schema.BoolAttribute{
+				Description: "Region has Advanced DDoS Protection capability",
 				Computed:    true,
 			},
 			"has_k8s": schema.BoolAttribute{
