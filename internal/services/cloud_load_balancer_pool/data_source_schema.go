@@ -217,7 +217,8 @@ func DataSourceSchema(ctx context.Context) schema.Schema {
 						},
 					},
 					"expected_codes": schema.StringAttribute{
-						Computed: true,
+						Description: "Expected HTTP response codes. Can be a single code or a range of codes. Can only be used together with `HTTP` or `HTTPS` health monitor type. For example, 200,202,300-302,401,403,404,500-504. If not specified, the default is 200.",
+						Computed:    true,
 					},
 					"http_method": schema.StringAttribute{
 						Description: "HTTP method\nAvailable values: \"CONNECT\", \"DELETE\", \"GET\", \"HEAD\", \"OPTIONS\", \"PATCH\", \"POST\", \"PUT\", \"TRACE\".",
