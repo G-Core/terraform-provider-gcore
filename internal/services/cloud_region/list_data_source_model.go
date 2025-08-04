@@ -48,7 +48,6 @@ func (m *CloudRegionsDataSourceModel) toListParams(_ context.Context) (params cl
 type CloudRegionsItemsDataSourceModel struct {
 	ID                   types.Int64                                                      `tfsdk:"id" json:"id,computed"`
 	AccessLevel          types.String                                                     `tfsdk:"access_level" json:"access_level,computed"`
-	AIServiceEndpointID  types.Int64                                                      `tfsdk:"ai_service_endpoint_id" json:"ai_service_endpoint_id,computed"`
 	AvailableVolumeTypes customfield.List[types.String]                                   `tfsdk:"available_volume_types" json:"available_volume_types,computed"`
 	Coordinates          customfield.NestedObject[CloudRegionsCoordinatesDataSourceModel] `tfsdk:"coordinates" json:"coordinates,computed"`
 	Country              types.String                                                     `tfsdk:"country" json:"country,computed"`
