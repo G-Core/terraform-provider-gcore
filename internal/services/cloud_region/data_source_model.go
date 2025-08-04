@@ -17,7 +17,6 @@ type CloudRegionDataSourceModel struct {
 	RegionID             types.Int64                                                     `tfsdk:"region_id" path:"region_id,required"`
 	ShowVolumeTypes      types.Bool                                                      `tfsdk:"show_volume_types" query:"show_volume_types,computed_optional"`
 	AccessLevel          types.String                                                    `tfsdk:"access_level" json:"access_level,computed"`
-	AIServiceEndpointID  types.Int64                                                     `tfsdk:"ai_service_endpoint_id" json:"ai_service_endpoint_id,computed"`
 	Country              types.String                                                    `tfsdk:"country" json:"country,computed"`
 	CreatedAt            timetypes.RFC3339                                               `tfsdk:"created_at" json:"created_at,computed" format:"date-time"`
 	CreatedOn            timetypes.RFC3339                                               `tfsdk:"created_on" json:"created_on,computed" format:"date-time"`

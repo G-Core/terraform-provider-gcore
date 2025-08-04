@@ -79,10 +79,6 @@ func ListDataSourceSchema(ctx context.Context) schema.Schema {
 								stringvalidator.OneOfCaseInsensitive("core", "edge"),
 							},
 						},
-						"ai_service_endpoint_id": schema.Int64Attribute{
-							Description: "AI service API endpoint ID",
-							Computed:    true,
-						},
 						"available_volume_types": schema.ListAttribute{
 							Description: "List of available volume types, 'standard', '`ssd_hiiops`', 'cold'].",
 							Computed:    true,
