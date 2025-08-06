@@ -51,7 +51,7 @@ func resourceIamApiToken() *schema.Resource {
 				Type:        schema.TypeString,
 				Computed:    true,
 				Optional:    true,
-				Description: "Date when the API token becomes expired (ISO 8086/RFC 3339 format), UTC. If null, then the API token will never expire.",
+				Description: "Date when the API token becomes expired (ISO 8086/RFC 3339 format), UTC. If null, the token will expire in one week.",
 			},
 			"client_user": {
 				Type:        schema.TypeList,

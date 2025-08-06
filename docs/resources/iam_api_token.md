@@ -43,16 +43,14 @@ resource "gcore_iam_api_token" "iam_api_token" {
 ### Optional
 
 - `description` (String) API token description.
-- `exp_date` (String) Date when the API token becomes expired (ISO 8086/RFC 3339 format), UTC. If null, then the API token will never expire.
+- `exp_date` (String) Date when the API token becomes expired (ISO 8086/RFC 3339 format), UTC. If null, the token will expire in one week.
 
 ### Read-Only
 
 - `created` (String) Date when the API token was issued (ISO 8086/RFC 3339 format), UTC.
-- `deleted` (Boolean) Deletion flag. If true, then the API token was deleted.
-- `expired` (Boolean) Expiration flag. If true, then the API token has expired. When an API token expires it will be automatically deleted.
 - `id` (String) The ID of this resource.
 - `last_usage` (String) Date when the API token was last used (ISO 8086/RFC 3339 format), UTC.
-- `token` (String) API token value
+- `token` (String, Sensitive) API token value
 
 <a id="nestedblock--client_user"></a>
 ### Nested Schema for `client_user`
@@ -60,14 +58,6 @@ resource "gcore_iam_api_token" "iam_api_token" {
 Optional:
 
 - `role` (Block List, Max: 1) (see [below for nested schema](#nestedblock--client_user--role))
-
-Read-Only:
-
-- `client_id` (Number) Account's ID.
-- `deleted` (Boolean) Deletion flag. If true, then the API token was deleted.
-- `user_email` (String) User's email who issued the API token.
-- `user_id` (Number) User's ID who issued the API token.
-- `user_name` (String) User's name who issued the API token.
 
 <a id="nestedblock--client_user--role"></a>
 ### Nested Schema for `client_user.role`
