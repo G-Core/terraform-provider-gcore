@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
@@ -103,15 +104,13 @@ func resourceIamApiTokenCreate(ctx context.Context, d *schema.ResourceData, m in
 	name := d.Get("name").(string)
 
 	var expDatePtr *string
-	if v, ok := d.GetOk("exp_date"); ok {
+	if v, ok := d.GetOk("exp_date"); ok && v.(string) != "" {
 		expDateStr := v.(string)
-		if expDateStr != "" {
-			expDatePtr = &expDateStr
-		} else {
-			expDatePtr = nil
-		}
+		expDatePtr = &expDateStr
 	} else {
-		expDatePtr = nil
+		expTime := time.Now().UTC().Add(7 * 24 * time.Hour)
+		expDateStr := expTime.Format(time.RFC3339)
+		expDatePtr = &expDateStr
 	}
 
 	clientUser := d.Get("client_user").([]interface{})
