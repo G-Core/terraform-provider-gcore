@@ -17,7 +17,6 @@ func resourceIamApiToken() *schema.Resource {
 	return &schema.Resource{
 		CreateContext: resourceIamApiTokenCreate,
 		ReadContext:   resourceIamApiTokenRead,
-		UpdateContext: resourceIamApiTokenUpdate,
 		DeleteContext: resourceIamApiTokenDelete,
 		Description:   "Represent IAM ApiToken for authentication and management capabilities",
 
@@ -25,6 +24,7 @@ func resourceIamApiToken() *schema.Resource {
 			"client_id": {
 				Type:        schema.TypeInt,
 				Required:    true,
+				ForceNew:    true,
 				Description: "Account ID.",
 			},
 			"token": {
@@ -35,11 +35,13 @@ func resourceIamApiToken() *schema.Resource {
 			"name": {
 				Type:        schema.TypeString,
 				Required:    true,
+				ForceNew:    true,
 				Description: "API token name.",
 			},
 			"description": {
 				Type:        schema.TypeString,
 				Optional:    true,
+				ForceNew:    true,
 				Description: "API token description.",
 			},
 			"exp_date": {
@@ -51,6 +53,7 @@ func resourceIamApiToken() *schema.Resource {
 			"client_user": {
 				Type:        schema.TypeList,
 				Required:    true,
+				ForceNew:    true,
 				MaxItems:    1,
 				Description: "API token role.",
 				Elem: &schema.Resource{
@@ -210,10 +213,6 @@ func resourceIamApiTokenRead(ctx context.Context, d *schema.ResourceData, m inte
 	}
 
 	return nil
-}
-
-func resourceIamApiTokenUpdate(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
-	return resourceIamApiTokenRead(ctx, d, m)
 }
 
 func resourceIamApiTokenDelete(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
