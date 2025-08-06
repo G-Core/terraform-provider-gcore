@@ -32,24 +32,6 @@ func ListDataSourceSchema(ctx context.Context) schema.Schema {
 				Description: "The comment of the insight silence",
 				Optional:    true,
 			},
-			"ordering": schema.StringAttribute{
-				Description: "Sort the response by given field.\nAvailable values: \"id\", \"-id\", \"insight_type\", \"-insight_type\", \"comment\", \"-comment\", \"author\", \"-author\", \"expire_at\", \"-expire_at\".",
-				Optional:    true,
-				Validators: []validator.String{
-					stringvalidator.OneOfCaseInsensitive(
-						"id",
-						"-id",
-						"insight_type",
-						"-insight_type",
-						"comment",
-						"-comment",
-						"author",
-						"-author",
-						"expire_at",
-						"-expire_at",
-					),
-				},
-			},
 			"id": schema.ListAttribute{
 				Description: "The ID of the insight silence",
 				Optional:    true,
@@ -66,6 +48,25 @@ func ListDataSourceSchema(ctx context.Context) schema.Schema {
 				Optional:    true,
 				Validators: []validator.Int64{
 					int64validator.Between(0, 100),
+				},
+			},
+			"ordering": schema.StringAttribute{
+				Description: "Sort the response by given field.\nAvailable values: \"id\", \"-id\", \"insight_type\", \"-insight_type\", \"comment\", \"-comment\", \"author\", \"-author\", \"expire_at\", \"-expire_at\".",
+				Computed:    true,
+				Optional:    true,
+				Validators: []validator.String{
+					stringvalidator.OneOfCaseInsensitive(
+						"id",
+						"-id",
+						"insight_type",
+						"-insight_type",
+						"comment",
+						"-comment",
+						"author",
+						"-author",
+						"expire_at",
+						"-expire_at",
+					),
 				},
 			},
 			"max_items": schema.Int64Attribute{

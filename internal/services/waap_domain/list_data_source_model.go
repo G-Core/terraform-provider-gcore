@@ -47,7 +47,7 @@ func (m *WaapDomainsDataSourceModel) toListParams(_ context.Context) (params waa
 		params.Ordering = waap.DomainListParamsOrdering(m.Ordering.ValueString())
 	}
 	if !m.Status.IsNull() {
-		params.Status = waap.WaapDomainStatus(m.Status.ValueString())
+		params.Status = waap.DomainListParamsStatus(m.Status.ValueString())
 	}
 
 	return

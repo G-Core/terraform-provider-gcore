@@ -81,15 +81,12 @@ import (
 	"github.com/stainless-sdks/gcore-terraform/internal/services/waap_custom_page_set"
 	"github.com/stainless-sdks/gcore-terraform/internal/services/waap_domain"
 	"github.com/stainless-sdks/gcore-terraform/internal/services/waap_domain_advanced_rule"
-	"github.com/stainless-sdks/gcore-terraform/internal/services/waap_domain_analytics_request"
-	"github.com/stainless-sdks/gcore-terraform/internal/services/waap_domain_api_discovery_scan_result"
 	"github.com/stainless-sdks/gcore-terraform/internal/services/waap_domain_api_path"
 	"github.com/stainless-sdks/gcore-terraform/internal/services/waap_domain_custom_rule"
 	"github.com/stainless-sdks/gcore-terraform/internal/services/waap_domain_firewall_rule"
 	"github.com/stainless-sdks/gcore-terraform/internal/services/waap_domain_insight"
 	"github.com/stainless-sdks/gcore-terraform/internal/services/waap_domain_insight_silence"
 	"github.com/stainless-sdks/gcore-terraform/internal/services/waap_domain_setting"
-	"github.com/stainless-sdks/gcore-terraform/internal/services/waap_ip_info"
 	"github.com/stainless-sdks/gcore-terraform/internal/services/waap_organization"
 	"github.com/stainless-sdks/gcore-terraform/internal/services/waap_tag"
 )
@@ -343,14 +340,10 @@ func (p *GcoreProvider) DataSources(ctx context.Context) []func() datasource.Dat
 		waap_domain_setting.NewWaapDomainSettingDataSource,
 		waap_domain_api_path.NewWaapDomainAPIPathDataSource,
 		waap_domain_api_path.NewWaapDomainAPIPathsDataSource,
-		waap_domain_api_discovery_scan_result.NewWaapDomainAPIDiscoveryScanResultDataSource,
-		waap_domain_api_discovery_scan_result.NewWaapDomainAPIDiscoveryScanResultsDataSource,
 		waap_domain_insight.NewWaapDomainInsightDataSource,
 		waap_domain_insight.NewWaapDomainInsightsDataSource,
 		waap_domain_insight_silence.NewWaapDomainInsightSilenceDataSource,
 		waap_domain_insight_silence.NewWaapDomainInsightSilencesDataSource,
-		waap_domain_analytics_request.NewWaapDomainAnalyticsRequestDataSource,
-		waap_domain_analytics_request.NewWaapDomainAnalyticsRequestsDataSource,
 		waap_domain_custom_rule.NewWaapDomainCustomRuleDataSource,
 		waap_domain_custom_rule.NewWaapDomainCustomRulesDataSource,
 		waap_domain_firewall_rule.NewWaapDomainFirewallRuleDataSource,
@@ -361,7 +354,6 @@ func (p *GcoreProvider) DataSources(ctx context.Context) []func() datasource.Dat
 		waap_custom_page_set.NewWaapCustomPageSetsDataSource,
 		waap_tag.NewWaapTagsDataSource,
 		waap_organization.NewWaapOrganizationsDataSource,
-		waap_ip_info.NewWaapIPInfoDataSource,
 		iam_api_token.NewIamAPITokenDataSource,
 		iam_user.NewIamUserDataSource,
 		iam_user.NewIamUsersDataSource,

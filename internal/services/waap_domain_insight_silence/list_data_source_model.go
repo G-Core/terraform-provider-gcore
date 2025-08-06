@@ -21,10 +21,10 @@ type WaapDomainInsightSilencesDataSourceModel struct {
 	DomainID    types.Int64                                                                 `tfsdk:"domain_id" path:"domain_id,required"`
 	Author      types.String                                                                `tfsdk:"author" query:"author,optional"`
 	Comment     types.String                                                                `tfsdk:"comment" query:"comment,optional"`
-	Ordering    types.String                                                                `tfsdk:"ordering" query:"ordering,optional"`
 	ID          *[]types.String                                                             `tfsdk:"id" query:"id,optional"`
 	InsightType *[]types.String                                                             `tfsdk:"insight_type" query:"insight_type,optional"`
 	Limit       types.Int64                                                                 `tfsdk:"limit" query:"limit,computed_optional"`
+	Ordering    types.String                                                                `tfsdk:"ordering" query:"ordering,computed_optional"`
 	MaxItems    types.Int64                                                                 `tfsdk:"max_items"`
 	Items       customfield.NestedObjectList[WaapDomainInsightSilencesItemsDataSourceModel] `tfsdk:"items"`
 }
@@ -54,7 +54,7 @@ func (m *WaapDomainInsightSilencesDataSourceModel) toListParams(_ context.Contex
 		params.Limit = param.NewOpt(m.Limit.ValueInt64())
 	}
 	if !m.Ordering.IsNull() {
-		params.Ordering = waap.WaapInsightSilenceSortBy(m.Ordering.ValueString())
+		params.Ordering = waap.DomainInsightSilenceListParamsOrdering(m.Ordering.ValueString())
 	}
 
 	return

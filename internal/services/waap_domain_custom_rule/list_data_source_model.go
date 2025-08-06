@@ -33,7 +33,7 @@ func (m *WaapDomainCustomRulesDataSourceModel) toListParams(_ context.Context) (
 	params = waap.DomainCustomRuleListParams{}
 
 	if !m.Action.IsNull() {
-		params.Action = waap.WaapRuleActionType(m.Action.ValueString())
+		params.Action = waap.DomainCustomRuleListParamsAction(m.Action.ValueString())
 	}
 	if !m.Description.IsNull() {
 		params.Description = param.NewOpt(m.Description.ValueString())

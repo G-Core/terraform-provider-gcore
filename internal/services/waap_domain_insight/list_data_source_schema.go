@@ -29,26 +29,6 @@ func ListDataSourceSchema(ctx context.Context) schema.Schema {
 				Description: "The description of the insight. Supports '\\*' as a wildcard.",
 				Optional:    true,
 			},
-			"ordering": schema.StringAttribute{
-				Description: "Sort the response by given field.\nAvailable values: \"id\", \"-id\", \"insight_type\", \"-insight_type\", \"first_seen\", \"-first_seen\", \"last_seen\", \"-last_seen\", \"last_status_change\", \"-last_status_change\", \"status\", \"-status\".",
-				Optional:    true,
-				Validators: []validator.String{
-					stringvalidator.OneOfCaseInsensitive(
-						"id",
-						"-id",
-						"insight_type",
-						"-insight_type",
-						"first_seen",
-						"-first_seen",
-						"last_seen",
-						"-last_seen",
-						"last_status_change",
-						"-last_status_change",
-						"status",
-						"-status",
-					),
-				},
-			},
 			"id": schema.ListAttribute{
 				Description: "The ID of the insight",
 				Optional:    true,
@@ -79,6 +59,27 @@ func ListDataSourceSchema(ctx context.Context) schema.Schema {
 				Optional:    true,
 				Validators: []validator.Int64{
 					int64validator.Between(0, 100),
+				},
+			},
+			"ordering": schema.StringAttribute{
+				Description: "Sort the response by given field.\nAvailable values: \"id\", \"-id\", \"insight_type\", \"-insight_type\", \"first_seen\", \"-first_seen\", \"last_seen\", \"-last_seen\", \"last_status_change\", \"-last_status_change\", \"status\", \"-status\".",
+				Computed:    true,
+				Optional:    true,
+				Validators: []validator.String{
+					stringvalidator.OneOfCaseInsensitive(
+						"id",
+						"-id",
+						"insight_type",
+						"-insight_type",
+						"first_seen",
+						"-first_seen",
+						"last_seen",
+						"-last_seen",
+						"last_status_change",
+						"-last_status_change",
+						"status",
+						"-status",
+					),
 				},
 			},
 			"max_items": schema.Int64Attribute{
