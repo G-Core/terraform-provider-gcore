@@ -74,43 +74,8 @@ func resourceIamApiToken() *schema.Resource {
 								},
 							},
 						},
-						"deleted": {
-							Type:        schema.TypeBool,
-							Computed:    true,
-							Description: "Deletion flag. If true, then the API token was deleted.",
-						},
-						"user_id": {
-							Type:        schema.TypeInt,
-							Computed:    true,
-							Description: "User's ID who issued the API token.",
-						},
-						"user_name": {
-							Type:        schema.TypeString,
-							Computed:    true,
-							Description: "User's name who issued the API token.",
-						},
-						"user_email": {
-							Type:        schema.TypeString,
-							Computed:    true,
-							Description: "User's email who issued the API token.",
-						},
-						"client_id": {
-							Type:        schema.TypeInt,
-							Computed:    true,
-							Description: "Account's ID.",
-						},
 					},
 				},
-			},
-			"deleted": {
-				Type:        schema.TypeBool,
-				Computed:    true,
-				Description: "Deletion flag. If true, then the API token was deleted.",
-			},
-			"expired": {
-				Type:        schema.TypeBool,
-				Computed:    true,
-				Description: "Expiration flag. If true, then the API token has expired. When an API token expires it will be automatically deleted.",
 			},
 			"created": {
 				Type:        schema.TypeString,
@@ -243,52 +208,6 @@ func resourceIamApiTokenRead(ctx context.Context, d *schema.ResourceData, m inte
 	if token.LastUsage != nil {
 		d.Set("last_usage", *token.LastUsage)
 	}
-
-	if token.Deleted != nil {
-		d.Set("deleted", *token.Deleted)
-	}
-
-	if token.Expired != nil {
-		d.Set("expired", *token.Expired)
-	}
-
-	clientUserData := map[string]interface{}{}
-
-	if token.ClientUser.Deleted != nil {
-		clientUserData["deleted"] = *token.ClientUser.Deleted
-	}
-
-	if token.ClientUser.UserId != nil {
-		clientUserData["user_id"] = *token.ClientUser.UserId
-	}
-
-	if token.ClientUser.UserName != nil {
-		clientUserData["user_name"] = *token.ClientUser.UserName
-	}
-
-	if token.ClientUser.UserEmail != nil {
-		clientUserData["user_email"] = *token.ClientUser.UserEmail
-	}
-
-	if token.ClientUser.ClientId != nil {
-		clientUserData["client_id"] = *token.ClientUser.ClientId
-	}
-
-	if token.ClientUser.Role != nil {
-		roleData := map[string]interface{}{}
-
-		if token.ClientUser.Role.Id != nil {
-			roleData["id"] = *token.ClientUser.Role.Id
-		}
-
-		if token.ClientUser.Role.Name != nil {
-			roleData["name"] = string(*token.ClientUser.Role.Name)
-		}
-
-		clientUserData["role"] = []interface{}{roleData}
-	}
-
-	d.Set("client_user", []interface{}{clientUserData})
 
 	return nil
 }
