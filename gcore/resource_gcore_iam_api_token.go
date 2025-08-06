@@ -30,6 +30,7 @@ func resourceIamApiToken() *schema.Resource {
 			"token": {
 				Type:        schema.TypeString,
 				Computed:    true,
+				Sensitive:   true,
 				Description: "API token value",
 			},
 			"name": {
