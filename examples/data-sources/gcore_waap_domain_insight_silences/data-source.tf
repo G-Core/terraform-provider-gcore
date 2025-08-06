@@ -4,5 +4,4 @@ data "gcore_waap_domain_insight_silences" "example_waap_domain_insight_silences"
   author = "author"
   comment = "comment"
   insight_type = ["string", "string"]
-  ordering = "id"
 }

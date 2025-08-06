@@ -34,7 +34,7 @@ func (m *WaapDomainAdvancedRulesDataSourceModel) toListParams(_ context.Context)
 	params = waap.DomainAdvancedRuleListParams{}
 
 	if !m.Action.IsNull() {
-		params.Action = waap.WaapRuleActionType(m.Action.ValueString())
+		params.Action = waap.DomainAdvancedRuleListParamsAction(m.Action.ValueString())
 	}
 	if !m.Description.IsNull() {
 		params.Description = param.NewOpt(m.Description.ValueString())

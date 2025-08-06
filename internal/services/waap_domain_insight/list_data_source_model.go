@@ -20,11 +20,11 @@ type WaapDomainInsightsResultsListDataSourceEnvelope struct {
 type WaapDomainInsightsDataSourceModel struct {
 	DomainID    types.Int64                                                          `tfsdk:"domain_id" path:"domain_id,required"`
 	Description types.String                                                         `tfsdk:"description" query:"description,optional"`
-	Ordering    types.String                                                         `tfsdk:"ordering" query:"ordering,optional"`
 	ID          *[]types.String                                                      `tfsdk:"id" query:"id,optional"`
 	InsightType *[]types.String                                                      `tfsdk:"insight_type" query:"insight_type,optional"`
 	Status      *[]types.String                                                      `tfsdk:"status" query:"status,optional"`
 	Limit       types.Int64                                                          `tfsdk:"limit" query:"limit,computed_optional"`
+	Ordering    types.String                                                         `tfsdk:"ordering" query:"ordering,computed_optional"`
 	MaxItems    types.Int64                                                          `tfsdk:"max_items"`
 	Items       customfield.NestedObjectList[WaapDomainInsightsItemsDataSourceModel] `tfsdk:"items"`
 }
@@ -38,9 +38,9 @@ func (m *WaapDomainInsightsDataSourceModel) toListParams(_ context.Context) (par
 	for _, item := range *m.InsightType {
 		mInsightType = append(mInsightType, item.ValueString())
 	}
-	mStatus := []waap.WaapInsightStatus{}
+	mStatus := []string{}
 	for _, item := range *m.Status {
-		mStatus = append(mStatus, waap.WaapInsightStatus(item.ValueString()))
+		mStatus = append(mStatus, string(item.ValueString()))
 	}
 
 	params = waap.DomainInsightListParams{
@@ -56,7 +56,7 @@ func (m *WaapDomainInsightsDataSourceModel) toListParams(_ context.Context) (par
 		params.Limit = param.NewOpt(m.Limit.ValueInt64())
 	}
 	if !m.Ordering.IsNull() {
-		params.Ordering = waap.WaapInsightSortBy(m.Ordering.ValueString())
+		params.Ordering = waap.DomainInsightListParamsOrdering(m.Ordering.ValueString())
 	}
 
 	return
