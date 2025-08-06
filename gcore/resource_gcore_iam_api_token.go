@@ -2,6 +2,7 @@ package gcore
 
 import (
 	"context"
+	"fmt"
 	"log"
 	"net/http"
 	"strconv"
@@ -181,6 +182,16 @@ func resourceIamApiTokenRead(ctx context.Context, d *schema.ResourceData, m inte
 		return diag.Errorf("Failed to get Api Token: %v", err)
 	}
 
+	if getResp.StatusCode() == http.StatusNotFound {
+		d.SetId("")
+		return diag.Diagnostics{
+			{
+				Severity: diag.Warning,
+				Summary:  fmt.Sprintf("Token (%d) was not found, removed from TF state", tokenId),
+			},
+		}
+	}
+
 	if getResp.StatusCode() != http.StatusOK {
 		return diag.Errorf("Failed to get Api Token. Status code: %d with error: %s", getResp.StatusCode(), getResp.Body)
 	}
@@ -190,10 +201,6 @@ func resourceIamApiTokenRead(ctx context.Context, d *schema.ResourceData, m inte
 	}
 
 	token := getResp.JSON200
-
-	if token.Id != nil {
-		d.Set("token_id", *token.Id)
-	}
 
 	d.Set("name", token.Name)
 
@@ -211,6 +218,26 @@ func resourceIamApiTokenRead(ctx context.Context, d *schema.ResourceData, m inte
 
 	if token.LastUsage != nil {
 		d.Set("last_usage", *token.LastUsage)
+	}
+
+	if token.ClientUser.Role != nil {
+		roleData := map[string]interface{}{}
+
+		if token.ClientUser.Role.Id != nil {
+			roleData["id"] = *token.ClientUser.Role.Id
+		}
+
+		if token.ClientUser.Role.Name != nil {
+			roleData["name"] = string(*token.ClientUser.Role.Name)
+		}
+
+		if err := d.Set("client_user", []interface{}{
+			map[string]interface{}{
+				"role": []interface{}{roleData},
+			},
+		}); err != nil {
+			return diag.FromErr(err)
+		}
 	}
 
 	return nil
