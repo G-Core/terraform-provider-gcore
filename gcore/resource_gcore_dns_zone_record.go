@@ -509,7 +509,7 @@ func resourceDNSZoneRecordRead(ctx context.Context, d *schema.ResourceData, m in
 	config := m.(*Config)
 	client := config.DNSClient
 
-	result, err := client.RRSet(ctx, zone, domain, rType)
+	result, err := client.RRSet(ctx, zone, domain, rType, 0, 0)
 	if err != nil {
 		return diag.FromErr(fmt.Errorf("get zone rrset: %w", err))
 	}

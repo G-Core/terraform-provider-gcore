@@ -23,18 +23,18 @@ func resourceCDNCert() *schema.Resource {
 				Description: "Name of the SSL certificate. Must be unique.",
 			},
 			"cert": {
-				Type:        schema.TypeString,
-				Optional:    true,
-				Sensitive:   true,
-				ForceNew:    true,
-				Description: "The public part of the SSL certificate. All chain of the SSL certificate should be added.",
+				Type:         schema.TypeString,
+				Optional:     true,
+				RequiredWith: []string{"private_key"},
+				Sensitive:    true,
+				Description:  "The public part of the SSL certificate. All chain of the SSL certificate should be added.",
 			},
 			"private_key": {
-				Type:        schema.TypeString,
-				Optional:    true,
-				Sensitive:   true,
-				ForceNew:    true,
-				Description: "The private key of the SSL certificate.",
+				Type:         schema.TypeString,
+				Optional:     true,
+				RequiredWith: []string{"cert"},
+				Sensitive:    true,
+				Description:  "The private key of the SSL certificate.",
 			},
 			"has_related_resources": {
 				Type:        schema.TypeBool,
@@ -126,8 +126,22 @@ func resourceCDNCertUpdate(ctx context.Context, d *schema.ResourceData, m interf
 
 	var req sslcerts.UpdateRequest
 	req.Name = d.Get("name").(string)
+	req.ValidateRootCA = d.Get("validate_root_ca").(bool)
+
+	if d.HasChange("cert") || d.HasChange("private_key") {
+		req.Cert = d.Get("cert").(string)
+		req.PrivateKey = d.Get("private_key").(string)
+	}
 
 	if _, err := client.SSLCerts().Update(ctx, id, &req); err != nil {
+		// Restore previous cert and private_key values on error
+		if d.HasChange("cert") || d.HasChange("private_key") {
+			prevCert, _ := d.GetChange("cert")
+			prevKey, _ := d.GetChange("private_key")
+			d.Set("cert", prevCert)
+			d.Set("private_key", prevKey)
+		}
+
 		return diag.FromErr(err)
 	}
 
