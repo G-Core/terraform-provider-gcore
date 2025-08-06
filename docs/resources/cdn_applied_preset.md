@@ -59,6 +59,8 @@ resource "gcore_cdn_applied_preset" "demo_preset" {
 
 Import is supported using the following syntax:
 
+The [`terraform import` command](https://developer.hashicorp.com/terraform/cli/commands/import) can be used, for example:
+
 ```shell
 # import using <preset_id>:<object_id>
 terraform import gcore_cdn_applied_preset.demo_preset 52:123456

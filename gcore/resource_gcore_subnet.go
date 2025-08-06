@@ -348,9 +348,7 @@ func resourceSubnetRead(ctx context.Context, d *schema.ResourceData, m interface
 	d.Set("project_id", subnet.ProjectID)
 	d.Set("gateway_ip", subnet.GatewayIP.String())
 
-	fields := []string{"connect_to_network_router"}
-	revertState(d, &fields)
-
+	d.Set("connect_to_network_router", true)
 	if subnet.GatewayIP == nil {
 		d.Set("connect_to_network_router", false)
 		d.Set("gateway_ip", "disable")
@@ -428,6 +426,10 @@ func resourceSubnetUpdate(ctx context.Context, d *schema.ResourceData, m interfa
 			gateway_ip := net.ParseIP(newValue.(string))
 			updateOpts.GatewayIP = &gateway_ip
 		}
+	} else {
+		oldValueToKeep := d.Get("gateway_ip").(string)
+		gateway_ip := net.ParseIP(oldValueToKeep)
+		updateOpts.GatewayIP = &gateway_ip
 	}
 
 	_, err = subnets.Update(client, subnetID, updateOpts).Extract()

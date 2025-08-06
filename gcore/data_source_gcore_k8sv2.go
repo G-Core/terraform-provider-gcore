@@ -194,6 +194,29 @@ func dataSourceK8sV2() *schema.Resource {
 					},
 				},
 			},
+			"csi": {
+				Type:        schema.TypeList,
+				Description: "Container Storage Interface (CSI) driver settings.",
+				Computed:    true,
+				Elem: &schema.Resource{
+					Schema: map[string]*schema.Schema{
+						"nfs": {
+							Type:        schema.TypeList,
+							Description: "NFS CSI driver settings.",
+							Computed:    true,
+							Elem: &schema.Resource{
+								Schema: map[string]*schema.Schema{
+									"vast_enabled": {
+										Type:        schema.TypeBool,
+										Description: "Indicates the status of VAST NFS integration.",
+										Computed:    true,
+									},
+								},
+							},
+						},
+					},
+				},
+			},
 			"ddos_profile": {
 				Type:        schema.TypeList,
 				Description: "DDoS profile configuration.",
@@ -501,6 +524,18 @@ func dataSourceK8sV2Read(ctx context.Context, d *schema.ResourceData, m interfac
 			}}
 		}
 		if err := d.Set("cni", []interface{}{v}); err != nil {
+			return diag.FromErr(err)
+		}
+	}
+
+	if cluster.CSI != nil {
+		v := map[string]interface{}{}
+		if cluster.CSI.NFS != nil {
+			v["nfs"] = []map[string]interface{}{{
+				"vast_enabled": cluster.CSI.NFS.VASTEnabled,
+			}}
+		}
+		if err := d.Set("csi", []interface{}{v}); err != nil {
 			return diag.FromErr(err)
 		}
 	}
