@@ -1,6 +1,7 @@
 package gcore
 
 import (
+	"bytes"
 	"context"
 	"errors"
 	"fmt"
@@ -503,6 +504,13 @@ func resourceAICluster() *schema.Resource {
 			},
 		},
 	}
+}
+
+func aiSgHashID(i interface{}) int {
+	var buf bytes.Buffer
+	sg := i.(map[string]interface{})
+	buf.WriteString(sg["id"].(string))
+	return schema.HashString(buf.String())
 }
 
 func extractAIClusterInterfacesMap(interfaces []interface{}) ([]instances.InterfaceInstanceCreateOpts, error) {
