@@ -12,7 +12,6 @@ import (
 	ai "github.com/G-Core/gcorelabscloud-go/gcore/ai/v1/ais"
 	"github.com/G-Core/gcorelabscloud-go/gcore/instance/v1/instances"
 	"github.com/G-Core/gcorelabscloud-go/gcore/instance/v1/types"
-	"github.com/G-Core/gcorelabscloud-go/gcore/securitygroup/v1/securitygroups"
 	"github.com/G-Core/gcorelabscloud-go/gcore/volume/v1/volumes"
 	"github.com/hashicorp/go-cty/cty"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
@@ -236,12 +235,12 @@ func dataSourceAICluster() *schema.Resource {
 				Type:        schema.TypeSet,
 				Description: "Security groups attached to the cluster",
 				Computed:    true,
-				Set:         aiSgHashName,
+				Set:         aiSgHashID,
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
-						"name": {
+						"id": {
 							Type:        schema.TypeString,
-							Description: "Security group name",
+							Description: "Security group ID",
 							Computed:    true,
 						},
 					},
@@ -441,10 +440,10 @@ func dataSourceAICluster() *schema.Resource {
 	}
 }
 
-func aiSgHashName(i interface{}) int {
+func aiSgHashID(i interface{}) int {
 	var buf bytes.Buffer
 	sg := i.(map[string]interface{})
-	buf.WriteString(sg["name"].(string))
+	buf.WriteString(sg["id"].(string))
 	return schema.HashString(buf.String())
 }
 
@@ -484,32 +483,17 @@ func aiVolumeHash(i interface{}) int {
 	return schema.HashString(buf.String())
 }
 
-func flattenSecurityGroup(securityGroups []ai.PoplarInterfaceSecGrop, provider *gcorecloud.ProviderClient, d *schema.ResourceData) ([]interface{}, error) {
+func flattenSecurityGroup(securityGroups []ai.PoplarInterfaceSecGrop) []interface{} {
 	if len(securityGroups) == 0 {
-		return nil, nil
+		return nil
 	}
-
-	// Create security group client to fetch names
-	sgClient, err := CreateClient(provider, d, securityGroupPoint, versionPointV1)
-	if err != nil {
-		return nil, err
-	}
-
-	sgList := make([]interface{}, 0, len(securityGroups[0].SecurityGroups))
-	for _, sgID := range securityGroups[0].SecurityGroups {
-		// Get security group details to fetch the name
-		sg, err := securitygroups.Get(sgClient, sgID).Extract()
-		if err != nil {
-			log.Printf("[WARNING] Cannot get security group %s: %v", sgID, err)
-			// Skip this security group if we can't fetch its details
-			continue
-		}
-
+	sgIDs := make([]interface{}, len(securityGroups[0].SecurityGroups))
+	for index, sgID := range securityGroups[0].SecurityGroups {
 		sgMap := make(map[string]interface{})
-		sgMap["name"] = sg.Name
-		sgList = append(sgList, sgMap)
+		sgMap["id"] = sgID
+		sgIDs[index] = sgMap
 	}
-	return sgList, nil
+	return sgIDs
 }
 
 func flattenInterfaces(interfaces []ai.AIClusterInterface) []map[string]interface{} {
@@ -660,11 +644,7 @@ func setAIClusterResourcerData(d *schema.ResourceData, provider *gcorecloud.Prov
 	d.Set("username", cluster.Username)
 	d.Set("keypair_name", cluster.KeypairName)
 	d.Set("user_data", cluster.UserData)
-	securityGroups, err := flattenSecurityGroup(cluster.SecurityGroups, provider, d)
-	if err != nil {
-		return err
-	}
-	d.Set("security_group", securityGroups)
+	d.Set("security_group", flattenSecurityGroup(cluster.SecurityGroups))
 	client, err := CreateClient(provider, d, AIClusterPoint, versionPointV1)
 	if err != nil {
 		return err

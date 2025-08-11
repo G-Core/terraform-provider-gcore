@@ -1,19 +1,17 @@
 package gcore
 
 import (
-	"bytes"
 	"context"
 	"errors"
 	"fmt"
 	"log"
 	"strings"
-	"time"
 
 	gcorecloud "github.com/G-Core/gcorelabscloud-go"
 	ai "github.com/G-Core/gcorelabscloud-go/gcore/ai/v1/ais"
+	gpuclusters "github.com/G-Core/gcorelabscloud-go/gcore/gpu/v3/clusters"
 	"github.com/G-Core/gcorelabscloud-go/gcore/instance/v1/instances"
 	"github.com/G-Core/gcorelabscloud-go/gcore/instance/v1/types"
-	"github.com/G-Core/gcorelabscloud-go/gcore/securitygroup/v1/securitygroups"
 	"github.com/G-Core/gcorelabscloud-go/gcore/task/v1/tasks"
 	"github.com/G-Core/gcorelabscloud-go/gcore/utils/metadata/v1/metadata"
 	"github.com/G-Core/gcorelabscloud-go/gcore/volume/v1/volumes"
@@ -119,6 +117,7 @@ func resourceAICluster() *schema.Resource {
 				Type:        schema.TypeInt,
 				Description: "Number of servers in the GPU cluster",
 				Optional:    true,
+				ForceNew:    true,
 			},
 			"cluster_status": {
 				Type:        schema.TypeString,
@@ -150,11 +149,13 @@ func resourceAICluster() *schema.Resource {
 				Type:        schema.TypeString,
 				Description: "Flavor ID (name)",
 				Required:    true,
+				ForceNew:    true,
 			},
 			"image_id": {
 				Type:        schema.TypeString,
 				Description: "Image ID",
 				Required:    true,
+				ForceNew:    true,
 			},
 			"image_name": {
 				Type:        schema.TypeString,
@@ -165,6 +166,7 @@ func resourceAICluster() *schema.Resource {
 				Type:        schema.TypeSet,
 				Description: "List of volumes attached to the cluster",
 				Optional:    true,
+				ForceNew:    true,
 				Set:         aiVolumeHash,
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
@@ -284,6 +286,7 @@ func resourceAICluster() *schema.Resource {
 				Type:        schema.TypeSet,
 				Description: "Security groups attached to the cluster",
 				Optional:    true,
+				ForceNew:    true,
 				Set:         aiSgHashID,
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
@@ -300,6 +303,7 @@ func resourceAICluster() *schema.Resource {
 				Type:        schema.TypeList,
 				Description: "Networks managed by user and associated with the cluster",
 				Required:    true,
+				ForceNew:    true,
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
 						"type": {
@@ -337,23 +341,27 @@ func resourceAICluster() *schema.Resource {
 				Type:        schema.TypeString,
 				Description: "The name of the SSH keypair to use for the GPU servers",
 				Optional:    true,
+				ForceNew:    true,
 			},
 			"user_data": {
 				Type:        schema.TypeString,
 				Description: "User data string in base64 format. This is passed to the instance at launch. For Linux instances, 'user_data' is ignored when 'password' field is provided. For Windows instances, Admin user password is set by 'password' field and cannot be updated via 'user_data'",
 				Optional:    true,
+				ForceNew:    true,
 				Computed:    true,
 			},
 			"username": {
 				Type:        schema.TypeString,
 				Description: "A name of a new user in the Linux instance. It may be passed with a 'password' parameter",
 				Optional:    true,
+				ForceNew:    true,
 				Computed:    true,
 			},
 			"password": {
 				Type:        schema.TypeString,
 				Description: "A password for servers in GPU cluster. This parameter is used to set a password for the Admin user on a Windows instance, a default user or a new user on a Linux instance",
 				Optional:    true,
+				ForceNew:    true,
 				Computed:    true,
 			},
 			"cluster_metadata": {
@@ -504,13 +512,6 @@ func resourceAICluster() *schema.Resource {
 			},
 		},
 	}
-}
-
-func aiSgHashID(i interface{}) int {
-	var buf bytes.Buffer
-	sg := i.(map[string]interface{})
-	buf.WriteString(sg["id"].(string))
-	return schema.HashString(buf.String())
 }
 
 func extractAIClusterInterfacesMap(interfaces []interface{}) ([]instances.InterfaceInstanceCreateOpts, error) {
@@ -804,14 +805,6 @@ func resourceAIClusterUpdate(ctx context.Context, d *schema.ResourceData, m inte
 	log.Println("[DEBUG] Start AI cluster updating")
 	config := m.(*Config)
 	provider := config.Provider
-	clientV1, err := CreateClient(provider, d, AIClusterPoint, versionPointV1)
-	if err != nil {
-		return diag.FromErr(err)
-	}
-	clientV1GPU, err := CreateClient(provider, d, AIClusterGPUPoint, versionPointV1)
-	if err != nil {
-		return diag.FromErr(err)
-	}
 	clientV2, err := CreateClient(provider, d, AIClusterPoint, versionPointV2)
 	if err != nil {
 		return diag.FromErr(err)
@@ -826,6 +819,10 @@ func resourceAIClusterUpdate(ctx context.Context, d *schema.ResourceData, m inte
 		newStatus := strings.ToTitle(d.Get("cluster_status").(string))
 		switch newStatus {
 		case SuspendedStatus:
+			clientV1, err := CreateClient(provider, d, AIClusterPoint, versionPointV1)
+			if err != nil {
+				return diag.FromErr(err)
+			}
 			results, err := ai.Suspend(clientV1, clusterID).Extract()
 			if err != nil {
 				return diag.FromErr(err)
@@ -843,6 +840,10 @@ func resourceAIClusterUpdate(ctx context.Context, d *schema.ResourceData, m inte
 				return diag.FromErr(err)
 			}
 		case ActiveStatus:
+			clientV1, err := CreateClient(provider, d, AIClusterPoint, versionPointV1)
+			if err != nil {
+				return diag.FromErr(err)
+			}
 			results, err := ai.Resume(clientV1, clusterID).Extract()
 			if err != nil {
 				return diag.FromErr(err)
@@ -862,44 +863,7 @@ func resourceAIClusterUpdate(ctx context.Context, d *schema.ResourceData, m inte
 		}
 	}
 
-	// Make resize
-	if d.HasChanges("instances_count") {
-		IsResize = true
-		_, newSGs := d.GetChange("security_group")
-		securityGroupList := newSGs.(*schema.Set).List()
-		securityGroupIDs := make([]gcorecloud.ItemID, len(securityGroupList))
-		for sgIndex, sgID := range securityGroupList {
-			securityGroupIDs[sgIndex] = gcorecloud.ItemID{ID: sgID.(map[string]interface{})["id"].(string)}
-		}
-
-		instancesCount, ok := d.GetOk("instances_count")
-		if !ok || instancesCount.(int) == 0 {
-			// if the number of instances has been specified before, then it cannot be removed or set to 0
-			return diag.FromErr(errors.New("cannot resize cluster to 0 instances"))
-		}
-
-		resizeOpts := ai.ResizeGPUAIClusterOpts{
-			InstancesCount: instancesCount.(int),
-		}
-		log.Printf("[DEBUG] AI cluster resize options: %+v", resizeOpts)
-		results, err := ai.Resize(clientV1GPU, clusterID, resizeOpts).Extract()
-		if err != nil {
-			return diag.FromErr(err)
-		}
-		taskClient, err := CreateClient(provider, d, TaskPoint, versionPointV1)
-		if err != nil {
-			return diag.FromErr(err)
-		}
-		taskID := results.Tasks[0]
-		log.Printf("[DEBUG] resize ai cluster task id (%s)", taskID)
-
-		_, err = tasks.WaitTaskAndReturnResult(taskClient, taskID, true, AIClusterCreatingTimeout, func(task tasks.TaskID) (interface{}, error) {
-			return nil, nil
-		})
-		if err != nil {
-			return diag.FromErr(err)
-		}
-	}
+	// Resize no longer supported: require replacement (ForceNew)
 	if d.HasChange("volume") && !IsResize {
 		oldVolumes, newVolumes := d.GetChange("volume")
 		oldVolumeList := extractInstanceVolumesMap(oldVolumes.(*schema.Set).List())
@@ -929,7 +893,11 @@ func resourceAIClusterUpdate(ctx context.Context, d *schema.ResourceData, m inte
 			}
 
 			taskID := results.Tasks[0]
-			if err := waitInstanceOperation(clientV1, taskID); err != nil {
+			clientV1Local, err := CreateClient(provider, d, AIClusterPoint, versionPointV1)
+			if err != nil {
+				return diag.FromErr(err)
+			}
+			if err := waitInstanceOperation(clientV1Local, taskID); err != nil {
 				return diag.FromErr(err)
 			}
 		}
@@ -943,7 +911,11 @@ func resourceAIClusterUpdate(ctx context.Context, d *schema.ResourceData, m inte
 				}
 
 				taskID := results.Tasks[0]
-				if err := waitInstanceOperation(clientV1, taskID); err != nil {
+				clientV1Local, err := CreateClient(provider, d, AIClusterPoint, versionPointV1)
+				if err != nil {
+					return diag.FromErr(err)
+				}
+				if err := waitInstanceOperation(clientV1Local, taskID); err != nil {
 					return diag.FromErr(err)
 				}
 			}
@@ -965,7 +937,11 @@ func resourceAIClusterUpdate(ctx context.Context, d *schema.ResourceData, m inte
 				poplarInstances := d.Get("poplar_servers").([]interface{})
 				for _, instance := range poplarInstances {
 					instanceID := instance.(map[string]interface{})["instance_id"].(string)
-					results, err := ai.AttachAIInstanceInterface(clientV1, instanceID, newIface).Extract()
+					clientV1Local, err := CreateClient(provider, d, AIClusterPoint, versionPointV1)
+					if err != nil {
+						return diag.FromErr(err)
+					}
+					results, err := ai.AttachAIInstanceInterface(clientV1Local, instanceID, newIface).Extract()
 					if err != nil {
 						return diag.FromErr(err)
 					}
@@ -999,7 +975,11 @@ func resourceAIClusterUpdate(ctx context.Context, d *schema.ResourceData, m inte
 						return diag.FromErr(err)
 					}
 
-					results, err := ai.DetachAIInstanceInterface(clientV1, instanceID, detachOpts).Extract()
+					clientV1Local, err := CreateClient(provider, d, AIClusterPoint, versionPointV1)
+					if err != nil {
+						return diag.FromErr(err)
+					}
+					results, err := ai.DetachAIInstanceInterface(clientV1Local, instanceID, detachOpts).Extract()
 					if err != nil {
 						return diag.FromErr(err)
 					}
@@ -1018,61 +998,8 @@ func resourceAIClusterUpdate(ctx context.Context, d *schema.ResourceData, m inte
 	}
 
 	if d.HasChange("security_group") && !IsResize {
-		sgClient, err := CreateClient(provider, d, securityGroupPoint, versionPointV1)
-		if err != nil {
-			return diag.FromErr(err)
-		}
-		oldSecGroups, newSecGroups := d.GetChange("security_group")
-		newSecGroupSet := newSecGroups.(*schema.Set)
-		oldSecGroupSet := oldSecGroups.(*schema.Set)
-		for _, addSG := range newSecGroupSet.Difference(oldSecGroupSet).List() {
-			sgID := addSG.(map[string]interface{})["id"].(string)
-			result, err := securitygroups.Get(sgClient, sgID).Extract()
-			if err != nil {
-				return diag.FromErr(err)
-			}
-			opts := instances.SecurityGroupOpts{Name: result.Name}
-			log.Printf("[DEBUG] assing to ai cluster sg ID %v, name %v", sgID, result.Name)
-			err = ai.AssignSecurityGroup(clientV1, clusterID, opts).ExtractErr()
-			if err != nil {
-				return diag.FromErr(fmt.Errorf("assign security group ID %v: %w", sgID, err))
-			}
-			stopWaitConf := retry.StateChangeConf{
-				Target:     []string{SgStateAssigned},
-				Refresh:    AICluserSgRefreshedFunc(clientV1, clusterID, sgID),
-				Timeout:    3 * time.Minute,
-				Delay:      10 * time.Second,
-				MinTimeout: 5 * time.Second,
-			}
-			_, err = stopWaitConf.WaitForStateContext(ctx)
-			if err != nil {
-				return diag.Errorf("Error waiting for sg (%s) assigned): %s", sgID, err)
-			}
-		}
-		for _, delSG := range oldSecGroupSet.Difference(newSecGroupSet).List() {
-			sgID := delSG.(map[string]interface{})["id"].(string)
-			result, err := securitygroups.Get(sgClient, sgID).Extract()
-			if err != nil {
-				return diag.FromErr(err)
-			}
-			opts := instances.SecurityGroupOpts{Name: result.Name}
-			log.Printf("[DEBUG] unassing from ai cluster sg ID %v, name %v", sgID, result.Name)
-			err = ai.UnAssignSecurityGroup(clientV1, clusterID, opts).ExtractErr()
-			if err != nil {
-				return diag.FromErr(fmt.Errorf("unassign security group %v: %w", sgID, err))
-			}
-			stopWaitConf := retry.StateChangeConf{
-				Target:     []string{SgStateUnassigned},
-				Refresh:    AICluserSgRefreshedFunc(clientV1, clusterID, sgID),
-				Timeout:    3 * time.Minute,
-				Delay:      10 * time.Second,
-				MinTimeout: 5 * time.Second,
-			}
-			_, err = stopWaitConf.WaitForStateContext(ctx)
-			if err != nil {
-				return diag.Errorf("Error waiting for sg (%s) unassigned): %s", sgID, err)
-			}
-		}
+		// deprecated: SG updates not supported anymore; require replacement
+		return diag.FromErr(errors.New("security_group updates are not supported; change will recreate the cluster"))
 	}
 
 	if d.HasChange("cluster_metadata") && !IsResize {
@@ -1087,36 +1014,18 @@ func resourceAIClusterUpdate(ctx context.Context, d *schema.ResourceData, m inte
 		}
 	}
 
-	// if only the image_id has changed, then we need to rebuild the cluster
-	if d.HasChange("image_id") && !d.HasChangesExcept("image_id") {
-		_, newImageID := d.GetChange("image_id")
-		cluster, err := ai.Get(clientV2, clusterID).Extract()
+	// image change requires replacement (ForceNew). If only name changed for a virtual cluster, rename.
+	if d.HasChange("cluster_name") && d.Get("flavor").(string) != "baremetal" {
+		// virtual cluster: use gpu/v3 rename
+		gpuClient, err := CreateClient(provider, d, AIClusterGPUPoint, versionPointV1)
 		if err != nil {
 			return diag.FromErr(err)
 		}
-		var nodesIDs []string
-		for _, instance := range cluster.PoplarServer {
-			nodesIDs = append(nodesIDs, instance.ID)
-		}
-		rebuildOpts := ai.RebuildGPUAIClusterOpts{ImageID: newImageID.(string), Nodes: nodesIDs}
-
-		log.Printf("[DEBUG] GPU cluster rebuild options: %+v", rebuildOpts)
-		results, err := ai.RebuildGPUAICluster(clientV1GPU, clusterID, rebuildOpts).Extract()
-		if err != nil {
-			return diag.FromErr(err)
-		}
-		taskClient, err := CreateClient(provider, d, TaskPoint, versionPointV1)
-		if err != nil {
-			return diag.FromErr(err)
-		}
-		taskID := results.Tasks[0]
-		log.Printf("[DEBUG] GPU cluster task_id (%s)", taskID)
-
-		_, err = tasks.WaitTaskAndReturnResult(taskClient, taskID, true, AIClusterCreatingTimeout, func(task tasks.TaskID) (interface{}, error) {
-			return nil, nil
-		})
-		if err != nil {
-			return diag.FromErr(err)
+		_, newName := d.GetChange("cluster_name")
+		renameOpts := gpuclusters.RenameClusterOpts{Name: newName.(string)}
+		res := gpuclusters.Rename(gpuClient, clusterID, renameOpts)
+		if res.Err != nil {
+			return diag.FromErr(fmt.Errorf("rename gpu ai cluster: %w", res.Err))
 		}
 	}
 
@@ -1169,6 +1078,8 @@ func resourceAIClusterDelete(ctx context.Context, d *schema.ResourceData, m inte
 	log.Printf("[DEBUG] Finish of AI cluster deletion")
 	return diags
 }
+
+// assignAIClusterSecurityGroupWithRetry removed: cluster-level only logic now used inline
 
 // ServerV2StateRefreshFunc returns a resource.StateRefreshFunc that is used to watch
 // a gcorecloud instance.
