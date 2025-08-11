@@ -644,11 +644,30 @@ func setAIClusterResourcerData(d *schema.ResourceData, provider *gcorecloud.Prov
 	d.Set("username", cluster.Username)
 	d.Set("keypair_name", cluster.KeypairName)
 	d.Set("user_data", cluster.UserData)
-	d.Set("security_group", flattenSecurityGroup(cluster.SecurityGroups))
+	// Populate security_group from ports to ensure IDs are stored in state
 	client, err := CreateClient(provider, d, AIClusterPoint, versionPointV1)
 	if err != nil {
 		return err
 	}
+	ports, err := ai.ListPortsAll(client, cluster.ClusterID)
+	if err != nil {
+		return err
+	}
+	sgSet := make(map[string]struct{})
+	for _, port := range ports {
+		for _, sg := range port.SecurityGroups {
+			if sg.ID != "" {
+				sgSet[sg.ID] = struct{}{}
+			}
+		}
+	}
+	sgList := make([]interface{}, 0, len(sgSet))
+	for id := range sgSet {
+		m := make(map[string]interface{})
+		m["id"] = id
+		sgList = append(sgList, m)
+	}
+	d.Set("security_group", sgList)
 	clusterInterfaces, err := ai.ListInterfacesAll(client, cluster.ClusterID)
 	if err != nil {
 		return err
