@@ -483,19 +483,6 @@ func aiVolumeHash(i interface{}) int {
 	return schema.HashString(buf.String())
 }
 
-func flattenSecurityGroup(securityGroups []ai.PoplarInterfaceSecGrop) []interface{} {
-	if len(securityGroups) == 0 {
-		return nil
-	}
-	sgIDs := make([]interface{}, len(securityGroups[0].SecurityGroups))
-	for index, sgID := range securityGroups[0].SecurityGroups {
-		sgMap := make(map[string]interface{})
-		sgMap["id"] = sgID
-		sgIDs[index] = sgMap
-	}
-	return sgIDs
-}
-
 func flattenInterfaces(interfaces []ai.AIClusterInterface) []map[string]interface{} {
 	clusterInterfaces := make([]map[string]interface{}, len(interfaces))
 	for index, iface := range interfaces {
