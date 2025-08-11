@@ -15,5 +15,6 @@ resource "gcore_cloud_file_share" "example_cloud_file_share" {
   tags = {
     my-tag = "my-tag-value"
   }
+  type_name = "standard"
   volume_type = "default_share_type"
 }

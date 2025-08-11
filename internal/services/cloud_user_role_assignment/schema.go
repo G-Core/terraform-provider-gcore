@@ -6,10 +6,12 @@ import (
 	"context"
 
 	"github.com/hashicorp/terraform-plugin-framework-timetypes/timetypes"
+	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/int64planmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
+	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
 )
 
 var _ resource.ResourceWithConfigValidators = (*CloudUserRoleAssignmentResource)(nil)
@@ -23,8 +25,17 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 				PlanModifiers: []planmodifier.Int64{int64planmodifier.UseStateForUnknown()},
 			},
 			"role": schema.StringAttribute{
-				Description: "User role",
+				Description: "User role\nAvailable values: \"ClientAdministrator\", \"InternalNetworkOnlyUser\", \"Observer\", \"ProjectAdministrator\", \"User\".",
 				Required:    true,
+				Validators: []validator.String{
+					stringvalidator.OneOfCaseInsensitive(
+						"ClientAdministrator",
+						"InternalNetworkOnlyUser",
+						"Observer",
+						"ProjectAdministrator",
+						"User",
+					),
+				},
 			},
 			"user_id": schema.Int64Attribute{
 				Description: "User ID",

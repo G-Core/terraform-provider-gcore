@@ -7,6 +7,7 @@ import (
 
 	"github.com/hashicorp/terraform-plugin-framework-timetypes/timetypes"
 	"github.com/hashicorp/terraform-plugin-framework-validators/int64validator"
+	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/datasource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
@@ -68,8 +69,17 @@ func ListDataSourceSchema(ctx context.Context) schema.Schema {
 							Computed:    true,
 						},
 						"role": schema.StringAttribute{
-							Description: "User role",
+							Description: "User role\nAvailable values: \"ClientAdministrator\", \"InternalNetworkOnlyUser\", \"Observer\", \"ProjectAdministrator\", \"User\".",
 							Computed:    true,
+							Validators: []validator.String{
+								stringvalidator.OneOfCaseInsensitive(
+									"ClientAdministrator",
+									"InternalNetworkOnlyUser",
+									"Observer",
+									"ProjectAdministrator",
+									"User",
+								),
+							},
 						},
 						"updated_at": schema.StringAttribute{
 							Description: "Updated timestamp",

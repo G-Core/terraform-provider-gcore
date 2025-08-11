@@ -14,8 +14,9 @@ type CloudFileShareModel struct {
 	RegionID         types.Int64                                                `tfsdk:"region_id" path:"region_id,optional"`
 	Protocol         types.String                                               `tfsdk:"protocol" json:"protocol,required"`
 	Size             types.Int64                                                `tfsdk:"size" json:"size,required"`
-	VolumeType       types.String                                               `tfsdk:"volume_type" json:"volume_type,optional"`
 	Network          *CloudFileShareNetworkModel                                `tfsdk:"network" json:"network,optional,no_refresh"`
+	TypeName         types.String                                               `tfsdk:"type_name" json:"type_name,computed_optional"`
+	VolumeType       types.String                                               `tfsdk:"volume_type" json:"volume_type,computed_optional"`
 	Access           customfield.NestedObjectList[CloudFileShareAccessModel]    `tfsdk:"access" json:"access,computed_optional,no_refresh"`
 	ShareSettings    customfield.NestedObject[CloudFileShareShareSettingsModel] `tfsdk:"share_settings" json:"share_settings,computed_optional"`
 	Name             types.String                                               `tfsdk:"name" json:"name,required"`
@@ -32,7 +33,6 @@ type CloudFileShareModel struct {
 	SubnetID         types.String                                               `tfsdk:"subnet_id" json:"subnet_id,computed"`
 	SubnetName       types.String                                               `tfsdk:"subnet_name" json:"subnet_name,computed"`
 	TaskID           types.String                                               `tfsdk:"task_id" json:"task_id,computed"`
-	TypeName         types.String                                               `tfsdk:"type_name" json:"type_name,computed"`
 	Tasks            customfield.List[types.String]                             `tfsdk:"tasks" json:"tasks,computed,no_refresh"`
 }
 
