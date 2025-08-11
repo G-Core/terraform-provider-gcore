@@ -178,127 +178,152 @@ func ListDataSourceSchema(ctx context.Context) schema.Schema {
 							CustomType:  customfield.NewNestedObjectType[CloudLoadBalancersDDOSProfileDataSourceModel](ctx),
 							Attributes: map[string]schema.Attribute{
 								"id": schema.Int64Attribute{
-									Description: "DDoS protection profile ID",
+									Description: "Unique identifier for the DDoS protection profile",
 									Computed:    true,
-								},
-								"profile_template": schema.SingleNestedAttribute{
-									Description: "Template data",
-									Computed:    true,
-									CustomType:  customfield.NewNestedObjectType[CloudLoadBalancersDDOSProfileProfileTemplateDataSourceModel](ctx),
-									Attributes: map[string]schema.Attribute{
-										"id": schema.Int64Attribute{
-											Computed: true,
-										},
-										"name": schema.StringAttribute{
-											Computed: true,
-										},
-										"description": schema.StringAttribute{
-											Computed: true,
-										},
-										"fields": schema.ListNestedAttribute{
-											Computed:   true,
-											CustomType: customfield.NewNestedObjectListType[CloudLoadBalancersDDOSProfileProfileTemplateFieldsDataSourceModel](ctx),
-											NestedObject: schema.NestedAttributeObject{
-												Attributes: map[string]schema.Attribute{
-													"id": schema.Int64Attribute{
-														Computed: true,
-													},
-													"name": schema.StringAttribute{
-														Computed: true,
-													},
-													"default": schema.StringAttribute{
-														Computed: true,
-													},
-													"description": schema.StringAttribute{
-														Computed: true,
-													},
-													"field_type": schema.StringAttribute{
-														Computed: true,
-													},
-													"required": schema.BoolAttribute{
-														Computed: true,
-													},
-													"validation_schema": schema.StringAttribute{
-														Computed:   true,
-														CustomType: jsontypes.NormalizedType{},
-													},
-												},
-											},
-										},
-									},
 								},
 								"fields": schema.ListNestedAttribute{
-									Computed:   true,
-									CustomType: customfield.NewNestedObjectListType[CloudLoadBalancersDDOSProfileFieldsDataSourceModel](ctx),
+									Description: "List of configured field values for the protection profile",
+									Computed:    true,
+									CustomType:  customfield.NewNestedObjectListType[CloudLoadBalancersDDOSProfileFieldsDataSourceModel](ctx),
 									NestedObject: schema.NestedAttributeObject{
 										Attributes: map[string]schema.Attribute{
 											"id": schema.Int64Attribute{
-												Computed: true,
-											},
-											"default": schema.StringAttribute{
-												Computed:   true,
-												CustomType: jsontypes.NormalizedType{},
-											},
-											"description": schema.StringAttribute{
-												Computed: true,
-											},
-											"field_value": schema.StringAttribute{
-												Computed:   true,
-												CustomType: jsontypes.NormalizedType{},
-											},
-											"name": schema.StringAttribute{
-												Computed: true,
+												Description: "Unique identifier for the DDoS protection field",
+												Computed:    true,
 											},
 											"base_field": schema.Int64Attribute{
-												Computed: true,
+												Description: "ID of DDoS profile field",
+												Computed:    true,
+											},
+											"default": schema.StringAttribute{
+												Description: "Predefined default value for the field if not specified",
+												Computed:    true,
+											},
+											"description": schema.StringAttribute{
+												Description: "Detailed description explaining the field's purpose and usage guidelines",
+												Computed:    true,
 											},
 											"field_name": schema.StringAttribute{
-												Computed: true,
+												Description: "Name of DDoS profile field",
+												Computed:    true,
 											},
 											"field_type": schema.StringAttribute{
-												Computed: true,
+												Description: "Data type classification of the field (e.g., string, integer, array)",
+												Computed:    true,
+											},
+											"field_value": schema.StringAttribute{
+												Description: "Complex value. Only one of 'value' or '`field_value`' must be specified.",
+												Computed:    true,
+												CustomType:  jsontypes.NormalizedType{},
+											},
+											"name": schema.StringAttribute{
+												Description: "Human-readable name of the protection field",
+												Computed:    true,
 											},
 											"required": schema.BoolAttribute{
-												Computed: true,
+												Description: "Indicates whether this field must be provided when creating a protection profile",
+												Computed:    true,
 											},
 											"validation_schema": schema.StringAttribute{
-												Computed:   true,
-												CustomType: jsontypes.NormalizedType{},
+												Description: "JSON schema defining validation rules and constraints for the field value",
+												Computed:    true,
+												CustomType:  jsontypes.NormalizedType{},
 											},
 											"value": schema.StringAttribute{
-												Computed: true,
+												Description: "Basic type value. Only one of 'value' or '`field_value`' must be specified.",
+												Computed:    true,
 											},
 										},
 									},
 								},
 								"options": schema.SingleNestedAttribute{
-									Computed:   true,
-									CustomType: customfield.NewNestedObjectType[CloudLoadBalancersDDOSProfileOptionsDataSourceModel](ctx),
+									Description: "Configuration options controlling profile activation and BGP routing",
+									Computed:    true,
+									CustomType:  customfield.NewNestedObjectType[CloudLoadBalancersDDOSProfileOptionsDataSourceModel](ctx),
 									Attributes: map[string]schema.Attribute{
 										"active": schema.BoolAttribute{
-											Description: "Activate profile.",
+											Description: "Controls whether the DDoS protection profile is enabled and actively protecting the resource",
 											Computed:    true,
 										},
 										"bgp": schema.BoolAttribute{
-											Description: "Activate BGP protocol.",
+											Description: "Enables Border Gateway Protocol (BGP) routing for DDoS protection traffic",
+											Computed:    true,
+										},
+									},
+								},
+								"profile_template": schema.SingleNestedAttribute{
+									Description: "Complete template configuration data used for this profile",
+									Computed:    true,
+									CustomType:  customfield.NewNestedObjectType[CloudLoadBalancersDDOSProfileProfileTemplateDataSourceModel](ctx),
+									Attributes: map[string]schema.Attribute{
+										"id": schema.Int64Attribute{
+											Description: "Unique identifier for the DDoS protection template",
+											Computed:    true,
+										},
+										"description": schema.StringAttribute{
+											Description: "Detailed description explaining the template's purpose and use cases",
+											Computed:    true,
+										},
+										"fields": schema.ListNestedAttribute{
+											Description: "List of configurable fields that define the template's protection parameters",
+											Computed:    true,
+											CustomType:  customfield.NewNestedObjectListType[CloudLoadBalancersDDOSProfileProfileTemplateFieldsDataSourceModel](ctx),
+											NestedObject: schema.NestedAttributeObject{
+												Attributes: map[string]schema.Attribute{
+													"id": schema.Int64Attribute{
+														Description: "Unique identifier for the DDoS protection field",
+														Computed:    true,
+													},
+													"default": schema.StringAttribute{
+														Description: "Predefined default value for the field if not specified",
+														Computed:    true,
+													},
+													"description": schema.StringAttribute{
+														Description: "Detailed description explaining the field's purpose and usage guidelines",
+														Computed:    true,
+													},
+													"field_type": schema.StringAttribute{
+														Description: "Data type classification of the field (e.g., string, integer, array)",
+														Computed:    true,
+													},
+													"name": schema.StringAttribute{
+														Description: "Human-readable name of the protection field",
+														Computed:    true,
+													},
+													"required": schema.BoolAttribute{
+														Description: "Indicates whether this field must be provided when creating a protection profile",
+														Computed:    true,
+													},
+													"validation_schema": schema.StringAttribute{
+														Description: "JSON schema defining validation rules and constraints for the field value",
+														Computed:    true,
+														CustomType:  jsontypes.NormalizedType{},
+													},
+												},
+											},
+										},
+										"name": schema.StringAttribute{
+											Description: "Human-readable name of the protection template",
 											Computed:    true,
 										},
 									},
 								},
 								"profile_template_description": schema.StringAttribute{
-									Description: "DDoS profile template description",
+									Description: "Detailed description of the protection template used for this profile",
 									Computed:    true,
 								},
 								"protocols": schema.ListNestedAttribute{
-									Description: "List of protocols",
+									Description: "List of network protocols and ports configured for protection",
 									Computed:    true,
 									CustomType:  customfield.NewNestedObjectListType[CloudLoadBalancersDDOSProfileProtocolsDataSourceModel](ctx),
 									NestedObject: schema.NestedAttributeObject{
 										Attributes: map[string]schema.Attribute{
 											"port": schema.StringAttribute{
-												Computed: true,
+												Description: "Network port number for which protocols are configured",
+												Computed:    true,
 											},
 											"protocols": schema.ListAttribute{
+												Description: "List of network protocols enabled on the specified port",
 												Computed:    true,
 												CustomType:  customfield.NewListType[types.String](ctx),
 												ElementType: types.StringType,
@@ -307,18 +332,20 @@ func ListDataSourceSchema(ctx context.Context) schema.Schema {
 									},
 								},
 								"site": schema.StringAttribute{
-									Computed: true,
+									Description: "Geographic site identifier where the protection is deployed",
+									Computed:    true,
 								},
 								"status": schema.SingleNestedAttribute{
-									Computed:   true,
-									CustomType: customfield.NewNestedObjectType[CloudLoadBalancersDDOSProfileStatusDataSourceModel](ctx),
+									Description: "Current operational status and any error information for the profile",
+									Computed:    true,
+									CustomType:  customfield.NewNestedObjectType[CloudLoadBalancersDDOSProfileStatusDataSourceModel](ctx),
 									Attributes: map[string]schema.Attribute{
 										"error_description": schema.StringAttribute{
-											Description: "Description of the error, if it exists",
+											Description: "Detailed error message describing any issues with the profile operation",
 											Computed:    true,
 										},
 										"status": schema.StringAttribute{
-											Description: "Profile status",
+											Description: "Current operational status of the DDoS protection profile",
 											Computed:    true,
 										},
 									},

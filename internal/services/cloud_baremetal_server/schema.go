@@ -171,20 +171,20 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 				Optional:    true,
 				Attributes: map[string]schema.Attribute{
 					"profile_template": schema.Int64Attribute{
-						Description: "Advanced DDoS template ID",
+						Description: "Unique identifier of the DDoS protection template to use for this profile",
 						Required:    true,
 					},
 					"fields": schema.ListNestedAttribute{
-						Description: "DDoS profile parameters",
+						Description: "List of field configurations that customize the protection parameters for this profile",
 						Optional:    true,
 						NestedObject: schema.NestedAttributeObject{
 							Attributes: map[string]schema.Attribute{
 								"base_field": schema.Int64Attribute{
-									Description: "ID of DDoS profile field",
+									Description: "Unique identifier of the DDoS protection field being configured",
 									Optional:    true,
 								},
 								"field_name": schema.StringAttribute{
-									Description: "Name of DDoS profile field",
+									Description: "Human-readable name of the DDoS protection field being configured",
 									Optional:    true,
 								},
 								"field_value": schema.ListAttribute{

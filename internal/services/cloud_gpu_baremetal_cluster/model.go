@@ -106,41 +106,24 @@ type CloudGPUBaremetalClusterServersBlackholePortsModel struct {
 
 type CloudGPUBaremetalClusterServersDDOSProfileModel struct {
 	ID                         types.Int64                                                                              `tfsdk:"id" json:"id,computed"`
-	ProfileTemplate            customfield.NestedObject[CloudGPUBaremetalClusterServersDDOSProfileProfileTemplateModel] `tfsdk:"profile_template" json:"profile_template,computed"`
 	Fields                     customfield.NestedObjectList[CloudGPUBaremetalClusterServersDDOSProfileFieldsModel]      `tfsdk:"fields" json:"fields,computed"`
 	Options                    customfield.NestedObject[CloudGPUBaremetalClusterServersDDOSProfileOptionsModel]         `tfsdk:"options" json:"options,computed"`
+	ProfileTemplate            customfield.NestedObject[CloudGPUBaremetalClusterServersDDOSProfileProfileTemplateModel] `tfsdk:"profile_template" json:"profile_template,computed"`
 	ProfileTemplateDescription types.String                                                                             `tfsdk:"profile_template_description" json:"profile_template_description,computed"`
 	Protocols                  customfield.NestedObjectList[CloudGPUBaremetalClusterServersDDOSProfileProtocolsModel]   `tfsdk:"protocols" json:"protocols,computed"`
 	Site                       types.String                                                                             `tfsdk:"site" json:"site,computed"`
 	Status                     customfield.NestedObject[CloudGPUBaremetalClusterServersDDOSProfileStatusModel]          `tfsdk:"status" json:"status,computed"`
 }
 
-type CloudGPUBaremetalClusterServersDDOSProfileProfileTemplateModel struct {
-	ID          types.Int64                                                                                        `tfsdk:"id" json:"id,computed"`
-	Name        types.String                                                                                       `tfsdk:"name" json:"name,computed"`
-	Description types.String                                                                                       `tfsdk:"description" json:"description,computed"`
-	Fields      customfield.NestedObjectList[CloudGPUBaremetalClusterServersDDOSProfileProfileTemplateFieldsModel] `tfsdk:"fields" json:"fields,computed"`
-}
-
-type CloudGPUBaremetalClusterServersDDOSProfileProfileTemplateFieldsModel struct {
-	ID               types.Int64          `tfsdk:"id" json:"id,computed"`
-	Name             types.String         `tfsdk:"name" json:"name,computed"`
-	Default          types.String         `tfsdk:"default" json:"default,computed"`
-	Description      types.String         `tfsdk:"description" json:"description,computed"`
-	FieldType        types.String         `tfsdk:"field_type" json:"field_type,computed"`
-	Required         types.Bool           `tfsdk:"required" json:"required,computed"`
-	ValidationSchema jsontypes.Normalized `tfsdk:"validation_schema" json:"validation_schema,computed"`
-}
-
 type CloudGPUBaremetalClusterServersDDOSProfileFieldsModel struct {
 	ID               types.Int64          `tfsdk:"id" json:"id,computed"`
-	Default          jsontypes.Normalized `tfsdk:"default" json:"default,computed"`
-	Description      types.String         `tfsdk:"description" json:"description,computed"`
-	FieldValue       jsontypes.Normalized `tfsdk:"field_value" json:"field_value,computed"`
-	Name             types.String         `tfsdk:"name" json:"name,computed"`
 	BaseField        types.Int64          `tfsdk:"base_field" json:"base_field,computed"`
+	Default          types.String         `tfsdk:"default" json:"default,computed"`
+	Description      types.String         `tfsdk:"description" json:"description,computed"`
 	FieldName        types.String         `tfsdk:"field_name" json:"field_name,computed"`
 	FieldType        types.String         `tfsdk:"field_type" json:"field_type,computed"`
+	FieldValue       jsontypes.Normalized `tfsdk:"field_value" json:"field_value,computed"`
+	Name             types.String         `tfsdk:"name" json:"name,computed"`
 	Required         types.Bool           `tfsdk:"required" json:"required,computed"`
 	ValidationSchema jsontypes.Normalized `tfsdk:"validation_schema" json:"validation_schema,computed"`
 	Value            types.String         `tfsdk:"value" json:"value,computed"`
@@ -149,6 +132,23 @@ type CloudGPUBaremetalClusterServersDDOSProfileFieldsModel struct {
 type CloudGPUBaremetalClusterServersDDOSProfileOptionsModel struct {
 	Active types.Bool `tfsdk:"active" json:"active,computed"`
 	Bgp    types.Bool `tfsdk:"bgp" json:"bgp,computed"`
+}
+
+type CloudGPUBaremetalClusterServersDDOSProfileProfileTemplateModel struct {
+	ID          types.Int64                                                                                        `tfsdk:"id" json:"id,computed"`
+	Description types.String                                                                                       `tfsdk:"description" json:"description,computed"`
+	Fields      customfield.NestedObjectList[CloudGPUBaremetalClusterServersDDOSProfileProfileTemplateFieldsModel] `tfsdk:"fields" json:"fields,computed"`
+	Name        types.String                                                                                       `tfsdk:"name" json:"name,computed"`
+}
+
+type CloudGPUBaremetalClusterServersDDOSProfileProfileTemplateFieldsModel struct {
+	ID               types.Int64          `tfsdk:"id" json:"id,computed"`
+	Default          types.String         `tfsdk:"default" json:"default,computed"`
+	Description      types.String         `tfsdk:"description" json:"description,computed"`
+	FieldType        types.String         `tfsdk:"field_type" json:"field_type,computed"`
+	Name             types.String         `tfsdk:"name" json:"name,computed"`
+	Required         types.Bool           `tfsdk:"required" json:"required,computed"`
+	ValidationSchema jsontypes.Normalized `tfsdk:"validation_schema" json:"validation_schema,computed"`
 }
 
 type CloudGPUBaremetalClusterServersDDOSProfileProtocolsModel struct {

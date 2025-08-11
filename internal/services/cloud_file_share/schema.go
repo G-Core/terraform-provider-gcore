@@ -56,14 +56,6 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 				},
 				PlanModifiers: []planmodifier.Int64{int64planmodifier.RequiresReplace()},
 			},
-			"volume_type": schema.StringAttribute{
-				Description: "File share volume type\nAvailable values: \"default_share_type\", \"vast_share_type\".",
-				Optional:    true,
-				Validators: []validator.String{
-					stringvalidator.OneOfCaseInsensitive("default_share_type", "vast_share_type"),
-				},
-				PlanModifiers: []planmodifier.String{stringplanmodifier.RequiresReplace()},
-			},
 			"network": schema.SingleNestedAttribute{
 				Description: "File share network configuration",
 				Optional:    true,
@@ -78,6 +70,25 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 					},
 				},
 				PlanModifiers: []planmodifier.Object{objectplanmodifier.RequiresReplace()},
+			},
+			"type_name": schema.StringAttribute{
+				Description: "Standard file share type\nAvailable values: \"standard\", \"vast\".",
+				Computed:    true,
+				Optional:    true,
+				Validators: []validator.String{
+					stringvalidator.OneOfCaseInsensitive("standard", "vast"),
+				},
+				PlanModifiers: []planmodifier.String{stringplanmodifier.RequiresReplaceIfConfigured()},
+			},
+			"volume_type": schema.StringAttribute{
+				Description:        "Deprecated. Use `type_name` instead.\nAvailable values: \"default_share_type\", \"vast_share_type\".",
+				Computed:           true,
+				Optional:           true,
+				DeprecationMessage: "This attribute is deprecated.",
+				Validators: []validator.String{
+					stringvalidator.OneOfCaseInsensitive("default_share_type", "vast_share_type"),
+				},
+				PlanModifiers: []planmodifier.String{stringplanmodifier.RequiresReplaceIfConfigured()},
 			},
 			"access": schema.ListNestedAttribute{
 				Description: "Access Rules",
@@ -204,13 +215,6 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 			"task_id": schema.StringAttribute{
 				Description: "The UUID of the active task that currently holds a lock on the resource. This lock prevents concurrent modifications to ensure consistency. If `null`, the resource is not locked.",
 				Computed:    true,
-			},
-			"type_name": schema.StringAttribute{
-				Description: "File share type name\nAvailable values: \"standard\", \"vast\".",
-				Computed:    true,
-				Validators: []validator.String{
-					stringvalidator.OneOfCaseInsensitive("standard", "vast"),
-				},
 			},
 			"tasks": schema.ListAttribute{
 				Description: "List of task IDs",
