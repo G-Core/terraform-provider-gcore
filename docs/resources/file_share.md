@@ -32,7 +32,7 @@ resource "gcore_file_share" "file_share_vast" {
   size        = 10
   project_id  = data.gcore_project.project.id
   region_id   = data.gcore_region.region.id
-  volume_type = "vast_share_type"
+  type_name   = "vast"
   protocol    = "NFS"
 }
 ```
@@ -57,7 +57,7 @@ resource "gcore_file_share" "file_share_standard" {
   size        = 20
   project_id  = data.gcore_project.project.id
   region_id   = data.gcore_region.region.id
-  volume_type = "default_share_type"
+  type_name   = "standard"
   protocol    = "NFS"
 
   network {
@@ -79,12 +79,12 @@ resource "gcore_file_share" "file_share_standard" {
 - `name` (String) The name of the file share. It must be unique within the project and region.
 - `protocol` (String) The protocol used by the file share. Currently, only 'NFS' is supported.
 - `size` (Number) The size of the file share in GB. It must be a positive integer.
-- `volume_type` (String) The type of the volume. Must be one of 'default_share_type' or 'vast_share_type'.
+- `type_name` (String) The type of the file share. Must be one of 'standard' or 'vast'.
 
 ### Optional
 
 - `access` (Block List) (see [below for nested schema](#nestedblock--access))
-- `network` (Block List, Max: 1) Network configuration for the file share. It must include a network ID and optionally a subnet ID. (Only required for volume type: 'default_share_type') (see [below for nested schema](#nestedblock--network))
+- `network` (Block List, Max: 1) Network configuration for the file share. It must include a network ID and optionally a subnet ID. (Only required for type_name: 'standard') (see [below for nested schema](#nestedblock--network))
 - `project_id` (Number) Project ID, only one of project_id or project_name should be set
 - `project_name` (String) Project name, only one of project_id or project_name should be set
 - `region_id` (Number) Region ID, only one of region_id or region_name should be set
@@ -98,7 +98,7 @@ resource "gcore_file_share" "file_share_standard" {
 - `creator_task_id` (String) The ID of the task that created the file share.
 - `id` (String) The ID of this resource.
 - `network_name` (String) The name of the network associated with the file share.
-- `share_network_name` (String) The name of the share network associated with the file share. This is only applicable for default_share_type.
+- `share_network_name` (String) The name of the share network associated with the file share. This is only applicable for 'standard'.
 - `status` (String) The status of the file share.
 - `subnet_name` (String) The name of the subnet associated with the file share
 - `type_name` (String) The type of the file share (standard or vast).
@@ -117,7 +117,7 @@ Required:
 
 Required:
 
-- `network_id` (String) The ID of the network to which the file share will be connected. This is required for 'default_share_type'.
+- `network_id` (String) The ID of the network to which the file share will be connected. This is required for 'standard'.
 
 Optional:
 

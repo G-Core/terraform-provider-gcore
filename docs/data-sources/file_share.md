@@ -58,10 +58,9 @@ output "view" {
 - `network_id` (String) The ID of the network to which the file share will be connected.
 - `network_name` (String) The name of the network associated with the file share.
 - `protocol` (String) The protocol used by the file share. Currently, only 'NFS' is supported.
-- `share_network_name` (String) The name of the share network associated with the file share. This is only applicable for default_share_type.
+- `share_network_name` (String) The name of the share network associated with the file share. This is only applicable for 'standard'.
 - `size` (Number) The size of the file share in GB. It must be a positive integer.
 - `status` (String) The status of the file share.
 - `subnet_id` (String) The ID of the subnet within the network. This is optional and can be used to specify a particular subnet for the file share.
 - `subnet_name` (String) The name of the subnet associated with the file share
 - `type_name` (String) The type of the file share (standard or vast).
-- `volume_type` (String) The type of the volume. Must be one of 'default_share_type' or 'vast_share_type'.
