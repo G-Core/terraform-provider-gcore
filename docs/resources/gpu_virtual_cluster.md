@@ -27,7 +27,7 @@ data "gcore_region" "region" {
 
 resource "gcore_gpu_virtual_cluster" "example" {
   name          = "example-gpu-cluster"
-  flavor        = "gpu-flavor"
+  flavor        = "g3-ai-192-1536-12000-l40s-48-8"
   servers_count = 2
   project_id    = data.gcore_project.project.id
   region_id     = data.gcore_region.region.id

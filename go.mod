@@ -7,10 +7,11 @@ toolchain go1.24.3
 require (
 	github.com/AlekSi/pointer v1.2.0
 	github.com/G-Core/FastEdge-client-sdk-go v0.3.6
+	github.com/G-Core/gcore-dns-sdk-go v0.3.1
 	github.com/G-Core/gcore-storage-sdk-go v0.1.34
 	github.com/G-Core/gcore-waap-sdk-go v0.4.0
-	github.com/G-Core/gcorelabscdn-go v1.0.31
-	github.com/G-Core/gcorelabscloud-go v0.21.0
+	github.com/G-Core/gcorelabscdn-go v1.0.32
+	github.com/G-Core/gcorelabscloud-go v0.22.2
 	github.com/google/go-cmp v0.7.0
 	github.com/google/uuid v1.6.0
 	github.com/hashicorp/go-cty v1.4.1-0.20200414143053-d3edf31b6320
