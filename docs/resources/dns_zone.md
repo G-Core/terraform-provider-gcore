@@ -87,7 +87,6 @@ resource "gcore_dns_zone" "test_zone" {
 - `dnssec` (Boolean) Activation or deactivation of DNSSEC for the zone.Set it to true to enable DNSSEC for the zone or false to disable it.By default, DNSSEC is set to false wich means it is disabled.
 - `enabled` (Boolean) Default: true. If a zone is disabled, then its records will not be resolved on dns servers
 - `expiry` (Number) number of seconds after which secondary name servers should stop answering request for this zone
-- `import_file_content` (String) Content of the BIND file to import zone from. Zone will be imported on creation.
 - `meta` (Map of String) Arbitrary data of zone in JSON format. You can specify webhook URL and webhook_method here. Webhook will receive a map with three arrays: for created, updated, and deleted rrsets. webhook_method can be omitted; POST will be used by default.
 - `nx_ttl` (Number) Time To Live of cache
 - `primary_server` (String) Primary master name server for zone

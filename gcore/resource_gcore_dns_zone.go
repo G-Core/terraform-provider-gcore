@@ -32,7 +32,6 @@ const (
 	DNSZoneSchemaRRSetsAmount   = "rrsets_amount"
 	DNSZoneSchemaSerial         = "serial"
 	DNSZoneSchemaStatus         = "status"
-	// DNSZoneSchemaImportFileContent = "import_file_content"
 )
 
 func resourceDNSZone() *schema.Resource {
@@ -51,11 +50,6 @@ func resourceDNSZone() *schema.Resource {
 				},
 				Description: "A name of DNS Zone resource.",
 			},
-			// DNSZoneSchemaImportFileContent: {
-			// 	Type:        schema.TypeString,
-			// 	Optional:    true,
-			// 	Description: "Content of the BIND file to import zone from. Zone will be imported on creation.",
-			// },
 			DNSZoneSchemaDNSSEC: {
 				Type:     schema.TypeBool,
 				Optional: true,
@@ -170,13 +164,6 @@ func resourceDNSZoneCreate(ctx context.Context, d *schema.ResourceData, m interf
 		return diag.FromErr(fmt.Errorf("create zone: %v", err))
 	}
 
-	// if importFileContent, ok := d.GetOk(DNSZoneSchemaImportFileContent); ok {
-	// 	_, err = client.ImportZone(ctx, zoneName, importFileContent.(string))
-	// 	if err != nil {
-	// 		return diag.FromErr(fmt.Errorf("import zone from file content: %w", err))
-	// 	}
-	// }
-
 	enableDnssec := d.Get(DNSZoneSchemaDNSSEC).(bool)
 	if enableDnssec {
 		_, err = client.ToggleDnssec(ctx, zoneName, true)
@@ -266,7 +253,7 @@ func resourceDNSZoneRead(ctx context.Context, d *schema.ResourceData, m interfac
 
 	result, err := client.Zone(ctx, zoneName)
 	if err != nil {
-		return diag.FromErr(err)
+		return diag.FromErr(fmt.Errorf("get zone: %w", err))
 	}
 
 	enableDnssec := result.DNSSECEnabled
