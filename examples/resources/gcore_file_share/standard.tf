@@ -11,12 +11,12 @@ data "gcore_region" "region" {
 }
 
 resource "gcore_file_share" "file_share_standard" {
-  name        = "tf-file-share-standard"
-  size        = 20
-  project_id  = data.gcore_project.project.id
-  region_id   = data.gcore_region.region.id
-  volume_type = "default_share_type"
-  protocol    = "NFS"
+  name       = "tf-file-share-standard"
+  size       = 20
+  project_id = data.gcore_project.project.id
+  region_id  = data.gcore_region.region.id
+  type_name  = "standard"
+  protocol   = "NFS"
 
   network {
     network_id = "378ba73d-16c5-4a4e-a755-d9406dd73e63"

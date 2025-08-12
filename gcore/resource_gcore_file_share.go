@@ -90,25 +90,31 @@ func resourceFileShare() *schema.Resource {
 				Required:    true,
 				Description: `The size of the file share in GB. It must be a positive integer.`,
 			},
-			"volume_type": {
+			"type_name": {
 				Type:        schema.TypeString,
 				Required:    true,
 				ForceNew:    true,
-				Description: `The type of the volume. Must be one of 'default_share_type' or 'vast_share_type'.`,
+				Description: `The type of the file share. Must be one of 'standard' or 'vast'.`,
+				ValidateFunc: func(v interface{}, k string) ([]string, []error) {
+					if v.(string) != "standard" && v.(string) != "vast" {
+						return nil, []error{fmt.Errorf("type_name must be 'standard' or 'vast'")}
+					}
+					return nil, nil
+				},
 			},
 			"network": {
 				Type:        schema.TypeList,
 				Optional:    true,
 				MaxItems:    1,
 				ForceNew:    true,
-				Description: "Network configuration for the file share. It must include a network ID and optionally a subnet ID. (Only required for volume type: 'default_share_type')",
+				Description: "Network configuration for the file share. It must include a network ID and optionally a subnet ID. (Only required for type_name: 'standard')",
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
 						"network_id": {
 							Type:        schema.TypeString,
 							Required:    true,
 							ForceNew:    true,
-							Description: "The ID of the network to which the file share will be connected. This is required for 'default_share_type'.",
+							Description: "The ID of the network to which the file share will be connected. This is required for 'standard'.",
 						},
 						"subnet_id": {
 							Type:        schema.TypeString,
@@ -175,18 +181,14 @@ func resourceFileShare() *schema.Resource {
 			"share_network_name": {
 				Type:        schema.TypeString,
 				Computed:    true,
-				Description: `The name of the share network associated with the file share. This is only applicable for default_share_type.`,
+				Description: `The name of the share network associated with the file share. This is only applicable for 'standard'.`,
 			},
 			"subnet_name": {
 				Type:        schema.TypeString,
 				Computed:    true,
 				Description: `The name of the subnet associated with the file share`,
 			},
-			"type_name": {
-				Type:        schema.TypeString,
-				Computed:    true,
-				Description: `The type of the file share (standard or vast).`,
-			},
+			// (computed fields end)
 		},
 	}
 }
@@ -470,33 +472,46 @@ func expandFileShareCreateOpts(d *schema.ResourceData) (*file_shares.CreateOpts,
 			tags[k] = val.(string)
 		}
 	}
-	// check if file share volume type to know if its standard or vast
-	volumeType := d.Get("volume_type").(string)
-	if volumeType != "default_share_type" && volumeType != "vast_share_type" {
-		return nil, fmt.Errorf("volume_type must be one of 'default_share_type' or 'vast_share_type'")
+	// determine file share type name (new API: 'standard' or 'vast')
+	typeNameRaw, hasTypeName := d.GetOk("type_name")
+	var typeName string
+	if hasTypeName {
+		typeName = typeNameRaw.(string)
+		if typeName != "standard" && typeName != "vast" {
+			return nil, fmt.Errorf("type_name must be 'standard' or 'vast'")
+		}
+	} else {
+		return nil, fmt.Errorf("type_name is required")
 	}
 
-	// check that network and access are set only for default_share_type
-	if volumeType == "vast_share_type" {
+	// check that network and access are set only for 'standard'
+	if typeName == "vast" {
 		networkList := d.Get("network").([]interface{})
 		if len(networkList) > 0 {
-			return nil, fmt.Errorf("network block is not allowed for vast_share_type")
+			return nil, fmt.Errorf("network block is not allowed for 'vast'")
 		}
 		accessList := d.Get("access").([]interface{})
 		if len(accessList) > 0 {
-			return nil, fmt.Errorf("access block is not allowed for vast_share_type")
+			return nil, fmt.Errorf("access block is not allowed for 'vast'")
 		}
 	}
 
+	// The API expects legacy VolumeType on create; map new names to legacy values
+	var legacyVolumeType string
+	if typeName == "standard" {
+		legacyVolumeType = "default_share_type"
+	} else { // vast
+		legacyVolumeType = "vast_share_type"
+	}
 	opts := file_shares.CreateOpts{
 		Name:       name,
 		Protocol:   protocol,
 		Size:       size,
 		Tags:       tags,
-		VolumeType: volumeType,
+		VolumeType: legacyVolumeType,
 	}
 
-	if volumeType == "default_share_type" {
+	if typeName == "standard" {
 		networkList := d.Get("network").([]interface{})
 		var networkOpts file_shares.FileShareNetworkOpts
 		if len(networkList) > 0 {

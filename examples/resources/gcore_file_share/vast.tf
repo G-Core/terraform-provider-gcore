@@ -12,10 +12,10 @@ data "gcore_region" "region" {
 
 
 resource "gcore_file_share" "file_share_vast" {
-  name        = "tf-file-share-vast"
-  size        = 10
-  project_id  = data.gcore_project.project.id
-  region_id   = data.gcore_region.region.id
-  volume_type = "vast_share_type"
-  protocol    = "NFS"
+  name       = "tf-file-share-vast"
+  size       = 10
+  project_id = data.gcore_project.project.id
+  region_id  = data.gcore_region.region.id
+  type_name  = "vast"
+  protocol   = "NFS"
 }

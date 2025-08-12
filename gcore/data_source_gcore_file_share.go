@@ -57,11 +57,7 @@ func dataSourceFileShare() *schema.Resource {
 				Computed:    true,
 				Description: "The size of the file share in GB. It must be a positive integer.",
 			},
-			"volume_type": {
-				Type:        schema.TypeString,
-				Computed:    true,
-				Description: "The type of the volume. Must be one of 'default_share_type' or 'vast_share_type'.",
-			},
+			// Deprecated and removed: volume_type. Use type_name instead.
 			"connection_point": {
 				Type:        schema.TypeString,
 				Computed:    true,
@@ -105,7 +101,7 @@ func dataSourceFileShare() *schema.Resource {
 			"share_network_name": {
 				Type:        schema.TypeString,
 				Computed:    true,
-				Description: "The name of the share network associated with the file share. This is only applicable for default_share_type.",
+				Description: "The name of the share network associated with the file share. This is only applicable for 'standard'.",
 			},
 			"tags": {
 				Type:        schema.TypeMap,
@@ -156,7 +152,7 @@ func dataSourceFileShareRead(ctx context.Context, d *schema.ResourceData, m inte
 	d.Set("name", fs.Name)
 	d.Set("protocol", fs.Protocol)
 	d.Set("size", fs.Size)
-	d.Set("volume_type", fs.VolumeType)
+	// volume_type removed in API; expose type_name only
 	d.Set("connection_point", fs.ConnectionPoint)
 	d.Set("status", string(fs.Status))
 	d.Set("created_at", fs.CreatedAt.String())
