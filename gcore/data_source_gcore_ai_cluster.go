@@ -649,7 +649,14 @@ func setAIClusterResourcerData(d *schema.ResourceData, provider *gcorecloud.Prov
 		}
 	}
 	sgList := make([]interface{}, 0, len(sgSet))
+	// Sort security group IDs for deterministic ordering
+	sgIDs := make([]string, 0, len(sgSet))
 	for id := range sgSet {
+		sgIDs = append(sgIDs, id)
+	}
+	sort.Strings(sgIDs)
+	sgList := make([]interface{}, 0, len(sgIDs))
+	for _, id := range sgIDs {
 		m := make(map[string]interface{})
 		m["id"] = id
 		sgList = append(sgList, m)
