@@ -1,6 +1,6 @@
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 
-package cloud_inference_model
+package cloud_inference_application_template
 
 import (
 	"context"
@@ -15,21 +15,21 @@ import (
 	"github.com/stainless-sdks/gcore-terraform/internal/logging"
 )
 
-type CloudInferenceModelDataSource struct {
+type CloudInferenceApplicationTemplateDataSource struct {
 	client *gcore.Client
 }
 
-var _ datasource.DataSourceWithConfigure = (*CloudInferenceModelDataSource)(nil)
+var _ datasource.DataSourceWithConfigure = (*CloudInferenceApplicationTemplateDataSource)(nil)
 
-func NewCloudInferenceModelDataSource() datasource.DataSource {
-	return &CloudInferenceModelDataSource{}
+func NewCloudInferenceApplicationTemplateDataSource() datasource.DataSource {
+	return &CloudInferenceApplicationTemplateDataSource{}
 }
 
-func (d *CloudInferenceModelDataSource) Metadata(ctx context.Context, req datasource.MetadataRequest, resp *datasource.MetadataResponse) {
-	resp.TypeName = req.ProviderTypeName + "_cloud_inference_model"
+func (d *CloudInferenceApplicationTemplateDataSource) Metadata(ctx context.Context, req datasource.MetadataRequest, resp *datasource.MetadataResponse) {
+	resp.TypeName = req.ProviderTypeName + "_cloud_inference_application_template"
 }
 
-func (d *CloudInferenceModelDataSource) Configure(ctx context.Context, req datasource.ConfigureRequest, resp *datasource.ConfigureResponse) {
+func (d *CloudInferenceApplicationTemplateDataSource) Configure(ctx context.Context, req datasource.ConfigureRequest, resp *datasource.ConfigureResponse) {
 	if req.ProviderData == nil {
 		return
 	}
@@ -48,8 +48,8 @@ func (d *CloudInferenceModelDataSource) Configure(ctx context.Context, req datas
 	d.client = client
 }
 
-func (d *CloudInferenceModelDataSource) Read(ctx context.Context, req datasource.ReadRequest, resp *datasource.ReadResponse) {
-	var data *CloudInferenceModelDataSourceModel
+func (d *CloudInferenceApplicationTemplateDataSource) Read(ctx context.Context, req datasource.ReadRequest, resp *datasource.ReadResponse) {
+	var data *CloudInferenceApplicationTemplateDataSourceModel
 
 	resp.Diagnostics.Append(req.Config.Get(ctx, &data)...)
 
@@ -58,9 +58,9 @@ func (d *CloudInferenceModelDataSource) Read(ctx context.Context, req datasource
 	}
 
 	res := new(http.Response)
-	_, err := d.client.Cloud.Inference.Models.Get(
+	_, err := d.client.Cloud.Inference.Applications.Templates.Get(
 		ctx,
-		data.ModelID.ValueString(),
+		data.ApplicationName.ValueString(),
 		option.WithResponseBodyInto(&res),
 		option.WithMiddleware(logging.Middleware(ctx)),
 	)
