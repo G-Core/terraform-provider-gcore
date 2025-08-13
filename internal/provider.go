@@ -25,10 +25,11 @@ import (
 	"github.com/stainless-sdks/gcore-terraform/internal/services/cloud_gpu_baremetal_cluster"
 	"github.com/stainless-sdks/gcore-terraform/internal/services/cloud_gpu_baremetal_cluster_image"
 	"github.com/stainless-sdks/gcore-terraform/internal/services/cloud_inference_api_key"
+	"github.com/stainless-sdks/gcore-terraform/internal/services/cloud_inference_application_deployment"
+	"github.com/stainless-sdks/gcore-terraform/internal/services/cloud_inference_application_template"
 	"github.com/stainless-sdks/gcore-terraform/internal/services/cloud_inference_deployment"
 	"github.com/stainless-sdks/gcore-terraform/internal/services/cloud_inference_deployment_log"
 	"github.com/stainless-sdks/gcore-terraform/internal/services/cloud_inference_flavor"
-	"github.com/stainless-sdks/gcore-terraform/internal/services/cloud_inference_model"
 	"github.com/stainless-sdks/gcore-terraform/internal/services/cloud_inference_registry_credential"
 	"github.com/stainless-sdks/gcore-terraform/internal/services/cloud_inference_secret"
 	"github.com/stainless-sdks/gcore-terraform/internal/services/cloud_instance"
@@ -233,6 +234,7 @@ func (p *GcoreProvider) Resources(ctx context.Context) []func() resource.Resourc
 		cloud_inference_registry_credential.NewResource,
 		cloud_inference_secret.NewResource,
 		cloud_inference_api_key.NewResource,
+		cloud_inference_application_deployment.NewResource,
 		cloud_placement_group.NewResource,
 		cloud_baremetal_server.NewResource,
 		cloud_registry.NewResource,
@@ -309,8 +311,6 @@ func (p *GcoreProvider) DataSources(ctx context.Context) []func() datasource.Dat
 		cloud_user_role_assignment.NewCloudUserRoleAssignmentsDataSource,
 		cloud_inference_flavor.NewCloudInferenceFlavorDataSource,
 		cloud_inference_flavor.NewCloudInferenceFlavorsDataSource,
-		cloud_inference_model.NewCloudInferenceModelDataSource,
-		cloud_inference_model.NewCloudInferenceModelsDataSource,
 		cloud_inference_deployment.NewCloudInferenceDeploymentDataSource,
 		cloud_inference_deployment.NewCloudInferenceDeploymentsDataSource,
 		cloud_inference_deployment_log.NewCloudInferenceDeploymentLogsDataSource,
@@ -320,6 +320,8 @@ func (p *GcoreProvider) DataSources(ctx context.Context) []func() datasource.Dat
 		cloud_inference_secret.NewCloudInferenceSecretsDataSource,
 		cloud_inference_api_key.NewCloudInferenceAPIKeyDataSource,
 		cloud_inference_api_key.NewCloudInferenceAPIKeysDataSource,
+		cloud_inference_application_deployment.NewCloudInferenceApplicationDeploymentDataSource,
+		cloud_inference_application_template.NewCloudInferenceApplicationTemplateDataSource,
 		cloud_placement_group.NewCloudPlacementGroupDataSource,
 		cloud_baremetal_server.NewCloudBaremetalServersDataSource,
 		cloud_registry.NewCloudRegistryDataSource,
