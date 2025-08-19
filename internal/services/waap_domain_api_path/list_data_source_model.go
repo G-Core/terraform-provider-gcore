@@ -35,12 +35,16 @@ type WaapDomainAPIPathsDataSourceModel struct {
 
 func (m *WaapDomainAPIPathsDataSourceModel) toListParams(_ context.Context) (params waap.DomainAPIPathListParams, diags diag.Diagnostics) {
 	mIDs := []string{}
-	for _, item := range *m.IDs {
-		mIDs = append(mIDs, item.ValueString())
+	if m.IDs != nil {
+		for _, item := range *m.IDs {
+			mIDs = append(mIDs, item.ValueString())
+		}
 	}
 	mStatus := []string{}
-	for _, item := range *m.Status {
-		mStatus = append(mStatus, string(item.ValueString()))
+	if m.Status != nil {
+		for _, item := range *m.Status {
+			mStatus = append(mStatus, string(item.ValueString()))
+		}
 	}
 
 	params = waap.DomainAPIPathListParams{

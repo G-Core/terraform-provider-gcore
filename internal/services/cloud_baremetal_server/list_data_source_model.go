@@ -47,8 +47,10 @@ type CloudBaremetalServersDataSourceModel struct {
 
 func (m *CloudBaremetalServersDataSourceModel) toListParams(_ context.Context) (params cloud.BaremetalServerListParams, diags diag.Diagnostics) {
 	mTagValue := []string{}
-	for _, item := range *m.TagValue {
-		mTagValue = append(mTagValue, item.ValueString())
+	if m.TagValue != nil {
+		for _, item := range *m.TagValue {
+			mTagValue = append(mTagValue, item.ValueString())
+		}
 	}
 	mChangesBefore, errs := m.ChangesBefore.ValueRFC3339Time()
 	diags.Append(errs...)

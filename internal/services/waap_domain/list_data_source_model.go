@@ -29,8 +29,10 @@ type WaapDomainsDataSourceModel struct {
 
 func (m *WaapDomainsDataSourceModel) toListParams(_ context.Context) (params waap.DomainListParams, diags diag.Diagnostics) {
 	mIDs := []int64{}
-	for _, item := range *m.IDs {
-		mIDs = append(mIDs, item.ValueInt64())
+	if m.IDs != nil {
+		for _, item := range *m.IDs {
+			mIDs = append(mIDs, item.ValueInt64())
+		}
 	}
 
 	params = waap.DomainListParams{
