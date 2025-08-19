@@ -26,8 +26,10 @@ type CloudQuotaRequestsDataSourceModel struct {
 
 func (m *CloudQuotaRequestsDataSourceModel) toListParams(_ context.Context) (params cloud.QuotaRequestListParams, diags diag.Diagnostics) {
 	mStatus := []string{}
-	for _, item := range *m.Status {
-		mStatus = append(mStatus, string(item.ValueString()))
+	if m.Status != nil {
+		for _, item := range *m.Status {
+			mStatus = append(mStatus, string(item.ValueString()))
+		}
 	}
 
 	params = cloud.QuotaRequestListParams{

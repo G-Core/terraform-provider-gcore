@@ -31,16 +31,22 @@ type WaapDomainInsightsDataSourceModel struct {
 
 func (m *WaapDomainInsightsDataSourceModel) toListParams(_ context.Context) (params waap.DomainInsightListParams, diags diag.Diagnostics) {
 	mID := []string{}
-	for _, item := range *m.ID {
-		mID = append(mID, item.ValueString())
+	if m.ID != nil {
+		for _, item := range *m.ID {
+			mID = append(mID, item.ValueString())
+		}
 	}
 	mInsightType := []string{}
-	for _, item := range *m.InsightType {
-		mInsightType = append(mInsightType, item.ValueString())
+	if m.InsightType != nil {
+		for _, item := range *m.InsightType {
+			mInsightType = append(mInsightType, item.ValueString())
+		}
 	}
 	mStatus := []string{}
-	for _, item := range *m.Status {
-		mStatus = append(mStatus, string(item.ValueString()))
+	if m.Status != nil {
+		for _, item := range *m.Status {
+			mStatus = append(mStatus, string(item.ValueString()))
+		}
 	}
 
 	params = waap.DomainInsightListParams{

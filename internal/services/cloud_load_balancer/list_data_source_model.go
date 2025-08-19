@@ -36,8 +36,10 @@ type CloudLoadBalancersDataSourceModel struct {
 
 func (m *CloudLoadBalancersDataSourceModel) toListParams(_ context.Context) (params cloud.LoadBalancerListParams, diags diag.Diagnostics) {
 	mTagKey := []string{}
-	for _, item := range *m.TagKey {
-		mTagKey = append(mTagKey, item.ValueString())
+	if m.TagKey != nil {
+		for _, item := range *m.TagKey {
+			mTagKey = append(mTagKey, item.ValueString())
+		}
 	}
 
 	params = cloud.LoadBalancerListParams{

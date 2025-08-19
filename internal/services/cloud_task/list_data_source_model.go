@@ -35,16 +35,22 @@ type CloudTasksDataSourceModel struct {
 
 func (m *CloudTasksDataSourceModel) toListParams(_ context.Context) (params cloud.TaskListParams, diags diag.Diagnostics) {
 	mProjectID := []int64{}
-	for _, item := range *m.ProjectID {
-		mProjectID = append(mProjectID, item.ValueInt64())
+	if m.ProjectID != nil {
+		for _, item := range *m.ProjectID {
+			mProjectID = append(mProjectID, item.ValueInt64())
+		}
 	}
 	mRegionID := []int64{}
-	for _, item := range *m.RegionID {
-		mRegionID = append(mRegionID, item.ValueInt64())
+	if m.RegionID != nil {
+		for _, item := range *m.RegionID {
+			mRegionID = append(mRegionID, item.ValueInt64())
+		}
 	}
 	mState := []string{}
-	for _, item := range *m.State {
-		mState = append(mState, string(item.ValueString()))
+	if m.State != nil {
+		for _, item := range *m.State {
+			mState = append(mState, string(item.ValueString()))
+		}
 	}
 	mFromTimestamp, errs := m.FromTimestamp.ValueRFC3339Time()
 	diags.Append(errs...)

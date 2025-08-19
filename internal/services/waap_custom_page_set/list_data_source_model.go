@@ -27,8 +27,10 @@ type WaapCustomPageSetsDataSourceModel struct {
 
 func (m *WaapCustomPageSetsDataSourceModel) toListParams(_ context.Context) (params waap.CustomPageSetListParams, diags diag.Diagnostics) {
 	mIDs := []int64{}
-	for _, item := range *m.IDs {
-		mIDs = append(mIDs, item.ValueInt64())
+	if m.IDs != nil {
+		for _, item := range *m.IDs {
+			mIDs = append(mIDs, item.ValueInt64())
+		}
 	}
 
 	params = waap.CustomPageSetListParams{

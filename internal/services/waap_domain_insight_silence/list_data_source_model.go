@@ -31,12 +31,16 @@ type WaapDomainInsightSilencesDataSourceModel struct {
 
 func (m *WaapDomainInsightSilencesDataSourceModel) toListParams(_ context.Context) (params waap.DomainInsightSilenceListParams, diags diag.Diagnostics) {
 	mID := []string{}
-	for _, item := range *m.ID {
-		mID = append(mID, item.ValueString())
+	if m.ID != nil {
+		for _, item := range *m.ID {
+			mID = append(mID, item.ValueString())
+		}
 	}
 	mInsightType := []string{}
-	for _, item := range *m.InsightType {
-		mInsightType = append(mInsightType, item.ValueString())
+	if m.InsightType != nil {
+		for _, item := range *m.InsightType {
+			mInsightType = append(mInsightType, item.ValueString())
+		}
 	}
 
 	params = waap.DomainInsightSilenceListParams{

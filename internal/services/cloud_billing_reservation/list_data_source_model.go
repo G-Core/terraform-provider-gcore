@@ -35,8 +35,10 @@ type CloudBillingReservationsDataSourceModel struct {
 
 func (m *CloudBillingReservationsDataSourceModel) toListParams(_ context.Context) (params cloud.BillingReservationListParams, diags diag.Diagnostics) {
 	mStatus := []string{}
-	for _, item := range *m.Status {
-		mStatus = append(mStatus, string(item.ValueString()))
+	if m.Status != nil {
+		for _, item := range *m.Status {
+			mStatus = append(mStatus, string(item.ValueString()))
+		}
 	}
 	mActivatedFrom, errs := m.ActivatedFrom.ValueRFC3339Time()
 	diags.Append(errs...)

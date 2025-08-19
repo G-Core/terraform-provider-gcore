@@ -36,24 +36,34 @@ type CloudAuditLogsDataSourceModel struct {
 
 func (m *CloudAuditLogsDataSourceModel) toListParams(_ context.Context) (params cloud.AuditLogListParams, diags diag.Diagnostics) {
 	mActionType := []string{}
-	for _, item := range *m.ActionType {
-		mActionType = append(mActionType, string(item.ValueString()))
+	if m.ActionType != nil {
+		for _, item := range *m.ActionType {
+			mActionType = append(mActionType, string(item.ValueString()))
+		}
 	}
 	mAPIGroup := []string{}
-	for _, item := range *m.APIGroup {
-		mAPIGroup = append(mAPIGroup, string(item.ValueString()))
+	if m.APIGroup != nil {
+		for _, item := range *m.APIGroup {
+			mAPIGroup = append(mAPIGroup, string(item.ValueString()))
+		}
 	}
 	mProjectID := []int64{}
-	for _, item := range *m.ProjectID {
-		mProjectID = append(mProjectID, item.ValueInt64())
+	if m.ProjectID != nil {
+		for _, item := range *m.ProjectID {
+			mProjectID = append(mProjectID, item.ValueInt64())
+		}
 	}
 	mRegionID := []int64{}
-	for _, item := range *m.RegionID {
-		mRegionID = append(mRegionID, item.ValueInt64())
+	if m.RegionID != nil {
+		for _, item := range *m.RegionID {
+			mRegionID = append(mRegionID, item.ValueInt64())
+		}
 	}
 	mResourceID := []string{}
-	for _, item := range *m.ResourceID {
-		mResourceID = append(mResourceID, item.ValueString())
+	if m.ResourceID != nil {
+		for _, item := range *m.ResourceID {
+			mResourceID = append(mResourceID, item.ValueString())
+		}
 	}
 	mFromTimestamp, errs := m.FromTimestamp.ValueRFC3339Time()
 	diags.Append(errs...)
