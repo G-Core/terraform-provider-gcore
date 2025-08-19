@@ -7,6 +7,7 @@ import (
 	"strings"
 	"time"
 
+	dnssdk "github.com/G-Core/gcore-dns-sdk-go"
 	"github.com/hashicorp/go-cty/cty"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
@@ -80,7 +81,7 @@ func resourceDNSZoneCreate(ctx context.Context, d *schema.ResourceData, m interf
 	config := m.(*Config)
 	client := config.DNSClient
 
-	_, err := client.CreateZone(ctx, name)
+	_, err := client.CreateZone(ctx, dnssdk.AddZone{Name: name})
 	if err != nil {
 		return diag.FromErr(fmt.Errorf("create zone: %v", err))
 	}
