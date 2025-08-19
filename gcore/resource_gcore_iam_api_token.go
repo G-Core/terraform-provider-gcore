@@ -2,10 +2,12 @@ package gcore
 
 import (
 	"context"
+	"fmt"
 	"log"
 	"net/http"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
@@ -17,7 +19,6 @@ func resourceIamApiToken() *schema.Resource {
 	return &schema.Resource{
 		CreateContext: resourceIamApiTokenCreate,
 		ReadContext:   resourceIamApiTokenRead,
-		UpdateContext: resourceIamApiTokenUpdate,
 		DeleteContext: resourceIamApiTokenDelete,
 		Description:   "Represent IAM ApiToken for authentication and management capabilities",
 
@@ -25,32 +26,37 @@ func resourceIamApiToken() *schema.Resource {
 			"client_id": {
 				Type:        schema.TypeInt,
 				Required:    true,
+				ForceNew:    true,
 				Description: "Account ID.",
 			},
 			"token": {
 				Type:        schema.TypeString,
 				Computed:    true,
+				Sensitive:   true,
 				Description: "API token value",
 			},
 			"name": {
 				Type:        schema.TypeString,
 				Required:    true,
+				ForceNew:    true,
 				Description: "API token name.",
 			},
 			"description": {
 				Type:        schema.TypeString,
 				Optional:    true,
+				ForceNew:    true,
 				Description: "API token description.",
 			},
 			"exp_date": {
 				Type:        schema.TypeString,
 				Computed:    true,
 				Optional:    true,
-				Description: "Date when the API token becomes expired (ISO 8086/RFC 3339 format), UTC. If null, then the API token will never expire.",
+				Description: "Date when the API token becomes expired (ISO 8086/RFC 3339 format), UTC. If null, the token will expire in one week.",
 			},
 			"client_user": {
 				Type:        schema.TypeList,
 				Required:    true,
+				ForceNew:    true,
 				MaxItems:    1,
 				Description: "API token role.",
 				Elem: &schema.Resource{
@@ -74,43 +80,8 @@ func resourceIamApiToken() *schema.Resource {
 								},
 							},
 						},
-						"deleted": {
-							Type:        schema.TypeBool,
-							Computed:    true,
-							Description: "Deletion flag. If true, then the API token was deleted.",
-						},
-						"user_id": {
-							Type:        schema.TypeInt,
-							Computed:    true,
-							Description: "User's ID who issued the API token.",
-						},
-						"user_name": {
-							Type:        schema.TypeString,
-							Computed:    true,
-							Description: "User's name who issued the API token.",
-						},
-						"user_email": {
-							Type:        schema.TypeString,
-							Computed:    true,
-							Description: "User's email who issued the API token.",
-						},
-						"client_id": {
-							Type:        schema.TypeInt,
-							Computed:    true,
-							Description: "Account's ID.",
-						},
 					},
 				},
-			},
-			"deleted": {
-				Type:        schema.TypeBool,
-				Computed:    true,
-				Description: "Deletion flag. If true, then the API token was deleted.",
-			},
-			"expired": {
-				Type:        schema.TypeBool,
-				Computed:    true,
-				Description: "Expiration flag. If true, then the API token has expired. When an API token expires it will be automatically deleted.",
 			},
 			"created": {
 				Type:        schema.TypeString,
@@ -133,15 +104,13 @@ func resourceIamApiTokenCreate(ctx context.Context, d *schema.ResourceData, m in
 	name := d.Get("name").(string)
 
 	var expDatePtr *string
-	if v, ok := d.GetOk("exp_date"); ok {
+	if v, ok := d.GetOk("exp_date"); ok && v.(string) != "" {
 		expDateStr := v.(string)
-		if expDateStr != "" {
-			expDatePtr = &expDateStr
-		} else {
-			expDatePtr = nil
-		}
+		expDatePtr = &expDateStr
 	} else {
-		expDatePtr = nil
+		expTime := time.Now().UTC().Add(7 * 24 * time.Hour)
+		expDateStr := expTime.Format(time.RFC3339)
+		expDatePtr = &expDateStr
 	}
 
 	clientUser := d.Get("client_user").([]interface{})
@@ -212,6 +181,16 @@ func resourceIamApiTokenRead(ctx context.Context, d *schema.ResourceData, m inte
 		return diag.Errorf("Failed to get Api Token: %v", err)
 	}
 
+	if getResp.StatusCode() == http.StatusNotFound {
+		d.SetId("")
+		return diag.Diagnostics{
+			{
+				Severity: diag.Warning,
+				Summary:  fmt.Sprintf("Token (%d) was not found, removed from TF state", tokenId),
+			},
+		}
+	}
+
 	if getResp.StatusCode() != http.StatusOK {
 		return diag.Errorf("Failed to get Api Token. Status code: %d with error: %s", getResp.StatusCode(), getResp.Body)
 	}
@@ -221,10 +200,6 @@ func resourceIamApiTokenRead(ctx context.Context, d *schema.ResourceData, m inte
 	}
 
 	token := getResp.JSON200
-
-	if token.Id != nil {
-		d.Set("token_id", *token.Id)
-	}
 
 	d.Set("name", token.Name)
 
@@ -244,36 +219,6 @@ func resourceIamApiTokenRead(ctx context.Context, d *schema.ResourceData, m inte
 		d.Set("last_usage", *token.LastUsage)
 	}
 
-	if token.Deleted != nil {
-		d.Set("deleted", *token.Deleted)
-	}
-
-	if token.Expired != nil {
-		d.Set("expired", *token.Expired)
-	}
-
-	clientUserData := map[string]interface{}{}
-
-	if token.ClientUser.Deleted != nil {
-		clientUserData["deleted"] = *token.ClientUser.Deleted
-	}
-
-	if token.ClientUser.UserId != nil {
-		clientUserData["user_id"] = *token.ClientUser.UserId
-	}
-
-	if token.ClientUser.UserName != nil {
-		clientUserData["user_name"] = *token.ClientUser.UserName
-	}
-
-	if token.ClientUser.UserEmail != nil {
-		clientUserData["user_email"] = *token.ClientUser.UserEmail
-	}
-
-	if token.ClientUser.ClientId != nil {
-		clientUserData["client_id"] = *token.ClientUser.ClientId
-	}
-
 	if token.ClientUser.Role != nil {
 		roleData := map[string]interface{}{}
 
@@ -285,16 +230,16 @@ func resourceIamApiTokenRead(ctx context.Context, d *schema.ResourceData, m inte
 			roleData["name"] = string(*token.ClientUser.Role.Name)
 		}
 
-		clientUserData["role"] = []interface{}{roleData}
+		if err := d.Set("client_user", []interface{}{
+			map[string]interface{}{
+				"role": []interface{}{roleData},
+			},
+		}); err != nil {
+			return diag.FromErr(err)
+		}
 	}
 
-	d.Set("client_user", []interface{}{clientUserData})
-
 	return nil
-}
-
-func resourceIamApiTokenUpdate(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
-	return resourceIamApiTokenRead(ctx, d, m)
 }
 
 func resourceIamApiTokenDelete(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
