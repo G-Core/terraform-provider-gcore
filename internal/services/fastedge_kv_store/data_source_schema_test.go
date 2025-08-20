@@ -1,0 +1,19 @@
+// File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
+
+package fastedge_kv_store_test
+
+import (
+	"context"
+	"testing"
+
+	"github.com/stainless-sdks/gcore-terraform/internal/services/fastedge_kv_store"
+	"github.com/stainless-sdks/gcore-terraform/internal/test_helpers"
+)
+
+func TestFastedgeKvStoreDataSourceModelSchemaParity(t *testing.T) {
+	t.Parallel()
+	model := (*fastedge_kv_store.FastedgeKvStoreDataSourceModel)(nil)
+	schema := fastedge_kv_store.DataSourceSchema(context.TODO())
+	errs := test_helpers.ValidateDataSourceModelSchemaIntegrity(model, schema)
+	errs.Report(t)
+}
