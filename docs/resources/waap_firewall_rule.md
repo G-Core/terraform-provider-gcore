@@ -125,6 +125,8 @@ Optional:
 
 Import is supported using the following syntax:
 
+The [`terraform import` command](https://developer.hashicorp.com/terraform/cli/commands/import) can be used, for example:
+
 ```shell
 # import using <domain_id>:<rule_id>
 terraform import gcore_waap_firewall_rule.firewall_rule 136578:912200

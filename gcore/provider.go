@@ -189,6 +189,9 @@ func Provider() *schema.Provider {
 			"gcore_cdn_sslcert":                   resourceCDNCert(),
 			"gcore_cdn_rule_template":             resourceRuleTemplate(),
 			"gcore_cdn_cacert":                    resourceCDNCACert(),
+			"gcore_cdn_logs_uploader_config":      resourceCDNLogsUploaderConfig(),
+			"gcore_cdn_logs_uploader_policy":      resourceCDNLogsUploaderPolicy(),
+			"gcore_cdn_logs_uploader_target":      resourceCDNLogsUploaderTarget(),
 			lifecyclePolicyResource:               resourceLifecyclePolicy(),
 			"gcore_ddos_protection":               resourceDDoSProtection(),
 			"gcore_inference_deployment":          resourceInferenceDeployment(),
@@ -209,6 +212,7 @@ func Provider() *schema.Provider {
 			"gcore_waap_policy":                   resourceWaapPolicy(),
 			"gcore_waap_firewall_rule":            resourceWaapFirewallRule(),
 			"gcore_iam_account":                   resourceIamAccount(),
+			"gcore_iam_api_token":                 resourceIamApiToken(),
 		},
 		DataSourcesMap: map[string]*schema.Resource{
 			"gcore_ai_cluster":                 dataSourceAICluster(),
