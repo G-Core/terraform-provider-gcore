@@ -124,7 +124,6 @@ func resourceRegistryCredentialRead(ctx context.Context, d *schema.ResourceData,
 
 	d.Set("name", creds.Name)
 	d.Set("username", creds.Username)
-	d.Set("password", creds.Password)
 	d.Set("registry_url", creds.RegistryURL)
 	d.Set("project_id", creds.ProjectID)
 
