@@ -140,7 +140,7 @@ func (r *CloudLoadBalancerResource) Update(ctx context.Context, req resource.Upd
 	res := new(http.Response)
 	_, err = r.client.Cloud.LoadBalancers.Update(
 		ctx,
-		data.LoadbalancerID.ValueString(),
+		data.ID.ValueString(),
 		params,
 		option.WithRequestBody("application/json", dataBytes),
 		option.WithResponseBodyInto(&res),
@@ -182,7 +182,7 @@ func (r *CloudLoadBalancerResource) Read(ctx context.Context, req resource.ReadR
 	res := new(http.Response)
 	_, err := r.client.Cloud.LoadBalancers.Get(
 		ctx,
-		data.LoadbalancerID.ValueString(),
+		data.ID.ValueString(),
 		params,
 		option.WithResponseBodyInto(&res),
 		option.WithMiddleware(logging.Middleware(ctx)),
@@ -227,7 +227,7 @@ func (r *CloudLoadBalancerResource) Delete(ctx context.Context, req resource.Del
 
 	_, err := r.client.Cloud.LoadBalancers.Delete(
 		ctx,
-		data.LoadbalancerID.ValueString(),
+		data.ID.ValueString(),
 		params,
 		option.WithMiddleware(logging.Middleware(ctx)),
 	)
