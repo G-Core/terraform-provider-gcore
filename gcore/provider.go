@@ -211,6 +211,7 @@ func Provider() *schema.Provider {
 			"gcore_waap_custom_page_set":          resourceWaapCustomPageSet(),
 			"gcore_waap_policy":                   resourceWaapPolicy(),
 			"gcore_waap_firewall_rule":            resourceWaapFirewallRule(),
+			"gcore_iam_user":                      resourceIamUser(),
 			"gcore_iam_account":                   resourceIamAccount(),
 			"gcore_iam_api_token":                 resourceIamApiToken(),
 		},
