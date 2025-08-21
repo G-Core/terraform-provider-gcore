@@ -212,6 +212,8 @@ func Provider() *schema.Provider {
 			"gcore_waap_policy":                   resourceWaapPolicy(),
 			"gcore_waap_firewall_rule":            resourceWaapFirewallRule(),
 			"gcore_iam_user":                      resourceIamUser(),
+			"gcore_iam_account":                   resourceIamAccount(),
+			"gcore_iam_api_token":                 resourceIamApiToken(),
 		},
 		DataSourcesMap: map[string]*schema.Resource{
 			"gcore_ai_cluster":                 dataSourceAICluster(),
