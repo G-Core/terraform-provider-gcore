@@ -16,6 +16,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/provider/schema"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/types"
+	"github.com/stainless-sdks/gcore-terraform/internal/services/cloud_load_balancer"
 )
 
 var _ provider.ProviderWithConfigValidators = (*GcoreProvider)(nil)
@@ -137,11 +138,16 @@ func (p *GcoreProvider) ConfigValidators(_ context.Context) []provider.ConfigVal
 }
 
 func (p *GcoreProvider) Resources(ctx context.Context) []func() resource.Resource {
-	return []func() resource.Resource{}
+	return []func() resource.Resource{
+		cloud_load_balancer.NewResource,
+	}
 }
 
 func (p *GcoreProvider) DataSources(ctx context.Context) []func() datasource.DataSource {
-	return []func() datasource.DataSource{}
+	return []func() datasource.DataSource{
+		cloud_load_balancer.NewCloudLoadBalancerDataSource,
+		cloud_load_balancer.NewCloudLoadBalancersDataSource,
+	}
 }
 
 func NewProvider(version string) func() provider.Provider {
