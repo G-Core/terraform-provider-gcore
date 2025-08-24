@@ -837,7 +837,12 @@ func fillRRSet(d *schema.ResourceData, rType string, rrSet *dnssdk.RRSet) error 
 				for k, v := range cidrLabels {
 					if vStr, ok := v.(string); ok {
 						vInt, _ := strconv.Atoi(vStr)
-						cidrLabelsMap[k] = vInt
+						vInt, err := strconv.Atoi(vStr)
+						if err != nil {
+							metaErrs = append(metaErrs, fmt.Errorf("cidr label %s has invalid integer value %q: %v", k, vStr, err))
+						} else {
+							cidrLabelsMap[k] = vInt
+						}
 					} else {
 						metaErrs = append(metaErrs, fmt.Errorf("cidr label %s has wrong type %T, expected string", k, v))
 					}
