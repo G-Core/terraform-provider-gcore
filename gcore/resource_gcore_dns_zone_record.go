@@ -744,6 +744,7 @@ func fillRRSet(d *schema.ResourceData, rType string, rrSet *dnssdk.RRSet) error 
 		data := resource.(map[string]interface{})
 		content := data[DNSZoneRecordSchemaContent].(string)
 		if strings.TrimSpace(content) == "" {
+			log.Printf("Warning: Skipping resource record with empty content: %+v", data)
 			continue
 		}
 		rr := (&dnssdk.ResourceRecord{}).SetContent(rType, content)
