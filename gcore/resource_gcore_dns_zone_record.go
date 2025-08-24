@@ -792,7 +792,7 @@ func fillRRSet(d *schema.ResourceData, rType string, rrSet *dnssdk.RRSet) error 
 			valStr := meta[DNSZoneRecordSchemaMetaNotes].(string)
 			if valStr != "" {
 				rr.AddMeta(dnssdk.NewResourceMetaNotes(valStr))
-			}
+			rr.AddMeta(dnssdk.NewResourceMetaNotes(valStr))
 
 			latLongVal := meta[DNSZoneRecordSchemaMetaLatLong].([]any)
 			if len(latLongVal) == 2 {
