@@ -5,6 +5,7 @@ package gcore
 
 import (
 	"fmt"
+	"os"
 	"strings"
 	"testing"
 	"time"
@@ -12,9 +13,18 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
 )
 
+func getTestZone(t *testing.T) string {
+	zone := os.Getenv("GCORE_DNS_TEST_ZONE")
+	if zone == "" {
+		t.Helper()
+		t.Skip("GCORE_DNS_TEST_ZONE is not set, skipping acceptance test")
+	}
+	return zone
+}
+
 func TestAccDnsZoneRecord(t *testing.T) {
 	random := time.Now().Nanosecond()
-	zone := "kokizzu.neuroops.link"
+	zone := getTestZone(t)
 	rrSetName := strings.ReplaceAll(zone, ".", "_")
 	subDomain := fmt.Sprintf("key%d", random)
 	name := fmt.Sprintf("%s_%s", subDomain, rrSetName)
@@ -202,7 +212,7 @@ resource "%s" "%s" {
 // note: when testing, set GCORE_DNS_API=https://api.gcore.com/dns
 func TestAccDnsZoneRecordSvcbHttps(t *testing.T) {
 	random := time.Now().Nanosecond()
-	zone := "kokizzu.neuroops.link"
+	zone := getTestZone(t)
 	subDomain := fmt.Sprintf("key%d", random)
 	name := strings.ReplaceAll(fmt.Sprintf("%s_%s", subDomain, zone), `.`, `_`)
 	fullDomain := subDomain + "." + zone
@@ -255,7 +265,7 @@ func TestAccDnsZoneRecordRRSetMeta(t *testing.T) {
 	// checks for rrset.meta failover/healthchecks and geodns_link
 
 	random := time.Now().Nanosecond()
-	const zone = "kokizzu.neuroops.link"
+	zone := getTestZone(t)
 	subDomain := fmt.Sprintf("key%d", random)
 	name := strings.ReplaceAll(fmt.Sprintf("%s_%s", subDomain, zone), `.`, `_`)
 	fullDomain := subDomain + "." + zone
@@ -358,7 +368,7 @@ resource "%s" "%s" {
 // note: when testing, set GCORE_DNS_API=https://api.gcore.com/dns
 func TestAccDnsZoneRecordNetworkMapping(t *testing.T) {
 	random := time.Now().Nanosecond()
-	zone := "kokizzu.neuroops.link"
+	zone := getTestZone(t)
 	subDomain := fmt.Sprintf("key-nm-%d", random)
 	fullDomain := subDomain + "." + zone
 	mappingName := fmt.Sprintf("test-mapping-%d", random)
