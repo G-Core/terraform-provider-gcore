@@ -86,19 +86,19 @@ func (r *CloudLoadBalancerResource) Create(ctx context.Context, req resource.Cre
 		option.WithMiddleware(logging.Middleware(ctx)),
 	)
 	if err != nil {
-		resp.Diagnostics.AddError("failed to create load balancer", err.Error())
+		resp.Diagnostics.AddError("failed to make http request", err.Error())
 		return
 	}
 
 	// Update data with the returned LoadBalancer
 	loadBalancerBytes, err := apijson.MarshalRoot(loadBalancer)
 	if err != nil {
-		resp.Diagnostics.AddError("failed to serialize load balancer response", err.Error())
+		resp.Diagnostics.AddError("failed to serialize http request", err.Error())
 		return
 	}
 	err = apijson.UnmarshalComputed(loadBalancerBytes, &data)
 	if err != nil {
-		resp.Diagnostics.AddError("failed to deserialize load balancer response", err.Error())
+		resp.Diagnostics.AddError("failed to deserialize http request", err.Error())
 		return
 	}
 
