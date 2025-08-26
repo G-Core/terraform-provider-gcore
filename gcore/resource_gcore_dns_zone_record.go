@@ -696,7 +696,7 @@ func fillRRSet(d *schema.ResourceData, rType string, rrSet *dnssdk.RRSet) error 
 		for k, v := range kv.(map[string]any) {
 			switch k {
 			// DNSZoneRRSetSchemaMetaFailover - 10. `meta` (map)
-			case DNSZoneRRSetSchemaMetaFailover, DNSZoneRRSetSchemaMetaHealthchecks:
+			case DNSZoneRRSetSchemaMetaHealthchecks:
 				failoverObj, ok := v.(*schema.Set)
 				if !ok {
 					return fmt.Errorf("invalid type of rrset meta.healthchecks, expected map[string]any, got %T %v", v, v)
@@ -713,6 +713,23 @@ func fillRRSet(d *schema.ResourceData, rType string, rrSet *dnssdk.RRSet) error 
 						}
 					}
 					rrSet.Meta[DNSZoneRRSetSchemaMetaHealthchecks] = fMap
+				}
+			case DNSZoneRRSetSchemaMetaFailover:
+				failoverObj, ok := v.(*schema.Set)
+				if !ok {
+					return fmt.Errorf("invalid type of rrset meta.failover, expected map[string]any, got %T %v", v, v)
+				}
+				if failoverObj.Len() > 0 {
+					fMap := map[string]any{}
+					for _, kv2 := range failoverObj.List() {
+						m2, ok := kv2.(map[string]any)
+						if !ok {
+							return fmt.Errorf("invalid type of rrset meta.failover.*, expected map[string]any, got %T %v", kv2, kv2)
+						}
+						for k2, v2 := range m2 {
+							fMap[k2] = v2
+						}
+					}
 					rrSet.Meta[DNSZoneRRSetSchemaMetaFailover] = fMap
 				}
 			case DNSZoneRRSetSchemaMetaGeodnsLink:
