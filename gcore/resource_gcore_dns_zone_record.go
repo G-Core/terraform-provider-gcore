@@ -834,7 +834,6 @@ func fillRRSet(d *schema.ResourceData, rType string, rrSet *dnssdk.RRSet) error 
 				cidrLabelsMap := make(map[string]int, len(cidrLabels))
 				for k, v := range cidrLabels {
 					if vStr, ok := v.(string); ok {
-						vInt, _ := strconv.Atoi(vStr)
 						vInt, err := strconv.Atoi(vStr)
 						if err != nil {
 							metaErrs = append(metaErrs, fmt.Errorf("cidr label %s has invalid integer value %q: %v", k, vStr, err))
