@@ -148,7 +148,9 @@ Available values: "ACTIVE", "DELETED", "ERROR", "PENDING_CREATE", "PENDING_DELET
 - `stats` (Attributes) Statistics of load balancer. (see [below for nested schema](#nestedatt--stats))
 - `tags_v2` (Attributes List) List of key-value tags associated with the resource. A tag is a key-value pair that can be associated with a resource, enabling efficient filtering and grouping for better organization and management. Some tags are read-only and cannot be modified by the user. Tags are also integrated with cost reports, allowing cost data to be filtered based on tag keys or values. (see [below for nested schema](#nestedatt--tags_v2))
 - `task_id` (String) The UUID of the active task that currently holds a lock on the resource. This lock prevents concurrent modifications to ensure consistency. If `null`, the resource is not locked.
-- `tasks` (List of String) List of task IDs
+- `tasks` (List of String) List of task IDs representing asynchronous operations. Use these IDs to monitor operation progress:
+\* `GET /v1/tasks/{`task_id`}` - Check individual task status and details
+Poll task status until completion (`FINISHED`/`ERROR`) before proceeding with dependent operations.
 - `updated_at` (String) Datetime when the load balancer was last updated
 - `vip_address` (String) Load balancer IP address
 - `vrrp_ips` (Attributes List) List of VRRP IP addresses (see [below for nested schema](#nestedatt--vrrp_ips))
@@ -250,7 +252,10 @@ Optional:
 - `monitor_address` (String) An alternate IP address used for health monitoring of a backend member. Default is null which monitors the member address.
 - `monitor_port` (Number) An alternate protocol port used for health monitoring of a backend member. Default is null which monitors the member `protocol_port`.
 - `subnet_id` (String) `subnet_id` in which `address` is present. Either `subnet_id` or `instance_id` should be provided
-- `weight` (Number) Member weight. Valid values are 0 < `weight` <= 256, defaults to 1.
+- `weight` (Number) Member weight. Valid values are 0 < `weight` <= 256, defaults to 1. Controls traffic distribution based on the pool's load balancing algorithm:
+\* `ROUND_ROBIN`: Distributes connections to each member in turn according to weights. Higher weight = more turns in the cycle. Example: weights 3 vs 1 = ~75% vs ~25% of requests.
+\* `LEAST_CONNECTIONS`: Sends new connections to the member with fewest active connections, performing round-robin within groups of the same normalized load. Higher weight = allowed to hold more simultaneous connections before being considered 'more loaded'. Example: weights 2 vs 1 means 20 vs 10 active connections is treated as balanced.
+\* `SOURCE_IP`: Routes clients consistently to the same member by hashing client source IP; hash result is modulo total weight of running members. Higher weight = more hash buckets, so more client IPs map to that member. Example: weights 2 vs 1 = roughly two-thirds of distinct client IPs map to the higher-weight member.
 
 
 <a id="nestedatt--listeners--pools--session_persistence"></a>
