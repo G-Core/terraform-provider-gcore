@@ -102,6 +102,9 @@ func (r *CloudLoadBalancerResource) Create(ctx context.Context, req resource.Cre
 		return
 	}
 
+	// The loadbalancer_id does not come in the response, and it's needed by Terraform, so it's set manually
+	data.LoadbalancerID = data.ID
+
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
 }
 
@@ -157,6 +160,9 @@ func (r *CloudLoadBalancerResource) Update(ctx context.Context, req resource.Upd
 		return
 	}
 
+	// The loadbalancer_id does not come in the response, and it's needed by Terraform, so it's set manually
+	data.LoadbalancerID = data.ID
+
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
 }
 
@@ -202,6 +208,9 @@ func (r *CloudLoadBalancerResource) Read(ctx context.Context, req resource.ReadR
 		resp.Diagnostics.AddError("failed to deserialize http request", err.Error())
 		return
 	}
+
+	// The loadbalancer_id does not come in the response, and it's needed by Terraform, so it's set manually
+	data.LoadbalancerID = data.ID
 
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
 }
