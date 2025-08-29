@@ -77,24 +77,33 @@ func (r *CloudLoadBalancerResource) Create(ctx context.Context, req resource.Cre
 		resp.Diagnostics.AddError("failed to serialize http request", err.Error())
 		return
 	}
-	res := new(http.Response)
-	_, err = r.client.Cloud.LoadBalancers.New(
+
+	// Use NewAndPoll to get the LoadBalancer directly instead of task_id
+	loadBalancer, err := r.client.Cloud.LoadBalancers.NewAndPoll(
 		ctx,
 		params,
 		option.WithRequestBody("application/json", dataBytes),
-		option.WithResponseBodyInto(&res),
 		option.WithMiddleware(logging.Middleware(ctx)),
 	)
 	if err != nil {
 		resp.Diagnostics.AddError("failed to make http request", err.Error())
 		return
 	}
-	bytes, _ := io.ReadAll(res.Body)
-	err = apijson.UnmarshalComputed(bytes, &data)
+
+	// Update data with the returned LoadBalancer
+	loadBalancerBytes, err := apijson.MarshalRoot(loadBalancer)
+	if err != nil {
+		resp.Diagnostics.AddError("failed to serialize http request", err.Error())
+		return
+	}
+	err = apijson.UnmarshalComputed(loadBalancerBytes, &data)
 	if err != nil {
 		resp.Diagnostics.AddError("failed to deserialize http request", err.Error())
 		return
 	}
+
+	// The loadbalancer_id does not come in the response, and it's needed by Terraform, so it's set manually
+	data.LoadbalancerID = data.ID
 
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
 }
@@ -134,7 +143,7 @@ func (r *CloudLoadBalancerResource) Update(ctx context.Context, req resource.Upd
 	res := new(http.Response)
 	_, err = r.client.Cloud.LoadBalancers.Update(
 		ctx,
-		data.LoadbalancerID.ValueString(),
+		data.ID.ValueString(),
 		params,
 		option.WithRequestBody("application/json", dataBytes),
 		option.WithResponseBodyInto(&res),
@@ -150,6 +159,9 @@ func (r *CloudLoadBalancerResource) Update(ctx context.Context, req resource.Upd
 		resp.Diagnostics.AddError("failed to deserialize http request", err.Error())
 		return
 	}
+
+	// The loadbalancer_id does not come in the response, and it's needed by Terraform, so it's set manually
+	data.LoadbalancerID = data.ID
 
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
 }
@@ -176,7 +188,7 @@ func (r *CloudLoadBalancerResource) Read(ctx context.Context, req resource.ReadR
 	res := new(http.Response)
 	_, err := r.client.Cloud.LoadBalancers.Get(
 		ctx,
-		data.LoadbalancerID.ValueString(),
+		data.ID.ValueString(),
 		params,
 		option.WithResponseBodyInto(&res),
 		option.WithMiddleware(logging.Middleware(ctx)),
@@ -196,6 +208,9 @@ func (r *CloudLoadBalancerResource) Read(ctx context.Context, req resource.ReadR
 		resp.Diagnostics.AddError("failed to deserialize http request", err.Error())
 		return
 	}
+
+	// The loadbalancer_id does not come in the response, and it's needed by Terraform, so it's set manually
+	data.LoadbalancerID = data.ID
 
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
 }
@@ -221,7 +236,7 @@ func (r *CloudLoadBalancerResource) Delete(ctx context.Context, req resource.Del
 
 	_, err := r.client.Cloud.LoadBalancers.Delete(
 		ctx,
-		data.LoadbalancerID.ValueString(),
+		data.ID.ValueString(),
 		params,
 		option.WithMiddleware(logging.Middleware(ctx)),
 	)
