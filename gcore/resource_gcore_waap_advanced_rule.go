@@ -380,7 +380,7 @@ func getWaapActionPayload(actionRaw any) *waap.CustomerRuleActionInput {
 					val := waap.RuleBlockStatusCode(v.(int))
 					blockAction.StatusCode = &val
 				}
-				if v, ok := blockMap["action_duration"]; ok {
+				if v, ok := blockMap["action_duration"]; ok && v.(string) != "" {
 					val := v.(string)
 					blockAction.ActionDuration = &val
 				}
