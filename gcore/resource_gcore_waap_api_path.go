@@ -128,18 +128,18 @@ func resourceWaapApiPathCreate(ctx context.Context, d *schema.ResourceData, m in
 		req.ApiVersion = &version
 	}
 
-	if tags := convertSchemaSetToStringList(d.Get("tags").(*schema.Set)); tags != nil && len(tags) > 0 {
+	if tags := convertSchemaSetToStringList(d.Get("tags").(*schema.Set)); len(tags) > 0 {
 		req.Tags = &tags
 	}
 
-	if apiGroups := convertSchemaSetToStringList(d.Get("api_groups").(*schema.Set)); apiGroups != nil && len(apiGroups) > 0 {
+	if apiGroups := convertSchemaSetToStringList(d.Get("api_groups").(*schema.Set)); len(apiGroups) > 0 {
 		req.ApiGroups = &apiGroups
 	}
 
 	result, err := client.CreateApiPathV1DomainsDomainIdApiPathsPostWithResponse(ctx, d.Get("domain_id").(int), req)
 
 	if err != nil {
-		return diag.Errorf("Failed to create API Path: %w", err)
+		return diag.Errorf("Failed to create API Path: %s", err)
 	}
 
 	if result.StatusCode() != http.StatusCreated {
@@ -162,7 +162,7 @@ func resourceWaapApiPathCreate(ctx context.Context, d *schema.ResourceData, m in
 			return diag.Diagnostics{
 				{
 					Severity: diag.Warning,
-					Summary:  fmt.Sprintf("Failed to update API Path status: %w", err),
+					Summary:  fmt.Sprintf("Failed to update API Path status: %s", err),
 				},
 			}
 		}
@@ -194,7 +194,7 @@ func resourceWaapApiPathRead(ctx context.Context, d *schema.ResourceData, m inte
 
 	result, err := client.GetApiPathV1DomainsDomainIdApiPathsPathIdGetWithResponse(ctx, d.Get("domain_id").(int), apiPathUUID)
 	if err != nil {
-		return diag.Errorf("Failed to read API Path: %w", apiPathUUID, err)
+		return diag.Errorf("Failed to read API Path: %s. Error: %s", apiPathUUID, err)
 	}
 
 	if result.StatusCode() == http.StatusNotFound {
@@ -243,18 +243,18 @@ func resourceWaapApiPathUpdate(ctx context.Context, d *schema.ResourceData, m in
 		req.Status = &status
 	}
 
-	if apiGroups := convertSchemaSetToStringList(d.Get("api_groups").(*schema.Set)); apiGroups != nil && len(apiGroups) > 0 {
+	if apiGroups := convertSchemaSetToStringList(d.Get("api_groups").(*schema.Set)); len(apiGroups) > 0 {
 		req.ApiGroups = &apiGroups
 	}
 
-	if tags := convertSchemaSetToStringList(d.Get("tags").(*schema.Set)); tags != nil && len(tags) > 0 {
+	if tags := convertSchemaSetToStringList(d.Get("tags").(*schema.Set)); len(tags) > 0 {
 		req.Tags = &tags
 	}
 
 	result, err := client.UpdateApiPathV1DomainsDomainIdApiPathsPathIdPatchWithResponse(ctx, d.Get("domain_id").(int), pathUUID, req)
 
 	if err != nil {
-		return diag.Errorf("Failed to update API Path: %w", err)
+		return diag.Errorf("Failed to update API Path: %s", err)
 	}
 
 	if result.StatusCode() != http.StatusNoContent {

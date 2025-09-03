@@ -231,7 +231,7 @@ func resourceWaapAdvancedRuleCreate(ctx context.Context, d *schema.ResourceData,
 	result, err := client.CreateAdvancedRuleV1DomainsDomainIdAdvancedRulesPostWithResponse(ctx, d.Get("domain_id").(int), req)
 
 	if err != nil {
-		return diag.Errorf("Failed to create Advanced Rule: %w", err)
+		return diag.Errorf("Failed to create Advanced Rule: %s", err)
 	}
 
 	if result.StatusCode() != http.StatusCreated {
@@ -257,13 +257,13 @@ func resourceWaapAdvancedRuleRead(ctx context.Context, d *schema.ResourceData, m
 
 	result, err := client.GetAdvancedRuleV1DomainsDomainIdAdvancedRulesRuleIdGetWithResponse(ctx, d.Get("domain_id").(int), ruleID)
 	if err != nil {
-		return diag.Errorf("Failed to read Advanced Rule: %w", err)
+		return diag.Errorf("Failed to read Advanced Rule: %s", err)
 	}
 
 	if result.StatusCode() == http.StatusNotFound {
 		d.SetId("") // Resource not found, remove from state
 		return diag.Diagnostics{
-			{Severity: diag.Warning, Summary: fmt.Sprintf("Advanced Rule (%s) was not found, removed from TF state", ruleID)},
+			{Severity: diag.Warning, Summary: fmt.Sprintf("Advanced Rule (%d) was not found, removed from TF state", ruleID)},
 		}
 	}
 
@@ -278,7 +278,7 @@ func resourceWaapAdvancedRuleRead(ctx context.Context, d *schema.ResourceData, m
 	d.Set("phase", result.JSON200.Phase)
 	d.Set("action", readWaapActionFromResponse(result.JSON200.Action))
 
-	log.Printf("[DEBUG] Finish WAAP Advanced Rule reading (id=%s)\n", ruleID)
+	log.Printf("[DEBUG] Finish WAAP Advanced Rule reading (id=%d)\n", ruleID)
 	return nil
 }
 
@@ -320,14 +320,14 @@ func resourceWaapAdvancedRuleUpdate(ctx context.Context, d *schema.ResourceData,
 	result, err := client.UpdateAdvancedRuleV1DomainsDomainIdAdvancedRulesRuleIdPatchWithResponse(ctx, d.Get("domain_id").(int), ruleID, req)
 
 	if err != nil {
-		return diag.Errorf("Failed to update Advanced Rule: %w", err)
+		return diag.Errorf("Failed to update Advanced Rule: %s", err)
 	}
 
 	if result.StatusCode() != http.StatusNoContent {
 		return diag.Errorf("Failed to update Advanced Rule. Status code: %d with error: %s", result.StatusCode(), result.Body)
 	}
 
-	log.Printf("[DEBUG] Finish WAAP Advanced Rule updating (id=%s)", ruleID)
+	log.Printf("[DEBUG] Finish WAAP Advanced Rule updating (id=%d)\n", ruleID)
 	return resourceWaapAdvancedRuleRead(ctx, d, m)
 }
 
