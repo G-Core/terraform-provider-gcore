@@ -295,15 +295,12 @@ func resourceWaapAdvancedRuleUpdate(ctx context.Context, d *schema.ResourceData,
 	name := d.Get("name").(string)
 	enabled := d.Get("enabled").(bool)
 	source := d.Get("source").(string)
+	description := d.Get("description").(string)
 	req := waap.UpdateAdvancedRule{
-		Name:    &name,
-		Enabled: &enabled,
-		Source:  &source,
-	}
-
-	if v, ok := d.GetOk("description"); ok {
-		description := v.(string)
-		req.Description = &description
+		Name:        &name,
+		Enabled:     &enabled,
+		Source:      &source,
+		Description: &description,
 	}
 
 	if v, ok := d.GetOk("phase"); ok {
