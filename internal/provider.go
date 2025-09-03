@@ -17,6 +17,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/stainless-sdks/gcore-terraform/internal/services/cloud_load_balancer"
+	"github.com/stainless-sdks/gcore-terraform/internal/services/cloud_project"
 )
 
 var _ provider.ProviderWithConfigValidators = (*GcoreProvider)(nil)
@@ -145,6 +146,8 @@ func (p *GcoreProvider) Resources(ctx context.Context) []func() resource.Resourc
 
 func (p *GcoreProvider) DataSources(ctx context.Context) []func() datasource.DataSource {
 	return []func() datasource.DataSource{
+		cloud_project.NewCloudProjectDataSource,
+		cloud_project.NewCloudProjectsDataSource,
 		cloud_load_balancer.NewCloudLoadBalancerDataSource,
 		cloud_load_balancer.NewCloudLoadBalancersDataSource,
 	}
