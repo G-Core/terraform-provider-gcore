@@ -180,9 +180,6 @@ func resourceWaapFirewallRuleCreate(ctx context.Context, d *schema.ResourceData,
 	if v, ok := d.GetOk("description"); ok {
 		description := v.(string)
 		req.Description = &description
-	} else {
-		description := ""
-		req.Description = &description
 	}
 
 	if v, ok := d.GetOk("action"); ok {
@@ -292,18 +289,12 @@ func resourceWaapFirewallRuleUpdate(ctx context.Context, d *schema.ResourceData,
 
 	name := d.Get("name").(string)
 	enabled := d.Get("enabled").(bool)
+	description := d.Get("description").(string)
 
 	req := waap.UpdateFirewallRule{
-		Name:    &name,
-		Enabled: &enabled,
-	}
-
-	if v, ok := d.GetOk("description"); ok {
-		description := v.(string)
-		req.Description = &description
-	} else {
-		description := ""
-		req.Description = &description
+		Name:        &name,
+		Enabled:     &enabled,
+		Description: &description,
 	}
 
 	if v, ok := d.GetOk("action"); ok {
