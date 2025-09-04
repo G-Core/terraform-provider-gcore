@@ -22,7 +22,6 @@ type CloudLoadBalancersDataSourceModel struct {
 	ProjectID        types.Int64                                                          `tfsdk:"project_id" path:"project_id,optional"`
 	RegionID         types.Int64                                                          `tfsdk:"region_id" path:"region_id,optional"`
 	AssignedFloating types.Bool                                                           `tfsdk:"assigned_floating" query:"assigned_floating,optional"`
-	Limit            types.Int64                                                          `tfsdk:"limit" query:"limit,optional"`
 	LoggingEnabled   types.Bool                                                           `tfsdk:"logging_enabled" query:"logging_enabled,optional"`
 	Name             types.String                                                         `tfsdk:"name" query:"name,optional"`
 	OrderBy          types.String                                                         `tfsdk:"order_by" query:"order_by,optional"`
@@ -48,9 +47,6 @@ func (m *CloudLoadBalancersDataSourceModel) toListParams(_ context.Context) (par
 
 	if !m.AssignedFloating.IsNull() {
 		params.AssignedFloating = param.NewOpt(m.AssignedFloating.ValueBool())
-	}
-	if !m.Limit.IsNull() {
-		params.Limit = param.NewOpt(m.Limit.ValueInt64())
 	}
 	if !m.LoggingEnabled.IsNull() {
 		params.LoggingEnabled = param.NewOpt(m.LoggingEnabled.ValueBool())

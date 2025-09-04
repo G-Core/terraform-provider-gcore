@@ -31,10 +31,6 @@ func ListDataSourceSchema(ctx context.Context) schema.Schema {
 				Description: "With or without assigned floating IP",
 				Optional:    true,
 			},
-			"limit": schema.Int64Attribute{
-				Description: "Limit the number of returned limit request entities.",
-				Optional:    true,
-			},
 			"logging_enabled": schema.BoolAttribute{
 				Description: "With or without logging",
 				Optional:    true,

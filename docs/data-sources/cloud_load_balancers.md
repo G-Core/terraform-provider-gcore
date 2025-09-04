@@ -17,7 +17,6 @@ data "gcore_cloud_load_balancers" "example_cloud_load_balancers" {
   project_id = 0
   region_id = 0
   assigned_floating = true
-  limit = 0
   logging_enabled = true
   name = "name"
   order_by = "order_by"
@@ -34,7 +33,6 @@ data "gcore_cloud_load_balancers" "example_cloud_load_balancers" {
 ### Optional
 
 - `assigned_floating` (Boolean) With or without assigned floating IP
-- `limit` (Number) Limit the number of returned limit request entities.
 - `logging_enabled` (Boolean) With or without logging
 - `max_items` (Number) Max items to fetch, default: 1000
 - `name` (String) Filter by name

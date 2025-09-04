@@ -2,7 +2,6 @@ data "gcore_cloud_load_balancers" "example_cloud_load_balancers" {
   project_id = 0
   region_id = 0
   assigned_floating = true
-  limit = 0
   logging_enabled = true
   name = "name"
   order_by = "order_by"

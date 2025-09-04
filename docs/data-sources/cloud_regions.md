@@ -23,7 +23,6 @@ data "gcore_cloud_regions" "example_cloud_regions" {
 
 ### Optional
 
-- `limit` (Number) Limit the number of returned regions. Falls back to default of 100 if not specified. Limited by max limit value of 1000
 - `max_items` (Number) Max items to fetch, default: 1000
 - `order_by` (String) Order by field and direction.
 Available values: "created_at.asc", "created_at.desc", "display_name.asc", "display_name.desc".

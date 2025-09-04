@@ -26,7 +26,6 @@ data "gcore_cloud_projects" "example_cloud_projects" {
 
 - `client_id` (Number) Client ID filter for administrators.
 - `include_deleted` (Boolean) Whether to include deleted projects in the response.
-- `limit` (Number) Limit value is used to limit the number of records in the result
 - `max_items` (Number) Max items to fetch, default: 1000
 - `name` (String) Name to filter the results by.
 - `order_by` (String) Order by field and direction.
