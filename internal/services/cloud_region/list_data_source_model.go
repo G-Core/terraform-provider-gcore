@@ -19,7 +19,6 @@ type CloudRegionsResultsListDataSourceEnvelope struct {
 
 type CloudRegionsDataSourceModel struct {
 	Product         types.String                                                   `tfsdk:"product" query:"product,optional"`
-	Limit           types.Int64                                                    `tfsdk:"limit" query:"limit,computed_optional"`
 	OrderBy         types.String                                                   `tfsdk:"order_by" query:"order_by,computed_optional"`
 	ShowVolumeTypes types.Bool                                                     `tfsdk:"show_volume_types" query:"show_volume_types,computed_optional"`
 	MaxItems        types.Int64                                                    `tfsdk:"max_items"`
@@ -29,9 +28,6 @@ type CloudRegionsDataSourceModel struct {
 func (m *CloudRegionsDataSourceModel) toListParams(_ context.Context) (params cloud.RegionListParams, diags diag.Diagnostics) {
 	params = cloud.RegionListParams{}
 
-	if !m.Limit.IsNull() {
-		params.Limit = param.NewOpt(m.Limit.ValueInt64())
-	}
 	if !m.OrderBy.IsNull() {
 		params.OrderBy = cloud.RegionListParamsOrderBy(m.OrderBy.ValueString())
 	}

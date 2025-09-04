@@ -21,7 +21,6 @@ type CloudProjectsDataSourceModel struct {
 	ClientID       types.Int64                                                     `tfsdk:"client_id" query:"client_id,optional"`
 	Name           types.String                                                    `tfsdk:"name" query:"name,optional"`
 	IncludeDeleted types.Bool                                                      `tfsdk:"include_deleted" query:"include_deleted,computed_optional"`
-	Limit          types.Int64                                                     `tfsdk:"limit" query:"limit,computed_optional"`
 	OrderBy        types.String                                                    `tfsdk:"order_by" query:"order_by,computed_optional"`
 	MaxItems       types.Int64                                                     `tfsdk:"max_items"`
 	Items          customfield.NestedObjectList[CloudProjectsItemsDataSourceModel] `tfsdk:"items"`
@@ -35,9 +34,6 @@ func (m *CloudProjectsDataSourceModel) toListParams(_ context.Context) (params c
 	}
 	if !m.IncludeDeleted.IsNull() {
 		params.IncludeDeleted = param.NewOpt(m.IncludeDeleted.ValueBool())
-	}
-	if !m.Limit.IsNull() {
-		params.Limit = param.NewOpt(m.Limit.ValueInt64())
 	}
 	if !m.Name.IsNull() {
 		params.Name = param.NewOpt(m.Name.ValueString())
