@@ -193,26 +193,6 @@ func resourceFileShare() *schema.Resource {
 	}
 }
 
-// checkFileShareQuota checks if the requested size for a file share exceeds the quota limits. Note that the quota for
-// file shares count is not checked here, given that the API does not provide a way to check it.
-func checkFileShareQuota(client *gcorecloud.ServiceClient, requestedSize int) error {
-	opts := file_shares.CheckLimitOpts{
-		Size: requestedSize,
-	}
-	result, err := file_shares.CheckLimits(client, opts).Extract()
-	// If the API call fails, we do not fail the resource creation, but log a warning.
-	if err != nil {
-		log.Printf("[WARN] check limits failed due to: %v.\n", err)
-		return nil
-	}
-	// If the request is below the minimum size limit, the API returns a size limit of 0.
-	if result.SizeLimit == 0 {
-		return nil
-	}
-	return fmt.Errorf("file share size quota exceeded, requested size %d (current usage %d) exceeds limit %d\n",
-		result.SizeRequested, result.SizeUsage, result.SizeLimit)
-}
-
 func resourceFileShareCreate(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	log.Println("[DEBUG] Start file share creating")
 	config := m.(*Config)
@@ -220,11 +200,6 @@ func resourceFileShareCreate(ctx context.Context, d *schema.ResourceData, m inte
 
 	client, err := CreateClient(provider, d, fileSharePoint, "v1")
 	if err != nil {
-		return diag.FromErr(err)
-	}
-	// Quota size check
-	requestedSize := d.Get("size").(int)
-	if err := checkFileShareQuota(client, requestedSize); err != nil {
 		return diag.FromErr(err)
 	}
 
@@ -315,10 +290,6 @@ func resourceFileShareUpdate(ctx context.Context, d *schema.ResourceData, m inte
 	if d.HasChange("size") {
 		newSize := d.Get("size").(int)
 		if newSize > 0 {
-			// Quota check before resize
-			if err := checkFileShareQuota(client, newSize); err != nil {
-				return diag.FromErr(err)
-			}
 			extendOpts := file_shares.ExtendOpts{Size: newSize}
 			result := file_shares.Extend(client, fileShareID, extendOpts)
 			if result.Err != nil {
