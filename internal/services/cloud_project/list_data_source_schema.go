@@ -71,6 +71,15 @@ func ListDataSourceSchema(ctx context.Context) schema.Schema {
 							Computed:    true,
 							CustomType:  timetypes.RFC3339Type{},
 						},
+						"deleted_at": schema.StringAttribute{
+							Description: "Datetime of deletion, which is automatically generated if the project is deleted.",
+							Computed:    true,
+							CustomType:  timetypes.RFC3339Type{},
+						},
+						"description": schema.StringAttribute{
+							Description: "Description of the project.",
+							Computed:    true,
+						},
 						"is_default": schema.BoolAttribute{
 							Description: "Indicates if the project is the default one. Each client always has one default project.",
 							Computed:    true,
@@ -81,15 +90,6 @@ func ListDataSourceSchema(ctx context.Context) schema.Schema {
 						},
 						"state": schema.StringAttribute{
 							Description: "The state of the project.",
-							Computed:    true,
-						},
-						"deleted_at": schema.StringAttribute{
-							Description: "Datetime of deletion, which is automatically generated if the project is deleted.",
-							Computed:    true,
-							CustomType:  timetypes.RFC3339Type{},
-						},
-						"description": schema.StringAttribute{
-							Description: "Description of the project.",
 							Computed:    true,
 						},
 						"task_id": schema.StringAttribute{
