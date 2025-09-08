@@ -173,7 +173,7 @@ func resourceWaapDomainCreate(ctx context.Context, d *schema.ResourceData, m int
 		updateResp, err := client.UpdateDomainV1DomainsDomainIdPatchWithResponse(ctx, domain.Id, updateReq)
 
 		if err != nil {
-			return diag.Errorf("Failed to update Domain status: %w", err)
+			return diag.Errorf("Failed to update Domain status: %s", err)
 		}
 
 		if updateResp.StatusCode() != http.StatusNoContent {
@@ -188,7 +188,7 @@ func resourceWaapDomainCreate(ctx context.Context, d *schema.ResourceData, m int
 		updateSettingsResp, err := updateDomainSettings(ctx, client, settings, domain.Id)
 
 		if err != nil {
-			return diag.Errorf("Failed to update Domain settings: %w", err)
+			return diag.Errorf("Failed to update Domain settings: %s", err)
 		}
 
 		if updateSettingsResp.StatusCode() != http.StatusNoContent {
@@ -201,7 +201,7 @@ func resourceWaapDomainCreate(ctx context.Context, d *schema.ResourceData, m int
 		updateApiDiscoverySettingsResp, err := updateApiDiscoverySettings(ctx, client, apiDiscoverySettings, domain.Id)
 
 		if err != nil {
-			return diag.Errorf("Failed to update API Discovery settings: %w", err)
+			return diag.Errorf("Failed to update API Discovery settings: %s", err)
 		}
 
 		if updateApiDiscoverySettingsResp.StatusCode() != http.StatusOK {
@@ -227,7 +227,7 @@ func resourceWaapDomainRead(ctx context.Context, d *schema.ResourceData, m inter
 	// Get domain details
 	resp, err := client.GetDomainV1DomainsDomainIdGetWithResponse(ctx, domainID)
 	if err != nil {
-		return diag.Errorf("Failed to read Domain details: %w", err)
+		return diag.Errorf("Failed to read Domain details: %s", err)
 	}
 
 	if resp.StatusCode() == http.StatusNotFound {
@@ -246,7 +246,7 @@ func resourceWaapDomainRead(ctx context.Context, d *schema.ResourceData, m inter
 	// Get domain settings
 	settingsResp, err := client.GetDomainSettingsV1DomainsDomainIdSettingsGetWithResponse(ctx, domainID)
 	if err != nil {
-		return diag.Errorf("Failed to read Domain settings: %w", err)
+		return diag.Errorf("Failed to read Domain settings: %s", err)
 	}
 
 	if settingsResp.StatusCode() != http.StatusOK {
@@ -282,7 +282,7 @@ func resourceWaapDomainRead(ctx context.Context, d *schema.ResourceData, m inter
 	// Get API Discovery settings
 	apiDiscoverySettingsResp, err := client.GetApiDiscoverySettingsV1DomainsDomainIdApiDiscoverySettingsGetWithResponse(ctx, domainID)
 	if err != nil {
-		return diag.Errorf("Failed to read API Discovery settings: %w", err)
+		return diag.Errorf("Failed to read API Discovery settings: %s", err)
 	}
 
 	if apiDiscoverySettingsResp.StatusCode() != http.StatusOK {
@@ -335,7 +335,7 @@ func resourceWaapDomainUpdate(ctx context.Context, d *schema.ResourceData, m int
 			updateResp, err := client.UpdateDomainV1DomainsDomainIdPatchWithResponse(ctx, domainID, updateStatusReq)
 
 			if err != nil {
-				return diag.Errorf("Failed to update Domain status: %w", err)
+				return diag.Errorf("Failed to update Domain status: %s", err)
 			}
 
 			if updateResp.StatusCode() != http.StatusNoContent {
@@ -350,7 +350,7 @@ func resourceWaapDomainUpdate(ctx context.Context, d *schema.ResourceData, m int
 			updateSettingsResp, err := updateDomainSettings(ctx, client, settings, domainID)
 
 			if err != nil {
-				return diag.Errorf("Failed to update Domain settings: %w", err)
+				return diag.Errorf("Failed to update Domain settings: %s", err)
 			}
 
 			if updateSettingsResp.StatusCode() != http.StatusNoContent {
@@ -365,7 +365,7 @@ func resourceWaapDomainUpdate(ctx context.Context, d *schema.ResourceData, m int
 			updateApiDiscoverySettingsResp, err := updateApiDiscoverySettings(ctx, client, apiDiscoverySettings, domainID)
 
 			if err != nil {
-				return diag.Errorf("Failed to update API Discovery settings: %w", err)
+				return diag.Errorf("Failed to update API Discovery settings: %s", err)
 			}
 
 			if updateApiDiscoverySettingsResp.StatusCode() != http.StatusOK {

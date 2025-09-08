@@ -74,7 +74,7 @@ func resourceWaapPolicyRead(ctx context.Context, d *schema.ResourceData, m inter
 
 	d.Set("policies", policiesFromConfig)
 
-	log.Printf("[DEBUG] Finish WAAP Policy reading (id=%s)\n", domainID)
+	log.Printf("[DEBUG] Finish WAAP Policy reading (id=%d)\n", domainID)
 	return nil
 }
 
@@ -118,7 +118,7 @@ func resourceWaapPolicyUpdate(ctx context.Context, d *schema.ResourceData, m int
 		updateResp, err := client.ToggleDomainPolicyV1DomainsDomainIdPoliciesPolicyIdTogglePatchWithResponse(ctx, domainID, policyID)
 
 		if err != nil {
-			return diag.Errorf("Failed to update Policy state: %w", err)
+			return diag.Errorf("Failed to update Policy state: %s", err)
 		}
 
 		if updateResp.StatusCode() != http.StatusOK {
@@ -126,7 +126,7 @@ func resourceWaapPolicyUpdate(ctx context.Context, d *schema.ResourceData, m int
 		}
 	}
 
-	log.Printf("[DEBUG] Finish WAAP Policy updating (id=%s)\n", domainID)
+	log.Printf("[DEBUG] Finish WAAP Policy updating (id=%d)\n", domainID)
 
 	diags = append(diags, resourceWaapPolicyRead(ctx, d, m)...)
 	return diags
@@ -139,14 +139,14 @@ func resourceWaapPolicyDelete(ctx context.Context, d *schema.ResourceData, m int
 func getPoliciesFromApi(ctx context.Context, waapClient *waap.ClientWithResponses, domainID int) (map[string]interface{}, int, diag.Diagnostics) {
 	policiesResp, err := waapClient.GetRuleSetListV1DomainsDomainIdRuleSetsGetWithResponse(ctx, domainID)
 	if err != nil {
-		return nil, 0, diag.Errorf("Failed to read Policy: %w", err)
+		return nil, 0, diag.Errorf("Failed to read Policy: %s", err)
 	}
 
 	statusCode := policiesResp.StatusCode()
 
 	if statusCode == http.StatusNotFound {
 		return nil, statusCode, diag.Diagnostics{
-			{Severity: diag.Warning, Summary: fmt.Sprintf("Policy for Domain (%s) was not found, removed from TF state", domainID)},
+			{Severity: diag.Warning, Summary: fmt.Sprintf("Policy for Domain (%d) was not found, removed from TF state", domainID)},
 		}
 	}
 
@@ -182,7 +182,7 @@ func validatePolicies(ctx context.Context, d *schema.ResourceDiff, m interface{}
 	client := m.(*Config).WaapClient
 	policiesFromApi, _, diagErr := getPoliciesFromApi(ctx, client, domainID)
 	if diagErr != nil {
-		return fmt.Errorf("failed to get policies for validation: %s", diagErr)
+		return fmt.Errorf("failed to get policies for validation: %v", diagErr)
 	}
 
 	// Validate that all specified policy IDs exist
