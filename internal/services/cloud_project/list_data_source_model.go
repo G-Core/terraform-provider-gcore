@@ -49,10 +49,10 @@ type CloudProjectsItemsDataSourceModel struct {
 	ID          types.Int64       `tfsdk:"id" json:"id,computed"`
 	ClientID    types.Int64       `tfsdk:"client_id" json:"client_id,computed"`
 	CreatedAt   timetypes.RFC3339 `tfsdk:"created_at" json:"created_at,computed" format:"date-time"`
+	DeletedAt   timetypes.RFC3339 `tfsdk:"deleted_at" json:"deleted_at,computed" format:"date-time"`
+	Description types.String      `tfsdk:"description" json:"description,computed"`
 	IsDefault   types.Bool        `tfsdk:"is_default" json:"is_default,computed"`
 	Name        types.String      `tfsdk:"name" json:"name,computed"`
 	State       types.String      `tfsdk:"state" json:"state,computed"`
-	DeletedAt   timetypes.RFC3339 `tfsdk:"deleted_at" json:"deleted_at,computed" format:"date-time"`
-	Description types.String      `tfsdk:"description" json:"description,computed"`
 	TaskID      types.String      `tfsdk:"task_id" json:"task_id,computed"`
 }
