@@ -188,6 +188,7 @@ Optional:
 
 - `asn` (List of Number) An asn meta (eg. 12345) of DNS Zone Record resource.
 - `backup` (Boolean) Set as backup record
+- `cidr_labels` (Map of String) A map of CIDR tags for this record, where key is tag name and value is tag value. Example: {"tag_name_1": 10, "tag_name_2": 50}.
 - `continents` (List of String) Continents meta (eg. Asia) of DNS Zone Record resource.
 - `countries` (List of String) Countries ISO codes meta (eg. us) of DNS Zone Record resource.
 - `default` (Boolean) Fallback meta equals true marks records which are used as a default answer (when nothing was selected by specified meta fields).
@@ -218,6 +219,7 @@ Optional:
 
 Optional:
 
+- `cidr_mapping` (String) Cidr mapping rule name of DNS Zone RRSet resource.
 - `geodns_link` (String) Geodns link (domain, or cl-) of DNS Zone RRSet resource.
 - `healthchecks` (Block Set) Failover meta (eg. {"frequency": 60,"host": "www.gcore.com","http_status_code": null,"method": "GET","port": 80,"protocol": "HTTP","regexp": "","timeout": 10,"tls": false,"url": "/"}). (see [below for nested schema](#nestedblock--meta--healthchecks))
 
