@@ -11,7 +11,7 @@ import (
 )
 
 type CloudLoadBalancerModel struct {
-	LoadbalancerID        types.String                                                       `tfsdk:"loadbalancer_id" path:"loadbalancer_id,optional"`
+	ID                    types.String                                                       `tfsdk:"id" json:"id,computed"`
 	ProjectID             types.Int64                                                        `tfsdk:"project_id" path:"project_id,optional"`
 	RegionID              types.Int64                                                        `tfsdk:"region_id" path:"region_id,optional"`
 	Flavor                types.String                                                       `tfsdk:"flavor" json:"flavor,optional,no_refresh"`
@@ -28,7 +28,6 @@ type CloudLoadBalancerModel struct {
 	Logging               customfield.NestedObject[CloudLoadBalancerLoggingModel]            `tfsdk:"logging" json:"logging,computed_optional"`
 	CreatedAt             timetypes.RFC3339                                                  `tfsdk:"created_at" json:"created_at,computed" format:"date-time"`
 	CreatorTaskID         types.String                                                       `tfsdk:"creator_task_id" json:"creator_task_id,computed"`
-	ID                    types.String                                                       `tfsdk:"id" json:"id,computed"`
 	OperatingStatus       types.String                                                       `tfsdk:"operating_status" json:"operating_status,computed"`
 	ProvisioningStatus    types.String                                                       `tfsdk:"provisioning_status" json:"provisioning_status,computed"`
 	Region                types.String                                                       `tfsdk:"region" json:"region,computed"`

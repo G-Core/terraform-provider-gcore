@@ -117,7 +117,6 @@ resource "gcore_cloud_load_balancer" "example_cloud_load_balancer" {
 - `flavor` (String) Load balancer flavor name
 - `floating_ip` (Attributes) Floating IP configuration for assignment (see [below for nested schema](#nestedatt--floating_ip))
 - `listeners` (Attributes List) Load balancer listeners. Maximum 50 per LB (excluding Prometheus endpoint listener). (see [below for nested schema](#nestedatt--listeners))
-- `loadbalancer_id` (String)
 - `logging` (Attributes) Logging configuration (see [below for nested schema](#nestedatt--logging))
 - `name` (String) Load balancer name
 - `name_template` (String) Load balancer name which will be changed by template.
@@ -139,7 +138,7 @@ Available values: "dual", "ipv4", "ipv6".
 - `creator_task_id` (String) Task that created this entity
 - `ddos_profile` (Attributes) Loadbalancer advanced DDoS protection profile. (see [below for nested schema](#nestedatt--ddos_profile))
 - `floating_ips` (Attributes List) List of assigned floating IPs (see [below for nested schema](#nestedatt--floating_ips))
-- `id` (String) Load balancer ID
+- `id` (String) The ID of this resource.
 - `operating_status` (String) Load balancer operating status
 Available values: "DEGRADED", "DRAINING", "ERROR", "NO_MONITOR", "OFFLINE", "ONLINE".
 - `provisioning_status` (String) Load balancer lifecycle status
@@ -460,3 +459,11 @@ Read-Only:
 - `role` (String) LoadBalancer instance role to which VRRP IP belong
 Available values: "BACKUP", "MASTER", "STANDALONE".
 - `subnet_id` (String) Subnet UUID
+
+## Import
+
+Import is supported using the following syntax:
+
+```shell
+$ terraform import gcore_cloud_load_balancer.example '<project_id>/<region_id>/<loadbalancer_id>'
+```
