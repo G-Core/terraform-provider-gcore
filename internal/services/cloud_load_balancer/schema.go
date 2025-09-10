@@ -28,9 +28,9 @@ var _ resource.ResourceWithConfigValidators = (*CloudLoadBalancerResource)(nil)
 func ResourceSchema(ctx context.Context) schema.Schema {
 	return schema.Schema{
 		Attributes: map[string]schema.Attribute{
-			"loadbalancer_id": schema.StringAttribute{
-				Optional:      true,
-				PlanModifiers: []planmodifier.String{stringplanmodifier.RequiresReplace()},
+			"id": schema.StringAttribute{
+				Computed:      true,
+				PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
 			},
 			"project_id": schema.Int64Attribute{
 				Optional:      true,
@@ -489,10 +489,6 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 			},
 			"creator_task_id": schema.StringAttribute{
 				Description: "Task that created this entity",
-				Computed:    true,
-			},
-			"id": schema.StringAttribute{
-				Description: "Load balancer ID",
 				Computed:    true,
 			},
 			"operating_status": schema.StringAttribute{

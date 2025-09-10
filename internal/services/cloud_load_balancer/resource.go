@@ -13,13 +13,16 @@ import (
 	"github.com/G-Core/gcore-go/option"
 	"github.com/G-Core/gcore-go/packages/param"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
+	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/stainless-sdks/gcore-terraform/internal/apijson"
+	"github.com/stainless-sdks/gcore-terraform/internal/importpath"
 	"github.com/stainless-sdks/gcore-terraform/internal/logging"
 )
 
 // Ensure provider defined types fully satisfy framework interfaces.
 var _ resource.ResourceWithConfigure = (*CloudLoadBalancerResource)(nil)
 var _ resource.ResourceWithModifyPlan = (*CloudLoadBalancerResource)(nil)
+var _ resource.ResourceWithImportState = (*CloudLoadBalancerResource)(nil)
 
 func NewResource() resource.Resource {
 	return &CloudLoadBalancerResource{}
@@ -102,9 +105,6 @@ func (r *CloudLoadBalancerResource) Create(ctx context.Context, req resource.Cre
 		return
 	}
 
-	// The loadbalancer_id does not come in the response, and it's needed by Terraform, so it's set manually
-	data.LoadbalancerID = data.ID
-
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
 }
 
@@ -160,9 +160,6 @@ func (r *CloudLoadBalancerResource) Update(ctx context.Context, req resource.Upd
 		return
 	}
 
-	// The loadbalancer_id does not come in the response, and it's needed by Terraform, so it's set manually
-	data.LoadbalancerID = data.ID
-
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
 }
 
@@ -209,9 +206,6 @@ func (r *CloudLoadBalancerResource) Read(ctx context.Context, req resource.ReadR
 		return
 	}
 
-	// The loadbalancer_id does not come in the response, and it's needed by Terraform, so it's set manually
-	data.LoadbalancerID = data.ID
-
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
 }
 
@@ -242,6 +236,53 @@ func (r *CloudLoadBalancerResource) Delete(ctx context.Context, req resource.Del
 	)
 	if err != nil {
 		resp.Diagnostics.AddError("failed to make http request", err.Error())
+		return
+	}
+
+	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
+}
+
+func (r *CloudLoadBalancerResource) ImportState(ctx context.Context, req resource.ImportStateRequest, resp *resource.ImportStateResponse) {
+	var data *CloudLoadBalancerModel = new(CloudLoadBalancerModel)
+
+	path_project_id := int64(0)
+	path_region_id := int64(0)
+	path_loadbalancer_id := ""
+	diags := importpath.ParseImportID(
+		req.ID,
+		"<project_id>/<region_id>/<loadbalancer_id>",
+		&path_project_id,
+		&path_region_id,
+		&path_loadbalancer_id,
+	)
+	resp.Diagnostics.Append(diags...)
+	if resp.Diagnostics.HasError() {
+		return
+	}
+
+	data.ProjectID = types.Int64Value(path_project_id)
+	data.RegionID = types.Int64Value(path_region_id)
+	data.ID = types.StringValue(path_loadbalancer_id)
+
+	res := new(http.Response)
+	_, err := r.client.Cloud.LoadBalancers.Get(
+		ctx,
+		path_loadbalancer_id,
+		cloud.LoadBalancerGetParams{
+			ProjectID: param.NewOpt(path_project_id),
+			RegionID:  param.NewOpt(path_region_id),
+		},
+		option.WithResponseBodyInto(&res),
+		option.WithMiddleware(logging.Middleware(ctx)),
+	)
+	if err != nil {
+		resp.Diagnostics.AddError("failed to make http request", err.Error())
+		return
+	}
+	bytes, _ := io.ReadAll(res.Body)
+	err = apijson.Unmarshal(bytes, &data)
+	if err != nil {
+		resp.Diagnostics.AddError("failed to deserialize http request", err.Error())
 		return
 	}
 
