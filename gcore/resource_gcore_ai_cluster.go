@@ -596,7 +596,7 @@ func resourceAIClusterCreate(ctx context.Context, d *schema.ResourceData, m inte
 		createOpts.InstancesCount = instancesCount.(int)
 	}
 
-	if userData, ok := d.GetOk("userdata"); ok {
+	if userData, ok := d.GetOk("user_data"); ok {
 		createOpts.UserData = userData.(string)
 	}
 
