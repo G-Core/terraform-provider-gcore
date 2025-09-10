@@ -16,6 +16,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/provider/schema"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/types"
+	"github.com/stainless-sdks/gcore-terraform/internal/services/cloud_instance_image"
 	"github.com/stainless-sdks/gcore-terraform/internal/services/cloud_load_balancer"
 	"github.com/stainless-sdks/gcore-terraform/internal/services/cloud_project"
 	"github.com/stainless-sdks/gcore-terraform/internal/services/cloud_region"
@@ -153,6 +154,7 @@ func (p *GcoreProvider) DataSources(ctx context.Context) []func() datasource.Dat
 		cloud_region.NewCloudRegionsDataSource,
 		cloud_load_balancer.NewCloudLoadBalancerDataSource,
 		cloud_load_balancer.NewCloudLoadBalancersDataSource,
+		cloud_instance_image.NewCloudInstanceImageDataSource,
 	}
 }
 
