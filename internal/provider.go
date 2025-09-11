@@ -20,6 +20,7 @@ import (
 	"github.com/stainless-sdks/gcore-terraform/internal/services/cloud_load_balancer"
 	"github.com/stainless-sdks/gcore-terraform/internal/services/cloud_project"
 	"github.com/stainless-sdks/gcore-terraform/internal/services/cloud_region"
+	"github.com/stainless-sdks/gcore-terraform/internal/services/cloud_volume"
 )
 
 var _ provider.ProviderWithConfigValidators = (*GcoreProvider)(nil)
@@ -143,6 +144,7 @@ func (p *GcoreProvider) ConfigValidators(_ context.Context) []provider.ConfigVal
 func (p *GcoreProvider) Resources(ctx context.Context) []func() resource.Resource {
 	return []func() resource.Resource{
 		cloud_load_balancer.NewResource,
+		cloud_volume.NewResource,
 	}
 }
 
@@ -154,6 +156,8 @@ func (p *GcoreProvider) DataSources(ctx context.Context) []func() datasource.Dat
 		cloud_region.NewCloudRegionsDataSource,
 		cloud_load_balancer.NewCloudLoadBalancerDataSource,
 		cloud_load_balancer.NewCloudLoadBalancersDataSource,
+		cloud_volume.NewCloudVolumeDataSource,
+		cloud_volume.NewCloudVolumesDataSource,
 		cloud_instance_image.NewCloudInstanceImageDataSource,
 	}
 }
