@@ -2,7 +2,7 @@ terraform {
   required_providers {
     gcore = {
       source  = "G-Core/gcore"
-      version = "~> 0.20"
+      version = ">= 0.20, < 1.0"
     }
   }
 }
