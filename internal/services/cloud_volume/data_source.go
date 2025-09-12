@@ -74,7 +74,7 @@ func (d *CloudVolumeDataSource) Read(ctx context.Context, req datasource.ReadReq
 	// Use raw JSON from the response to unmarshal the "computed" fields into the data model
 	err = apijson.UnmarshalComputed([]byte(volume.RawJSON()), &data)
 	if err != nil {
-		resp.Diagnostics.AddError("failed to deserialize http request", err.Error())
+		resp.Diagnostics.AddError("failed to unmarshal volume data", err.Error())
 		return
 	}
 
