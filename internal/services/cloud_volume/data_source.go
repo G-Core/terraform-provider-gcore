@@ -5,8 +5,6 @@ package cloud_volume
 import (
 	"context"
 	"fmt"
-	"io"
-	"net/http"
 
 	"github.com/G-Core/gcore-go"
 	"github.com/G-Core/gcore-go/option"
@@ -63,20 +61,18 @@ func (d *CloudVolumeDataSource) Read(ctx context.Context, req datasource.ReadReq
 		return
 	}
 
-	res := new(http.Response)
-	_, err := d.client.Cloud.Volumes.Get(
+	volume, err := d.client.Cloud.Volumes.Get(
 		ctx,
 		data.VolumeID.ValueString(),
 		params,
-		option.WithResponseBodyInto(&res),
 		option.WithMiddleware(logging.Middleware(ctx)),
 	)
 	if err != nil {
 		resp.Diagnostics.AddError("failed to make http request", err.Error())
 		return
 	}
-	bytes, _ := io.ReadAll(res.Body)
-	err = apijson.UnmarshalComputed(bytes, &data)
+	// Use raw JSON from the response to unmarshal the "computed" fields into the data model
+	err = apijson.UnmarshalComputed([]byte(volume.RawJSON()), &data)
 	if err != nil {
 		resp.Diagnostics.AddError("failed to deserialize http request", err.Error())
 		return
