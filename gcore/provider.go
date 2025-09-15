@@ -206,6 +206,7 @@ func Provider() *schema.Provider {
 			"gcore_waap_custom_page_set":          resourceWaapCustomPageSet(),
 			"gcore_waap_policy":                   resourceWaapPolicy(),
 			"gcore_waap_firewall_rule":            resourceWaapFirewallRule(),
+			"gcore_file_share":                    resourceFileShare(),
 		},
 		DataSourcesMap: map[string]*schema.Resource{
 			"gcore_ai_cluster":                 dataSourceAICluster(),
@@ -245,6 +246,7 @@ func Provider() *schema.Provider {
 			"gcore_waap_security_insight_type": dataWaapSecurityInsightType(),
 			"gcore_waap_domain_policy":         dataWaapDomainPolicy(),
 			"gcore_waap_tag":                   dataWaapTag(),
+			"gcore_file_share":                 dataSourceFileShare(),
 		},
 		ConfigureContextFunc: providerConfigure,
 	}

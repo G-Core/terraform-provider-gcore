@@ -354,3 +354,85 @@ resource "%s" "%s" {
 		},
 	})
 }
+
+// note: when testing, set GCORE_DNS_API=https://api.gcore.com/dns
+func TestAccDnsZoneRecordNetworkMapping(t *testing.T) {
+	random := time.Now().Nanosecond()
+	zone := "kokizzu.neuroops.link"
+	subDomain := fmt.Sprintf("key-nm-%d", random)
+	fullDomain := subDomain + "." + zone
+	mappingName := fmt.Sprintf("test-mapping-%d", random)
+
+	const mappingResource = "gcore_dns_network_mapping"
+	mappingResourceName := fmt.Sprintf("%s.network_mapping", mappingResource)
+	recordResourceName := fmt.Sprintf("%s.rrset_example", DNSZoneRecordResource)
+
+	template := func(val1, val2 int) string {
+		return fmt.Sprintf(`
+resource "%s" "network_mapping" {
+  name = "%s"
+  mapping {
+    tags = ["development", "test"]
+    cidr4 = ["10.0.0.0/16", "10.1.0.0/16"]
+    cidr6 = ["fd00::/8"]
+  }
+}
+
+resource "%s" "rrset_example" {
+  zone   = "%s"
+  domain = "%s"
+  type   = "CNAME"
+  ttl    = 120
+
+  filter {
+    type = "network_mapping"
+    strict = false
+  }
+
+  meta {
+    cidr_mapping = %s.network_mapping.name
+  }
+
+  resource_record {
+    content = "ezt.cdb-staging.cdn.orange.com"
+    meta {
+      cidr_labels = {
+        (%s.network_mapping.mapping[0].tags[0]) = %d
+        (%s.network_mapping.mapping[0].tags[1]) = %d
+      }
+    }
+    enabled = true
+  }
+}
+`, mappingResource, mappingName, DNSZoneRecordResource, zone, fullDomain, mappingResource, mappingResource, val1, mappingResource, val2)
+	}
+
+	resource.Test(t, resource.TestCase{
+		PreCheck: func() {
+			testAccPreCheckVars(t, GCORE_PERMANENT_TOKEN_VAR, GCORE_DNS_URL_VAR)
+		},
+		ProviderFactories: testAccProviders,
+		Steps: []resource.TestStep{
+			{
+				Config: template(10, 20),
+				Check: resource.ComposeTestCheckFunc(
+					testAccCheckResourceExists(recordResourceName),
+					testAccCheckResourceExists(mappingResourceName),
+					resource.TestCheckResourceAttr(recordResourceName, "filter.0.type", "network_mapping"),
+					resource.TestCheckResourceAttr(recordResourceName, "meta.0.cidr_mapping", mappingName),
+					resource.TestCheckResourceAttr(recordResourceName, "resource_record.0.meta.0.cidr_labels.development", "10"),
+					resource.TestCheckResourceAttr(recordResourceName, "resource_record.0.meta.0.cidr_labels.test", "20"),
+				),
+			},
+			{
+				Config: template(50, 75),
+				Check: resource.ComposeTestCheckFunc(
+					testAccCheckResourceExists(recordResourceName),
+					testAccCheckResourceExists(mappingResourceName),
+					resource.TestCheckResourceAttr(recordResourceName, "resource_record.0.meta.0.cidr_labels.development", "50"),
+					resource.TestCheckResourceAttr(recordResourceName, "resource_record.0.meta.0.cidr_labels.test", "75"),
+				),
+			},
+		},
+	})
+}

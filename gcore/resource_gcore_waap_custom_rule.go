@@ -557,12 +557,12 @@ func resourceCustomRulesCreate(ctx context.Context, d *schema.ResourceData, m in
 	}
 
 	if v, ok := d.GetOk("conditions"); ok {
-		req.Conditions = getConditionsPaylod(v)
+		req.Conditions = getConditionsPayload(v)
 	}
 
 	resp, err := client.CreateCustomRuleV1DomainsDomainIdCustomRulesPostWithResponse(ctx, d.Get("domain_id").(int), req)
 	if err != nil {
-		return diag.Errorf("Failed to create Custom Rule: %w", err)
+		return diag.Errorf("Failed to create Custom Rule: %s", err)
 	}
 
 	if resp.StatusCode() != http.StatusCreated {
@@ -577,7 +577,7 @@ func resourceCustomRulesCreate(ctx context.Context, d *schema.ResourceData, m in
 }
 
 func resourceCustomRulesRead(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
-	log.Println("[DEBUG] Start WAAP Custom Rule reading (id=%s)", d.Id())
+	log.Printf("[DEBUG] Start WAAP Custom Rule reading (id=%s)\n", d.Id())
 
 	client := m.(*Config).WaapClient
 
@@ -588,13 +588,13 @@ func resourceCustomRulesRead(ctx context.Context, d *schema.ResourceData, m inte
 
 	resp, err := client.GetCustomRuleV1DomainsDomainIdCustomRulesRuleIdGetWithResponse(ctx, d.Get("domain_id").(int), ruleId)
 	if err != nil {
-		return diag.Errorf("Failed to read Custom Rule: %w", err)
+		return diag.Errorf("Failed to read Custom Rule: %s", err)
 	}
 
 	if resp.StatusCode() == http.StatusNotFound {
 		d.SetId("") // Resource not found, remove from state
 		return diag.Diagnostics{
-			{Severity: diag.Warning, Summary: fmt.Sprintf("Custom Rule (%s) was not found, removed from TF state", ruleId)},
+			{Severity: diag.Warning, Summary: fmt.Sprintf("Custom Rule (%d) was not found, removed from TF state", ruleId)},
 		}
 	}
 
@@ -612,13 +612,13 @@ func resourceCustomRulesRead(ctx context.Context, d *schema.ResourceData, m inte
 		return diag.Errorf("Failed to save conditions to the state: %s", err)
 	}
 
-	log.Println("[DEBUG] Finish WAAP Custom Rule reading (id=%s)", ruleId)
+	log.Printf("[DEBUG] Finish WAAP Custom Rule reading (id=%d)\n", ruleId)
 
 	return nil
 }
 
 func resourceCustomRulesUpdate(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
-	log.Println("[DEBUG] Start WAAP Custom Rule updating (id=%s)", d.Id())
+	log.Printf("[DEBUG] Start WAAP Custom Rule updating (id=%s)\n", d.Id())
 
 	client := m.(*Config).WaapClient
 
@@ -643,20 +643,20 @@ func resourceCustomRulesUpdate(ctx context.Context, d *schema.ResourceData, m in
 	}
 
 	if d.HasChange("conditions") {
-		conditions := getConditionsPaylod(d.Get("conditions"))
+		conditions := getConditionsPayload(d.Get("conditions"))
 		req.Conditions = &conditions
 	}
 
 	resp, err := client.UpdateCustomRuleV1DomainsDomainIdCustomRulesRuleIdPatchWithResponse(ctx, d.Get("domain_id").(int), ruleId, req)
 	if err != nil {
-		return diag.Errorf("Failed to update Custom Rule: %w", err)
+		return diag.Errorf("Failed to update Custom Rule: %s", err)
 	}
 
 	if resp.StatusCode() != http.StatusNoContent {
 		return diag.Errorf("Failed to update Custom Rule. Status code: %d with error: %s", resp.StatusCode(), resp.Body)
 	}
 
-	log.Printf("[DEBUG] Finish WAAP Custom Rule updating (id=%s)", ruleId)
+	log.Printf("[DEBUG] Finish WAAP Custom Rule updating (id=%d)", ruleId)
 	return resourceCustomRulesRead(ctx, d, m)
 }
 
@@ -685,7 +685,7 @@ func resourceCustomRulesDelete(ctx context.Context, d *schema.ResourceData, m in
 	return nil
 }
 
-func getConditionsPaylod(conditionsRaw any) []waap.CustomRuleConditionInput {
+func getConditionsPayload(conditionsRaw any) []waap.CustomRuleConditionInput {
 	conditions := conditionsRaw.([]interface{})
 	result := []waap.CustomRuleConditionInput{}
 
@@ -700,12 +700,9 @@ func getConditionsPaylod(conditionsRaw any) []waap.CustomRuleConditionInput {
 				conditionRequest := waap.CustomRuleConditionInput{}
 				ip_obj := item.(map[string]interface{})
 
-				var ipAddress waap.IpCondition_IpAddress
-				ipAddress.FromIpConditionIpAddress1(ip_obj["ip_address"].(string))
-
 				negation := ip_obj["negation"].(bool)
 				ipCondition := waap.IpCondition{
-					IpAddress: ipAddress,
+					IpAddress: ip_obj["ip_address"].(string),
 					Negation:  &negation,
 				}
 
@@ -716,19 +713,11 @@ func getConditionsPaylod(conditionsRaw any) []waap.CustomRuleConditionInput {
 			if key == "ip_range" {
 				conditionRequest := waap.CustomRuleConditionInput{}
 				ipRangeObj := item.(map[string]interface{})
-				lowerBound := ipRangeObj["lower_bound"].(string)
-				upperBound := ipRangeObj["upper_bound"].(string)
 				negation := ipRangeObj["negation"].(bool)
 
-				var lowerObj waap.IpRangeCondition_LowerBound
-				lowerObj.FromIpRangeConditionLowerBound0(lowerBound)
-
-				var upperObj waap.IpRangeCondition_UpperBound
-				upperObj.FromIpRangeConditionUpperBound0(upperBound)
-
 				ipRange := waap.IpRangeCondition{
-					LowerBound: lowerObj,
-					UpperBound: upperObj,
+					LowerBound: ipRangeObj["lower_bound"].(string),
+					UpperBound: ipRangeObj["upper_bound"].(string),
 					Negation:   &negation,
 				}
 
@@ -925,13 +914,7 @@ func getConditionsPaylod(conditionsRaw any) []waap.CustomRuleConditionInput {
 				pattern := obj["path_pattern"].(string)
 				requests := obj["requests"].(int)
 				time := obj["time"].(int)
-
-				ips := make([]waap.RequestRateCondition_Ips_Item, 0)
-				for _, ip := range obj["ips"].(*schema.Set).List() {
-					var ipAddress waap.RequestRateCondition_Ips_Item
-					ipAddress.FromRequestRateConditionIps0(ip.(string))
-					ips = append(ips, ipAddress)
-				}
+				ips := convertSchemaSetToStringList(obj["ips"].(*schema.Set))
 
 				methods := make([]waap.HTTPMethod, 0)
 				for _, method := range obj["http_methods"].(*schema.Set).List() {

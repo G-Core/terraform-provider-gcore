@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"log"
 	"net"
+	"strconv"
 	"strings"
 	"time"
 
@@ -65,6 +66,9 @@ const (
 	DNSZoneRRSetSchemaMetaFailoverTimeout        = "timeout"
 	DNSZoneRRSetSchemaMetaFailoverTLS            = "tls"
 	DNSZoneRRSetSchemaMetaFailoverURL            = "url"
+
+	DNSZoneRRSetSchemaMetaCidrMapping = "cidr_mapping"
+	DNSZoneRecordSchemaMetaCidrLabels = "cidr_labels"
 )
 
 var dnsZoneRecordSchemaMetaList = []string{
@@ -79,6 +83,7 @@ var dnsZoneRecordSchemaMetaList = []string{
 	DNSZoneRecordSchemaMetaWeight,
 	DNSZoneRecordSchemaMetaBackup,
 	DNSZoneRecordSchemaMetaFallback,
+	DNSZoneRecordSchemaMetaCidrLabels,
 }
 
 func resourceDNSZoneRecord() *schema.Resource {
@@ -159,7 +164,7 @@ func resourceDNSZoneRecord() *schema.Resource {
 							Required: true,
 							ValidateDiagFunc: func(i interface{}, path cty.Path) diag.Diagnostics {
 								names := []string{"geodns", "geodistance", "default", "first_n", "is_healthy",
-									"healthcheck", "weighted_shuffle", "asn", "country", "continent", "region", "ip"}
+									"healthcheck", "weighted_shuffle", "asn", "country", "continent", "region", "ip", "network_mapping"}
 								name := i.(string)
 								for _, n := range names {
 									if n == name {
@@ -285,6 +290,11 @@ func resourceDNSZoneRecord() *schema.Resource {
 										Optional:    true,
 										Description: "Set as backup record",
 									},
+									DNSZoneRecordSchemaMetaCidrLabels: {
+										Type:        schema.TypeMap,
+										Optional:    true,
+										Description: "A map of CIDR tags for this record, where key is tag name and value is tag value. Example: {\"tag_name_1\": 10, \"tag_name_2\": 50}.",
+									},
 								},
 							},
 						},
@@ -405,6 +415,11 @@ func resourceDNSZoneRecord() *schema.Resource {
 									},
 								},
 							},
+						},
+						DNSZoneRRSetSchemaMetaCidrMapping: {
+							Type:        schema.TypeString,
+							Optional:    true,
+							Description: "Cidr mapping rule name of DNS Zone RRSet resource.",
 						},
 					},
 				},
@@ -562,6 +577,23 @@ func resourceDNSZoneRecordRead(ctx context.Context, d *schema.ResourceData, m in
 				continue
 			}
 
+			// if cidr_labels
+			v, ok := val.(map[string]any)
+			if ok {
+				if key == DNSZoneRecordSchemaMetaCidrLabels {
+					cidrLabels := map[string]string{}
+					for k, v := range v {
+						if val, ok := v.(float64); ok {
+							cidrLabels[k] = strconv.FormatFloat(val, 'f', -1, 64)
+						} else {
+							return diag.Errorf("invalid type of cidr_labels value %s, expected float64, got %T", k, v)
+						}
+					}
+					meta[key] = cidrLabels
+					continue
+				}
+			}
+
 			// if array
 			valArr, ok := val.([]any)
 			if ok {
@@ -664,23 +696,42 @@ func fillRRSet(d *schema.ResourceData, rType string, rrSet *dnssdk.RRSet) error 
 		for k, v := range kv.(map[string]any) {
 			switch k {
 			// DNSZoneRRSetSchemaMetaFailover - 10. `meta` (map)
-			case DNSZoneRRSetSchemaMetaFailover, DNSZoneRRSetSchemaMetaHealthchecks:
+			case DNSZoneRRSetSchemaMetaHealthchecks:
 				failoverObj, ok := v.(*schema.Set)
 				if !ok {
 					return fmt.Errorf("invalid type of rrset meta.healthchecks, expected map[string]any, got %T %v", v, v)
 				}
-				fMap := map[string]any{}
-				for _, kv2 := range failoverObj.List() {
-					m2, ok := kv2.(map[string]any)
-					if !ok {
-						return fmt.Errorf("invalid type of rrset meta.healthchecks.*, expected map[string]any, got %T %v", kv2, kv2)
+				if failoverObj.Len() > 0 {
+					fMap := map[string]any{}
+					for _, kv2 := range failoverObj.List() {
+						m2, ok := kv2.(map[string]any)
+						if !ok {
+							return fmt.Errorf("invalid type of rrset meta.healthchecks.*, expected map[string]any, got %T %v", kv2, kv2)
+						}
+						for k2, v2 := range m2 {
+							fMap[k2] = v2
+						}
 					}
-					for k2, v2 := range m2 {
-						fMap[k2] = v2
-					}
+					rrSet.Meta[DNSZoneRRSetSchemaMetaHealthchecks] = fMap
 				}
-				rrSet.Meta[DNSZoneRRSetSchemaMetaHealthchecks] = fMap
-				rrSet.Meta[DNSZoneRRSetSchemaMetaFailover] = fMap
+			case DNSZoneRRSetSchemaMetaFailover:
+				failoverObj, ok := v.(*schema.Set)
+				if !ok {
+					return fmt.Errorf("invalid type of rrset meta.failover, expected map[string]any, got %T %v", v, v)
+				}
+				if failoverObj.Len() > 0 {
+					fMap := map[string]any{}
+					for _, kv2 := range failoverObj.List() {
+						m2, ok := kv2.(map[string]any)
+						if !ok {
+							return fmt.Errorf("invalid type of rrset meta.failover.*, expected map[string]any, got %T %v", kv2, kv2)
+						}
+						for k2, v2 := range m2 {
+							fMap[k2] = v2
+						}
+					}
+					rrSet.Meta[DNSZoneRRSetSchemaMetaFailover] = fMap
+				}
 			case DNSZoneRRSetSchemaMetaGeodnsLink:
 				geodnsLink, ok := v.(string)
 				if !ok {
@@ -688,6 +739,14 @@ func fillRRSet(d *schema.ResourceData, rType string, rrSet *dnssdk.RRSet) error 
 				}
 				if geodnsLink != `` {
 					rrSet.Meta[k] = geodnsLink
+				}
+			case DNSZoneRRSetSchemaMetaCidrMapping:
+				cidrMapping, ok := v.(string)
+				if !ok {
+					return fmt.Errorf("invalid type of rrset meta.cidr_mapping, expected string, got %T %v", v, v)
+				}
+				if cidrMapping != `` {
+					rrSet.Meta[k] = cidrMapping
 				}
 			default:
 				return fmt.Errorf("unsupported rrset meta key %s with value %v", k, v)
@@ -701,6 +760,10 @@ func fillRRSet(d *schema.ResourceData, rType string, rrSet *dnssdk.RRSet) error 
 	for _, resource := range d.Get(DNSZoneRecordSchemaResourceRecord).(*schema.Set).List() {
 		data := resource.(map[string]interface{})
 		content := data[DNSZoneRecordSchemaContent].(string)
+		if strings.TrimSpace(content) == "" {
+			log.Printf("Warning: Skipping resource record with empty content: %+v", data)
+			continue
+		}
 		rr := (&dnssdk.ResourceRecord{}).SetContent(rType, content)
 		enabled := data[DNSZoneRecordSchemaEnabled].(bool)
 		rr.Enabled = enabled
@@ -781,6 +844,24 @@ func fillRRSet(d *schema.ResourceData, rType string, rrSet *dnssdk.RRSet) error 
 			valInt, ok := meta[DNSZoneRecordSchemaMetaWeight].(int)
 			if ok && valInt > 0 {
 				rr.AddMeta(validWrap(dnssdk.NewResourceMetaWeight(valInt)))
+			}
+
+			cidrLabels, ok := meta[DNSZoneRecordSchemaMetaCidrLabels].(map[string]interface{})
+			if ok && len(cidrLabels) > 0 {
+				cidrLabelsMap := make(map[string]int, len(cidrLabels))
+				for k, v := range cidrLabels {
+					if vStr, ok := v.(string); ok {
+						vInt, err := strconv.Atoi(vStr)
+						if err != nil {
+							metaErrs = append(metaErrs, fmt.Errorf("cidr label %s has invalid integer value %q: %v", k, vStr, err))
+						} else {
+							cidrLabelsMap[k] = vInt
+						}
+					} else {
+						metaErrs = append(metaErrs, fmt.Errorf("cidr label %s has wrong type %T, expected string", k, v))
+					}
+				}
+				rr.AddMeta(validWrap(dnssdk.NewResourceMetaCidrLabels(cidrLabelsMap)))
 			}
 		}
 

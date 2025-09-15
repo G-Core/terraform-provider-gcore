@@ -180,9 +180,6 @@ func resourceWaapFirewallRuleCreate(ctx context.Context, d *schema.ResourceData,
 	if v, ok := d.GetOk("description"); ok {
 		description := v.(string)
 		req.Description = &description
-	} else {
-		description := ""
-		req.Description = &description
 	}
 
 	if v, ok := d.GetOk("action"); ok {
@@ -196,7 +193,7 @@ func resourceWaapFirewallRuleCreate(ctx context.Context, d *schema.ResourceData,
 	resp, err := client.CreateFirewallRuleV1DomainsDomainIdFirewallRulesPostWithResponse(ctx, d.Get("domain_id").(int), req)
 
 	if err != nil {
-		return diag.Errorf("Failed to create Firewall Rule: %w", err)
+		return diag.Errorf("Failed to create Firewall Rule: %s", err)
 	}
 
 	if resp.StatusCode() != http.StatusCreated {
@@ -218,13 +215,13 @@ func resourceWaapFirewallRuleRead(ctx context.Context, d *schema.ResourceData, m
 
 	resp, err := client.GetFirewallRuleV1DomainsDomainIdFirewallRulesRuleIdGetWithResponse(ctx, d.Get("domain_id").(int), ruleID)
 	if err != nil {
-		return diag.Errorf("Failed to read Firewall Rule: %w", err)
+		return diag.Errorf("Failed to read Firewall Rule: %s", err)
 	}
 
 	if resp.StatusCode() == http.StatusNotFound {
 		d.SetId("") // Resource not found, remove from state
 		return diag.Diagnostics{
-			{Severity: diag.Warning, Summary: fmt.Sprintf("Firewall Rule (%s) was not found, removed from TF state", ruleID)},
+			{Severity: diag.Warning, Summary: fmt.Sprintf("Firewall Rule (%d) was not found, removed from TF state", ruleID)},
 		}
 	}
 
@@ -292,18 +289,12 @@ func resourceWaapFirewallRuleUpdate(ctx context.Context, d *schema.ResourceData,
 
 	name := d.Get("name").(string)
 	enabled := d.Get("enabled").(bool)
+	description := d.Get("description").(string)
 
 	req := waap.UpdateFirewallRule{
-		Name:    &name,
-		Enabled: &enabled,
-	}
-
-	if v, ok := d.GetOk("description"); ok {
-		description := v.(string)
-		req.Description = &description
-	} else {
-		description := ""
-		req.Description = &description
+		Name:        &name,
+		Enabled:     &enabled,
+		Description: &description,
 	}
 
 	if v, ok := d.GetOk("action"); ok {
@@ -318,7 +309,7 @@ func resourceWaapFirewallRuleUpdate(ctx context.Context, d *schema.ResourceData,
 
 	resp, err := client.UpdateFirewallRuleV1DomainsDomainIdFirewallRulesRuleIdPatchWithResponse(ctx, d.Get("domain_id").(int), ruleID, req)
 	if err != nil {
-		return diag.Errorf("Failed to update Firewall Rule: %w", err)
+		return diag.Errorf("Failed to update Firewall Rule: %s", err)
 	}
 
 	if resp.StatusCode() != http.StatusNoContent {
@@ -369,7 +360,7 @@ func parseFirewallActionBlock(actionCfg []interface{}) waap.FirewallRuleActionIn
 					val := waap.RuleBlockStatusCode(v.(int))
 					blockAction.StatusCode = &val
 				}
-				if v, ok := blockMap["action_duration"]; ok {
+				if v, ok := blockMap["action_duration"]; ok && v.(string) != "" {
 					val := v.(string)
 					blockAction.ActionDuration = &val
 				}
@@ -393,9 +384,7 @@ func parseFirewallConditionBlock(conditionCfg []interface{}) []waap.FirewallRule
 				ipMap := v[0].(map[string]interface{})
 
 				if v, ok := ipMap["ip_address"]; ok {
-					var ipAddress waap.IpCondition_IpAddress
-					unmarshalStringToJSONStruct(v.(string), &ipAddress)
-					ipStruct.IpAddress = ipAddress
+					ipStruct.IpAddress = v.(string)
 				}
 
 				if v, exists := ipMap["negation"]; exists && v.(bool) {
@@ -412,15 +401,11 @@ func parseFirewallConditionBlock(conditionCfg []interface{}) []waap.FirewallRule
 				ipRangeMap := v[0].(map[string]interface{})
 
 				if v, ok := ipRangeMap["lower_bound"]; ok {
-					var lowerBound waap.IpRangeCondition_LowerBound
-					unmarshalStringToJSONStruct(v.(string), &lowerBound)
-					ipRangeStruct.LowerBound = lowerBound
+					ipRangeStruct.LowerBound = v.(string)
 				}
 
 				if v, ok := ipRangeMap["upper_bound"]; ok {
-					var upperBound waap.IpRangeCondition_UpperBound
-					unmarshalStringToJSONStruct(v.(string), &upperBound)
-					ipRangeStruct.UpperBound = upperBound
+					ipRangeStruct.UpperBound = v.(string)
 				}
 
 				if v, exists := ipRangeMap["negation"]; exists && v.(bool) {
@@ -433,11 +418,6 @@ func parseFirewallConditionBlock(conditionCfg []interface{}) []waap.FirewallRule
 	}
 
 	return []waap.FirewallRuleCondition{conditionStruct}
-}
-
-func unmarshalStringToJSONStruct[T any](addr string, target *T) {
-	raw := json.RawMessage(`"` + addr + `"`)
-	json.Unmarshal(raw, target)
 }
 
 func marshalStructToJSONString[T any](input T) string {

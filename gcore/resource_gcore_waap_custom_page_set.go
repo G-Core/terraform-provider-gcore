@@ -283,7 +283,7 @@ func resourceWaapCustomPageSetRead(ctx context.Context, d *schema.ResourceData, 
 	if resp.StatusCode() == http.StatusNotFound {
 		d.SetId("")
 		return diag.Diagnostics{
-			{Severity: diag.Warning, Summary: fmt.Sprintf("Custom Page Set (%s) was not found, removed from TF state", setID)},
+			{Severity: diag.Warning, Summary: fmt.Sprintf("Custom Page Set (%d) was not found, removed from TF state", setID)},
 		}
 	}
 
