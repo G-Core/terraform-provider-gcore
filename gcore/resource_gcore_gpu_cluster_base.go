@@ -302,7 +302,6 @@ func resourceGPUClusterSchema() map[string]*schema.Schema {
 
 func resourceGPUClusterCreate(ctx context.Context, d *schema.ResourceData, m interface{}, gpuNodeType GPUNodeType) diag.Diagnostics {
 	log.Printf("[DEBUG] Start %s GPU cluster creation", gpuNodeType)
-	log.Printf("[DEBUG] resource data: %+v", d)
 	config := m.(*Config)
 	provider := config.Provider
 	client, err := CreateClient(provider, d, getGPUServicePath(gpuNodeType), "v3")
@@ -696,9 +695,13 @@ func extractServerSettingsFromCluster(cluster *clusters.Cluster) (map[string]int
 		serverSettings["volume"] = volumes
 	}
 
-	// Extract security groups if available
+	// Extract security groups if available (currently the ID is returned in the name field)
 	if len(cluster.ServersSettings.SecurityGroups) > 0 {
-		serverSettings["security_groups"] = cluster.ServersSettings.SecurityGroups
+		securityGroupIDs := make([]string, 0, len(cluster.ServersSettings.SecurityGroups))
+		for _, sg := range cluster.ServersSettings.SecurityGroups {
+			securityGroupIDs = append(securityGroupIDs, sg.Name)
+		}
+		serverSettings["security_groups"] = securityGroupIDs
 	}
 	// Don't set user_data in the resource data if it's nil or empty string from the API
 	// This ensures consistency between nil and empty string representation
@@ -828,14 +831,14 @@ func extractVolumes(volume any) []clusters.VolumeOpts {
 	return result
 }
 
-func extractSecurityGroups(securityGroups []interface{}) []string {
+func extractSecurityGroups(securityGroups []interface{}) []gcorecloud.ItemID {
 	if len(securityGroups) == 0 {
 		return nil
 	}
-	result := make([]string, 0, len(securityGroups))
+	result := make([]gcorecloud.ItemID, 0, len(securityGroups))
 	for _, sg := range securityGroups {
 		if sg != nil {
-			result = append(result, sg.(string))
+			result = append(result, gcorecloud.ItemID{ID: sg.(string)})
 		}
 	}
 	return result
