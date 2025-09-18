@@ -119,6 +119,7 @@ func resourceFileShare() *schema.Resource {
 						"subnet_id": {
 							Type:        schema.TypeString,
 							Optional:    true,
+							Computed:    true,
 							ForceNew:    true,
 							Description: "The ID of the subnet within the network. This is optional and can be used to specify a particular subnet for the file share.",
 						},
@@ -467,19 +468,12 @@ func expandFileShareCreateOpts(d *schema.ResourceData) (*file_shares.CreateOpts,
 		}
 	}
 
-	// The API expects legacy VolumeType on create; map new names to legacy values
-	var legacyVolumeType string
-	if typeName == "standard" {
-		legacyVolumeType = "default_share_type"
-	} else { // vast
-		legacyVolumeType = "vast_share_type"
-	}
 	opts := file_shares.CreateOpts{
-		Name:       name,
-		Protocol:   protocol,
-		Size:       size,
-		Tags:       tags,
-		VolumeType: legacyVolumeType,
+		Name:     name,
+		Protocol: protocol,
+		Size:     size,
+		Tags:     tags,
+		TypeName: typeName,
 	}
 
 	if typeName == "standard" {
