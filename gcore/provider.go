@@ -175,6 +175,7 @@ func Provider() *schema.Provider {
 			"gcore_storage_sftp":                  resourceStorageSFTP(),
 			"gcore_storage_sftp_key":              resourceStorageSFTPKey(),
 			"gcore_cdn_resource":                  resourceCDNResource(),
+			"gcore_cdn_client_config":             resourceCDNClientConfig(),
 			"gcore_cdn_origingroup":               resourceCDNOriginGroup(),
 			"gcore_cdn_originshielding":           resourceCDNOriginShielding(),
 			"gcore_cdn_applied_preset":            resourceCDNAppliedPreset(),
