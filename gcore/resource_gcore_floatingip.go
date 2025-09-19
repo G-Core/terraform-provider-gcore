@@ -7,6 +7,7 @@ import (
 	"net"
 	"time"
 
+	clientUtils "github.com/G-Core/gcorelabscloud-go/client/utils"
 	"github.com/G-Core/gcorelabscloud-go/gcore/utils"
 	"github.com/G-Core/gcorelabscloud-go/gcore/utils/metadata/v1/metadata"
 
@@ -149,6 +150,12 @@ func resourceFloatingIP() *schema.Resource {
 						},
 					},
 				},
+			},
+			"tags": {
+				Type:        schema.TypeMap,
+				Optional:    true,
+				Elem:        &schema.Schema{Type: schema.TypeString},
+				Description: "Tags to associate with the floating IP. Tags are key-value pairs.",
 			},
 		},
 	}
@@ -317,6 +324,36 @@ func resourceFloatingIPUpdate(ctx context.Context, d *schema.ResourceData, m int
 		err = metadata.MetadataReplace(client, d.Id(), meta).Err
 		if err != nil {
 			return diag.Errorf("cannot update metadata. Error: %s", err)
+		}
+	}
+
+	if d.HasChange("tags") {
+		oldTags, newTags := d.GetChange("tags")
+		newTagsMap := make(map[string]*string)
+		if newTags != nil {
+			for k, val := range newTags.(map[string]interface{}) {
+				newTagsMap[k] = clientUtils.StringToPointer(val.(string))
+			}
+		}
+
+		oldTagsMap := make(map[string]string)
+		if oldTags != nil {
+			for k, val := range oldTags.(map[string]interface{}) {
+				oldTagsMap[k] = val.(string)
+			}
+		}
+
+		for oldKey := range oldTagsMap {
+			if _, exists := newTagsMap[oldKey]; !exists {
+				newTagsMap[oldKey] = nil
+			}
+		}
+
+		_, err := floatingips.Update(client, d.Id(), floatingips.UpdateOpts{
+			Tags: newTagsMap,
+		}).Extract()
+		if err != nil {
+			return diag.FromErr(err)
 		}
 	}
 	return resourceFloatingIPRead(ctx, d, m)

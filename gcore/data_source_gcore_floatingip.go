@@ -132,6 +132,26 @@ func dataSourceFloatingIP() *schema.Resource {
 					},
 				},
 			},
+			"tags": &schema.Schema{
+				Type:     schema.TypeList,
+				Computed: true,
+				Elem: &schema.Resource{
+					Schema: map[string]*schema.Schema{
+						"key": {
+							Type:     schema.TypeString,
+							Computed: true,
+						},
+						"value": {
+							Type:     schema.TypeString,
+							Computed: true,
+						},
+						"read_only": {
+							Type:     schema.TypeBool,
+							Computed: true,
+						},
+					},
+				},
+			},
 		},
 	}
 }
@@ -217,6 +237,10 @@ func dataSourceFloatingIPRead(ctx context.Context, d *schema.ResourceData, m int
 	}
 
 	if err := d.Set("metadata_read_only", metadataReadOnly); err != nil {
+		return diag.FromErr(err)
+	}
+
+	if err := d.Set("tags", metadataReadOnly); err != nil {
 		return diag.FromErr(err)
 	}
 
