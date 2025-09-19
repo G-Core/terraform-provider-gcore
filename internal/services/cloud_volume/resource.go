@@ -117,6 +117,64 @@ func (r *CloudVolumeResource) Update(ctx context.Context, req resource.UpdateReq
 		return
 	}
 
+	// Handle volume size changes (resize) separately before other updates
+	sizeChanged := !data.Size.IsNull() && !state.Size.IsNull() && data.Size.ValueInt64() != state.Size.ValueInt64()
+
+	if sizeChanged {
+		newSize := data.Size.ValueInt64()
+		currentSize := state.Size.ValueInt64()
+
+		if newSize < currentSize {
+			resp.Diagnostics.AddError("invalid size change", "new volume size must be greater than current size")
+			return
+		}
+
+		resizeParams := cloud.VolumeResizeParams{
+			Size: newSize,
+		}
+
+		if !data.ProjectID.IsNull() {
+			resizeParams.ProjectID = param.NewOpt(data.ProjectID.ValueInt64())
+		}
+
+		if !data.RegionID.IsNull() {
+			resizeParams.RegionID = param.NewOpt(data.RegionID.ValueInt64())
+		}
+
+		resizedVolume, err := r.client.Cloud.Volumes.ResizeAndPoll(
+			ctx,
+			data.ID.ValueString(),
+			resizeParams,
+			option.WithMiddleware(logging.Middleware(ctx)),
+		)
+		if err != nil {
+			resp.Diagnostics.AddError("failed to resize volume", err.Error())
+			return
+		}
+
+		// If only size changed, use the resized volume data and return
+		dataBytes, err := data.MarshalJSONForUpdate(*state)
+		if err != nil {
+			resp.Diagnostics.AddError("failed to serialize http request", err.Error())
+			return
+		}
+
+		// Check if anything other than size needs to be updated
+		var tempModel CloudVolumeModel
+		err = apijson.UnmarshalComputed(dataBytes, &tempModel)
+		if err == nil && len(dataBytes) <= 2 { // Only empty JSON object {}
+			// Only size changed, use the resize result
+			err = apijson.UnmarshalComputed([]byte(resizedVolume.RawJSON()), &data)
+			if err != nil {
+				resp.Diagnostics.AddError("failed to deserialize resize response", err.Error())
+				return
+			}
+			resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
+			return
+		}
+	}
+
+	// Handle other volume updates (name, tags, etc.)
 	params := cloud.VolumeUpdateParams{}
 
 	if !data.ProjectID.IsNull() {
