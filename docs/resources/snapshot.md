@@ -57,8 +57,6 @@ resource "gcore_snapshot" "snapshot" {
 
 Import is supported using the following syntax:
 
-The [`terraform import` command](https://developer.hashicorp.com/terraform/cli/commands/import) can be used, for example:
-
 ```shell
 # import using <project_id>:<region_id>:<snapshot_id> format
 terraform import gcore_snapshot.snapshot1 1:6:447d2959-8ae0-4ca0-8d47-9f050a3637d7

@@ -84,7 +84,7 @@ Optional:
 
 Read-Only:
 
-- `id` (String)
+- `id` (String) The ID of this resource.
 - `type` (String)
 
 <a id="nestedblock--schedule--cron"></a>
@@ -127,19 +127,14 @@ Optional:
 <a id="nestedblock--volume"></a>
 ### Nested Schema for `volume`
 
-Required:
-
-- `id` (String)
-
 Read-Only:
 
+- `id` (String) The ID of this resource.
 - `name` (String)
 
 ## Import
 
 Import is supported using the following syntax:
-
-The [`terraform import` command](https://developer.hashicorp.com/terraform/cli/commands/import) can be used, for example:
 
 ```shell
 # import using <project_id>:<region_id>:<lifecyclepolicy_id> format

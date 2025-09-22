@@ -258,12 +258,15 @@ Optional:
 - `attachment_tag` (String)
 - `boot_index` (Number) If boot_index==0 volumes can not detached
 - `delete_on_termination` (Boolean)
-- `id` (String)
 - `image_id` (String)
 - `name` (String)
 - `size` (Number)
 - `type_name` (String)
 - `volume_id` (String)
+
+Read-Only:
+
+- `id` (String) The ID of this resource.
 
 
 <a id="nestedatt--security_group"></a>
@@ -277,8 +280,6 @@ Read-Only:
 ## Import
 
 Import is supported using the following syntax:
-
-The [`terraform import` command](https://developer.hashicorp.com/terraform/cli/commands/import) can be used, for example:
 
 ```shell
 # import using <project_id>:<region_id>:<instance_id> format
