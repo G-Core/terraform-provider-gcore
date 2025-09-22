@@ -52,8 +52,6 @@ resource "gcore_inference_secret" "aws" {
 
 Import is supported using the following syntax:
 
-The [`terraform import` command](https://developer.hashicorp.com/terraform/cli/commands/import) can be used, for example:
-
 ```shell
 # import using <project_id>:<secret_name> format
 terraform import gcore_inference_secret.aws 1:my-secret-name

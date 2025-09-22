@@ -98,8 +98,6 @@ Required:
 
 Import is supported using the following syntax:
 
-The [`terraform import` command](https://developer.hashicorp.com/terraform/cli/commands/import) can be used, for example:
-
 ```shell
 # import using <domain_id>:<rule_id>
 terraform import gcore_waap_advanced_rule.advanced_rule 10029:98347

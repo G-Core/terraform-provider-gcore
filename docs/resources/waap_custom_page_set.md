@@ -186,8 +186,6 @@ Optional:
 
 Import is supported using the following syntax:
 
-The [`terraform import` command](https://developer.hashicorp.com/terraform/cli/commands/import) can be used, for example:
-
 ```shell
 # import using <custom_page_set_id>
 terraform import gcore_waap_custom_page_set.example 12345
