@@ -17,9 +17,9 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/stainless-sdks/gcore-terraform/internal/services/cloud_instance_image"
-	"github.com/stainless-sdks/gcore-terraform/internal/services/cloud_lblistener"
-	"github.com/stainless-sdks/gcore-terraform/internal/services/cloud_lbpool"
 	"github.com/stainless-sdks/gcore-terraform/internal/services/cloud_load_balancer"
+	"github.com/stainless-sdks/gcore-terraform/internal/services/cloud_load_balancer_listener"
+	"github.com/stainless-sdks/gcore-terraform/internal/services/cloud_load_balancer_pool"
 	"github.com/stainless-sdks/gcore-terraform/internal/services/cloud_network"
 	"github.com/stainless-sdks/gcore-terraform/internal/services/cloud_project"
 	"github.com/stainless-sdks/gcore-terraform/internal/services/cloud_region"
@@ -147,8 +147,8 @@ func (p *GcoreProvider) ConfigValidators(_ context.Context) []provider.ConfigVal
 func (p *GcoreProvider) Resources(ctx context.Context) []func() resource.Resource {
 	return []func() resource.Resource{
 		cloud_load_balancer.NewResource,
-		cloud_lblistener.NewResource,
-		cloud_lbpool.NewResource,
+		cloud_load_balancer_listener.NewResource,
+		cloud_load_balancer_pool.NewResource,
 		cloud_network.NewResource,
 		cloud_volume.NewResource,
 	}
@@ -162,8 +162,8 @@ func (p *GcoreProvider) DataSources(ctx context.Context) []func() datasource.Dat
 		cloud_region.NewCloudRegionsDataSource,
 		cloud_load_balancer.NewCloudLoadBalancerDataSource,
 		cloud_load_balancer.NewCloudLoadBalancersDataSource,
-		cloud_lblistener.NewCloudLblistenerDataSource,
-		cloud_lbpool.NewCloudLbpoolDataSource,
+		cloud_load_balancer_listener.NewCloudLoadBalancerListenerDataSource,
+		cloud_load_balancer_pool.NewCloudLoadBalancerPoolDataSource,
 		cloud_network.NewCloudNetworkDataSource,
 		cloud_network.NewCloudNetworksDataSource,
 		cloud_volume.NewCloudVolumeDataSource,
