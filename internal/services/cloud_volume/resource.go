@@ -118,19 +118,11 @@ func (r *CloudVolumeResource) Update(ctx context.Context, req resource.UpdateReq
 	}
 
 	// Handle volume size changes (resize) separately before other updates
-	sizeChanged := !data.Size.IsNull() && !state.Size.IsNull() && data.Size.ValueInt64() != state.Size.ValueInt64()
+	sizeChanged := !data.Size.Equal(state.Size)
 
 	if sizeChanged {
-		newSize := data.Size.ValueInt64()
-		currentSize := state.Size.ValueInt64()
-
-		if newSize < currentSize {
-			resp.Diagnostics.AddError("invalid size change", "new volume size must be greater than current size")
-			return
-		}
-
 		resizeParams := cloud.VolumeResizeParams{
-			Size: newSize,
+			Size: data.Size.ValueInt64(),
 		}
 
 		if !data.ProjectID.IsNull() {
@@ -151,63 +143,69 @@ func (r *CloudVolumeResource) Update(ctx context.Context, req resource.UpdateReq
 			resp.Diagnostics.AddError("failed to resize volume", err.Error())
 			return
 		}
+		err = apijson.UnmarshalComputed([]byte(resizedVolume.RawJSON()), &data)
+		if err != nil {
+			resp.Diagnostics.AddError("failed to deserialize http request", err.Error())
+			return
+		}
+	}
 
-		// If only size changed, use the resized volume data and return
+	// Check if name or tags have changed before sending update request
+	nameChanged := !data.Name.Equal(state.Name)
+	tagsChanged := false
+
+	// Check if tags changed
+	if (data.Tags == nil) != (state.Tags == nil) {
+		tagsChanged = true
+	} else if data.Tags != nil && state.Tags != nil {
+		if len(*data.Tags) != len(*state.Tags) {
+			tagsChanged = true
+		} else {
+			for k, v := range *data.Tags {
+				if stateV, exists := (*state.Tags)[k]; !exists || !v.Equal(stateV) {
+					tagsChanged = true
+					break
+				}
+			}
+		}
+	}
+
+	// Only send update request if name or tags changed
+	if nameChanged || tagsChanged {
+		params := cloud.VolumeUpdateParams{}
+
+		if !data.ProjectID.IsNull() {
+			params.ProjectID = param.NewOpt(data.ProjectID.ValueInt64())
+		}
+
+		if !data.RegionID.IsNull() {
+			params.RegionID = param.NewOpt(data.RegionID.ValueInt64())
+		}
+
 		dataBytes, err := data.MarshalJSONForUpdate(*state)
 		if err != nil {
 			resp.Diagnostics.AddError("failed to serialize http request", err.Error())
 			return
 		}
-
-		// Check if anything other than size needs to be updated
-		var tempModel CloudVolumeModel
-		err = apijson.UnmarshalComputed(dataBytes, &tempModel)
-		if err == nil && len(dataBytes) <= 2 { // Only empty JSON object {}
-			// Only size changed, use the resize result
-			err = apijson.UnmarshalComputed([]byte(resizedVolume.RawJSON()), &data)
-			if err != nil {
-				resp.Diagnostics.AddError("failed to deserialize resize response", err.Error())
-				return
-			}
-			resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
+		res := new(http.Response)
+		_, err = r.client.Cloud.Volumes.Update(
+			ctx,
+			data.ID.ValueString(),
+			params,
+			option.WithRequestBody("application/json", dataBytes),
+			option.WithResponseBodyInto(&res),
+			option.WithMiddleware(logging.Middleware(ctx)),
+		)
+		if err != nil {
+			resp.Diagnostics.AddError("failed to make http request", err.Error())
 			return
 		}
-	}
-
-	// Handle other volume updates (name, tags, etc.)
-	params := cloud.VolumeUpdateParams{}
-
-	if !data.ProjectID.IsNull() {
-		params.ProjectID = param.NewOpt(data.ProjectID.ValueInt64())
-	}
-
-	if !data.RegionID.IsNull() {
-		params.RegionID = param.NewOpt(data.RegionID.ValueInt64())
-	}
-
-	dataBytes, err := data.MarshalJSONForUpdate(*state)
-	if err != nil {
-		resp.Diagnostics.AddError("failed to serialize http request", err.Error())
-		return
-	}
-	res := new(http.Response)
-	_, err = r.client.Cloud.Volumes.Update(
-		ctx,
-		data.ID.ValueString(),
-		params,
-		option.WithRequestBody("application/json", dataBytes),
-		option.WithResponseBodyInto(&res),
-		option.WithMiddleware(logging.Middleware(ctx)),
-	)
-	if err != nil {
-		resp.Diagnostics.AddError("failed to make http request", err.Error())
-		return
-	}
-	bytes, _ := io.ReadAll(res.Body)
-	err = apijson.UnmarshalComputed(bytes, &data)
-	if err != nil {
-		resp.Diagnostics.AddError("failed to deserialize http request", err.Error())
-		return
+		bytes, _ := io.ReadAll(res.Body)
+		err = apijson.UnmarshalComputed(bytes, &data)
+		if err != nil {
+			resp.Diagnostics.AddError("failed to deserialize http request", err.Error())
+			return
+		}
 	}
 
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
