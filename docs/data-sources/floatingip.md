@@ -63,9 +63,20 @@ output "view" {
 - `metadata_read_only` (List of Object) (see [below for nested schema](#nestedatt--metadata_read_only))
 - `router_id` (String)
 - `status` (String)
+- `tags` (List of Object) (see [below for nested schema](#nestedatt--tags))
 
 <a id="nestedatt--metadata_read_only"></a>
 ### Nested Schema for `metadata_read_only`
+
+Read-Only:
+
+- `key` (String)
+- `read_only` (Boolean)
+- `value` (String)
+
+
+<a id="nestedatt--tags"></a>
+### Nested Schema for `tags`
 
 Read-Only:
 

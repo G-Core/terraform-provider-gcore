@@ -37,6 +37,7 @@ resource "gcore_floatingip" "floating_ip" {
 - `project_name` (String)
 - `region_id` (Number)
 - `region_name` (String)
+- `tags` (Map of String) Tags to associate with the floating IP. Tags are key-value pairs.
 
 ### Read-Only
 
@@ -61,8 +62,6 @@ Read-Only:
 ## Import
 
 Import is supported using the following syntax:
-
-The [`terraform import` command](https://developer.hashicorp.com/terraform/cli/commands/import) can be used, for example:
 
 ```shell
 # import using <project_id>:<region_id>:<floatingip_id> format
