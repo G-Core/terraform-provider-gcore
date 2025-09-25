@@ -192,8 +192,6 @@ func (r *CloudNetworkSubnetResource) Read(ctx context.Context, req resource.Read
 	}
 	bytes, _ := io.ReadAll(res.Body)
 	err = apijson.Unmarshal(bytes, &data)
-	fmt.Printf("===== TaskID: %s", data.TaskID)
-	fmt.Printf("===== TaskID.IsNull: %t", data.TaskID.IsNull())
 	if err != nil {
 		resp.Diagnostics.AddError("failed to deserialize http request", err.Error())
 		return
