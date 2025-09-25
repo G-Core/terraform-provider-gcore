@@ -16,6 +16,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/provider/schema"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/types"
+	"github.com/stainless-sdks/gcore-terraform/internal/services/cloud_floating_ip"
 	"github.com/stainless-sdks/gcore-terraform/internal/services/cloud_instance_image"
 	"github.com/stainless-sdks/gcore-terraform/internal/services/cloud_load_balancer"
 	"github.com/stainless-sdks/gcore-terraform/internal/services/cloud_load_balancer_listener"
@@ -159,6 +160,7 @@ func (p *GcoreProvider) Resources(ctx context.Context) []func() resource.Resourc
 		cloud_network.NewResource,
 		cloud_network_subnet.NewResource,
 		cloud_volume.NewResource,
+		cloud_floating_ip.NewResource,
 	}
 }
 
@@ -180,6 +182,8 @@ func (p *GcoreProvider) DataSources(ctx context.Context) []func() datasource.Dat
 		cloud_network_subnet.NewCloudNetworkSubnetsDataSource,
 		cloud_volume.NewCloudVolumeDataSource,
 		cloud_volume.NewCloudVolumesDataSource,
+		cloud_floating_ip.NewCloudFloatingIPDataSource,
+		cloud_floating_ip.NewCloudFloatingIPsDataSource,
 		cloud_instance_image.NewCloudInstanceImageDataSource,
 	}
 }

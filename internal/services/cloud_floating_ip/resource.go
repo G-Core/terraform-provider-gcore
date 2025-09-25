@@ -1,0 +1,352 @@
+// File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
+
+package cloud_floating_ip
+
+import (
+	"context"
+	"fmt"
+	"io"
+	"net/http"
+
+	"github.com/stainless-sdks/gcore-terraform/internal/custom"
+
+	"github.com/G-Core/gcore-go"
+	"github.com/G-Core/gcore-go/cloud"
+	"github.com/G-Core/gcore-go/option"
+	"github.com/G-Core/gcore-go/packages/param"
+	"github.com/hashicorp/terraform-plugin-framework/resource"
+	"github.com/hashicorp/terraform-plugin-framework/types"
+	"github.com/stainless-sdks/gcore-terraform/internal/apijson"
+	"github.com/stainless-sdks/gcore-terraform/internal/importpath"
+	"github.com/stainless-sdks/gcore-terraform/internal/logging"
+)
+
+// Ensure provider defined types fully satisfy framework interfaces.
+var _ resource.ResourceWithConfigure = (*CloudFloatingIPResource)(nil)
+var _ resource.ResourceWithModifyPlan = (*CloudFloatingIPResource)(nil)
+var _ resource.ResourceWithImportState = (*CloudFloatingIPResource)(nil)
+
+func NewResource() resource.Resource {
+	return &CloudFloatingIPResource{}
+}
+
+// CloudFloatingIPResource defines the resource implementation.
+type CloudFloatingIPResource struct {
+	client *gcore.Client
+}
+
+func (r *CloudFloatingIPResource) Metadata(ctx context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
+	resp.TypeName = req.ProviderTypeName + "_cloud_floating_ip"
+}
+
+func (r *CloudFloatingIPResource) Configure(ctx context.Context, req resource.ConfigureRequest, resp *resource.ConfigureResponse) {
+	if req.ProviderData == nil {
+		return
+	}
+
+	client, ok := req.ProviderData.(*gcore.Client)
+
+	if !ok {
+		resp.Diagnostics.AddError(
+			"unexpected resource configure type",
+			fmt.Sprintf("Expected *gcore.Client, got: %T. Please report this issue to the provider developers.", req.ProviderData),
+		)
+
+		return
+	}
+
+	r.client = client
+}
+
+func (r *CloudFloatingIPResource) Create(ctx context.Context, req resource.CreateRequest, resp *resource.CreateResponse) {
+	var data *CloudFloatingIPModel
+
+	resp.Diagnostics.Append(req.Plan.Get(ctx, &data)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
+
+	params := cloud.FloatingIPNewParams{}
+
+	if !data.ProjectID.IsNull() {
+		params.ProjectID = param.NewOpt(data.ProjectID.ValueInt64())
+	}
+
+	if !data.RegionID.IsNull() {
+		params.RegionID = param.NewOpt(data.RegionID.ValueInt64())
+	}
+
+	dataBytes, err := data.MarshalJSON()
+	if err != nil {
+		resp.Diagnostics.AddError("failed to serialize http request", err.Error())
+		return
+	}
+	floatingIP, err := r.client.Cloud.FloatingIPs.NewAndPoll(
+		ctx,
+		params,
+		option.WithRequestBody("application/json", dataBytes),
+		option.WithMiddleware(logging.Middleware(ctx)),
+	)
+	if err != nil {
+		resp.Diagnostics.AddError("failed to make http request", err.Error())
+		return
+	}
+	err = apijson.UnmarshalComputed([]byte(floatingIP.RawJSON()), &data)
+	if err != nil {
+		resp.Diagnostics.AddError("failed to deserialize http request", err.Error())
+		return
+	}
+
+	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
+}
+
+func (r *CloudFloatingIPResource) Update(ctx context.Context, req resource.UpdateRequest, resp *resource.UpdateResponse) {
+	var data *CloudFloatingIPModel
+
+	resp.Diagnostics.Append(req.Plan.Get(ctx, &data)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
+
+	var state *CloudFloatingIPModel
+
+	resp.Diagnostics.Append(req.State.Get(ctx, &state)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
+
+	params := cloud.FloatingIPUpdateParams{}
+
+	if !data.ProjectID.IsNull() {
+		params.ProjectID = param.NewOpt(data.ProjectID.ValueInt64())
+	}
+
+	if !data.RegionID.IsNull() {
+		params.RegionID = param.NewOpt(data.RegionID.ValueInt64())
+	}
+
+	// Check if fixed_ip_address or port_id have changed to determine if we need to unassign/assign the floating ip.
+	// If the fields have not been specified in the manifest, they will be unknown, so we don't want to treat that as a
+	// change, otherwise the Equal() method would return false.
+	fixedIPAddressChanged := !data.FixedIPAddress.IsUnknown() && !data.FixedIPAddress.Equal(state.FixedIPAddress)
+	portIDChanged := !data.PortID.IsUnknown() && !data.PortID.Equal(state.PortID)
+
+	if fixedIPAddressChanged || portIDChanged {
+		// check if the floating ip was previously assigned to a port (old values are not null)
+		if !state.FixedIPAddress.IsNull() || !state.PortID.IsNull() {
+			unassignParams := cloud.FloatingIPUnassignParams{}
+			if !data.ProjectID.IsNull() {
+				unassignParams.ProjectID = param.NewOpt(data.ProjectID.ValueInt64())
+			}
+			if !data.RegionID.IsNull() {
+				unassignParams.RegionID = param.NewOpt(data.RegionID.ValueInt64())
+			}
+			_, err := r.client.Cloud.FloatingIPs.Unassign(
+				ctx,
+				data.ID.ValueString(),
+				unassignParams,
+				option.WithMiddleware(logging.Middleware(ctx)),
+			)
+			if err != nil {
+				resp.Diagnostics.AddError("failed to make http request", err.Error())
+				return
+			}
+		}
+		// if the new values are not null, assign the floating ip to the new port
+		if !data.PortID.IsNull() {
+			assignParams := cloud.FloatingIPAssignParams{
+				PortID: data.PortID.ValueString(),
+			}
+			if !data.ProjectID.IsNull() {
+				assignParams.ProjectID = param.NewOpt(data.ProjectID.ValueInt64())
+			}
+			if !data.RegionID.IsNull() {
+				assignParams.RegionID = param.NewOpt(data.RegionID.ValueInt64())
+			}
+			// only set fixed_ip_address if it's not unknown
+			if !data.FixedIPAddress.IsUnknown() {
+				assignParams.FixedIPAddress = param.NewOpt(data.FixedIPAddress.ValueString())
+			}
+			res, err := r.client.Cloud.FloatingIPs.Assign(
+				ctx,
+				data.ID.ValueString(),
+				assignParams,
+				option.WithMiddleware(logging.Middleware(ctx)),
+			)
+			if err != nil {
+				resp.Diagnostics.AddError("failed to make http request", err.Error())
+				return
+			}
+			err = apijson.UnmarshalComputed([]byte(res.RawJSON()), &data)
+			if err != nil {
+				resp.Diagnostics.AddError("failed to deserialize http request", err.Error())
+				return
+			}
+		}
+	}
+
+	// Check if tags have changed to determine if we need to send an update request
+	tagsChanged := !custom.TagsEqual(data.Tags, state.Tags)
+
+	if tagsChanged {
+		dataBytes, err := data.MarshalJSONForUpdate(*state)
+		if err != nil {
+			resp.Diagnostics.AddError("failed to serialize http request", err.Error())
+			return
+		}
+		res := new(http.Response)
+		_, err = r.client.Cloud.FloatingIPs.Update(
+			ctx,
+			data.ID.ValueString(),
+			params,
+			option.WithRequestBody("application/json", dataBytes),
+			option.WithResponseBodyInto(&res),
+			option.WithMiddleware(logging.Middleware(ctx)),
+		)
+		if err != nil {
+			resp.Diagnostics.AddError("failed to make http request", err.Error())
+			return
+		}
+		bytes, _ := io.ReadAll(res.Body)
+		err = apijson.UnmarshalComputed(bytes, &data)
+		if err != nil {
+			resp.Diagnostics.AddError("failed to deserialize http request", err.Error())
+			return
+		}
+	}
+
+	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
+}
+
+func (r *CloudFloatingIPResource) Read(ctx context.Context, req resource.ReadRequest, resp *resource.ReadResponse) {
+	var data *CloudFloatingIPModel
+
+	resp.Diagnostics.Append(req.State.Get(ctx, &data)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
+
+	params := cloud.FloatingIPGetParams{}
+
+	if !data.ProjectID.IsNull() {
+		params.ProjectID = param.NewOpt(data.ProjectID.ValueInt64())
+	}
+
+	if !data.RegionID.IsNull() {
+		params.RegionID = param.NewOpt(data.RegionID.ValueInt64())
+	}
+
+	res := new(http.Response)
+	_, err := r.client.Cloud.FloatingIPs.Get(
+		ctx,
+		data.ID.ValueString(),
+		params,
+		option.WithResponseBodyInto(&res),
+		option.WithMiddleware(logging.Middleware(ctx)),
+	)
+	if res != nil && res.StatusCode == 404 {
+		resp.Diagnostics.AddWarning("Resource not found", "The resource was not found on the server and will be removed from state.")
+		resp.State.RemoveResource(ctx)
+		return
+	}
+	if err != nil {
+		resp.Diagnostics.AddError("failed to make http request", err.Error())
+		return
+	}
+	bytes, _ := io.ReadAll(res.Body)
+	err = apijson.Unmarshal(bytes, &data)
+	if err != nil {
+		resp.Diagnostics.AddError("failed to deserialize http request", err.Error())
+		return
+	}
+
+	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
+}
+
+func (r *CloudFloatingIPResource) Delete(ctx context.Context, req resource.DeleteRequest, resp *resource.DeleteResponse) {
+	var data *CloudFloatingIPModel
+
+	resp.Diagnostics.Append(req.State.Get(ctx, &data)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
+
+	params := cloud.FloatingIPDeleteParams{}
+
+	if !data.ProjectID.IsNull() {
+		params.ProjectID = param.NewOpt(data.ProjectID.ValueInt64())
+	}
+
+	if !data.RegionID.IsNull() {
+		params.RegionID = param.NewOpt(data.RegionID.ValueInt64())
+	}
+
+	err := r.client.Cloud.FloatingIPs.DeleteAndPoll(
+		ctx,
+		data.ID.ValueString(),
+		params,
+		option.WithMiddleware(logging.Middleware(ctx)),
+	)
+	if err != nil {
+		resp.Diagnostics.AddError("failed to make http request", err.Error())
+		return
+	}
+
+	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
+}
+
+func (r *CloudFloatingIPResource) ImportState(ctx context.Context, req resource.ImportStateRequest, resp *resource.ImportStateResponse) {
+	var data *CloudFloatingIPModel = new(CloudFloatingIPModel)
+
+	path_project_id := int64(0)
+	path_region_id := int64(0)
+	path_floating_ip_id := ""
+	diags := importpath.ParseImportID(
+		req.ID,
+		"<project_id>/<region_id>/<floating_ip_id>",
+		&path_project_id,
+		&path_region_id,
+		&path_floating_ip_id,
+	)
+	resp.Diagnostics.Append(diags...)
+	if resp.Diagnostics.HasError() {
+		return
+	}
+
+	data.ProjectID = types.Int64Value(path_project_id)
+	data.RegionID = types.Int64Value(path_region_id)
+	data.ID = types.StringValue(path_floating_ip_id)
+
+	res := new(http.Response)
+	_, err := r.client.Cloud.FloatingIPs.Get(
+		ctx,
+		path_floating_ip_id,
+		cloud.FloatingIPGetParams{
+			ProjectID: param.NewOpt(path_project_id),
+			RegionID:  param.NewOpt(path_region_id),
+		},
+		option.WithResponseBodyInto(&res),
+		option.WithMiddleware(logging.Middleware(ctx)),
+	)
+	if err != nil {
+		resp.Diagnostics.AddError("failed to make http request", err.Error())
+		return
+	}
+	bytes, _ := io.ReadAll(res.Body)
+	err = apijson.Unmarshal(bytes, &data)
+	if err != nil {
+		resp.Diagnostics.AddError("failed to deserialize http request", err.Error())
+		return
+	}
+
+	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
+}
+
+func (r *CloudFloatingIPResource) ModifyPlan(_ context.Context, _ resource.ModifyPlanRequest, _ *resource.ModifyPlanResponse) {
+
+}
