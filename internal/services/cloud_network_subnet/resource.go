@@ -222,7 +222,7 @@ func (r *CloudNetworkSubnetResource) Delete(ctx context.Context, req resource.De
 		params.RegionID = param.NewOpt(data.RegionID.ValueInt64())
 	}
 
-	err := r.client.Cloud.Networks.Subnets.Delete(
+	_, err := r.client.Cloud.Networks.Subnets.Delete(
 		ctx,
 		data.ID.ValueString(),
 		params,
