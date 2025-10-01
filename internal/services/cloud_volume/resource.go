@@ -15,6 +15,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/stainless-sdks/gcore-terraform/internal/apijson"
+	"github.com/stainless-sdks/gcore-terraform/internal/custom"
 	"github.com/stainless-sdks/gcore-terraform/internal/importpath"
 	"github.com/stainless-sdks/gcore-terraform/internal/logging"
 )
@@ -117,39 +118,79 @@ func (r *CloudVolumeResource) Update(ctx context.Context, req resource.UpdateReq
 		return
 	}
 
-	params := cloud.VolumeUpdateParams{}
+	// Handle volume size changes (resize) separately before other updates
+	sizeChanged := !data.Size.Equal(state.Size)
 
-	if !data.ProjectID.IsNull() {
-		params.ProjectID = param.NewOpt(data.ProjectID.ValueInt64())
+	if sizeChanged {
+		resizeParams := cloud.VolumeResizeParams{
+			Size: data.Size.ValueInt64(),
+		}
+
+		if !data.ProjectID.IsNull() {
+			resizeParams.ProjectID = param.NewOpt(data.ProjectID.ValueInt64())
+		}
+
+		if !data.RegionID.IsNull() {
+			resizeParams.RegionID = param.NewOpt(data.RegionID.ValueInt64())
+		}
+
+		resizedVolume, err := r.client.Cloud.Volumes.ResizeAndPoll(
+			ctx,
+			data.ID.ValueString(),
+			resizeParams,
+			option.WithMiddleware(logging.Middleware(ctx)),
+		)
+		if err != nil {
+			resp.Diagnostics.AddError("failed to make http request", err.Error())
+			return
+		}
+		err = apijson.UnmarshalComputed([]byte(resizedVolume.RawJSON()), &data)
+		if err != nil {
+			resp.Diagnostics.AddError("failed to deserialize http request", err.Error())
+			return
+		}
 	}
 
-	if !data.RegionID.IsNull() {
-		params.RegionID = param.NewOpt(data.RegionID.ValueInt64())
-	}
+	// Check if name or tags have changed before sending update request
+	nameChanged := !data.Name.Equal(state.Name)
+	tagsChanged := !custom.TagsEqual(data.Tags, state.Tags)
 
-	dataBytes, err := data.MarshalJSONForUpdate(*state)
-	if err != nil {
-		resp.Diagnostics.AddError("failed to serialize http request", err.Error())
-		return
-	}
-	res := new(http.Response)
-	_, err = r.client.Cloud.Volumes.Update(
-		ctx,
-		data.ID.ValueString(),
-		params,
-		option.WithRequestBody("application/json", dataBytes),
-		option.WithResponseBodyInto(&res),
-		option.WithMiddleware(logging.Middleware(ctx)),
-	)
-	if err != nil {
-		resp.Diagnostics.AddError("failed to make http request", err.Error())
-		return
-	}
-	bytes, _ := io.ReadAll(res.Body)
-	err = apijson.UnmarshalComputed(bytes, &data)
-	if err != nil {
-		resp.Diagnostics.AddError("failed to deserialize http request", err.Error())
-		return
+	// Only send update request if name or tags changed
+	if nameChanged || tagsChanged {
+		params := cloud.VolumeUpdateParams{}
+
+		if !data.ProjectID.IsNull() {
+			params.ProjectID = param.NewOpt(data.ProjectID.ValueInt64())
+		}
+
+		if !data.RegionID.IsNull() {
+			params.RegionID = param.NewOpt(data.RegionID.ValueInt64())
+		}
+
+		dataBytes, err := data.MarshalJSONForUpdate(*state)
+		if err != nil {
+			resp.Diagnostics.AddError("failed to serialize http request", err.Error())
+			return
+		}
+		res := new(http.Response)
+		_, err = r.client.Cloud.Volumes.Update(
+			ctx,
+			data.ID.ValueString(),
+			params,
+			option.WithRequestBody("application/json", dataBytes),
+			option.WithResponseBodyInto(&res),
+			option.WithMiddleware(logging.Middleware(ctx)),
+		)
+		if err != nil {
+			resp.Diagnostics.AddError("failed to make http request", err.Error())
+			return
+		}
+		bytes, _ := io.ReadAll(res.Body)
+		err = apijson.UnmarshalComputed(bytes, &data)
+		if err != nil {
+			resp.Diagnostics.AddError("failed to deserialize http request", err.Error())
+			return
+		}
 	}
 
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
