@@ -835,7 +835,8 @@ func resourceBmInstanceUpdate(ctx context.Context, d *schema.ResourceData, m int
         for fipID, havePort := range current {
             if _, ok := desired[fipID]; !ok && havePort != "" {
                 log.Printf("[DEBUG] Unassign floating IP %s (not in desired)", fipID)
-                if err := floatingips.UnAssign(fipClient, fipID).ExtractErr(); err != nil {
+                _, err := floatingips.UnAssign(client, d.Id()).Extract()
+                if err != nil {
                     return diag.Errorf("failed to unassign floating IP %s: %v", fipID, err)
                 }
             }
