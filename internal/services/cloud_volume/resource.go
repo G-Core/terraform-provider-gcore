@@ -15,6 +15,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/stainless-sdks/gcore-terraform/internal/apijson"
+	"github.com/stainless-sdks/gcore-terraform/internal/custom"
 	"github.com/stainless-sdks/gcore-terraform/internal/importpath"
 	"github.com/stainless-sdks/gcore-terraform/internal/logging"
 )
@@ -140,7 +141,7 @@ func (r *CloudVolumeResource) Update(ctx context.Context, req resource.UpdateReq
 			option.WithMiddleware(logging.Middleware(ctx)),
 		)
 		if err != nil {
-			resp.Diagnostics.AddError("failed to resize volume", err.Error())
+			resp.Diagnostics.AddError("failed to make http request", err.Error())
 			return
 		}
 		err = apijson.UnmarshalComputed([]byte(resizedVolume.RawJSON()), &data)
@@ -152,23 +153,7 @@ func (r *CloudVolumeResource) Update(ctx context.Context, req resource.UpdateReq
 
 	// Check if name or tags have changed before sending update request
 	nameChanged := !data.Name.Equal(state.Name)
-	tagsChanged := false
-
-	// Check if tags changed
-	if (data.Tags == nil) != (state.Tags == nil) {
-		tagsChanged = true
-	} else if data.Tags != nil && state.Tags != nil {
-		if len(*data.Tags) != len(*state.Tags) {
-			tagsChanged = true
-		} else {
-			for k, v := range *data.Tags {
-				if stateV, exists := (*state.Tags)[k]; !exists || !v.Equal(stateV) {
-					tagsChanged = true
-					break
-				}
-			}
-		}
-	}
+	tagsChanged := !custom.TagsEqual(data.Tags, state.Tags)
 
 	// Only send update request if name or tags changed
 	if nameChanged || tagsChanged {
