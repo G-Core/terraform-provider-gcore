@@ -80,20 +80,18 @@ func (r *CloudLoadBalancerListenerResource) Create(ctx context.Context, req reso
 		resp.Diagnostics.AddError("failed to serialize http request", err.Error())
 		return
 	}
-	res := new(http.Response)
-	_, err = r.client.Cloud.LoadBalancers.Listeners.New(
+	listener, err := r.client.Cloud.LoadBalancers.Listeners.NewAndPoll(
 		ctx,
 		params,
 		option.WithRequestBody("application/json", dataBytes),
-		option.WithResponseBodyInto(&res),
 		option.WithMiddleware(logging.Middleware(ctx)),
 	)
 	if err != nil {
 		resp.Diagnostics.AddError("failed to make http request", err.Error())
 		return
 	}
-	bytes, _ := io.ReadAll(res.Body)
-	err = apijson.UnmarshalComputed(bytes, &data)
+	// Use raw JSON from the response to unmarshal the "computed" fields into the data model
+	err = apijson.UnmarshalComputed([]byte(listener.RawJSON()), &data)
 	if err != nil {
 		resp.Diagnostics.AddError("failed to deserialize http request", err.Error())
 		return
@@ -134,21 +132,19 @@ func (r *CloudLoadBalancerListenerResource) Update(ctx context.Context, req reso
 		resp.Diagnostics.AddError("failed to serialize http request", err.Error())
 		return
 	}
-	res := new(http.Response)
-	_, err = r.client.Cloud.LoadBalancers.Listeners.Update(
+	listener, err := r.client.Cloud.LoadBalancers.Listeners.UpdateAndPoll(
 		ctx,
 		data.ID.ValueString(),
 		params,
 		option.WithRequestBody("application/json", dataBytes),
-		option.WithResponseBodyInto(&res),
 		option.WithMiddleware(logging.Middleware(ctx)),
 	)
 	if err != nil {
 		resp.Diagnostics.AddError("failed to make http request", err.Error())
 		return
 	}
-	bytes, _ := io.ReadAll(res.Body)
-	err = apijson.UnmarshalComputed(bytes, &data)
+	// Use raw JSON from the response to unmarshal the "computed" fields into the data model
+	err = apijson.UnmarshalComputed([]byte(listener.RawJSON()), &data)
 	if err != nil {
 		resp.Diagnostics.AddError("failed to deserialize http request", err.Error())
 		return
@@ -222,7 +218,7 @@ func (r *CloudLoadBalancerListenerResource) Delete(ctx context.Context, req reso
 		params.RegionID = param.NewOpt(data.RegionID.ValueInt64())
 	}
 
-	_, err := r.client.Cloud.LoadBalancers.Listeners.Delete(
+	err := r.client.Cloud.LoadBalancers.Listeners.DeleteAndPoll(
 		ctx,
 		data.ID.ValueString(),
 		params,
