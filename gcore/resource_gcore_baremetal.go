@@ -777,7 +777,7 @@ func resourceBmInstanceUpdate(ctx context.Context, d *schema.ResourceData, m int
 			}
 		}
 
-        currentIfs, err := instances.ListInterfacesAll(client, d.Id())
+        currentIfs, err = instances.ListInterfacesAll(client, d.Id())
         if err != nil {
             return diag.FromErr(err)
         }
@@ -796,9 +796,11 @@ func resourceBmInstanceUpdate(ctx context.Context, d *schema.ResourceData, m int
                 portID = iface["port_id"].(string)
             case types.SubnetInterfaceType:
                 for _, ci := range currentIfs {
-                    if ci.SubnetID == iface["subnet_id"].(string) {
-                        portID = ci.PortID
-                        break
+                    for _, a := range ci.IPAssignments {
+                        if a.SubnetID == iface["subnet_id"].(string) {
+                            portID = ci.PortID
+                            break
+                        }
                     }
                 }
             case types.AnySubnetInterfaceType:
@@ -833,7 +835,7 @@ func resourceBmInstanceUpdate(ctx context.Context, d *schema.ResourceData, m int
         for fipID, havePort := range current {
             if _, ok := desired[fipID]; !ok && havePort != "" {
                 log.Printf("[DEBUG] Unassign floating IP %s (not in desired)", fipID)
-                if err := floatingips.Unassign(fipClient, fipID).ExtractErr(); err != nil {
+                if err := floatingips.UnAssign(fipClient, fipID).ExtractErr(); err != nil {
                     return diag.Errorf("failed to unassign floating IP %s: %v", fipID, err)
                 }
             }
