@@ -38,9 +38,9 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 				PlanModifiers: []planmodifier.Int64{int64planmodifier.RequiresReplace()},
 			},
 			"fixed_ip_address": schema.StringAttribute{
-				Description: "If the port has multiple IP addresses, a specific one can be selected using this field. If not specified, the first IP in the port's list will be used by default.",
-				Computed:    true,
-				Optional:    true,
+				Description:   "If the port has multiple IP addresses, a specific one can be selected using this field. If not specified, the first IP in the port's list will be used by default.",
+				Computed:      true,
+				Optional:      true,
 			},
 			"port_id": schema.StringAttribute{
 				Description: "If provided, the floating IP will be immediately attached to the specified port.",

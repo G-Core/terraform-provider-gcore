@@ -13,8 +13,8 @@ type CloudFloatingIPModel struct {
 	ID                types.String                   `tfsdk:"id" json:"id,computed"`
 	ProjectID         types.Int64                    `tfsdk:"project_id" path:"project_id,optional"`
 	RegionID          types.Int64                    `tfsdk:"region_id" path:"region_id,optional"`
-	FixedIPAddress    types.String                   `tfsdk:"fixed_ip_address" json:"fixed_ip_address,computed_optional"`
-	PortID            types.String                   `tfsdk:"port_id" json:"port_id,computed_optional"`
+	FixedIPAddress    types.String                   `tfsdk:"fixed_ip_address" json:"fixed_ip_address,optional"`
+	PortID            types.String                   `tfsdk:"port_id" json:"port_id,optional"`
 	Tags              *map[string]types.String       `tfsdk:"tags" json:"tags,optional,no_refresh"`
 	CreatedAt         timetypes.RFC3339              `tfsdk:"created_at" json:"created_at,computed" format:"date-time"`
 	CreatorTaskID     types.String                   `tfsdk:"creator_task_id" json:"creator_task_id,computed"`
