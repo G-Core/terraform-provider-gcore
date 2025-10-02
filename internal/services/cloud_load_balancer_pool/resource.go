@@ -117,6 +117,30 @@ func (r *CloudLoadBalancerPoolResource) Update(ctx context.Context, req resource
 		return
 	}
 
+	// Handle health monitor deletion
+	if state.Healthmonitor != nil && data.Healthmonitor == nil {
+		deleteParams := cloud.LoadBalancerPoolHealthMonitorDeleteParams{}
+
+		if !data.ProjectID.IsNull() {
+			deleteParams.ProjectID = param.NewOpt(data.ProjectID.ValueInt64())
+		}
+
+		if !data.RegionID.IsNull() {
+			deleteParams.RegionID = param.NewOpt(data.RegionID.ValueInt64())
+		}
+
+		err := r.client.Cloud.LoadBalancers.Pools.HealthMonitors.Delete(
+			ctx,
+			data.ID.ValueString(),
+			deleteParams,
+			option.WithMiddleware(logging.Middleware(ctx)),
+		)
+		if err != nil {
+			resp.Diagnostics.AddError("failed to delete health monitor", err.Error())
+			return
+		}
+	}
+
 	params := cloud.LoadBalancerPoolUpdateParams{}
 
 	if !data.ProjectID.IsNull() {
