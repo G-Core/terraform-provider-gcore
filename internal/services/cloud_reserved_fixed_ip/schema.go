@@ -9,7 +9,6 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
-	"github.com/hashicorp/terraform-plugin-framework/resource/schema/boolplanmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/int64planmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringplanmodifier"
@@ -25,7 +24,7 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 		Attributes: map[string]schema.Attribute{
 			"id": schema.StringAttribute{
 				Computed:      true,
-				PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown(), stringplanmodifier.RequiresReplace()},
+				PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
 			},
 			"project_id": schema.Int64Attribute{
 				Optional:      true,
@@ -66,11 +65,6 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 				},
 				PlanModifiers: []planmodifier.String{stringplanmodifier.RequiresReplace()},
 			},
-			"is_vip": schema.BoolAttribute{
-				Description:   "If reserved fixed IP is a VIP",
-				Optional:      true,
-				PlanModifiers: []planmodifier.Bool{boolplanmodifier.RequiresReplace()},
-			},
 			"network_id": schema.StringAttribute{
 				Description:   "Reserved fixed IP will be allocated in a subnet of this network",
 				Optional:      true,
@@ -85,6 +79,10 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 				Description:   "Reserved fixed IP will be allocated in this subnet",
 				Optional:      true,
 				PlanModifiers: []planmodifier.String{stringplanmodifier.RequiresReplace()},
+			},
+			"is_vip": schema.BoolAttribute{
+				Description: "If reserved fixed IP is a VIP",
+				Optional:    true,
 			},
 			"created_at": schema.StringAttribute{
 				Description: "Datetime when the reserved fixed IP was created",
