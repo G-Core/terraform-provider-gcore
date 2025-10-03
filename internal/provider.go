@@ -26,6 +26,7 @@ import (
 	"github.com/stainless-sdks/gcore-terraform/internal/services/cloud_project"
 	"github.com/stainless-sdks/gcore-terraform/internal/services/cloud_region"
 	"github.com/stainless-sdks/gcore-terraform/internal/services/cloud_reserved_fixed_ip"
+	"github.com/stainless-sdks/gcore-terraform/internal/services/cloud_security_group"
 	"github.com/stainless-sdks/gcore-terraform/internal/services/cloud_volume"
 )
 
@@ -161,6 +162,7 @@ func (p *GcoreProvider) Resources(ctx context.Context) []func() resource.Resourc
 		cloud_network_subnet.NewResource,
 		cloud_volume.NewResource,
 		cloud_floating_ip.NewResource,
+		cloud_security_group.NewResource,
 	}
 }
 
@@ -184,6 +186,8 @@ func (p *GcoreProvider) DataSources(ctx context.Context) []func() datasource.Dat
 		cloud_volume.NewCloudVolumesDataSource,
 		cloud_floating_ip.NewCloudFloatingIPDataSource,
 		cloud_floating_ip.NewCloudFloatingIPsDataSource,
+		cloud_security_group.NewCloudSecurityGroupDataSource,
+		cloud_security_group.NewCloudSecurityGroupsDataSource,
 		cloud_instance_image.NewCloudInstanceImageDataSource,
 	}
 }
