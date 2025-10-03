@@ -262,7 +262,7 @@ func (r *CloudLoadBalancerResource) Delete(ctx context.Context, req resource.Del
 		params.RegionID = param.NewOpt(data.RegionID.ValueInt64())
 	}
 
-	_, err := r.client.Cloud.LoadBalancers.Delete(
+	err := r.client.Cloud.LoadBalancers.DeleteAndPoll(
 		ctx,
 		data.ID.ValueString(),
 		params,
