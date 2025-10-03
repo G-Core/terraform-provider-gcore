@@ -49,6 +49,16 @@ func resourceCDNOriginShieldingRead(ctx context.Context, d *schema.ResourceData,
 
 	result, err := client.OriginShielding().Get(ctx, int64(resourceID))
 	if err != nil {
+		if isNotFoundError(err) {
+			d.SetId("") // Resource not found, remove from state
+			return diag.Diagnostics{
+				{
+					Severity: diag.Warning,
+					Summary:  fmt.Sprintf("Origin Shielding with id %s not found, removing from state", resourceID),
+				},
+			}
+		}
+
 		return diag.FromErr(err)
 	}
 

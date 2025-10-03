@@ -102,6 +102,16 @@ func resourceCDNCertRead(ctx context.Context, d *schema.ResourceData, m interfac
 
 	result, err := client.SSLCerts().Get(ctx, id)
 	if err != nil {
+		if isNotFoundError(err) {
+			d.SetId("") // Resource not found, remove from state
+			return diag.Diagnostics{
+				{
+					Severity: diag.Warning,
+					Summary:  fmt.Sprintf("SSL Certificate \"%s\" not found, removing from state", d.Get("name")),
+				},
+			}
+		}
+
 		return diag.FromErr(err)
 	}
 

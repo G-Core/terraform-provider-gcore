@@ -171,6 +171,16 @@ func resourceCDNResourceRead(ctx context.Context, d *schema.ResourceData, m inte
 
 	result, err := client.Resources().Get(ctx, id)
 	if err != nil {
+		if isNotFoundError(err) {
+			d.SetId("") // Resource not found, remove from state
+			return diag.Diagnostics{
+				{
+					Severity: diag.Warning,
+					Summary:  fmt.Sprintf("CDN Resource \"%s\" not found, removing from state", d.Get("cname")),
+				},
+			}
+		}
+
 		return diag.FromErr(err)
 	}
 

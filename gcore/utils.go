@@ -1121,3 +1121,7 @@ func convertSchemaSetToIntList(v *schema.Set) []int {
 	}
 	return result
 }
+
+func isNotFoundError(err error) bool {
+	return strings.Contains(err.Error(), "status: 404")
+}

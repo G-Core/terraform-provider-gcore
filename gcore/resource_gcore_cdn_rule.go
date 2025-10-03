@@ -150,6 +150,16 @@ func resourceCDNRuleRead(ctx context.Context, d *schema.ResourceData, m interfac
 
 	result, err := client.Rules().Get(ctx, int64(resourceID), id)
 	if err != nil {
+		if isNotFoundError(err) {
+			d.SetId("") // Resource not found, remove from state
+			return diag.Diagnostics{
+				{
+					Severity: diag.Warning,
+					Summary:  fmt.Sprintf("CDN Rule \"%s\" not found, removing from state", d.Get("name")),
+				},
+			}
+		}
+
 		return diag.FromErr(err)
 	}
 

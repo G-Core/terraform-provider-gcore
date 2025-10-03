@@ -493,6 +493,16 @@ func resourceCDNLogsUploaderTargetRead(ctx context.Context, d *schema.ResourceDa
 
 	result, err := client.LogsUploader().TargetGet(ctx, id)
 	if err != nil {
+		if isNotFoundError(err) {
+			d.SetId("") // Resource not found, remove from state
+			return diag.Diagnostics{
+				{
+					Severity: diag.Warning,
+					Summary:  fmt.Sprintf("Logs Uploader Target \"%s\" not found, removing from state", d.Get("name")),
+				},
+			}
+		}
+
 		return diag.FromErr(err)
 	}
 
