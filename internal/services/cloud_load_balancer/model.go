@@ -18,9 +18,9 @@ type CloudLoadBalancerModel struct {
 	NameTemplate          types.String                                                       `tfsdk:"name_template" json:"name_template,optional,no_refresh"`
 	VipIPFamily           types.String                                                       `tfsdk:"vip_ip_family" json:"vip_ip_family,optional"`
 	VipNetworkID          types.String                                                       `tfsdk:"vip_network_id" json:"vip_network_id,optional,no_refresh"`
-	VipPortID             types.String                                                       `tfsdk:"vip_port_id" json:"vip_port_id,optional"`
 	VipSubnetID           types.String                                                       `tfsdk:"vip_subnet_id" json:"vip_subnet_id,optional,no_refresh"`
 	FloatingIP            *CloudLoadBalancerFloatingIPModel                                  `tfsdk:"floating_ip" json:"floating_ip,optional,no_refresh"`
+	VipPortID             types.String                                                       `tfsdk:"vip_port_id" json:"vip_port_id,computed_optional"`
 	Listeners             customfield.NestedObjectList[CloudLoadBalancerListenersModel]      `tfsdk:"listeners" json:"listeners,computed_optional"`
 	Name                  types.String                                                       `tfsdk:"name" json:"name,optional"`
 	PreferredConnectivity types.String                                                       `tfsdk:"preferred_connectivity" json:"preferred_connectivity,optional"`
