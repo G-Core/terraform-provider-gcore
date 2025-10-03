@@ -823,20 +823,20 @@ func resourceBmInstanceUpdate(ctx context.Context, d *schema.ResourceData, m int
             }
         }
 
-        for fipID, wantPort := range desired {
-            if havePort, ok := current[fipID]; !ok || havePort != wantPort {
-                log.Printf("[DEBUG] Assign floating IP %s -> port %s", fipID, wantPort)
-                if _, err := floatingips.Assign(fipClient, fipID, floatingips.CreateOpts{PortID: wantPort}).Extract(); err != nil {
-                    return diag.Errorf("failed to assign floating IP %s to port %s: %v", fipID, wantPort, err)
-                }
-            }
-        }
-
         for fipID, havePort := range current {
             if _, ok := desired[fipID]; !ok && havePort != "" {
                 log.Printf("[DEBUG] Unassign floating IP %s (not in desired)", fipID)
                 if _, err := floatingips.UnAssign(fipClient, fipID).Extract(); err != nil {
                     return diag.Errorf("failed to unassign floating IP %s: %v", fipID, err)
+                }
+            }
+        }
+
+        for fipID, wantPort := range desired {
+            if havePort, ok := current[fipID]; !ok || havePort != wantPort {
+                log.Printf("[DEBUG] Assign floating IP %s -> port %s", fipID, wantPort)
+                if _, err := floatingips.Assign(fipClient, fipID, floatingips.CreateOpts{PortID: wantPort}).Extract(); err != nil {
+                    return diag.Errorf("failed to assign floating IP %s to port %s: %v", fipID, wantPort, err)
                 }
             }
         }
