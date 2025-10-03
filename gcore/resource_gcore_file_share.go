@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"log"
+	"strings"
 
 	"github.com/G-Core/gcorelabscloud-go/client/utils"
 
@@ -189,7 +190,56 @@ func resourceFileShare() *schema.Resource {
 				Computed:    true,
 				Description: `The name of the subnet associated with the file share`,
 			},
-			// (computed fields end)
+			"share_settings": {
+				Type:        schema.TypeList,
+				Optional:    true,
+				MaxItems:    1,
+				Description: "Share settings for the file share.",
+				Elem: &schema.Resource{
+					Schema: map[string]*schema.Schema{
+						"allowed_characters": {
+							Type:        schema.TypeString,
+							Optional:    true,
+							Computed:    true,
+							Description: "Allowed characters in file names.",
+							ValidateFunc: func(v interface{}, k string) ([]string, []error) {
+								val := v.(string)
+								allowedCharacters := file_shares.FileShareAllowedCharacters("").StringList()
+								for _, v := range allowedCharacters {
+									if v == val {
+										return nil, nil
+									}
+								}
+								return nil, []error{fmt.Errorf("%s must be one of: %s", val,
+									strings.Join(allowedCharacters, ", "))}
+							},
+						},
+						"path_length": {
+							Type:        schema.TypeString,
+							Optional:    true,
+							Computed:    true,
+							Description: "Affects the maximum limit of file path component name length.",
+							ValidateFunc: func(v interface{}, k string) ([]string, []error) {
+								val := v.(string)
+								pathLengths := file_shares.FileSharePathLength("").StringList()
+								for _, v := range pathLengths {
+									if v == val {
+										return nil, nil
+									}
+								}
+								return nil, []error{fmt.Errorf("%s must be one of: %s", val,
+									strings.Join(pathLengths, ", "))}
+							},
+						},
+						"root_squash": {
+							Type:        schema.TypeBool,
+							Optional:    true,
+							Computed:    true,
+							Description: "Indicates if root squash is enabled.",
+						},
+					},
+				},
+			},
 		},
 	}
 }
@@ -259,9 +309,19 @@ func resourceFileShareRead(ctx context.Context, d *schema.ResourceData, m interf
 	d.Set("connection_point", fileShare.ConnectionPoint)
 	d.Set("created_at", fileShare.CreatedAt.String())
 	d.Set("type_name", fileShare.TypeName)
-	d.Set("network_id", fileShare.NetworkID)
+	if fileShare.TypeName == "standard" {
+		networkMap := map[string]interface{}{}
+		if fileShare.NetworkID != "" {
+			networkMap["network_id"] = fileShare.NetworkID
+		}
+		if fileShare.SubnetID != "" {
+			networkMap["subnet_id"] = fileShare.SubnetID
+		}
+		if len(networkMap) > 0 {
+			d.Set("network", []interface{}{networkMap})
+		}
+	}
 	d.Set("network_name", fileShare.NetworkName)
-	d.Set("subnet_id", fileShare.SubnetID)
 	d.Set("subnet_name", fileShare.SubnetName)
 	d.Set("creator_task_id", fileShare.CreatorTaskID)
 	if fileShare.ShareNetworkName != nil {
@@ -275,6 +335,19 @@ func resourceFileShareRead(ctx context.Context, d *schema.ResourceData, m interf
 			}
 		}
 		d.Set("tags", tags)
+	}
+	shareSettingsMap := map[string]interface{}{}
+	if fileShare.ShareSettings.AllowedCharacters != nil && fileShare.ShareSettings.AllowedCharacters.String() != "" {
+		shareSettingsMap["allowed_characters"] = fileShare.ShareSettings.AllowedCharacters.String()
+	}
+	if fileShare.ShareSettings.PathLength != nil && fileShare.ShareSettings.PathLength.String() != "" {
+		shareSettingsMap["path_length"] = fileShare.ShareSettings.PathLength.String()
+	}
+	if fileShare.ShareSettings.RootSquash != nil {
+		shareSettingsMap["root_squash"] = *fileShare.ShareSettings.RootSquash
+	}
+	if len(shareSettingsMap) > 0 {
+		d.Set("share_settings", []interface{}{shareSettingsMap})
 	}
 	return nil
 }
@@ -314,7 +387,7 @@ func resourceFileShareUpdate(ctx context.Context, d *schema.ResourceData, m inte
 		}
 	}
 
-	if d.HasChange("name") || d.HasChange("tags") {
+	if d.HasChange("name") || d.HasChange("tags") || d.HasChange("share_settings") {
 		// Tags needs to be initialized to avoid sending null to the API and removing all tags.
 		updateOpts := file_shares.UpdateWithTagsOpts{Tags: make(map[string]*string)}
 		newName := d.Get("name").(string)
@@ -351,6 +424,29 @@ func resourceFileShareUpdate(ctx context.Context, d *schema.ResourceData, m inte
 			}
 			updateOpts.Tags = newTagsMap
 		}
+
+		if d.HasChange("share_settings") {
+			//if d.Get("type_name").(string) != "vast" {
+			//	return diag.FromErr(fmt.Errorf("share_settings block can be updated only for 'vast' type_name"))
+			//}
+			shareSettingsList := d.Get("share_settings").([]interface{})
+			if len(shareSettingsList) > 0 {
+				// schema restricts share_settings to a single block
+				ssMap := shareSettingsList[0].(map[string]interface{})
+				var shareSettingsOpts file_shares.ShareSettingsOpts
+				if v, ok := ssMap["allowed_characters"]; ok && v != nil && v.(string) != "" {
+					shareSettingsOpts.AllowedCharacters = file_shares.FileShareAllowedCharacters(v.(string))
+				}
+				if v, ok := ssMap["path_length"]; ok && v != nil && v.(string) != "" {
+					shareSettingsOpts.PathLength = file_shares.FileSharePathLength(v.(string))
+				}
+				if v, ok := ssMap["root_squash"]; ok && v != nil {
+					shareSettingsOpts.RootSquash = v.(bool)
+				}
+				updateOpts.ShareSettings = &shareSettingsOpts
+			}
+		}
+
 		_, err := file_shares.UpdateWithTags(client, fileShareID, updateOpts).Extract()
 		if err != nil {
 			return diag.FromErr(err)
@@ -468,6 +564,12 @@ func expandFileShareCreateOpts(d *schema.ResourceData) (*file_shares.CreateOpts,
 		}
 	}
 
+	// check that share_settings block is only set for 'vast'
+	shareSettingsList := d.Get("share_settings").([]interface{})
+	//if len(shareSettingsList) > 0 && typeName == "standard" {
+	//	return nil, fmt.Errorf("share_settings block is not allowed for 'standard'")
+	//}
+
 	opts := file_shares.CreateOpts{
 		Name:     name,
 		Protocol: protocol,
@@ -501,5 +603,24 @@ func expandFileShareCreateOpts(d *schema.ResourceData) (*file_shares.CreateOpts,
 		}
 		opts.Access = access
 	}
+
+	if typeName == "vast" {
+		var shareSettingsOpts file_shares.ShareSettingsOpts
+		if len(shareSettingsList) > 0 {
+			// schema restricts share_settings to a single block
+			ssMap := shareSettingsList[0].(map[string]interface{})
+			if v, ok := ssMap["allowed_characters"]; ok && v != nil && v.(string) != "" {
+				shareSettingsOpts.AllowedCharacters = file_shares.FileShareAllowedCharacters(v.(string))
+			}
+			if v, ok := ssMap["path_length"]; ok && v != nil && v.(string) != "" {
+				shareSettingsOpts.PathLength = file_shares.FileSharePathLength(v.(string))
+			}
+			if v, ok := ssMap["root_squash"]; ok && v != nil {
+				shareSettingsOpts.RootSquash = v.(bool)
+			}
+			opts.ShareSettings = &shareSettingsOpts
+		}
+	}
+
 	return &opts, nil
 }
