@@ -49,6 +49,7 @@ output "view" {
 - `project_name` (String) Project name, only one of project_id or project_name should be set
 - `region_id` (Number) Region ID, only one of region_id or region_name should be set
 - `region_name` (String) Region name, only one of region_id or region_name should be set
+- `share_settings` (Block List, Max: 1) Share settings for the file share. (see [below for nested schema](#nestedblock--share_settings))
 
 ### Read-Only
 
@@ -64,4 +65,14 @@ output "view" {
 - `subnet_id` (String) The ID of the subnet within the network. This is optional and can be used to specify a particular subnet for the file share.
 - `subnet_name` (String) The name of the subnet associated with the file share
 - `tags` (Map of String) Tags associated with the file share. Tags are key-value pairs.
+- `type_name` (String) The type of the file share (standard or vast).
+
+<a id="nestedblock--share_settings"></a>
+### Nested Schema for `share_settings`
+
+Optional:
+
+- `allowed_characters` (String) Allowed characters in file names.
+- `path_length` (String) Affects the maximum limit of file path component name length.
+- `root_squash` (Boolean) Indicates if root squash is enabled.
 - `type_name` (String) The type of the file share (standard or vast).
