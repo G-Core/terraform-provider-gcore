@@ -183,6 +183,16 @@ func resourceCDNLogsUploaderPolicyRead(ctx context.Context, d *schema.ResourceDa
 
 	result, err := client.LogsUploader().PolicyGet(ctx, id)
 	if err != nil {
+		if isNotFoundError(err) {
+			d.SetId("") // Resource not found, remove from state
+			return diag.Diagnostics{
+				{
+					Severity: diag.Warning,
+					Summary:  fmt.Sprintf("Logs Uploader Policy \"%s\" not found, removing from state", d.Get("name")),
+				},
+			}
+		}
+
 		return diag.FromErr(err)
 	}
 

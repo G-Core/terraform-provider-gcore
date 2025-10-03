@@ -77,6 +77,16 @@ func resourceCDNCACertRead(ctx context.Context, d *schema.ResourceData, m interf
 
 	result, err := client.CACerts().Get(ctx, id)
 	if err != nil {
+		if isNotFoundError(err) {
+			d.SetId("") // Resource not found, remove from state
+			return diag.Diagnostics{
+				{
+					Severity: diag.Warning,
+					Summary:  fmt.Sprintf("CA Certificate \"%s\" not found, removing from state", d.Get("name")),
+				},
+			}
+		}
+
 		return diag.FromErr(err)
 	}
 

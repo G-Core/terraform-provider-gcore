@@ -104,6 +104,16 @@ func resourceRuleTemplateRead(ctx context.Context, d *schema.ResourceData, m int
 
 	result, err := client.RuleTemplates().Get(ctx, id)
 	if err != nil {
+		if isNotFoundError(err) {
+			d.SetId("") // Resource not found, remove from state
+			return diag.Diagnostics{
+				{
+					Severity: diag.Warning,
+					Summary:  fmt.Sprintf("CDN Rule Template \"%s\" not found, removing from state", d.Get("name")),
+				},
+			}
+		}
+
 		return diag.FromErr(err)
 	}
 
