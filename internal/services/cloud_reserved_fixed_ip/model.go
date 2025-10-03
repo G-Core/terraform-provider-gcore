@@ -17,8 +17,8 @@ type CloudReservedFixedIPModel struct {
 	IPAddress           types.String                                                               `tfsdk:"ip_address" json:"ip_address,optional,no_refresh"`
 	IPFamily            types.String                                                               `tfsdk:"ip_family" json:"ip_family,optional,no_refresh"`
 	NetworkID           types.String                                                               `tfsdk:"network_id" json:"network_id,optional"`
-	SubnetID            types.String                                                               `tfsdk:"subnet_id" json:"subnet_id,optional"`
 	PortID              types.String                                                               `tfsdk:"port_id" json:"port_id,computed_optional"`
+	SubnetID            types.String                                                               `tfsdk:"subnet_id" json:"subnet_id,optional"`
 	IsVip               types.Bool                                                                 `tfsdk:"is_vip" json:"is_vip,optional"`
 	CreatedAt           timetypes.RFC3339                                                          `tfsdk:"created_at" json:"created_at,computed" format:"date-time"`
 	CreatorTaskID       types.String                                                               `tfsdk:"creator_task_id" json:"creator_task_id,computed"`
@@ -39,7 +39,7 @@ type CloudReservedFixedIPModel struct {
 }
 
 func (m CloudReservedFixedIPModel) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(m)
+	return apijson.MarshalRoot(&m)
 }
 
 func (m CloudReservedFixedIPModel) MarshalJSONForUpdate(state CloudReservedFixedIPModel) (data []byte, err error) {
