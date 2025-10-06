@@ -6,10 +6,13 @@ import (
 	"context"
 
 	"github.com/hashicorp/terraform-plugin-framework-timetypes/timetypes"
+	"github.com/hashicorp/terraform-plugin-framework-validators/datasourcevalidator"
 	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/datasource/schema"
+	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
+	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/stainless-sdks/gcore-terraform/internal/customfield"
 )
 
@@ -19,9 +22,13 @@ func DataSourceSchema(ctx context.Context) schema.Schema {
 	return schema.Schema{
 		Description: "A floating IP is a static IP address that points to one of your Instances. It allows you to redirect network traffic to any of your Instances in the same datacenter.",
 		Attributes: map[string]schema.Attribute{
+			"id": schema.StringAttribute{
+				Description: "Floating IP ID",
+				Computed:    true,
+			},
 			"floating_ip_id": schema.StringAttribute{
 				Description: "Floating IP ID",
-				Required:    true,
+				Optional:    true,
 			},
 			"project_id": schema.Int64Attribute{
 				Description: "Project ID",
@@ -46,10 +53,6 @@ func DataSourceSchema(ctx context.Context) schema.Schema {
 			},
 			"floating_ip_address": schema.StringAttribute{
 				Description: "IP Address of the floating IP",
-				Computed:    true,
-			},
-			"id": schema.StringAttribute{
-				Description: "Floating IP ID",
 				Computed:    true,
 			},
 			"port_id": schema.StringAttribute{
@@ -105,6 +108,20 @@ func DataSourceSchema(ctx context.Context) schema.Schema {
 					},
 				},
 			},
+			"find_one_by": schema.SingleNestedAttribute{
+				Optional: true,
+				Attributes: map[string]schema.Attribute{
+					"tag_key": schema.ListAttribute{
+						Description: "Optional. Filter by tag keys. ?`tag_key`=key1&`tag_key`=key2",
+						Optional:    true,
+						ElementType: types.StringType,
+					},
+					"tag_key_value": schema.StringAttribute{
+						Description: "Optional. Filter by tag key-value pairs.",
+						Optional:    true,
+					},
+				},
+			},
 		},
 	}
 }
@@ -114,5 +131,7 @@ func (d *CloudFloatingIPDataSource) Schema(ctx context.Context, req datasource.S
 }
 
 func (d *CloudFloatingIPDataSource) ConfigValidators(_ context.Context) []datasource.ConfigValidator {
-	return []datasource.ConfigValidator{}
+	return []datasource.ConfigValidator{
+		datasourcevalidator.ExactlyOneOf(path.MatchRoot("floating_ip_id"), path.MatchRoot("find_one_by")),
+	}
 }

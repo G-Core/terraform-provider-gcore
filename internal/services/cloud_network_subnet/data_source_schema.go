@@ -6,9 +6,12 @@ import (
 	"context"
 
 	"github.com/hashicorp/terraform-plugin-framework-timetypes/timetypes"
+	"github.com/hashicorp/terraform-plugin-framework-validators/datasourcevalidator"
 	"github.com/hashicorp/terraform-plugin-framework-validators/int64validator"
+	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/datasource/schema"
+	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/stainless-sdks/gcore-terraform/internal/customfield"
@@ -19,16 +22,20 @@ var _ datasource.DataSourceWithConfigValidators = (*CloudNetworkSubnetDataSource
 func DataSourceSchema(ctx context.Context) schema.Schema {
 	return schema.Schema{
 		Attributes: map[string]schema.Attribute{
+			"id": schema.StringAttribute{
+				Description: "Subnet ID",
+				Computed:    true,
+			},
+			"subnet_id": schema.StringAttribute{
+				Description: "Subnet ID",
+				Optional:    true,
+			},
 			"project_id": schema.Int64Attribute{
 				Description: "Project ID",
 				Required:    true,
 			},
 			"region_id": schema.Int64Attribute{
 				Description: "Region ID",
-				Required:    true,
-			},
-			"subnet_id": schema.StringAttribute{
-				Description: "Subnet ID",
 				Required:    true,
 			},
 			"available_ips": schema.Int64Attribute{
@@ -60,10 +67,6 @@ func DataSourceSchema(ctx context.Context) schema.Schema {
 				Description:        "Deprecated. Always returns `false`.",
 				Computed:           true,
 				DeprecationMessage: "This attribute is deprecated.",
-			},
-			"id": schema.StringAttribute{
-				Description: "Subnet id.",
-				Computed:    true,
 			},
 			"ip_version": schema.Int64Attribute{
 				Description: "IP version\nAvailable values: 4, 6.",
@@ -141,6 +144,45 @@ func DataSourceSchema(ctx context.Context) schema.Schema {
 					},
 				},
 			},
+			"find_one_by": schema.SingleNestedAttribute{
+				Optional: true,
+				Attributes: map[string]schema.Attribute{
+					"network_id": schema.StringAttribute{
+						Description: "Only list subnets of this network",
+						Optional:    true,
+					},
+					"order_by": schema.StringAttribute{
+						Description: "Ordering subnets list result by `name`, `created_at`, `updated_at`, `available_ips`, `total_ips`, and `cidr` (default) fields of the subnet and directions (`name.asc`).\nAvailable values: \"available_ips.asc\", \"available_ips.desc\", \"cidr.asc\", \"cidr.desc\", \"created_at.asc\", \"created_at.desc\", \"name.asc\", \"name.desc\", \"total_ips.asc\", \"total_ips.desc\", \"updated_at.asc\", \"updated_at.desc\".",
+						Computed:    true,
+						Optional:    true,
+						Validators: []validator.String{
+							stringvalidator.OneOfCaseInsensitive(
+								"available_ips.asc",
+								"available_ips.desc",
+								"cidr.asc",
+								"cidr.desc",
+								"created_at.asc",
+								"created_at.desc",
+								"name.asc",
+								"name.desc",
+								"total_ips.asc",
+								"total_ips.desc",
+								"updated_at.asc",
+								"updated_at.desc",
+							),
+						},
+					},
+					"tag_key": schema.ListAttribute{
+						Description: "Optional. Filter by tag keys. ?`tag_key`=key1&`tag_key`=key2",
+						Optional:    true,
+						ElementType: types.StringType,
+					},
+					"tag_key_value": schema.StringAttribute{
+						Description: "Optional. Filter by tag key-value pairs.",
+						Optional:    true,
+					},
+				},
+			},
 		},
 	}
 }
@@ -150,5 +192,7 @@ func (d *CloudNetworkSubnetDataSource) Schema(ctx context.Context, req datasourc
 }
 
 func (d *CloudNetworkSubnetDataSource) ConfigValidators(_ context.Context) []datasource.ConfigValidator {
-	return []datasource.ConfigValidator{}
+	return []datasource.ConfigValidator{
+		datasourcevalidator.ExactlyOneOf(path.MatchRoot("subnet_id"), path.MatchRoot("find_one_by")),
+	}
 }

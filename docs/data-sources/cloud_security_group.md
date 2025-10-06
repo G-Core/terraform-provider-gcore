@@ -25,21 +25,34 @@ data "gcore_cloud_security_group" "example_cloud_security_group" {
 
 ### Required
 
-- `group_id` (String)
 - `project_id` (Number)
 - `region_id` (Number)
+
+### Optional
+
+- `find_one_by` (Attributes) (see [below for nested schema](#nestedatt--find_one_by))
+- `group_id` (String)
 
 ### Read-Only
 
 - `created_at` (String) Datetime when the security group was created
 - `description` (String) Security group description
-- `id` (String) Security group ID
+- `id` (String) The ID of this resource.
 - `name` (String) Security group name
 - `region` (String) Region name
 - `revision_number` (Number) The number of revisions
 - `security_group_rules` (Attributes List) Security group rules (see [below for nested schema](#nestedatt--security_group_rules))
 - `tags_v2` (Attributes List) Tags for a security group (see [below for nested schema](#nestedatt--tags_v2))
 - `updated_at` (String) Datetime when the security group was last updated
+
+<a id="nestedatt--find_one_by"></a>
+### Nested Schema for `find_one_by`
+
+Optional:
+
+- `tag_key` (List of String) Filter by tag keys.
+- `tag_key_value` (String) Filter by tag key-value pairs. Must be a valid JSON string.
+
 
 <a id="nestedatt--security_group_rules"></a>
 ### Nested Schema for `security_group_rules`
