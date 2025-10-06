@@ -50,18 +50,6 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 				Optional:      true,
 				PlanModifiers: []planmodifier.String{stringplanmodifier.RequiresReplace()},
 			},
-			"vip_ip_family": schema.StringAttribute{
-				Description: "IP family for load balancer subnet auto-selection if `vip_network_id` is specified\nAvailable values: \"dual\", \"ipv4\", \"ipv6\".",
-				Optional:    true,
-				Validators: []validator.String{
-					stringvalidator.OneOfCaseInsensitive(
-						"dual",
-						"ipv4",
-						"ipv6",
-					),
-				},
-				PlanModifiers: []planmodifier.String{stringplanmodifier.RequiresReplace()},
-			},
 			"vip_network_id": schema.StringAttribute{
 				Description:   "Network ID for load balancer. If not specified, default external network will be used. Mutually exclusive with `vip_port_id`",
 				Optional:      true,
@@ -89,6 +77,19 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 					},
 				},
 				PlanModifiers: []planmodifier.Object{objectplanmodifier.RequiresReplace()},
+			},
+			"vip_ip_family": schema.StringAttribute{
+				Description: "IP family for load balancer subnet auto-selection if `vip_network_id` is specified\nAvailable values: \"dual\", \"ipv4\", \"ipv6\".",
+				Computed:    true,
+				Optional:    true,
+				Validators: []validator.String{
+					stringvalidator.OneOfCaseInsensitive(
+						"dual",
+						"ipv4",
+						"ipv6",
+					),
+				},
+				PlanModifiers: []planmodifier.String{stringplanmodifier.RequiresReplaceIfConfigured()},
 			},
 			"vip_port_id": schema.StringAttribute{
 				Description:   "Existing Reserved Fixed IP port ID for load balancer. Mutually exclusive with `vip_network_id`",
@@ -436,17 +437,18 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 				Description: "Load balancer name",
 				Optional:    true,
 			},
-			"preferred_connectivity": schema.StringAttribute{
-				Description: "Preferred option to establish connectivity between load balancer and its pools members. L2 provides best performance, L3 provides less IPs usage. It is taking effect only if `instance_id` + `ip_address` is provided, not `subnet_id` + `ip_address`, because we're considering this as intentional `subnet_id` specification.\nAvailable values: \"L2\", \"L3\".",
-				Optional:    true,
-				Validators: []validator.String{
-					stringvalidator.OneOfCaseInsensitive("L2", "L3"),
-				},
-			},
 			"tags": schema.MapAttribute{
 				Description: "Key-value tags to associate with the resource. A tag is a key-value pair that can be associated with a resource, enabling efficient filtering and grouping for better organization and management. Some tags are read-only and cannot be modified by the user. Tags are also integrated with cost reports, allowing cost data to be filtered based on tag keys or values.",
 				Optional:    true,
 				ElementType: types.StringType,
+			},
+			"preferred_connectivity": schema.StringAttribute{
+				Description: "Preferred option to establish connectivity between load balancer and its pools members. L2 provides best performance, L3 provides less IPs usage. It is taking effect only if `instance_id` + `ip_address` is provided, not `subnet_id` + `ip_address`, because we're considering this as intentional `subnet_id` specification.\nAvailable values: \"L2\", \"L3\".",
+				Computed:    true,
+				Optional:    true,
+				Validators: []validator.String{
+					stringvalidator.OneOfCaseInsensitive("L2", "L3"),
+				},
 			},
 			"logging": schema.SingleNestedAttribute{
 				Description: "Logging configuration",

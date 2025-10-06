@@ -15,9 +15,9 @@ type CloudNetworkSubnetModel struct {
 	RegionID               types.Int64                                                     `tfsdk:"region_id" path:"region_id,optional"`
 	Cidr                   types.String                                                    `tfsdk:"cidr" json:"cidr,required"`
 	NetworkID              types.String                                                    `tfsdk:"network_id" json:"network_id,required"`
-	IPVersion              types.Int64                                                     `tfsdk:"ip_version" json:"ip_version,computed_optional"`
 	RouterIDToConnect      types.String                                                    `tfsdk:"router_id_to_connect" json:"router_id_to_connect,optional,no_refresh"`
 	ConnectToNetworkRouter types.Bool                                                      `tfsdk:"connect_to_network_router" json:"connect_to_network_router,computed_optional,no_refresh"`
+	IPVersion              types.Int64                                                     `tfsdk:"ip_version" json:"ip_version,computed_optional"`
 	Name                   types.String                                                    `tfsdk:"name" json:"name,required"`
 	Tags                   *map[string]types.String                                        `tfsdk:"tags" json:"tags,optional,no_refresh"`
 	EnableDhcp             types.Bool                                                      `tfsdk:"enable_dhcp" json:"enable_dhcp,computed_optional"`

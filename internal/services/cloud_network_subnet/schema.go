@@ -48,15 +48,6 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 				Required:      true,
 				PlanModifiers: []planmodifier.String{stringplanmodifier.RequiresReplace()},
 			},
-			"ip_version": schema.Int64Attribute{
-				Description: "IP version\nAvailable values: 4, 6.",
-				Optional:    true,
-				Computed:    true,
-				Validators: []validator.Int64{
-					int64validator.OneOf(4, 6),
-				},
-				PlanModifiers: []planmodifier.Int64{int64planmodifier.RequiresReplace()},
-			},
 			"router_id_to_connect": schema.StringAttribute{
 				Description:   "ID of the router to connect to. Requires `connect_to_network_router` set to true. If not specified, attempts to find a router created during network creation.",
 				Optional:      true,
@@ -68,6 +59,15 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 				Optional:      true,
 				PlanModifiers: []planmodifier.Bool{boolplanmodifier.RequiresReplaceIfConfigured()},
 				Default:       booldefault.StaticBool(true),
+			},
+			"ip_version": schema.Int64Attribute{
+				Description: "IP version\nAvailable values: 4, 6.",
+				Computed:    true,
+				Optional:    true,
+				Validators: []validator.Int64{
+					int64validator.OneOf(4, 6),
+				},
+				PlanModifiers: []planmodifier.Int64{int64planmodifier.RequiresReplaceIfConfigured()},
 			},
 			"name": schema.StringAttribute{
 				Description: "Subnet name",
