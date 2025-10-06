@@ -39,7 +39,7 @@ data "gcore_cloud_load_balancer_listener" "example_cloud_load_balancer_listener"
 - `allowed_cidrs` (List of String) Network CIDRs from which service will be accessible
 - `connection_limit` (Number) Limit of simultaneous connections
 - `creator_task_id` (String) Task that created this entity
-- `id` (String) Load balancer listener ID
+- `id` (String) Listener ID
 - `insert_headers` (String) Dictionary of additional header insertion into HTTP headers. Only used with HTTP and `TERMINATED_HTTPS` protocols.
 - `loadbalancer_id` (String) Load balancer ID
 - `name` (String) Load balancer listener name

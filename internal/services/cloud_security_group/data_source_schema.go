@@ -6,11 +6,14 @@ import (
 	"context"
 
 	"github.com/hashicorp/terraform-plugin-framework-timetypes/timetypes"
+	"github.com/hashicorp/terraform-plugin-framework-validators/datasourcevalidator"
 	"github.com/hashicorp/terraform-plugin-framework-validators/int64validator"
 	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/datasource/schema"
+	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
+	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/stainless-sdks/gcore-terraform/internal/customfield"
 )
 
@@ -19,8 +22,11 @@ var _ datasource.DataSourceWithConfigValidators = (*CloudSecurityGroupDataSource
 func DataSourceSchema(ctx context.Context) schema.Schema {
 	return schema.Schema{
 		Attributes: map[string]schema.Attribute{
+			"id": schema.StringAttribute{
+				Computed: true,
+			},
 			"group_id": schema.StringAttribute{
-				Required: true,
+				Optional: true,
 			},
 			"project_id": schema.Int64Attribute{
 				Required: true,
@@ -35,10 +41,6 @@ func DataSourceSchema(ctx context.Context) schema.Schema {
 			},
 			"description": schema.StringAttribute{
 				Description: "Security group description",
-				Computed:    true,
-			},
-			"id": schema.StringAttribute{
-				Description: "Security group ID",
 				Computed:    true,
 			},
 			"name": schema.StringAttribute{
@@ -182,6 +184,20 @@ func DataSourceSchema(ctx context.Context) schema.Schema {
 					},
 				},
 			},
+			"find_one_by": schema.SingleNestedAttribute{
+				Optional: true,
+				Attributes: map[string]schema.Attribute{
+					"tag_key": schema.ListAttribute{
+						Description: "Filter by tag keys.",
+						Optional:    true,
+						ElementType: types.StringType,
+					},
+					"tag_key_value": schema.StringAttribute{
+						Description: "Filter by tag key-value pairs. Must be a valid JSON string.",
+						Optional:    true,
+					},
+				},
+			},
 		},
 	}
 }
@@ -191,5 +207,7 @@ func (d *CloudSecurityGroupDataSource) Schema(ctx context.Context, req datasourc
 }
 
 func (d *CloudSecurityGroupDataSource) ConfigValidators(_ context.Context) []datasource.ConfigValidator {
-	return []datasource.ConfigValidator{}
+	return []datasource.ConfigValidator{
+		datasourcevalidator.ExactlyOneOf(path.MatchRoot("group_id"), path.MatchRoot("find_one_by")),
+	}
 }

@@ -27,6 +27,10 @@ data "gcore_cloud_network_subnet" "example_cloud_network_subnet" {
 
 - `project_id` (Number) Project ID
 - `region_id` (Number) Region ID
+
+### Optional
+
+- `find_one_by` (Attributes) (see [below for nested schema](#nestedatt--find_one_by))
 - `subnet_id` (String) Subnet ID
 
 ### Read-Only
@@ -40,7 +44,7 @@ data "gcore_cloud_network_subnet" "example_cloud_network_subnet" {
 - `gateway_ip` (String) Default GW IPv4 address, advertised in DHCP routes of this subnet. If null, no gateway is advertised by this subnet.
 - `has_router` (Boolean, Deprecated) Deprecated. Always returns `false`.
 - `host_routes` (Attributes List) List of custom static routes to advertise via DHCP. (see [below for nested schema](#nestedatt--host_routes))
-- `id` (String) Subnet id.
+- `id` (String) Subnet ID
 - `ip_version` (Number) IP version
 Available values: 4, 6.
 - `name` (String) Subnet name
@@ -50,6 +54,18 @@ Available values: 4, 6.
 - `task_id` (String) The UUID of the active task that currently holds a lock on the resource. This lock prevents concurrent modifications to ensure consistency. If `null`, the resource is not locked.
 - `total_ips` (Number) Total number of ips in subnet
 - `updated_at` (String) Datetime when the subnet was last updated
+
+<a id="nestedatt--find_one_by"></a>
+### Nested Schema for `find_one_by`
+
+Optional:
+
+- `network_id` (String) Only list subnets of this network
+- `order_by` (String) Ordering subnets list result by `name`, `created_at`, `updated_at`, `available_ips`, `total_ips`, and `cidr` (default) fields of the subnet and directions (`name.asc`).
+Available values: "available_ips.asc", "available_ips.desc", "cidr.asc", "cidr.desc", "created_at.asc", "created_at.desc", "name.asc", "name.desc", "total_ips.asc", "total_ips.desc", "updated_at.asc", "updated_at.desc".
+- `tag_key` (List of String) Optional. Filter by tag keys. ?`tag_key`=key1&`tag_key`=key2
+- `tag_key_value` (String) Optional. Filter by tag key-value pairs.
+
 
 <a id="nestedatt--host_routes"></a>
 ### Nested Schema for `host_routes`

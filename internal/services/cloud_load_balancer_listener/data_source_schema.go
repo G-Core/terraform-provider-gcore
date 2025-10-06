@@ -20,6 +20,10 @@ var _ datasource.DataSourceWithConfigValidators = (*CloudLoadBalancerListenerDat
 func DataSourceSchema(ctx context.Context) schema.Schema {
 	return schema.Schema{
 		Attributes: map[string]schema.Attribute{
+			"id": schema.StringAttribute{
+				Description: "Listener ID",
+				Computed:    true,
+			},
 			"listener_id": schema.StringAttribute{
 				Description: "Listener ID",
 				Required:    true,
@@ -46,10 +50,6 @@ func DataSourceSchema(ctx context.Context) schema.Schema {
 			},
 			"creator_task_id": schema.StringAttribute{
 				Description: "Task that created this entity",
-				Computed:    true,
-			},
-			"id": schema.StringAttribute{
-				Description: "Load balancer listener ID",
 				Computed:    true,
 			},
 			"loadbalancer_id": schema.StringAttribute{

@@ -7,10 +7,12 @@ import (
 
 	"github.com/hashicorp/terraform-plugin-framework-jsontypes/jsontypes"
 	"github.com/hashicorp/terraform-plugin-framework-timetypes/timetypes"
+	"github.com/hashicorp/terraform-plugin-framework-validators/datasourcevalidator"
 	"github.com/hashicorp/terraform-plugin-framework-validators/int64validator"
 	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/datasource/schema"
+	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/stainless-sdks/gcore-terraform/internal/customfield"
@@ -21,8 +23,11 @@ var _ datasource.DataSourceWithConfigValidators = (*CloudLoadBalancerDataSource)
 func DataSourceSchema(ctx context.Context) schema.Schema {
 	return schema.Schema{
 		Attributes: map[string]schema.Attribute{
+			"id": schema.StringAttribute{
+				Computed: true,
+			},
 			"loadbalancer_id": schema.StringAttribute{
-				Required: true,
+				Optional: true,
 			},
 			"project_id": schema.Int64Attribute{
 				Required: true,
@@ -45,10 +50,6 @@ func DataSourceSchema(ctx context.Context) schema.Schema {
 			},
 			"creator_task_id": schema.StringAttribute{
 				Description: "Task that created this entity",
-				Computed:    true,
-			},
-			"id": schema.StringAttribute{
-				Description: "Load balancer ID",
 				Computed:    true,
 			},
 			"name": schema.StringAttribute{
@@ -555,6 +556,44 @@ func DataSourceSchema(ctx context.Context) schema.Schema {
 					},
 				},
 			},
+			"find_one_by": schema.SingleNestedAttribute{
+				Optional: true,
+				Attributes: map[string]schema.Attribute{
+					"assigned_floating": schema.BoolAttribute{
+						Description: "With or without assigned floating IP",
+						Optional:    true,
+					},
+					"logging_enabled": schema.BoolAttribute{
+						Description: "With or without logging",
+						Optional:    true,
+					},
+					"name": schema.StringAttribute{
+						Description: "Filter by name",
+						Optional:    true,
+					},
+					"order_by": schema.StringAttribute{
+						Description: "Ordering Load Balancer list result by name, `created_at`, `updated_at`, `operating_status`, `provisioning_status`, `vip_address`, `vip_ip_family` and flavor fields of the load balancer and directions (name.asc), default is \"`created_at`.asc\"",
+						Optional:    true,
+					},
+					"show_stats": schema.BoolAttribute{
+						Description: "Show statistics",
+						Optional:    true,
+					},
+					"tag_key": schema.ListAttribute{
+						Description: "Filter by tag keys.",
+						Optional:    true,
+						ElementType: types.StringType,
+					},
+					"tag_key_value": schema.StringAttribute{
+						Description: "Filter by tag key-value pairs. Must be a valid JSON string.",
+						Optional:    true,
+					},
+					"with_ddos": schema.BoolAttribute{
+						Description: "Show Advanced DDoS protection profile, if exists",
+						Optional:    true,
+					},
+				},
+			},
 		},
 	}
 }
@@ -564,5 +603,7 @@ func (d *CloudLoadBalancerDataSource) Schema(ctx context.Context, req datasource
 }
 
 func (d *CloudLoadBalancerDataSource) ConfigValidators(_ context.Context) []datasource.ConfigValidator {
-	return []datasource.ConfigValidator{}
+	return []datasource.ConfigValidator{
+		datasourcevalidator.ExactlyOneOf(path.MatchRoot("loadbalancer_id"), path.MatchRoot("find_one_by")),
+	}
 }
