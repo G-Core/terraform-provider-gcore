@@ -643,6 +643,18 @@ var (
 						Required:    true,
 						Description: "Specify the types of media chunk files to which parameters, extracted from playlist files, will be forwarded.",
 					},
+					"forward_only_keys": {
+						Type:        schema.TypeSet,
+						Elem:        &schema.Schema{Type: schema.TypeString},
+						Optional:    true,
+						Description: "Specify the keys that will be forwarded from playlist files to media chunk files.",
+					},
+					"forward_except_keys": {
+						Type:        schema.TypeSet,
+						Elem:        &schema.Schema{Type: schema.TypeString},
+						Optional:    true,
+						Description: "Specify the keys that will not be forwarded from playlist files to media chunk files.",
+					},
 				},
 			},
 		},

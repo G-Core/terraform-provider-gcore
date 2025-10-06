@@ -508,6 +508,12 @@ func listToOptions(l []interface{}) *gcdn.Options {
 		for _, v := range opt["forward_to_file_types"].(*schema.Set).List() {
 			opts.QueryStringForwarding.ForwardToFileTypes = append(opts.QueryStringForwarding.ForwardToFileTypes, v.(string))
 		}
+		for _, v := range opt["forward_only_keys"].(*schema.Set).List() {
+			opts.QueryStringForwarding.ForwardOnlyKeys = append(opts.QueryStringForwarding.ForwardOnlyKeys, v.(string))
+		}
+		for _, v := range opt["forward_except_keys"].(*schema.Set).List() {
+			opts.QueryStringForwarding.ForwardExceptKeys = append(opts.QueryStringForwarding.ForwardExceptKeys, v.(string))
+		}
 	}
 	if opt, ok := getOptByName(fields, "redirect_https_to_http"); ok {
 		opts.RedirectHttpsToHttp = &gcdn.RedirectHttpsToHttp{

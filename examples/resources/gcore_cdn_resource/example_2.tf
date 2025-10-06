@@ -141,8 +141,10 @@ resource "gcore_cdn_resource" "cdn_example_com" {
       ]
     }
     query_string_forwarding {
-      forward_from_file_types = ["m3u8", "m3u"],
+      forward_from_file_types = ["m3u8", "m3u"]
       forward_to_file_types = ["m3u8", "m3u", "ts", "m4s"]
+      forward_only_keys = ["auth_token", "session_id"]
+      forward_except_keys = ["debug_info"]
     }
     redirect_https_to_http {
       enabled = false

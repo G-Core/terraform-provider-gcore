@@ -10,14 +10,13 @@ require (
 	github.com/G-Core/gcore-dns-sdk-go v0.3.3
 	github.com/G-Core/gcore-storage-sdk-go v0.1.34
 	github.com/G-Core/gcore-waap-sdk-go v0.5.0
-	github.com/G-Core/gcorelabscdn-go v1.0.34
+	github.com/G-Core/gcorelabscdn-go v1.0.35
 	github.com/G-Core/gcorelabscloud-go v0.25.2
 	github.com/google/go-cmp v0.7.0
 	github.com/google/uuid v1.6.0
 	github.com/hashicorp/go-cty v1.4.1-0.20200414143053-d3edf31b6320
 	github.com/hashicorp/terraform-plugin-sdk/v2 v2.27.0
 	github.com/mitchellh/mapstructure v1.5.0
-
 )
 
 require (
@@ -127,7 +126,6 @@ require (
 	google.golang.org/protobuf v1.33.0 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
-
 )
 
 require (

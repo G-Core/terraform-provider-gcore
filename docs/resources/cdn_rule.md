@@ -574,6 +574,8 @@ Required:
 Optional:
 
 - `enabled` (Boolean)
+- `forward_except_keys` (Set of String) Specify the keys that will not be forwarded from playlist files to media chunk files.
+- `forward_only_keys` (Set of String) Specify the keys that will be forwarded from playlist files to media chunk files.
 
 
 <a id="nestedblock--options--redirect_http_to_https"></a>
