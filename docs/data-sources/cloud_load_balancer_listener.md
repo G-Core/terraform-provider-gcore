@@ -27,11 +27,11 @@ data "gcore_cloud_load_balancer_listener" "example_cloud_load_balancer_listener"
 ### Required
 
 - `listener_id` (String) Listener ID
-- `project_id` (Number) Project ID
-- `region_id` (Number) Region ID
 
 ### Optional
 
+- `project_id` (Number) Project ID
+- `region_id` (Number) Region ID
 - `show_stats` (Boolean) Show stats
 
 ### Read-Only

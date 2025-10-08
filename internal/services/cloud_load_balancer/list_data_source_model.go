@@ -45,6 +45,12 @@ func (m *CloudLoadBalancersDataSourceModel) toListParams(_ context.Context) (par
 		TagKey: mTagKey,
 	}
 
+	if !m.ProjectID.IsNull() {
+		params.ProjectID = param.NewOpt(m.ProjectID.ValueInt64())
+	}
+	if !m.RegionID.IsNull() {
+		params.RegionID = param.NewOpt(m.RegionID.ValueInt64())
+	}
 	if !m.AssignedFloating.IsNull() {
 		params.AssignedFloating = param.NewOpt(m.AssignedFloating.ValueBool())
 	}
@@ -65,12 +71,6 @@ func (m *CloudLoadBalancersDataSourceModel) toListParams(_ context.Context) (par
 	}
 	if !m.WithDDOS.IsNull() {
 		params.WithDDOS = param.NewOpt(m.WithDDOS.ValueBool())
-	}
-	if !m.ProjectID.IsNull() {
-		params.ProjectID = param.NewOpt(m.ProjectID.ValueInt64())
-	}
-	if !m.RegionID.IsNull() {
-		params.RegionID = param.NewOpt(m.RegionID.ValueInt64())
 	}
 
 	return

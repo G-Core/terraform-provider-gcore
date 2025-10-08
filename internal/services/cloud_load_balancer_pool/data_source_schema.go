@@ -28,11 +28,11 @@ func DataSourceSchema(ctx context.Context) schema.Schema {
 			},
 			"project_id": schema.Int64Attribute{
 				Description: "Project ID",
-				Required:    true,
+				Optional:    true,
 			},
 			"region_id": schema.Int64Attribute{
 				Description: "Region ID",
-				Required:    true,
+				Optional:    true,
 			},
 			"ca_secret_id": schema.StringAttribute{
 				Description: "Secret ID of CA certificate bundle",

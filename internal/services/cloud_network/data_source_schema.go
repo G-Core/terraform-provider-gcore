@@ -31,11 +31,11 @@ func DataSourceSchema(ctx context.Context) schema.Schema {
 			},
 			"project_id": schema.Int64Attribute{
 				Description: "Project ID",
-				Required:    true,
+				Optional:    true,
 			},
 			"region_id": schema.Int64Attribute{
 				Description: "Region ID",
-				Required:    true,
+				Optional:    true,
 			},
 			"created_at": schema.StringAttribute{
 				Description: "Datetime when the network was created",

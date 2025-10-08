@@ -16,8 +16,8 @@ import (
 type CloudFloatingIPDataSourceModel struct {
 	ID                types.String                                                     `tfsdk:"id" path:"floating_ip_id,computed"`
 	FloatingIPID      types.String                                                     `tfsdk:"floating_ip_id" path:"floating_ip_id,optional"`
-	ProjectID         types.Int64                                                      `tfsdk:"project_id" path:"project_id,required"`
-	RegionID          types.Int64                                                      `tfsdk:"region_id" path:"region_id,required"`
+	ProjectID         types.Int64                                                      `tfsdk:"project_id" path:"project_id,optional"`
+	RegionID          types.Int64                                                      `tfsdk:"region_id" path:"region_id,optional"`
 	CreatedAt         timetypes.RFC3339                                                `tfsdk:"created_at" json:"created_at,computed" format:"date-time"`
 	CreatorTaskID     types.String                                                     `tfsdk:"creator_task_id" json:"creator_task_id,computed"`
 	FixedIPAddress    types.String                                                     `tfsdk:"fixed_ip_address" json:"fixed_ip_address,computed"`
@@ -57,6 +57,12 @@ func (m *CloudFloatingIPDataSourceModel) toListParams(_ context.Context) (params
 		TagKey: mFindOneByTagKey,
 	}
 
+	if !m.ProjectID.IsNull() {
+		params.ProjectID = param.NewOpt(m.ProjectID.ValueInt64())
+	}
+	if !m.RegionID.IsNull() {
+		params.RegionID = param.NewOpt(m.RegionID.ValueInt64())
+	}
 	if !m.FindOneBy.TagKeyValue.IsNull() {
 		params.TagKeyValue = param.NewOpt(m.FindOneBy.TagKeyValue.ValueString())
 	}

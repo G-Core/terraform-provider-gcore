@@ -16,8 +16,8 @@ import (
 type CloudVolumeDataSourceModel struct {
 	ID                  types.String                                                        `tfsdk:"id" path:"volume_id,computed"`
 	VolumeID            types.String                                                        `tfsdk:"volume_id" path:"volume_id,optional"`
-	ProjectID           types.Int64                                                         `tfsdk:"project_id" path:"project_id,required"`
-	RegionID            types.Int64                                                         `tfsdk:"region_id" path:"region_id,required"`
+	ProjectID           types.Int64                                                         `tfsdk:"project_id" path:"project_id,optional"`
+	RegionID            types.Int64                                                         `tfsdk:"region_id" path:"region_id,optional"`
 	Bootable            types.Bool                                                          `tfsdk:"bootable" json:"bootable,computed"`
 	CreatedAt           timetypes.RFC3339                                                   `tfsdk:"created_at" json:"created_at,computed" format:"date-time"`
 	CreatorTaskID       types.String                                                        `tfsdk:"creator_task_id" json:"creator_task_id,computed"`
@@ -62,6 +62,12 @@ func (m *CloudVolumeDataSourceModel) toListParams(_ context.Context) (params clo
 		TagKey: mFindOneByTagKey,
 	}
 
+	if !m.ProjectID.IsNull() {
+		params.ProjectID = param.NewOpt(m.ProjectID.ValueInt64())
+	}
+	if !m.RegionID.IsNull() {
+		params.RegionID = param.NewOpt(m.RegionID.ValueInt64())
+	}
 	if !m.FindOneBy.Bootable.IsNull() {
 		params.Bootable = param.NewOpt(m.FindOneBy.Bootable.ValueBool())
 	}

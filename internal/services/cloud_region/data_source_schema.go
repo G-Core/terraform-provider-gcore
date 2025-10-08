@@ -23,7 +23,7 @@ func DataSourceSchema(ctx context.Context) schema.Schema {
 		Attributes: map[string]schema.Attribute{
 			"region_id": schema.Int64Attribute{
 				Description: "Region ID",
-				Required:    true,
+				Optional:    true,
 			},
 			"show_volume_types": schema.BoolAttribute{
 				Description: "If true, null `available_volume_type` is replaced with a list of available volume types.",

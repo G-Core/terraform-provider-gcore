@@ -17,8 +17,8 @@ import (
 type CloudLoadBalancerDataSourceModel struct {
 	ID                    types.String                                                                 `tfsdk:"id" path:"loadbalancer_id,computed"`
 	LoadbalancerID        types.String                                                                 `tfsdk:"loadbalancer_id" path:"loadbalancer_id,optional"`
-	ProjectID             types.Int64                                                                  `tfsdk:"project_id" path:"project_id,required"`
-	RegionID              types.Int64                                                                  `tfsdk:"region_id" path:"region_id,required"`
+	ProjectID             types.Int64                                                                  `tfsdk:"project_id" path:"project_id,optional"`
+	RegionID              types.Int64                                                                  `tfsdk:"region_id" path:"region_id,optional"`
 	ShowStats             types.Bool                                                                   `tfsdk:"show_stats" query:"show_stats,optional"`
 	WithDDOS              types.Bool                                                                   `tfsdk:"with_ddos" query:"with_ddos,optional"`
 	CreatedAt             timetypes.RFC3339                                                            `tfsdk:"created_at" json:"created_at,computed" format:"date-time"`
@@ -70,6 +70,12 @@ func (m *CloudLoadBalancerDataSourceModel) toListParams(_ context.Context) (para
 		TagKey: mFindOneByTagKey,
 	}
 
+	if !m.ProjectID.IsNull() {
+		params.ProjectID = param.NewOpt(m.ProjectID.ValueInt64())
+	}
+	if !m.RegionID.IsNull() {
+		params.RegionID = param.NewOpt(m.RegionID.ValueInt64())
+	}
 	if !m.FindOneBy.AssignedFloating.IsNull() {
 		params.AssignedFloating = param.NewOpt(m.FindOneBy.AssignedFloating.ValueBool())
 	}
