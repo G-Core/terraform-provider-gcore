@@ -16,8 +16,8 @@ import (
 type CloudNetworkSubnetDataSourceModel struct {
 	ID             types.String                                                              `tfsdk:"id" path:"subnet_id,computed"`
 	SubnetID       types.String                                                              `tfsdk:"subnet_id" path:"subnet_id,optional"`
-	ProjectID      types.Int64                                                               `tfsdk:"project_id" path:"project_id,required"`
-	RegionID       types.Int64                                                               `tfsdk:"region_id" path:"region_id,required"`
+	ProjectID      types.Int64                                                               `tfsdk:"project_id" path:"project_id,optional"`
+	RegionID       types.Int64                                                               `tfsdk:"region_id" path:"region_id,optional"`
 	AvailableIPs   types.Int64                                                               `tfsdk:"available_ips" json:"available_ips,computed"`
 	Cidr           types.String                                                              `tfsdk:"cidr" json:"cidr,computed"`
 	CreatedAt      timetypes.RFC3339                                                         `tfsdk:"created_at" json:"created_at,computed" format:"date-time"`
@@ -63,6 +63,12 @@ func (m *CloudNetworkSubnetDataSourceModel) toListParams(_ context.Context) (par
 		TagKey: mFindOneByTagKey,
 	}
 
+	if !m.ProjectID.IsNull() {
+		params.ProjectID = param.NewOpt(m.ProjectID.ValueInt64())
+	}
+	if !m.RegionID.IsNull() {
+		params.RegionID = param.NewOpt(m.RegionID.ValueInt64())
+	}
 	if !m.FindOneBy.NetworkID.IsNull() {
 		params.NetworkID = param.NewOpt(m.FindOneBy.NetworkID.ValueString())
 	}

@@ -14,7 +14,7 @@ import (
 )
 
 type CloudRegionDataSourceModel struct {
-	RegionID             types.Int64                                                     `tfsdk:"region_id" path:"region_id,required"`
+	RegionID             types.Int64                                                     `tfsdk:"region_id" path:"region_id,optional"`
 	ShowVolumeTypes      types.Bool                                                      `tfsdk:"show_volume_types" query:"show_volume_types,computed_optional"`
 	AccessLevel          types.String                                                    `tfsdk:"access_level" json:"access_level,computed"`
 	Country              types.String                                                    `tfsdk:"country" json:"country,computed"`
@@ -49,11 +49,11 @@ type CloudRegionDataSourceModel struct {
 func (m *CloudRegionDataSourceModel) toReadParams(_ context.Context) (params cloud.RegionGetParams, diags diag.Diagnostics) {
 	params = cloud.RegionGetParams{}
 
-	if !m.ShowVolumeTypes.IsNull() {
-		params.ShowVolumeTypes = param.NewOpt(m.ShowVolumeTypes.ValueBool())
-	}
 	if !m.RegionID.IsNull() {
 		params.RegionID = param.NewOpt(m.RegionID.ValueInt64())
+	}
+	if !m.ShowVolumeTypes.IsNull() {
+		params.ShowVolumeTypes = param.NewOpt(m.ShowVolumeTypes.ValueBool())
 	}
 
 	return

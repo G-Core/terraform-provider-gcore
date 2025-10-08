@@ -31,11 +31,11 @@ func DataSourceSchema(ctx context.Context) schema.Schema {
 			},
 			"project_id": schema.Int64Attribute{
 				Description: "Project ID",
-				Required:    true,
+				Optional:    true,
 			},
 			"region_id": schema.Int64Attribute{
 				Description: "Region ID",
-				Required:    true,
+				Optional:    true,
 			},
 			"bootable": schema.BoolAttribute{
 				Description: "Indicates whether the volume is bootable.",

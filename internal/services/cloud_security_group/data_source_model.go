@@ -16,8 +16,8 @@ import (
 type CloudSecurityGroupDataSourceModel struct {
 	ID                 types.String                                                                      `tfsdk:"id" path:"group_id,computed"`
 	GroupID            types.String                                                                      `tfsdk:"group_id" path:"group_id,optional"`
-	ProjectID          types.Int64                                                                       `tfsdk:"project_id" path:"project_id,required"`
-	RegionID           types.Int64                                                                       `tfsdk:"region_id" path:"region_id,required"`
+	ProjectID          types.Int64                                                                       `tfsdk:"project_id" path:"project_id,optional"`
+	RegionID           types.Int64                                                                       `tfsdk:"region_id" path:"region_id,optional"`
 	CreatedAt          timetypes.RFC3339                                                                 `tfsdk:"created_at" json:"created_at,computed" format:"date-time"`
 	Description        types.String                                                                      `tfsdk:"description" json:"description,computed"`
 	Name               types.String                                                                      `tfsdk:"name" json:"name,computed"`
@@ -54,6 +54,12 @@ func (m *CloudSecurityGroupDataSourceModel) toListParams(_ context.Context) (par
 		TagKey: mFindOneByTagKey,
 	}
 
+	if !m.ProjectID.IsNull() {
+		params.ProjectID = param.NewOpt(m.ProjectID.ValueInt64())
+	}
+	if !m.RegionID.IsNull() {
+		params.RegionID = param.NewOpt(m.RegionID.ValueInt64())
+	}
 	if !m.FindOneBy.TagKeyValue.IsNull() {
 		params.TagKeyValue = param.NewOpt(m.FindOneBy.TagKeyValue.ValueString())
 	}

@@ -30,10 +30,10 @@ func DataSourceSchema(ctx context.Context) schema.Schema {
 				Optional: true,
 			},
 			"project_id": schema.Int64Attribute{
-				Required: true,
+				Optional: true,
 			},
 			"region_id": schema.Int64Attribute{
-				Required: true,
+				Optional: true,
 			},
 			"show_stats": schema.BoolAttribute{
 				Description: "Show statistics",

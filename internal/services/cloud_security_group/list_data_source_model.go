@@ -38,14 +38,14 @@ func (m *CloudSecurityGroupsDataSourceModel) toListParams(_ context.Context) (pa
 		TagKey: mTagKey,
 	}
 
-	if !m.TagKeyValue.IsNull() {
-		params.TagKeyValue = param.NewOpt(m.TagKeyValue.ValueString())
-	}
 	if !m.ProjectID.IsNull() {
 		params.ProjectID = param.NewOpt(m.ProjectID.ValueInt64())
 	}
 	if !m.RegionID.IsNull() {
 		params.RegionID = param.NewOpt(m.RegionID.ValueInt64())
+	}
+	if !m.TagKeyValue.IsNull() {
+		params.TagKeyValue = param.NewOpt(m.TagKeyValue.ValueString())
 	}
 
 	return

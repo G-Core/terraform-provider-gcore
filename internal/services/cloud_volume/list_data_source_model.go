@@ -44,6 +44,12 @@ func (m *CloudVolumesDataSourceModel) toListParams(_ context.Context) (params cl
 		TagKey: mTagKey,
 	}
 
+	if !m.ProjectID.IsNull() {
+		params.ProjectID = param.NewOpt(m.ProjectID.ValueInt64())
+	}
+	if !m.RegionID.IsNull() {
+		params.RegionID = param.NewOpt(m.RegionID.ValueInt64())
+	}
 	if !m.Bootable.IsNull() {
 		params.Bootable = param.NewOpt(m.Bootable.ValueBool())
 	}
@@ -64,12 +70,6 @@ func (m *CloudVolumesDataSourceModel) toListParams(_ context.Context) (params cl
 	}
 	if !m.TagKeyValue.IsNull() {
 		params.TagKeyValue = param.NewOpt(m.TagKeyValue.ValueString())
-	}
-	if !m.ProjectID.IsNull() {
-		params.ProjectID = param.NewOpt(m.ProjectID.ValueInt64())
-	}
-	if !m.RegionID.IsNull() {
-		params.RegionID = param.NewOpt(m.RegionID.ValueInt64())
 	}
 
 	return

@@ -16,7 +16,7 @@ func DataSourceSchema(ctx context.Context) schema.Schema {
 	return schema.Schema{
 		Attributes: map[string]schema.Attribute{
 			"project_id": schema.Int64Attribute{
-				Required: true,
+				Optional: true,
 			},
 			"client_id": schema.Int64Attribute{
 				Description: "ID associated with the client.",

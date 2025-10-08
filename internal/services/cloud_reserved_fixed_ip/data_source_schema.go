@@ -21,10 +21,10 @@ func DataSourceSchema(ctx context.Context) schema.Schema {
 				Required: true,
 			},
 			"project_id": schema.Int64Attribute{
-				Required: true,
+				Optional: true,
 			},
 			"region_id": schema.Int64Attribute{
-				Required: true,
+				Optional: true,
 			},
 			"created_at": schema.StringAttribute{
 				Description: "Datetime when the reserved fixed IP was created",
