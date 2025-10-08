@@ -177,12 +177,27 @@ func resourceFloatingIPCreate(ctx context.Context, d *schema.ResourceData, m int
 		FixedIPAddress: net.ParseIP(d.Get("fixed_ip_address").(string)),
 	}
 
-	if metadataRaw, ok := d.GetOk("metadata_map"); ok {
+	metadataRaw, metadataOk := d.GetOk("metadata_map")
+	tagsRaw, tagsOk := d.GetOk("tags")
+
+	if metadataOk && tagsOk {
+		return diag.FromErr(fmt.Errorf("only one of metadata_map or tags can be set"))
+	}
+
+	if metadataOk {
 		meta, err := utils.MapInterfaceToMapString(metadataRaw)
 		if err != nil {
 			return diag.FromErr(err)
 		}
 		opts.Metadata = meta
+	}
+
+	if tagsOk {
+		tags, err := utils.MapInterfaceToMapString(tagsRaw)
+		if err != nil {
+			return diag.FromErr(err)
+		}
+		opts.Metadata = tags
 	}
 
 	results, err := floatingips.Create(client, opts).Extract()
