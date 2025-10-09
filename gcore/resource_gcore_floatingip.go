@@ -125,8 +125,10 @@ func resourceFloatingIP() *schema.Resource {
 				Computed: true,
 			},
 			"metadata_map": &schema.Schema{
-				Type:     schema.TypeMap,
-				Optional: true,
+				Type:          schema.TypeMap,
+				Optional:      true,
+				Deprecated:    "Use tags instead",
+				ConflictsWith: []string{"tags"},
 				Elem: &schema.Schema{
 					Type: schema.TypeString,
 				},
