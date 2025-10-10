@@ -4,6 +4,7 @@ import (
 	"crypto/md5"
 	"encoding/binary"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 	"log"
@@ -36,6 +37,7 @@ import (
 	"github.com/G-Core/gcorelabscloud-go/gcore/securitygroup/v1/securitygroups"
 	typesSG "github.com/G-Core/gcorelabscloud-go/gcore/securitygroup/v1/types"
 	"github.com/G-Core/gcorelabscloud-go/gcore/subnet/v1/subnets"
+	"github.com/G-Core/gcorelabscloud-go/gcore/task/v1/tasks"
 	"github.com/hashicorp/go-cty/cty"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
@@ -1124,4 +1126,25 @@ func convertSchemaSetToIntList(v *schema.Set) []int {
 
 func isNotFoundError(err error) bool {
 	return strings.Contains(err.Error(), "status: 404")
+}
+
+// waitForTaskResult waits for the first task inside the provided tasks.Result to finish.
+// It extracts the task ID, creates a tasks client, and waits up to waitSeconds.
+// Returns diagnostics describing any failure, or nil on success.
+func waitForTaskResult(result tasks.Result, waitSeconds int, provider *gcorecloud.ProviderClient, data *schema.ResourceData) error {
+	taskResults, err := result.Extract()
+	if err != nil {
+		return err
+	}
+	if len(taskResults.Tasks) == 0 {
+		return errors.New("no task IDs returned")
+	}
+	taskID := taskResults.Tasks[0]
+
+	tasksClient, err := CreateClient(provider, data, tasksPoint, versionPointV1)
+	if err != nil {
+		return err
+	}
+
+	return tasks.WaitForFinishedTask(tasksClient, taskID, waitSeconds)
 }
