@@ -10,7 +10,7 @@ on:
 jobs:
   fossa:
     runs-on: ubuntu-latest
-    if: github.actor != 'dependabot[bot]' && github.repository == 'G-Core/gcore-go'
+    if: github.actor != 'dependabot[bot]' && github.repository == 'G-Core/gcore-terraform'
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
