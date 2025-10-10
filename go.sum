@@ -17,6 +17,14 @@ github.com/G-Core/gcorelabscdn-go v1.0.35 h1:7UFoL1jSb8e+JN1xxQisGE8gtflqx1vM1gH
 github.com/G-Core/gcorelabscdn-go v1.0.35/go.mod h1:iSGXaTvZBzDHQW+rKFS918BgFVpONcyLEijwh8WsXpE=
 github.com/G-Core/gcorelabscloud-go v0.25.2 h1:5Ojt0Myavo9/mthg1+8mSGmpjRoEuesGwOhwY+2APhY=
 github.com/G-Core/gcorelabscloud-go v0.25.2/go.mod h1:y0j2JVc+sDBZxGrTtGAR8pxolYKoyyY8CFUK/GEsqbI=
+github.com/G-Core/gcorelabscloud-go v0.25.3-0.20251009094230-0dbc6f54cde2 h1:jLmMJ9HE1yAf1MDWykkGi/2P7DtV0XlsqY1W19+y7Kw=
+github.com/G-Core/gcorelabscloud-go v0.25.3-0.20251009094230-0dbc6f54cde2/go.mod h1:y0j2JVc+sDBZxGrTtGAR8pxolYKoyyY8CFUK/GEsqbI=
+github.com/G-Core/gcorelabscloud-go v0.25.3-0.20251009142303-5e63c25263ac h1:M9xqiPqPz+F2DiiudzVR3nlBehovt7nTF8fJ9HPulTc=
+github.com/G-Core/gcorelabscloud-go v0.25.3-0.20251009142303-5e63c25263ac/go.mod h1:y0j2JVc+sDBZxGrTtGAR8pxolYKoyyY8CFUK/GEsqbI=
+github.com/G-Core/gcorelabscloud-go v0.25.3-0.20251010141500-2fade0fd4f17 h1:cn0VXSHDQkO+3yQ59AcamlkWyjY+p2Y27H3X9z9MPac=
+github.com/G-Core/gcorelabscloud-go v0.25.3-0.20251010141500-2fade0fd4f17/go.mod h1:y0j2JVc+sDBZxGrTtGAR8pxolYKoyyY8CFUK/GEsqbI=
+github.com/G-Core/gcorelabscloud-go v0.25.3-0.20251010213724-b6e3612dbec6 h1:gQgvnl9XKFcO9Y1qUntd4T5ftsu1Zqhynfj3AsVotP0=
+github.com/G-Core/gcorelabscloud-go v0.25.3-0.20251010213724-b6e3612dbec6/go.mod h1:y0j2JVc+sDBZxGrTtGAR8pxolYKoyyY8CFUK/GEsqbI=
 github.com/Kunde21/markdownfmt/v3 v3.1.0 h1:KiZu9LKs+wFFBQKhrZJrFZwtLnCCWJahL+S+E/3VnM0=
 github.com/Kunde21/markdownfmt/v3 v3.1.0/go.mod h1:tPXN1RTyOzJwhfHoon9wUr4HGYmWgVxSQN6VBJDkrVc=
 github.com/Masterminds/goutils v1.1.1 h1:5nUrii3FMTL5diU80unEVvNevw1nH4+ZV4DSLVJLSYI=
