@@ -65,7 +65,8 @@ func resourcePostgresCluster() *schema.Resource {
 				return []*schema.ResourceData{d}, nil
 			},
 		},
-		Schema: resourceSchema(),
+		Schema:        resourceSchema(),
+		CustomizeDiff: validateDatabaseOwners,
 	}
 }
 
@@ -161,9 +162,10 @@ func resourceSchema() map[string]*schema.Schema {
 			},
 		},
 		"ha_replication_mode": {
-			Type:        schema.TypeString,
-			Description: "Replication mode. Possible values are `async` and `sync`.",
-			Optional:    true,
+			Type:             schema.TypeString,
+			Description:      "Replication mode. Possible values are `async` and `sync`.",
+			Optional:         true,
+			ValidateDiagFunc: validation.ToDiagFunc(validation.StringInSlice([]string{"async", "sync"}, false)),
 		},
 		"network": {
 			Type:        schema.TypeList,
@@ -182,10 +184,11 @@ func resourceSchema() map[string]*schema.Schema {
 						Set: schema.HashString,
 					},
 					"network_type": {
-						Type:        schema.TypeString,
-						Description: "Network type. Currently, only `public` is supported.",
-						Optional:    true,
-						Default:     "public",
+						Type:             schema.TypeString,
+						Description:      "Network type. Currently, only `public` is supported.",
+						Optional:         true,
+						Default:          "public",
+						ValidateDiagFunc: validation.ToDiagFunc(validation.StringInSlice([]string{"public"}, false)),
 					},
 					"connection_string": {
 						Type:        schema.TypeString,
@@ -222,14 +225,16 @@ func resourceSchema() map[string]*schema.Schema {
 						},
 					},
 					"pooler_mode": {
-						Type:        schema.TypeString,
-						Description: "Connection pooler mode. Possible values are `session`, `transaction`, and `statement`. If not set, connection pooler is not enabled.",
-						Optional:    true,
+						Type:             schema.TypeString,
+						Description:      "Connection pooler mode. Possible values are `session`, `transaction`, and `statement`. If not set, connection pooler is not enabled.",
+						Optional:         true,
+						ValidateDiagFunc: validation.ToDiagFunc(validation.StringInSlice([]string{"session", "transaction", "statement"}, false)),
 					},
 					"pooler_type": {
-						Type:        schema.TypeString,
-						Description: "Connection pooler type. Currently, only `pgbouncer` is supported.",
-						Optional:    true,
+						Type:             schema.TypeString,
+						Description:      "Connection pooler type. Currently, only `pgbouncer` is supported.",
+						Optional:         true,
+						ValidateDiagFunc: validation.ToDiagFunc(validation.StringInSlice([]string{"pgbouncer"}, false)),
 					},
 				},
 			},
@@ -250,6 +255,9 @@ func resourceSchema() map[string]*schema.Schema {
 						Type:        schema.TypeString,
 						Description: "Storage type.",
 						Required:    true,
+						ForceNew:    true,
+						ValidateDiagFunc: validation.ToDiagFunc(validation.StringInSlice([]string{
+							"ssd-hiiops", "ssd-lowlatency", "standard"}, false)),
 					},
 				},
 			},
@@ -267,9 +275,10 @@ func resourceSchema() map[string]*schema.Schema {
 						Required:    true,
 					},
 					"role_attributes": {
-						Type:        schema.TypeSet,
-						Description: "List of role attributes. Possible values are `BYPASSRLS`, `CREATEROLE`, `CREATEDB`, `INHERIT`, `LOGIN`, and `NOLOGIN`.",
-						Required:    true,
+						Type: schema.TypeSet,
+						Description: fmt.Sprintf("List of role attributes. Possible values are: %s.",
+							strings.Join(clusters.RoleAttributeStringList(), ", ")),
+						Required: true,
 						Elem: &schema.Schema{
 							Type:             schema.TypeString,
 							ValidateDiagFunc: validation.ToDiagFunc(validation.StringInSlice(clusters.RoleAttributeStringList(), false)),
@@ -730,4 +739,42 @@ func suppressDiffMultiline(k, old, new string, d *schema.ResourceData) bool {
 		}
 	}
 	return true
+}
+
+func validateDatabaseOwners(ctx context.Context, diff *schema.ResourceDiff, meta interface{}) error {
+	dbRaw := diff.Get("database")
+	userRaw := diff.Get("user")
+	if dbRaw == nil || userRaw == nil {
+		return nil
+	}
+
+	userSet, ok := userRaw.(*schema.Set)
+	if !ok {
+		return nil
+	}
+	userNames := make(map[string]struct{}, userSet.Len())
+	for _, u := range userSet.List() {
+		umap := u.(map[string]interface{})
+		if name, ok := umap["name"].(string); ok && name != "" {
+			userNames[name] = struct{}{}
+		}
+	}
+
+	dbSet, ok := dbRaw.(*schema.Set)
+	if !ok {
+		return nil
+	}
+	var err error
+	for _, db := range dbSet.List() {
+		if db == nil {
+			continue
+		}
+		dbMap := db.(map[string]interface{})
+		owner, _ := dbMap["owner"].(string)
+		if _, found := userNames[owner]; !found {
+			return fmt.Errorf("database owner %q not found among defined user names. "+
+				"Add a user with name %q in the user block", owner, owner)
+		}
+	}
+	return err
 }
