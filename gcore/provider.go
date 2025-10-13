@@ -248,6 +248,7 @@ func Provider() *schema.Provider {
 			"gcore_waap_domain_policy":         dataWaapDomainPolicy(),
 			"gcore_waap_tag":                   dataWaapTag(),
 			"gcore_file_share":                 dataSourceFileShare(),
+			"gcore_postgres_cluster":           dataSourcePostgresCluster(),
 		},
 		ConfigureContextFunc: providerConfigure,
 	}
