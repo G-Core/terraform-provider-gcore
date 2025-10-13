@@ -554,7 +554,7 @@ func resourcePostgresClusterUpdate(ctx context.Context, data *schema.ResourceDat
 		pgConfigList := data.Get("pg_config").([]interface{})
 		if len(pgConfigList) > 0 {
 			pgConfigMap := pgConfigList[0].(map[string]interface{})
-			updateOpts.PGServerConfiguration = &clusters.PGServerConfigurationOpts{
+			updateOpts.PGServerConfiguration = &clusters.PGServerConfigurationUpdateOpts{
 				PGConf:  pgConfigMap["pg_conf"].(string),
 				Version: pgConfigMap["version"].(string),
 			}
