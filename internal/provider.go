@@ -172,7 +172,6 @@ func (p *GcoreProvider) DataSources(ctx context.Context) []func() datasource.Dat
 		cloud_region.NewCloudRegionsDataSource,
 		cloud_ssh_key.NewCloudSSHKeyDataSource,
 		cloud_ssh_key.NewCloudSSHKeysDataSource,
-		cloud_load_balancer.NewCloudLoadBalancerDataSource,
 		cloud_load_balancer.NewCloudLoadBalancersDataSource,
 		cloud_load_balancer_listener.NewCloudLoadBalancerListenerDataSource,
 		cloud_load_balancer_pool.NewCloudLoadBalancerPoolDataSource,
