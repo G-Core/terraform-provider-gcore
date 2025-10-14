@@ -27,6 +27,7 @@ import (
 	"github.com/stainless-sdks/gcore-terraform/internal/services/cloud_region"
 	"github.com/stainless-sdks/gcore-terraform/internal/services/cloud_reserved_fixed_ip"
 	"github.com/stainless-sdks/gcore-terraform/internal/services/cloud_security_group"
+	"github.com/stainless-sdks/gcore-terraform/internal/services/cloud_ssh_key"
 	"github.com/stainless-sdks/gcore-terraform/internal/services/cloud_volume"
 )
 
@@ -154,6 +155,7 @@ func (p *GcoreProvider) ConfigValidators(_ context.Context) []provider.ConfigVal
 
 func (p *GcoreProvider) Resources(ctx context.Context) []func() resource.Resource {
 	return []func() resource.Resource{
+		cloud_ssh_key.NewResource,
 		cloud_load_balancer.NewResource,
 		cloud_load_balancer_listener.NewResource,
 		cloud_load_balancer_pool.NewResource,
@@ -172,6 +174,8 @@ func (p *GcoreProvider) DataSources(ctx context.Context) []func() datasource.Dat
 		cloud_project.NewCloudProjectsDataSource,
 		cloud_region.NewCloudRegionDataSource,
 		cloud_region.NewCloudRegionsDataSource,
+		cloud_ssh_key.NewCloudSSHKeyDataSource,
+		cloud_ssh_key.NewCloudSSHKeysDataSource,
 		cloud_load_balancer.NewCloudLoadBalancerDataSource,
 		cloud_load_balancer.NewCloudLoadBalancersDataSource,
 		cloud_load_balancer_listener.NewCloudLoadBalancerListenerDataSource,
