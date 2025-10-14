@@ -231,7 +231,7 @@ Optional:
 
 Required:
 
-- `size` (Number) Storage size in GiB. Must be between 10 and 100.
+- `size` (Number) Storage size in GiB. Must be between 1 and 100.
 - `type` (String) Storage type.
 
 

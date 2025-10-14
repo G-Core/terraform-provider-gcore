@@ -248,7 +248,7 @@ func resourceSchema() map[string]*schema.Schema {
 				Schema: map[string]*schema.Schema{
 					"size": {
 						Type:        schema.TypeInt,
-						Description: "Storage size in GiB. Must be between 10 and 100.",
+						Description: "Storage size in GiB. Must be between 1 and 100.",
 						Required:    true,
 					},
 					"type": {
