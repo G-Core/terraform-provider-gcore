@@ -65,6 +65,6 @@ output "cdn_client" {
 
 Read-Only:
 
-- `enabled` (Boolean) Defines whether the CDN service is activated.
-- `status` (String) CDN service status.
-- `updated` (String) Date of the last CDN service status update (ISO 8601/RFC 3339 format, UTC.)
+- `enabled` (Boolean)
+- `status` (String)
+- `updated` (String)
