@@ -1,7 +1,7 @@
 resource "gcore_cloud_load_balancer_listener" "example_cloud_load_balancer_listener" {
   project_id = 1
   region_id = 1
-  load_balancer_id = "30f4f55b-4a7c-48e0-9954-5cddfee216e7"
+  loadbalancer_id = "30f4f55b-4a7c-48e0-9954-5cddfee216e7"
   name = "my_listener"
   protocol = "HTTP"
   protocol_port = 80

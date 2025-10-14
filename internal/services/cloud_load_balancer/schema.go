@@ -5,8 +5,6 @@ package cloud_load_balancer
 import (
 	"context"
 
-	"github.com/hashicorp/terraform-plugin-framework-jsontypes/jsontypes"
-	"github.com/hashicorp/terraform-plugin-framework-timetypes/timetypes"
 	"github.com/hashicorp/terraform-plugin-framework-validators/int64validator"
 	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
@@ -15,6 +13,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/int64default"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/int64planmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/listplanmodifier"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/mapplanmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/objectplanmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringplanmodifier"
@@ -30,7 +29,7 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 		Attributes: map[string]schema.Attribute{
 			"id": schema.StringAttribute{
 				Computed:      true,
-				PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
+				PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown(), stringplanmodifier.RequiresReplace()},
 			},
 			"project_id": schema.Int64Attribute{
 				Optional:      true,
@@ -42,6 +41,11 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 			},
 			"flavor": schema.StringAttribute{
 				Description:   "Load balancer flavor name",
+				Optional:      true,
+				PlanModifiers: []planmodifier.String{stringplanmodifier.RequiresReplace()},
+			},
+			"name": schema.StringAttribute{
+				Description:   "Load balancer name",
 				Optional:      true,
 				PlanModifiers: []planmodifier.String{stringplanmodifier.RequiresReplace()},
 			},
@@ -60,6 +64,12 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 				Optional:      true,
 				PlanModifiers: []planmodifier.String{stringplanmodifier.RequiresReplace()},
 			},
+			"tags": schema.MapAttribute{
+				Description:   "Key-value tags to associate with the resource. A tag is a key-value pair that can be associated with a resource, enabling efficient filtering and grouping for better organization and management. Some tags are read-only and cannot be modified by the user. Tags are also integrated with cost reports, allowing cost data to be filtered based on tag keys or values.",
+				Optional:      true,
+				ElementType:   types.StringType,
+				PlanModifiers: []planmodifier.Map{mapplanmodifier.RequiresReplace()},
+			},
 			"floating_ip": schema.SingleNestedAttribute{
 				Description: "Floating IP configuration for assignment",
 				Optional:    true,
@@ -77,6 +87,15 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 					},
 				},
 				PlanModifiers: []planmodifier.Object{objectplanmodifier.RequiresReplace()},
+			},
+			"preferred_connectivity": schema.StringAttribute{
+				Description: "Preferred option to establish connectivity between load balancer and its pools members. L2 provides best performance, L3 provides less IPs usage. It is taking effect only if `instance_id` + `ip_address` is provided, not `subnet_id` + `ip_address`, because we're considering this as intentional `subnet_id` specification.\nAvailable values: \"L2\", \"L3\".",
+				Computed:    true,
+				Optional:    true,
+				Validators: []validator.String{
+					stringvalidator.OneOfCaseInsensitive("L2", "L3"),
+				},
+				PlanModifiers: []planmodifier.String{stringplanmodifier.RequiresReplaceIfConfigured()},
 			},
 			"vip_ip_family": schema.StringAttribute{
 				Description: "IP family for load balancer subnet auto-selection if `vip_network_id` is specified\nAvailable values: \"dual\", \"ipv4\", \"ipv6\".",
@@ -269,7 +288,7 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 										Description: "Listener ID",
 										Optional:    true,
 									},
-									"load_balancer_id": schema.StringAttribute{
+									"loadbalancer_id": schema.StringAttribute{
 										Description: "Loadbalancer ID",
 										Optional:    true,
 									},
@@ -433,23 +452,6 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 				},
 				PlanModifiers: []planmodifier.List{listplanmodifier.RequiresReplaceIfConfigured()},
 			},
-			"name": schema.StringAttribute{
-				Description: "Load balancer name",
-				Optional:    true,
-			},
-			"tags": schema.MapAttribute{
-				Description: "Key-value tags to associate with the resource. A tag is a key-value pair that can be associated with a resource, enabling efficient filtering and grouping for better organization and management. Some tags are read-only and cannot be modified by the user. Tags are also integrated with cost reports, allowing cost data to be filtered based on tag keys or values.",
-				Optional:    true,
-				ElementType: types.StringType,
-			},
-			"preferred_connectivity": schema.StringAttribute{
-				Description: "Preferred option to establish connectivity between load balancer and its pools members. L2 provides best performance, L3 provides less IPs usage. It is taking effect only if `instance_id` + `ip_address` is provided, not `subnet_id` + `ip_address`, because we're considering this as intentional `subnet_id` specification.\nAvailable values: \"L2\", \"L3\".",
-				Computed:    true,
-				Optional:    true,
-				Validators: []validator.String{
-					stringvalidator.OneOfCaseInsensitive("L2", "L3"),
-				},
-			},
 			"logging": schema.SingleNestedAttribute{
 				Description: "Logging configuration",
 				Computed:    true,
@@ -484,430 +486,13 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 						Optional:    true,
 					},
 				},
-			},
-			"created_at": schema.StringAttribute{
-				Description: "Datetime when the load balancer was created",
-				Computed:    true,
-				CustomType:  timetypes.RFC3339Type{},
-			},
-			"creator_task_id": schema.StringAttribute{
-				Description: "Task that created this entity",
-				Computed:    true,
-			},
-			"operating_status": schema.StringAttribute{
-				Description: "Load balancer operating status\nAvailable values: \"DEGRADED\", \"DRAINING\", \"ERROR\", \"NO_MONITOR\", \"OFFLINE\", \"ONLINE\".",
-				Computed:    true,
-				Validators: []validator.String{
-					stringvalidator.OneOfCaseInsensitive(
-						"DEGRADED",
-						"DRAINING",
-						"ERROR",
-						"NO_MONITOR",
-						"OFFLINE",
-						"ONLINE",
-					),
-				},
-			},
-			"provisioning_status": schema.StringAttribute{
-				Description: "Load balancer lifecycle status\nAvailable values: \"ACTIVE\", \"DELETED\", \"ERROR\", \"PENDING_CREATE\", \"PENDING_DELETE\", \"PENDING_UPDATE\".",
-				Computed:    true,
-				Validators: []validator.String{
-					stringvalidator.OneOfCaseInsensitive(
-						"ACTIVE",
-						"DELETED",
-						"ERROR",
-						"PENDING_CREATE",
-						"PENDING_DELETE",
-						"PENDING_UPDATE",
-					),
-				},
-			},
-			"region": schema.StringAttribute{
-				Description: "Region name",
-				Computed:    true,
-			},
-			"task_id": schema.StringAttribute{
-				Description: "The UUID of the active task that currently holds a lock on the resource. This lock prevents concurrent modifications to ensure consistency. If `null`, the resource is not locked.",
-				Computed:    true,
-			},
-			"updated_at": schema.StringAttribute{
-				Description: "Datetime when the load balancer was last updated",
-				Computed:    true,
-				CustomType:  timetypes.RFC3339Type{},
-			},
-			"vip_address": schema.StringAttribute{
-				Description: "Load balancer IP address",
-				Computed:    true,
+				PlanModifiers: []planmodifier.Object{objectplanmodifier.RequiresReplaceIfConfigured()},
 			},
 			"tasks": schema.ListAttribute{
 				Description: "List of task IDs representing asynchronous operations. Use these IDs to monitor operation progress:\n\\* `GET /v1/tasks/{`task_id`}` - Check individual task status and details\nPoll task status until completion (`FINISHED`/`ERROR`) before proceeding with dependent operations.",
 				Computed:    true,
 				CustomType:  customfield.NewListType[types.String](ctx),
 				ElementType: types.StringType,
-			},
-			"additional_vips": schema.ListNestedAttribute{
-				Description: "List of additional IP addresses",
-				Computed:    true,
-				CustomType:  customfield.NewNestedObjectListType[CloudLoadBalancerAdditionalVipsModel](ctx),
-				NestedObject: schema.NestedAttributeObject{
-					Attributes: map[string]schema.Attribute{
-						"ip_address": schema.StringAttribute{
-							Description: "IP address",
-							Computed:    true,
-						},
-						"subnet_id": schema.StringAttribute{
-							Description: "Subnet UUID",
-							Computed:    true,
-						},
-					},
-				},
-			},
-			"ddos_profile": schema.SingleNestedAttribute{
-				Description: "Loadbalancer advanced DDoS protection profile.",
-				Computed:    true,
-				CustomType:  customfield.NewNestedObjectType[CloudLoadBalancerDDOSProfileModel](ctx),
-				Attributes: map[string]schema.Attribute{
-					"id": schema.Int64Attribute{
-						Description: "Unique identifier for the DDoS protection profile",
-						Computed:    true,
-					},
-					"fields": schema.ListNestedAttribute{
-						Description: "List of configured field values for the protection profile",
-						Computed:    true,
-						CustomType:  customfield.NewNestedObjectListType[CloudLoadBalancerDDOSProfileFieldsModel](ctx),
-						NestedObject: schema.NestedAttributeObject{
-							Attributes: map[string]schema.Attribute{
-								"id": schema.Int64Attribute{
-									Description: "Unique identifier for the DDoS protection field",
-									Computed:    true,
-								},
-								"base_field": schema.Int64Attribute{
-									Description: "ID of DDoS profile field",
-									Computed:    true,
-								},
-								"default": schema.StringAttribute{
-									Description: "Predefined default value for the field if not specified",
-									Computed:    true,
-								},
-								"description": schema.StringAttribute{
-									Description: "Detailed description explaining the field's purpose and usage guidelines",
-									Computed:    true,
-								},
-								"field_name": schema.StringAttribute{
-									Description: "Name of DDoS profile field",
-									Computed:    true,
-								},
-								"field_type": schema.StringAttribute{
-									Description: "Data type classification of the field (e.g., string, integer, array)",
-									Computed:    true,
-								},
-								"field_value": schema.StringAttribute{
-									Description: "Complex value. Only one of 'value' or '`field_value`' must be specified.",
-									Computed:    true,
-									CustomType:  jsontypes.NormalizedType{},
-								},
-								"name": schema.StringAttribute{
-									Description: "Human-readable name of the protection field",
-									Computed:    true,
-								},
-								"required": schema.BoolAttribute{
-									Description: "Indicates whether this field must be provided when creating a protection profile",
-									Computed:    true,
-								},
-								"validation_schema": schema.StringAttribute{
-									Description: "JSON schema defining validation rules and constraints for the field value",
-									Computed:    true,
-									CustomType:  jsontypes.NormalizedType{},
-								},
-								"value": schema.StringAttribute{
-									Description: "Basic type value. Only one of 'value' or '`field_value`' must be specified.",
-									Computed:    true,
-								},
-							},
-						},
-					},
-					"options": schema.SingleNestedAttribute{
-						Description: "Configuration options controlling profile activation and BGP routing",
-						Computed:    true,
-						CustomType:  customfield.NewNestedObjectType[CloudLoadBalancerDDOSProfileOptionsModel](ctx),
-						Attributes: map[string]schema.Attribute{
-							"active": schema.BoolAttribute{
-								Description: "Controls whether the DDoS protection profile is enabled and actively protecting the resource",
-								Computed:    true,
-							},
-							"bgp": schema.BoolAttribute{
-								Description: "Enables Border Gateway Protocol (BGP) routing for DDoS protection traffic",
-								Computed:    true,
-							},
-						},
-					},
-					"profile_template": schema.SingleNestedAttribute{
-						Description: "Complete template configuration data used for this profile",
-						Computed:    true,
-						CustomType:  customfield.NewNestedObjectType[CloudLoadBalancerDDOSProfileProfileTemplateModel](ctx),
-						Attributes: map[string]schema.Attribute{
-							"id": schema.Int64Attribute{
-								Description: "Unique identifier for the DDoS protection template",
-								Computed:    true,
-							},
-							"description": schema.StringAttribute{
-								Description: "Detailed description explaining the template's purpose and use cases",
-								Computed:    true,
-							},
-							"fields": schema.ListNestedAttribute{
-								Description: "List of configurable fields that define the template's protection parameters",
-								Computed:    true,
-								CustomType:  customfield.NewNestedObjectListType[CloudLoadBalancerDDOSProfileProfileTemplateFieldsModel](ctx),
-								NestedObject: schema.NestedAttributeObject{
-									Attributes: map[string]schema.Attribute{
-										"id": schema.Int64Attribute{
-											Description: "Unique identifier for the DDoS protection field",
-											Computed:    true,
-										},
-										"default": schema.StringAttribute{
-											Description: "Predefined default value for the field if not specified",
-											Computed:    true,
-										},
-										"description": schema.StringAttribute{
-											Description: "Detailed description explaining the field's purpose and usage guidelines",
-											Computed:    true,
-										},
-										"field_type": schema.StringAttribute{
-											Description: "Data type classification of the field (e.g., string, integer, array)",
-											Computed:    true,
-										},
-										"name": schema.StringAttribute{
-											Description: "Human-readable name of the protection field",
-											Computed:    true,
-										},
-										"required": schema.BoolAttribute{
-											Description: "Indicates whether this field must be provided when creating a protection profile",
-											Computed:    true,
-										},
-										"validation_schema": schema.StringAttribute{
-											Description: "JSON schema defining validation rules and constraints for the field value",
-											Computed:    true,
-											CustomType:  jsontypes.NormalizedType{},
-										},
-									},
-								},
-							},
-							"name": schema.StringAttribute{
-								Description: "Human-readable name of the protection template",
-								Computed:    true,
-							},
-						},
-					},
-					"profile_template_description": schema.StringAttribute{
-						Description: "Detailed description of the protection template used for this profile",
-						Computed:    true,
-					},
-					"protocols": schema.ListNestedAttribute{
-						Description: "List of network protocols and ports configured for protection",
-						Computed:    true,
-						CustomType:  customfield.NewNestedObjectListType[CloudLoadBalancerDDOSProfileProtocolsModel](ctx),
-						NestedObject: schema.NestedAttributeObject{
-							Attributes: map[string]schema.Attribute{
-								"port": schema.StringAttribute{
-									Description: "Network port number for which protocols are configured",
-									Computed:    true,
-								},
-								"protocols": schema.ListAttribute{
-									Description: "List of network protocols enabled on the specified port",
-									Computed:    true,
-									CustomType:  customfield.NewListType[types.String](ctx),
-									ElementType: types.StringType,
-								},
-							},
-						},
-					},
-					"site": schema.StringAttribute{
-						Description: "Geographic site identifier where the protection is deployed",
-						Computed:    true,
-					},
-					"status": schema.SingleNestedAttribute{
-						Description: "Current operational status and any error information for the profile",
-						Computed:    true,
-						CustomType:  customfield.NewNestedObjectType[CloudLoadBalancerDDOSProfileStatusModel](ctx),
-						Attributes: map[string]schema.Attribute{
-							"error_description": schema.StringAttribute{
-								Description: "Detailed error message describing any issues with the profile operation",
-								Computed:    true,
-							},
-							"status": schema.StringAttribute{
-								Description: "Current operational status of the DDoS protection profile",
-								Computed:    true,
-							},
-						},
-					},
-				},
-			},
-			"floating_ips": schema.ListNestedAttribute{
-				Description: "List of assigned floating IPs",
-				Computed:    true,
-				CustomType:  customfield.NewNestedObjectListType[CloudLoadBalancerFloatingIPsModel](ctx),
-				NestedObject: schema.NestedAttributeObject{
-					Attributes: map[string]schema.Attribute{
-						"id": schema.StringAttribute{
-							Description: "Floating IP ID",
-							Computed:    true,
-						},
-						"created_at": schema.StringAttribute{
-							Description: "Datetime when the floating IP was created",
-							Computed:    true,
-							CustomType:  timetypes.RFC3339Type{},
-						},
-						"creator_task_id": schema.StringAttribute{
-							Description: "Task that created this entity",
-							Computed:    true,
-						},
-						"fixed_ip_address": schema.StringAttribute{
-							Description: "IP address of the port the floating IP is attached to",
-							Computed:    true,
-						},
-						"floating_ip_address": schema.StringAttribute{
-							Description: "IP Address of the floating IP",
-							Computed:    true,
-						},
-						"port_id": schema.StringAttribute{
-							Description: "Port ID the floating IP is attached to. The `fixed_ip_address` is the IP address of the port.",
-							Computed:    true,
-						},
-						"project_id": schema.Int64Attribute{
-							Description: "Project ID",
-							Computed:    true,
-						},
-						"region": schema.StringAttribute{
-							Description: "Region name",
-							Computed:    true,
-						},
-						"region_id": schema.Int64Attribute{
-							Description: "Region ID",
-							Computed:    true,
-						},
-						"router_id": schema.StringAttribute{
-							Description: "Router ID",
-							Computed:    true,
-						},
-						"status": schema.StringAttribute{
-							Description: "Floating IP status\nAvailable values: \"ACTIVE\", \"DOWN\", \"ERROR\".",
-							Computed:    true,
-							Validators: []validator.String{
-								stringvalidator.OneOfCaseInsensitive(
-									"ACTIVE",
-									"DOWN",
-									"ERROR",
-								),
-							},
-						},
-						"tags": schema.ListNestedAttribute{
-							Description: "List of key-value tags associated with the resource. A tag is a key-value pair that can be associated with a resource, enabling efficient filtering and grouping for better organization and management. Some tags are read-only and cannot be modified by the user. Tags are also integrated with cost reports, allowing cost data to be filtered based on tag keys or values.",
-							Computed:    true,
-							CustomType:  customfield.NewNestedObjectListType[CloudLoadBalancerFloatingIPsTagsModel](ctx),
-							NestedObject: schema.NestedAttributeObject{
-								Attributes: map[string]schema.Attribute{
-									"key": schema.StringAttribute{
-										Description: "Tag key. The maximum size for a key is 255 bytes.",
-										Computed:    true,
-									},
-									"read_only": schema.BoolAttribute{
-										Description: "If true, the tag is read-only and cannot be modified by the user",
-										Computed:    true,
-									},
-									"value": schema.StringAttribute{
-										Description: "Tag value. The maximum size for a value is 1024 bytes.",
-										Computed:    true,
-									},
-								},
-							},
-						},
-						"task_id": schema.StringAttribute{
-							Description: "The UUID of the active task that currently holds a lock on the resource. This lock prevents concurrent modifications to ensure consistency. If `null`, the resource is not locked.",
-							Computed:    true,
-						},
-						"updated_at": schema.StringAttribute{
-							Description: "Datetime when the floating IP was last updated",
-							Computed:    true,
-							CustomType:  timetypes.RFC3339Type{},
-						},
-					},
-				},
-			},
-			"stats": schema.SingleNestedAttribute{
-				Description: "Statistics of load balancer.",
-				Computed:    true,
-				CustomType:  customfield.NewNestedObjectType[CloudLoadBalancerStatsModel](ctx),
-				Attributes: map[string]schema.Attribute{
-					"active_connections": schema.Int64Attribute{
-						Description: "Currently active connections",
-						Computed:    true,
-					},
-					"bytes_in": schema.Int64Attribute{
-						Description: "Total bytes received",
-						Computed:    true,
-					},
-					"bytes_out": schema.Int64Attribute{
-						Description: "Total bytes sent",
-						Computed:    true,
-					},
-					"request_errors": schema.Int64Attribute{
-						Description: "Total requests that were unable to be fulfilled",
-						Computed:    true,
-					},
-					"total_connections": schema.Int64Attribute{
-						Description: "Total connections handled",
-						Computed:    true,
-					},
-				},
-			},
-			"tags_v2": schema.ListNestedAttribute{
-				Description: "List of key-value tags associated with the resource. A tag is a key-value pair that can be associated with a resource, enabling efficient filtering and grouping for better organization and management. Some tags are read-only and cannot be modified by the user. Tags are also integrated with cost reports, allowing cost data to be filtered based on tag keys or values.",
-				Computed:    true,
-				CustomType:  customfield.NewNestedObjectListType[CloudLoadBalancerTagsV2Model](ctx),
-				NestedObject: schema.NestedAttributeObject{
-					Attributes: map[string]schema.Attribute{
-						"key": schema.StringAttribute{
-							Description: "Tag key. The maximum size for a key is 255 bytes.",
-							Computed:    true,
-						},
-						"read_only": schema.BoolAttribute{
-							Description: "If true, the tag is read-only and cannot be modified by the user",
-							Computed:    true,
-						},
-						"value": schema.StringAttribute{
-							Description: "Tag value. The maximum size for a value is 1024 bytes.",
-							Computed:    true,
-						},
-					},
-				},
-			},
-			"vrrp_ips": schema.ListNestedAttribute{
-				Description: "List of VRRP IP addresses",
-				Computed:    true,
-				CustomType:  customfield.NewNestedObjectListType[CloudLoadBalancerVrrpIPsModel](ctx),
-				NestedObject: schema.NestedAttributeObject{
-					Attributes: map[string]schema.Attribute{
-						"ip_address": schema.StringAttribute{
-							Description: "IP address",
-							Computed:    true,
-						},
-						"role": schema.StringAttribute{
-							Description: "LoadBalancer instance role to which VRRP IP belong\nAvailable values: \"BACKUP\", \"MASTER\", \"STANDALONE\".",
-							Computed:    true,
-							Validators: []validator.String{
-								stringvalidator.OneOfCaseInsensitive(
-									"BACKUP",
-									"MASTER",
-									"STANDALONE",
-								),
-							},
-						},
-						"subnet_id": schema.StringAttribute{
-							Description: "Subnet UUID",
-							Computed:    true,
-						},
-					},
-				},
 			},
 		},
 	}

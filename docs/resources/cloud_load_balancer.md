@@ -45,7 +45,7 @@ resource "gcore_cloud_load_balancer" "example_cloud_load_balancer" {
         url_path = "/"
       }
       listener_id = "listener_id"
-      load_balancer_id = "bbb35f84-35cc-4b2f-84c2-a6a29bba68aa"
+      loadbalancer_id = "bbb35f84-35cc-4b2f-84c2-a6a29bba68aa"
       members = [{
         address = "192.168.1.101"
         protocol_port = 8000
@@ -133,26 +133,10 @@ Available values: "dual", "ipv4", "ipv6".
 
 ### Read-Only
 
-- `additional_vips` (Attributes List) List of additional IP addresses (see [below for nested schema](#nestedatt--additional_vips))
-- `created_at` (String) Datetime when the load balancer was created
-- `creator_task_id` (String) Task that created this entity
-- `ddos_profile` (Attributes) Loadbalancer advanced DDoS protection profile. (see [below for nested schema](#nestedatt--ddos_profile))
-- `floating_ips` (Attributes List) List of assigned floating IPs (see [below for nested schema](#nestedatt--floating_ips))
 - `id` (String) The ID of this resource.
-- `operating_status` (String) Load balancer operating status
-Available values: "DEGRADED", "DRAINING", "ERROR", "NO_MONITOR", "OFFLINE", "ONLINE".
-- `provisioning_status` (String) Load balancer lifecycle status
-Available values: "ACTIVE", "DELETED", "ERROR", "PENDING_CREATE", "PENDING_DELETE", "PENDING_UPDATE".
-- `region` (String) Region name
-- `stats` (Attributes) Statistics of load balancer. (see [below for nested schema](#nestedatt--stats))
-- `tags_v2` (Attributes List) List of key-value tags associated with the resource. A tag is a key-value pair that can be associated with a resource, enabling efficient filtering and grouping for better organization and management. Some tags are read-only and cannot be modified by the user. Tags are also integrated with cost reports, allowing cost data to be filtered based on tag keys or values. (see [below for nested schema](#nestedatt--tags_v2))
-- `task_id` (String) The UUID of the active task that currently holds a lock on the resource. This lock prevents concurrent modifications to ensure consistency. If `null`, the resource is not locked.
 - `tasks` (List of String) List of task IDs representing asynchronous operations. Use these IDs to monitor operation progress:
 \* `GET /v1/tasks/{`task_id`}` - Check individual task status and details
 Poll task status until completion (`FINISHED`/`ERROR`) before proceeding with dependent operations.
-- `updated_at` (String) Datetime when the load balancer was last updated
-- `vip_address` (String) Load balancer IP address
-- `vrrp_ips` (Attributes List) List of VRRP IP addresses (see [below for nested schema](#nestedatt--vrrp_ips))
 
 <a id="nestedatt--floating_ip"></a>
 ### Nested Schema for `floating_ip`
@@ -207,7 +191,7 @@ Optional:
 - `crl_secret_id` (String) Secret ID of CA revocation list file
 - `healthmonitor` (Attributes) Health monitor details (see [below for nested schema](#nestedatt--listeners--pools--healthmonitor))
 - `listener_id` (String) Listener ID
-- `load_balancer_id` (String) Loadbalancer ID
+- `loadbalancer_id` (String) Loadbalancer ID
 - `members` (Attributes List) Pool members (see [below for nested schema](#nestedatt--listeners--pools--members))
 - `secret_id` (String) Secret ID for TLS client authentication to the member servers
 - `session_persistence` (Attributes) Session persistence details (see [below for nested schema](#nestedatt--listeners--pools--session_persistence))
@@ -299,171 +283,3 @@ Optional:
 Required:
 
 - `period` (Number) Duration of days for which logs must be kept.
-
-
-
-<a id="nestedatt--additional_vips"></a>
-### Nested Schema for `additional_vips`
-
-Read-Only:
-
-- `ip_address` (String) IP address
-- `subnet_id` (String) Subnet UUID
-
-
-<a id="nestedatt--ddos_profile"></a>
-### Nested Schema for `ddos_profile`
-
-Read-Only:
-
-- `fields` (Attributes List) List of configured field values for the protection profile (see [below for nested schema](#nestedatt--ddos_profile--fields))
-- `id` (Number) Unique identifier for the DDoS protection profile
-- `options` (Attributes) Configuration options controlling profile activation and BGP routing (see [below for nested schema](#nestedatt--ddos_profile--options))
-- `profile_template` (Attributes) Complete template configuration data used for this profile (see [below for nested schema](#nestedatt--ddos_profile--profile_template))
-- `profile_template_description` (String) Detailed description of the protection template used for this profile
-- `protocols` (Attributes List) List of network protocols and ports configured for protection (see [below for nested schema](#nestedatt--ddos_profile--protocols))
-- `site` (String) Geographic site identifier where the protection is deployed
-- `status` (Attributes) Current operational status and any error information for the profile (see [below for nested schema](#nestedatt--ddos_profile--status))
-
-<a id="nestedatt--ddos_profile--fields"></a>
-### Nested Schema for `ddos_profile.fields`
-
-Read-Only:
-
-- `base_field` (Number) ID of DDoS profile field
-- `default` (String) Predefined default value for the field if not specified
-- `description` (String) Detailed description explaining the field's purpose and usage guidelines
-- `field_name` (String) Name of DDoS profile field
-- `field_type` (String) Data type classification of the field (e.g., string, integer, array)
-- `field_value` (String) Complex value. Only one of 'value' or '`field_value`' must be specified.
-- `id` (Number) Unique identifier for the DDoS protection field
-- `name` (String) Human-readable name of the protection field
-- `required` (Boolean) Indicates whether this field must be provided when creating a protection profile
-- `validation_schema` (String) JSON schema defining validation rules and constraints for the field value
-- `value` (String) Basic type value. Only one of 'value' or '`field_value`' must be specified.
-
-
-<a id="nestedatt--ddos_profile--options"></a>
-### Nested Schema for `ddos_profile.options`
-
-Read-Only:
-
-- `active` (Boolean) Controls whether the DDoS protection profile is enabled and actively protecting the resource
-- `bgp` (Boolean) Enables Border Gateway Protocol (BGP) routing for DDoS protection traffic
-
-
-<a id="nestedatt--ddos_profile--profile_template"></a>
-### Nested Schema for `ddos_profile.profile_template`
-
-Read-Only:
-
-- `description` (String) Detailed description explaining the template's purpose and use cases
-- `fields` (Attributes List) List of configurable fields that define the template's protection parameters (see [below for nested schema](#nestedatt--ddos_profile--profile_template--fields))
-- `id` (Number) Unique identifier for the DDoS protection template
-- `name` (String) Human-readable name of the protection template
-
-<a id="nestedatt--ddos_profile--profile_template--fields"></a>
-### Nested Schema for `ddos_profile.profile_template.fields`
-
-Read-Only:
-
-- `default` (String) Predefined default value for the field if not specified
-- `description` (String) Detailed description explaining the field's purpose and usage guidelines
-- `field_type` (String) Data type classification of the field (e.g., string, integer, array)
-- `id` (Number) Unique identifier for the DDoS protection field
-- `name` (String) Human-readable name of the protection field
-- `required` (Boolean) Indicates whether this field must be provided when creating a protection profile
-- `validation_schema` (String) JSON schema defining validation rules and constraints for the field value
-
-
-
-<a id="nestedatt--ddos_profile--protocols"></a>
-### Nested Schema for `ddos_profile.protocols`
-
-Read-Only:
-
-- `port` (String) Network port number for which protocols are configured
-- `protocols` (List of String) List of network protocols enabled on the specified port
-
-
-<a id="nestedatt--ddos_profile--status"></a>
-### Nested Schema for `ddos_profile.status`
-
-Read-Only:
-
-- `error_description` (String) Detailed error message describing any issues with the profile operation
-- `status` (String) Current operational status of the DDoS protection profile
-
-
-
-<a id="nestedatt--floating_ips"></a>
-### Nested Schema for `floating_ips`
-
-Read-Only:
-
-- `created_at` (String) Datetime when the floating IP was created
-- `creator_task_id` (String) Task that created this entity
-- `fixed_ip_address` (String) IP address of the port the floating IP is attached to
-- `floating_ip_address` (String) IP Address of the floating IP
-- `id` (String) Floating IP ID
-- `port_id` (String) Port ID the floating IP is attached to. The `fixed_ip_address` is the IP address of the port.
-- `project_id` (Number) Project ID
-- `region` (String) Region name
-- `region_id` (Number) Region ID
-- `router_id` (String) Router ID
-- `status` (String) Floating IP status
-Available values: "ACTIVE", "DOWN", "ERROR".
-- `tags` (Attributes List) List of key-value tags associated with the resource. A tag is a key-value pair that can be associated with a resource, enabling efficient filtering and grouping for better organization and management. Some tags are read-only and cannot be modified by the user. Tags are also integrated with cost reports, allowing cost data to be filtered based on tag keys or values. (see [below for nested schema](#nestedatt--floating_ips--tags))
-- `task_id` (String) The UUID of the active task that currently holds a lock on the resource. This lock prevents concurrent modifications to ensure consistency. If `null`, the resource is not locked.
-- `updated_at` (String) Datetime when the floating IP was last updated
-
-<a id="nestedatt--floating_ips--tags"></a>
-### Nested Schema for `floating_ips.tags`
-
-Read-Only:
-
-- `key` (String) Tag key. The maximum size for a key is 255 bytes.
-- `read_only` (Boolean) If true, the tag is read-only and cannot be modified by the user
-- `value` (String) Tag value. The maximum size for a value is 1024 bytes.
-
-
-
-<a id="nestedatt--stats"></a>
-### Nested Schema for `stats`
-
-Read-Only:
-
-- `active_connections` (Number) Currently active connections
-- `bytes_in` (Number) Total bytes received
-- `bytes_out` (Number) Total bytes sent
-- `request_errors` (Number) Total requests that were unable to be fulfilled
-- `total_connections` (Number) Total connections handled
-
-
-<a id="nestedatt--tags_v2"></a>
-### Nested Schema for `tags_v2`
-
-Read-Only:
-
-- `key` (String) Tag key. The maximum size for a key is 255 bytes.
-- `read_only` (Boolean) If true, the tag is read-only and cannot be modified by the user
-- `value` (String) Tag value. The maximum size for a value is 1024 bytes.
-
-
-<a id="nestedatt--vrrp_ips"></a>
-### Nested Schema for `vrrp_ips`
-
-Read-Only:
-
-- `ip_address` (String) IP address
-- `role` (String) LoadBalancer instance role to which VRRP IP belong
-Available values: "BACKUP", "MASTER", "STANDALONE".
-- `subnet_id` (String) Subnet UUID
-
-## Import
-
-Import is supported using the following syntax:
-
-```shell
-$ terraform import gcore_cloud_load_balancer.example '<project_id>/<region_id>/<load_balancer_id>'
-```
