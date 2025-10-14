@@ -31,7 +31,7 @@ resource "gcore_floatingip" "floating_ip" {
 ### Optional
 
 - `fixed_ip_address` (String)
-- `metadata_map` (Map of String)
+- `metadata_map` (Map of String, Deprecated)
 - `port_id` (String)
 - `project_id` (Number)
 - `project_name` (String)
