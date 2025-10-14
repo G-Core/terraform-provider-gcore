@@ -22,6 +22,7 @@ import (
 	"github.com/stainless-sdks/gcore-terraform/internal/services/cloud_load_balancer_listener"
 	"github.com/stainless-sdks/gcore-terraform/internal/services/cloud_load_balancer_pool"
 	"github.com/stainless-sdks/gcore-terraform/internal/services/cloud_network"
+	"github.com/stainless-sdks/gcore-terraform/internal/services/cloud_network_router"
 	"github.com/stainless-sdks/gcore-terraform/internal/services/cloud_network_subnet"
 	"github.com/stainless-sdks/gcore-terraform/internal/services/cloud_project"
 	"github.com/stainless-sdks/gcore-terraform/internal/services/cloud_region"
@@ -162,6 +163,7 @@ func (p *GcoreProvider) Resources(ctx context.Context) []func() resource.Resourc
 		cloud_reserved_fixed_ip.NewResource,
 		cloud_network.NewResource,
 		cloud_network_subnet.NewResource,
+		cloud_network_router.NewResource,
 		cloud_volume.NewResource,
 		cloud_floating_ip.NewResource,
 		cloud_security_group.NewResource,
@@ -186,6 +188,8 @@ func (p *GcoreProvider) DataSources(ctx context.Context) []func() datasource.Dat
 		cloud_network.NewCloudNetworksDataSource,
 		cloud_network_subnet.NewCloudNetworkSubnetDataSource,
 		cloud_network_subnet.NewCloudNetworkSubnetsDataSource,
+		cloud_network_router.NewCloudNetworkRouterDataSource,
+		cloud_network_router.NewCloudNetworkRoutersDataSource,
 		cloud_volume.NewCloudVolumeDataSource,
 		cloud_volume.NewCloudVolumesDataSource,
 		cloud_floating_ip.NewCloudFloatingIPDataSource,
