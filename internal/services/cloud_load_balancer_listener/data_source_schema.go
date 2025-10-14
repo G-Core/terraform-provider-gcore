@@ -52,7 +52,7 @@ func DataSourceSchema(ctx context.Context) schema.Schema {
 				Description: "Task that created this entity",
 				Computed:    true,
 			},
-			"load_balancer_id": schema.StringAttribute{
+			"loadbalancer_id": schema.StringAttribute{
 				Description: "Load balancer ID",
 				Computed:    true,
 			},

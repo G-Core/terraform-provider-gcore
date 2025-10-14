@@ -13,7 +13,7 @@ type CloudLoadBalancerListenerModel struct {
 	ID                   types.String                                                  `tfsdk:"id" json:"id,computed"`
 	ProjectID            types.Int64                                                   `tfsdk:"project_id" path:"project_id,optional"`
 	RegionID             types.Int64                                                   `tfsdk:"region_id" path:"region_id,optional"`
-	LoadBalancerID       types.String                                                  `tfsdk:"load_balancer_id" json:"load_balancer_id,required"`
+	LoadbalancerID       types.String                                                  `tfsdk:"loadbalancer_id" json:"loadbalancer_id,required"`
 	Protocol             types.String                                                  `tfsdk:"protocol" json:"protocol,required"`
 	ProtocolPort         types.Int64                                                   `tfsdk:"protocol_port" json:"protocol_port,required"`
 	InsertXForwarded     types.Bool                                                    `tfsdk:"insert_x_forwarded" json:"insert_x_forwarded,optional,no_refresh"`
