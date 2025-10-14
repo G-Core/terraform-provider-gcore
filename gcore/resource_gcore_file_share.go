@@ -267,7 +267,7 @@ func resourceFileShareCreate(ctx context.Context, d *schema.ResourceData, m inte
 		return diag.FromErr(err)
 	}
 	taskID := taskResults.Tasks[0]
-	log.Printf("[DEBUG] Task id (%s)", taskID)
+
 	fileShareID, err := tasks.WaitTaskAndReturnResult(client, taskID, true, fileShareCreatingTimeout, func(task tasks.TaskID) (interface{}, error) {
 		taskInfo, err := tasks.Get(client, string(task)).Extract()
 		if err != nil {
@@ -357,33 +357,39 @@ func resourceFileShareUpdate(ctx context.Context, d *schema.ResourceData, m inte
 	config := m.(*Config)
 	provider := config.Provider
 	fileShareID := d.Id()
-	client, err := CreateClient(provider, d, fileSharePoint, "v1")
+
+	clientV1, err := CreateClient(provider, d, fileSharePoint, "v1")
 	if err != nil {
 		return diag.FromErr(err)
 	}
+	clientV3, err := CreateClient(provider, d, fileSharePoint, "v3")
+	if err != nil {
+		return diag.FromErr(err)
+	}
+
 	if d.HasChange("size") {
 		newSize := d.Get("size").(int)
 		if newSize > 0 {
 			extendOpts := file_shares.ExtendOpts{Size: newSize}
-			result := file_shares.Extend(client, fileShareID, extendOpts)
+			result := file_shares.Extend(clientV1, fileShareID, extendOpts)
 			if result.Err != nil {
 				return diag.FromErr(result.Err)
 			}
+
+			//TODO: replace code below with waitForTaskResult() when PR #273 is merged
 			taskResults, err := result.Extract()
 			if err != nil {
 				return diag.FromErr(err)
 			}
-			taskID := taskResults.Tasks[0]
-			_, err = tasks.WaitTaskAndReturnResult(client, taskID, true, fileShareCreatingTimeout, func(task tasks.TaskID) (interface{}, error) {
-				_, err := file_shares.Get(client, fileShareID).Extract()
-				if err != nil {
-					return nil, fmt.Errorf("cannot get file share with ID: %s. Error: %w", fileShareID, err)
-				}
-				return nil, nil
-			})
-			if err != nil {
-				return diag.FromErr(err)
+			if len(taskResults.Tasks) == 0 {
+				return diag.FromErr(errors.New("no task IDs returned"))
 			}
+			taskID := taskResults.Tasks[0]
+
+			if err := tasks.WaitForFinishedTask(clientV1, taskID, fileShareCreatingTimeout); err != nil {
+				return diag.FromErr(fmt.Errorf("error while waiting for task %s to finish: %w", taskID, err))
+			}
+
 		}
 	}
 
@@ -426,9 +432,6 @@ func resourceFileShareUpdate(ctx context.Context, d *schema.ResourceData, m inte
 		}
 
 		if d.HasChange("share_settings") {
-			//if d.Get("type_name").(string) != "vast" {
-			//	return diag.FromErr(fmt.Errorf("share_settings block can be updated only for 'vast' type_name"))
-			//}
 			shareSettingsList := d.Get("share_settings").([]interface{})
 			if len(shareSettingsList) > 0 {
 				// schema restricts share_settings to a single block
@@ -441,15 +444,29 @@ func resourceFileShareUpdate(ctx context.Context, d *schema.ResourceData, m inte
 					shareSettingsOpts.PathLength = file_shares.FileSharePathLength(v.(string))
 				}
 				if v, ok := ssMap["root_squash"]; ok && v != nil {
-					shareSettingsOpts.RootSquash = v.(bool)
+					rootSquash := v.(bool)
+					shareSettingsOpts.RootSquash = &rootSquash
 				}
 				updateOpts.ShareSettings = &shareSettingsOpts
 			}
 		}
 
-		_, err := file_shares.UpdateWithTags(client, fileShareID, updateOpts).Extract()
+		result := file_shares.UpdateWithTags(clientV3, fileShareID, updateOpts)
+		if result.Err != nil {
+			return diag.FromErr(result.Err)
+		}
+		//TODO: replace code below with waitForTaskResult() when PR #273 is merged
+		taskResults, err := result.Extract()
 		if err != nil {
 			return diag.FromErr(err)
+		}
+		if len(taskResults.Tasks) == 0 {
+			return diag.FromErr(errors.New("no task IDs returned"))
+		}
+		taskID := taskResults.Tasks[0]
+
+		if err := tasks.WaitForFinishedTask(clientV1, taskID, fileShareCreatingTimeout); err != nil {
+			return diag.FromErr(fmt.Errorf("error while waiting for task %s to finish: %w", taskID, err))
 		}
 	}
 
@@ -457,7 +474,7 @@ func resourceFileShareUpdate(ctx context.Context, d *schema.ResourceData, m inte
 	if d.HasChange("access") {
 		log.Println("[DEBUG] Updating access rules for file share")
 		// List all current access rules
-		pager := file_shares.ListAccessRules(client, fileShareID)
+		pager := file_shares.ListAccessRules(clientV1, fileShareID)
 		pages, err := pager.AllPages()
 		if err != nil {
 			return diag.FromErr(fmt.Errorf("failed to get all access rule pages for file share %s: %w", fileShareID, err))
@@ -468,7 +485,7 @@ func resourceFileShareUpdate(ctx context.Context, d *schema.ResourceData, m inte
 		}
 		// Delete all existing access rules
 		for _, rule := range rules {
-			result := file_shares.DeleteAccessRule(client, fileShareID, rule.ID)
+			result := file_shares.DeleteAccessRule(clientV1, fileShareID, rule.ID)
 			if result.Err != nil {
 				return diag.FromErr(fmt.Errorf("failed to delete access rule %s: %w", rule.ID, result.Err))
 			}
@@ -481,7 +498,7 @@ func resourceFileShareUpdate(ctx context.Context, d *schema.ResourceData, m inte
 				IPAddress:  amap["ip_address"].(string),
 				AccessMode: amap["access_mode"].(string),
 			}
-			result := file_shares.CreateAccessRule(client, fileShareID, createOpts)
+			result := file_shares.CreateAccessRule(clientV1, fileShareID, createOpts)
 			if result.Err != nil {
 				return diag.FromErr(fmt.Errorf("failed to create access rule for file share %s: %w", fileShareID, result.Err))
 			}
@@ -508,7 +525,7 @@ func resourceFileShareDelete(ctx context.Context, d *schema.ResourceData, m inte
 		return diag.FromErr(err)
 	}
 	taskID := taskResults.Tasks[0]
-	log.Printf("[DEBUG] Task id (%s)", taskID)
+
 	_, err = tasks.WaitTaskAndReturnResult(client, taskID, true, fileShareDeletingTimeout, func(task tasks.TaskID) (interface{}, error) {
 		_, err := file_shares.Get(client, fileShareID).Extract()
 		if err == nil {
@@ -566,9 +583,6 @@ func expandFileShareCreateOpts(d *schema.ResourceData) (*file_shares.CreateOpts,
 
 	// check that share_settings block is only set for 'vast'
 	shareSettingsList := d.Get("share_settings").([]interface{})
-	//if len(shareSettingsList) > 0 && typeName == "standard" {
-	//	return nil, fmt.Errorf("share_settings block is not allowed for 'standard'")
-	//}
 
 	opts := file_shares.CreateOpts{
 		Name:     name,
@@ -616,7 +630,8 @@ func expandFileShareCreateOpts(d *schema.ResourceData) (*file_shares.CreateOpts,
 				shareSettingsOpts.PathLength = file_shares.FileSharePathLength(v.(string))
 			}
 			if v, ok := ssMap["root_squash"]; ok && v != nil {
-				shareSettingsOpts.RootSquash = v.(bool)
+				rootSquash := v.(bool)
+				shareSettingsOpts.RootSquash = &rootSquash
 			}
 			opts.ShareSettings = &shareSettingsOpts
 		}
