@@ -107,21 +107,30 @@ func resourceFileShare() *schema.Resource {
 				Type:        schema.TypeList,
 				Optional:    true,
 				MaxItems:    1,
-				ForceNew:    true,
 				Description: "Network configuration for the file share. It must include a network ID and optionally a subnet ID. (Only required for type_name: 'standard')",
+				DiffSuppressFunc: func(k, old, new string, d *schema.ResourceData) bool {
+					// For vast type, ignore network changes when not explicitly configured
+					if typeName, ok := d.GetOk("type_name"); ok && typeName.(string) == "vast" {
+						// If network is not configured in the new config, suppress the diff
+						// "0" means not configured, "1" means configured
+						if new == "0" && old != "0" {
+							return true
+						}
+					}
+					return false
+				},
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
 						"network_id": {
 							Type:        schema.TypeString,
-							Required:    true,
-							ForceNew:    true,
+							Optional:    true,
+							Computed:    true,
 							Description: "The ID of the network to which the file share will be connected. This is required for 'standard'.",
 						},
 						"subnet_id": {
 							Type:        schema.TypeString,
 							Optional:    true,
 							Computed:    true,
-							ForceNew:    true,
 							Description: "The ID of the subnet within the network. This is optional and can be used to specify a particular subnet for the file share.",
 						},
 					},
@@ -195,6 +204,14 @@ func resourceFileShare() *schema.Resource {
 				Optional:    true,
 				MaxItems:    1,
 				Description: "Share settings for the file share.",
+				DiffSuppressFunc: func(k, old, new string, d *schema.ResourceData) bool {
+					// If share_settings is not configured in the new config, suppress the diff
+					// "0" means not configured, "1" means configured
+					if new == "0" && old != "0" {
+						return true
+					}
+					return false
+				},
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
 						"allowed_characters": {
@@ -309,17 +326,15 @@ func resourceFileShareRead(ctx context.Context, d *schema.ResourceData, m interf
 	d.Set("connection_point", fileShare.ConnectionPoint)
 	d.Set("created_at", fileShare.CreatedAt.String())
 	d.Set("type_name", fileShare.TypeName)
-	if fileShare.TypeName == "standard" {
-		networkMap := map[string]interface{}{}
-		if fileShare.NetworkID != "" {
-			networkMap["network_id"] = fileShare.NetworkID
+	if fileShare.NetworkID != "" || fileShare.SubnetID != "" {
+		networkMap := map[string]interface{}{
+			"network_id": fileShare.NetworkID,
+			"subnet_id":  fileShare.SubnetID,
 		}
-		if fileShare.SubnetID != "" {
-			networkMap["subnet_id"] = fileShare.SubnetID
-		}
-		if len(networkMap) > 0 {
-			d.Set("network", []interface{}{networkMap})
-		}
+		d.Set("network", []interface{}{networkMap})
+	} else {
+		// Set to empty list when no network data
+		d.Set("network", []interface{}{})
 	}
 	d.Set("network_name", fileShare.NetworkName)
 	d.Set("subnet_name", fileShare.SubnetName)
