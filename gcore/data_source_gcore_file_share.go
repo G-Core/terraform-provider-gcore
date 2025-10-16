@@ -109,6 +109,41 @@ func dataSourceFileShare() *schema.Resource {
 				Elem:        &schema.Schema{Type: schema.TypeString},
 				Description: "Tags associated with the file share. Tags are key-value pairs.",
 			},
+			"share_settings": {
+				Type:        schema.TypeList,
+				Optional:    true,
+				Computed:    true,
+				MaxItems:    1,
+				Description: "Share settings for the file share.",
+				Elem: &schema.Resource{
+					Schema: map[string]*schema.Schema{
+						"type_name": {
+							Type:        schema.TypeString,
+							Optional:    true,
+							Computed:    true,
+							Description: "The type of the file share (standard or vast).",
+						},
+						"allowed_characters": {
+							Type:        schema.TypeString,
+							Optional:    true,
+							Computed:    true,
+							Description: "Allowed characters in file names.",
+						},
+						"path_length": {
+							Type:        schema.TypeString,
+							Optional:    true,
+							Computed:    true,
+							Description: "Affects the maximum limit of file path component name length.",
+						},
+						"root_squash": {
+							Type:        schema.TypeBool,
+							Optional:    true,
+							Computed:    true,
+							Description: "Indicates if root squash is enabled.",
+						},
+					},
+				},
+			},
 		},
 	}
 }
@@ -174,6 +209,19 @@ func dataSourceFileShareRead(ctx context.Context, d *schema.ResourceData, m inte
 		}
 		d.Set("tags", tags)
 	}
+	shareSettingsMap := map[string]interface{}{
+		"type_name": fs.ShareSettings.TypeName,
+	}
+	if fs.ShareSettings.AllowedCharacters != nil && fs.ShareSettings.AllowedCharacters.String() != "" {
+		shareSettingsMap["allowed_characters"] = fs.ShareSettings.AllowedCharacters.String()
+	}
+	if fs.ShareSettings.PathLength != nil && fs.ShareSettings.PathLength.String() != "" {
+		shareSettingsMap["path_length"] = fs.ShareSettings.PathLength.String()
+	}
+	if fs.ShareSettings.RootSquash != nil {
+		shareSettingsMap["root_squash"] = *fs.ShareSettings.RootSquash
+	}
+	d.Set("share_settings", []interface{}{shareSettingsMap})
 	return nil
 }
 
