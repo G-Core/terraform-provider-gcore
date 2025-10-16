@@ -75,7 +75,7 @@ func resourceKeypairCreate(ctx context.Context, d *schema.ResourceData, m interf
 	opts := keypairs.CreateOpts{
 		Name:      d.Get("sshkey_name").(string),
 		PublicKey: d.Get("public_key").(string),
-		ProjectID: d.Get("project_id").(int),
+		ProjectID: client.ProjectID,
 	}
 
 	kp, err := keypairs.Create(client, opts).Extract()
