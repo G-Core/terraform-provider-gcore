@@ -39,7 +39,7 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 				Optional:      true,
 				PlanModifiers: []planmodifier.Int64{int64planmodifier.RequiresReplace()},
 			},
-			"loadbalancer_id": schema.StringAttribute{
+			"load_balancer_id": schema.StringAttribute{
 				Description:   "Load balancer ID",
 				Required:      true,
 				PlanModifiers: []planmodifier.String{stringplanmodifier.RequiresReplace()},
