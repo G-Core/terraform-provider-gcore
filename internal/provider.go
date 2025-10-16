@@ -21,6 +21,7 @@ import (
 	"github.com/stainless-sdks/gcore-terraform/internal/services/cloud_load_balancer"
 	"github.com/stainless-sdks/gcore-terraform/internal/services/cloud_load_balancer_listener"
 	"github.com/stainless-sdks/gcore-terraform/internal/services/cloud_load_balancer_pool"
+	"github.com/stainless-sdks/gcore-terraform/internal/services/cloud_load_balancer_pool_member"
 	"github.com/stainless-sdks/gcore-terraform/internal/services/cloud_network"
 	"github.com/stainless-sdks/gcore-terraform/internal/services/cloud_network_router"
 	"github.com/stainless-sdks/gcore-terraform/internal/services/cloud_network_subnet"
@@ -160,6 +161,7 @@ func (p *GcoreProvider) Resources(ctx context.Context) []func() resource.Resourc
 		cloud_load_balancer.NewResource,
 		cloud_load_balancer_listener.NewResource,
 		cloud_load_balancer_pool.NewResource,
+		cloud_load_balancer_pool_member.NewResource,
 		cloud_reserved_fixed_ip.NewResource,
 		cloud_network.NewResource,
 		cloud_network_subnet.NewResource,
