@@ -4,6 +4,8 @@ go 1.23.0
 
 toolchain go1.23.9
 
+replace github.com/G-Core/gcore-go => github.com/stainless-sdks/gcore-go v0.0.0-20251015105027-3314f5bd889e
+
 require (
 	github.com/G-Core/gcore-go v0.15.0
 	github.com/davecgh/go-spew v1.1.1
