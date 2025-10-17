@@ -112,7 +112,9 @@ func (r *CloudLoadBalancerPoolMemberResource) Delete(ctx context.Context, req re
 		return
 	}
 
-	params := cloud.LoadBalancerPoolMemberRemoveParams{}
+	params := cloud.LoadBalancerPoolMemberRemoveParams{
+		PoolID: data.PoolID.ValueString(),
+	}
 
 	if !data.ProjectID.IsNull() {
 		params.ProjectID = param.NewOpt(data.ProjectID.ValueInt64())
