@@ -119,12 +119,9 @@ Required:
 <a id="nestedblock--network"></a>
 ### Nested Schema for `network`
 
-Required:
-
-- `network_id` (String) The ID of the network to which the file share will be connected. This is required for 'standard'.
-
 Optional:
 
+- `network_id` (String) The ID of the network to which the file share will be connected. This is required for 'standard'.
 - `subnet_id` (String) The ID of the subnet within the network. This is optional and can be used to specify a particular subnet for the file share.
 
 

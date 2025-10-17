@@ -215,9 +215,7 @@ func dataSourceSubnetRead(ctx context.Context, d *schema.ResourceData, m interfa
 	d.Set("project_id", subnet.ProjectID)
 	d.Set("gateway_ip", subnet.GatewayIP.String())
 
-	d.Set("connect_to_network_router", true)
 	if subnet.GatewayIP == nil {
-		d.Set("connect_to_network_router", false)
 		d.Set("gateway_ip", "disable")
 	}
 
