@@ -124,8 +124,8 @@ func (r *CloudReservedFixedIPResource) Update(ctx context.Context, req resource.
 
 	// Check for unsupported changes to allowed_address_pairs
 	// Note: allowed_address_pairs is Computed-only in the schema, so users shouldn't be able to modify it directly.
-	// But we add this check for completeness in case the schema changes in the future.
-	if !plan.AllowedAddressPairs.Equal(state.AllowedAddressPairs) {
+	// Only check if the plan value is known (not null/unknown) and different from state
+	if !plan.AllowedAddressPairs.IsNull() && !plan.AllowedAddressPairs.IsUnknown() && !plan.AllowedAddressPairs.Equal(state.AllowedAddressPairs) {
 		resp.Diagnostics.AddError("Update Not Supported",
 			"Updating 'allowed_address_pairs' is not supported yet. This feature requires Ports API integration which is not available in the current SDK version.")
 		return
@@ -317,5 +317,5 @@ func (r *CloudReservedFixedIPResource) ImportState(ctx context.Context, req reso
 }
 
 func (r *CloudReservedFixedIPResource) ModifyPlan(_ context.Context, _ resource.ModifyPlanRequest, _ *resource.ModifyPlanResponse) {
-
+	// Schema plan modifiers handle port_id preservation
 }

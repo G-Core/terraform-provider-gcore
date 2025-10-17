@@ -77,7 +77,7 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 				Description:   "Port ID to make a reserved fixed IP (for example, `vip_port_id` of the Load Balancer entity).",
 				Computed:      true,
 				Optional:      true,
-				PlanModifiers: []planmodifier.String{stringplanmodifier.RequiresReplace()},
+				PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
 			},
 			"subnet_id": schema.StringAttribute{
 				Description:   "Reserved fixed IP will be allocated in this subnet",
