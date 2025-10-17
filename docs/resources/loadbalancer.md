@@ -81,7 +81,7 @@ Optional:
 
 Read-Only:
 
-- `id` (String) The ID of this resource.
+- `id` (String)
 
 
 <a id="nestedblock--timeouts"></a>
@@ -106,6 +106,8 @@ Read-Only:
 ## Import
 
 Import is supported using the following syntax:
+
+The [`terraform import` command](https://developer.hashicorp.com/terraform/cli/commands/import) can be used, for example:
 
 ```shell
 # import using <project_id>:<region_id>:<loadbalancer_id>:<listener_id> format, listener_id - nested listener id
