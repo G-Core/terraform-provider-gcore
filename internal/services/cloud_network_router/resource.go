@@ -80,20 +80,17 @@ func (r *CloudNetworkRouterResource) Create(ctx context.Context, req resource.Cr
 		resp.Diagnostics.AddError("failed to serialize http request", err.Error())
 		return
 	}
-	res := new(http.Response)
-	_, err = r.client.Cloud.Networks.Routers.New(
+	router, err := r.client.Cloud.Networks.Routers.NewAndPoll(
 		ctx,
 		params,
 		option.WithRequestBody("application/json", dataBytes),
-		option.WithResponseBodyInto(&res),
 		option.WithMiddleware(logging.Middleware(ctx)),
 	)
 	if err != nil {
 		resp.Diagnostics.AddError("failed to make http request", err.Error())
 		return
 	}
-	bytes, _ := io.ReadAll(res.Body)
-	err = apijson.UnmarshalComputed(bytes, &data)
+	err = apijson.UnmarshalComputed([]byte(router.RawJSON()), &data)
 	if err != nil {
 		resp.Diagnostics.AddError("failed to deserialize http request", err.Error())
 		return
@@ -222,7 +219,7 @@ func (r *CloudNetworkRouterResource) Delete(ctx context.Context, req resource.De
 		params.RegionID = param.NewOpt(data.RegionID.ValueInt64())
 	}
 
-	_, err := r.client.Cloud.Networks.Routers.Delete(
+	err := r.client.Cloud.Networks.Routers.DeleteAndPoll(
 		ctx,
 		data.ID.ValueString(),
 		params,
