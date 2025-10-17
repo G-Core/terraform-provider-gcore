@@ -379,7 +379,7 @@ Optional:
 Read-Only:
 
 - `created_at` (String)
-- `id` (String) The ID of this resource.
+- `id` (String)
 - `updated_at` (String)
 
 
