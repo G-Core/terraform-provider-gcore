@@ -17,7 +17,6 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/stainless-sdks/gcore-terraform/internal/services/cloud_floating_ip"
-	"github.com/stainless-sdks/gcore-terraform/internal/services/cloud_inference_secret"
 	"github.com/stainless-sdks/gcore-terraform/internal/services/cloud_instance_image"
 	"github.com/stainless-sdks/gcore-terraform/internal/services/cloud_load_balancer"
 	"github.com/stainless-sdks/gcore-terraform/internal/services/cloud_load_balancer_listener"
@@ -30,6 +29,7 @@ import (
 	"github.com/stainless-sdks/gcore-terraform/internal/services/cloud_project"
 	"github.com/stainless-sdks/gcore-terraform/internal/services/cloud_region"
 	"github.com/stainless-sdks/gcore-terraform/internal/services/cloud_reserved_fixed_ip"
+	"github.com/stainless-sdks/gcore-terraform/internal/services/cloud_secret"
 	"github.com/stainless-sdks/gcore-terraform/internal/services/cloud_security_group"
 	"github.com/stainless-sdks/gcore-terraform/internal/services/cloud_ssh_key"
 	"github.com/stainless-sdks/gcore-terraform/internal/services/cloud_volume"
@@ -171,7 +171,6 @@ func (p *GcoreProvider) Resources(ctx context.Context) []func() resource.Resourc
 		cloud_volume.NewResource,
 		cloud_floating_ip.NewResource,
 		cloud_security_group.NewResource,
-		cloud_inference_secret.NewResource,
 		cloud_placement_group.NewResource,
 	}
 }
@@ -182,6 +181,8 @@ func (p *GcoreProvider) DataSources(ctx context.Context) []func() datasource.Dat
 		cloud_project.NewCloudProjectsDataSource,
 		cloud_region.NewCloudRegionDataSource,
 		cloud_region.NewCloudRegionsDataSource,
+		cloud_secret.NewCloudSecretDataSource,
+		cloud_secret.NewCloudSecretsDataSource,
 		cloud_ssh_key.NewCloudSSHKeyDataSource,
 		cloud_ssh_key.NewCloudSSHKeysDataSource,
 		cloud_load_balancer.NewCloudLoadBalancerDataSource,
@@ -202,8 +203,6 @@ func (p *GcoreProvider) DataSources(ctx context.Context) []func() datasource.Dat
 		cloud_floating_ip.NewCloudFloatingIPsDataSource,
 		cloud_security_group.NewCloudSecurityGroupDataSource,
 		cloud_security_group.NewCloudSecurityGroupsDataSource,
-		cloud_inference_secret.NewCloudInferenceSecretDataSource,
-		cloud_inference_secret.NewCloudInferenceSecretsDataSource,
 		cloud_placement_group.NewCloudPlacementGroupDataSource,
 		cloud_instance_image.NewCloudInstanceImageDataSource,
 	}

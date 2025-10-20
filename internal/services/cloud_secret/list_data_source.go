@@ -1,6 +1,6 @@
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 
-package cloud_inference_secret
+package cloud_secret
 
 import (
 	"context"
@@ -13,21 +13,21 @@ import (
 	"github.com/stainless-sdks/gcore-terraform/internal/customfield"
 )
 
-type CloudInferenceSecretsDataSource struct {
+type CloudSecretsDataSource struct {
 	client *gcore.Client
 }
 
-var _ datasource.DataSourceWithConfigure = (*CloudInferenceSecretsDataSource)(nil)
+var _ datasource.DataSourceWithConfigure = (*CloudSecretsDataSource)(nil)
 
-func NewCloudInferenceSecretsDataSource() datasource.DataSource {
-	return &CloudInferenceSecretsDataSource{}
+func NewCloudSecretsDataSource() datasource.DataSource {
+	return &CloudSecretsDataSource{}
 }
 
-func (d *CloudInferenceSecretsDataSource) Metadata(ctx context.Context, req datasource.MetadataRequest, resp *datasource.MetadataResponse) {
-	resp.TypeName = req.ProviderTypeName + "_cloud_inference_secrets"
+func (d *CloudSecretsDataSource) Metadata(ctx context.Context, req datasource.MetadataRequest, resp *datasource.MetadataResponse) {
+	resp.TypeName = req.ProviderTypeName + "_cloud_secrets"
 }
 
-func (d *CloudInferenceSecretsDataSource) Configure(ctx context.Context, req datasource.ConfigureRequest, resp *datasource.ConfigureResponse) {
+func (d *CloudSecretsDataSource) Configure(ctx context.Context, req datasource.ConfigureRequest, resp *datasource.ConfigureResponse) {
 	if req.ProviderData == nil {
 		return
 	}
@@ -46,8 +46,8 @@ func (d *CloudInferenceSecretsDataSource) Configure(ctx context.Context, req dat
 	d.client = client
 }
 
-func (d *CloudInferenceSecretsDataSource) Read(ctx context.Context, req datasource.ReadRequest, resp *datasource.ReadResponse) {
-	var data *CloudInferenceSecretsDataSourceModel
+func (d *CloudSecretsDataSource) Read(ctx context.Context, req datasource.ReadRequest, resp *datasource.ReadResponse) {
+	var data *CloudSecretsDataSourceModel
 
 	resp.Diagnostics.Append(req.Config.Get(ctx, &data)...)
 
@@ -61,13 +61,13 @@ func (d *CloudInferenceSecretsDataSource) Read(ctx context.Context, req datasour
 		return
 	}
 
-	env := CloudInferenceSecretsResultsListDataSourceEnvelope{}
+	env := CloudSecretsResultsListDataSourceEnvelope{}
 	maxItems := int(data.MaxItems.ValueInt64())
 	acc := []attr.Value{}
 	if maxItems <= 0 {
 		maxItems = 1000
 	}
-	page, err := d.client.Cloud.Inference.Secrets.List(ctx, params)
+	page, err := d.client.Cloud.Secrets.List(ctx, params)
 	if err != nil {
 		resp.Diagnostics.AddError("failed to make http request", err.Error())
 		return
@@ -92,7 +92,7 @@ func (d *CloudInferenceSecretsDataSource) Read(ctx context.Context, req datasour
 	}
 
 	acc = acc[:min(len(acc), maxItems)]
-	result, diags := customfield.NewObjectListFromAttributes[CloudInferenceSecretsItemsDataSourceModel](ctx, acc)
+	result, diags := customfield.NewObjectListFromAttributes[CloudSecretsItemsDataSourceModel](ctx, acc)
 	resp.Diagnostics.Append(diags...)
 	data.Items = result
 

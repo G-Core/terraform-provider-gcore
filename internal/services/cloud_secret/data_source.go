@@ -1,6 +1,6 @@
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 
-package cloud_inference_secret
+package cloud_secret
 
 import (
 	"context"
@@ -15,21 +15,21 @@ import (
 	"github.com/stainless-sdks/gcore-terraform/internal/logging"
 )
 
-type CloudInferenceSecretDataSource struct {
+type CloudSecretDataSource struct {
 	client *gcore.Client
 }
 
-var _ datasource.DataSourceWithConfigure = (*CloudInferenceSecretDataSource)(nil)
+var _ datasource.DataSourceWithConfigure = (*CloudSecretDataSource)(nil)
 
-func NewCloudInferenceSecretDataSource() datasource.DataSource {
-	return &CloudInferenceSecretDataSource{}
+func NewCloudSecretDataSource() datasource.DataSource {
+	return &CloudSecretDataSource{}
 }
 
-func (d *CloudInferenceSecretDataSource) Metadata(ctx context.Context, req datasource.MetadataRequest, resp *datasource.MetadataResponse) {
-	resp.TypeName = req.ProviderTypeName + "_cloud_inference_secret"
+func (d *CloudSecretDataSource) Metadata(ctx context.Context, req datasource.MetadataRequest, resp *datasource.MetadataResponse) {
+	resp.TypeName = req.ProviderTypeName + "_cloud_secret"
 }
 
-func (d *CloudInferenceSecretDataSource) Configure(ctx context.Context, req datasource.ConfigureRequest, resp *datasource.ConfigureResponse) {
+func (d *CloudSecretDataSource) Configure(ctx context.Context, req datasource.ConfigureRequest, resp *datasource.ConfigureResponse) {
 	if req.ProviderData == nil {
 		return
 	}
@@ -48,8 +48,8 @@ func (d *CloudInferenceSecretDataSource) Configure(ctx context.Context, req data
 	d.client = client
 }
 
-func (d *CloudInferenceSecretDataSource) Read(ctx context.Context, req datasource.ReadRequest, resp *datasource.ReadResponse) {
-	var data *CloudInferenceSecretDataSourceModel
+func (d *CloudSecretDataSource) Read(ctx context.Context, req datasource.ReadRequest, resp *datasource.ReadResponse) {
+	var data *CloudSecretDataSourceModel
 
 	resp.Diagnostics.Append(req.Config.Get(ctx, &data)...)
 
@@ -64,9 +64,9 @@ func (d *CloudInferenceSecretDataSource) Read(ctx context.Context, req datasourc
 	}
 
 	res := new(http.Response)
-	_, err := d.client.Cloud.Inference.Secrets.Get(
+	_, err := d.client.Cloud.Secrets.Get(
 		ctx,
-		data.SecretName.ValueString(),
+		data.SecretID.ValueString(),
 		params,
 		option.WithResponseBodyInto(&res),
 		option.WithMiddleware(logging.Middleware(ctx)),
