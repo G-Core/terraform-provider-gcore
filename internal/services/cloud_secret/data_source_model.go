@@ -14,6 +14,7 @@ import (
 )
 
 type CloudSecretDataSourceModel struct {
+	ID           types.String                  `tfsdk:"id" path:"secret_id,computed"`
 	SecretID     types.String                  `tfsdk:"secret_id" path:"secret_id,required"`
 	ProjectID    types.Int64                   `tfsdk:"project_id" path:"project_id,optional"`
 	RegionID     types.Int64                   `tfsdk:"region_id" path:"region_id,optional"`
@@ -21,7 +22,6 @@ type CloudSecretDataSourceModel struct {
 	BitLength    types.Int64                   `tfsdk:"bit_length" json:"bit_length,computed"`
 	Created      timetypes.RFC3339             `tfsdk:"created" json:"created,computed" format:"date-time"`
 	Expiration   timetypes.RFC3339             `tfsdk:"expiration" json:"expiration,computed" format:"date-time"`
-	ID           types.String                  `tfsdk:"id" json:"id,computed"`
 	Mode         types.String                  `tfsdk:"mode" json:"mode,computed"`
 	Name         types.String                  `tfsdk:"name" json:"name,computed"`
 	SecretType   types.String                  `tfsdk:"secret_type" json:"secret_type,computed"`

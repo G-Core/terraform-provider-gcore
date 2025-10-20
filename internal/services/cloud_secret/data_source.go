@@ -81,6 +81,7 @@ func (d *CloudSecretDataSource) Read(ctx context.Context, req datasource.ReadReq
 		resp.Diagnostics.AddError("failed to deserialize http request", err.Error())
 		return
 	}
+	data.ID = data.SecretID
 
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
 }

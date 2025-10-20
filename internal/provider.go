@@ -155,6 +155,7 @@ func (p *GcoreProvider) ConfigValidators(_ context.Context) []provider.ConfigVal
 
 func (p *GcoreProvider) Resources(ctx context.Context) []func() resource.Resource {
 	return []func() resource.Resource{
+		cloud_secret.NewResource,
 		cloud_ssh_key.NewResource,
 		cloud_load_balancer.NewResource,
 		cloud_load_balancer_listener.NewResource,
