@@ -109,7 +109,7 @@ This example demonstrates how to create a baremetal GPU cluster with VAST file s
 ```terraform
 resource "gcore_file_share" "file_share_vast" {
   name       = "tf-file-share-vast"
-  size       = 1
+  size       = 100  # Size in GiB
   project_id = data.gcore_project.pr.id
   region_id  = data.gcore_region.rg.id
   type_name  = "vast"
@@ -133,13 +133,16 @@ resource "gcore_ai_cluster" "gpu_cluster" {
   flavor = "bm3-ai-1xlarge-h200-141-8"
   image_id = "18126da2-261a-4e56-a059-82e71477bada"
   cluster_name = "my-gpu-cluster-for-vast"
-  keypair_name = "qa-prod-tk-def"
+  keypair_name = "my-keypair"
   instances_count = 1
 
   interface {
     type = "external"
   }
 
+  // This interface is required to ensure that the AI cluster
+  // is connected to the same network as the file share.
+  // Without it, mounting the NFS share will fail.
   interface {
     type = "subnet"
     network_id = gcore_file_share.file_share_vast.network[0].network_id
