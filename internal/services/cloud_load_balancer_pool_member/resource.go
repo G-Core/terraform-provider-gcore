@@ -100,7 +100,72 @@ func (r *CloudLoadBalancerPoolMemberResource) Update(ctx context.Context, req re
 }
 
 func (r *CloudLoadBalancerPoolMemberResource) Read(ctx context.Context, req resource.ReadRequest, resp *resource.ReadResponse) {
+	var data *CloudLoadBalancerPoolMemberModel
 
+	resp.Diagnostics.Append(req.State.Get(ctx, &data)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
+
+	// If ID is null or empty, skip the read
+	if data.ID.IsNull() || data.ID.ValueString() == "" {
+		return
+	}
+
+	params := cloud.LoadBalancerPoolGetParams{}
+
+	if !data.ProjectID.IsNull() {
+		params.ProjectID = param.NewOpt(data.ProjectID.ValueInt64())
+	}
+
+	if !data.RegionID.IsNull() {
+		params.RegionID = param.NewOpt(data.RegionID.ValueInt64())
+	}
+
+	// Get the pool to access its members list
+	pool, err := r.client.Cloud.LoadBalancers.Pools.Get(
+		ctx,
+		data.PoolID.ValueString(),
+		params,
+		option.WithMiddleware(logging.Middleware(ctx)),
+	)
+	if err != nil {
+		resp.Diagnostics.AddError("failed to get load balancer pool", err.Error())
+		return
+	}
+	if pool == nil {
+		resp.Diagnostics.AddError("unexpected nil response", "SDK returned nil pool")
+		return
+	}
+
+	// Find the member in the pool's members list
+	memberID := data.ID.ValueString()
+	found := false
+
+	for _, member := range pool.Members {
+		if member.ID == memberID {
+			// Update the data model with the member's current state
+			err = apijson.UnmarshalComputed([]byte(member.RawJSON()), &data)
+			if err != nil {
+				resp.Diagnostics.AddError("failed to deserialize member data", err.Error())
+				return
+			}
+			found = true
+			break
+		}
+	}
+
+	if !found {
+		// Member not found in pool - remove from state
+		resp.Diagnostics.AddWarning("Member not found",
+			fmt.Sprintf("Load balancer pool member with ID %s not found in pool %s. Removing from state.",
+				memberID, data.PoolID.ValueString()))
+		resp.State.RemoveResource(ctx)
+		return
+	}
+
+	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
 }
 
 func (r *CloudLoadBalancerPoolMemberResource) Delete(ctx context.Context, req resource.DeleteRequest, resp *resource.DeleteResponse) {
