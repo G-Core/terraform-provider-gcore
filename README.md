@@ -34,11 +34,16 @@ provider "gcore" {
 }
 
 # Configure a resource
-resource "gcore_cloud_ssh_key" "example_cloud_ssh_key" {
+resource "gcore_cloud_secret" "example_cloud_secret" {
   project_id = 1
-  name = "my-ssh-key"
-  public_key = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIIjxL6g1II8NsO8odvBwGKvq2Dx/h/xrvsV9b9LVIYKm my-username@my-hostname"
-  shared_in_project = true
+  region_id = 1
+  name = "Load balancer certificate #1"
+  payload = {
+    certificate = "<certificate>"
+    certificate_chain = "<certificate_chain>"
+    private_key = "<private_key>"
+  }
+  expiration = "2019-12-27T18:11:19.117Z"
 }
 ```
 

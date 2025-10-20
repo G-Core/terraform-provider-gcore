@@ -19,6 +19,10 @@ var _ datasource.DataSourceWithConfigValidators = (*CloudSecretDataSource)(nil)
 func DataSourceSchema(ctx context.Context) schema.Schema {
 	return schema.Schema{
 		Attributes: map[string]schema.Attribute{
+			"id": schema.StringAttribute{
+				Description: "Secret ID",
+				Computed:    true,
+			},
 			"secret_id": schema.StringAttribute{
 				Description: "Secret ID",
 				Required:    true,
@@ -48,10 +52,6 @@ func DataSourceSchema(ctx context.Context) schema.Schema {
 				Description: "Datetime when the secret will expire. The format is 2020-01-01T12:00:00+00:00. Defaults to None",
 				Computed:    true,
 				CustomType:  timetypes.RFC3339Type{},
-			},
-			"id": schema.StringAttribute{
-				Description: "Secret uuid",
-				Computed:    true,
 			},
 			"mode": schema.StringAttribute{
 				Description: "Metadata provided by a user or system for informational purposes. Defaults to None",
