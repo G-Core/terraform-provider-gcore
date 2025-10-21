@@ -25,8 +25,8 @@ import (
 )
 
 const (
-	AIClusterDeletingTimeout int = 1200
-	AIClusterCreatingTimeout int = 1200
+	AIClusterDeletingTimeout int = 7200
+	AIClusterCreatingTimeout int = 7200
 	AIClusterSuspendTimeout  int = 300
 
 	AIClusterPoint    = "ai/clusters"
