@@ -31,6 +31,7 @@ provider "gcore" {
   cloud_project_id = 0 # or set GCORE_CLOUD_PROJECT_ID env variable
   cloud_region_id = 0 # or set GCORE_CLOUD_REGION_ID env variable
   cloud_polling_interval_seconds = 0
+  cloud_polling_timeout_seconds = 0
 }
 
 # Configure a resource
@@ -62,6 +63,7 @@ If an environment variable is provided, then the option does not need to be set 
 | api_key                        | `GCORE_API_KEY`          | true     | —             |
 | cloud_region_id                | `GCORE_CLOUD_REGION_ID`  | false    | —             |
 | cloud_project_id               | `GCORE_CLOUD_PROJECT_ID` | false    | —             |
+| cloud_polling_timeout_seconds  | -                        | false    | `7200`        |
 | cloud_polling_interval_seconds | -                        | false    | `3`           |
 
 ## Semantic versioning

@@ -52,6 +52,7 @@ type GcoreProviderModel struct {
 	CloudProjectID              types.Int64  `tfsdk:"cloud_project_id" json:"cloud_project_id,optional"`
 	CloudRegionID               types.Int64  `tfsdk:"cloud_region_id" json:"cloud_region_id,optional"`
 	CloudPollingIntervalSeconds types.Int64  `tfsdk:"cloud_polling_interval_seconds" json:"cloud_polling_interval_seconds,optional"`
+	CloudPollingTimeoutSeconds  types.Int64  `tfsdk:"cloud_polling_timeout_seconds" json:"cloud_polling_timeout_seconds,optional"`
 }
 
 func (p *GcoreProvider) Metadata(ctx context.Context, req provider.MetadataRequest, resp *provider.MetadataResponse) {
@@ -76,6 +77,9 @@ func ProviderSchema(ctx context.Context) schema.Schema {
 				Optional: true,
 			},
 			"cloud_polling_interval_seconds": schema.Int64Attribute{
+				Optional: true,
+			},
+			"cloud_polling_timeout_seconds": schema.Int64Attribute{
 				Optional: true,
 			},
 		},
@@ -139,6 +143,12 @@ func (p *GcoreProvider) Configure(ctx context.Context, req provider.ConfigureReq
 		opts = append(opts, option.WithCloudPollingIntervalSeconds(data.CloudPollingIntervalSeconds.ValueInt64()))
 	} else {
 		opts = append(opts, option.WithCloudPollingIntervalSeconds(3))
+	}
+
+	if !data.CloudPollingTimeoutSeconds.IsNull() && !data.CloudPollingTimeoutSeconds.IsUnknown() {
+		opts = append(opts, option.WithCloudPollingTimeoutSeconds(data.CloudPollingTimeoutSeconds.ValueInt64()))
+	} else {
+		opts = append(opts, option.WithCloudPollingTimeoutSeconds(7200))
 	}
 
 	client := gcore.NewClient(
