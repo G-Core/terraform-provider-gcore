@@ -150,6 +150,7 @@ func (p *GcoreProvider) Configure(ctx context.Context, req provider.ConfigureReq
 	} else {
 		opts = append(opts, option.WithCloudPollingTimeoutSeconds(7200))
 	}
+
 	// Override Go SDK max retries to 4 from 2 which is the default.
 	// The max delay is capped at 8 secs, so the maximum value for max retries is 4.
 	opts = append(opts, option.WithMaxRetries(4))
