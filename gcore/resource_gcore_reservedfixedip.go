@@ -378,13 +378,19 @@ func resourceReservedFixedIPUpdate(ctx context.Context, d *schema.ResourceData, 
 
 	if d.HasChange("allowed_address_pairs") {
 		aap := d.Get("allowed_address_pairs").([]interface{})
-		allowedAddressPairs := make([]reservedfixedips.AllowedAddressPairs, len(aap))
-		for i, p := range aap {
+		allowedAddressPairs := make([]reservedfixedips.AllowedAddressPairs, 0, len(aap))
+
+		for _, p := range aap {
 			pair := p.(map[string]interface{})
-			allowedAddressPairs[i] = reservedfixedips.AllowedAddressPairs{
-				IPAddress:  pair["ip_address"].(string),
-				MacAddress: pair["mac_address"].(string),
+			aap := reservedfixedips.AllowedAddressPairs{
+				IPAddress: pair["ip_address"].(string),
 			}
+
+			if macAddress, ok := pair["mac_address"].(string); ok && macAddress != "" {
+				aap.MacAddress = macAddress
+			}
+
+			allowedAddressPairs = append(allowedAddressPairs, aap)
 		}
 
 		clientPort, err := CreateClient(provider, d, portsPoint, versionPointV2)
