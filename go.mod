@@ -5,7 +5,7 @@ go 1.23.0
 toolchain go1.23.9
 
 require (
-	github.com/G-Core/gcore-go v0.16.0
+	github.com/G-Core/gcore-go v0.16.1-0.20241020000000-000000000000
 	github.com/davecgh/go-spew v1.1.1
 	github.com/hashicorp/terraform-plugin-docs v0.16.0
 	github.com/hashicorp/terraform-plugin-framework v1.15.0
@@ -75,3 +75,5 @@ require (
 	google.golang.org/grpc v1.72.1 // indirect
 	google.golang.org/protobuf v1.36.6 // indirect
 )
+
+replace github.com/G-Core/gcore-go => github.com/stainless-sdks/gcore-go v0.0.0-20251020103714-4267ffd4fa26

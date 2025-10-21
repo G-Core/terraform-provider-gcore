@@ -80,20 +80,19 @@ func (r *CloudSecretResource) Create(ctx context.Context, req resource.CreateReq
 		resp.Diagnostics.AddError("failed to serialize http request", err.Error())
 		return
 	}
-	res := new(http.Response)
-	_, err = r.client.Cloud.Secrets.UploadTlsCertificate(
+
+	secret, err := r.client.Cloud.Secrets.UploadTlsCertificateAndPoll(
 		ctx,
 		params,
 		option.WithRequestBody("application/json", dataBytes),
-		option.WithResponseBodyInto(&res),
 		option.WithMiddleware(logging.Middleware(ctx)),
 	)
 	if err != nil {
 		resp.Diagnostics.AddError("failed to make http request", err.Error())
 		return
 	}
-	bytes, _ := io.ReadAll(res.Body)
-	err = apijson.UnmarshalComputed(bytes, &data)
+
+	err = apijson.UnmarshalComputed([]byte(secret.RawJSON()), &data)
 	if err != nil {
 		resp.Diagnostics.AddError("failed to deserialize http request", err.Error())
 		return
@@ -171,7 +170,7 @@ func (r *CloudSecretResource) Delete(ctx context.Context, req resource.DeleteReq
 		params.RegionID = param.NewOpt(data.RegionID.ValueInt64())
 	}
 
-	_, err := r.client.Cloud.Secrets.Delete(
+	err := r.client.Cloud.Secrets.DeleteAndPoll(
 		ctx,
 		data.ID.ValueString(),
 		params,
