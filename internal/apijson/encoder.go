@@ -181,7 +181,6 @@ func (e *encoder) newTypeEncoder(t reflect.Type) encoderFunc {
 	case reflect.Pointer:
 		inner := t.Elem()
 
-		innerEncoder := e.typeEncoder(inner)
 		return func(p reflect.Value, s reflect.Value) ([]byte, error) {
 			// if we end up accessing missing fields/properties, we might end up with an invalid
 			// reflect value. In that case, we just initialize it to a nil pointer of that type.
@@ -200,11 +199,21 @@ func (e *encoder) newTypeEncoder(t reflect.Type) encoderFunc {
 			if !s.IsNil() && p.IsNil() {
 				return explicitJsonNull, nil
 			}
-			// if state is nil, then there is no value to unset. we still have to pass
-			// some value in for state, so we pass in the plan value so it marshals as-is
+
+			// If state is nil, then there is no value to unset. We still have to pass some value in for state, so
+			// we pass in the plan value so it marshals as-is.
 			if s.IsNil() {
 				s = reflect.New(p.Type().Elem())
+
+				// If we're patching, then we force serializing the plan as a non-patch. Otherwise, if the plan is the
+				// zero value of the inner type, then it wouldn't be included (because we are setting a zero value
+				// state above) when it should be.
+				previousPatch := e.patch
+				e.patch = false
+				defer func() { e.patch = previousPatch }()
 			}
+
+			innerEncoder := e.typeEncoder(inner)
 			return innerEncoder(p.Elem(), s.Elem())
 		}
 	case reflect.Struct:
@@ -419,25 +428,25 @@ func UnwrapTerraformAttrValue(ctx context.Context, value attr.Value) (out any, d
 		return o, d
 	case basetypes.BoolValuable:
 		v, d := val.ToBoolValue(ctx)
-		return v.ValueBool(), d
+		return v.ValueBoolPointer(), d
 	case basetypes.Int32Valuable:
 		v, d := val.ToInt32Value(ctx)
-		return v.ValueInt32(), d
+		return v.ValueInt32Pointer(), d
 	case basetypes.Int64Valuable:
 		v, d := val.ToInt64Value(ctx)
-		return v.ValueInt64(), d
+		return v.ValueInt64Pointer(), d
 	case basetypes.Float32Valuable:
 		v, d := val.ToFloat32Value(ctx)
-		return v.ValueFloat32(), d
+		return v.ValueFloat32Pointer(), d
 	case basetypes.Float64Valuable:
 		v, d := val.ToFloat64Value(ctx)
-		return v.ValueFloat64(), d
+		return v.ValueFloat64Pointer(), d
 	case basetypes.NumberValue:
 		v, d := val.ToNumberValue(ctx)
 		return v.ValueBigFloat(), d
 	case basetypes.StringValue:
 		v, d := val.ToStringValue(ctx)
-		return v.ValueString(), d
+		return v.ValueStringPointer(), d
 	case basetypes.TupleValue:
 		return val.Elements(), nil
 	case basetypes.ListValuable:
@@ -461,16 +470,17 @@ func UnwrapTerraformAttrValue(ctx context.Context, value attr.Value) (out any, d
 func (e encoder) newTerraformTypeEncoder(t reflect.Type) encoderFunc {
 	ctx := context.TODO()
 
+	// Note that we use pointers for primitives so that we can distinguish between a zero and omitted value.
 	if t == reflect.TypeOf(basetypes.BoolValue{}) {
-		return e.terraformUnwrappedEncoder(reflect.TypeOf(true), func(value attr.Value) (any, diag.Diagnostics) {
+		return e.terraformUnwrappedEncoder(reflect.PointerTo(reflect.TypeOf(true)), func(value attr.Value) (any, diag.Diagnostics) {
 			return UnwrapTerraformAttrValue(ctx, value)
 		})
 	} else if t == reflect.TypeOf(basetypes.Int64Value{}) {
-		return e.terraformUnwrappedEncoder(reflect.TypeOf(int64(0)), func(value attr.Value) (any, diag.Diagnostics) {
+		return e.terraformUnwrappedEncoder(reflect.PointerTo(reflect.TypeOf(int64(0))), func(value attr.Value) (any, diag.Diagnostics) {
 			return UnwrapTerraformAttrValue(ctx, value)
 		})
 	} else if t == reflect.TypeOf(basetypes.Float64Value{}) {
-		return e.terraformUnwrappedEncoder(reflect.TypeOf(float64(0)), func(value attr.Value) (any, diag.Diagnostics) {
+		return e.terraformUnwrappedEncoder(reflect.PointerTo(reflect.TypeOf(float64(0))), func(value attr.Value) (any, diag.Diagnostics) {
 			return UnwrapTerraformAttrValue(ctx, value)
 		})
 	} else if t == reflect.TypeOf(basetypes.NumberValue{}) {
@@ -478,7 +488,7 @@ func (e encoder) newTerraformTypeEncoder(t reflect.Type) encoderFunc {
 			return UnwrapTerraformAttrValue(ctx, value)
 		})
 	} else if t == reflect.TypeOf(basetypes.StringValue{}) {
-		return e.terraformUnwrappedEncoder(reflect.TypeOf(""), func(value attr.Value) (any, diag.Diagnostics) {
+		return e.terraformUnwrappedEncoder(reflect.PointerTo(reflect.TypeOf("")), func(value attr.Value) (any, diag.Diagnostics) {
 			return UnwrapTerraformAttrValue(ctx, value)
 		})
 	} else if t == reflect.TypeOf(timetypes.RFC3339{}) {
