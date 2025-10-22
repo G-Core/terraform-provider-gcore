@@ -72,7 +72,7 @@ resource "gcore_cloud_security_group" "example_cloud_security_group" {
 - `region` (String) Region name
 - `revision_number` (Number) The number of revisions
 - `security_group_rules` (Attributes List) Security group rules (see [below for nested schema](#nestedatt--security_group_rules))
-- `tags_v2` (Attributes List) Tags for a security group (see [below for nested schema](#nestedatt--tags_v2))
+- `tags_v2` (Attributes List) List of key-value tags associated with the resource. A tag is a key-value pair that can be associated with a resource, enabling efficient filtering and grouping for better organization and management. Some tags are read-only and cannot be modified by the user. Tags are also integrated with cost reports, allowing cost data to be filtered based on tag keys or values. (see [below for nested schema](#nestedatt--tags_v2))
 - `updated_at` (String) Datetime when the security group was last updated
 
 <a id="nestedatt--changed_rules"></a>
