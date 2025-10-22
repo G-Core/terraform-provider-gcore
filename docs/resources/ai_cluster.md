@@ -47,6 +47,13 @@ resource "gcore_keypair" "keypair" {
   sshkey_name = "my-keypair"
   public_key  = "ssh-ed25519 ...your public key... gcore@gcore.com"
 }
+
+data "gcore_file_share" "vast" {
+  name = "my-files-share"
+
+  project_id = data.gcore_project.project.id
+  region_id  = data.gcore_region.region.id
+}
 ```
 
 ### Basic example
@@ -107,13 +114,6 @@ resource "gcore_ai_cluster" "gpu_cluster" {
 This example demonstrates how to create a baremetal GPU cluster with VAST file share manual mount. First you need to create VAST file share and then cluster
 
 ```terraform
-data "gcore_file_share" "vast" {
-  name = "my-files-share"
-
-  project_id = data.gcore_project.pr.id
-  region_id  = data.gcore_region.rg.id
-}
-
 resource "gcore_ai_cluster" "gpu_cluster" {
   flavor          = "bm3-ai-1xlarge-h200-141-8"
   image_id        = "aab83c98-7c9c-4942-a488-6c8b63dd42bd"
@@ -147,8 +147,8 @@ resource "gcore_ai_cluster" "gpu_cluster" {
     my-metadata-key = "my-metadata-value"
   }
 
-  project_id = data.gcore_project.pr.id
-  region_id  = data.gcore_region.rg.id
+  project_id = data.gcore_project.project.id
+  region_id  = data.gcore_region.region.id
 }
 ```
 

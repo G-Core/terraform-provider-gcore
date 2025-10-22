@@ -1,10 +1,3 @@
-data "gcore_file_share" "vast" {
-  name = "my-files-share"
-
-  project_id = data.gcore_project.pr.id
-  region_id  = data.gcore_region.rg.id
-}
-
 resource "gcore_ai_cluster" "gpu_cluster" {
   flavor          = "bm3-ai-1xlarge-h200-141-8"
   image_id        = "aab83c98-7c9c-4942-a488-6c8b63dd42bd"
@@ -38,6 +31,6 @@ resource "gcore_ai_cluster" "gpu_cluster" {
     my-metadata-key = "my-metadata-value"
   }
 
-  project_id = data.gcore_project.pr.id
-  region_id  = data.gcore_region.rg.id
+  project_id = data.gcore_project.project.id
+  region_id  = data.gcore_region.region.id
 }
