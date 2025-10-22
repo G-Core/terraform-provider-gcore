@@ -27,7 +27,7 @@ import (
 
 var encoders sync.Map // map[encoderEntry]encoderFunc
 
-func MarshalRoot(value interface{}, writer *multipart.Writer) error {
+func MarshalRoot(value any, writer *multipart.Writer) error {
 	e := &encoder{root: true, dateFormat: time.RFC3339}
 	return e.marshal(value, writer)
 }
@@ -51,7 +51,7 @@ type encoderEntry struct {
 	root       bool
 }
 
-func (e *encoder) marshal(value interface{}, writer *multipart.Writer) error {
+func (e *encoder) marshal(value any, writer *multipart.Writer) error {
 	val := reflect.ValueOf(value)
 	if !val.IsValid() {
 		return nil

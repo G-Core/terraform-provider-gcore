@@ -34,19 +34,19 @@ var EscapeSJSONKey = strings.NewReplacer("\\", "\\\\", "|", "\\|", "#", "\\#", "
 // CustomMarshaler allows types to override their JSON encoding behavior while supporting
 // plan/state diffing for Terraform operations. This is checked before standard encoding.
 type CustomMarshaler interface {
-	MarshalJSONWithState(plan interface{}, state interface{}) ([]byte, error)
+	MarshalJSONWithState(plan any, state any) ([]byte, error)
 }
 
 // Marshals the given data to a JSON string.
 // For null values, omits the property entirely.
-func Marshal(value interface{}) ([]byte, error) {
+func Marshal(value any) ([]byte, error) {
 	e := &encoder{dateFormat: time.RFC3339}
 	return e.marshal(value, value)
 }
 
 // Marshals the given plan data to a JSON string.
 // For null values, omits the property unless the corresponding state value was set.
-func MarshalForUpdate(plan interface{}, state interface{}) ([]byte, error) {
+func MarshalForUpdate(plan any, state any) ([]byte, error) {
 	e := &encoder{root: true, dateFormat: time.RFC3339}
 	return e.marshal(plan, state)
 }
@@ -54,12 +54,12 @@ func MarshalForUpdate(plan interface{}, state interface{}) ([]byte, error) {
 // Marshals the given plan data to a JSON string.
 // Only serializes properties that changed from the state.
 // https://datatracker.ietf.org/doc/html/rfc7386
-func MarshalForPatch(plan interface{}, state interface{}) ([]byte, error) {
+func MarshalForPatch(plan any, state any) ([]byte, error) {
 	e := &encoder{root: true, dateFormat: time.RFC3339, patch: true}
 	return e.marshal(plan, state)
 }
 
-func MarshalRoot(value interface{}) ([]byte, error) {
+func MarshalRoot(value any) ([]byte, error) {
 	e := &encoder{root: true, dateFormat: time.RFC3339}
 	return e.marshal(value, value)
 }
@@ -97,7 +97,7 @@ func errorFromDiagnostics(diags diag.Diagnostics) error {
 	return errors.New(strings.Join(messages, " "))
 }
 
-func (e *encoder) marshal(plan interface{}, state interface{}) ([]byte, error) {
+func (e *encoder) marshal(plan any, state any) ([]byte, error) {
 	planVal := reflect.ValueOf(plan)
 	stateVal := reflect.ValueOf(state)
 	if !planVal.IsValid() {
@@ -156,7 +156,7 @@ func (e *encoder) newTypeEncoder(t reflect.Type) encoderFunc {
 				return nil, nil
 			}
 			marshaler := plan.Interface().(CustomMarshaler)
-			var stateVal interface{}
+			var stateVal any
 			if state.IsValid() {
 				stateVal = state.Interface()
 			}
