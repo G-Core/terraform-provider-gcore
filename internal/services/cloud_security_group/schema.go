@@ -40,9 +40,15 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 				Optional:      true,
 				PlanModifiers: []planmodifier.Int64{int64planmodifier.RequiresReplace()},
 			},
+			"instances": schema.ListAttribute{
+				Description:   "List of instances",
+				Optional:      true,
+				ElementType:   types.StringType,
+				PlanModifiers: []planmodifier.List{listplanmodifier.RequiresReplace()},
+			},
 			"security_group": schema.SingleNestedAttribute{
 				Description: "Security group",
-				Required:    true,
+				Optional:    true,
 				Attributes: map[string]schema.Attribute{
 					"name": schema.StringAttribute{
 						Description: "Security group name",
@@ -139,12 +145,6 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 					},
 				},
 				PlanModifiers: []planmodifier.Object{objectplanmodifier.RequiresReplace()},
-			},
-			"instances": schema.ListAttribute{
-				Description:   "List of instances",
-				Optional:      true,
-				ElementType:   types.StringType,
-				PlanModifiers: []planmodifier.List{listplanmodifier.RequiresReplace()},
 			},
 			"name": schema.StringAttribute{
 				Description: "Name",
