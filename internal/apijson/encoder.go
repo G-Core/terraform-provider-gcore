@@ -407,7 +407,13 @@ func (e encoder) handleNullAndUndefined(innerFunc func(attr.Value, attr.Value) (
 // safeCollectionElements safely extracts elements from List, Tuple, or Set values
 // This prevents panics when plan and state have different collection types
 func UnwrapTerraformAttrValue(value attr.Value) (out any, diags diag.Diagnostics) {
+	if value == nil {
+		return nil, diags
+	}
+
 	switch v := value.(type) {
+	case basetypes.DynamicValue:
+		return UnwrapTerraformAttrValue(v.UnderlyingValue())
 	case basetypes.BoolValue:
 		return v.ValueBool(), nil
 	case basetypes.Int32Value:
@@ -433,13 +439,12 @@ func UnwrapTerraformAttrValue(value attr.Value) (out any, diags diag.Diagnostics
 	case basetypes.ObjectValue:
 		return v.Attributes(), nil
 	default:
-		diags.AddError("unknown type received at terraform encoder", fmt.Sprintf("received: %s", value.Type(context.TODO())))
+		diags.AddError("unknown type received at unwrap terraform encoder", fmt.Sprintf("received: %s", value.Type(context.TODO())))
 		return nil, diags
 	}
 }
 
 func (e encoder) newTerraformTypeEncoder(t reflect.Type) encoderFunc {
-
 	if t == reflect.TypeOf(basetypes.BoolValue{}) {
 		return e.terraformUnwrappedEncoder(reflect.TypeOf(true), func(value attr.Value) (any, diag.Diagnostics) {
 			return UnwrapTerraformAttrValue(value)
@@ -676,39 +681,63 @@ func (e encoder) newInterfaceEncoder() encoderFunc {
 	}
 }
 
-// Given a []byte of json (may either be an empty object or an object that already contains entries)
-// encode all of the entries in the map to the json byte array.
-func (e *encoder) encodeMapEntries(json []byte, plan reflect.Value, _ reflect.Value) ([]byte, error) {
-	// We do not implement "patch" behavior for maps because it is conceptually treated as a single "value"
-	// that should get updated all at once (similar to how arrays work). Technically this is not specified
-	// in rfc7386, but it is the most intuitive behavior for maps.
-	prevPatch := e.patch
-	e.patch = false
-	defer func() { e.patch = prevPatch }()
-
-	type mapPair struct {
-		key  []byte
-		plan reflect.Value
+func encodeKey(key reflect.Value, keyEncoder encoderFunc) (string, error) {
+	if key.Type().Kind() == reflect.String {
+		return key.String(), nil
 	}
 
+	encodedKeyBytes, err := keyEncoder(key, key)
+	if err != nil {
+		return "", err
+	}
+
+	return string(encodedKeyBytes), nil
+}
+
+// Given a []byte of json (may either be an empty object or an object that already contains entries)
+// encode all of the entries in the map to the json byte array.
+func (e *encoder) encodeMapEntries(json []byte, plan reflect.Value, state reflect.Value) ([]byte, error) {
+	type mapPair struct {
+		key   []byte
+		plan  reflect.Value
+		state reflect.Value
+	}
+
+	pairKeys := map[string]bool{}
 	pairs := []mapPair{}
 	keyEncoder := e.typeEncoder(plan.Type().Key())
 
 	iter := plan.MapRange()
 	for iter.Next() {
-		var encodedKeyString string
-		if iter.Key().Type().Kind() == reflect.String {
-			encodedKeyString = iter.Key().String()
-		} else {
-			var err error
-			encodedKeyBytes, err := keyEncoder(iter.Key(), iter.Key())
-			encodedKeyString = string(encodedKeyBytes)
+		encodedKeyString, err := encodeKey(iter.Key(), keyEncoder)
+		if err != nil {
+			return nil, err
+		}
+
+		pairKeys[encodedKeyString] = true
+		encodedKey := []byte(encodedKeyString)
+		pairs = append(pairs, mapPair{key: encodedKey, plan: iter.Value(), state: state.MapIndex(iter.Key())})
+	}
+
+	// When patching a map, we also have to consider keys in the state that aren't in the plan. These keys
+	// should be deleted.
+	if e.patch {
+		iter = state.MapRange()
+		for iter.Next() {
+			encodedKeyString, err := encodeKey(iter.Key(), keyEncoder)
 			if err != nil {
 				return nil, err
 			}
+
+			if _, ok := pairKeys[encodedKeyString]; ok {
+				// We already handled this key when iterating over the plan's keys.
+				continue
+			}
+
+			pairKeys[encodedKeyString] = true
+			encodedKey := []byte(encodedKeyString)
+			pairs = append(pairs, mapPair{key: encodedKey, plan: plan.MapIndex(iter.Key()), state: iter.Value()})
 		}
-		encodedKey := []byte(encodedKeyString)
-		pairs = append(pairs, mapPair{key: encodedKey, plan: iter.Value()})
 	}
 
 	// Ensure deterministic output
@@ -716,9 +745,29 @@ func (e *encoder) encodeMapEntries(json []byte, plan reflect.Value, _ reflect.Va
 		return bytes.Compare(pairs[i].key, pairs[j].key) < 0
 	})
 
-	elementEncoder := e.typeEncoder(plan.Type().Elem())
 	for _, pair := range pairs {
-		encodedValue, err := elementEncoder(pair.plan, pair.plan)
+		var encodedValue []byte
+		var err error
+
+		if pair.plan.IsValid() && pair.state.IsValid() {
+			if e.patch && reflect.DeepEqual(pair.plan.Interface(), pair.state.Interface()) {
+				// We are patching and this key's value didn't change so we can omit it.
+				continue
+			}
+			elementEncoder := e.typeEncoder(plan.Type().Elem())
+			encodedValue, err = elementEncoder(pair.plan, pair.state)
+		} else if pair.plan.IsValid() {
+			// This key exists in the plan, but it doesn't exist in the state. Just encode the full value associated
+			// with this key in the plan.
+			prevPatch := e.patch
+			e.patch = false
+			elementEncoder := e.typeEncoder(plan.Type().Elem())
+			encodedValue, err = elementEncoder(pair.plan, pair.plan)
+			e.patch = prevPatch
+		} else {
+			// This key exists in the state, but not the plan, so we should delete it by sending null (see below).
+			encodedValue = nil
+		}
 		if err != nil {
 			return nil, err
 		}
@@ -746,14 +795,13 @@ func (e *encoder) newMapEncoder(_ reflect.Type) encoderFunc {
 			return explicitJsonNull, nil
 		} else if patch && !stateNil && reflect.DeepEqual(plan.Interface(), state.Interface()) {
 			return nil, nil
+		} else if state.Kind() != plan.Kind() {
+			e.patch = false
+			json, err := e.encodeMapEntries([]byte("{}"), plan, plan)
+			e.patch = patch
+			return json, err
 		}
 
-		json := []byte("{}")
-		var err error
-		json, err = e.encodeMapEntries(json, plan, state)
-		if err != nil {
-			return nil, err
-		}
-		return json, nil
+		return e.encodeMapEntries([]byte("{}"), plan, state)
 	}
 }

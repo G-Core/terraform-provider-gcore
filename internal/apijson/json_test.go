@@ -1171,7 +1171,7 @@ var updateTests = map[string]struct {
 		}),
 		customfield.NewMapMust(ctx, map[string]customfield.List[types.String]{}),
 		`{}`,
-		`{}`,
+		`{"Key1":null,"Key2":null}`,
 	},
 
 	"update to add a key to a custom map": {
@@ -1183,7 +1183,7 @@ var updateTests = map[string]struct {
 			"Key2": DropDiagnostic(customfield.NewList[types.String](ctx, []types.String{basetypes.NewStringValue("Value2")})),
 		}),
 		`{"Key1":["Value1"],"Key2":["Value2"]}`,
-		`{"Key1":["Value1"],"Key2":["Value2"]}`,
+		`{"Key2":["Value2"]}`,
 	},
 
 	"update a nested array in a custom map": {
@@ -1196,7 +1196,7 @@ var updateTests = map[string]struct {
 			"Key2": DropDiagnostic(customfield.NewList[types.String](ctx, []types.String{basetypes.NewStringValue("Value3"), basetypes.NewStringValue("Value2")})),
 		}),
 		`{"Key1":["Value1"],"Key2":["Value3","Value2"]}`,
-		`{"Key1":["Value1"],"Key2":["Value3","Value2"]}`,
+		`{"Key2":["Value3","Value2"]}`,
 	},
 
 	"unset custom map": {
@@ -1217,7 +1217,7 @@ var updateTests = map[string]struct {
 			"Key1": P("Value1"),
 		},
 		`{"Key1":"Value1"}`,
-		`{"Key1":"Value1"}`,
+		`{"Key2":null}`,
 	},
 
 	"set custom object map": {
@@ -1260,7 +1260,7 @@ var updateTests = map[string]struct {
 			},
 		}),
 		`{"OuterKey":{"nested_object_map":{"NestedKey":{"embedded_int":17,"embedded_string":"nested_string_value"}}}}`,
-		`{"OuterKey":{"nested_object_map":{"NestedKey":{"embedded_int":17,"embedded_string":"nested_string_value"}}}}`,
+		`{"OuterKey":{"nested_object_map":{"NestedKey":{"embedded_int":17}}}}`,
 	},
 
 	"encode_state_for_unknown with unknown plan": {
