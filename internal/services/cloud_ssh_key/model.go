@@ -16,7 +16,6 @@ type CloudSSHKeyModel struct {
 	SharedInProject types.Bool        `tfsdk:"shared_in_project" json:"shared_in_project,computed_optional"`
 	CreatedAt       timetypes.RFC3339 `tfsdk:"created_at" json:"created_at,computed" format:"date-time"`
 	Fingerprint     types.String      `tfsdk:"fingerprint" json:"fingerprint,computed"`
-	PrivateKey      types.String      `tfsdk:"private_key" json:"private_key,computed,no_refresh"`
 	State           types.String      `tfsdk:"state" json:"state,computed"`
 }
 

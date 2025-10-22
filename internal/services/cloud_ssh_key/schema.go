@@ -37,7 +37,7 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 				PlanModifiers: []planmodifier.String{stringplanmodifier.RequiresReplace()},
 			},
 			"public_key": schema.StringAttribute{
-				Description:   "The public part of an SSH key is the shareable portion of an SSH key pair. It can be safely sent to servers or services to grant access. It does not contain sensitive information.\n- If you’re uploading your own key, provide the public part here (usually found in a file like `id_ed25519.pub`).\n- If you want the platform to generate an Ed25519 key pair for you, leave this field empty — the system will return the private key in the response **once only**.",
+				Description:   "The public part of an SSH key is the shareable portion of an SSH key pair. It can be safely sent to servers or services to grant access. It does not contain sensitive information. You must provide your own public key (usually found in a file like `id_ed25519.pub` or `id_rsa.pub`). Generate your SSH keypair locally using `ssh-keygen` before providing it here.",
 				Required:      true,
 				PlanModifiers: []planmodifier.String{stringplanmodifier.RequiresReplace()},
 			},
@@ -54,10 +54,6 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 			},
 			"fingerprint": schema.StringAttribute{
 				Description: "Fingerprint",
-				Computed:    true,
-			},
-			"private_key": schema.StringAttribute{
-				Description: "The private part of an SSH key is the confidential portion of the key pair. It should never be shared or exposed. This key is used to prove your identity when connecting to a server. \n\nIf you omit the `public_key`, the platform will generate a key for you. The `private_key` will be returned **once** in the API response. Be sure to save it securely, as it cannot be retrieved again later. \n\nBest practice: Save the private key to a secure location on your machine (e.g., `~/.ssh/id_ed25519`) and set the file permissions to be readable only by you.",
 				Computed:    true,
 			},
 			"state": schema.StringAttribute{
