@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"strings"
 
 	"github.com/G-Core/gcore-go"
 	"github.com/G-Core/gcore-go/cloud"
@@ -131,21 +132,18 @@ func (r *CloudNetworkRouterResource) Update(ctx context.Context, req resource.Up
 		resp.Diagnostics.AddError("failed to serialize http request", err.Error())
 		return
 	}
-	res := new(http.Response)
-	_, err = r.client.Cloud.Networks.Routers.Update(
+	router, err := r.client.Cloud.Networks.Routers.Update(
 		ctx,
 		data.ID.ValueString(),
 		params,
 		option.WithRequestBody("application/json", dataBytes),
-		option.WithResponseBodyInto(&res),
 		option.WithMiddleware(logging.Middleware(ctx)),
 	)
 	if err != nil {
 		resp.Diagnostics.AddError("failed to make http request", err.Error())
 		return
 	}
-	bytes, _ := io.ReadAll(res.Body)
-	err = apijson.UnmarshalComputed(bytes, &data)
+	err = apijson.UnmarshalComputed([]byte(router.RawJSON()), &data)
 	if err != nil {
 		resp.Diagnostics.AddError("failed to deserialize http request", err.Error())
 		return
@@ -173,25 +171,23 @@ func (r *CloudNetworkRouterResource) Read(ctx context.Context, req resource.Read
 		params.RegionID = param.NewOpt(data.RegionID.ValueInt64())
 	}
 
-	res := new(http.Response)
-	_, err := r.client.Cloud.Networks.Routers.Get(
+	router, err := r.client.Cloud.Networks.Routers.Get(
 		ctx,
 		data.ID.ValueString(),
 		params,
-		option.WithResponseBodyInto(&res),
 		option.WithMiddleware(logging.Middleware(ctx)),
 	)
-	if res != nil && res.StatusCode == 404 {
-		resp.Diagnostics.AddWarning("Resource not found", "The resource was not found on the server and will be removed from state.")
-		resp.State.RemoveResource(ctx)
-		return
-	}
 	if err != nil {
+		// Check if it's a 404 error
+		if strings.Contains(err.Error(), "404") {
+			resp.Diagnostics.AddWarning("Resource not found", "The resource was not found on the server and will be removed from state.")
+			resp.State.RemoveResource(ctx)
+			return
+		}
 		resp.Diagnostics.AddError("failed to make http request", err.Error())
 		return
 	}
-	bytes, _ := io.ReadAll(res.Body)
-	err = apijson.Unmarshal(bytes, &data)
+	err = apijson.Unmarshal([]byte(router.RawJSON()), &data)
 	if err != nil {
 		resp.Diagnostics.AddError("failed to deserialize http request", err.Error())
 		return
