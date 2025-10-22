@@ -1,31 +1,25 @@
-resource "gcore_file_share" "file_share_vast" {
-  name       = "tf-file-share-vast"
-  size       = 100  # Size in GiB
+data "gcore_file_share" "vast" {
+  name = "my-files-share"
   project_id = data.gcore_project.pr.id
-  region_id  = data.gcore_region.rg.id
-  type_name  = "vast"
-  protocol   = "NFS"
-}
-
-variable "user_userdata" {
- description = "This is a variable of type string"
- type        = string
- default     = <<EOF
-#cloud-config
-runcmd:
-  - mkdir -p /mount/path
-  - apt-get update -y
-  - apt-get install -y nfs-common
-  - mount -o vers=3,nconnect=56,remoteports=dns,spread_reads,spread_writes,noextend ${resource.gcore_file_share.file_share_vast.connection_point} /mount/path
-EOF
+  region_id  = data.gcore_region.rg.id 
 }
 
 resource "gcore_ai_cluster" "gpu_cluster" {
-  flavor = "bm3-ai-1xlarge-h200-141-8"
-  image_id = "18126da2-261a-4e56-a059-82e71477bada"
-  cluster_name = "my-gpu-cluster-for-vast"
-  keypair_name = "my-keypair"
+  depends_on = [gcore_file_share.file_share_vast]
+  flavor          = "bm3-ai-1xlarge-h200-141-8"
+  image_id        = "aab83c98-7c9c-4942-a488-6c8b63dd42bd"
+  cluster_name    = "gpu-cluster-for-vast"
+  keypair_name    = "my-keypair"
   instances_count = 1
+  user_data = base64encode(<<-EOT
+  #cloud-config
+  runcmd:
+    - mkdir -p /mnt/vast
+    - apt-get update -y
+    - apt-get install -y nfs-common
+    - mount -o vers=3,nconnect=56,remoteports=dns,spread_reads,spread_writes,noextend ${data.gcore_file_share.vast.connection_point} /mnt/vast
+  EOT
+    )
 
   interface {
     type = "external"
@@ -36,15 +30,13 @@ resource "gcore_ai_cluster" "gpu_cluster" {
   // Without it, mounting the NFS share will fail.
   interface {
     type = "subnet"
-    network_id = gcore_file_share.file_share_vast.network[0].network_id
-    subnet_id = gcore_file_share.file_share_vast.network[0].subnet_id
+    network_id = data.gcore_file_share.vast.network_id
+    subnet_id = data.gcore_file_share.vast.subnet_id
   }
 
   cluster_metadata = {
     my-metadata-key = "my-metadata-value"
   }
-
-  user_data = base64encode(var.user_userdata)
 
   project_id = data.gcore_project.pr.id
   region_id  = data.gcore_region.rg.id
