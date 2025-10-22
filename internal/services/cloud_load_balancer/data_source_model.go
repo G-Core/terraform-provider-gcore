@@ -54,6 +54,12 @@ func (m *CloudLoadBalancerDataSourceModel) toReadParams(_ context.Context) (para
 	if !m.RegionID.IsNull() {
 		params.RegionID = param.NewOpt(m.RegionID.ValueInt64())
 	}
+	if !m.FindOneBy.ShowStats.IsNull() {
+		params.ShowStats = param.NewOpt(m.FindOneBy.ShowStats.ValueBool())
+	}
+	if !m.FindOneBy.WithDDOS.IsNull() {
+		params.WithDDOS = param.NewOpt(m.FindOneBy.WithDDOS.ValueBool())
+	}
 
 	return
 }
