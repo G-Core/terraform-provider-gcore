@@ -178,6 +178,11 @@ func (r *CloudReservedFixedIPResource) Update(ctx context.Context, req resource.
 			resp.Diagnostics.AddError("failed to deserialize http request", err.Error())
 			return
 		}
+
+		// Restore ID field (API doesn't return id, but we need it for Terraform)
+		if !plan.PortID.IsNull() && plan.PortID.ValueString() != "" {
+			plan.ID = types.StringValue(plan.PortID.ValueString())
+		}
 	}
 
 	// If we get here, update succeeded or no changes needed, save plan to state
@@ -231,6 +236,11 @@ func (r *CloudReservedFixedIPResource) Read(ctx context.Context, req resource.Re
 	if err != nil {
 		resp.Diagnostics.AddError("failed to deserialize http request", err.Error())
 		return
+	}
+
+	// Restore ID field (API doesn't return id, but we need it for Terraform)
+	if !data.PortID.IsNull() && data.PortID.ValueString() != "" {
+		data.ID = types.StringValue(data.PortID.ValueString())
 	}
 
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
@@ -311,6 +321,11 @@ func (r *CloudReservedFixedIPResource) ImportState(ctx context.Context, req reso
 	if err != nil {
 		resp.Diagnostics.AddError("failed to deserialize http request", err.Error())
 		return
+	}
+
+	// Restore ID field (API doesn't return id, but we need it for Terraform)
+	if !data.PortID.IsNull() && data.PortID.ValueString() != "" {
+		data.ID = types.StringValue(data.PortID.ValueString())
 	}
 
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
