@@ -1,14 +1,14 @@
 data "gcore_file_share" "vast" {
   name = "my-files-share"
+
   project_id = data.gcore_project.pr.id
-  region_id  = data.gcore_region.rg.id 
+  region_id  = data.gcore_region.rg.id
 }
 
 resource "gcore_ai_cluster" "gpu_cluster" {
-  depends_on = [gcore_file_share.file_share_vast]
   flavor          = "bm3-ai-1xlarge-h200-141-8"
   image_id        = "aab83c98-7c9c-4942-a488-6c8b63dd42bd"
-  cluster_name    = "gpu-cluster-for-vast"
+  cluster_name    = "cluster-for-vast"
   keypair_name    = "my-keypair"
   instances_count = 1
   user_data = base64encode(<<-EOT
@@ -29,9 +29,9 @@ resource "gcore_ai_cluster" "gpu_cluster" {
   // is connected to the same network as the file share.
   // Without it, mounting the NFS share will fail.
   interface {
-    type = "subnet"
+    type       = "subnet"
     network_id = data.gcore_file_share.vast.network_id
-    subnet_id = data.gcore_file_share.vast.subnet_id
+    subnet_id  = data.gcore_file_share.vast.subnet_id
   }
 
   cluster_metadata = {
