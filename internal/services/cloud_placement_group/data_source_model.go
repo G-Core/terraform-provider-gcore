@@ -13,6 +13,7 @@ import (
 )
 
 type CloudPlacementGroupDataSourceModel struct {
+	ID            types.String                                                              `tfsdk:"id" path:"group_id,computed"`
 	GroupID       types.String                                                              `tfsdk:"group_id" path:"group_id,required"`
 	ProjectID     types.Int64                                                               `tfsdk:"project_id" path:"project_id,optional"`
 	RegionID      types.Int64                                                               `tfsdk:"region_id" path:"region_id,optional"`

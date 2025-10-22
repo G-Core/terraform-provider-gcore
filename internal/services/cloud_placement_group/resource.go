@@ -13,13 +13,16 @@ import (
 	"github.com/G-Core/gcore-go/option"
 	"github.com/G-Core/gcore-go/packages/param"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
+	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/stainless-sdks/gcore-terraform/internal/apijson"
+	"github.com/stainless-sdks/gcore-terraform/internal/importpath"
 	"github.com/stainless-sdks/gcore-terraform/internal/logging"
 )
 
 // Ensure provider defined types fully satisfy framework interfaces.
 var _ resource.ResourceWithConfigure = (*CloudPlacementGroupResource)(nil)
 var _ resource.ResourceWithModifyPlan = (*CloudPlacementGroupResource)(nil)
+var _ resource.ResourceWithImportState = (*CloudPlacementGroupResource)(nil)
 
 func NewResource() resource.Resource {
 	return &CloudPlacementGroupResource{}
@@ -95,6 +98,7 @@ func (r *CloudPlacementGroupResource) Create(ctx context.Context, req resource.C
 		resp.Diagnostics.AddError("failed to deserialize http request", err.Error())
 		return
 	}
+	data.ID = data.ServergroupID
 
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
 }
@@ -125,7 +129,7 @@ func (r *CloudPlacementGroupResource) Read(ctx context.Context, req resource.Rea
 	res := new(http.Response)
 	_, err := r.client.Cloud.PlacementGroups.Get(
 		ctx,
-		data.GroupID.ValueString(),
+		data.ServergroupID.ValueString(),
 		params,
 		option.WithResponseBodyInto(&res),
 		option.WithMiddleware(logging.Middleware(ctx)),
@@ -145,6 +149,7 @@ func (r *CloudPlacementGroupResource) Read(ctx context.Context, req resource.Rea
 		resp.Diagnostics.AddError("failed to deserialize http request", err.Error())
 		return
 	}
+	data.ID = data.ServergroupID
 
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
 }
@@ -170,7 +175,7 @@ func (r *CloudPlacementGroupResource) Delete(ctx context.Context, req resource.D
 
 	_, err := r.client.Cloud.PlacementGroups.Delete(
 		ctx,
-		data.GroupID.ValueString(),
+		data.ServergroupID.ValueString(),
 		params,
 		option.WithMiddleware(logging.Middleware(ctx)),
 	)
@@ -178,6 +183,55 @@ func (r *CloudPlacementGroupResource) Delete(ctx context.Context, req resource.D
 		resp.Diagnostics.AddError("failed to make http request", err.Error())
 		return
 	}
+	data.ID = data.ServergroupID
+
+	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
+}
+
+func (r *CloudPlacementGroupResource) ImportState(ctx context.Context, req resource.ImportStateRequest, resp *resource.ImportStateResponse) {
+	var data *CloudPlacementGroupModel = new(CloudPlacementGroupModel)
+
+	path_project_id := int64(0)
+	path_region_id := int64(0)
+	path_group_id := ""
+	diags := importpath.ParseImportID(
+		req.ID,
+		"<project_id>/<region_id>/<group_id>",
+		&path_project_id,
+		&path_region_id,
+		&path_group_id,
+	)
+	resp.Diagnostics.Append(diags...)
+	if resp.Diagnostics.HasError() {
+		return
+	}
+
+	data.ProjectID = types.Int64Value(path_project_id)
+	data.RegionID = types.Int64Value(path_region_id)
+	data.ServergroupID = types.StringValue(path_group_id)
+
+	res := new(http.Response)
+	_, err := r.client.Cloud.PlacementGroups.Get(
+		ctx,
+		path_group_id,
+		cloud.PlacementGroupGetParams{
+			ProjectID: param.NewOpt(path_project_id),
+			RegionID:  param.NewOpt(path_region_id),
+		},
+		option.WithResponseBodyInto(&res),
+		option.WithMiddleware(logging.Middleware(ctx)),
+	)
+	if err != nil {
+		resp.Diagnostics.AddError("failed to make http request", err.Error())
+		return
+	}
+	bytes, _ := io.ReadAll(res.Body)
+	err = apijson.Unmarshal(bytes, &data)
+	if err != nil {
+		resp.Diagnostics.AddError("failed to deserialize http request", err.Error())
+		return
+	}
+	data.ID = data.ServergroupID
 
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
 }

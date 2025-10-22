@@ -16,6 +16,9 @@ func DataSourceSchema(ctx context.Context) schema.Schema {
 	return schema.Schema{
 		Description: "Placement Groups allow you to specific a policy that determines whether Virtual Machines will be hosted on the same physical server or on different ones.",
 		Attributes: map[string]schema.Attribute{
+			"id": schema.StringAttribute{
+				Computed: true,
+			},
 			"group_id": schema.StringAttribute{
 				Required: true,
 			},

@@ -34,6 +34,7 @@ data "gcore_cloud_placement_group" "example_cloud_placement_group" {
 
 ### Read-Only
 
+- `id` (String) The ID of this resource.
 - `instances` (Attributes List) The list of instances in this server group. (see [below for nested schema](#nestedatt--instances))
 - `name` (String) The name of the server group.
 - `policy` (String) The server group policy. Options are: anti-affinity, affinity, or soft-anti-affinity.

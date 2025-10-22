@@ -9,13 +9,13 @@ import (
 )
 
 type CloudPlacementGroupModel struct {
-	GroupID       types.String                                                    `tfsdk:"group_id" path:"group_id,optional"`
+	ID            types.String                                                    `tfsdk:"id" json:"-,computed"`
+	ServergroupID types.String                                                    `tfsdk:"servergroup_id" json:"servergroup_id,computed"`
 	ProjectID     types.Int64                                                     `tfsdk:"project_id" path:"project_id,optional"`
 	RegionID      types.Int64                                                     `tfsdk:"region_id" path:"region_id,optional"`
 	Name          types.String                                                    `tfsdk:"name" json:"name,required"`
 	Policy        types.String                                                    `tfsdk:"policy" json:"policy,required"`
 	Region        types.String                                                    `tfsdk:"region" json:"region,computed"`
-	ServergroupID types.String                                                    `tfsdk:"servergroup_id" json:"servergroup_id,computed"`
 	Instances     customfield.NestedObjectList[CloudPlacementGroupInstancesModel] `tfsdk:"instances" json:"instances,computed"`
 }
 

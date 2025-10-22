@@ -81,6 +81,7 @@ func (d *CloudPlacementGroupDataSource) Read(ctx context.Context, req datasource
 		resp.Diagnostics.AddError("failed to deserialize http request", err.Error())
 		return
 	}
+	data.ID = data.GroupID
 
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
 }

@@ -21,9 +21,15 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 	return schema.Schema{
 		Description: "Placement Groups allow you to specific a policy that determines whether Virtual Machines will be hosted on the same physical server or on different ones.",
 		Attributes: map[string]schema.Attribute{
-			"group_id": schema.StringAttribute{
-				Optional:      true,
-				PlanModifiers: []planmodifier.String{stringplanmodifier.RequiresReplace()},
+			"id": schema.StringAttribute{
+				Description:   "The ID of the server group.",
+				Computed:      true,
+				PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown(), stringplanmodifier.RequiresReplace()},
+			},
+			"servergroup_id": schema.StringAttribute{
+				Description:   "The ID of the server group.",
+				Computed:      true,
+				PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown(), stringplanmodifier.RequiresReplace()},
 			},
 			"project_id": schema.Int64Attribute{
 				Optional:      true,
@@ -52,10 +58,6 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 			},
 			"region": schema.StringAttribute{
 				Description: "Region name",
-				Computed:    true,
-			},
-			"servergroup_id": schema.StringAttribute{
-				Description: "The ID of the server group.",
 				Computed:    true,
 			},
 			"instances": schema.ListNestedAttribute{
