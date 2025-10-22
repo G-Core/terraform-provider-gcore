@@ -172,21 +172,23 @@ func (e *encoder) terraformUnwrappedDynamicEncoder(unwrap terraformUnwrappingFun
 }
 
 func (e *encoder) newTerraformTypeEncoder(t reflect.Type) encoderFunc {
+	ctx := context.TODO()
+
 	if t == reflect.TypeOf(basetypes.BoolValue{}) {
 		return e.terraformUnwrappedEncoder(reflect.TypeOf(true), func(value attr.Value) (any, diag.Diagnostics) {
-			return apijson.UnwrapTerraformAttrValue(value)
+			return apijson.UnwrapTerraformAttrValue(ctx, value)
 		})
 	} else if t == reflect.TypeOf(basetypes.Int64Value{}) {
 		return e.terraformUnwrappedEncoder(reflect.TypeOf(int64(0)), func(value attr.Value) (any, diag.Diagnostics) {
-			return apijson.UnwrapTerraformAttrValue(value)
+			return apijson.UnwrapTerraformAttrValue(ctx, value)
 		})
 	} else if t == reflect.TypeOf(basetypes.Float64Value{}) {
 		return e.terraformUnwrappedEncoder(reflect.TypeOf(float64(0)), func(value attr.Value) (any, diag.Diagnostics) {
-			return apijson.UnwrapTerraformAttrValue(value)
+			return apijson.UnwrapTerraformAttrValue(ctx, value)
 		})
 	} else if t == reflect.TypeOf(basetypes.StringValue{}) {
 		return e.terraformUnwrappedEncoder(reflect.TypeOf(""), func(value attr.Value) (any, diag.Diagnostics) {
-			return apijson.UnwrapTerraformAttrValue(value)
+			return apijson.UnwrapTerraformAttrValue(ctx, value)
 		})
 	} else if t == reflect.TypeOf(timetypes.RFC3339{}) {
 		return e.terraformUnwrappedEncoder(reflect.TypeOf(time.Time{}), func(value attr.Value) (any, diag.Diagnostics) {
@@ -210,7 +212,6 @@ func (e *encoder) newTerraformTypeEncoder(t reflect.Type) encoderFunc {
 		return encodePartAsJSON
 	} else if t.Implements(reflect.TypeOf((*basetypes.DynamicValuable)(nil)).Elem()) {
 		return e.terraformUnwrappedDynamicEncoder(func(value attr.Value) (any, diag.Diagnostics) {
-			ctx := context.TODO()
 			val, d := value.(basetypes.DynamicValuable).ToDynamicValue(ctx)
 			return val.UnderlyingValue(), d
 		})
