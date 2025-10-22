@@ -316,6 +316,22 @@ func (r *CloudReservedFixedIPResource) ImportState(ctx context.Context, req reso
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
 }
 
-func (r *CloudReservedFixedIPResource) ModifyPlan(_ context.Context, _ resource.ModifyPlanRequest, _ *resource.ModifyPlanResponse) {
-	// Schema plan modifiers handle port_id preservation
+func (r *CloudReservedFixedIPResource) ModifyPlan(ctx context.Context, req resource.ModifyPlanRequest, resp *resource.ModifyPlanResponse) {
+	// If port_id is not being explicitly configured and we have a state value, preserve it
+	// This prevents unnecessary replacements when only is_vip changes
+	var plan, state *CloudReservedFixedIPModel
+
+	resp.Diagnostics.Append(req.Plan.Get(ctx, &plan)...)
+	resp.Diagnostics.Append(req.State.Get(ctx, &state)...)
+
+	if resp.Diagnostics.HasError() || state == nil || plan == nil {
+		return
+	}
+
+	// If port_id is unknown in the plan but known in state, preserve the state value
+	// This happens when is_vip changes trigger a refresh of computed fields
+	if plan.PortID.IsUnknown() && !state.PortID.IsNull() && !state.PortID.IsUnknown() {
+		plan.PortID = state.PortID
+		resp.Diagnostics.Append(resp.Plan.Set(ctx, plan)...)
+	}
 }
