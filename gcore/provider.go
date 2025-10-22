@@ -208,7 +208,7 @@ func Provider() *schema.Provider {
 			"gcore_waap_firewall_rule":            resourceWaapFirewallRule(),
 			"gcore_file_share":                    resourceFileShare(),
 			"gcore_postgres_cluster":              resourcePostgresCluster(),
-			"gcore_port_allowed_address_pairs":    resourceGcorePortAllowedAddressPairs(),
+			"gcore_port_allowed_address_pairs":    resourcePortAllowedAddressPairs(),
 		},
 		DataSourcesMap: map[string]*schema.Resource{
 			"gcore_ai_cluster":                 dataSourceAICluster(),

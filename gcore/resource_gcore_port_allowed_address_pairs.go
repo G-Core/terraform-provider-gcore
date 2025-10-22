@@ -15,7 +15,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 )
 
-func resourceGcorePortAllowedAddressPairs() *schema.Resource {
+func resourcePortAllowedAddressPairs() *schema.Resource {
 	return &schema.Resource{
 		CreateContext: resourcePortAAPCreate,
 		ReadContext:   resourcePortAAPRead,
