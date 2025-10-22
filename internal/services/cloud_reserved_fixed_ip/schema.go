@@ -23,7 +23,8 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 	return schema.Schema{
 		Attributes: map[string]schema.Attribute{
 			"id": schema.StringAttribute{
-				Computed: true,
+				Computed:      true,
+				PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
 			},
 			"project_id": schema.Int64Attribute{
 				Optional:      true,
@@ -64,12 +65,13 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 				},
 				PlanModifiers: []planmodifier.String{stringplanmodifier.RequiresReplace()},
 			},
-			"is_vip": schema.BoolAttribute{
-				Description: "If reserved fixed IP is a VIP",
-				Optional:    true,
-			},
 			"network_id": schema.StringAttribute{
 				Description:   "Reserved fixed IP will be allocated in a subnet of this network",
+				Optional:      true,
+				PlanModifiers: []planmodifier.String{stringplanmodifier.RequiresReplace()},
+			},
+			"subnet_id": schema.StringAttribute{
+				Description:   "Reserved fixed IP will be allocated in this subnet",
 				Optional:      true,
 				PlanModifiers: []planmodifier.String{stringplanmodifier.RequiresReplace()},
 			},
@@ -77,12 +79,11 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 				Description:   "Port ID to make a reserved fixed IP (for example, `vip_port_id` of the Load Balancer entity).",
 				Computed:      true,
 				Optional:      true,
-				PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
+				PlanModifiers: []planmodifier.String{stringplanmodifier.RequiresReplaceIfConfigured()},
 			},
-			"subnet_id": schema.StringAttribute{
-				Description:   "Reserved fixed IP will be allocated in this subnet",
-				Optional:      true,
-				PlanModifiers: []planmodifier.String{stringplanmodifier.RequiresReplace()},
+			"is_vip": schema.BoolAttribute{
+				Description: "If reserved fixed IP is a VIP",
+				Optional:    true,
 			},
 			"created_at": schema.StringAttribute{
 				Description: "Datetime when the reserved fixed IP was created",
