@@ -32,3 +32,9 @@ resource "gcore_keypair" "keypair" {
   public_key  = "ssh-ed25519 ...your public key... gcore@gcore.com"
 }
 
+data "gcore_file_share" "vast" {
+  name = "my-files-share"
+
+  project_id = data.gcore_project.project.id
+  region_id  = data.gcore_region.region.id
+}
