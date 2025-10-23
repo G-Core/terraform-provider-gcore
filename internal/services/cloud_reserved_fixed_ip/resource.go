@@ -144,9 +144,9 @@ func (r *CloudReservedFixedIPResource) Update(ctx context.Context, req resource.
 		return
 	}
 
-	// Handle is_vip update via Vip.Toggle() API
+	// Handle is_vip update via Update() API
 	if !plan.IsVip.Equal(state.IsVip) {
-		params := cloud.ReservedFixedIPVipToggleParams{
+		params := cloud.ReservedFixedIPUpdateParams{
 			IsVip: plan.IsVip.ValueBool(),
 		}
 
@@ -159,7 +159,7 @@ func (r *CloudReservedFixedIPResource) Update(ctx context.Context, req resource.
 		}
 
 		res := new(http.Response)
-		_, err := r.client.Cloud.ReservedFixedIPs.Vip.Toggle(
+		_, err := r.client.Cloud.ReservedFixedIPs.Update(
 			ctx,
 			state.PortID.ValueString(),
 			params,
@@ -167,7 +167,7 @@ func (r *CloudReservedFixedIPResource) Update(ctx context.Context, req resource.
 			option.WithMiddleware(logging.Middleware(ctx)),
 		)
 		if err != nil {
-			resp.Diagnostics.AddError("failed to toggle VIP status", err.Error())
+			resp.Diagnostics.AddError("failed to update VIP status", err.Error())
 			return
 		}
 
