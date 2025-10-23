@@ -108,11 +108,6 @@ func (r *CloudLoadBalancerPoolMemberResource) Read(ctx context.Context, req reso
 		return
 	}
 
-	// If ID is null or empty, skip the read
-	if data.ID.IsNull() || data.ID.ValueString() == "" {
-		return
-	}
-
 	params := cloud.LoadBalancerPoolGetParams{}
 
 	if !data.ProjectID.IsNull() {
@@ -132,10 +127,6 @@ func (r *CloudLoadBalancerPoolMemberResource) Read(ctx context.Context, req reso
 	)
 	if err != nil {
 		resp.Diagnostics.AddError("failed to get load balancer pool", err.Error())
-		return
-	}
-	if pool == nil {
-		resp.Diagnostics.AddError("unexpected nil response", "SDK returned nil pool")
 		return
 	}
 
