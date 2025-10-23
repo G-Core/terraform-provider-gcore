@@ -14,8 +14,8 @@ type CloudSecurityGroupModel struct {
 	ID                 types.String                                                            `tfsdk:"id" json:"id,computed"`
 	ProjectID          types.Int64                                                             `tfsdk:"project_id" path:"project_id,optional"`
 	RegionID           types.Int64                                                             `tfsdk:"region_id" path:"region_id,optional"`
+	SecurityGroup      *CloudSecurityGroupSecurityGroupModel                                   `tfsdk:"security_group" json:"security_group,required,no_refresh"`
 	Instances          *[]types.String                                                         `tfsdk:"instances" json:"instances,optional,no_refresh"`
-	SecurityGroup      customfield.NestedObject[CloudSecurityGroupSecurityGroupModel]          `tfsdk:"security_group" json:"security_group,computed_optional,no_refresh"`
 	Name               types.String                                                            `tfsdk:"name" json:"name,optional"`
 	Tags               *map[string]types.String                                                `tfsdk:"tags" json:"tags,optional,no_refresh"`
 	ChangedRules       *[]*CloudSecurityGroupChangedRulesModel                                 `tfsdk:"changed_rules" json:"changed_rules,optional,no_refresh"`
