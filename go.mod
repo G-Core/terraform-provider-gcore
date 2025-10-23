@@ -75,5 +75,3 @@ require (
 	google.golang.org/grpc v1.72.1 // indirect
 	google.golang.org/protobuf v1.36.6 // indirect
 )
-
-replace github.com/G-Core/gcore-go => github.com/stainless-sdks/gcore-go v0.0.0-20251020103714-4267ffd4fa26
