@@ -25,9 +25,11 @@ import (
 	"github.com/stainless-sdks/gcore-terraform/internal/services/cloud_network"
 	"github.com/stainless-sdks/gcore-terraform/internal/services/cloud_network_router"
 	"github.com/stainless-sdks/gcore-terraform/internal/services/cloud_network_subnet"
+	"github.com/stainless-sdks/gcore-terraform/internal/services/cloud_placement_group"
 	"github.com/stainless-sdks/gcore-terraform/internal/services/cloud_project"
 	"github.com/stainless-sdks/gcore-terraform/internal/services/cloud_region"
 	"github.com/stainless-sdks/gcore-terraform/internal/services/cloud_reserved_fixed_ip"
+	"github.com/stainless-sdks/gcore-terraform/internal/services/cloud_secret"
 	"github.com/stainless-sdks/gcore-terraform/internal/services/cloud_security_group"
 	"github.com/stainless-sdks/gcore-terraform/internal/services/cloud_ssh_key"
 	"github.com/stainless-sdks/gcore-terraform/internal/services/cloud_volume"
@@ -50,6 +52,7 @@ type GcoreProviderModel struct {
 	CloudProjectID              types.Int64  `tfsdk:"cloud_project_id" json:"cloud_project_id,optional"`
 	CloudRegionID               types.Int64  `tfsdk:"cloud_region_id" json:"cloud_region_id,optional"`
 	CloudPollingIntervalSeconds types.Int64  `tfsdk:"cloud_polling_interval_seconds" json:"cloud_polling_interval_seconds,optional"`
+	CloudPollingTimeoutSeconds  types.Int64  `tfsdk:"cloud_polling_timeout_seconds" json:"cloud_polling_timeout_seconds,optional"`
 }
 
 func (p *GcoreProvider) Metadata(ctx context.Context, req provider.MetadataRequest, resp *provider.MetadataResponse) {
@@ -74,6 +77,9 @@ func ProviderSchema(ctx context.Context) schema.Schema {
 				Optional: true,
 			},
 			"cloud_polling_interval_seconds": schema.Int64Attribute{
+				Optional: true,
+			},
+			"cloud_polling_timeout_seconds": schema.Int64Attribute{
 				Optional: true,
 			},
 		},
@@ -139,6 +145,12 @@ func (p *GcoreProvider) Configure(ctx context.Context, req provider.ConfigureReq
 		opts = append(opts, option.WithCloudPollingIntervalSeconds(3))
 	}
 
+	if !data.CloudPollingTimeoutSeconds.IsNull() && !data.CloudPollingTimeoutSeconds.IsUnknown() {
+		opts = append(opts, option.WithCloudPollingTimeoutSeconds(data.CloudPollingTimeoutSeconds.ValueInt64()))
+	} else {
+		opts = append(opts, option.WithCloudPollingTimeoutSeconds(7200))
+	}
+
 	// Override Go SDK max retries to 4 from 2 which is the default.
 	// The max delay is capped at 8 secs, so the maximum value for max retries is 4.
 	opts = append(opts, option.WithMaxRetries(4))
@@ -157,6 +169,7 @@ func (p *GcoreProvider) ConfigValidators(_ context.Context) []provider.ConfigVal
 
 func (p *GcoreProvider) Resources(ctx context.Context) []func() resource.Resource {
 	return []func() resource.Resource{
+		cloud_secret.NewResource,
 		cloud_ssh_key.NewResource,
 		cloud_load_balancer.NewResource,
 		cloud_load_balancer_listener.NewResource,
@@ -169,6 +182,7 @@ func (p *GcoreProvider) Resources(ctx context.Context) []func() resource.Resourc
 		cloud_volume.NewResource,
 		cloud_floating_ip.NewResource,
 		cloud_security_group.NewResource,
+		cloud_placement_group.NewResource,
 	}
 }
 
@@ -178,8 +192,11 @@ func (p *GcoreProvider) DataSources(ctx context.Context) []func() datasource.Dat
 		cloud_project.NewCloudProjectsDataSource,
 		cloud_region.NewCloudRegionDataSource,
 		cloud_region.NewCloudRegionsDataSource,
+		cloud_secret.NewCloudSecretDataSource,
+		cloud_secret.NewCloudSecretsDataSource,
 		cloud_ssh_key.NewCloudSSHKeyDataSource,
 		cloud_ssh_key.NewCloudSSHKeysDataSource,
+		cloud_load_balancer.NewCloudLoadBalancerDataSource,
 		cloud_load_balancer.NewCloudLoadBalancersDataSource,
 		cloud_load_balancer_listener.NewCloudLoadBalancerListenerDataSource,
 		cloud_load_balancer_pool.NewCloudLoadBalancerPoolDataSource,
@@ -197,6 +214,7 @@ func (p *GcoreProvider) DataSources(ctx context.Context) []func() datasource.Dat
 		cloud_floating_ip.NewCloudFloatingIPsDataSource,
 		cloud_security_group.NewCloudSecurityGroupDataSource,
 		cloud_security_group.NewCloudSecurityGroupsDataSource,
+		cloud_placement_group.NewCloudPlacementGroupDataSource,
 		cloud_instance_image.NewCloudInstanceImageDataSource,
 	}
 }

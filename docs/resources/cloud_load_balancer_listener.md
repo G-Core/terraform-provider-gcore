@@ -16,7 +16,7 @@ description: |-
 resource "gcore_cloud_load_balancer_listener" "example_cloud_load_balancer_listener" {
   project_id = 1
   region_id = 1
-  loadbalancer_id = "30f4f55b-4a7c-48e0-9954-5cddfee216e7"
+  load_balancer_id = "30f4f55b-4a7c-48e0-9954-5cddfee216e7"
   name = "my_listener"
   protocol = "HTTP"
   protocol_port = 80
@@ -40,7 +40,7 @@ resource "gcore_cloud_load_balancer_listener" "example_cloud_load_balancer_liste
 
 ### Required
 
-- `loadbalancer_id` (String) Load balancer ID
+- `load_balancer_id` (String) Load balancer ID
 - `name` (String) Load balancer listener name
 - `protocol` (String) Load balancer listener protocol
 Available values: "HTTP", "HTTPS", "PROMETHEUS", "TCP", "TERMINATED_HTTPS", "UDP".
