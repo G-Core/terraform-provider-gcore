@@ -5,6 +5,8 @@ package cloud_load_balancer
 import (
 	"context"
 	"fmt"
+	"io"
+	"net/http"
 
 	"github.com/G-Core/gcore-go"
 	"github.com/G-Core/gcore-go/cloud"
