@@ -158,7 +158,7 @@ resource "gcore_reservedfixedip" "fixed_ip_by_port" {
 
 ### Optional
 
-- `allowed_address_pairs` (Block List) Group of IP addresses that share the current IP as VIP (see [below for nested schema](#nestedblock--allowed_address_pairs))
+- `allowed_address_pairs` (Block List) IP addresses or CIDRs which can be used by this port. Can be applied only after attaching Reserved Fixed IP to the Virtual Instance. Consider usage of `gcore_port_allowed_address_pairs`. (see [below for nested schema](#nestedblock--allowed_address_pairs))
 - `fixed_ip_address` (String) IP address of the port. Can be passed with type `ip_address` or retrieved after creation.
 - `ip_family` (String) IP family of the reserved fixed ip to create. Available values are 'ipv4', 'ipv6', 'dual'
 - `is_vip` (Boolean) Flag to indicate whether the port is a virtual IP address.
