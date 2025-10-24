@@ -15,8 +15,8 @@ type CloudNetworkRouterModel struct {
 	RegionID            types.Int64                                                          `tfsdk:"region_id" path:"region_id,optional"`
 	Interfaces          customfield.NestedObjectList[CloudNetworkRouterInterfacesModel]      `tfsdk:"interfaces" json:"interfaces,computed_optional"`
 	Name                types.String                                                         `tfsdk:"name" json:"name,required"`
-	Routes              *[]*CloudNetworkRouterRoutesModel                                    `tfsdk:"routes" json:"routes,optional"`
 	ExternalGatewayInfo customfield.NestedObject[CloudNetworkRouterExternalGatewayInfoModel] `tfsdk:"external_gateway_info" json:"external_gateway_info,computed_optional"`
+	Routes              customfield.NestedObjectList[CloudNetworkRouterRoutesModel]          `tfsdk:"routes" json:"routes,computed_optional"`
 	CreatedAt           timetypes.RFC3339                                                    `tfsdk:"created_at" json:"created_at,computed" format:"date-time"`
 	CreatorTaskID       types.String                                                         `tfsdk:"creator_task_id" json:"creator_task_id,computed"`
 	Distributed         types.Bool                                                           `tfsdk:"distributed" json:"distributed,computed"`
@@ -40,13 +40,13 @@ type CloudNetworkRouterInterfacesModel struct {
 	Type     types.String `tfsdk:"type" json:"type,computed_optional,no_refresh"`
 }
 
-type CloudNetworkRouterRoutesModel struct {
-	Destination types.String `tfsdk:"destination" json:"destination,required"`
-	Nexthop     types.String `tfsdk:"nexthop" json:"nexthop,required"`
-}
-
 type CloudNetworkRouterExternalGatewayInfoModel struct {
 	NetworkID  types.String `tfsdk:"network_id" json:"network_id,computed_optional"`
 	EnableSnat types.Bool   `tfsdk:"enable_snat" json:"enable_snat,computed_optional"`
 	Type       types.String `tfsdk:"type" json:"type,computed_optional,no_refresh"`
+}
+
+type CloudNetworkRouterRoutesModel struct {
+	Destination types.String `tfsdk:"destination" json:"destination,required"`
+	Nexthop     types.String `tfsdk:"nexthop" json:"nexthop,required"`
 }
