@@ -65,22 +65,6 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 				Description: "name of router",
 				Required:    true,
 			},
-			"routes": schema.ListNestedAttribute{
-				Description: "List of custom routes.",
-				Optional:    true,
-				NestedObject: schema.NestedAttributeObject{
-					Attributes: map[string]schema.Attribute{
-						"destination": schema.StringAttribute{
-							Description: "CIDR of destination IPv4 subnet.",
-							Required:    true,
-						},
-						"nexthop": schema.StringAttribute{
-							Description: "IPv4 address to forward traffic to if it's destination IP matches 'destination' CIDR.",
-							Required:    true,
-						},
-					},
-				},
-			},
 			"external_gateway_info": schema.SingleNestedAttribute{
 				Computed:   true,
 				Optional:   true,
@@ -103,6 +87,24 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 						Optional:    true,
 						Validators: []validator.String{
 							stringvalidator.OneOfCaseInsensitive("manual", "default"),
+						},
+					},
+				},
+			},
+			"routes": schema.ListNestedAttribute{
+				Description: "List of custom routes.",
+				Computed:    true,
+				Optional:    true,
+				CustomType:  customfield.NewNestedObjectListType[CloudNetworkRouterRoutesModel](ctx),
+				NestedObject: schema.NestedAttributeObject{
+					Attributes: map[string]schema.Attribute{
+						"destination": schema.StringAttribute{
+							Description: "CIDR of destination IPv4 subnet.",
+							Required:    true,
+						},
+						"nexthop": schema.StringAttribute{
+							Description: "IPv4 address to forward traffic to if it's destination IP matches 'destination' CIDR.",
+							Required:    true,
 						},
 					},
 				},
