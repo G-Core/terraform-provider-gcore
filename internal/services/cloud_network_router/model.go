@@ -46,7 +46,7 @@ type CloudNetworkRouterRoutesModel struct {
 }
 
 type CloudNetworkRouterExternalGatewayInfoModel struct {
-	NetworkID  types.String `tfsdk:"network_id" json:"network_id,optional"`
+	NetworkID  types.String `tfsdk:"network_id" json:"network_id,computed_optional"`
 	EnableSnat types.Bool   `tfsdk:"enable_snat" json:"enable_snat,computed_optional"`
 	Type       types.String `tfsdk:"type" json:"type,computed_optional,no_refresh"`
 }
