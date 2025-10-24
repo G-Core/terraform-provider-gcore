@@ -13,7 +13,7 @@ import (
 )
 
 type CloudProjectDataSourceModel struct {
-	ProjectID   types.Int64       `tfsdk:"project_id" path:"project_id,required"`
+	ProjectID   types.Int64       `tfsdk:"project_id" path:"project_id,optional"`
 	ClientID    types.Int64       `tfsdk:"client_id" json:"client_id,computed"`
 	CreatedAt   timetypes.RFC3339 `tfsdk:"created_at" json:"created_at,computed" format:"date-time"`
 	DeletedAt   timetypes.RFC3339 `tfsdk:"deleted_at" json:"deleted_at,computed" format:"date-time"`

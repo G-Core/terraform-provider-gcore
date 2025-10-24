@@ -45,7 +45,7 @@ resource "gcore_cloud_load_balancer" "example_cloud_load_balancer" {
         url_path = "/"
       }
       listener_id = "listener_id"
-      loadbalancer_id = "bbb35f84-35cc-4b2f-84c2-a6a29bba68aa"
+      load_balancer_id = "bbb35f84-35cc-4b2f-84c2-a6a29bba68aa"
       members = [{
         address = "192.168.1.101"
         protocol_port = 8000
@@ -207,7 +207,7 @@ Optional:
 - `crl_secret_id` (String) Secret ID of CA revocation list file
 - `healthmonitor` (Attributes) Health monitor details (see [below for nested schema](#nestedatt--listeners--pools--healthmonitor))
 - `listener_id` (String) Listener ID
-- `loadbalancer_id` (String) Loadbalancer ID
+- `load_balancer_id` (String) Loadbalancer ID
 - `members` (Attributes List) Pool members (see [below for nested schema](#nestedatt--listeners--pools--members))
 - `secret_id` (String) Secret ID for TLS client authentication to the member servers
 - `session_persistence` (Attributes) Session persistence details (see [below for nested schema](#nestedatt--listeners--pools--session_persistence))
@@ -465,5 +465,5 @@ Available values: "BACKUP", "MASTER", "STANDALONE".
 Import is supported using the following syntax:
 
 ```shell
-$ terraform import gcore_cloud_load_balancer.example '<project_id>/<region_id>/<loadbalancer_id>'
+$ terraform import gcore_cloud_load_balancer.example '<project_id>/<region_id>/<load_balancer_id>'
 ```

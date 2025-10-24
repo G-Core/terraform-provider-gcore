@@ -22,10 +22,10 @@ func DataSourceSchema(ctx context.Context) schema.Schema {
 				Required: true,
 			},
 			"project_id": schema.Int64Attribute{
-				Required: true,
+				Optional: true,
 			},
 			"region_id": schema.Int64Attribute{
-				Required: true,
+				Optional: true,
 			},
 			"include_prices": schema.BoolAttribute{
 				Description: "Show price",

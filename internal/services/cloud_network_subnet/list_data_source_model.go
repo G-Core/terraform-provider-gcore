@@ -40,6 +40,12 @@ func (m *CloudNetworkSubnetsDataSourceModel) toListParams(_ context.Context) (pa
 		TagKey: mTagKey,
 	}
 
+	if !m.ProjectID.IsNull() {
+		params.ProjectID = param.NewOpt(m.ProjectID.ValueInt64())
+	}
+	if !m.RegionID.IsNull() {
+		params.RegionID = param.NewOpt(m.RegionID.ValueInt64())
+	}
 	if !m.NetworkID.IsNull() {
 		params.NetworkID = param.NewOpt(m.NetworkID.ValueString())
 	}
@@ -48,12 +54,6 @@ func (m *CloudNetworkSubnetsDataSourceModel) toListParams(_ context.Context) (pa
 	}
 	if !m.TagKeyValue.IsNull() {
 		params.TagKeyValue = param.NewOpt(m.TagKeyValue.ValueString())
-	}
-	if !m.ProjectID.IsNull() {
-		params.ProjectID = param.NewOpt(m.ProjectID.ValueInt64())
-	}
-	if !m.RegionID.IsNull() {
-		params.RegionID = param.NewOpt(m.RegionID.ValueInt64())
 	}
 
 	return

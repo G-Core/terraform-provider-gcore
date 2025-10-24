@@ -26,6 +26,9 @@ data "gcore_cloud_load_balancer_pool" "example_cloud_load_balancer_pool" {
 ### Required
 
 - `pool_id` (String) Pool ID
+
+### Optional
+
 - `project_id` (Number) Project ID
 - `region_id` (Number) Region ID
 

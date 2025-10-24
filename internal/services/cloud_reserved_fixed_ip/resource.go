@@ -80,22 +80,32 @@ func (r *CloudReservedFixedIPResource) Create(ctx context.Context, req resource.
 		resp.Diagnostics.AddError("failed to serialize http request", err.Error())
 		return
 	}
-	res := new(http.Response)
-	_, err = r.client.Cloud.ReservedFixedIPs.New(
+
+	// Use NewAndPoll to automatically handle async operation and task polling
+	reservedFixedIP, err := r.client.Cloud.ReservedFixedIPs.NewAndPoll(
 		ctx,
 		params,
 		option.WithRequestBody("application/json", dataBytes),
-		option.WithResponseBodyInto(&res),
 		option.WithMiddleware(logging.Middleware(ctx)),
 	)
 	if err != nil {
-		resp.Diagnostics.AddError("failed to make http request", err.Error())
+		resp.Diagnostics.AddError("failed to create reserved fixed IP", err.Error())
 		return
 	}
-	bytes, _ := io.ReadAll(res.Body)
-	err = apijson.UnmarshalComputed(bytes, &data)
+
+	// Use RawJSON from the NewAndPoll response directly
+	err = apijson.UnmarshalComputed([]byte(reservedFixedIP.RawJSON()), &data)
 	if err != nil {
 		resp.Diagnostics.AddError("failed to deserialize http request", err.Error())
+		return
+	}
+
+	// Set the ID to port_id for Terraform resource identification
+	if !data.PortID.IsNull() && data.PortID.ValueString() != "" {
+		data.ID = types.StringValue(data.PortID.ValueString())
+	} else {
+		resp.Diagnostics.AddError("Resource creation incomplete",
+			"Could not extract port_id from API response")
 		return
 	}
 
@@ -103,7 +113,75 @@ func (r *CloudReservedFixedIPResource) Create(ctx context.Context, req resource.
 }
 
 func (r *CloudReservedFixedIPResource) Update(ctx context.Context, req resource.UpdateRequest, resp *resource.UpdateResponse) {
-	// Update is not supported for this resource
+	var plan, state *CloudReservedFixedIPModel
+
+	resp.Diagnostics.Append(req.Plan.Get(ctx, &plan)...)
+	resp.Diagnostics.Append(req.State.Get(ctx, &state)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
+
+	// Check for unsupported changes to allowed_address_pairs
+	// Note: allowed_address_pairs is Computed-only in the schema, so users shouldn't be able to modify it directly.
+	// But we add this check for completeness in case the schema changes in the future.
+	if !plan.AllowedAddressPairs.Equal(state.AllowedAddressPairs) {
+		resp.Diagnostics.AddError("Update Not Supported",
+			"Updating 'allowed_address_pairs' is not supported yet. This feature requires Ports API integration which is not available in the current SDK version.")
+		return
+	}
+
+	// Check for any other attempted changes to fields that should be immutable
+	if !plan.Type.Equal(state.Type) {
+		resp.Diagnostics.AddError("Update Not Supported",
+			"The 'type' field cannot be changed after creation. Please recreate the resource with the new type.")
+		return
+	}
+
+	if !plan.NetworkID.Equal(state.NetworkID) || !plan.SubnetID.Equal(state.SubnetID) || !plan.PortID.Equal(state.PortID) || !plan.IPAddress.Equal(state.IPAddress) {
+		resp.Diagnostics.AddError("Update Not Supported",
+			"Network configuration fields (network_id, subnet_id, port_id, ip_address) cannot be changed after creation. Please recreate the resource with the new configuration.")
+		return
+	}
+
+	// Handle is_vip update via Vip.Toggle() API
+	if !plan.IsVip.Equal(state.IsVip) {
+		params := cloud.ReservedFixedIPVipToggleParams{
+			IsVip: plan.IsVip.ValueBool(),
+		}
+
+		if !plan.ProjectID.IsNull() {
+			params.ProjectID = param.NewOpt(plan.ProjectID.ValueInt64())
+		}
+
+		if !plan.RegionID.IsNull() {
+			params.RegionID = param.NewOpt(plan.RegionID.ValueInt64())
+		}
+
+		res := new(http.Response)
+		_, err := r.client.Cloud.ReservedFixedIPs.Vip.Toggle(
+			ctx,
+			state.PortID.ValueString(),
+			params,
+			option.WithResponseBodyInto(&res),
+			option.WithMiddleware(logging.Middleware(ctx)),
+		)
+		if err != nil {
+			resp.Diagnostics.AddError("failed to toggle VIP status", err.Error())
+			return
+		}
+
+		// Update state with response
+		bytes, _ := io.ReadAll(res.Body)
+		err = apijson.UnmarshalComputed(bytes, &plan)
+		if err != nil {
+			resp.Diagnostics.AddError("failed to deserialize http request", err.Error())
+			return
+		}
+	}
+
+	// If we get here, update succeeded or no changes needed, save plan to state
+	resp.Diagnostics.Append(resp.State.Set(ctx, &plan)...)
 }
 
 func (r *CloudReservedFixedIPResource) Read(ctx context.Context, req resource.ReadRequest, resp *resource.ReadResponse) {
@@ -112,6 +190,11 @@ func (r *CloudReservedFixedIPResource) Read(ctx context.Context, req resource.Re
 	resp.Diagnostics.Append(req.State.Get(ctx, &data)...)
 
 	if resp.Diagnostics.HasError() {
+		return
+	}
+
+	// If ID is null or empty, the resource doesn't exist yet - skip the read
+	if data.ID.IsNull() || data.ID.ValueString() == "" {
 		return
 	}
 
@@ -133,6 +216,7 @@ func (r *CloudReservedFixedIPResource) Read(ctx context.Context, req resource.Re
 		option.WithResponseBodyInto(&res),
 		option.WithMiddleware(logging.Middleware(ctx)),
 	)
+	// Check if it's a 404 error (resource not found)
 	if res != nil && res.StatusCode == 404 {
 		resp.Diagnostics.AddWarning("Resource not found", "The resource was not found on the server and will be removed from state.")
 		resp.State.RemoveResource(ctx)
@@ -143,7 +227,7 @@ func (r *CloudReservedFixedIPResource) Read(ctx context.Context, req resource.Re
 		return
 	}
 	bytes, _ := io.ReadAll(res.Body)
-	err = apijson.Unmarshal(bytes, &data)
+	err = apijson.UnmarshalComputed(bytes, &data)
 	if err != nil {
 		resp.Diagnostics.AddError("failed to deserialize http request", err.Error())
 		return
@@ -223,7 +307,7 @@ func (r *CloudReservedFixedIPResource) ImportState(ctx context.Context, req reso
 		return
 	}
 	bytes, _ := io.ReadAll(res.Body)
-	err = apijson.Unmarshal(bytes, &data)
+	err = apijson.UnmarshalComputed(bytes, &data)
 	if err != nil {
 		resp.Diagnostics.AddError("failed to deserialize http request", err.Error())
 		return

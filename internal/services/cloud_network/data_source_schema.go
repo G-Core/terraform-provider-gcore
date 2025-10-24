@@ -6,8 +6,12 @@ import (
 	"context"
 
 	"github.com/hashicorp/terraform-plugin-framework-timetypes/timetypes"
+	"github.com/hashicorp/terraform-plugin-framework-validators/datasourcevalidator"
+	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/datasource/schema"
+	"github.com/hashicorp/terraform-plugin-framework/path"
+	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/stainless-sdks/gcore-terraform/internal/customfield"
 )
@@ -17,17 +21,21 @@ var _ datasource.DataSourceWithConfigValidators = (*CloudNetworkDataSource)(nil)
 func DataSourceSchema(ctx context.Context) schema.Schema {
 	return schema.Schema{
 		Attributes: map[string]schema.Attribute{
+			"id": schema.StringAttribute{
+				Description: "Network ID",
+				Computed:    true,
+			},
 			"network_id": schema.StringAttribute{
 				Description: "Network ID",
-				Required:    true,
+				Optional:    true,
 			},
 			"project_id": schema.Int64Attribute{
 				Description: "Project ID",
-				Required:    true,
+				Optional:    true,
 			},
 			"region_id": schema.Int64Attribute{
 				Description: "Region ID",
-				Required:    true,
+				Optional:    true,
 			},
 			"created_at": schema.StringAttribute{
 				Description: "Datetime when the network was created",
@@ -44,10 +52,6 @@ func DataSourceSchema(ctx context.Context) schema.Schema {
 			},
 			"external": schema.BoolAttribute{
 				Description: "True if the network `router:external` attribute",
-				Computed:    true,
-			},
-			"id": schema.StringAttribute{
-				Description: "Network ID",
 				Computed:    true,
 			},
 			"mtu": schema.Int64Attribute{
@@ -114,6 +118,37 @@ func DataSourceSchema(ctx context.Context) schema.Schema {
 					},
 				},
 			},
+			"find_one_by": schema.SingleNestedAttribute{
+				Optional: true,
+				Attributes: map[string]schema.Attribute{
+					"name": schema.StringAttribute{
+						Description: "Filter networks by name",
+						Optional:    true,
+					},
+					"order_by": schema.StringAttribute{
+						Description: "Ordering networks list result by `name`, `created_at` fields of the network and directions (`created_at.desc`).\nAvailable values: \"created_at.asc\", \"created_at.desc\", \"name.asc\", \"name.desc\".",
+						Computed:    true,
+						Optional:    true,
+						Validators: []validator.String{
+							stringvalidator.OneOfCaseInsensitive(
+								"created_at.asc",
+								"created_at.desc",
+								"name.asc",
+								"name.desc",
+							),
+						},
+					},
+					"tag_key": schema.ListAttribute{
+						Description: "Optional. Filter by tag keys. ?`tag_key`=key1&`tag_key`=key2",
+						Optional:    true,
+						ElementType: types.StringType,
+					},
+					"tag_key_value": schema.StringAttribute{
+						Description: "Optional. Filter by tag key-value pairs.",
+						Optional:    true,
+					},
+				},
+			},
 		},
 	}
 }
@@ -123,5 +158,7 @@ func (d *CloudNetworkDataSource) Schema(ctx context.Context, req datasource.Sche
 }
 
 func (d *CloudNetworkDataSource) ConfigValidators(_ context.Context) []datasource.ConfigValidator {
-	return []datasource.ConfigValidator{}
+	return []datasource.ConfigValidator{
+		datasourcevalidator.ExactlyOneOf(path.MatchRoot("network_id"), path.MatchRoot("find_one_by")),
+	}
 }

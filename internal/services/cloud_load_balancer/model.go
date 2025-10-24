@@ -16,15 +16,15 @@ type CloudLoadBalancerModel struct {
 	RegionID              types.Int64                                                        `tfsdk:"region_id" path:"region_id,optional"`
 	Flavor                types.String                                                       `tfsdk:"flavor" json:"flavor,optional,no_refresh"`
 	NameTemplate          types.String                                                       `tfsdk:"name_template" json:"name_template,optional,no_refresh"`
-	VipIPFamily           types.String                                                       `tfsdk:"vip_ip_family" json:"vip_ip_family,computed_optional"`
 	VipNetworkID          types.String                                                       `tfsdk:"vip_network_id" json:"vip_network_id,optional,no_refresh"`
-	VipPortID             types.String                                                       `tfsdk:"vip_port_id" json:"vip_port_id,computed_optional"`
 	VipSubnetID           types.String                                                       `tfsdk:"vip_subnet_id" json:"vip_subnet_id,optional,no_refresh"`
 	FloatingIP            *CloudLoadBalancerFloatingIPModel                                  `tfsdk:"floating_ip" json:"floating_ip,optional,no_refresh"`
+	VipIPFamily           types.String                                                       `tfsdk:"vip_ip_family" json:"vip_ip_family,computed_optional"`
+	VipPortID             types.String                                                       `tfsdk:"vip_port_id" json:"vip_port_id,computed_optional"`
 	Listeners             customfield.NestedObjectList[CloudLoadBalancerListenersModel]      `tfsdk:"listeners" json:"listeners,computed_optional"`
 	Name                  types.String                                                       `tfsdk:"name" json:"name,optional"`
-	PreferredConnectivity types.String                                                       `tfsdk:"preferred_connectivity" json:"preferred_connectivity,computed_optional"`
 	Tags                  *map[string]types.String                                           `tfsdk:"tags" json:"tags,optional,no_refresh"`
+	PreferredConnectivity types.String                                                       `tfsdk:"preferred_connectivity" json:"preferred_connectivity,computed_optional"`
 	Logging               customfield.NestedObject[CloudLoadBalancerLoggingModel]            `tfsdk:"logging" json:"logging,computed_optional"`
 	CreatedAt             timetypes.RFC3339                                                  `tfsdk:"created_at" json:"created_at,computed" format:"date-time"`
 	CreatorTaskID         types.String                                                       `tfsdk:"creator_task_id" json:"creator_task_id,computed"`
@@ -80,7 +80,7 @@ type CloudLoadBalancerListenersPoolsModel struct {
 	CrlSecretID          types.String                                                              `tfsdk:"crl_secret_id" json:"crl_secret_id,optional"`
 	Healthmonitor        *CloudLoadBalancerListenersPoolsHealthmonitorModel                        `tfsdk:"healthmonitor" json:"healthmonitor,optional"`
 	ListenerID           types.String                                                              `tfsdk:"listener_id" json:"listener_id,optional"`
-	LoadbalancerID       types.String                                                              `tfsdk:"loadbalancer_id" json:"loadbalancer_id,optional"`
+	LoadBalancerID       types.String                                                              `tfsdk:"load_balancer_id" json:"load_balancer_id,optional"`
 	Members              customfield.NestedObjectList[CloudLoadBalancerListenersPoolsMembersModel] `tfsdk:"members" json:"members,computed_optional"`
 	SecretID             types.String                                                              `tfsdk:"secret_id" json:"secret_id,optional"`
 	SessionPersistence   *CloudLoadBalancerListenersPoolsSessionPersistenceModel                   `tfsdk:"session_persistence" json:"session_persistence,optional"`

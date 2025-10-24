@@ -15,14 +15,14 @@ import (
 )
 
 type CloudLoadBalancerDataSourceModel struct {
-	LoadbalancerID        types.String                                                                 `tfsdk:"loadbalancer_id" path:"loadbalancer_id,required"`
-	ProjectID             types.Int64                                                                  `tfsdk:"project_id" path:"project_id,required"`
-	RegionID              types.Int64                                                                  `tfsdk:"region_id" path:"region_id,required"`
+	ID                    types.String                                                                 `tfsdk:"id" path:"load_balancer_id,computed"`
+	LoadBalancerID        types.String                                                                 `tfsdk:"load_balancer_id" path:"load_balancer_id,optional"`
+	ProjectID             types.Int64                                                                  `tfsdk:"project_id" path:"project_id,optional"`
+	RegionID              types.Int64                                                                  `tfsdk:"region_id" path:"region_id,optional"`
 	ShowStats             types.Bool                                                                   `tfsdk:"show_stats" query:"show_stats,optional"`
 	WithDDOS              types.Bool                                                                   `tfsdk:"with_ddos" query:"with_ddos,optional"`
 	CreatedAt             timetypes.RFC3339                                                            `tfsdk:"created_at" json:"created_at,computed" format:"date-time"`
 	CreatorTaskID         types.String                                                                 `tfsdk:"creator_task_id" json:"creator_task_id,computed"`
-	ID                    types.String                                                                 `tfsdk:"id" json:"id,computed"`
 	Name                  types.String                                                                 `tfsdk:"name" json:"name,computed"`
 	OperatingStatus       types.String                                                                 `tfsdk:"operating_status" json:"operating_status,computed"`
 	PreferredConnectivity types.String                                                                 `tfsdk:"preferred_connectivity" json:"preferred_connectivity,computed"`
@@ -42,22 +42,66 @@ type CloudLoadBalancerDataSourceModel struct {
 	Stats                 customfield.NestedObject[CloudLoadBalancerStatsDataSourceModel]              `tfsdk:"stats" json:"stats,computed"`
 	TagsV2                customfield.NestedObjectList[CloudLoadBalancerTagsV2DataSourceModel]         `tfsdk:"tags_v2" json:"tags_v2,computed"`
 	VrrpIPs               customfield.NestedObjectList[CloudLoadBalancerVrrpIPsDataSourceModel]        `tfsdk:"vrrp_ips" json:"vrrp_ips,computed"`
+	FindOneBy             *CloudLoadBalancerFindOneByDataSourceModel                                   `tfsdk:"find_one_by"`
 }
 
 func (m *CloudLoadBalancerDataSourceModel) toReadParams(_ context.Context) (params cloud.LoadBalancerGetParams, diags diag.Diagnostics) {
 	params = cloud.LoadBalancerGetParams{}
 
-	if !m.ShowStats.IsNull() {
-		params.ShowStats = param.NewOpt(m.ShowStats.ValueBool())
-	}
-	if !m.WithDDOS.IsNull() {
-		params.WithDDOS = param.NewOpt(m.WithDDOS.ValueBool())
-	}
 	if !m.ProjectID.IsNull() {
 		params.ProjectID = param.NewOpt(m.ProjectID.ValueInt64())
 	}
 	if !m.RegionID.IsNull() {
 		params.RegionID = param.NewOpt(m.RegionID.ValueInt64())
+	}
+	if !m.FindOneBy.ShowStats.IsNull() {
+		params.ShowStats = param.NewOpt(m.FindOneBy.ShowStats.ValueBool())
+	}
+	if !m.FindOneBy.WithDDOS.IsNull() {
+		params.WithDDOS = param.NewOpt(m.FindOneBy.WithDDOS.ValueBool())
+	}
+
+	return
+}
+
+func (m *CloudLoadBalancerDataSourceModel) toListParams(_ context.Context) (params cloud.LoadBalancerListParams, diags diag.Diagnostics) {
+	mFindOneByTagKey := []string{}
+	if m.FindOneBy.TagKey != nil {
+		for _, item := range *m.FindOneBy.TagKey {
+			mFindOneByTagKey = append(mFindOneByTagKey, item.ValueString())
+		}
+	}
+
+	params = cloud.LoadBalancerListParams{
+		TagKey: mFindOneByTagKey,
+	}
+
+	if !m.ProjectID.IsNull() {
+		params.ProjectID = param.NewOpt(m.ProjectID.ValueInt64())
+	}
+	if !m.RegionID.IsNull() {
+		params.RegionID = param.NewOpt(m.RegionID.ValueInt64())
+	}
+	if !m.FindOneBy.AssignedFloating.IsNull() {
+		params.AssignedFloating = param.NewOpt(m.FindOneBy.AssignedFloating.ValueBool())
+	}
+	if !m.FindOneBy.LoggingEnabled.IsNull() {
+		params.LoggingEnabled = param.NewOpt(m.FindOneBy.LoggingEnabled.ValueBool())
+	}
+	if !m.FindOneBy.Name.IsNull() {
+		params.Name = param.NewOpt(m.FindOneBy.Name.ValueString())
+	}
+	if !m.FindOneBy.OrderBy.IsNull() {
+		params.OrderBy = param.NewOpt(m.FindOneBy.OrderBy.ValueString())
+	}
+	if !m.FindOneBy.ShowStats.IsNull() {
+		params.ShowStats = param.NewOpt(m.FindOneBy.ShowStats.ValueBool())
+	}
+	if !m.FindOneBy.TagKeyValue.IsNull() {
+		params.TagKeyValue = param.NewOpt(m.FindOneBy.TagKeyValue.ValueString())
+	}
+	if !m.FindOneBy.WithDDOS.IsNull() {
+		params.WithDDOS = param.NewOpt(m.FindOneBy.WithDDOS.ValueBool())
 	}
 
 	return
@@ -188,4 +232,15 @@ type CloudLoadBalancerVrrpIPsDataSourceModel struct {
 	IPAddress types.String `tfsdk:"ip_address" json:"ip_address,computed"`
 	Role      types.String `tfsdk:"role" json:"role,computed"`
 	SubnetID  types.String `tfsdk:"subnet_id" json:"subnet_id,computed"`
+}
+
+type CloudLoadBalancerFindOneByDataSourceModel struct {
+	AssignedFloating types.Bool      `tfsdk:"assigned_floating" query:"assigned_floating,optional"`
+	LoggingEnabled   types.Bool      `tfsdk:"logging_enabled" query:"logging_enabled,optional"`
+	Name             types.String    `tfsdk:"name" query:"name,optional"`
+	OrderBy          types.String    `tfsdk:"order_by" query:"order_by,optional"`
+	ShowStats        types.Bool      `tfsdk:"show_stats" query:"show_stats,optional"`
+	TagKey           *[]types.String `tfsdk:"tag_key" query:"tag_key,optional"`
+	TagKeyValue      types.String    `tfsdk:"tag_key_value" query:"tag_key_value,optional"`
+	WithDDOS         types.Bool      `tfsdk:"with_ddos" query:"with_ddos,optional"`
 }

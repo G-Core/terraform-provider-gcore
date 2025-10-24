@@ -26,6 +26,9 @@ data "gcore_cloud_reserved_fixed_ip" "example_cloud_reserved_fixed_ip" {
 ### Required
 
 - `port_id` (String)
+
+### Optional
+
 - `project_id` (Number)
 - `region_id` (Number)
 

@@ -281,13 +281,13 @@ func (r *CloudLoadBalancerResource) ImportState(ctx context.Context, req resourc
 
 	path_project_id := int64(0)
 	path_region_id := int64(0)
-	path_loadbalancer_id := ""
+	path_load_balancer_id := ""
 	diags := importpath.ParseImportID(
 		req.ID,
-		"<project_id>/<region_id>/<loadbalancer_id>",
+		"<project_id>/<region_id>/<load_balancer_id>",
 		&path_project_id,
 		&path_region_id,
-		&path_loadbalancer_id,
+		&path_load_balancer_id,
 	)
 	resp.Diagnostics.Append(diags...)
 	if resp.Diagnostics.HasError() {
@@ -296,12 +296,12 @@ func (r *CloudLoadBalancerResource) ImportState(ctx context.Context, req resourc
 
 	data.ProjectID = types.Int64Value(path_project_id)
 	data.RegionID = types.Int64Value(path_region_id)
-	data.ID = types.StringValue(path_loadbalancer_id)
+	data.ID = types.StringValue(path_load_balancer_id)
 
 	res := new(http.Response)
 	_, err := r.client.Cloud.LoadBalancers.Get(
 		ctx,
-		path_loadbalancer_id,
+		path_load_balancer_id,
 		cloud.LoadBalancerGetParams{
 			ProjectID: param.NewOpt(path_project_id),
 			RegionID:  param.NewOpt(path_region_id),

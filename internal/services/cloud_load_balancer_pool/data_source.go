@@ -81,6 +81,7 @@ func (d *CloudLoadBalancerPoolDataSource) Read(ctx context.Context, req datasour
 		resp.Diagnostics.AddError("failed to deserialize http request", err.Error())
 		return
 	}
+	data.ID = data.PoolID
 
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
 }

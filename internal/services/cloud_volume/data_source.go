@@ -57,6 +57,36 @@ func (d *CloudVolumeDataSource) Read(ctx context.Context, req datasource.ReadReq
 		return
 	}
 
+	if data.FindOneBy != nil {
+		params, diags := data.toListParams(ctx)
+		resp.Diagnostics.Append(diags...)
+		if resp.Diagnostics.HasError() {
+			return
+		}
+
+		env := CloudVolumesResultsListDataSourceEnvelope{}
+		page, err := d.client.Cloud.Volumes.List(ctx, params)
+		if err != nil {
+			resp.Diagnostics.AddError("failed to make http request", err.Error())
+			return
+		}
+
+		bytes := []byte(page.RawJSON())
+		err = apijson.UnmarshalComputed(bytes, &env)
+		if err != nil {
+			resp.Diagnostics.AddError("failed to unmarshal http request", err.Error())
+			return
+		}
+
+		if count := len(env.Results.Elements()); count != 1 {
+			resp.Diagnostics.AddError("failed to find exactly one result", fmt.Sprint(count)+" found")
+			return
+		}
+		ts, diags := env.Results.AsStructSliceT(ctx)
+		resp.Diagnostics.Append(diags...)
+		data.VolumeID = ts[0].ID
+	}
+
 	params, diags := data.toReadParams(ctx)
 	resp.Diagnostics.Append(diags...)
 	if resp.Diagnostics.HasError() {
@@ -81,6 +111,7 @@ func (d *CloudVolumeDataSource) Read(ctx context.Context, req datasource.ReadReq
 		resp.Diagnostics.AddError("failed to deserialize http request", err.Error())
 		return
 	}
+	data.ID = data.VolumeID
 
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
 }

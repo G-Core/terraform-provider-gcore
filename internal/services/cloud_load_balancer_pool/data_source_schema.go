@@ -18,17 +18,21 @@ var _ datasource.DataSourceWithConfigValidators = (*CloudLoadBalancerPoolDataSou
 func DataSourceSchema(ctx context.Context) schema.Schema {
 	return schema.Schema{
 		Attributes: map[string]schema.Attribute{
+			"id": schema.StringAttribute{
+				Description: "Pool ID",
+				Computed:    true,
+			},
 			"pool_id": schema.StringAttribute{
 				Description: "Pool ID",
 				Required:    true,
 			},
 			"project_id": schema.Int64Attribute{
 				Description: "Project ID",
-				Required:    true,
+				Optional:    true,
 			},
 			"region_id": schema.Int64Attribute{
 				Description: "Region ID",
-				Required:    true,
+				Optional:    true,
 			},
 			"ca_secret_id": schema.StringAttribute{
 				Description: "Secret ID of CA certificate bundle",
@@ -40,10 +44,6 @@ func DataSourceSchema(ctx context.Context) schema.Schema {
 			},
 			"crl_secret_id": schema.StringAttribute{
 				Description: "Secret ID of CA revocation list file",
-				Computed:    true,
-			},
-			"id": schema.StringAttribute{
-				Description: "Pool ID",
 				Computed:    true,
 			},
 			"lb_algorithm": schema.StringAttribute{

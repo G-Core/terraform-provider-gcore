@@ -34,6 +34,12 @@ type CloudReservedFixedIPsDataSourceModel struct {
 func (m *CloudReservedFixedIPsDataSourceModel) toListParams(_ context.Context) (params cloud.ReservedFixedIPListParams, diags diag.Diagnostics) {
 	params = cloud.ReservedFixedIPListParams{}
 
+	if !m.ProjectID.IsNull() {
+		params.ProjectID = param.NewOpt(m.ProjectID.ValueInt64())
+	}
+	if !m.RegionID.IsNull() {
+		params.RegionID = param.NewOpt(m.RegionID.ValueInt64())
+	}
 	if !m.AvailableOnly.IsNull() {
 		params.AvailableOnly = param.NewOpt(m.AvailableOnly.ValueBool())
 	}
@@ -54,12 +60,6 @@ func (m *CloudReservedFixedIPsDataSourceModel) toListParams(_ context.Context) (
 	}
 	if !m.VipOnly.IsNull() {
 		params.VipOnly = param.NewOpt(m.VipOnly.ValueBool())
-	}
-	if !m.ProjectID.IsNull() {
-		params.ProjectID = param.NewOpt(m.ProjectID.ValueInt64())
-	}
-	if !m.RegionID.IsNull() {
-		params.RegionID = param.NewOpt(m.RegionID.ValueInt64())
 	}
 
 	return

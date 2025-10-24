@@ -6,9 +6,11 @@ import (
 	"context"
 
 	"github.com/hashicorp/terraform-plugin-framework-timetypes/timetypes"
+	"github.com/hashicorp/terraform-plugin-framework-validators/datasourcevalidator"
 	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/datasource/schema"
+	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/stainless-sdks/gcore-terraform/internal/customfield"
@@ -19,17 +21,21 @@ var _ datasource.DataSourceWithConfigValidators = (*CloudVolumeDataSource)(nil)
 func DataSourceSchema(ctx context.Context) schema.Schema {
 	return schema.Schema{
 		Attributes: map[string]schema.Attribute{
-			"project_id": schema.Int64Attribute{
-				Description: "Project ID",
-				Required:    true,
-			},
-			"region_id": schema.Int64Attribute{
-				Description: "Region ID",
-				Required:    true,
+			"id": schema.StringAttribute{
+				Description: "Volume ID",
+				Computed:    true,
 			},
 			"volume_id": schema.StringAttribute{
 				Description: "Volume ID",
-				Required:    true,
+				Optional:    true,
+			},
+			"project_id": schema.Int64Attribute{
+				Description: "Project ID",
+				Optional:    true,
+			},
+			"region_id": schema.Int64Attribute{
+				Description: "Region ID",
+				Optional:    true,
 			},
 			"bootable": schema.BoolAttribute{
 				Description: "Indicates whether the volume is bootable.",
@@ -42,10 +48,6 @@ func DataSourceSchema(ctx context.Context) schema.Schema {
 			},
 			"creator_task_id": schema.StringAttribute{
 				Description: "The ID of the task that created this volume.",
-				Computed:    true,
-			},
-			"id": schema.StringAttribute{
-				Description: "The unique identifier of the volume.",
 				Computed:    true,
 			},
 			"is_root_volume": schema.BoolAttribute{
@@ -200,6 +202,44 @@ func DataSourceSchema(ctx context.Context) schema.Schema {
 					},
 				},
 			},
+			"find_one_by": schema.SingleNestedAttribute{
+				Optional: true,
+				Attributes: map[string]schema.Attribute{
+					"bootable": schema.BoolAttribute{
+						Description: "Filter by bootable field",
+						Optional:    true,
+					},
+					"cluster_id": schema.StringAttribute{
+						Description: "Filter volumes by k8s cluster ID",
+						Optional:    true,
+					},
+					"has_attachments": schema.BoolAttribute{
+						Description: "Filter by the presence of attachments",
+						Optional:    true,
+					},
+					"id_part": schema.StringAttribute{
+						Description: "Filter the volume list result by the ID part of the volume",
+						Optional:    true,
+					},
+					"instance_id": schema.StringAttribute{
+						Description: "Filter volumes by instance ID",
+						Optional:    true,
+					},
+					"name_part": schema.StringAttribute{
+						Description: "Filter volumes by `name_part` inclusion in volume name.Any substring can be used and volumes will be returned with names containing the substring.",
+						Optional:    true,
+					},
+					"tag_key": schema.ListAttribute{
+						Description: "Optional. Filter by tag keys. ?`tag_key`=key1&`tag_key`=key2",
+						Optional:    true,
+						ElementType: types.StringType,
+					},
+					"tag_key_value": schema.StringAttribute{
+						Description: "Optional. Filter by tag key-value pairs.",
+						Optional:    true,
+					},
+				},
+			},
 		},
 	}
 }
@@ -209,5 +249,7 @@ func (d *CloudVolumeDataSource) Schema(ctx context.Context, req datasource.Schem
 }
 
 func (d *CloudVolumeDataSource) ConfigValidators(_ context.Context) []datasource.ConfigValidator {
-	return []datasource.ConfigValidator{}
+	return []datasource.ConfigValidator{
+		datasourcevalidator.ExactlyOneOf(path.MatchRoot("volume_id"), path.MatchRoot("find_one_by")),
+	}
 }

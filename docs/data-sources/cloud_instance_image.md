@@ -27,12 +27,12 @@ data "gcore_cloud_instance_image" "example_cloud_instance_image" {
 ### Required
 
 - `image_id` (String)
-- `project_id` (Number)
-- `region_id` (Number)
 
 ### Optional
 
 - `include_prices` (Boolean) Show price
+- `project_id` (Number)
+- `region_id` (Number)
 
 ### Read-Only
 
