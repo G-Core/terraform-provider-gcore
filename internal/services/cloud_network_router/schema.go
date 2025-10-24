@@ -88,6 +88,7 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 				Attributes: map[string]schema.Attribute{
 					"network_id": schema.StringAttribute{
 						Description: "id of the external network.",
+						Computed:    true,
 						Optional:    true,
 					},
 					"enable_snat": schema.BoolAttribute{
