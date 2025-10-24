@@ -21,7 +21,14 @@ func resourcePortAllowedAddressPairs() *schema.Resource {
 		ReadContext:   resourcePortAAPRead,
 		UpdateContext: resourcePortAAPUpdate,
 		DeleteContext: resourcePortAAPDelete,
-		Description:   "Manages allowed address pairs of any port resource.",
+		Description:   `Manages allowed address pairs for any private port attached to a Virtual Instance.
+
+If the 'port_id' belongs to a 'gcore_reservedfixedip' resource, it is recommended to add
+'ignore_changes = [allowed_address_pairs]' to the 'gcore_reservedfixedip' resource and include
+'depends_on = [gcore_instancev2.<resource>]' in the current resource.
+
+This ensures that the allowed address pairs are configured only after
+the Reserved Fixed IP has been associated with the Virtual Instance.`,
 		Schema: map[string]*schema.Schema{
 			"region_id": {
 				Type:          schema.TypeInt,

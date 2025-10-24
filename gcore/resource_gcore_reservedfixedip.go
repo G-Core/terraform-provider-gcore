@@ -163,7 +163,7 @@ func resourceReservedFixedIP() *schema.Resource {
 			"allowed_address_pairs": {
 				Type:        schema.TypeList,
 				Optional:    true,
-				Description: "Group of IP addresses that share the current IP as VIP",
+				Description: "IP addresses or CIDRs which can be used by this port. Can be applied only after attaching Reserved Fixed IP to the Virtual Instance. Consider usage of `gcore_port_allowed_address_pairs`.",
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
 						"ip_address": {
