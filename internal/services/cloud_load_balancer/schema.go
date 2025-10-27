@@ -445,7 +445,6 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 				Description: "Preferred option to establish connectivity between load balancer and its pools members. L2 provides best performance, L3 provides less IPs usage. It is taking effect only if `instance_id` + `ip_address` is provided, not `subnet_id` + `ip_address`, because we're considering this as intentional `subnet_id` specification.\nAvailable values: \"L2\", \"L3\".",
 				Computed:    true,
 				Optional:    true,
-				Computed:    true,
 				Validators: []validator.String{
 					stringvalidator.OneOfCaseInsensitive("L2", "L3"),
 				},

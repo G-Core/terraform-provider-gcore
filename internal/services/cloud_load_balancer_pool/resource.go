@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"strings"
 
 	"github.com/G-Core/gcore-go"
 	"github.com/G-Core/gcore-go/cloud"
@@ -156,6 +157,37 @@ func (r *CloudLoadBalancerPoolResource) Update(ctx context.Context, req resource
 		resp.Diagnostics.AddError("failed to serialize http request", err.Error())
 		return
 	}
+
+	dataStr := strings.TrimSpace(string(dataBytes))
+
+	// If no fields have changed, skip the update and just refresh from API
+	if dataStr == "{}" || dataStr == "null" || len(dataBytes) == 0 {
+		// No changes to send - just read current state
+		res := new(http.Response)
+		_, err := r.client.Cloud.LoadBalancers.Pools.Get(
+			ctx,
+			data.ID.ValueString(),
+			cloud.LoadBalancerPoolGetParams{
+				ProjectID: params.ProjectID,
+				RegionID:  params.RegionID,
+			},
+			option.WithResponseBodyInto(&res),
+			option.WithMiddleware(logging.Middleware(ctx)),
+		)
+		if err != nil {
+			resp.Diagnostics.AddError("failed to read pool", err.Error())
+			return
+		}
+		bytes, _ := io.ReadAll(res.Body)
+		err = apijson.UnmarshalComputed(bytes, &data)
+		if err != nil {
+			resp.Diagnostics.AddError("failed to deserialize response", err.Error())
+			return
+		}
+		resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
+		return
+	}
+
 	pool, err := r.client.Cloud.LoadBalancers.Pools.UpdateAndPoll(
 		ctx,
 		data.ID.ValueString(),
