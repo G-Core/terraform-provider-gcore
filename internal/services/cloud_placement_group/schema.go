@@ -60,15 +60,16 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 				Description: "Region name",
 				Computed:    true,
 			},
-			"instances": schema.ListNestedAttribute{
+			"instances": schema.SetNestedAttribute{
 				Description: "The list of instances in this server group.",
+				Optional:    true,
 				Computed:    true,
-				CustomType:  customfield.NewNestedObjectListType[CloudPlacementGroupInstancesModel](ctx),
+				CustomType:  customfield.NewNestedObjectSetType[CloudPlacementGroupInstancesModel](ctx),
 				NestedObject: schema.NestedAttributeObject{
 					Attributes: map[string]schema.Attribute{
 						"instance_id": schema.StringAttribute{
 							Description: "The ID of the instance, corresponding to the attribute 'id'.",
-							Computed:    true,
+							Optional:    true,
 						},
 						"instance_name": schema.StringAttribute{
 							Description: "The name of the instance, corresponding to the attribute 'name'.",
