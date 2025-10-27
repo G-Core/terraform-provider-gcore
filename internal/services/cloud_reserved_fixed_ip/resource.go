@@ -122,28 +122,7 @@ func (r *CloudReservedFixedIPResource) Update(ctx context.Context, req resource.
 		return
 	}
 
-	// Check for unsupported changes to allowed_address_pairs
-	// Note: allowed_address_pairs is Computed-only in the schema, so users shouldn't be able to modify it directly.
-	// Only check if the plan value is known (not null/unknown) and different from state
-	if !plan.AllowedAddressPairs.IsNull() && !plan.AllowedAddressPairs.IsUnknown() && !plan.AllowedAddressPairs.Equal(state.AllowedAddressPairs) {
-		resp.Diagnostics.AddError("Update Not Supported",
-			"Updating 'allowed_address_pairs' is not supported yet. This feature requires Ports API integration which is not available in the current SDK version.")
-		return
-	}
-
-	// Check for any other attempted changes to fields that should be immutable
-	if !plan.Type.Equal(state.Type) {
-		resp.Diagnostics.AddError("Update Not Supported",
-			"The 'type' field cannot be changed after creation. Please recreate the resource with the new type.")
-		return
-	}
-
-	if !plan.NetworkID.Equal(state.NetworkID) || !plan.SubnetID.Equal(state.SubnetID) || !plan.PortID.Equal(state.PortID) || !plan.IPAddress.Equal(state.IPAddress) {
-		resp.Diagnostics.AddError("Update Not Supported",
-			"Network configuration fields (network_id, subnet_id, port_id, ip_address) cannot be changed after creation. Please recreate the resource with the new configuration.")
-		return
-	}
-
+	// Only is_vip can be updated; all other fields have RequiresReplace plan modifiers
 	// Handle is_vip update via Update() API
 	if !plan.IsVip.Equal(state.IsVip) {
 		params := cloud.ReservedFixedIPUpdateParams{
