@@ -81,7 +81,6 @@ func (d *CloudInferenceSecretDataSource) Read(ctx context.Context, req datasourc
 		resp.Diagnostics.AddError("failed to deserialize http request", err.Error())
 		return
 	}
-	data.ID = data.SecretName
 
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
 }
