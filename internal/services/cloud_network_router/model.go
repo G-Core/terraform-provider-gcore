@@ -32,7 +32,11 @@ func (m CloudNetworkRouterModel) MarshalJSON() (data []byte, err error) {
 }
 
 func (m CloudNetworkRouterModel) MarshalJSONForUpdate(state CloudNetworkRouterModel) (data []byte, err error) {
-	return apijson.MarshalForPatch(m, state)
+	// Create a copy of the model to marshal, but force interfaces to equal state
+	// so they're not included in the PATCH request (interfaces are managed via attach/detach)
+	mCopy := m
+	mCopy.Interfaces = state.Interfaces
+	return apijson.MarshalForPatch(mCopy, state)
 }
 
 type CloudNetworkRouterInterfacesModel struct {

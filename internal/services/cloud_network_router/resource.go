@@ -90,7 +90,14 @@ func (r *CloudNetworkRouterResource) Create(ctx context.Context, req resource.Cr
 		resp.Diagnostics.AddError("failed to make http request", err.Error())
 		return
 	}
-	err = apijson.UnmarshalComputed([]byte(router.RawJSON()), &data)
+
+	// Use apijson.MarshalRoot instead of router.RawJSON() for consistent handling
+	routerBytes, err := apijson.MarshalRoot(router)
+	if err != nil {
+		resp.Diagnostics.AddError("failed to serialize router response", err.Error())
+		return
+	}
+	err = apijson.UnmarshalComputed(routerBytes, &data)
 	if err != nil {
 		resp.Diagnostics.AddError("failed to deserialize http request", err.Error())
 		return
@@ -215,39 +222,48 @@ func (r *CloudNetworkRouterResource) Update(ctx context.Context, req resource.Up
 	}
 
 	// Update other router attributes (name, routes, external_gateway_info)
-	params := cloud.NetworkRouterUpdateParams{}
+	// Only send PATCH request if fields OTHER than interfaces have changed
+	needsUpdate := !data.Name.Equal(state.Name) ||
+		!data.Routes.Equal(state.Routes) ||
+		!data.ExternalGatewayInfo.Equal(state.ExternalGatewayInfo)
 
-	if !data.ProjectID.IsNull() {
-		params.ProjectID = param.NewOpt(data.ProjectID.ValueInt64())
-	}
+	var err error
+	if needsUpdate {
+		params := cloud.NetworkRouterUpdateParams{}
 
-	if !data.RegionID.IsNull() {
-		params.RegionID = param.NewOpt(data.RegionID.ValueInt64())
-	}
+		if !data.ProjectID.IsNull() {
+			params.ProjectID = param.NewOpt(data.ProjectID.ValueInt64())
+		}
 
-	dataBytes, err := data.MarshalJSONForUpdate(*state)
-	if err != nil {
-		resp.Diagnostics.AddError("failed to serialize http request", err.Error())
-		return
-	}
-	res := new(http.Response)
-	_, err = r.client.Cloud.Networks.Routers.Update(
-		ctx,
-		routerID,
-		params,
-		option.WithRequestBody("application/json", dataBytes),
-		option.WithResponseBodyInto(&res),
-		option.WithMiddleware(logging.Middleware(ctx)),
-	)
-	if err != nil {
-		resp.Diagnostics.AddError("failed to make http request", err.Error())
-		return
-	}
-	bytes, _ := io.ReadAll(res.Body)
-	err = apijson.UnmarshalComputed(bytes, &data)
-	if err != nil {
-		resp.Diagnostics.AddError("failed to deserialize http request", err.Error())
-		return
+		if !data.RegionID.IsNull() {
+			params.RegionID = param.NewOpt(data.RegionID.ValueInt64())
+		}
+
+		var dataBytes []byte
+		dataBytes, err = data.MarshalJSONForUpdate(*state)
+		if err != nil {
+			resp.Diagnostics.AddError("failed to serialize http request", err.Error())
+			return
+		}
+		res := new(http.Response)
+		_, err = r.client.Cloud.Networks.Routers.Update(
+			ctx,
+			routerID,
+			params,
+			option.WithRequestBody("application/json", dataBytes),
+			option.WithResponseBodyInto(&res),
+			option.WithMiddleware(logging.Middleware(ctx)),
+		)
+		if err != nil {
+			resp.Diagnostics.AddError("failed to make http request", err.Error())
+			return
+		}
+		bytes, _ := io.ReadAll(res.Body)
+		err = apijson.UnmarshalComputed(bytes, &data)
+		if err != nil {
+			resp.Diagnostics.AddError("failed to deserialize http request", err.Error())
+			return
+		}
 	}
 
 	// Do a final Read to get consistent state after attach/detach and update operations
