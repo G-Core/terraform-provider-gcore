@@ -28,6 +28,6 @@ func (m CloudPlacementGroupModel) MarshalJSONForUpdate(state CloudPlacementGroup
 }
 
 type CloudPlacementGroupInstancesModel struct {
-	InstanceID   types.String `tfsdk:"instance_id" json:"instance_id,computed_optional"`
+	InstanceID   types.String `tfsdk:"instance_id" json:"instance_id,optional"`
 	InstanceName types.String `tfsdk:"instance_name" json:"instance_name,computed"`
 }
