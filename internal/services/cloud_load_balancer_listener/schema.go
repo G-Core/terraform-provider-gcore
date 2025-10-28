@@ -128,7 +128,7 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 				},
 			},
 			"connection_limit": schema.Int64Attribute{
-				Description: "Limit of the simultaneous connections",
+				Description: "Limit of the simultaneous connections. If -1 is provided, it is translated to the default value 100000.",
 				Computed:    true,
 				Optional:    true,
 				Validators: []validator.Int64{

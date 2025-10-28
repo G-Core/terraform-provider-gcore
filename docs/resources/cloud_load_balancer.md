@@ -180,7 +180,7 @@ Available values: "HTTP", "HTTPS", "PROMETHEUS", "TCP", "TERMINATED_HTTPS", "UDP
 Optional:
 
 - `allowed_cidrs` (List of String) Network CIDRs from which service will be accessible
-- `connection_limit` (Number) Limit of the simultaneous connections
+- `connection_limit` (Number) Limit of the simultaneous connections. If -1 is provided, it is translated to the default value 100000.
 - `insert_x_forwarded` (Boolean) Add headers X-Forwarded-For, X-Forwarded-Port, X-Forwarded-Proto to requests. Only used with HTTP or `TERMINATED_HTTPS` protocols.
 - `pools` (Attributes List) Member pools (see [below for nested schema](#nestedatt--listeners--pools))
 - `secret_id` (String) ID of the secret where PKCS12 file is stored for `TERMINATED_HTTPS` or PROMETHEUS listener
