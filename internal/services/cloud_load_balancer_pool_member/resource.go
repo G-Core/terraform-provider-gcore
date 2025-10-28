@@ -96,7 +96,140 @@ func (r *CloudLoadBalancerPoolMemberResource) Create(ctx context.Context, req re
 }
 
 func (r *CloudLoadBalancerPoolMemberResource) Update(ctx context.Context, req resource.UpdateRequest, resp *resource.UpdateResponse) {
-	// Update is not supported for this resource
+	var data *CloudLoadBalancerPoolMemberModel
+	var state *CloudLoadBalancerPoolMemberModel
+
+	resp.Diagnostics.Append(req.Plan.Get(ctx, &data)...)
+	resp.Diagnostics.Append(req.State.Get(ctx, &state)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
+
+	params := cloud.LoadBalancerPoolGetParams{}
+	if !data.ProjectID.IsNull() {
+		params.ProjectID = param.NewOpt(data.ProjectID.ValueInt64())
+	}
+	if !data.RegionID.IsNull() {
+		params.RegionID = param.NewOpt(data.RegionID.ValueInt64())
+	}
+
+	// 1. Get the pool to access all members
+	pool, err := r.client.Cloud.LoadBalancers.Pools.Get(
+		ctx,
+		data.PoolID.ValueString(),
+		params,
+		option.WithMiddleware(logging.Middleware(ctx)),
+	)
+	if err != nil {
+		resp.Diagnostics.AddError("failed to get pool for member update", err.Error())
+		return
+	}
+
+	// 2. Rebuild members list with updated member
+	var updatedMembers []cloud.LoadBalancerPoolUpdateParamsMember
+	memberFound := false
+
+	for _, member := range pool.Members {
+		if member.ID == data.ID.ValueString() {
+			// This is the member we're updating
+			memberFound = true
+			updatedMember := cloud.LoadBalancerPoolUpdateParamsMember{
+				Address:      data.Address.ValueString(),
+				ProtocolPort: data.ProtocolPort.ValueInt64(),
+			}
+
+			if !data.InstanceID.IsNull() {
+				updatedMember.InstanceID = param.NewOpt(data.InstanceID.ValueString())
+			}
+			if !data.MonitorAddress.IsNull() {
+				updatedMember.MonitorAddress = param.NewOpt(data.MonitorAddress.ValueString())
+			}
+			if !data.MonitorPort.IsNull() {
+				updatedMember.MonitorPort = param.NewOpt(data.MonitorPort.ValueInt64())
+			}
+			if !data.SubnetID.IsNull() {
+				updatedMember.SubnetID = param.NewOpt(data.SubnetID.ValueString())
+			}
+			if !data.AdminStateUp.IsNull() {
+				updatedMember.AdminStateUp = param.NewOpt(data.AdminStateUp.ValueBool())
+			}
+			if !data.Backup.IsNull() {
+				updatedMember.Backup = param.NewOpt(data.Backup.ValueBool())
+			}
+			if !data.Weight.IsNull() {
+				updatedMember.Weight = param.NewOpt(data.Weight.ValueInt64())
+			}
+
+			updatedMembers = append(updatedMembers, updatedMember)
+		} else {
+			// Keep other members unchanged
+			existingMember := cloud.LoadBalancerPoolUpdateParamsMember{
+				Address:      member.Address,
+				ProtocolPort: member.ProtocolPort,
+			}
+
+			if member.MonitorAddress != "" {
+				existingMember.MonitorAddress = param.NewOpt(member.MonitorAddress)
+			}
+			if member.MonitorPort != 0 {
+				existingMember.MonitorPort = param.NewOpt(member.MonitorPort)
+			}
+			if member.SubnetID != "" {
+				existingMember.SubnetID = param.NewOpt(member.SubnetID)
+			}
+			existingMember.AdminStateUp = param.NewOpt(member.AdminStateUp)
+			existingMember.Backup = param.NewOpt(member.Backup)
+			if member.Weight != 0 {
+				existingMember.Weight = param.NewOpt(member.Weight)
+			}
+
+			updatedMembers = append(updatedMembers, existingMember)
+		}
+	}
+
+	if !memberFound {
+		resp.Diagnostics.AddError("member not found in pool",
+			fmt.Sprintf("member ID %s not found in pool %s", data.ID.ValueString(), data.PoolID.ValueString()))
+		return
+	}
+
+	// 3. Update the pool with the new members list
+	updateParams := cloud.LoadBalancerPoolUpdateParams{
+		Name:    param.NewOpt(pool.Name),
+		Members: updatedMembers,
+	}
+	if !data.ProjectID.IsNull() {
+		updateParams.ProjectID = param.NewOpt(data.ProjectID.ValueInt64())
+	}
+	if !data.RegionID.IsNull() {
+		updateParams.RegionID = param.NewOpt(data.RegionID.ValueInt64())
+	}
+
+	poolUpdated, err := r.client.Cloud.LoadBalancers.Pools.UpdateAndPoll(
+		ctx,
+		data.PoolID.ValueString(),
+		updateParams,
+		option.WithMiddleware(logging.Middleware(ctx)),
+	)
+	if err != nil {
+		resp.Diagnostics.AddError("failed to update load balancer pool member", err.Error())
+		return
+	}
+
+	// 4. Read back the updated member data
+	for _, member := range poolUpdated.Members {
+		if member.ID == data.ID.ValueString() {
+			err = apijson.UnmarshalComputed([]byte(member.RawJSON()), &data)
+			if err != nil {
+				resp.Diagnostics.AddError("failed to deserialize updated member", err.Error())
+				return
+			}
+			break
+		}
+	}
+
+	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
 }
 
 func (r *CloudLoadBalancerPoolMemberResource) Read(ctx context.Context, req resource.ReadRequest, resp *resource.ReadResponse) {
