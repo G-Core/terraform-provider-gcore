@@ -116,6 +116,105 @@ func (r *CloudNetworkRouterResource) Update(ctx context.Context, req resource.Up
 		return
 	}
 
+	routerID := data.ID.ValueString()
+
+	// Handle interface attach/detach operations
+	if !data.Interfaces.Equal(state.Interfaces) {
+		// Get old and new interface lists
+		oldInterfaces, diags := state.Interfaces.AsStructSliceT(ctx)
+		resp.Diagnostics.Append(diags...)
+		if resp.Diagnostics.HasError() {
+			return
+		}
+
+		newInterfaces, diags := data.Interfaces.AsStructSliceT(ctx)
+		resp.Diagnostics.Append(diags...)
+		if resp.Diagnostics.HasError() {
+			return
+		}
+
+		// Create a map of old interfaces for quick lookup
+		oldInterfaceMap := make(map[string]bool)
+		for _, oldIface := range oldInterfaces {
+			if oldIface.SubnetID.ValueString() != "" {
+				oldInterfaceMap[oldIface.SubnetID.ValueString()] = true
+			}
+		}
+
+		// Process new interfaces: attach those that don't exist in old
+		newInterfaceMap := make(map[string]bool)
+		for _, newIface := range newInterfaces {
+			subnetID := newIface.SubnetID.ValueString()
+			if subnetID == "" {
+				continue
+			}
+			newInterfaceMap[subnetID] = true
+
+			// If this interface is not in old set, attach it
+			if !oldInterfaceMap[subnetID] {
+				attachParams := cloud.NetworkRouterAttachSubnetParams{
+					SubnetID: subnetID,
+				}
+				if !data.ProjectID.IsNull() {
+					attachParams.ProjectID = param.NewOpt(data.ProjectID.ValueInt64())
+				}
+				if !data.RegionID.IsNull() {
+					attachParams.RegionID = param.NewOpt(data.RegionID.ValueInt64())
+				}
+
+				_, err := r.client.Cloud.Networks.Routers.AttachSubnet(
+					ctx,
+					routerID,
+					attachParams,
+					option.WithMiddleware(logging.Middleware(ctx)),
+				)
+				if err != nil {
+					resp.Diagnostics.AddError(
+						"failed to attach subnet to router",
+						fmt.Sprintf("SubnetID: %s, Error: %s", subnetID, err.Error()),
+					)
+					return
+				}
+			}
+		}
+
+		// Process old interfaces: detach those that are not in new set
+		for _, oldIface := range oldInterfaces {
+			subnetID := oldIface.SubnetID.ValueString()
+			if subnetID == "" {
+				continue
+			}
+
+			// If this interface is not in new set, detach it
+			if !newInterfaceMap[subnetID] {
+				detachParams := cloud.NetworkRouterDetachSubnetParams{
+					SubnetID: cloud.SubnetIDParam{SubnetID: subnetID},
+				}
+				if !data.ProjectID.IsNull() {
+					detachParams.ProjectID = param.NewOpt(data.ProjectID.ValueInt64())
+				}
+				if !data.RegionID.IsNull() {
+					detachParams.RegionID = param.NewOpt(data.RegionID.ValueInt64())
+				}
+
+				_, err := r.client.Cloud.Networks.Routers.DetachSubnet(
+					ctx,
+					routerID,
+					detachParams,
+					option.WithMiddleware(logging.Middleware(ctx)),
+				)
+				if err != nil {
+					resp.Diagnostics.AddError(
+						"failed to detach subnet from router",
+						fmt.Sprintf("SubnetID: %s, Error: %s", subnetID, err.Error()),
+					)
+					return
+				}
+			}
+		}
+	}
+
+	// Update other router attributes (name, routes, external_gateway_info)
 	params := cloud.NetworkRouterUpdateParams{}
 
 	if !data.ProjectID.IsNull() {
@@ -134,7 +233,7 @@ func (r *CloudNetworkRouterResource) Update(ctx context.Context, req resource.Up
 	res := new(http.Response)
 	_, err = r.client.Cloud.Networks.Routers.Update(
 		ctx,
-		data.ID.ValueString(),
+		routerID,
 		params,
 		option.WithRequestBody("application/json", dataBytes),
 		option.WithResponseBodyInto(&res),
@@ -148,6 +247,34 @@ func (r *CloudNetworkRouterResource) Update(ctx context.Context, req resource.Up
 	err = apijson.UnmarshalComputed(bytes, &data)
 	if err != nil {
 		resp.Diagnostics.AddError("failed to deserialize http request", err.Error())
+		return
+	}
+
+	// Do a final Read to get consistent state after attach/detach and update operations
+	getParams := cloud.NetworkRouterGetParams{}
+	if !data.ProjectID.IsNull() {
+		getParams.ProjectID = param.NewOpt(data.ProjectID.ValueInt64())
+	}
+	if !data.RegionID.IsNull() {
+		getParams.RegionID = param.NewOpt(data.RegionID.ValueInt64())
+	}
+
+	readRes := new(http.Response)
+	_, err = r.client.Cloud.Networks.Routers.Get(
+		ctx,
+		routerID,
+		getParams,
+		option.WithResponseBodyInto(&readRes),
+		option.WithMiddleware(logging.Middleware(ctx)),
+	)
+	if err != nil {
+		resp.Diagnostics.AddError("failed to read router after update", err.Error())
+		return
+	}
+	readBytes, _ := io.ReadAll(readRes.Body)
+	err = apijson.Unmarshal(readBytes, &data)
+	if err != nil {
+		resp.Diagnostics.AddError("failed to deserialize router after update", err.Error())
 		return
 	}
 
