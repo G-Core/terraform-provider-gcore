@@ -123,45 +123,42 @@ func (r *CloudReservedFixedIPResource) Update(ctx context.Context, req resource.
 	}
 
 	// Only is_vip can be updated; all other fields have RequiresReplace plan modifiers
-	// Handle is_vip update via Update() API
-	if !plan.IsVip.Equal(state.IsVip) {
-		params := cloud.ReservedFixedIPUpdateParams{
-			IsVip: plan.IsVip.ValueBool(),
-		}
+	params := cloud.ReservedFixedIPUpdateParams{
+		IsVip: plan.IsVip.ValueBool(),
+	}
 
-		if !plan.ProjectID.IsNull() {
-			params.ProjectID = param.NewOpt(plan.ProjectID.ValueInt64())
-		}
+	if !plan.ProjectID.IsNull() {
+		params.ProjectID = param.NewOpt(plan.ProjectID.ValueInt64())
+	}
 
-		if !plan.RegionID.IsNull() {
-			params.RegionID = param.NewOpt(plan.RegionID.ValueInt64())
-		}
+	if !plan.RegionID.IsNull() {
+		params.RegionID = param.NewOpt(plan.RegionID.ValueInt64())
+	}
 
-		res := new(http.Response)
-		_, err := r.client.Cloud.ReservedFixedIPs.Update(
-			ctx,
-			state.PortID.ValueString(),
-			params,
-			option.WithResponseBodyInto(&res),
-			option.WithMiddleware(logging.Middleware(ctx)),
-		)
-		if err != nil {
-			resp.Diagnostics.AddError("failed to update VIP status", err.Error())
-			return
-		}
+	res := new(http.Response)
+	_, err := r.client.Cloud.ReservedFixedIPs.Update(
+		ctx,
+		state.PortID.ValueString(),
+		params,
+		option.WithResponseBodyInto(&res),
+		option.WithMiddleware(logging.Middleware(ctx)),
+	)
+	if err != nil {
+		resp.Diagnostics.AddError("failed to update VIP status", err.Error())
+		return
+	}
 
-		// Update state with response
-		bytes, _ := io.ReadAll(res.Body)
-		err = apijson.UnmarshalComputed(bytes, &plan)
-		if err != nil {
-			resp.Diagnostics.AddError("failed to deserialize http request", err.Error())
-			return
-		}
+	// Update state with response
+	bytes, _ := io.ReadAll(res.Body)
+	err = apijson.UnmarshalComputed(bytes, &plan)
+	if err != nil {
+		resp.Diagnostics.AddError("failed to deserialize http request", err.Error())
+		return
+	}
 
-		// Restore ID field (API doesn't return id, but we need it for Terraform)
-		if !plan.PortID.IsNull() && plan.PortID.ValueString() != "" {
-			plan.ID = types.StringValue(plan.PortID.ValueString())
-		}
+	// Restore ID field (API doesn't return id, but we need it for Terraform)
+	if !plan.PortID.IsNull() && plan.PortID.ValueString() != "" {
+		plan.ID = types.StringValue(plan.PortID.ValueString())
 	}
 
 	// If we get here, update succeeded or no changes needed, save plan to state
