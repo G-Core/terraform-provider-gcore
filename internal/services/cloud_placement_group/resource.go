@@ -4,6 +4,7 @@ package cloud_placement_group
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"io"
 	"net/http"
@@ -242,8 +243,15 @@ func (r *CloudPlacementGroupResource) Update(ctx context.Context, req resource.U
 			option.WithMiddleware(logging.Middleware(ctx)),
 		)
 		if err != nil {
-			resp.Diagnostics.AddError("failed to remove instance from placement group", err.Error())
-			return
+			var apierr *gcore.Error
+			if errors.As(err, &apierr) {
+				if apierr.StatusCode == 404 {
+					resp.Diagnostics.AddWarning("instance not found in a placement group.", err.Error())
+				} else {
+					resp.Diagnostics.AddError("failed to remove instance from placement group", err.Error())
+					return
+				}
+			}
 		}
 	}
 
