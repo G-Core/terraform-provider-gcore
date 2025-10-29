@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"strings"
 
 	"github.com/G-Core/gcore-go"
 	"github.com/G-Core/gcore-go/cloud"
@@ -94,12 +95,7 @@ func (r *CloudLoadBalancerResource) Create(ctx context.Context, req resource.Cre
 	}
 
 	// Update data with the returned LoadBalancer
-	loadBalancerBytes, err := apijson.MarshalRoot(loadBalancer)
-	if err != nil {
-		resp.Diagnostics.AddError("failed to serialize http request", err.Error())
-		return
-	}
-	err = apijson.UnmarshalComputed(loadBalancerBytes, &data)
+	err = apijson.UnmarshalComputed([]byte(loadBalancer.RawJSON()), &data)
 	if err != nil {
 		resp.Diagnostics.AddError("failed to deserialize http request", err.Error())
 		return
@@ -125,6 +121,45 @@ func (r *CloudLoadBalancerResource) Update(ctx context.Context, req resource.Upd
 		return
 	}
 
+	// Handle flavor changes with ResizeAndPoll - if only flavor changed, skip regular update
+	flavorChanged := !data.Flavor.Equal(state.Flavor) && !data.Flavor.IsNull()
+
+	if flavorChanged {
+		resizeParams := cloud.LoadBalancerResizeParams{
+			Flavor: data.Flavor.ValueString(),
+		}
+
+		if !data.ProjectID.IsNull() {
+			resizeParams.ProjectID = param.NewOpt(data.ProjectID.ValueInt64())
+		}
+
+		if !data.RegionID.IsNull() {
+			resizeParams.RegionID = param.NewOpt(data.RegionID.ValueInt64())
+		}
+
+		loadBalancer, err := r.client.Cloud.LoadBalancers.ResizeAndPoll(
+			ctx,
+			data.ID.ValueString(),
+			resizeParams,
+			option.WithMiddleware(logging.Middleware(ctx)),
+		)
+		if err != nil {
+			resp.Diagnostics.AddError("failed to resize load balancer", err.Error())
+			return
+		}
+
+		// Update data with resized LoadBalancer
+		err = apijson.UnmarshalComputed([]byte(loadBalancer.RawJSON()), &data)
+		if err != nil {
+			resp.Diagnostics.AddError("failed to deserialize resize response", err.Error())
+			return
+		}
+
+		// After resize, set state and return (don't call regular Update)
+		resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
+		return
+	}
+
 	params := cloud.LoadBalancerUpdateParams{}
 
 	if !data.ProjectID.IsNull() {
@@ -140,6 +175,37 @@ func (r *CloudLoadBalancerResource) Update(ctx context.Context, req resource.Upd
 		resp.Diagnostics.AddError("failed to serialize http request", err.Error())
 		return
 	}
+
+	dataStr := strings.TrimSpace(string(dataBytes))
+
+	// If no fields have changed, skip the update and just refresh from API
+	if dataStr == "{}" || dataStr == "null" || len(dataBytes) == 0 {
+		// No changes to send - just read current state
+		res := new(http.Response)
+		_, err := r.client.Cloud.LoadBalancers.Get(
+			ctx,
+			data.ID.ValueString(),
+			cloud.LoadBalancerGetParams{
+				ProjectID: params.ProjectID,
+				RegionID:  params.RegionID,
+			},
+			option.WithResponseBodyInto(&res),
+			option.WithMiddleware(logging.Middleware(ctx)),
+		)
+		if err != nil {
+			resp.Diagnostics.AddError("failed to read load balancer", err.Error())
+			return
+		}
+		bytes, _ := io.ReadAll(res.Body)
+		err = apijson.UnmarshalComputed(bytes, &data)
+		if err != nil {
+			resp.Diagnostics.AddError("failed to deserialize response", err.Error())
+			return
+		}
+		resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
+		return
+	}
+
 	res := new(http.Response)
 	_, err = r.client.Cloud.LoadBalancers.Update(
 		ctx,
@@ -228,7 +294,7 @@ func (r *CloudLoadBalancerResource) Delete(ctx context.Context, req resource.Del
 		params.RegionID = param.NewOpt(data.RegionID.ValueInt64())
 	}
 
-	_, err := r.client.Cloud.LoadBalancers.Delete(
+	err := r.client.Cloud.LoadBalancers.DeleteAndPoll(
 		ctx,
 		data.ID.ValueString(),
 		params,

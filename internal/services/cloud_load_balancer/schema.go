@@ -41,9 +41,8 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 				PlanModifiers: []planmodifier.Int64{int64planmodifier.RequiresReplace()},
 			},
 			"flavor": schema.StringAttribute{
-				Description:   "Load balancer flavor name",
-				Optional:      true,
-				PlanModifiers: []planmodifier.String{stringplanmodifier.RequiresReplace()},
+				Description: "Load balancer flavor name",
+				Optional:    true,
 			},
 			"name_template": schema.StringAttribute{
 				Description:   "Load balancer name which will be changed by template.",
@@ -449,6 +448,7 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 				Validators: []validator.String{
 					stringvalidator.OneOfCaseInsensitive("L2", "L3"),
 				},
+				PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
 			},
 			"logging": schema.SingleNestedAttribute{
 				Description: "Logging configuration",
