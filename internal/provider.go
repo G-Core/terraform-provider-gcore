@@ -17,6 +17,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/stainless-sdks/gcore-terraform/internal/services/cloud_floating_ip"
+	"github.com/stainless-sdks/gcore-terraform/internal/services/cloud_inference_secret"
 	"github.com/stainless-sdks/gcore-terraform/internal/services/cloud_instance"
 	"github.com/stainless-sdks/gcore-terraform/internal/services/cloud_instance_image"
 	"github.com/stainless-sdks/gcore-terraform/internal/services/cloud_load_balancer"
@@ -179,6 +180,7 @@ func (p *GcoreProvider) Resources(ctx context.Context) []func() resource.Resourc
 		cloud_volume.NewResource,
 		cloud_floating_ip.NewResource,
 		cloud_security_group.NewResource,
+		cloud_inference_secret.NewResource,
 		cloud_placement_group.NewResource,
 		cloud_instance.NewResource,
 	}
@@ -212,6 +214,8 @@ func (p *GcoreProvider) DataSources(ctx context.Context) []func() datasource.Dat
 		cloud_floating_ip.NewCloudFloatingIPsDataSource,
 		cloud_security_group.NewCloudSecurityGroupDataSource,
 		cloud_security_group.NewCloudSecurityGroupsDataSource,
+		cloud_inference_secret.NewCloudInferenceSecretDataSource,
+		cloud_inference_secret.NewCloudInferenceSecretsDataSource,
 		cloud_placement_group.NewCloudPlacementGroupDataSource,
 		cloud_instance.NewCloudInstanceDataSource,
 		cloud_instance.NewCloudInstancesDataSource,
