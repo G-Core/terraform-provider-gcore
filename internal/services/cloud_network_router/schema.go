@@ -10,6 +10,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/booldefault"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/boolplanmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/int64planmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/listplanmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
@@ -59,7 +60,7 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 						},
 					},
 				},
-				PlanModifiers: []planmodifier.List{listplanmodifier.RequiresReplaceIfConfigured()},
+				PlanModifiers: []planmodifier.List{listplanmodifier.UseStateForUnknown()},
 			},
 			"name": schema.StringAttribute{
 				Description: "name of router",
@@ -71,9 +72,10 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 				CustomType: customfield.NewNestedObjectType[CloudNetworkRouterExternalGatewayInfoModel](ctx),
 				Attributes: map[string]schema.Attribute{
 					"network_id": schema.StringAttribute{
-						Description: "id of the external network.",
-						Computed:    true,
-						Optional:    true,
+						Description:   "id of the external network.",
+						Computed:      true,
+						Optional:      true,
+						PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
 					},
 					"enable_snat": schema.BoolAttribute{
 						Description: "Is SNAT enabled. Defaults to true.",
@@ -95,7 +97,8 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 				Description: "List of custom routes.",
 				Computed:    true,
 				Optional:    true,
-				CustomType:  customfield.NewNestedObjectListType[CloudNetworkRouterRoutesModel](ctx),
+				CustomType:    customfield.NewNestedObjectListType[CloudNetworkRouterRoutesModel](ctx),
+			PlanModifiers: []planmodifier.List{listplanmodifier.UseStateForUnknown()},
 				NestedObject: schema.NestedAttributeObject{
 					Attributes: map[string]schema.Attribute{
 						"destination": schema.StringAttribute{
@@ -113,26 +116,32 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 				Description: "Datetime when the router was created",
 				Computed:    true,
 				CustomType:  timetypes.RFC3339Type{},
+			PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
 			},
 			"creator_task_id": schema.StringAttribute{
 				Description: "Task that created this entity",
 				Computed:    true,
+			PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
 			},
 			"distributed": schema.BoolAttribute{
 				Description: "Whether the router is distributed or centralized.",
 				Computed:    true,
+			PlanModifiers: []planmodifier.Bool{boolplanmodifier.UseStateForUnknown()},
 			},
 			"region": schema.StringAttribute{
 				Description: "Region name",
 				Computed:    true,
+			PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
 			},
 			"status": schema.StringAttribute{
 				Description: "Status of the router.",
 				Computed:    true,
+			PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
 			},
 			"task_id": schema.StringAttribute{
 				Description: "The UUID of the active task that currently holds a lock on the resource. This lock prevents concurrent modifications to ensure consistency. If `null`, the resource is not locked.",
 				Computed:    true,
+			PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
 			},
 			"updated_at": schema.StringAttribute{
 				Description: "Datetime when the router was last updated",
@@ -144,6 +153,7 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 				Computed:    true,
 				CustomType:  customfield.NewListType[types.String](ctx),
 				ElementType: types.StringType,
+			PlanModifiers: []planmodifier.List{listplanmodifier.UseStateForUnknown()},
 			},
 		},
 	}
