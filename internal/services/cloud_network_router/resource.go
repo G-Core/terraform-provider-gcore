@@ -288,7 +288,7 @@ func (r *CloudNetworkRouterResource) Update(ctx context.Context, req resource.Up
 		return
 	}
 	readBytes, _ := io.ReadAll(readRes.Body)
-	err = apijson.Unmarshal(readBytes, &data)
+	err = apijson.UnmarshalComputed(readBytes, &data)
 	if err != nil {
 		resp.Diagnostics.AddError("failed to deserialize router after update", err.Error())
 		return
@@ -334,7 +334,7 @@ func (r *CloudNetworkRouterResource) Read(ctx context.Context, req resource.Read
 		return
 	}
 	bytes, _ := io.ReadAll(res.Body)
-	err = apijson.Unmarshal(bytes, &data)
+	err = apijson.UnmarshalComputed(bytes, &data)
 	if err != nil {
 		resp.Diagnostics.AddError("failed to deserialize http request", err.Error())
 		return
@@ -414,7 +414,7 @@ func (r *CloudNetworkRouterResource) ImportState(ctx context.Context, req resour
 		return
 	}
 	bytes, _ := io.ReadAll(res.Body)
-	err = apijson.Unmarshal(bytes, &data)
+	err = apijson.UnmarshalComputed(bytes, &data)
 	if err != nil {
 		resp.Diagnostics.AddError("failed to deserialize http request", err.Error())
 		return
