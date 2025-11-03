@@ -113,56 +113,65 @@ func (r *CloudReservedFixedIPResource) Create(ctx context.Context, req resource.
 }
 
 func (r *CloudReservedFixedIPResource) Update(ctx context.Context, req resource.UpdateRequest, resp *resource.UpdateResponse) {
-	var plan, state *CloudReservedFixedIPModel
+	var data *CloudReservedFixedIPModel
 
-	resp.Diagnostics.Append(req.Plan.Get(ctx, &plan)...)
+	resp.Diagnostics.Append(req.Plan.Get(ctx, &data)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
+
+	var state *CloudReservedFixedIPModel
+
 	resp.Diagnostics.Append(req.State.Get(ctx, &state)...)
 
 	if resp.Diagnostics.HasError() {
 		return
 	}
 
-	// Only is_vip can be updated; all other fields have RequiresReplace plan modifiers
-	params := cloud.ReservedFixedIPUpdateParams{
-		IsVip: plan.IsVip.ValueBool(),
+	params := cloud.ReservedFixedIPUpdateParams{}
+
+	if !data.ProjectID.IsNull() {
+		params.ProjectID = param.NewOpt(data.ProjectID.ValueInt64())
 	}
 
-	if !plan.ProjectID.IsNull() {
-		params.ProjectID = param.NewOpt(plan.ProjectID.ValueInt64())
+	if !data.RegionID.IsNull() {
+		params.RegionID = param.NewOpt(data.RegionID.ValueInt64())
 	}
 
-	if !plan.RegionID.IsNull() {
-		params.RegionID = param.NewOpt(plan.RegionID.ValueInt64())
+	dataBytes, err := data.MarshalJSONForUpdate(*state)
+	if err != nil {
+		resp.Diagnostics.AddError("failed to serialize http request", err.Error())
+		return
 	}
-
 	res := new(http.Response)
-	_, err := r.client.Cloud.ReservedFixedIPs.Update(
+	_, err = r.client.Cloud.ReservedFixedIPs.Update(
 		ctx,
 		state.PortID.ValueString(),
 		params,
+		option.WithRequestBody("application/json", dataBytes),
 		option.WithResponseBodyInto(&res),
 		option.WithMiddleware(logging.Middleware(ctx)),
 	)
 	if err != nil {
-		resp.Diagnostics.AddError("failed to update VIP status", err.Error())
+		resp.Diagnostics.AddError("failed to update reserved fixed IP", err.Error())
 		return
 	}
 
 	// Update state with response
 	bytes, _ := io.ReadAll(res.Body)
-	err = apijson.UnmarshalComputed(bytes, &plan)
+	err = apijson.UnmarshalComputed(bytes, &data)
 	if err != nil {
 		resp.Diagnostics.AddError("failed to deserialize http request", err.Error())
 		return
 	}
 
 	// Restore ID field (API doesn't return id, but we need it for Terraform)
-	if !plan.PortID.IsNull() && plan.PortID.ValueString() != "" {
-		plan.ID = types.StringValue(plan.PortID.ValueString())
+	if !data.PortID.IsNull() && data.PortID.ValueString() != "" {
+		data.ID = types.StringValue(data.PortID.ValueString())
 	}
 
-	// If we get here, update succeeded or no changes needed, save plan to state
-	resp.Diagnostics.Append(resp.State.Set(ctx, &plan)...)
+	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
 }
 
 func (r *CloudReservedFixedIPResource) Read(ctx context.Context, req resource.ReadRequest, resp *resource.ReadResponse) {
