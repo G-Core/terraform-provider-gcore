@@ -54,5 +54,9 @@ output "kubeconfig" {
 
 ### Read-Only
 
+- `client_certificate` (String) String in base64 format. Cluster client certificate
+- `client_key` (String) String in base64 format. Cluster client key
+- `cluster_ca_certificate` (String) String in base64 format. Cluster ca certificate
+- `host` (String) Cluster host
 - `id` (String) The ID of this resource.
 - `kubeconfig` (String) Raw kubeconfig file
