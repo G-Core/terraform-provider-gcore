@@ -87,6 +87,7 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 						Description: "must be 'manual'.\nAvailable values: \"manual\", \"default\".",
 						Computed:    true,
 						Optional:    true,
+						PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
 						Validators: []validator.String{
 							stringvalidator.OneOfCaseInsensitive("manual", "default"),
 						},
