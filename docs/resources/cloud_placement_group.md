@@ -32,22 +32,25 @@ Available values: "affinity", "anti-affinity", "soft-anti-affinity".
 
 ### Optional
 
+- `instances` (Attributes Set) The list of instances in this server group. (see [below for nested schema](#nestedatt--instances))
 - `project_id` (Number)
 - `region_id` (Number)
 
 ### Read-Only
 
 - `id` (String) The ID of the server group.
-- `instances` (Attributes List) The list of instances in this server group. (see [below for nested schema](#nestedatt--instances))
 - `region` (String) Region name
 - `servergroup_id` (String) The ID of the server group.
 
 <a id="nestedatt--instances"></a>
 ### Nested Schema for `instances`
 
-Read-Only:
+Optional:
 
 - `instance_id` (String) The ID of the instance, corresponding to the attribute 'id'.
+
+Read-Only:
+
 - `instance_name` (String) The name of the instance, corresponding to the attribute 'name'.
 
 ## Import
