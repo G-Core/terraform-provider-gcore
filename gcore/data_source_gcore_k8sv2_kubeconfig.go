@@ -59,6 +59,26 @@ func dataSourceK8sV2KubeConfig() *schema.Resource {
 				Description: "Raw kubeconfig file",
 				Computed:    true,
 			},
+			"host": {
+				Type:        schema.TypeString,
+				Description: "Cluster host",
+				Computed:    true,
+			},
+			"cluster_ca_certificate": {
+				Type:        schema.TypeString,
+				Description: "String in base64 format. Cluster ca certificate",
+				Computed:    true,
+			},
+			"client_certificate": {
+				Type:        schema.TypeString,
+				Description: "String in base64 format. Cluster client certificate",
+				Computed:    true,
+			},
+			"client_key": {
+				Type:        schema.TypeString,
+				Description: "String in base64 format. Cluster client key",
+				Computed:    true,
+			},
 		},
 	}
 }
@@ -81,9 +101,16 @@ func dataSourceK8sV2KubeConfigRead(ctx context.Context, d *schema.ResourceData, 
 	}
 
 	kubeconfig, err := clusters.GetConfig(client, clusterName).Extract()
+	if err != nil {
+		return diag.FromErr(fmt.Errorf("cant get kubeconfig: %s", err.Error()))
+	}
 
 	d.SetId(cluster.Name)
 	d.Set("kubeconfig", kubeconfig.Config)
+	d.Set("cluster_ca_certificate", kubeconfig.ClusterCACertificate)
+	d.Set("client_certificate", kubeconfig.ClientCertificate)
+	d.Set("client_key", kubeconfig.ClientKey)
+	d.Set("host", kubeconfig.Host)
 
 	log.Println("[DEBUG] Finish K8s kubeconfig reading")
 	return diags
