@@ -45,10 +45,12 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 					"aws_access_key_id": schema.StringAttribute{
 						Description: "AWS IAM key ID.",
 						Required:    true,
+						WriteOnly:   true,
 					},
 					"aws_secret_access_key": schema.StringAttribute{
 						Description: "AWS IAM secret key.",
 						Required:    true,
+						WriteOnly:   true,
 					},
 				},
 				PlanModifiers: []planmodifier.Object{objectplanmodifier.RequiresReplace()},
