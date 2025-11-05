@@ -283,15 +283,6 @@ func (r *CloudNetworkRouterResource) Update(ctx context.Context, req resource.Up
 			option.WithMiddleware(logging.Middleware(ctx)),
 		}
 
-		if routesDeletionNeeded {
-			resp.Diagnostics.AddWarning(
-				"Route deletion workaround",
-				fmt.Sprintf("Forcing routes=[] in request body using WithJSONSet. Deleting %d routes.", len(stateRoutes)),
-			)
-			// Use the SDK's built-in mechanism to force routes field to be included
-			updateOpts = append(updateOpts, option.WithJSONSet("routes", []interface{}{}))
-		}
-
 		var dataBytes []byte
 		dataBytes, err = data.MarshalJSONForUpdate(*state)
 		if err != nil {
@@ -306,6 +297,17 @@ func (r *CloudNetworkRouterResource) Update(ctx context.Context, req resource.Up
 				option.WithRequestBody("application/json", dataBytes),
 				option.WithResponseBodyInto(&res),
 			)
+
+			// IMPORTANT: WithJSONSet must be added AFTER WithRequestBody so it can modify the body
+			if routesDeletionNeeded {
+				resp.Diagnostics.AddWarning(
+					"Route deletion workaround",
+					fmt.Sprintf("Forcing routes=[] in request body using WithJSONSet. Deleting %d routes.", len(stateRoutes)),
+				)
+				// Use the SDK's built-in mechanism to force routes field to be included
+				updateOpts = append(updateOpts, option.WithJSONSet("routes", []interface{}{}))
+			}
+
 			_, err = r.client.Cloud.Networks.Routers.Update(
 				ctx,
 				routerID,
