@@ -42,18 +42,23 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 				Description: "Secret data.",
 				Required:    true,
 				Attributes: map[string]schema.Attribute{
-					"aws_access_key_id": schema.StringAttribute{
+					"aws_access_key_id_wo": schema.StringAttribute{
 						Description: "AWS IAM key ID.",
 						Required:    true,
 						WriteOnly:   true,
 					},
-					"aws_secret_access_key": schema.StringAttribute{
+					"aws_secret_access_key_wo": schema.StringAttribute{
 						Description: "AWS IAM secret key.",
 						Required:    true,
 						WriteOnly:   true,
 					},
 				},
 				PlanModifiers: []planmodifier.Object{objectplanmodifier.RequiresReplace()},
+			},
+			"data_wo_version": schema.Int64Attribute{
+				Description:   "The version of the data sensitive params - used to trigger updates of write-only params.",
+				Required:      true,
+				PlanModifiers: []planmodifier.Int64{int64planmodifier.RequiresReplace()},
 			},
 		},
 	}

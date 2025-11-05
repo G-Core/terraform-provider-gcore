@@ -30,6 +30,7 @@ resource "gcore_cloud_inference_secret" "example_cloud_inference_secret" {
 ### Required
 
 - `data` (Attributes) Secret data. (see [below for nested schema](#nestedatt--data))
+- `data_wo_version` (Number) The version of the data sensitive params - used to trigger updates of write-only params.
 - `name` (String) Secret name.
 - `type` (String) Secret type. Currently only `aws-iam` is supported.
 
@@ -46,8 +47,8 @@ resource "gcore_cloud_inference_secret" "example_cloud_inference_secret" {
 
 Required:
 
-- `aws_access_key_id` (String, [Write-only](https://developer.hashicorp.com/terraform/language/resources/ephemeral#write-only-arguments)) AWS IAM key ID.
-- `aws_secret_access_key` (String, [Write-only](https://developer.hashicorp.com/terraform/language/resources/ephemeral#write-only-arguments)) AWS IAM secret key.
+- `aws_access_key_id_wo` (String, [Write-only](https://developer.hashicorp.com/terraform/language/resources/ephemeral#write-only-arguments)) AWS IAM key ID.
+- `aws_secret_access_key_wo` (String, [Write-only](https://developer.hashicorp.com/terraform/language/resources/ephemeral#write-only-arguments)) AWS IAM secret key.
 
 ## Import
 

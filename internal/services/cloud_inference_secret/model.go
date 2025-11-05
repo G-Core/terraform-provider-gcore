@@ -8,11 +8,12 @@ import (
 )
 
 type CloudInferenceSecretModel struct {
-	ID        types.String                   `tfsdk:"id" json:"-,computed"`
-	Name      types.String                   `tfsdk:"name" json:"name,required"`
-	ProjectID types.Int64                    `tfsdk:"project_id" path:"project_id,optional"`
-	Type      types.String                   `tfsdk:"type" json:"type,required"`
-	Data      *CloudInferenceSecretDataModel `tfsdk:"data" json:"data,required"`
+	ID            types.String                   `tfsdk:"id" json:"-,computed"`
+	Name          types.String                   `tfsdk:"name" json:"name,required"`
+	ProjectID     types.Int64                    `tfsdk:"project_id" path:"project_id,optional"`
+	Type          types.String                   `tfsdk:"type" json:"type,required"`
+	Data          *CloudInferenceSecretDataModel `tfsdk:"data" json:"data,required"`
+	DataWoVersion types.Int64                    `tfsdk:"data_wo_version"`
 }
 
 func (m CloudInferenceSecretModel) MarshalJSON() (data []byte, err error) {
@@ -24,6 +25,6 @@ func (m CloudInferenceSecretModel) MarshalJSONForUpdate(state CloudInferenceSecr
 }
 
 type CloudInferenceSecretDataModel struct {
-	AwsAccessKeyID     types.String `tfsdk:"aws_access_key_id" json:"aws_access_key_id,required"`
-	AwsSecretAccessKey types.String `tfsdk:"aws_secret_access_key" json:"aws_secret_access_key,required"`
+	AwsAccessKeyID     types.String `tfsdk:"aws_access_key_id_wo" json:"aws_access_key_id,required"`
+	AwsSecretAccessKey types.String `tfsdk:"aws_secret_access_key_wo" json:"aws_secret_access_key,required"`
 }
