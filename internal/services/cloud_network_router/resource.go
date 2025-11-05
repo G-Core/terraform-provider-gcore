@@ -12,9 +12,12 @@ import (
 	"github.com/G-Core/gcore-go/cloud"
 	"github.com/G-Core/gcore-go/option"
 	"github.com/G-Core/gcore-go/packages/param"
+	"github.com/hashicorp/terraform-plugin-framework/attr"
+	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/stainless-sdks/gcore-terraform/internal/apijson"
+	"github.com/stainless-sdks/gcore-terraform/internal/customfield"
 	"github.com/stainless-sdks/gcore-terraform/internal/importpath"
 	"github.com/stainless-sdks/gcore-terraform/internal/logging"
 )
@@ -222,6 +225,7 @@ func (r *CloudNetworkRouterResource) Update(ctx context.Context, req resource.Up
 	}
 
 	// Update other router attributes (name, routes, external_gateway_info)
+	// Note: Route deletion is handled in ModifyPlan to update the plan before Update runs
 	// Only send PATCH request if fields OTHER than interfaces have changed
 	needsUpdate := !data.Name.Equal(state.Name) ||
 		!data.Routes.Equal(state.Routes) ||
@@ -426,6 +430,37 @@ func (r *CloudNetworkRouterResource) ImportState(ctx context.Context, req resour
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
 }
 
-func (r *CloudNetworkRouterResource) ModifyPlan(_ context.Context, _ resource.ModifyPlanRequest, _ *resource.ModifyPlanResponse) {
+func (r *CloudNetworkRouterResource) ModifyPlan(ctx context.Context, req resource.ModifyPlanRequest, resp *resource.ModifyPlanResponse) {
+	// Handle routes with computed_optional: when routes block is removed from config,
+	// Terraform keeps the state value in plan (doesn't detect as changed). We need to
+	// detect this and update the plan to have empty routes so deletion works properly.
 
+	// Only apply during updates (not create or delete)
+	if req.State.Raw.IsNull() || req.Plan.Raw.IsNull() {
+		return
+	}
+
+	var plan *CloudNetworkRouterModel
+	resp.Diagnostics.Append(req.Plan.Get(ctx, &plan)...)
+	if resp.Diagnostics.HasError() {
+		return
+	}
+
+	var state *CloudNetworkRouterModel
+	resp.Diagnostics.Append(req.State.Get(ctx, &state)...)
+	if resp.Diagnostics.HasError() {
+		return
+	}
+
+	// Check if routes were removed from config
+	var configRoutes attr.Value
+	diagsRoutes := req.Config.GetAttribute(ctx, path.Root("routes"), &configRoutes)
+	routesRemovedFromConfig := !diagsRoutes.HasError() && configRoutes.IsNull() && !state.Routes.IsNull() && !state.Routes.IsUnknown()
+
+	if routesRemovedFromConfig {
+		// Routes not in config but exist in state - user removed the routes block.
+		// Update plan to have empty routes so Terraform knows they'll be deleted.
+		plan.Routes = customfield.NewObjectListMust(ctx, []CloudNetworkRouterRoutesModel{})
+		resp.Diagnostics.Append(resp.Plan.Set(ctx, plan)...)
+	}
 }
