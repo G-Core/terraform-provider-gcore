@@ -113,75 +113,65 @@ func (r *CloudReservedFixedIPResource) Create(ctx context.Context, req resource.
 }
 
 func (r *CloudReservedFixedIPResource) Update(ctx context.Context, req resource.UpdateRequest, resp *resource.UpdateResponse) {
-	var plan, state *CloudReservedFixedIPModel
+	var data *CloudReservedFixedIPModel
 
-	resp.Diagnostics.Append(req.Plan.Get(ctx, &plan)...)
+	resp.Diagnostics.Append(req.Plan.Get(ctx, &data)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
+
+	var state *CloudReservedFixedIPModel
+
 	resp.Diagnostics.Append(req.State.Get(ctx, &state)...)
 
 	if resp.Diagnostics.HasError() {
 		return
 	}
 
-	// Check for unsupported changes to allowed_address_pairs
-	// Note: allowed_address_pairs is Computed-only in the schema, so users shouldn't be able to modify it directly.
-	// But we add this check for completeness in case the schema changes in the future.
-	if !plan.AllowedAddressPairs.Equal(state.AllowedAddressPairs) {
-		resp.Diagnostics.AddError("Update Not Supported",
-			"Updating 'allowed_address_pairs' is not supported yet. This feature requires Ports API integration which is not available in the current SDK version.")
+	params := cloud.ReservedFixedIPUpdateParams{}
+
+	if !data.ProjectID.IsNull() {
+		params.ProjectID = param.NewOpt(data.ProjectID.ValueInt64())
+	}
+
+	if !data.RegionID.IsNull() {
+		params.RegionID = param.NewOpt(data.RegionID.ValueInt64())
+	}
+
+	dataBytes, err := data.MarshalJSONForUpdate(*state)
+	if err != nil {
+		resp.Diagnostics.AddError("failed to serialize http request", err.Error())
+		return
+	}
+	res := new(http.Response)
+	_, err = r.client.Cloud.ReservedFixedIPs.Update(
+		ctx,
+		state.PortID.ValueString(),
+		params,
+		option.WithRequestBody("application/json", dataBytes),
+		option.WithResponseBodyInto(&res),
+		option.WithMiddleware(logging.Middleware(ctx)),
+	)
+	if err != nil {
+		resp.Diagnostics.AddError("failed to update reserved fixed IP", err.Error())
 		return
 	}
 
-	// Check for any other attempted changes to fields that should be immutable
-	if !plan.Type.Equal(state.Type) {
-		resp.Diagnostics.AddError("Update Not Supported",
-			"The 'type' field cannot be changed after creation. Please recreate the resource with the new type.")
+	// Update state with response
+	bytes, _ := io.ReadAll(res.Body)
+	err = apijson.UnmarshalComputed(bytes, &data)
+	if err != nil {
+		resp.Diagnostics.AddError("failed to deserialize http request", err.Error())
 		return
 	}
 
-	if !plan.NetworkID.Equal(state.NetworkID) || !plan.SubnetID.Equal(state.SubnetID) || !plan.PortID.Equal(state.PortID) || !plan.IPAddress.Equal(state.IPAddress) {
-		resp.Diagnostics.AddError("Update Not Supported",
-			"Network configuration fields (network_id, subnet_id, port_id, ip_address) cannot be changed after creation. Please recreate the resource with the new configuration.")
-		return
+	// Restore ID field (API doesn't return id, but we need it for Terraform)
+	if !data.PortID.IsNull() && data.PortID.ValueString() != "" {
+		data.ID = types.StringValue(data.PortID.ValueString())
 	}
 
-	// Handle is_vip update via Vip.Toggle() API
-	if !plan.IsVip.Equal(state.IsVip) {
-		params := cloud.ReservedFixedIPVipToggleParams{
-			IsVip: plan.IsVip.ValueBool(),
-		}
-
-		if !plan.ProjectID.IsNull() {
-			params.ProjectID = param.NewOpt(plan.ProjectID.ValueInt64())
-		}
-
-		if !plan.RegionID.IsNull() {
-			params.RegionID = param.NewOpt(plan.RegionID.ValueInt64())
-		}
-
-		res := new(http.Response)
-		_, err := r.client.Cloud.ReservedFixedIPs.Vip.Toggle(
-			ctx,
-			state.PortID.ValueString(),
-			params,
-			option.WithResponseBodyInto(&res),
-			option.WithMiddleware(logging.Middleware(ctx)),
-		)
-		if err != nil {
-			resp.Diagnostics.AddError("failed to toggle VIP status", err.Error())
-			return
-		}
-
-		// Update state with response
-		bytes, _ := io.ReadAll(res.Body)
-		err = apijson.UnmarshalComputed(bytes, &plan)
-		if err != nil {
-			resp.Diagnostics.AddError("failed to deserialize http request", err.Error())
-			return
-		}
-	}
-
-	// If we get here, update succeeded or no changes needed, save plan to state
-	resp.Diagnostics.Append(resp.State.Set(ctx, &plan)...)
+	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
 }
 
 func (r *CloudReservedFixedIPResource) Read(ctx context.Context, req resource.ReadRequest, resp *resource.ReadResponse) {
@@ -231,6 +221,11 @@ func (r *CloudReservedFixedIPResource) Read(ctx context.Context, req resource.Re
 	if err != nil {
 		resp.Diagnostics.AddError("failed to deserialize http request", err.Error())
 		return
+	}
+
+	// Restore ID field (API doesn't return id, but we need it for Terraform)
+	if !data.PortID.IsNull() && data.PortID.ValueString() != "" {
+		data.ID = types.StringValue(data.PortID.ValueString())
 	}
 
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
@@ -313,9 +308,30 @@ func (r *CloudReservedFixedIPResource) ImportState(ctx context.Context, req reso
 		return
 	}
 
+	// Restore ID field (API doesn't return id, but we need it for Terraform)
+	if !data.PortID.IsNull() && data.PortID.ValueString() != "" {
+		data.ID = types.StringValue(data.PortID.ValueString())
+	}
+
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
 }
 
-func (r *CloudReservedFixedIPResource) ModifyPlan(_ context.Context, _ resource.ModifyPlanRequest, _ *resource.ModifyPlanResponse) {
+func (r *CloudReservedFixedIPResource) ModifyPlan(ctx context.Context, req resource.ModifyPlanRequest, resp *resource.ModifyPlanResponse) {
+	// If port_id is not being explicitly configured and we have a state value, preserve it
+	// This prevents unnecessary replacements when only is_vip changes
+	var plan, state *CloudReservedFixedIPModel
 
+	resp.Diagnostics.Append(req.Plan.Get(ctx, &plan)...)
+	resp.Diagnostics.Append(req.State.Get(ctx, &state)...)
+
+	if resp.Diagnostics.HasError() || state == nil || plan == nil {
+		return
+	}
+
+	// If port_id is unknown in the plan but known in state, preserve the state value
+	// This happens when is_vip changes trigger a refresh of computed fields
+	if plan.PortID.IsUnknown() && !state.PortID.IsNull() && !state.PortID.IsUnknown() {
+		plan.PortID = state.PortID
+		resp.Diagnostics.Append(resp.Plan.Set(ctx, plan)...)
+	}
 }
