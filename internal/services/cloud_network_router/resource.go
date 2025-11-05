@@ -12,10 +12,10 @@ import (
 	"github.com/G-Core/gcore-go/cloud"
 	"github.com/G-Core/gcore-go/option"
 	"github.com/G-Core/gcore-go/packages/param"
-	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/types"
+	"github.com/hashicorp/terraform-plugin-log/tflog"
 	"github.com/stainless-sdks/gcore-terraform/internal/apijson"
 	"github.com/stainless-sdks/gcore-terraform/internal/customfield"
 	"github.com/stainless-sdks/gcore-terraform/internal/importpath"
@@ -231,6 +231,32 @@ func (r *CloudNetworkRouterResource) Update(ctx context.Context, req resource.Up
 		!data.Routes.Equal(state.Routes) ||
 		!data.ExternalGatewayInfo.Equal(state.ExternalGatewayInfo)
 
+	// Log route details for debugging
+	var dataRoutes []CloudNetworkRouterRoutesModel
+	var stateRoutes []CloudNetworkRouterRoutesModel
+	data.Routes.ElementsAs(ctx, &dataRoutes, false)
+	state.Routes.ElementsAs(ctx, &stateRoutes, false)
+
+	// Add visible warning if routes are being removed
+	if len(dataRoutes) == 0 && len(stateRoutes) > 0 {
+		resp.Diagnostics.AddWarning(
+			"Router route deletion detected",
+			fmt.Sprintf("Removing %d routes from router. Plan has %d routes, State has %d routes. needsUpdate=%v",
+				len(stateRoutes), len(dataRoutes), len(stateRoutes), needsUpdate),
+		)
+	}
+
+	tflog.Warn(ctx, "Update needsUpdate check", map[string]interface{}{
+		"needs_update":         needsUpdate,
+		"name_equal":           data.Name.Equal(state.Name),
+		"routes_equal":         data.Routes.Equal(state.Routes),
+		"gateway_equal":        data.ExternalGatewayInfo.Equal(state.ExternalGatewayInfo),
+		"data_routes_null":     data.Routes.IsNull(),
+		"state_routes_null":    state.Routes.IsNull(),
+		"data_routes_count":    len(dataRoutes),
+		"state_routes_count":   len(stateRoutes),
+	})
+
 	var err error
 	if needsUpdate {
 		params := cloud.NetworkRouterUpdateParams{}
@@ -243,22 +269,48 @@ func (r *CloudNetworkRouterResource) Update(ctx context.Context, req resource.Up
 			params.RegionID = param.NewOpt(data.RegionID.ValueInt64())
 		}
 
+		// WORKAROUND: The SDK's NetworkRouterUpdateParams has `omitzero` on Routes field,
+		// which causes empty routes array to be omitted from JSON. We need to explicitly
+		// include routes=[] when deleting routes using option.WithJSONSet().
+		var planRoutes, stateRoutes []CloudNetworkRouterRoutesModel
+		data.Routes.ElementsAs(ctx, &planRoutes, false)
+		state.Routes.ElementsAs(ctx, &stateRoutes, false)
+
+		routesDeletionNeeded := len(planRoutes) == 0 && len(stateRoutes) > 0
+
+		// Build update options
+		updateOpts := []option.RequestOption{
+			option.WithMiddleware(logging.Middleware(ctx)),
+		}
+
+		if routesDeletionNeeded {
+			resp.Diagnostics.AddWarning(
+				"Route deletion workaround",
+				fmt.Sprintf("Forcing routes=[] in request body using WithJSONSet. Deleting %d routes.", len(stateRoutes)),
+			)
+			// Use the SDK's built-in mechanism to force routes field to be included
+			updateOpts = append(updateOpts, option.WithJSONSet("routes", []interface{}{}))
+		}
+
 		var dataBytes []byte
 		dataBytes, err = data.MarshalJSONForUpdate(*state)
 		if err != nil {
 			resp.Diagnostics.AddError("failed to serialize http request", err.Error())
 			return
 		}
-		// Skip PATCH if no actual changes (empty JSON body)
-		if len(dataBytes) > 0 && string(dataBytes) != "{}" && string(dataBytes) != "null" {
+
+		// Skip PATCH if no actual changes (empty JSON body) and not deleting routes
+		if len(dataBytes) > 0 && string(dataBytes) != "{}" && string(dataBytes) != "null" || routesDeletionNeeded {
 			res := new(http.Response)
+			updateOpts = append(updateOpts,
+				option.WithRequestBody("application/json", dataBytes),
+				option.WithResponseBodyInto(&res),
+			)
 			_, err = r.client.Cloud.Networks.Routers.Update(
 				ctx,
 				routerID,
 				params,
-				option.WithRequestBody("application/json", dataBytes),
-				option.WithResponseBodyInto(&res),
-				option.WithMiddleware(logging.Middleware(ctx)),
+				updateOpts...,
 			)
 			if err != nil {
 				resp.Diagnostics.AddError("failed to make http request", err.Error())
@@ -452,15 +504,48 @@ func (r *CloudNetworkRouterResource) ModifyPlan(ctx context.Context, req resourc
 		return
 	}
 
-	// Check if routes were removed from config
-	var configRoutes attr.Value
+	// Check if routes were removed from config or set to empty array
+	var configRoutes customfield.NestedObjectList[CloudNetworkRouterRoutesModel]
 	diagsRoutes := req.Config.GetAttribute(ctx, path.Root("routes"), &configRoutes)
-	routesRemovedFromConfig := !diagsRoutes.HasError() && configRoutes.IsNull() && !state.Routes.IsNull() && !state.Routes.IsUnknown()
+
+	// Get config routes as a list to check if empty
+	var configRoutesList []CloudNetworkRouterRoutesModel
+	configRoutesEmpty := false
+	if !diagsRoutes.HasError() && !configRoutes.IsNull() {
+		configRoutes.ElementsAs(ctx, &configRoutesList, false)
+		configRoutesEmpty = len(configRoutesList) == 0
+	}
+
+	// Routes are considered "removed" if:
+	// 1. Routes block is absent from config (configRoutes.IsNull()), OR
+	// 2. Routes is explicitly set to empty array in config (configRoutesEmpty)
+	routesRemovedFromConfig := !diagsRoutes.HasError() &&
+		(configRoutes.IsNull() || configRoutesEmpty) &&
+		!state.Routes.IsNull() &&
+		!state.Routes.IsUnknown()
+
+	// Log route details for debugging
+	var planRoutes []CloudNetworkRouterRoutesModel
+	var stateRoutes []CloudNetworkRouterRoutesModel
+	plan.Routes.ElementsAs(ctx, &planRoutes, false)
+	state.Routes.ElementsAs(ctx, &stateRoutes, false)
+
+	tflog.Warn(ctx, "ModifyPlan routes check", map[string]interface{}{
+		"config_routes_is_null":  configRoutes.IsNull(),
+		"config_routes_empty":    configRoutesEmpty,
+		"state_routes_is_null":   state.Routes.IsNull(),
+		"plan_routes_is_null":    plan.Routes.IsNull(),
+		"routes_removed":         routesRemovedFromConfig,
+		"plan_routes_count":      len(planRoutes),
+		"state_routes_count":     len(stateRoutes),
+		"config_routes_count":    len(configRoutesList),
+	})
 
 	if routesRemovedFromConfig {
-		// Routes not in config but exist in state - user removed the routes block.
+		// Routes not in config (or set to empty) but exist in state - user removed routes.
 		// Update plan to have empty routes so Terraform knows they'll be deleted.
 		plan.Routes = customfield.NewObjectListMust(ctx, []CloudNetworkRouterRoutesModel{})
 		resp.Diagnostics.Append(resp.Plan.Set(ctx, plan)...)
+		tflog.Warn(ctx, "ModifyPlan: Forcing routes to empty array for deletion")
 	}
 }
