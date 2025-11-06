@@ -58,6 +58,18 @@ func DataSourceSchema(ctx context.Context) schema.Schema {
 			"display_order": schema.Int64Attribute{
 				Computed: true,
 			},
+			"gpu_driver": schema.StringAttribute{
+				Description: "Name of the GPU driver vendor",
+				Computed:    true,
+			},
+			"gpu_driver_type": schema.StringAttribute{
+				Description: "Type of the GPU driver",
+				Computed:    true,
+			},
+			"gpu_driver_version": schema.StringAttribute{
+				Description: "Version of the installed GPU driver",
+				Computed:    true,
+			},
 			"hw_firmware_type": schema.StringAttribute{
 				Description: "Specifies the type of firmware with which to boot the guest.\nAvailable values: \"bios\", \"uefi\".",
 				Computed:    true,

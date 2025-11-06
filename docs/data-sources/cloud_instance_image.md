@@ -43,6 +43,9 @@ Available values: "aarch64", "x86_64".
 - `description` (String) Image description
 - `disk_format` (String) Disk format
 - `display_order` (Number)
+- `gpu_driver` (String) Name of the GPU driver vendor
+- `gpu_driver_type` (String) Type of the GPU driver
+- `gpu_driver_version` (String) Version of the installed GPU driver
 - `hw_firmware_type` (String) Specifies the type of firmware with which to boot the guest.
 Available values: "bios", "uefi".
 - `hw_machine_type` (String) A virtual chipset type.
