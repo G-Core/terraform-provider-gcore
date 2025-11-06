@@ -15,7 +15,6 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/types"
-	"github.com/hashicorp/terraform-plugin-log/tflog"
 	"github.com/stainless-sdks/gcore-terraform/internal/apijson"
 	"github.com/stainless-sdks/gcore-terraform/internal/customfield"
 	"github.com/stainless-sdks/gcore-terraform/internal/importpath"
@@ -246,17 +245,6 @@ func (r *CloudNetworkRouterResource) Update(ctx context.Context, req resource.Up
 		)
 	}
 
-	tflog.Warn(ctx, "Update needsUpdate check", map[string]interface{}{
-		"needs_update":         needsUpdate,
-		"name_equal":           data.Name.Equal(state.Name),
-		"routes_equal":         data.Routes.Equal(state.Routes),
-		"gateway_equal":        data.ExternalGatewayInfo.Equal(state.ExternalGatewayInfo),
-		"data_routes_null":     data.Routes.IsNull(),
-		"state_routes_null":    state.Routes.IsNull(),
-		"data_routes_count":    len(dataRoutes),
-		"state_routes_count":   len(stateRoutes),
-	})
-
 	var err error
 	if needsUpdate {
 		params := cloud.NetworkRouterUpdateParams{}
@@ -291,7 +279,7 @@ func (r *CloudNetworkRouterResource) Update(ctx context.Context, req resource.Up
 		}
 
 		// Skip PATCH if no actual changes (empty JSON body) and not deleting routes
-		if len(dataBytes) > 0 && string(dataBytes) != "{}" && string(dataBytes) != "null" || routesDeletionNeeded {
+		if (len(dataBytes) > 0 && string(dataBytes) != "{}" && string(dataBytes) != "null") || routesDeletionNeeded {
 			res := new(http.Response)
 			updateOpts = append(updateOpts,
 				option.WithRequestBody("application/json", dataBytes),
@@ -526,28 +514,10 @@ func (r *CloudNetworkRouterResource) ModifyPlan(ctx context.Context, req resourc
 		!state.Routes.IsNull() &&
 		!state.Routes.IsUnknown()
 
-	// Log route details for debugging
-	var planRoutes []CloudNetworkRouterRoutesModel
-	var stateRoutes []CloudNetworkRouterRoutesModel
-	plan.Routes.ElementsAs(ctx, &planRoutes, false)
-	state.Routes.ElementsAs(ctx, &stateRoutes, false)
-
-	tflog.Warn(ctx, "ModifyPlan routes check", map[string]interface{}{
-		"config_routes_is_null":  configRoutes.IsNull(),
-		"config_routes_empty":    configRoutesEmpty,
-		"state_routes_is_null":   state.Routes.IsNull(),
-		"plan_routes_is_null":    plan.Routes.IsNull(),
-		"routes_removed":         routesRemovedFromConfig,
-		"plan_routes_count":      len(planRoutes),
-		"state_routes_count":     len(stateRoutes),
-		"config_routes_count":    len(configRoutesList),
-	})
-
 	if routesRemovedFromConfig {
 		// Routes not in config (or set to empty) but exist in state - user removed routes.
 		// Update plan to have empty routes so Terraform knows they'll be deleted.
 		plan.Routes = customfield.NewObjectListMust(ctx, []CloudNetworkRouterRoutesModel{})
 		resp.Diagnostics.Append(resp.Plan.Set(ctx, plan)...)
-		tflog.Warn(ctx, "ModifyPlan: Forcing routes to empty array for deletion")
 	}
 }
