@@ -699,7 +699,7 @@ func extractServerSettingsFromCluster(cluster *clusters.Cluster) (map[string]int
 	if len(cluster.ServersSettings.SecurityGroups) > 0 {
 		securityGroupIDs := make([]string, 0, len(cluster.ServersSettings.SecurityGroups))
 		for _, sg := range cluster.ServersSettings.SecurityGroups {
-			securityGroupIDs = append(securityGroupIDs, sg.Name)
+			securityGroupIDs = append(securityGroupIDs, sg.ID)
 		}
 		serverSettings["security_groups"] = securityGroupIDs
 	}
