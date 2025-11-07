@@ -127,8 +127,73 @@ func (r *CloudNetworkRouterResource) Update(ctx context.Context, req resource.Up
 
 	routerID := data.ID.ValueString()
 
+	// Check if routes need to be updated/deleted
+	// This must be checked BEFORE interface operations to handle the case where
+	// routes must be deleted before interfaces can be detached
+	var dataRoutes, stateRoutes []CloudNetworkRouterRoutesModel
+	data.Routes.ElementsAs(ctx, &dataRoutes, false)
+	state.Routes.ElementsAs(ctx, &stateRoutes, false)
+	routesDeletionNeeded := len(dataRoutes) == 0 && len(stateRoutes) > 0
+
+	// CRITICAL: If routes are being deleted AND interfaces are being removed,
+	// we must delete routes FIRST via PATCH before detaching interfaces.
+	// The API prevents detaching an interface if routes exist that use it as nexthop.
+	interfacesChanging := !data.Interfaces.Equal(state.Interfaces)
+
+	// If both routes and interfaces are changing, and routes are being deleted,
+	// send PATCH to delete routes before detaching interfaces
+	if routesDeletionNeeded && interfacesChanging {
+		resp.Diagnostics.AddWarning(
+			"Router route deletion before interface detachment",
+			fmt.Sprintf("Deleting %d routes before detaching interfaces to avoid API validation errors.", len(stateRoutes)),
+		)
+
+		params := cloud.NetworkRouterUpdateParams{}
+		if !data.ProjectID.IsNull() {
+			params.ProjectID = param.NewOpt(data.ProjectID.ValueInt64())
+		}
+		if !data.RegionID.IsNull() {
+			params.RegionID = param.NewOpt(data.RegionID.ValueInt64())
+		}
+
+		updateOpts := []option.RequestOption{
+			option.WithMiddleware(logging.Middleware(ctx)),
+		}
+
+		dataBytes, err := data.MarshalJSONForUpdate(*state)
+		if err != nil {
+			resp.Diagnostics.AddError("failed to serialize http request", err.Error())
+			return
+		}
+
+		res := new(http.Response)
+		updateOpts = append(updateOpts,
+			option.WithRequestBody("application/json", dataBytes),
+			option.WithResponseBodyInto(&res),
+			option.WithJSONSet("routes", []interface{}{}), // Force routes=[] in body
+		)
+
+		_, err = r.client.Cloud.Networks.Routers.Update(
+			ctx,
+			routerID,
+			params,
+			updateOpts...,
+		)
+		if err != nil {
+			resp.Diagnostics.AddError("failed to delete routes before interface detachment", err.Error())
+			return
+		}
+		// Routes are now deleted, refresh state
+		bytes, _ := io.ReadAll(res.Body)
+		err = apijson.UnmarshalComputed(bytes, &data)
+		if err != nil {
+			resp.Diagnostics.AddError("failed to deserialize http request", err.Error())
+			return
+		}
+	}
+
 	// Handle interface attach/detach operations
-	if !data.Interfaces.Equal(state.Interfaces) {
+	if interfacesChanging {
 		// Get old and new interface lists
 		oldInterfaces, diags := state.Interfaces.AsStructSliceT(ctx)
 		resp.Diagnostics.Append(diags...)
@@ -224,20 +289,17 @@ func (r *CloudNetworkRouterResource) Update(ctx context.Context, req resource.Up
 	}
 
 	// Update other router attributes (name, routes, external_gateway_info)
-	// Note: Route deletion is handled in ModifyPlan to update the plan before Update runs
-	// Only send PATCH request if fields OTHER than interfaces have changed
+	// Note: If routes were already deleted above (when both routes and interfaces changed),
+	// we skip route updates here
 	needsUpdate := !data.Name.Equal(state.Name) ||
 		!data.Routes.Equal(state.Routes) ||
 		!data.ExternalGatewayInfo.Equal(state.ExternalGatewayInfo)
 
-	// Log route details for debugging
-	var dataRoutes []CloudNetworkRouterRoutesModel
-	var stateRoutes []CloudNetworkRouterRoutesModel
-	data.Routes.ElementsAs(ctx, &dataRoutes, false)
-	state.Routes.ElementsAs(ctx, &stateRoutes, false)
+	// If routes were already deleted in the early PATCH above, don't include them in this update
+	skipRoutesInUpdate := routesDeletionNeeded && interfacesChanging
 
-	// Add visible warning if routes are being removed
-	if len(dataRoutes) == 0 && len(stateRoutes) > 0 {
+	// Add visible warning if routes are being removed (and not already handled above)
+	if routesDeletionNeeded && !skipRoutesInUpdate {
 		resp.Diagnostics.AddWarning(
 			"Router route deletion detected",
 			fmt.Sprintf("Removing %d routes from router. Plan has %d routes, State has %d routes. needsUpdate=%v",
@@ -260,11 +322,8 @@ func (r *CloudNetworkRouterResource) Update(ctx context.Context, req resource.Up
 		// WORKAROUND: The SDK's NetworkRouterUpdateParams has `omitzero` on Routes field,
 		// which causes empty routes array to be omitted from JSON. We need to explicitly
 		// include routes=[] when deleting routes using option.WithJSONSet().
-		var planRoutes, stateRoutes []CloudNetworkRouterRoutesModel
-		data.Routes.ElementsAs(ctx, &planRoutes, false)
-		state.Routes.ElementsAs(ctx, &stateRoutes, false)
-
-		routesDeletionNeeded := len(planRoutes) == 0 && len(stateRoutes) > 0
+		// However, if routes were already deleted above, don't delete them again
+		needsRouteDeletion := routesDeletionNeeded && !skipRoutesInUpdate
 
 		// Build update options
 		updateOpts := []option.RequestOption{
@@ -279,7 +338,7 @@ func (r *CloudNetworkRouterResource) Update(ctx context.Context, req resource.Up
 		}
 
 		// Skip PATCH if no actual changes (empty JSON body) and not deleting routes
-		if (len(dataBytes) > 0 && string(dataBytes) != "{}" && string(dataBytes) != "null") || routesDeletionNeeded {
+		if (len(dataBytes) > 0 && string(dataBytes) != "{}" && string(dataBytes) != "null") || needsRouteDeletion {
 			res := new(http.Response)
 			updateOpts = append(updateOpts,
 				option.WithRequestBody("application/json", dataBytes),
@@ -287,7 +346,7 @@ func (r *CloudNetworkRouterResource) Update(ctx context.Context, req resource.Up
 			)
 
 			// IMPORTANT: WithJSONSet must be added AFTER WithRequestBody so it can modify the body
-			if routesDeletionNeeded {
+			if needsRouteDeletion {
 				resp.Diagnostics.AddWarning(
 					"Route deletion workaround",
 					fmt.Sprintf("Forcing routes=[] in request body using WithJSONSet. Deleting %d routes.", len(stateRoutes)),
