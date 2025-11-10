@@ -8,12 +8,13 @@ import (
 )
 
 type CloudInferenceRegistryCredentialModel struct {
-	ID          types.String `tfsdk:"id" json:"-,computed"`
-	Name        types.String `tfsdk:"name" json:"name,required"`
-	ProjectID   types.Int64  `tfsdk:"project_id" path:"project_id,optional"`
-	Password    types.String `tfsdk:"password" json:"password,required,no_refresh"`
-	RegistryURL types.String `tfsdk:"registry_url" json:"registry_url,required"`
-	Username    types.String `tfsdk:"username" json:"username,required"`
+	ID                types.String `tfsdk:"id" json:"-,computed"`
+	Name              types.String `tfsdk:"name" json:"name,required"`
+	ProjectID         types.Int64  `tfsdk:"project_id" path:"project_id,optional"`
+	Password          types.String `tfsdk:"password_wo" json:"password,required,no_refresh"`
+	RegistryURL       types.String `tfsdk:"registry_url" json:"registry_url,required"`
+	Username          types.String `tfsdk:"username" json:"username,required"`
+	PasswordWoVersion types.Int64  `tfsdk:"password_wo_version"`
 }
 
 func (m CloudInferenceRegistryCredentialModel) MarshalJSON() (data []byte, err error) {

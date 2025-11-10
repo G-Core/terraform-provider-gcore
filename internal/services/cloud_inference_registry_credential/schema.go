@@ -32,10 +32,11 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 				Optional:      true,
 				PlanModifiers: []planmodifier.Int64{int64planmodifier.RequiresReplace()},
 			},
-			"password": schema.StringAttribute{
+			"password_wo": schema.StringAttribute{
 				Description:   "Registry password.",
 				Required:      true,
 				PlanModifiers: []planmodifier.String{stringplanmodifier.RequiresReplace()},
+				WriteOnly:     true,
 			},
 			"registry_url": schema.StringAttribute{
 				Description:   "Registry URL.",
@@ -46,6 +47,12 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 				Description:   "Registry username.",
 				Required:      true,
 				PlanModifiers: []planmodifier.String{stringplanmodifier.RequiresReplace()},
+			},
+			"password_wo_version": schema.Int64Attribute{
+				Description: "Registry credential password write-only version. Used to trigger updates of the " +
+					"write-only password field.",
+				Required:      true,
+				PlanModifiers: []planmodifier.Int64{int64planmodifier.RequiresReplace()},
 			},
 		},
 	}

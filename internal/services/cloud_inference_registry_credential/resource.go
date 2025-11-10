@@ -12,6 +12,7 @@ import (
 	"github.com/G-Core/gcore-go/cloud"
 	"github.com/G-Core/gcore-go/option"
 	"github.com/G-Core/gcore-go/packages/param"
+	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/stainless-sdks/gcore-terraform/internal/apijson"
@@ -70,6 +71,8 @@ func (r *CloudInferenceRegistryCredentialResource) Create(ctx context.Context, r
 	if !data.ProjectID.IsNull() {
 		params.ProjectID = param.NewOpt(data.ProjectID.ValueInt64())
 	}
+
+	resp.Diagnostics.Append(req.Config.GetAttribute(ctx, path.Root("password_wo"), &data.Password)...)
 
 	dataBytes, err := data.MarshalJSON()
 	if err != nil {
