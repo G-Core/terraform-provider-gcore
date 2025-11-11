@@ -105,6 +105,85 @@ func (r *CloudNetworkRouterResource) Create(ctx context.Context, req resource.Cr
 		return
 	}
 
+	// IMPORTANT: After creating the router, we need to attach any interfaces specified in the plan
+	// The API doesn't support creating a router with interfaces in one call, so we need to:
+	// 1. Create the router (done above)
+	// 2. Attach interfaces via POST /attach (done below)
+	routerID := data.ID.ValueString()
+	if routerID == "" {
+		resp.Diagnostics.AddError("router creation failed", "Router ID is empty after creation")
+		return
+	}
+
+	// Get interfaces from plan
+	planInterfaces, diags := data.Interfaces.AsStructSliceT(ctx)
+	resp.Diagnostics.Append(diags...)
+	if resp.Diagnostics.HasError() {
+		return
+	}
+
+	// Attach each interface specified in the plan
+	for _, iface := range planInterfaces {
+		subnetID := iface.SubnetID.ValueString()
+		if subnetID == "" {
+			continue
+		}
+
+		attachParams := cloud.NetworkRouterAttachSubnetParams{
+			SubnetID: subnetID,
+		}
+		if !data.ProjectID.IsNull() {
+			attachParams.ProjectID = param.NewOpt(data.ProjectID.ValueInt64())
+		}
+		if !data.RegionID.IsNull() {
+			attachParams.RegionID = param.NewOpt(data.RegionID.ValueInt64())
+		}
+
+		_, err = r.client.Cloud.Networks.Routers.AttachSubnet(
+			ctx,
+			routerID,
+			attachParams,
+			option.WithMiddleware(logging.Middleware(ctx)),
+		)
+		if err != nil {
+			resp.Diagnostics.AddError(
+				"failed to attach subnet to router during creation",
+				fmt.Sprintf("RouterID: %s, SubnetID: %s, Error: %s", routerID, subnetID, err.Error()),
+			)
+			return
+		}
+	}
+
+	// Do a final Read to get consistent state after interface attachments
+	if len(planInterfaces) > 0 {
+		getParams := cloud.NetworkRouterGetParams{}
+		if !data.ProjectID.IsNull() {
+			getParams.ProjectID = param.NewOpt(data.ProjectID.ValueInt64())
+		}
+		if !data.RegionID.IsNull() {
+			getParams.RegionID = param.NewOpt(data.RegionID.ValueInt64())
+		}
+
+		readRes := new(http.Response)
+		_, err = r.client.Cloud.Networks.Routers.Get(
+			ctx,
+			routerID,
+			getParams,
+			option.WithResponseBodyInto(&readRes),
+			option.WithMiddleware(logging.Middleware(ctx)),
+		)
+		if err != nil {
+			resp.Diagnostics.AddError("failed to read router after interface attachment", err.Error())
+			return
+		}
+		readBytes, _ := io.ReadAll(readRes.Body)
+		err = apijson.UnmarshalComputed(readBytes, &data)
+		if err != nil {
+			resp.Diagnostics.AddError("failed to deserialize router after interface attachment", err.Error())
+			return
+		}
+	}
+
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
 }
 
