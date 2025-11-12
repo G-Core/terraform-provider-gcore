@@ -149,6 +149,11 @@ func (r *CloudNetworkRouterResource) Update(ctx context.Context, req resource.Up
 			fmt.Sprintf("Deleting %d routes before detaching interfaces to avoid API validation errors.", len(stateRoutes)),
 		)
 
+		// IMPORTANT: Save the planned interfaces before we overwrite data with API response
+		// The API response will still have interfaces attached, but we need to preserve
+		// the user's plan (which may have empty interfaces) for the detachment logic below
+		plannedInterfaces := data.Interfaces
+
 		params := cloud.NetworkRouterUpdateParams{}
 		if !data.ProjectID.IsNull() {
 			params.ProjectID = param.NewOpt(data.ProjectID.ValueInt64())
@@ -191,6 +196,11 @@ func (r *CloudNetworkRouterResource) Update(ctx context.Context, req resource.Up
 			resp.Diagnostics.AddError("failed to deserialize http request", err.Error())
 			return
 		}
+
+		// IMPORTANT: Restore the planned interfaces that we saved above
+		// The API response still has interfaces attached, but we need to use the user's plan
+		// for the interface detachment logic below to work correctly
+		data.Interfaces = plannedInterfaces
 	}
 
 	// Handle interface attach/detach operations
