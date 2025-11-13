@@ -17,6 +17,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/stainless-sdks/gcore-terraform/internal/services/cloud_floating_ip"
+	"github.com/stainless-sdks/gcore-terraform/internal/services/cloud_gpu_baremetal_cluster_image"
 	"github.com/stainless-sdks/gcore-terraform/internal/services/cloud_inference_secret"
 	"github.com/stainless-sdks/gcore-terraform/internal/services/cloud_instance"
 	"github.com/stainless-sdks/gcore-terraform/internal/services/cloud_instance_image"
@@ -186,6 +187,7 @@ func (p *GcoreProvider) Resources(ctx context.Context) []func() resource.Resourc
 		cloud_security_group.NewResource,
 		cloud_inference_secret.NewResource,
 		cloud_placement_group.NewResource,
+		cloud_gpu_baremetal_cluster_image.NewResource,
 		cloud_instance.NewResource,
 	}
 }
@@ -221,6 +223,7 @@ func (p *GcoreProvider) DataSources(ctx context.Context) []func() datasource.Dat
 		cloud_inference_secret.NewCloudInferenceSecretDataSource,
 		cloud_inference_secret.NewCloudInferenceSecretsDataSource,
 		cloud_placement_group.NewCloudPlacementGroupDataSource,
+		cloud_gpu_baremetal_cluster_image.NewCloudGPUBaremetalClusterImageDataSource,
 		cloud_instance.NewCloudInstanceDataSource,
 		cloud_instance.NewCloudInstancesDataSource,
 		cloud_instance_image.NewCloudInstanceImageDataSource,
