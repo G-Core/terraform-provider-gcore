@@ -144,11 +144,6 @@ func (r *CloudNetworkRouterResource) Update(ctx context.Context, req resource.Up
 	// If both routes and interfaces are changing, and routes are being deleted,
 	// send PATCH to delete routes before detaching interfaces
 	if routesDeletionNeeded && interfacesChanging {
-		resp.Diagnostics.AddWarning(
-			"Router route deletion before interface detachment",
-			fmt.Sprintf("Deleting %d routes before detaching interfaces to avoid API validation errors.", len(stateRoutes)),
-		)
-
 		// IMPORTANT: Save the planned interfaces before we overwrite data with API response
 		// The API response will still have interfaces attached, but we need to preserve
 		// the user's plan (which may have empty interfaces) for the detachment logic below
@@ -309,15 +304,6 @@ func (r *CloudNetworkRouterResource) Update(ctx context.Context, req resource.Up
 	// If routes were already deleted in the early PATCH above, don't include them in this update
 	skipRoutesInUpdate := routesDeletionNeeded && interfacesChanging
 
-	// Add visible warning if routes are being removed (and not already handled above)
-	if routesDeletionNeeded && !skipRoutesInUpdate {
-		resp.Diagnostics.AddWarning(
-			"Router route deletion detected",
-			fmt.Sprintf("Removing %d routes from router. Plan has %d routes, State has %d routes. needsUpdate=%v",
-				len(stateRoutes), len(dataRoutes), len(stateRoutes), needsUpdate),
-		)
-	}
-
 	var err error
 	if needsUpdate {
 		params := cloud.NetworkRouterUpdateParams{}
@@ -358,10 +344,6 @@ func (r *CloudNetworkRouterResource) Update(ctx context.Context, req resource.Up
 
 			// IMPORTANT: WithJSONSet must be added AFTER WithRequestBody so it can modify the body
 			if needsRouteDeletion {
-				resp.Diagnostics.AddWarning(
-					"Route deletion workaround",
-					fmt.Sprintf("Forcing routes=[] in request body using WithJSONSet. Deleting %d routes.", len(stateRoutes)),
-				)
 				// Use the SDK's built-in mechanism to force routes field to be included
 				updateOpts = append(updateOpts, option.WithJSONSet("routes", []interface{}{}))
 			}
