@@ -289,7 +289,7 @@ func (r *CloudLoadBalancerPoolResource) Delete(ctx context.Context, req resource
 }
 
 func (r *CloudLoadBalancerPoolResource) ImportState(ctx context.Context, req resource.ImportStateRequest, resp *resource.ImportStateResponse) {
-	var data *CloudLoadBalancerPoolModel = new(CloudLoadBalancerPoolModel)
+	var data = new(CloudLoadBalancerPoolModel)
 
 	path_project_id := int64(0)
 	path_region_id := int64(0)

@@ -301,7 +301,7 @@ func (r *CloudFloatingIPResource) Delete(ctx context.Context, req resource.Delet
 }
 
 func (r *CloudFloatingIPResource) ImportState(ctx context.Context, req resource.ImportStateRequest, resp *resource.ImportStateResponse) {
-	var data *CloudFloatingIPModel = new(CloudFloatingIPModel)
+	var data = new(CloudFloatingIPModel)
 
 	path_project_id := int64(0)
 	path_region_id := int64(0)

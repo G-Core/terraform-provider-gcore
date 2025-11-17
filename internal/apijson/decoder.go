@@ -94,10 +94,10 @@ const (
 	// Some values had to fudged a bit, for example by converting a string to an
 	// int, or an enum with extra values.
 	loose exactness = iota
-	// There are some extra arguments, but other wise it matches the union.
-	extras
 	// Exactly right.
 	exact
+	// There are some extra arguments, but other wise it matches the union.
+	// extras
 )
 
 type decoderFunc func(node gjson.Result, value reflect.Value, state *decoderState) error

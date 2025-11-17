@@ -234,7 +234,7 @@ func (r *CloudNetworkResource) Delete(ctx context.Context, req resource.DeleteRe
 }
 
 func (r *CloudNetworkResource) ImportState(ctx context.Context, req resource.ImportStateRequest, resp *resource.ImportStateResponse) {
-	var data *CloudNetworkModel = new(CloudNetworkModel)
+	var data = new(CloudNetworkModel)
 
 	path_project_id := int64(0)
 	path_region_id := int64(0)

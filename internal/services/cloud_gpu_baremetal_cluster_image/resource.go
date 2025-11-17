@@ -186,7 +186,7 @@ func (r *CloudGPUBaremetalClusterImageResource) Delete(ctx context.Context, req 
 }
 
 func (r *CloudGPUBaremetalClusterImageResource) ImportState(ctx context.Context, req resource.ImportStateRequest, resp *resource.ImportStateResponse) {
-	var data *CloudGPUBaremetalClusterImageModel = new(CloudGPUBaremetalClusterImageModel)
+	var data = new(CloudGPUBaremetalClusterImageModel)
 
 	path_project_id := int64(0)
 	path_region_id := int64(0)
