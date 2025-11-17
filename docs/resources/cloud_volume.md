@@ -68,7 +68,7 @@ Available values: "cold", "ssd_hiiops", "ssd_local", "ssd_lowlatency", "standard
 Available values: "attaching", "available", "awaiting-transfer", "backing-up", "creating", "deleting", "detaching", "downloading", "error", "error_backing-up", "error_deleting", "error_extending", "error_restoring", "extending", "in-use", "maintenance", "reserved", "restoring-backup", "retyping", "reverting", "uploading".
 - `task_id` (String) The UUID of the active task that currently holds a lock on the resource. This lock prevents concurrent modifications to ensure consistency. If `null`, the resource is not locked.
 - `tasks` (List of String) List of task IDs representing asynchronous operations. Use these IDs to monitor operation progress:
-\* `GET /v1/tasks/{`task_id`}` - Check individual task status and details
+* `GET /v1/tasks/{task_id}` - Check individual task status and details
 Poll task status until completion (`FINISHED`/`ERROR`) before proceeding with dependent operations.
 - `updated_at` (String) The date and time when the volume was last updated.
 - `volume_image_metadata` (Map of String) Image metadata for volumes created from an image.

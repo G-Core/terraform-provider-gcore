@@ -1,5 +1,5 @@
-github.com/G-Core/gcore-go v0.20.0 h1:e2IIc7yLq997BACZdYVjB2Ehm9dEZ/tLuYq1K2dIGFQ=
-github.com/G-Core/gcore-go v0.20.0/go.mod h1:VHbcTxWqi7XUSd/7yHFwodu4+KlsVR07MBmRr00DLw0=
+github.com/G-Core/gcore-go v0.21.0 h1:GgFcVbC58DTeSu83UJyNta3M4cPQ4YuZI20jmNQKyyI=
+github.com/G-Core/gcore-go v0.21.0/go.mod h1:VHbcTxWqi7XUSd/7yHFwodu4+KlsVR07MBmRr00DLw0=
 github.com/Masterminds/goutils v1.1.1 h1:5nUrii3FMTL5diU80unEVvNevw1nH4+ZV4DSLVJLSYI=
 github.com/Masterminds/goutils v1.1.1/go.mod h1:8cTjp+g8YejhMuvIA5y2vz3BpJxksy863GQaJW2MFNU=
 github.com/Masterminds/semver/v3 v3.1.1 h1:hLg3sBzpNErnxhQtUy/mmLR2I9foDujNK030IGemrRc=

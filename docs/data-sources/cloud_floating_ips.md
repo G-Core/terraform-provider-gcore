@@ -16,6 +16,7 @@ A floating IP is a static IP address that points to one of your Instances. It al
 data "gcore_cloud_floating_ips" "example_cloud_floating_ips" {
   project_id = 1
   region_id = 1
+  status = "ACTIVE"
   tag_key = ["key1", "key2"]
   tag_key_value = "tag_key_value"
 }
@@ -29,6 +30,8 @@ data "gcore_cloud_floating_ips" "example_cloud_floating_ips" {
 - `max_items` (Number) Max items to fetch, default: 1000
 - `project_id` (Number) Project ID
 - `region_id` (Number) Region ID
+- `status` (String) Filter by floating IP status. DOWN - unassigned (available). ACTIVE - attached to a port (in use). ERROR - error state.
+Available values: "ACTIVE", "DOWN", "ERROR".
 - `tag_key` (List of String) Optional. Filter by tag keys. ?`tag_key`=key1&`tag_key`=key2
 - `tag_key_value` (String) Optional. Filter by tag key-value pairs.
 
@@ -53,7 +56,7 @@ Read-Only:
 - `region` (String) Region name
 - `region_id` (Number) Region ID
 - `router_id` (String) Router ID
-- `status` (String) Floating IP status
+- `status` (String) Floating IP status. DOWN - unassigned (available). ACTIVE - attached to a port (in use). ERROR - error state.
 Available values: "ACTIVE", "DOWN", "ERROR".
 - `tags` (Attributes List) List of key-value tags associated with the resource. A tag is a key-value pair that can be associated with a resource, enabling efficient filtering and grouping for better organization and management. Some tags are read-only and cannot be modified by the user. Tags are also integrated with cost reports, allowing cost data to be filtered based on tag keys or values. (see [below for nested schema](#nestedatt--items--tags))
 - `task_id` (String) The UUID of the active task that currently holds a lock on the resource. This lock prevents concurrent modifications to ensure consistency. If `null`, the resource is not locked.
@@ -278,7 +281,7 @@ Read-Only:
 - `region` (String) Region name
 - `region_id` (Number) Region ID
 - `router_id` (String) Router ID
-- `status` (String) Floating IP status
+- `status` (String) Floating IP status. DOWN - unassigned (available). ACTIVE - attached to a port (in use). ERROR - error state.
 Available values: "ACTIVE", "DOWN", "ERROR".
 - `tags` (Attributes List) List of key-value tags associated with the resource. A tag is a key-value pair that can be associated with a resource, enabling efficient filtering and grouping for better organization and management. Some tags are read-only and cannot be modified by the user. Tags are also integrated with cost reports, allowing cost data to be filtered based on tag keys or values. (see [below for nested schema](#nestedatt--items--loadbalancer--floating_ips--tags))
 - `task_id` (String) The UUID of the active task that currently holds a lock on the resource. This lock prevents concurrent modifications to ensure consistency. If `null`, the resource is not locked.
