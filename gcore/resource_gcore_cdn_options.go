@@ -513,7 +513,7 @@ var (
 					"value": {
 						Type:        schema.TypeString,
 						Required:    true,
-						Description: "Key for caching. Should be a combination of the specified variables: $http_host, $request_uri, $scheme, $uri.",
+						Description: "Key for caching. Should be a combination of the specified variables: $request_uri, $scheme, $uri.",
 					},
 				},
 			},

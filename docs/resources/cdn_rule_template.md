@@ -403,7 +403,7 @@ Optional:
 
 Required:
 
-- `value` (String) Key for caching. Should be a combination of the specified variables: $http_host, $request_uri, $scheme, $uri.
+- `value` (String) Key for caching. Should be a combination of the specified variables: $request_uri, $scheme, $uri.
 
 Optional:
 
