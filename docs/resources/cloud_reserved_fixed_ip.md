@@ -60,7 +60,7 @@ Available values: "dual", "ipv4", "ipv6".
 - `subnet_v6_id` (String) ID of the subnet that owns the IPv6 address
 - `task_id` (String) The UUID of the active task that currently holds a lock on the resource. This lock prevents concurrent modifications to ensure consistency. If `null`, the resource is not locked.
 - `tasks` (List of String) List of task IDs representing asynchronous operations. Use these IDs to monitor operation progress:
-\* `GET /v1/tasks/{`task_id`}` - Check individual task status and details
+* `GET /v1/tasks/{task_id}` - Check individual task status and details
 Poll task status until completion (`FINISHED`/`ERROR`) before proceeding with dependent operations.
 - `updated_at` (String) Datetime when the reserved fixed IP was last updated
 
