@@ -237,7 +237,7 @@ func (r *CloudReservedFixedIPResource) Delete(ctx context.Context, req resource.
 }
 
 func (r *CloudReservedFixedIPResource) ImportState(ctx context.Context, req resource.ImportStateRequest, resp *resource.ImportStateResponse) {
-	var data *CloudReservedFixedIPModel = new(CloudReservedFixedIPModel)
+	var data = new(CloudReservedFixedIPModel)
 
 	path_project_id := int64(0)
 	path_region_id := int64(0)

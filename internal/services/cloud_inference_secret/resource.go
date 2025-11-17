@@ -177,7 +177,7 @@ func (r *CloudInferenceSecretResource) Delete(ctx context.Context, req resource.
 }
 
 func (r *CloudInferenceSecretResource) ImportState(ctx context.Context, req resource.ImportStateRequest, resp *resource.ImportStateResponse) {
-	var data *CloudInferenceSecretModel = new(CloudInferenceSecretModel)
+	var data = new(CloudInferenceSecretModel)
 
 	path_project_id := int64(0)
 	path_secret_name := ""

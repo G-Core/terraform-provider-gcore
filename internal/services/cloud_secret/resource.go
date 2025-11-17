@@ -186,7 +186,7 @@ func (r *CloudSecretResource) Delete(ctx context.Context, req resource.DeleteReq
 }
 
 func (r *CloudSecretResource) ImportState(ctx context.Context, req resource.ImportStateRequest, resp *resource.ImportStateResponse) {
-	var data *CloudSecretModel = new(CloudSecretModel)
+	var data = new(CloudSecretModel)
 
 	path_project_id := int64(0)
 	path_region_id := int64(0)

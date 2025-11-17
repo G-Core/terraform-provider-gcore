@@ -221,7 +221,7 @@ func (r *CloudSSHKeyResource) Delete(ctx context.Context, req resource.DeleteReq
 }
 
 func (r *CloudSSHKeyResource) ImportState(ctx context.Context, req resource.ImportStateRequest, resp *resource.ImportStateResponse) {
-	var data *CloudSSHKeyModel = new(CloudSSHKeyModel)
+	var data = new(CloudSSHKeyModel)
 
 	path_project_id := int64(0)
 	path_ssh_key_id := ""

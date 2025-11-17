@@ -237,7 +237,7 @@ func (r *CloudLoadBalancerListenerResource) Delete(ctx context.Context, req reso
 }
 
 func (r *CloudLoadBalancerListenerResource) ImportState(ctx context.Context, req resource.ImportStateRequest, resp *resource.ImportStateResponse) {
-	var data *CloudLoadBalancerListenerModel = new(CloudLoadBalancerListenerModel)
+	var data = new(CloudLoadBalancerListenerModel)
 
 	path_project_id := int64(0)
 	path_region_id := int64(0)

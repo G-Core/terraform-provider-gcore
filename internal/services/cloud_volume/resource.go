@@ -237,7 +237,7 @@ func (r *CloudVolumeResource) Delete(ctx context.Context, req resource.DeleteReq
 }
 
 func (r *CloudVolumeResource) ImportState(ctx context.Context, req resource.ImportStateRequest, resp *resource.ImportStateResponse) {
-	var data *CloudVolumeModel = new(CloudVolumeModel)
+	var data = new(CloudVolumeModel)
 
 	path_project_id := int64(0)
 	path_region_id := int64(0)

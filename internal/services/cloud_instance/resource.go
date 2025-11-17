@@ -237,7 +237,7 @@ func (r *CloudInstanceResource) Delete(ctx context.Context, req resource.DeleteR
 }
 
 func (r *CloudInstanceResource) ImportState(ctx context.Context, req resource.ImportStateRequest, resp *resource.ImportStateResponse) {
-	var data *CloudInstanceModel = new(CloudInstanceModel)
+	var data = new(CloudInstanceModel)
 
 	path_project_id := int64(0)
 	path_region_id := int64(0)

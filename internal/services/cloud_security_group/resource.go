@@ -237,7 +237,7 @@ func (r *CloudSecurityGroupResource) Delete(ctx context.Context, req resource.De
 }
 
 func (r *CloudSecurityGroupResource) ImportState(ctx context.Context, req resource.ImportStateRequest, resp *resource.ImportStateResponse) {
-	var data *CloudSecurityGroupModel = new(CloudSecurityGroupModel)
+	var data = new(CloudSecurityGroupModel)
 
 	path_project_id := int64(0)
 	path_region_id := int64(0)
