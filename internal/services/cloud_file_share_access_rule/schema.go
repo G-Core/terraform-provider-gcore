@@ -58,10 +58,12 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 				Validators: []validator.String{
 					stringvalidator.OneOfCaseInsensitive("ro", "rw"),
 				},
+				PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
 			},
 			"access_to": schema.StringAttribute{
-				Description: "Source IP or network",
-				Computed:    true,
+				Description:   "Source IP or network",
+				Computed:      true,
+				PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
 			},
 			"state": schema.StringAttribute{
 				Description: "Access Rule state\nAvailable values: \"active\", \"applying\", \"denying\", \"error\", \"new\", \"queued_to_apply\", \"queued_to_deny\".",
@@ -77,6 +79,7 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 						"queued_to_deny",
 					),
 				},
+				PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
 			},
 		},
 	}

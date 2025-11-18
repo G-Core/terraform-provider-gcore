@@ -8,13 +8,8 @@ resource "gcore_cloud_file_share" "example_cloud_file_share" {
   }
   protocol = "NFS"
   size = 5
-  access = [{
-    access_mode = "ro"
-    ip_address = "10.0.0.1"
-  }]
   tags = {
     my-tag = "my-tag-value"
   }
   type_name = "standard"
-  volume_type = "default_share_type"
 }

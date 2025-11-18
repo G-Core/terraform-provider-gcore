@@ -15,6 +15,8 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/stainless-sdks/gcore-terraform/internal/apijson"
+	"github.com/stainless-sdks/gcore-terraform/internal/custom"
+	"github.com/stainless-sdks/gcore-terraform/internal/customfield"
 	"github.com/stainless-sdks/gcore-terraform/internal/importpath"
 	"github.com/stainless-sdks/gcore-terraform/internal/logging"
 )
@@ -80,24 +82,23 @@ func (r *CloudFileShareResource) Create(ctx context.Context, req resource.Create
 		resp.Diagnostics.AddError("failed to serialize http request", err.Error())
 		return
 	}
-	res := new(http.Response)
-	_, err = r.client.Cloud.FileShares.New(
+	fileShare, err := r.client.Cloud.FileShares.NewAndPoll(
 		ctx,
 		params,
 		option.WithRequestBody("application/json", dataBytes),
-		option.WithResponseBodyInto(&res),
 		option.WithMiddleware(logging.Middleware(ctx)),
 	)
 	if err != nil {
 		resp.Diagnostics.AddError("failed to make http request", err.Error())
 		return
 	}
-	bytes, _ := io.ReadAll(res.Body)
-	err = apijson.UnmarshalComputed(bytes, &data)
+	err = apijson.UnmarshalComputed([]byte(fileShare.RawJSON()), &data)
 	if err != nil {
 		resp.Diagnostics.AddError("failed to deserialize http request", err.Error())
 		return
 	}
+	// AccessRuleIDs is read-only, so set it to null
+	data.AccessRuleIDs = customfield.NullList[types.String](ctx)
 
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
 }
@@ -119,39 +120,65 @@ func (r *CloudFileShareResource) Update(ctx context.Context, req resource.Update
 		return
 	}
 
-	params := cloud.FileShareUpdateParams{}
+	// Check if fields that can be updated using the Update method have changed
+	if !data.Name.Equal(state.Name) || !custom.TagsEqual(data.Tags, state.Tags) || !data.ShareSettings.Equal(state.ShareSettings) {
+		params := cloud.FileShareUpdateParams{}
 
-	if !data.ProjectID.IsNull() {
-		params.ProjectID = param.NewOpt(data.ProjectID.ValueInt64())
+		if !data.ProjectID.IsNull() {
+			params.ProjectID = param.NewOpt(data.ProjectID.ValueInt64())
+		}
+
+		if !data.RegionID.IsNull() {
+			params.RegionID = param.NewOpt(data.RegionID.ValueInt64())
+		}
+
+		dataBytes, err := data.MarshalJSONForUpdate(*state)
+		if err != nil {
+			resp.Diagnostics.AddError("failed to serialize http request", err.Error())
+			return
+		}
+		fileShare, err := r.client.Cloud.FileShares.UpdateAndPoll(
+			ctx,
+			data.ID.ValueString(),
+			params,
+			option.WithRequestBody("application/json", dataBytes),
+			option.WithMiddleware(logging.Middleware(ctx)),
+		)
+		if err != nil {
+			resp.Diagnostics.AddError("failed to make http request", err.Error())
+			return
+		}
+		err = apijson.UnmarshalComputed([]byte(fileShare.RawJSON()), &data)
+		if err != nil {
+			resp.Diagnostics.AddError("failed to deserialize http request", err.Error())
+			return
+		}
 	}
 
-	if !data.RegionID.IsNull() {
-		params.RegionID = param.NewOpt(data.RegionID.ValueInt64())
-	}
-
-	dataBytes, err := data.MarshalJSONForUpdate(*state)
-	if err != nil {
-		resp.Diagnostics.AddError("failed to serialize http request", err.Error())
-		return
-	}
-	res := new(http.Response)
-	_, err = r.client.Cloud.FileShares.Update(
-		ctx,
-		data.ID.ValueString(),
-		params,
-		option.WithRequestBody("application/json", dataBytes),
-		option.WithResponseBodyInto(&res),
-		option.WithMiddleware(logging.Middleware(ctx)),
-	)
-	if err != nil {
-		resp.Diagnostics.AddError("failed to make http request", err.Error())
-		return
-	}
-	bytes, _ := io.ReadAll(res.Body)
-	err = apijson.UnmarshalComputed(bytes, &data)
-	if err != nil {
-		resp.Diagnostics.AddError("failed to deserialize http request", err.Error())
-		return
+	// Check if size has changed, which requires a resize operation
+	if !data.Size.Equal(state.Size) {
+		params := cloud.FileShareResizeParams{Size: data.Size.ValueInt64()}
+		if !data.ProjectID.IsNull() {
+			params.ProjectID = param.NewOpt(data.ProjectID.ValueInt64())
+		}
+		if !data.RegionID.IsNull() {
+			params.RegionID = param.NewOpt(data.RegionID.ValueInt64())
+		}
+		fileShare, err := r.client.Cloud.FileShares.ResizeAndPoll(
+			ctx,
+			data.ID.ValueString(),
+			params,
+			option.WithMiddleware(logging.Middleware(ctx)),
+		)
+		if err != nil {
+			resp.Diagnostics.AddError("failed to make http request", err.Error())
+			return
+		}
+		err = apijson.UnmarshalComputed([]byte(fileShare.RawJSON()), &data)
+		if err != nil {
+			resp.Diagnostics.AddError("failed to deserialize http request", err.Error())
+			return
+		}
 	}
 
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
@@ -200,6 +227,30 @@ func (r *CloudFileShareResource) Read(ctx context.Context, req resource.ReadRequ
 		return
 	}
 
+	// Read access_rule_ids separately using the Access Rules list endpoint
+	accessRuleListParams := cloud.FileShareAccessRuleListParams{}
+	if !data.ProjectID.IsNull() {
+		accessRuleListParams.ProjectID = param.NewOpt(data.ProjectID.ValueInt64())
+	}
+	if !data.RegionID.IsNull() {
+		accessRuleListParams.RegionID = param.NewOpt(data.RegionID.ValueInt64())
+	}
+	accessRules, err := r.client.Cloud.FileShares.AccessRules.List(
+		ctx,
+		data.ID.ValueString(),
+		accessRuleListParams,
+		option.WithMiddleware(logging.Middleware(ctx)),
+	)
+	if err != nil {
+		// don't fail the read if we can't get access rules, just log a warning
+		resp.Diagnostics.AddWarning("failed to make http request", err.Error())
+	}
+	accessRuleIDs := make([]types.String, 0, len(accessRules.Results))
+	for _, rule := range accessRules.Results {
+		accessRuleIDs = append(accessRuleIDs, types.StringValue(rule.ID))
+	}
+	data.AccessRuleIDs, _ = customfield.NewList[types.String](ctx, accessRuleIDs)
+
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
 }
 
@@ -222,7 +273,7 @@ func (r *CloudFileShareResource) Delete(ctx context.Context, req resource.Delete
 		params.RegionID = param.NewOpt(data.RegionID.ValueInt64())
 	}
 
-	_, err := r.client.Cloud.FileShares.Delete(
+	err := r.client.Cloud.FileShares.DeleteAndPoll(
 		ctx,
 		data.ID.ValueString(),
 		params,

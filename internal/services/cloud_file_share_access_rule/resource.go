@@ -105,7 +105,55 @@ func (r *CloudFileShareAccessRuleResource) Update(ctx context.Context, req resou
 }
 
 func (r *CloudFileShareAccessRuleResource) Read(ctx context.Context, req resource.ReadRequest, resp *resource.ReadResponse) {
+	var data *CloudFileShareAccessRuleModel
 
+	resp.Diagnostics.Append(req.State.Get(ctx, &data)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
+
+	params := cloud.FileShareAccessRuleListParams{}
+
+	if !data.ProjectID.IsNull() {
+		params.ProjectID = param.NewOpt(data.ProjectID.ValueInt64())
+	}
+
+	if !data.RegionID.IsNull() {
+		params.RegionID = param.NewOpt(data.RegionID.ValueInt64())
+	}
+
+	// There is no Get endpoint for Access Rules, so we list and find the specific rule
+	accessRules, err := r.client.Cloud.FileShares.AccessRules.List(
+		ctx,
+		data.FileShareID.ValueString(),
+		params,
+		option.WithMiddleware(logging.Middleware(ctx)),
+	)
+	if err != nil {
+		resp.Diagnostics.AddError("failed to make http request", err.Error())
+		return
+	}
+	foundAccessRule := false
+	for _, rule := range accessRules.Results {
+		if rule.ID == data.ID.ValueString() {
+			foundAccessRule = true
+			err = apijson.Unmarshal([]byte(rule.RawJSON()), &data)
+			data.AccessMode = data.AccessLevel // Set AccessMode from AccessLevel as it's not returned by the API
+			data.IPAddress = data.AccessTo     // Set IPAddress from AccessTo as it's not returned by the API
+			if err != nil {
+				resp.Diagnostics.AddError("failed to deserialize http request", err.Error())
+				return
+			}
+		}
+	}
+	if !foundAccessRule {
+		resp.Diagnostics.AddWarning("Resource not found", "The resource was not found on the server and will be removed from state.")
+		resp.State.RemoveResource(ctx)
+		return
+	}
+
+	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
 }
 
 func (r *CloudFileShareAccessRuleResource) Delete(ctx context.Context, req resource.DeleteRequest, resp *resource.DeleteResponse) {

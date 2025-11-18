@@ -52,8 +52,6 @@ Available values: "available", "awaiting_transfer", "backup_creating", "backup_r
 - `task_id` (String) The UUID of the active task that currently holds a lock on the resource. This lock prevents concurrent modifications to ensure consistency. If `null`, the resource is not locked.
 - `type_name` (String) File share type name
 Available values: "standard", "vast".
-- `volume_type` (String, Deprecated) Deprecated. Use `type_name` instead. File share disk type
-Available values: "default_share_type", "vast_share_type".
 
 <a id="nestedatt--find_one_by"></a>
 ### Nested Schema for `find_one_by`

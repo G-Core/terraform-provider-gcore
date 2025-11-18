@@ -32,7 +32,6 @@ type CloudFileShareDataSourceModel struct {
 	SubnetName       types.String                                                         `tfsdk:"subnet_name" json:"subnet_name,computed"`
 	TaskID           types.String                                                         `tfsdk:"task_id" json:"task_id,computed"`
 	TypeName         types.String                                                         `tfsdk:"type_name" json:"type_name,computed"`
-	VolumeType       types.String                                                         `tfsdk:"volume_type" json:"volume_type,computed"`
 	ShareSettings    customfield.NestedObject[CloudFileShareShareSettingsDataSourceModel] `tfsdk:"share_settings" json:"share_settings,computed"`
 	Tags             customfield.NestedObjectList[CloudFileShareTagsDataSourceModel]      `tfsdk:"tags" json:"tags,computed"`
 	FindOneBy        *CloudFileShareFindOneByDataSourceModel                              `tfsdk:"find_one_by"`

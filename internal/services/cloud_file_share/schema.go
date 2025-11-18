@@ -7,11 +7,10 @@ import (
 
 	"github.com/hashicorp/terraform-plugin-framework-validators/int64validator"
 	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
+	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
-	"github.com/hashicorp/terraform-plugin-framework/resource/schema/booldefault"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/int64planmodifier"
-	"github.com/hashicorp/terraform-plugin-framework/resource/schema/listplanmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/objectplanmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringplanmodifier"
@@ -53,7 +52,6 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 				Validators: []validator.Int64{
 					int64validator.AtLeast(1),
 				},
-				PlanModifiers: []planmodifier.Int64{int64planmodifier.RequiresReplace()},
 			},
 			"network": schema.SingleNestedAttribute{
 				Description: "File share network configuration",
@@ -79,37 +77,11 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 				},
 				PlanModifiers: []planmodifier.String{stringplanmodifier.RequiresReplaceIfConfigured()},
 			},
-			"volume_type": schema.StringAttribute{
-				Description:        "Deprecated. Use `type_name` instead.\nAvailable values: \"default_share_type\", \"vast_share_type\".",
-				Computed:           true,
-				Optional:           true,
-				DeprecationMessage: "This attribute is deprecated.",
-				Validators: []validator.String{
-					stringvalidator.OneOfCaseInsensitive("default_share_type", "vast_share_type"),
-				},
-				PlanModifiers: []planmodifier.String{stringplanmodifier.RequiresReplaceIfConfigured()},
-			},
-			"access": schema.ListNestedAttribute{
-				Description: "Access Rules",
+			"access_rule_ids": schema.ListAttribute{
+				Description: "List of access rules IDs associated with the file share",
 				Computed:    true,
-				Optional:    true,
-				CustomType:  customfield.NewNestedObjectListType[CloudFileShareAccessModel](ctx),
-				NestedObject: schema.NestedAttributeObject{
-					Attributes: map[string]schema.Attribute{
-						"access_mode": schema.StringAttribute{
-							Description: "Access mode\nAvailable values: \"ro\", \"rw\".",
-							Required:    true,
-							Validators: []validator.String{
-								stringvalidator.OneOfCaseInsensitive("ro", "rw"),
-							},
-						},
-						"ip_address": schema.StringAttribute{
-							Description: "Source IP or network",
-							Required:    true,
-						},
-					},
-				},
-				PlanModifiers: []planmodifier.List{listplanmodifier.RequiresReplaceIfConfigured()},
+				CustomType:  customfield.NewListType[types.String](ctx),
+				ElementType: types.StringType,
 			},
 			"name": schema.StringAttribute{
 				Description: "Name",
@@ -146,9 +118,9 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 						Description: "Enables or disables root squash for NFS clients.\n- If `true` (default), root squash is enabled: the root user is mapped to nobody for all file and folder management operations on the export.\n- If `false`, root squash is disabled: the NFS client `root` user retains root privileges. Use this option if you trust the root user not to perform operations that will corrupt data.",
 						Computed:    true,
 						Optional:    true,
-						Default:     booldefault.StaticBool(true),
 					},
 				},
+				PlanModifiers: []planmodifier.Object{objectplanmodifier.UseStateForUnknown()},
 			},
 			"connection_point": schema.StringAttribute{
 				Description: "Connection point. Can be null during File share creation",
@@ -222,16 +194,6 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 				Description: "Subnet name.",
 				Computed:    true,
 			},
-			"task_id": schema.StringAttribute{
-				Description: "The UUID of the active task that currently holds a lock on the resource. This lock prevents concurrent modifications to ensure consistency. If `null`, the resource is not locked.",
-				Computed:    true,
-			},
-			"tasks": schema.ListAttribute{
-				Description: "List of task IDs representing asynchronous operations. Use these IDs to monitor operation progress:\n\\* `GET /v1/tasks/{`task_id`}` - Check individual task status and details\nPoll task status until completion (`FINISHED`/`ERROR`) before proceeding with dependent operations.",
-				Computed:    true,
-				CustomType:  customfield.NewListType[types.String](ctx),
-				ElementType: types.StringType,
-			},
 		},
 	}
 }
@@ -241,5 +203,70 @@ func (r *CloudFileShareResource) Schema(ctx context.Context, req resource.Schema
 }
 
 func (r *CloudFileShareResource) ConfigValidators(_ context.Context) []resource.ConfigValidator {
-	return []resource.ConfigValidator{}
+	return []resource.ConfigValidator{
+		&typeNameShareSettingsValidator{},
+		&typeNameNetworkValidator{},
+	}
+}
+
+type typeNameShareSettingsValidator struct{}
+
+func (v *typeNameShareSettingsValidator) Description(_ context.Context) string {
+	return "share_settings is only allowed when type_name is 'vast'"
+}
+
+func (v *typeNameShareSettingsValidator) MarkdownDescription(ctx context.Context) string {
+	return v.Description(ctx)
+}
+
+func (v *typeNameShareSettingsValidator) ValidateResource(ctx context.Context, req resource.ValidateConfigRequest, resp *resource.ValidateConfigResponse) {
+	var config CloudFileShareModel
+
+	resp.Diagnostics.Append(req.Config.Get(ctx, &config)...)
+	if resp.Diagnostics.HasError() {
+		return
+	}
+
+	// If share_settings is provided but type_name is not "vast", add error
+	if !config.ShareSettings.IsNull() && !config.ShareSettings.IsUnknown() {
+		typeName := config.TypeName.ValueString()
+		if typeName != "" && typeName != "vast" {
+			resp.Diagnostics.AddAttributeError(
+				path.Root("share_settings"),
+				"Invalid Attribute Combination",
+				"share_settings can only be provided when type_name is 'vast'",
+			)
+		}
+	}
+}
+
+type typeNameNetworkValidator struct{}
+
+func (v *typeNameNetworkValidator) Description(_ context.Context) string {
+	return "network is only allowed when type_name is 'standard'"
+}
+
+func (v *typeNameNetworkValidator) MarkdownDescription(ctx context.Context) string {
+	return v.Description(ctx)
+}
+
+func (v *typeNameNetworkValidator) ValidateResource(ctx context.Context, req resource.ValidateConfigRequest, resp *resource.ValidateConfigResponse) {
+	var config CloudFileShareModel
+
+	resp.Diagnostics.Append(req.Config.Get(ctx, &config)...)
+	if resp.Diagnostics.HasError() {
+		return
+	}
+
+	// If network is provided but type_name is not "standard", add error
+	if config.Network != nil {
+		typeName := config.TypeName.ValueString()
+		if typeName != "" && typeName != "standard" {
+			resp.Diagnostics.AddAttributeError(
+				path.Root("network"),
+				"Invalid Attribute Combination",
+				"network can only be provided when type_name is 'standard'",
+			)
+		}
+	}
 }

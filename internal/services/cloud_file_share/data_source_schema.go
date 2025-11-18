@@ -134,14 +134,6 @@ func DataSourceSchema(ctx context.Context) schema.Schema {
 					stringvalidator.OneOfCaseInsensitive("standard", "vast"),
 				},
 			},
-			"volume_type": schema.StringAttribute{
-				Description:        "Deprecated. Use `type_name` instead. File share disk type\nAvailable values: \"default_share_type\", \"vast_share_type\".",
-				Computed:           true,
-				DeprecationMessage: "This attribute is deprecated.",
-				Validators: []validator.String{
-					stringvalidator.OneOfCaseInsensitive("default_share_type", "vast_share_type"),
-				},
-			},
 			"share_settings": schema.SingleNestedAttribute{
 				Description: "Share settings specific to the file share type",
 				Computed:    true,

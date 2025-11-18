@@ -65,7 +65,6 @@ type CloudFileSharesItemsDataSourceModel struct {
 	Tags             customfield.NestedObjectList[CloudFileSharesTagsDataSourceModel]      `tfsdk:"tags" json:"tags,computed"`
 	TaskID           types.String                                                          `tfsdk:"task_id" json:"task_id,computed"`
 	TypeName         types.String                                                          `tfsdk:"type_name" json:"type_name,computed"`
-	VolumeType       types.String                                                          `tfsdk:"volume_type" json:"volume_type,computed"`
 }
 
 type CloudFileSharesShareSettingsDataSourceModel struct {
