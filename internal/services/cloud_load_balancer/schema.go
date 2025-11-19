@@ -45,7 +45,7 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 				Optional:    true,
 			},
 			"name_template": schema.StringAttribute{
-				Description:   "Load balancer name which will be changed by template.",
+				Description:   "Load balancer name which will be changed by template. Either `name` or `name_template` should be specified.",
 				Optional:      true,
 				PlanModifiers: []planmodifier.String{stringplanmodifier.RequiresReplace()},
 			},
@@ -433,7 +433,7 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 				PlanModifiers: []planmodifier.List{listplanmodifier.RequiresReplaceIfConfigured()},
 			},
 			"name": schema.StringAttribute{
-				Description: "Load balancer name",
+				Description: "Load balancer name. Either `name` or `name_template` should be specified.",
 				Optional:    true,
 			},
 			"tags": schema.MapAttribute{
