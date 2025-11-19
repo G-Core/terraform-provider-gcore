@@ -9,7 +9,6 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
-	"github.com/hashicorp/terraform-plugin-framework/resource/schema/booldefault"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/int64planmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringplanmodifier"
@@ -42,10 +41,8 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 				PlanModifiers: []planmodifier.String{stringplanmodifier.RequiresReplace()},
 			},
 			"shared_in_project": schema.BoolAttribute{
-				Description: "SSH key is shared with all users in the project",
-				Computed:    true,
-				Optional:    true,
-				Default:     booldefault.StaticBool(true),
+				Description: "Share your ssh key with all users in the project",
+				Required:    true,
 			},
 			"created_at": schema.StringAttribute{
 				Description: "SSH key creation time",

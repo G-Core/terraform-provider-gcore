@@ -118,13 +118,27 @@ resource "gcore_cloud_load_balancer" "example_cloud_load_balancer" {
 - `floating_ip` (Attributes) Floating IP configuration for assignment (see [below for nested schema](#nestedatt--floating_ip))
 - `listeners` (Attributes List) Load balancer listeners. Maximum 50 per LB (excluding Prometheus endpoint listener). (see [below for nested schema](#nestedatt--listeners))
 - `logging` (Attributes) Logging configuration (see [below for nested schema](#nestedatt--logging))
-- `name` (String) Load balancer name. Either `name` or `name_template` should be specified.
+- `name` (String) Name.
 - `name_template` (String) Load balancer name which will be changed by template. Either `name` or `name_template` should be specified.
 - `preferred_connectivity` (String) Preferred option to establish connectivity between load balancer and its pools members. L2 provides best performance, L3 provides less IPs usage. It is taking effect only if `instance_id` + `ip_address` is provided, not `subnet_id` + `ip_address`, because we're considering this as intentional `subnet_id` specification.
 Available values: "L2", "L3".
 - `project_id` (Number)
 - `region_id` (Number)
-- `tags` (Map of String) Key-value tags to associate with the resource. A tag is a key-value pair that can be associated with a resource, enabling efficient filtering and grouping for better organization and management. Some tags are read-only and cannot be modified by the user. Tags are also integrated with cost reports, allowing cost data to be filtered based on tag keys or values.
+- `tags` (Map of String) Update key-value tags using JSON Merge Patch semantics (RFC 7386). Provide key-value pairs to add or update tags. Set tag values to `null` to remove tags. Unspecified tags remain unchanged. Read-only tags are always preserved and cannot be modified.
+
+**Examples:**
+
+* **Add/update tags:** `{'tags': {'environment': 'production', 'team': 'backend'}}` adds new tags or updates existing ones.
+
+* **Delete tags:** `{'tags': {'old_tag': null}}` removes specific tags.
+
+* **Remove all tags:** `{'tags': null}` removes all user-managed tags (read-only tags are preserved).
+
+* **Partial update:** `{'tags': {'environment': 'staging'}}` only updates specified tags.
+
+* **Mixed operations:** `{'tags': {'environment': 'production', 'cost_center': 'engineering', 'deprecated_tag': null}}` adds/updates 'environment' and '`cost_center`' while removing '`deprecated_tag`', preserving other existing tags.
+
+* **Replace all:** first delete existing tags with null values, then add new ones in the same request.
 - `vip_ip_family` (String) IP family for load balancer subnet auto-selection if `vip_network_id` is specified
 Available values: "dual", "ipv4", "ipv6".
 - `vip_network_id` (String) Network ID for load balancer. If not specified, default external network will be used. Mutually exclusive with `vip_port_id`

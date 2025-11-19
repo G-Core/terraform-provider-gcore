@@ -21,7 +21,7 @@ type CloudVolumeModel struct {
 	SnapshotID           types.String                                              `tfsdk:"snapshot_id" json:"snapshot_id,optional,no_refresh"`
 	TypeName             types.String                                              `tfsdk:"type_name" json:"type_name,optional,no_refresh"`
 	LifecyclePolicyIDs   *[]types.Int64                                            `tfsdk:"lifecycle_policy_ids" json:"lifecycle_policy_ids,optional,no_refresh"`
-	Name                 types.String                                              `tfsdk:"name" json:"name,required"`
+	Name                 types.String                                              `tfsdk:"name" json:"name,optional"`
 	Tags                 *map[string]types.String                                  `tfsdk:"tags" json:"tags,optional,no_refresh"`
 	Bootable             types.Bool                                                `tfsdk:"bootable" json:"bootable,computed"`
 	CreatedAt            timetypes.RFC3339                                         `tfsdk:"created_at" json:"created_at,computed" format:"date-time"`

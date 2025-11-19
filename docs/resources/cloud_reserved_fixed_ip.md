@@ -27,6 +27,7 @@ resource "gcore_cloud_reserved_fixed_ip" "example_cloud_reserved_fixed_ip" {
 
 ### Required
 
+- `is_vip` (Boolean) If reserved fixed IP should be a VIP
 - `type` (String) Must be 'external'
 Available values: "external", "subnet", "any_subnet", "ip_address", "port".
 
@@ -35,7 +36,6 @@ Available values: "external", "subnet", "any_subnet", "ip_address", "port".
 - `ip_address` (String) Reserved fixed IP will be allocated the given IP address
 - `ip_family` (String) Which subnets should be selected: IPv4, IPv6 or use dual stack.
 Available values: "dual", "ipv4", "ipv6".
-- `is_vip` (Boolean) If reserved fixed IP is a VIP
 - `network_id` (String) Reserved fixed IP will be allocated in a subnet of this network
 - `port_id` (String) Port ID to make a reserved fixed IP (for example, `vip_port_id` of the Load Balancer entity).
 - `project_id` (Number)

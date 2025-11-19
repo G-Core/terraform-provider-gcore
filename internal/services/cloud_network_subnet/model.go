@@ -18,9 +18,9 @@ type CloudNetworkSubnetModel struct {
 	RouterIDToConnect      types.String                                                    `tfsdk:"router_id_to_connect" json:"router_id_to_connect,optional,no_refresh"`
 	ConnectToNetworkRouter types.Bool                                                      `tfsdk:"connect_to_network_router" json:"connect_to_network_router,computed_optional,no_refresh"`
 	IPVersion              types.Int64                                                     `tfsdk:"ip_version" json:"ip_version,computed_optional"`
-	Name                   types.String                                                    `tfsdk:"name" json:"name,required"`
+	EnableDhcp             types.Bool                                                      `tfsdk:"enable_dhcp" json:"enable_dhcp,optional"`
+	Name                   types.String                                                    `tfsdk:"name" json:"name,optional"`
 	Tags                   *map[string]types.String                                        `tfsdk:"tags" json:"tags,optional,no_refresh"`
-	EnableDhcp             types.Bool                                                      `tfsdk:"enable_dhcp" json:"enable_dhcp,computed_optional"`
 	GatewayIP              types.String                                                    `tfsdk:"gateway_ip" json:"gateway_ip,computed_optional"`
 	DNSNameservers         customfield.List[types.String]                                  `tfsdk:"dns_nameservers" json:"dns_nameservers,computed_optional"`
 	HostRoutes             customfield.NestedObjectList[CloudNetworkSubnetHostRoutesModel] `tfsdk:"host_routes" json:"host_routes,computed_optional"`
