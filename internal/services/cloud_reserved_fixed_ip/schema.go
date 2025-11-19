@@ -82,8 +82,8 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 				PlanModifiers: []planmodifier.String{stringplanmodifier.RequiresReplaceIfConfigured()},
 			},
 			"is_vip": schema.BoolAttribute{
-				Description: "If reserved fixed IP is a VIP",
-				Optional:    true,
+				Description: "If reserved fixed IP should be a VIP",
+				Required:    true,
 			},
 			"created_at": schema.StringAttribute{
 				Description: "Datetime when the reserved fixed IP was created",

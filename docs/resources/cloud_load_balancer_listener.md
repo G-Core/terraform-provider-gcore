@@ -41,7 +41,6 @@ resource "gcore_cloud_load_balancer_listener" "example_cloud_load_balancer_liste
 ### Required
 
 - `load_balancer_id` (String) Load balancer ID
-- `name` (String) Load balancer listener name
 - `protocol` (String) Load balancer listener protocol
 Available values: "HTTP", "HTTPS", "PROMETHEUS", "TCP", "TERMINATED_HTTPS", "UDP".
 - `protocol_port` (Number) Protocol port
@@ -49,11 +48,12 @@ Available values: "HTTP", "HTTPS", "PROMETHEUS", "TCP", "TERMINATED_HTTPS", "UDP
 ### Optional
 
 - `allowed_cidrs` (List of String) Network CIDRs from which service will be accessible
-- `connection_limit` (Number) Limit of the simultaneous connections. If -1 is provided, it is translated to the default value 100000.
+- `connection_limit` (Number) Limit of simultaneous connections. If -1 is provided, it is translated to the default value 100000.
 - `insert_x_forwarded` (Boolean) Add headers X-Forwarded-For, X-Forwarded-Port, X-Forwarded-Proto to requests. Only used with HTTP or `TERMINATED_HTTPS` protocols.
+- `name` (String) Load balancer listener name
 - `project_id` (Number) Project ID
 - `region_id` (Number) Region ID
-- `secret_id` (String) ID of the secret where PKCS12 file is stored for `TERMINATED_HTTPS` or PROMETHEUS listener
+- `secret_id` (String) ID of the secret where PKCS12 file is stored for `TERMINATED_HTTPS` or PROMETHEUS load balancer
 - `sni_secret_id` (List of String) List of secrets IDs containing PKCS12 format certificate/key bundles for `TERMINATED_HTTPS` or PROMETHEUS listeners
 - `timeout_client_data` (Number) Frontend client inactivity timeout in milliseconds
 - `timeout_member_connect` (Number) Backend member connection timeout in milliseconds

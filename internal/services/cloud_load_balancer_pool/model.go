@@ -14,11 +14,11 @@ type CloudLoadBalancerPoolModel struct {
 	RegionID             types.Int64                                                           `tfsdk:"region_id" path:"region_id,optional"`
 	ListenerID           types.String                                                          `tfsdk:"listener_id" json:"listener_id,optional,no_refresh"`
 	LoadBalancerID       types.String                                                          `tfsdk:"load_balancer_id" json:"load_balancer_id,optional,no_refresh"`
-	LbAlgorithm          types.String                                                          `tfsdk:"lb_algorithm" json:"lb_algorithm,required"`
-	Name                 types.String                                                          `tfsdk:"name" json:"name,required"`
-	Protocol             types.String                                                          `tfsdk:"protocol" json:"protocol,required"`
 	CaSecretID           types.String                                                          `tfsdk:"ca_secret_id" json:"ca_secret_id,optional"`
 	CrlSecretID          types.String                                                          `tfsdk:"crl_secret_id" json:"crl_secret_id,optional"`
+	LbAlgorithm          types.String                                                          `tfsdk:"lb_algorithm" json:"lb_algorithm,optional"`
+	Name                 types.String                                                          `tfsdk:"name" json:"name,optional"`
+	Protocol             types.String                                                          `tfsdk:"protocol" json:"protocol,optional"`
 	SecretID             types.String                                                          `tfsdk:"secret_id" json:"secret_id,optional"`
 	TimeoutClientData    types.Int64                                                           `tfsdk:"timeout_client_data" json:"timeout_client_data,optional"`
 	TimeoutMemberConnect types.Int64                                                           `tfsdk:"timeout_member_connect" json:"timeout_member_connect,optional"`
@@ -47,10 +47,10 @@ type CloudLoadBalancerPoolHealthmonitorModel struct {
 	Delay          types.Int64  `tfsdk:"delay" json:"delay,required"`
 	MaxRetries     types.Int64  `tfsdk:"max_retries" json:"max_retries,required"`
 	Timeout        types.Int64  `tfsdk:"timeout" json:"timeout,required"`
-	Type           types.String `tfsdk:"type" json:"type,required"`
 	ExpectedCodes  types.String `tfsdk:"expected_codes" json:"expected_codes,optional"`
 	HTTPMethod     types.String `tfsdk:"http_method" json:"http_method,optional"`
 	MaxRetriesDown types.Int64  `tfsdk:"max_retries_down" json:"max_retries_down,optional"`
+	Type           types.String `tfsdk:"type" json:"type,optional"`
 	URLPath        types.String `tfsdk:"url_path" json:"url_path,optional"`
 }
 

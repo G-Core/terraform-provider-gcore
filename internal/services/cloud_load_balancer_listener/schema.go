@@ -11,7 +11,6 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/boolplanmodifier"
-	"github.com/hashicorp/terraform-plugin-framework/resource/schema/int64default"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/int64planmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringplanmodifier"
@@ -72,16 +71,29 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 				Optional:      true,
 				PlanModifiers: []planmodifier.Bool{boolplanmodifier.RequiresReplace()},
 			},
+			"connection_limit": schema.Int64Attribute{
+				Description: "Limit of simultaneous connections. If -1 is provided, it is translated to the default value 100000.",
+				Optional:    true,
+				Validators: []validator.Int64{
+					int64validator.Between(-1, 1000000),
+				},
+			},
 			"name": schema.StringAttribute{
 				Description: "Load balancer listener name",
-				Required:    true,
+				Optional:    true,
 			},
 			"secret_id": schema.StringAttribute{
-				Description: "ID of the secret where PKCS12 file is stored for `TERMINATED_HTTPS` or PROMETHEUS listener",
+				Description: "ID of the secret where PKCS12 file is stored for `TERMINATED_HTTPS` or PROMETHEUS load balancer",
 				Optional:    true,
+			},
+			"allowed_cidrs": schema.ListAttribute{
+				Description: "Network CIDRs from which service will be accessible",
+				Optional:    true,
+				ElementType: types.StringType,
 			},
 			"timeout_client_data": schema.Int64Attribute{
 				Description: "Frontend client inactivity timeout in milliseconds",
+				Computed:    true,
 				Optional:    true,
 				Validators: []validator.Int64{
 					int64validator.Between(0, 86400000),
@@ -89,6 +101,7 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 			},
 			"timeout_member_connect": schema.Int64Attribute{
 				Description: "Backend member connection timeout in milliseconds",
+				Computed:    true,
 				Optional:    true,
 				Validators: []validator.Int64{
 					int64validator.Between(0, 86400000),
@@ -96,24 +109,24 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 			},
 			"timeout_member_data": schema.Int64Attribute{
 				Description: "Backend member inactivity timeout in milliseconds",
+				Computed:    true,
 				Optional:    true,
 				Validators: []validator.Int64{
 					int64validator.Between(0, 86400000),
 				},
 			},
-			"allowed_cidrs": schema.ListAttribute{
-				Description: "Network CIDRs from which service will be accessible",
-				Optional:    true,
-				ElementType: types.StringType,
-			},
 			"sni_secret_id": schema.ListAttribute{
 				Description: "List of secrets IDs containing PKCS12 format certificate/key bundles for `TERMINATED_HTTPS` or PROMETHEUS listeners",
+				Computed:    true,
 				Optional:    true,
+				CustomType:  customfield.NewListType[types.String](ctx),
 				ElementType: types.StringType,
 			},
 			"user_list": schema.ListNestedAttribute{
 				Description: "Load balancer listener list of username and encrypted password items",
+				Computed:    true,
 				Optional:    true,
+				CustomType:  customfield.NewNestedObjectListType[CloudLoadBalancerListenerUserListModel](ctx),
 				NestedObject: schema.NestedAttributeObject{
 					Attributes: map[string]schema.Attribute{
 						"encrypted_password": schema.StringAttribute{
@@ -126,15 +139,6 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 						},
 					},
 				},
-			},
-			"connection_limit": schema.Int64Attribute{
-				Description: "Limit of the simultaneous connections. If -1 is provided, it is translated to the default value 100000.",
-				Computed:    true,
-				Optional:    true,
-				Validators: []validator.Int64{
-					int64validator.Between(-1, 1000000),
-				},
-				Default: int64default.StaticInt64(100000),
 			},
 			"creator_task_id": schema.StringAttribute{
 				Description: "Task that created this entity",

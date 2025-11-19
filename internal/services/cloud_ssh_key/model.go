@@ -13,7 +13,7 @@ type CloudSSHKeyModel struct {
 	ProjectID       types.Int64       `tfsdk:"project_id" path:"project_id,optional"`
 	Name            types.String      `tfsdk:"name" json:"name,required"`
 	PublicKey       types.String      `tfsdk:"public_key" json:"public_key,required"`
-	SharedInProject types.Bool        `tfsdk:"shared_in_project" json:"shared_in_project,computed_optional"`
+	SharedInProject types.Bool        `tfsdk:"shared_in_project" json:"shared_in_project,required"`
 	CreatedAt       timetypes.RFC3339 `tfsdk:"created_at" json:"created_at,computed" format:"date-time"`
 	Fingerprint     types.String      `tfsdk:"fingerprint" json:"fingerprint,computed"`
 	State           types.String      `tfsdk:"state" json:"state,computed"`

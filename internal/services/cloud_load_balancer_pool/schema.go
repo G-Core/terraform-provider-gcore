@@ -47,9 +47,17 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 				Optional:      true,
 				PlanModifiers: []planmodifier.String{stringplanmodifier.RequiresReplace()},
 			},
+			"ca_secret_id": schema.StringAttribute{
+				Description: "Secret ID of CA certificate bundle",
+				Optional:    true,
+			},
+			"crl_secret_id": schema.StringAttribute{
+				Description: "Secret ID of CA revocation list file",
+				Optional:    true,
+			},
 			"lb_algorithm": schema.StringAttribute{
-				Description: "Load balancer algorithm\nAvailable values: \"LEAST_CONNECTIONS\", \"ROUND_ROBIN\", \"SOURCE_IP\".",
-				Required:    true,
+				Description: "New load balancer pool algorithm of how to distribute requests\nAvailable values: \"LEAST_CONNECTIONS\", \"ROUND_ROBIN\", \"SOURCE_IP\".",
+				Optional:    true,
 				Validators: []validator.String{
 					stringvalidator.OneOfCaseInsensitive(
 						"LEAST_CONNECTIONS",
@@ -59,12 +67,12 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 				},
 			},
 			"name": schema.StringAttribute{
-				Description: "Pool name",
-				Required:    true,
+				Description: "New pool name",
+				Optional:    true,
 			},
 			"protocol": schema.StringAttribute{
-				Description: "Protocol\nAvailable values: \"HTTP\", \"HTTPS\", \"PROXY\", \"PROXYV2\", \"TCP\", \"UDP\".",
-				Required:    true,
+				Description: "New communication protocol\nAvailable values: \"HTTP\", \"HTTPS\", \"PROXY\", \"PROXYV2\", \"TCP\", \"UDP\".",
+				Optional:    true,
 				Validators: []validator.String{
 					stringvalidator.OneOfCaseInsensitive(
 						"HTTP",
@@ -75,14 +83,6 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 						"UDP",
 					),
 				},
-			},
-			"ca_secret_id": schema.StringAttribute{
-				Description: "Secret ID of CA certificate bundle",
-				Optional:    true,
-			},
-			"crl_secret_id": schema.StringAttribute{
-				Description: "Secret ID of CA revocation list file",
-				Optional:    true,
 			},
 			"secret_id": schema.StringAttribute{
 				Description: "Secret ID for TLS client authentication to the member servers",
@@ -110,7 +110,7 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 				},
 			},
 			"healthmonitor": schema.SingleNestedAttribute{
-				Description: "Health monitor details",
+				Description: "New pool health monitor settings",
 				Optional:    true,
 				Attributes: map[string]schema.Attribute{
 					"delay": schema.Int64Attribute{
@@ -132,21 +132,6 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 						Required:    true,
 						Validators: []validator.Int64{
 							int64validator.AtMost(2147483),
-						},
-					},
-					"type": schema.StringAttribute{
-						Description: "Health monitor type. Once health monitor is created, cannot be changed.\nAvailable values: \"HTTP\", \"HTTPS\", \"K8S\", \"PING\", \"TCP\", \"TLS-HELLO\", \"UDP-CONNECT\".",
-						Required:    true,
-						Validators: []validator.String{
-							stringvalidator.OneOfCaseInsensitive(
-								"HTTP",
-								"HTTPS",
-								"K8S",
-								"PING",
-								"TCP",
-								"TLS-HELLO",
-								"UDP-CONNECT",
-							),
 						},
 					},
 					"expected_codes": schema.StringAttribute{
@@ -177,6 +162,21 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 							int64validator.Between(1, 10),
 						},
 					},
+					"type": schema.StringAttribute{
+						Description: "Health monitor type. Once health monitor is created, cannot be changed.\nAvailable values: \"HTTP\", \"HTTPS\", \"K8S\", \"PING\", \"TCP\", \"TLS-HELLO\", \"UDP-CONNECT\".",
+						Optional:    true,
+						Validators: []validator.String{
+							stringvalidator.OneOfCaseInsensitive(
+								"HTTP",
+								"HTTPS",
+								"K8S",
+								"PING",
+								"TCP",
+								"TLS-HELLO",
+								"UDP-CONNECT",
+							),
+						},
+					},
 					"url_path": schema.StringAttribute{
 						Description: "URL Path. Defaults to '/'. Can only be used together with `HTTP` or `HTTPS` health monitor type.",
 						Optional:    true,
@@ -184,7 +184,7 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 				},
 			},
 			"session_persistence": schema.SingleNestedAttribute{
-				Description: "Session persistence details",
+				Description: "New session persistence settings",
 				Optional:    true,
 				Attributes: map[string]schema.Attribute{
 					"type": schema.StringAttribute{
@@ -213,7 +213,7 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 				},
 			},
 			"members": schema.ListNestedAttribute{
-				Description: "Pool members",
+				Description: "New sequence of load balancer pool members. If members are the same (by address + port), they will be kept as is without recreation and downtime.",
 				Computed:    true,
 				Optional:    true,
 				CustomType:  customfield.NewNestedObjectListType[CloudLoadBalancerPoolMembersModel](ctx),
