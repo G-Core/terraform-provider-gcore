@@ -103,7 +103,57 @@ func (r *CloudInferenceRegistryCredentialResource) Create(ctx context.Context, r
 }
 
 func (r *CloudInferenceRegistryCredentialResource) Update(ctx context.Context, req resource.UpdateRequest, resp *resource.UpdateResponse) {
-	// Update is not supported for this resource
+	var data *CloudInferenceRegistryCredentialModel
+
+	resp.Diagnostics.Append(req.Plan.Get(ctx, &data)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
+
+	var state *CloudInferenceRegistryCredentialModel
+
+	resp.Diagnostics.Append(req.State.Get(ctx, &state)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
+
+	params := cloud.InferenceRegistryCredentialReplaceParams{}
+
+	if !data.ProjectID.IsNull() {
+		params.ProjectID = param.NewOpt(data.ProjectID.ValueInt64())
+	}
+
+	resp.Diagnostics.Append(req.Config.GetAttribute(ctx, path.Root("password_wo"), &data.Password)...)
+
+	dataBytes, err := data.MarshalJSONForUpdate(*state)
+	if err != nil {
+		resp.Diagnostics.AddError("failed to serialize http request", err.Error())
+		return
+	}
+	res := new(http.Response)
+	_, err = r.client.Cloud.Inference.RegistryCredentials.Replace(
+		ctx,
+		data.Name.ValueString(),
+		params,
+		option.WithRequestBody("application/json", dataBytes),
+		option.WithResponseBodyInto(&res),
+		option.WithMiddleware(logging.Middleware(ctx)),
+	)
+	if err != nil {
+		resp.Diagnostics.AddError("failed to make http request", err.Error())
+		return
+	}
+	bytes, _ := io.ReadAll(res.Body)
+	err = apijson.UnmarshalComputed(bytes, &data)
+	if err != nil {
+		resp.Diagnostics.AddError("failed to deserialize http request", err.Error())
+		return
+	}
+	data.ID = data.Name
+
+	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
 }
 
 func (r *CloudInferenceRegistryCredentialResource) Read(ctx context.Context, req resource.ReadRequest, resp *resource.ReadResponse) {
