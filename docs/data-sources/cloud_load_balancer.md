@@ -72,10 +72,8 @@ Optional:
 - `logging_enabled` (Boolean) With or without logging
 - `name` (String) Filter by name
 - `order_by` (String) Ordering Load Balancer list result by name, `created_at`, `updated_at`, `operating_status`, `provisioning_status`, `vip_address`, `vip_ip_family` and flavor fields of the load balancer and directions (name.asc), default is "`created_at`.asc"
-- `show_stats` (Boolean) Show statistics
 - `tag_key` (List of String) Filter by tag keys.
 - `tag_key_value` (String) Filter by tag key-value pairs. Must be a valid JSON string.
-- `with_ddos` (Boolean) Show Advanced DDoS protection profile, if exists
 
 
 <a id="nestedatt--additional_vips"></a>
