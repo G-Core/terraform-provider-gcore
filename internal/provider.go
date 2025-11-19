@@ -20,6 +20,7 @@ import (
 	"github.com/stainless-sdks/gcore-terraform/internal/services/cloud_file_share_access_rule"
 	"github.com/stainless-sdks/gcore-terraform/internal/services/cloud_floating_ip"
 	"github.com/stainless-sdks/gcore-terraform/internal/services/cloud_gpu_baremetal_cluster_image"
+	"github.com/stainless-sdks/gcore-terraform/internal/services/cloud_inference_registry_credential"
 	"github.com/stainless-sdks/gcore-terraform/internal/services/cloud_inference_secret"
 	"github.com/stainless-sdks/gcore-terraform/internal/services/cloud_instance"
 	"github.com/stainless-sdks/gcore-terraform/internal/services/cloud_instance_image"
@@ -187,6 +188,7 @@ func (p *GcoreProvider) Resources(ctx context.Context) []func() resource.Resourc
 		cloud_volume.NewResource,
 		cloud_floating_ip.NewResource,
 		cloud_security_group.NewResource,
+		cloud_inference_registry_credential.NewResource,
 		cloud_inference_secret.NewResource,
 		cloud_placement_group.NewResource,
 		cloud_file_share.NewResource,
@@ -224,6 +226,8 @@ func (p *GcoreProvider) DataSources(ctx context.Context) []func() datasource.Dat
 		cloud_floating_ip.NewCloudFloatingIPsDataSource,
 		cloud_security_group.NewCloudSecurityGroupDataSource,
 		cloud_security_group.NewCloudSecurityGroupsDataSource,
+		cloud_inference_registry_credential.NewCloudInferenceRegistryCredentialDataSource,
+		cloud_inference_registry_credential.NewCloudInferenceRegistryCredentialsDataSource,
 		cloud_inference_secret.NewCloudInferenceSecretDataSource,
 		cloud_inference_secret.NewCloudInferenceSecretsDataSource,
 		cloud_placement_group.NewCloudPlacementGroupDataSource,
