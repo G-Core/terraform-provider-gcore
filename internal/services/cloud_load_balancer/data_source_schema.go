@@ -575,10 +575,6 @@ func DataSourceSchema(ctx context.Context) schema.Schema {
 						Description: "Ordering Load Balancer list result by name, `created_at`, `updated_at`, `operating_status`, `provisioning_status`, `vip_address`, `vip_ip_family` and flavor fields of the load balancer and directions (name.asc), default is \"`created_at`.asc\"",
 						Optional:    true,
 					},
-					"show_stats": schema.BoolAttribute{
-						Description: "Show statistics",
-						Optional:    true,
-					},
 					"tag_key": schema.ListAttribute{
 						Description: "Filter by tag keys.",
 						Optional:    true,
@@ -586,10 +582,6 @@ func DataSourceSchema(ctx context.Context) schema.Schema {
 					},
 					"tag_key_value": schema.StringAttribute{
 						Description: "Filter by tag key-value pairs. Must be a valid JSON string.",
-						Optional:    true,
-					},
-					"with_ddos": schema.BoolAttribute{
-						Description: "Show Advanced DDoS protection profile, if exists",
 						Optional:    true,
 					},
 				},

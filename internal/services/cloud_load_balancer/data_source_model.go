@@ -94,14 +94,14 @@ func (m *CloudLoadBalancerDataSourceModel) toListParams(_ context.Context) (para
 	if !m.FindOneBy.OrderBy.IsNull() {
 		params.OrderBy = param.NewOpt(m.FindOneBy.OrderBy.ValueString())
 	}
-	if !m.FindOneBy.ShowStats.IsNull() {
-		params.ShowStats = param.NewOpt(m.FindOneBy.ShowStats.ValueBool())
+	if !m.ShowStats.IsNull() {
+		params.ShowStats = param.NewOpt(m.ShowStats.ValueBool())
 	}
 	if !m.FindOneBy.TagKeyValue.IsNull() {
 		params.TagKeyValue = param.NewOpt(m.FindOneBy.TagKeyValue.ValueString())
 	}
-	if !m.FindOneBy.WithDDOS.IsNull() {
-		params.WithDDOS = param.NewOpt(m.FindOneBy.WithDDOS.ValueBool())
+	if !m.WithDDOS.IsNull() {
+		params.WithDDOS = param.NewOpt(m.WithDDOS.ValueBool())
 	}
 
 	return
@@ -239,8 +239,6 @@ type CloudLoadBalancerFindOneByDataSourceModel struct {
 	LoggingEnabled   types.Bool      `tfsdk:"logging_enabled" query:"logging_enabled,optional"`
 	Name             types.String    `tfsdk:"name" query:"name,optional"`
 	OrderBy          types.String    `tfsdk:"order_by" query:"order_by,optional"`
-	ShowStats        types.Bool      `tfsdk:"show_stats" query:"show_stats,optional"`
 	TagKey           *[]types.String `tfsdk:"tag_key" query:"tag_key,optional"`
 	TagKeyValue      types.String    `tfsdk:"tag_key_value" query:"tag_key_value,optional"`
-	WithDDOS         types.Bool      `tfsdk:"with_ddos" query:"with_ddos,optional"`
 }
