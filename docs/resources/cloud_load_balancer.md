@@ -118,8 +118,8 @@ resource "gcore_cloud_load_balancer" "example_cloud_load_balancer" {
 - `floating_ip` (Attributes) Floating IP configuration for assignment (see [below for nested schema](#nestedatt--floating_ip))
 - `listeners` (Attributes List) Load balancer listeners. Maximum 50 per LB (excluding Prometheus endpoint listener). (see [below for nested schema](#nestedatt--listeners))
 - `logging` (Attributes) Logging configuration (see [below for nested schema](#nestedatt--logging))
-- `name` (String) Load balancer name
-- `name_template` (String) Load balancer name which will be changed by template.
+- `name` (String) Load balancer name. Either `name` or `name_template` should be specified.
+- `name_template` (String) Load balancer name which will be changed by template. Either `name` or `name_template` should be specified.
 - `preferred_connectivity` (String) Preferred option to establish connectivity between load balancer and its pools members. L2 provides best performance, L3 provides less IPs usage. It is taking effect only if `instance_id` + `ip_address` is provided, not `subnet_id` + `ip_address`, because we're considering this as intentional `subnet_id` specification.
 Available values: "L2", "L3".
 - `project_id` (Number)
