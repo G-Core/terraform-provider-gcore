@@ -103,7 +103,57 @@ func (r *CloudInferenceSecretResource) Create(ctx context.Context, req resource.
 }
 
 func (r *CloudInferenceSecretResource) Update(ctx context.Context, req resource.UpdateRequest, resp *resource.UpdateResponse) {
-	// Update is not supported for this resource
+	var data *CloudInferenceSecretModel
+
+	resp.Diagnostics.Append(req.Plan.Get(ctx, &data)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
+
+	var state *CloudInferenceSecretModel
+
+	resp.Diagnostics.Append(req.State.Get(ctx, &state)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
+
+	params := cloud.InferenceSecretReplaceParams{}
+
+	if !data.ProjectID.IsNull() {
+		params.ProjectID = param.NewOpt(data.ProjectID.ValueInt64())
+	}
+
+	resp.Diagnostics.Append(req.Config.GetAttribute(ctx, path.Root("data"), &data.Data)...)
+
+	dataBytes, err := data.MarshalJSONForUpdate(*state)
+	if err != nil {
+		resp.Diagnostics.AddError("failed to serialize http request", err.Error())
+		return
+	}
+	res := new(http.Response)
+	_, err = r.client.Cloud.Inference.Secrets.Replace(
+		ctx,
+		data.Name.ValueString(),
+		params,
+		option.WithRequestBody("application/json", dataBytes),
+		option.WithResponseBodyInto(&res),
+		option.WithMiddleware(logging.Middleware(ctx)),
+	)
+	if err != nil {
+		resp.Diagnostics.AddError("failed to make http request", err.Error())
+		return
+	}
+	bytes, _ := io.ReadAll(res.Body)
+	err = apijson.UnmarshalComputed(bytes, &data)
+	if err != nil {
+		resp.Diagnostics.AddError("failed to deserialize http request", err.Error())
+		return
+	}
+	data.ID = data.Name
+
+	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
 }
 
 func (r *CloudInferenceSecretResource) Read(ctx context.Context, req resource.ReadRequest, resp *resource.ReadResponse) {
