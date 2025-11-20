@@ -15,7 +15,7 @@ type CloudNetworkRouterModel struct {
 	RegionID            types.Int64                                                          `tfsdk:"region_id" path:"region_id,optional"`
 	Interfaces          customfield.NestedObjectList[CloudNetworkRouterInterfacesModel]      `tfsdk:"interfaces" json:"interfaces,computed_optional"`
 	Name                types.String                                                         `tfsdk:"name" json:"name,required"`
-	ExternalGatewayInfo customfield.NestedObject[CloudNetworkRouterExternalGatewayInfoModel] `tfsdk:"external_gateway_info" json:"external_gateway_info,computed_optional,nullable"`
+	ExternalGatewayInfo customfield.NestedObject[CloudNetworkRouterExternalGatewayInfoModel] `tfsdk:"external_gateway_info" json:"external_gateway_info,computed_optional"`
 	Routes              customfield.NestedObjectList[CloudNetworkRouterRoutesModel]          `tfsdk:"routes" json:"routes,computed_optional"`
 	CreatedAt           timetypes.RFC3339                                                    `tfsdk:"created_at" json:"created_at,computed" format:"date-time"`
 	CreatorTaskID       types.String                                                         `tfsdk:"creator_task_id" json:"creator_task_id,computed"`
@@ -36,6 +36,14 @@ func (m CloudNetworkRouterModel) MarshalJSONForUpdate(state CloudNetworkRouterMo
 	// so they're not included in the PATCH request (interfaces are managed via attach/detach)
 	mCopy := m
 	mCopy.Interfaces = state.Interfaces
+
+	// For routes with computed_optional: when routes block is removed from config,
+	// Terraform keeps the state value (doesn't mark as changed). But we need to send
+	// routes explicitly in PATCH to allow deletions. The old provider always sent
+	// routes when ANY field changed, including empty array [] for deletions.
+	// To preserve this behavior: DON'T force routes to equal state, let them be
+	// included in PATCH even if "equal" (which happens when config omits routes block)
+
 	return apijson.MarshalForPatch(mCopy, state)
 }
 
