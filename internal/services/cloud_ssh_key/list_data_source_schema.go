@@ -23,6 +23,10 @@ func ListDataSourceSchema(ctx context.Context) schema.Schema {
 				Description: "Project ID",
 				Optional:    true,
 			},
+			"name": schema.StringAttribute{
+				Description: "SSH key name. Partial substring match. Example: `name=abc` matches any key containing `abc` in name.",
+				Optional:    true,
+			},
 			"order_by": schema.StringAttribute{
 				Description: "Sort order for the SSH keys\nAvailable values: \"created_at.asc\", \"created_at.desc\", \"name.asc\", \"name.desc\".",
 				Computed:    true,
