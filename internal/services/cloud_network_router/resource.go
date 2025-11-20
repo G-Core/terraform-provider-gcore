@@ -128,25 +128,17 @@ func (r *CloudNetworkRouterResource) Update(ctx context.Context, req resource.Up
 
 	routerID := data.ID.ValueString()
 
-	// Check if routes need to be updated/deleted
-	// This must be checked BEFORE interface operations to handle the case where
-	// routes must be deleted before interfaces can be detached
 	var dataRoutes, stateRoutes []CloudNetworkRouterRoutesModel
 	data.Routes.ElementsAs(ctx, &dataRoutes, false)
 	state.Routes.ElementsAs(ctx, &stateRoutes, false)
 	routesDeletionNeeded := len(dataRoutes) < len(stateRoutes)
 
-	// CRITICAL: If routes are being deleted AND interfaces are being removed,
-	// we must delete routes FIRST via PATCH before detaching interfaces.
-	// The API prevents detaching an interface if routes exist that use it as nexthop.
+	// When deleting routes and detaching interfaces, routes must be deleted first.
+	// The API prevents detaching an interface if routes reference it as a nexthop.
 	interfacesChanging := !data.Interfaces.Equal(state.Interfaces)
 
-	// If both routes and interfaces are changing, and routes are being deleted,
-	// send PATCH to delete routes before detaching interfaces
 	if routesDeletionNeeded && interfacesChanging {
-		// IMPORTANT: Save the planned interfaces before we overwrite data with API response
-		// The API response will still have interfaces attached, but we need to preserve
-		// the user's plan (which may have empty interfaces) for the detachment logic below
+		// Save planned state before PATCH, as the response will contain old interface state
 		plannedInterfaces := data.Interfaces
 		plannedRoutes := data.Routes
 
@@ -172,7 +164,6 @@ func (r *CloudNetworkRouterResource) Update(ctx context.Context, req resource.Up
 		updateOpts = append(updateOpts,
 			option.WithRequestBody("application/json", dataBytes),
 			option.WithResponseBodyInto(&res),
-			option.WithJSONSet("routes", []interface{}{}), // Force routes=[] in body
 		)
 
 		_, err = r.client.Cloud.Networks.Routers.Update(
@@ -185,7 +176,6 @@ func (r *CloudNetworkRouterResource) Update(ctx context.Context, req resource.Up
 			resp.Diagnostics.AddError("failed to delete routes before interface detachment", err.Error())
 			return
 		}
-		// Routes are now deleted, refresh state
 		bytes, _ := io.ReadAll(res.Body)
 		err = apijson.UnmarshalComputed(bytes, &data)
 		if err != nil {
@@ -193,16 +183,12 @@ func (r *CloudNetworkRouterResource) Update(ctx context.Context, req resource.Up
 			return
 		}
 
-		// IMPORTANT: Restore the planned interfaces that we saved above
-		// The API response still has interfaces attached, but we need to use the user's plan
-		// for the interface detachment logic below to work correctly
+		// Restore planned state for interface detachment logic below
 		data.Interfaces = plannedInterfaces
 		data.Routes = plannedRoutes
 	}
 
-	// Handle interface attach/detach operations
 	if interfacesChanging {
-		// Get old and new interface lists
 		oldInterfaces, diags := state.Interfaces.AsStructSliceT(ctx)
 		resp.Diagnostics.Append(diags...)
 		if resp.Diagnostics.HasError() {
@@ -215,7 +201,6 @@ func (r *CloudNetworkRouterResource) Update(ctx context.Context, req resource.Up
 			return
 		}
 
-		// Create a map of old interfaces for quick lookup
 		oldInterfaceMap := make(map[string]bool)
 		for _, oldIface := range oldInterfaces {
 			if oldIface.SubnetID.ValueString() != "" {
@@ -223,7 +208,6 @@ func (r *CloudNetworkRouterResource) Update(ctx context.Context, req resource.Up
 			}
 		}
 
-		// Process new interfaces: attach those that don't exist in old
 		newInterfaceMap := make(map[string]bool)
 		for _, newIface := range newInterfaces {
 			subnetID := newIface.SubnetID.ValueString()
@@ -232,7 +216,6 @@ func (r *CloudNetworkRouterResource) Update(ctx context.Context, req resource.Up
 			}
 			newInterfaceMap[subnetID] = true
 
-			// If this interface is not in old set, attach it
 			if !oldInterfaceMap[subnetID] {
 				attachParams := cloud.NetworkRouterAttachSubnetParams{
 					SubnetID: subnetID,
@@ -260,14 +243,12 @@ func (r *CloudNetworkRouterResource) Update(ctx context.Context, req resource.Up
 			}
 		}
 
-		// Process old interfaces: detach those that are not in new set
 		for _, oldIface := range oldInterfaces {
 			subnetID := oldIface.SubnetID.ValueString()
 			if subnetID == "" {
 				continue
 			}
 
-			// If this interface is not in new set, detach it
 			if !newInterfaceMap[subnetID] {
 				detachParams := cloud.NetworkRouterDetachSubnetParams{
 					SubnetID: cloud.SubnetIDParam{SubnetID: subnetID},
@@ -296,15 +277,9 @@ func (r *CloudNetworkRouterResource) Update(ctx context.Context, req resource.Up
 		}
 	}
 
-	// Update other router attributes (name, routes, external_gateway_info)
-	// Note: If routes were already deleted above (when both routes and interfaces changed),
-	// we skip route updates here
 	needsUpdate := !data.Name.Equal(state.Name) ||
 		!data.Routes.Equal(state.Routes) ||
 		!data.ExternalGatewayInfo.Equal(state.ExternalGatewayInfo)
-
-	// If routes were already deleted in the early PATCH above, don't include them in this update
-	skipRoutesInUpdate := routesDeletionNeeded && interfacesChanging
 
 	var err error
 	if needsUpdate {
@@ -318,13 +293,6 @@ func (r *CloudNetworkRouterResource) Update(ctx context.Context, req resource.Up
 			params.RegionID = param.NewOpt(data.RegionID.ValueInt64())
 		}
 
-		// WORKAROUND: The SDK's NetworkRouterUpdateParams has `omitzero` on Routes field,
-		// which causes empty routes array to be omitted from JSON. We need to explicitly
-		// include routes=[] when deleting routes using option.WithJSONSet().
-		// However, if routes were already deleted above, don't delete them again
-		needsRouteDeletion := routesDeletionNeeded && !skipRoutesInUpdate
-
-		// Build update options
 		updateOpts := []option.RequestOption{
 			option.WithMiddleware(logging.Middleware(ctx)),
 		}
@@ -336,19 +304,12 @@ func (r *CloudNetworkRouterResource) Update(ctx context.Context, req resource.Up
 			return
 		}
 
-		// Skip PATCH if no actual changes (empty JSON body) and not deleting routes
-		if (len(dataBytes) > 0 && string(dataBytes) != "{}" && string(dataBytes) != "null") || needsRouteDeletion {
+		if len(dataBytes) > 0 && string(dataBytes) != "{}" && string(dataBytes) != "null" {
 			res := new(http.Response)
 			updateOpts = append(updateOpts,
 				option.WithRequestBody("application/json", dataBytes),
 				option.WithResponseBodyInto(&res),
 			)
-
-			// IMPORTANT: WithJSONSet must be added AFTER WithRequestBody so it can modify the body
-			if needsRouteDeletion {
-				// Use the SDK's built-in mechanism to force routes field to be included
-				updateOpts = append(updateOpts, option.WithJSONSet("routes", []interface{}{}))
-			}
 
 			_, err = r.client.Cloud.Networks.Routers.Update(
 				ctx,
@@ -369,7 +330,6 @@ func (r *CloudNetworkRouterResource) Update(ctx context.Context, req resource.Up
 		}
 	}
 
-	// Do a final Read to get consistent state after attach/detach and update operations
 	getParams := cloud.NetworkRouterGetParams{}
 	if !data.ProjectID.IsNull() {
 		getParams.ProjectID = param.NewOpt(data.ProjectID.ValueInt64())
@@ -527,11 +487,6 @@ func (r *CloudNetworkRouterResource) ImportState(ctx context.Context, req resour
 }
 
 func (r *CloudNetworkRouterResource) ModifyPlan(ctx context.Context, req resource.ModifyPlanRequest, resp *resource.ModifyPlanResponse) {
-	// Handle routes with computed_optional: when routes block is removed from config,
-	// Terraform keeps the state value in plan (doesn't detect as changed). We need to
-	// detect this and update the plan to have empty routes so deletion works properly.
-
-	// Only apply during updates (not create or delete)
 	if req.State.Raw.IsNull() || req.Plan.Raw.IsNull() {
 		return
 	}
@@ -548,11 +503,9 @@ func (r *CloudNetworkRouterResource) ModifyPlan(ctx context.Context, req resourc
 		return
 	}
 
-	// Check if routes were removed from config or set to empty array
 	var configRoutes customfield.NestedObjectList[CloudNetworkRouterRoutesModel]
 	diagsRoutes := req.Config.GetAttribute(ctx, path.Root("routes"), &configRoutes)
 
-	// Get config routes as a list to check if empty
 	var configRoutesList []CloudNetworkRouterRoutesModel
 	configRoutesEmpty := false
 	if !diagsRoutes.HasError() && !configRoutes.IsNull() {
@@ -560,17 +513,12 @@ func (r *CloudNetworkRouterResource) ModifyPlan(ctx context.Context, req resourc
 		configRoutesEmpty = len(configRoutesList) == 0
 	}
 
-	// Routes are considered "removed" if:
-	// 1. Routes block is absent from config (configRoutes.IsNull()), OR
-	// 2. Routes is explicitly set to empty array in config (configRoutesEmpty)
 	routesRemovedFromConfig := !diagsRoutes.HasError() &&
 		(configRoutes.IsNull() || configRoutesEmpty) &&
 		!state.Routes.IsNull() &&
 		!state.Routes.IsUnknown()
 
 	if routesRemovedFromConfig {
-		// Routes not in config (or set to empty) but exist in state - user removed routes.
-		// Update plan to have empty routes so Terraform knows they'll be deleted.
 		plan.Routes = customfield.NewObjectListMust(ctx, []CloudNetworkRouterRoutesModel{})
 		resp.Diagnostics.Append(resp.Plan.Set(ctx, plan)...)
 	}

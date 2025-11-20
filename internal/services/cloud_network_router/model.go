@@ -32,17 +32,9 @@ func (m CloudNetworkRouterModel) MarshalJSON() (data []byte, err error) {
 }
 
 func (m CloudNetworkRouterModel) MarshalJSONForUpdate(state CloudNetworkRouterModel) (data []byte, err error) {
-	// Create a copy of the model to marshal, but force interfaces to equal state
-	// so they're not included in the PATCH request (interfaces are managed via attach/detach)
+	// Interfaces are managed via attach/detach API calls, exclude from PATCH
 	mCopy := m
 	mCopy.Interfaces = state.Interfaces
-
-	// For routes with computed_optional: when routes block is removed from config,
-	// Terraform keeps the state value (doesn't mark as changed). But we need to send
-	// routes explicitly in PATCH to allow deletions. The old provider always sent
-	// routes when ANY field changed, including empty array [] for deletions.
-	// To preserve this behavior: DON'T force routes to equal state, let them be
-	// included in PATCH even if "equal" (which happens when config omits routes block)
 
 	return apijson.MarshalForPatch(mCopy, state)
 }
