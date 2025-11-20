@@ -41,6 +41,9 @@ func (m *CloudSSHKeyDataSourceModel) toListParams(_ context.Context) (params clo
 	if !m.ProjectID.IsNull() {
 		params.ProjectID = param.NewOpt(m.ProjectID.ValueInt64())
 	}
+	if !m.FindOneBy.Name.IsNull() {
+		params.Name = param.NewOpt(m.FindOneBy.Name.ValueString())
+	}
 	if !m.FindOneBy.OrderBy.IsNull() {
 		params.OrderBy = cloud.SSHKeyListParamsOrderBy(m.FindOneBy.OrderBy.ValueString())
 	}
@@ -49,5 +52,6 @@ func (m *CloudSSHKeyDataSourceModel) toListParams(_ context.Context) (params clo
 }
 
 type CloudSSHKeyFindOneByDataSourceModel struct {
+	Name    types.String `tfsdk:"name" query:"name,optional"`
 	OrderBy types.String `tfsdk:"order_by" query:"order_by,computed_optional"`
 }
