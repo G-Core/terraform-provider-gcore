@@ -134,7 +134,7 @@ func (r *CloudNetworkRouterResource) Update(ctx context.Context, req resource.Up
 	var dataRoutes, stateRoutes []CloudNetworkRouterRoutesModel
 	data.Routes.ElementsAs(ctx, &dataRoutes, false)
 	state.Routes.ElementsAs(ctx, &stateRoutes, false)
-	routesDeletionNeeded := len(dataRoutes) == 0 && len(stateRoutes) > 0
+	routesDeletionNeeded := len(dataRoutes) < len(stateRoutes)
 
 	// CRITICAL: If routes are being deleted AND interfaces are being removed,
 	// we must delete routes FIRST via PATCH before detaching interfaces.
@@ -148,6 +148,7 @@ func (r *CloudNetworkRouterResource) Update(ctx context.Context, req resource.Up
 		// The API response will still have interfaces attached, but we need to preserve
 		// the user's plan (which may have empty interfaces) for the detachment logic below
 		plannedInterfaces := data.Interfaces
+		plannedRoutes := data.Routes
 
 		params := cloud.NetworkRouterUpdateParams{}
 		if !data.ProjectID.IsNull() {
@@ -196,6 +197,7 @@ func (r *CloudNetworkRouterResource) Update(ctx context.Context, req resource.Up
 		// The API response still has interfaces attached, but we need to use the user's plan
 		// for the interface detachment logic below to work correctly
 		data.Interfaces = plannedInterfaces
+		data.Routes = plannedRoutes
 	}
 
 	// Handle interface attach/detach operations
