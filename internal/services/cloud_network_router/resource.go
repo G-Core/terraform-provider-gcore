@@ -231,11 +231,15 @@ func (r *CloudNetworkRouterResource) Update(ctx context.Context, req resource.Up
 			return
 		}
 		bytes, _ := io.ReadAll(res.Body)
+		// Preserve interfaces before unmarshaling PATCH response
+		// PATCH response doesn't include interfaces since they're managed via attach/detach
+		preservedInterfaces := data.Interfaces
 		err = apijson.UnmarshalComputed(bytes, &data)
 		if err != nil {
 			resp.Diagnostics.AddError("failed to deserialize http request", err.Error())
 			return
 		}
+		data.Interfaces = preservedInterfaces
 	}
 
 	// Step 3: Detach old interfaces LAST (after PATCH)
