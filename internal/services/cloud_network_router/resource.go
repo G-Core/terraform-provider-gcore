@@ -128,67 +128,10 @@ func (r *CloudNetworkRouterResource) Update(ctx context.Context, req resource.Up
 
 	routerID := data.ID.ValueString()
 
-	var dataRoutes, stateRoutes []CloudNetworkRouterRoutesModel
-	data.Routes.ElementsAs(ctx, &dataRoutes, false)
-	state.Routes.ElementsAs(ctx, &stateRoutes, false)
-	routesDeletionNeeded := len(dataRoutes) < len(stateRoutes)
+	// Compute interface changes once and reuse for attach/detach operations
+	var toAttach, toDetach []string
 
-	// When deleting routes and detaching interfaces, routes must be deleted first.
-	// The API prevents detaching an interface if routes reference it as a nexthop.
-	interfacesChanging := !data.Interfaces.Equal(state.Interfaces)
-
-	if routesDeletionNeeded && interfacesChanging {
-		// Save planned state before PATCH, as the response will contain old interface state
-		plannedInterfaces := data.Interfaces
-		plannedRoutes := data.Routes
-
-		params := cloud.NetworkRouterUpdateParams{}
-		if !data.ProjectID.IsNull() {
-			params.ProjectID = param.NewOpt(data.ProjectID.ValueInt64())
-		}
-		if !data.RegionID.IsNull() {
-			params.RegionID = param.NewOpt(data.RegionID.ValueInt64())
-		}
-
-		updateOpts := []option.RequestOption{
-			option.WithMiddleware(logging.Middleware(ctx)),
-		}
-
-		dataBytes, err := data.MarshalJSONForUpdate(*state)
-		if err != nil {
-			resp.Diagnostics.AddError("failed to serialize http request", err.Error())
-			return
-		}
-
-		res := new(http.Response)
-		updateOpts = append(updateOpts,
-			option.WithRequestBody("application/json", dataBytes),
-			option.WithResponseBodyInto(&res),
-		)
-
-		_, err = r.client.Cloud.Networks.Routers.Update(
-			ctx,
-			routerID,
-			params,
-			updateOpts...,
-		)
-		if err != nil {
-			resp.Diagnostics.AddError("failed to delete routes before interface detachment", err.Error())
-			return
-		}
-		bytes, _ := io.ReadAll(res.Body)
-		err = apijson.UnmarshalComputed(bytes, &data)
-		if err != nil {
-			resp.Diagnostics.AddError("failed to deserialize http request", err.Error())
-			return
-		}
-
-		// Restore planned state for interface detachment logic below
-		data.Interfaces = plannedInterfaces
-		data.Routes = plannedRoutes
-	}
-
-	if interfacesChanging {
+	if !data.Interfaces.Equal(state.Interfaces) {
 		oldInterfaces, diags := state.Interfaces.AsStructSliceT(ctx)
 		resp.Diagnostics.Append(diags...)
 		if resp.Diagnostics.HasError() {
@@ -203,133 +146,127 @@ func (r *CloudNetworkRouterResource) Update(ctx context.Context, req resource.Up
 
 		oldInterfaceMap := make(map[string]bool)
 		for _, oldIface := range oldInterfaces {
-			if oldIface.SubnetID.ValueString() != "" {
-				oldInterfaceMap[oldIface.SubnetID.ValueString()] = true
+			if subnetID := oldIface.SubnetID.ValueString(); subnetID != "" {
+				oldInterfaceMap[subnetID] = true
 			}
 		}
 
 		newInterfaceMap := make(map[string]bool)
 		for _, newIface := range newInterfaces {
-			subnetID := newIface.SubnetID.ValueString()
-			if subnetID == "" {
-				continue
-			}
-			newInterfaceMap[subnetID] = true
-
-			if !oldInterfaceMap[subnetID] {
-				attachParams := cloud.NetworkRouterAttachSubnetParams{
-					SubnetID: subnetID,
-				}
-				if !data.ProjectID.IsNull() {
-					attachParams.ProjectID = param.NewOpt(data.ProjectID.ValueInt64())
-				}
-				if !data.RegionID.IsNull() {
-					attachParams.RegionID = param.NewOpt(data.RegionID.ValueInt64())
-				}
-
-				_, err := r.client.Cloud.Networks.Routers.AttachSubnet(
-					ctx,
-					routerID,
-					attachParams,
-					option.WithMiddleware(logging.Middleware(ctx)),
-				)
-				if err != nil {
-					resp.Diagnostics.AddError(
-						"failed to attach subnet to router",
-						fmt.Sprintf("SubnetID: %s, Error: %s", subnetID, err.Error()),
-					)
-					return
+			if subnetID := newIface.SubnetID.ValueString(); subnetID != "" {
+				newInterfaceMap[subnetID] = true
+				if !oldInterfaceMap[subnetID] {
+					toAttach = append(toAttach, subnetID)
 				}
 			}
 		}
 
 		for _, oldIface := range oldInterfaces {
-			subnetID := oldIface.SubnetID.ValueString()
-			if subnetID == "" {
-				continue
-			}
-
-			if !newInterfaceMap[subnetID] {
-				detachParams := cloud.NetworkRouterDetachSubnetParams{
-					SubnetID: cloud.SubnetIDParam{SubnetID: subnetID},
-				}
-				if !data.ProjectID.IsNull() {
-					detachParams.ProjectID = param.NewOpt(data.ProjectID.ValueInt64())
-				}
-				if !data.RegionID.IsNull() {
-					detachParams.RegionID = param.NewOpt(data.RegionID.ValueInt64())
-				}
-
-				_, err := r.client.Cloud.Networks.Routers.DetachSubnet(
-					ctx,
-					routerID,
-					detachParams,
-					option.WithMiddleware(logging.Middleware(ctx)),
-				)
-				if err != nil {
-					resp.Diagnostics.AddError(
-						"failed to detach subnet from router",
-						fmt.Sprintf("SubnetID: %s, Error: %s", subnetID, err.Error()),
-					)
-					return
+			if subnetID := oldIface.SubnetID.ValueString(); subnetID != "" {
+				if !newInterfaceMap[subnetID] {
+					toDetach = append(toDetach, subnetID)
 				}
 			}
 		}
 	}
 
-	needsUpdate := !data.Name.Equal(state.Name) ||
-		!data.Routes.Equal(state.Routes) ||
-		!data.ExternalGatewayInfo.Equal(state.ExternalGatewayInfo)
-
-	var err error
-	if needsUpdate {
-		params := cloud.NetworkRouterUpdateParams{}
-
+	// Step 1: Attach new interfaces FIRST (before PATCH)
+	// This ensures interfaces exist before routes that reference them are added
+	for _, subnetID := range toAttach {
+		attachParams := cloud.NetworkRouterAttachSubnetParams{
+			SubnetID: subnetID,
+		}
 		if !data.ProjectID.IsNull() {
-			params.ProjectID = param.NewOpt(data.ProjectID.ValueInt64())
+			attachParams.ProjectID = param.NewOpt(data.ProjectID.ValueInt64())
 		}
-
 		if !data.RegionID.IsNull() {
-			params.RegionID = param.NewOpt(data.RegionID.ValueInt64())
+			attachParams.RegionID = param.NewOpt(data.RegionID.ValueInt64())
 		}
 
-		updateOpts := []option.RequestOption{
+		_, err := r.client.Cloud.Networks.Routers.AttachSubnet(
+			ctx,
+			routerID,
+			attachParams,
 			option.WithMiddleware(logging.Middleware(ctx)),
-		}
-
-		var dataBytes []byte
-		dataBytes, err = data.MarshalJSONForUpdate(*state)
+		)
 		if err != nil {
-			resp.Diagnostics.AddError("failed to serialize http request", err.Error())
+			resp.Diagnostics.AddError(
+				"failed to attach subnet to router",
+				fmt.Sprintf("SubnetID: %s, Error: %s", subnetID, err.Error()),
+			)
 			return
 		}
+	}
 
-		if len(dataBytes) > 0 && string(dataBytes) != "{}" && string(dataBytes) != "null" {
-			res := new(http.Response)
-			updateOpts = append(updateOpts,
-				option.WithRequestBody("application/json", dataBytes),
-				option.WithResponseBodyInto(&res),
-			)
+	// Step 2: Send PATCH for all field updates (routes, name, external_gateway_info)
+	// This happens after attach and before detach to satisfy both:
+	// - Routes can reference newly attached interfaces (nexthop validation)
+	// - Routes are deleted before interfaces are detached (API constraint)
+	params := cloud.NetworkRouterUpdateParams{}
+	if !data.ProjectID.IsNull() {
+		params.ProjectID = param.NewOpt(data.ProjectID.ValueInt64())
+	}
+	if !data.RegionID.IsNull() {
+		params.RegionID = param.NewOpt(data.RegionID.ValueInt64())
+	}
 
-			_, err = r.client.Cloud.Networks.Routers.Update(
-				ctx,
-				routerID,
-				params,
-				updateOpts...,
-			)
-			if err != nil {
-				resp.Diagnostics.AddError("failed to make http request", err.Error())
-				return
-			}
-			bytes, _ := io.ReadAll(res.Body)
-			err = apijson.UnmarshalComputed(bytes, &data)
-			if err != nil {
-				resp.Diagnostics.AddError("failed to deserialize http request", err.Error())
-				return
-			}
+	dataBytes, err := data.MarshalJSONForUpdate(*state)
+	if err != nil {
+		resp.Diagnostics.AddError("failed to serialize http request", err.Error())
+		return
+	}
+
+	if len(dataBytes) > 0 && string(dataBytes) != "{}" && string(dataBytes) != "null" {
+		res := new(http.Response)
+		_, err = r.client.Cloud.Networks.Routers.Update(
+			ctx,
+			routerID,
+			params,
+			option.WithRequestBody("application/json", dataBytes),
+			option.WithResponseBodyInto(&res),
+			option.WithMiddleware(logging.Middleware(ctx)),
+		)
+		if err != nil {
+			resp.Diagnostics.AddError("failed to make http request", err.Error())
+			return
+		}
+		bytes, _ := io.ReadAll(res.Body)
+		err = apijson.UnmarshalComputed(bytes, &data)
+		if err != nil {
+			resp.Diagnostics.AddError("failed to deserialize http request", err.Error())
+			return
 		}
 	}
 
+	// Step 3: Detach old interfaces LAST (after PATCH)
+	// This ensures routes referencing these interfaces are deleted first
+	for _, subnetID := range toDetach {
+		detachParams := cloud.NetworkRouterDetachSubnetParams{
+			SubnetID: cloud.SubnetIDParam{SubnetID: subnetID},
+		}
+		if !data.ProjectID.IsNull() {
+			detachParams.ProjectID = param.NewOpt(data.ProjectID.ValueInt64())
+		}
+		if !data.RegionID.IsNull() {
+			detachParams.RegionID = param.NewOpt(data.RegionID.ValueInt64())
+		}
+
+		_, err := r.client.Cloud.Networks.Routers.DetachSubnet(
+			ctx,
+			routerID,
+			detachParams,
+			option.WithMiddleware(logging.Middleware(ctx)),
+		)
+		if err != nil {
+			resp.Diagnostics.AddError(
+				"failed to detach subnet from router",
+				fmt.Sprintf("SubnetID: %s, Error: %s", subnetID, err.Error()),
+			)
+			return
+		}
+	}
+
+	// Step 4: GET to refresh final state after all operations
 	getParams := cloud.NetworkRouterGetParams{}
 	if !data.ProjectID.IsNull() {
 		getParams.ProjectID = param.NewOpt(data.ProjectID.ValueInt64())
