@@ -106,6 +106,7 @@ func resourceFileShare() *schema.Resource {
 			"network": {
 				Type:        schema.TypeList,
 				Optional:    true,
+				Computed:    true,
 				MaxItems:    1,
 				Description: "Network configuration for the file share. It must include a network ID and optionally a subnet ID. (Only required for type_name: 'standard')",
 				DiffSuppressFunc: func(k, old, new string, d *schema.ResourceData) bool {
