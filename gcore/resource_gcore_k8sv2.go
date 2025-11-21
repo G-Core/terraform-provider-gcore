@@ -1687,14 +1687,15 @@ func resourceK8sV2IsVMFlavor(flavor string) bool {
 func resourceK8sV2CheckLimits(client *gcorecloud.ServiceClient, old, new []interface{}) error {
 	log.Printf("[DEBUG] Checking quota limits")
 
-	opts := &clusters.CheckLimitsOpts{}
 	for _, n := range new {
 		newPool, ok := n.(map[string]interface{})
 		if !ok || len(newPool) == 0 {
 			continue
 		}
+
+		var poolOpts *clusters.CheckLimitsPoolOpts
 		if resourceK8sV2FindClusterPool(old, newPool) == nil || resourceK8sV2ClusterPoolNeedsReplace(old, newPool) {
-			poolOpts := clusters.CheckLimitsPoolOpts{
+			poolOpts = &clusters.CheckLimitsPoolOpts{
 				Name:              newPool["name"].(string),
 				FlavorID:          newPool["flavor_id"].(string),
 				MinNodeCount:      newPool["min_node_count"].(int),
@@ -1702,7 +1703,6 @@ func resourceK8sV2CheckLimits(client *gcorecloud.ServiceClient, old, new []inter
 				BootVolumeSize:    newPool["boot_volume_size"].(int),
 				ServerGroupPolicy: servergroups.ServerGroupPolicy(newPool["servergroup_policy"].(string)),
 			}
-			opts.Pools = append(opts.Pools, poolOpts)
 		} else if resourceK8sV2ClusterPoolNeedsUpdate(old, newPool) {
 			oldPool := resourceK8sV2FindClusterPool(old, newPool).(map[string]interface{})
 			minCount := newPool["min_node_count"].(int) - oldPool["min_node_count"].(int)
@@ -1710,7 +1710,7 @@ func resourceK8sV2CheckLimits(client *gcorecloud.ServiceClient, old, new []inter
 			if minCount <= 0 {
 				continue
 			}
-			poolOpts := clusters.CheckLimitsPoolOpts{
+			poolOpts = &clusters.CheckLimitsPoolOpts{
 				Name:              newPool["name"].(string),
 				FlavorID:          newPool["flavor_id"].(string),
 				MinNodeCount:      minCount,
@@ -1718,12 +1718,13 @@ func resourceK8sV2CheckLimits(client *gcorecloud.ServiceClient, old, new []inter
 				BootVolumeSize:    newPool["boot_volume_size"].(int),
 				ServerGroupPolicy: servergroups.ServerGroupPolicy(newPool["servergroup_policy"].(string)),
 			}
-			opts.Pools = append(opts.Pools, poolOpts)
 		}
-	}
 
-	if len(opts.Pools) > 0 {
-		quota, err := clusters.CheckLimits(client, opts).Extract()
+		if poolOpts == nil {
+			continue
+		}
+
+		quota, err := clusters.CheckLimitsPool(client, poolOpts).Extract()
 		if err != nil {
 			return fmt.Errorf("check limits: %w", err)
 		}
@@ -1732,5 +1733,6 @@ func resourceK8sV2CheckLimits(client *gcorecloud.ServiceClient, old, new []inter
 			return fmt.Errorf("quota limits exceeded for this operation: %s", string(b))
 		}
 	}
+
 	return nil
 }
