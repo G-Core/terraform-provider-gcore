@@ -128,8 +128,16 @@ func (r *CloudNetworkRouterResource) Update(ctx context.Context, req resource.Up
 	}
 
 	routerID := data.ID.ValueString()
-	projectIDOpt := int64Opt(data.ProjectID)
-	regionIDOpt := int64Opt(data.RegionID)
+
+	var projectIDOpt param.Opt[int64]
+	if !data.ProjectID.IsNull() {
+		projectIDOpt = param.NewOpt(data.ProjectID.ValueInt64())
+	}
+
+	var regionIDOpt param.Opt[int64]
+	if !data.RegionID.IsNull() {
+		regionIDOpt = param.NewOpt(data.RegionID.ValueInt64())
+	}
 
 	toAttach, toDetach, diags := diffInterfaces(ctx, data.Interfaces, state.Interfaces)
 	resp.Diagnostics.Append(diags...)
@@ -459,12 +467,4 @@ func diffInterfaces(ctx context.Context, plan customfield.NestedObjectList[Cloud
 
 func shouldSendPatch(dataBytes []byte) bool {
 	return len(dataBytes) > 0 && string(dataBytes) != "{}" && string(dataBytes) != "null"
-}
-
-func int64Opt(value types.Int64) param.Opt[int64] {
-	if value.IsNull() {
-		return param.Opt[int64]{}
-	}
-
-	return param.NewOpt(value.ValueInt64())
 }
