@@ -226,7 +226,7 @@ func ListDataSourceSchema(ctx context.Context) schema.Schema {
 									NestedObject: schema.NestedAttributeObject{
 										Attributes: map[string]schema.Attribute{
 											"key": schema.StringAttribute{
-												Description: "Tag key. The maximum size for a key is 255 bytes.",
+												Description: "Tag key. The maximum size for a key is 255 characters.",
 												Computed:    true,
 											},
 											"read_only": schema.BoolAttribute{
@@ -234,7 +234,7 @@ func ListDataSourceSchema(ctx context.Context) schema.Schema {
 												Computed:    true,
 											},
 											"value": schema.StringAttribute{
-												Description: "Tag value. The maximum size for a value is 1024 bytes.",
+												Description: "Tag value. The maximum size for a value is 255 characters.",
 												Computed:    true,
 											},
 										},
@@ -352,7 +352,7 @@ func ListDataSourceSchema(ctx context.Context) schema.Schema {
 									NestedObject: schema.NestedAttributeObject{
 										Attributes: map[string]schema.Attribute{
 											"key": schema.StringAttribute{
-												Description: "Tag key. The maximum size for a key is 255 bytes.",
+												Description: "Tag key. The maximum size for a key is 255 characters.",
 												Computed:    true,
 											},
 											"read_only": schema.BoolAttribute{
@@ -360,7 +360,7 @@ func ListDataSourceSchema(ctx context.Context) schema.Schema {
 												Computed:    true,
 											},
 											"value": schema.StringAttribute{
-												Description: "Tag value. The maximum size for a value is 1024 bytes.",
+												Description: "Tag value. The maximum size for a value is 255 characters.",
 												Computed:    true,
 											},
 										},
@@ -655,7 +655,7 @@ func ListDataSourceSchema(ctx context.Context) schema.Schema {
 												NestedObject: schema.NestedAttributeObject{
 													Attributes: map[string]schema.Attribute{
 														"key": schema.StringAttribute{
-															Description: "Tag key. The maximum size for a key is 255 bytes.",
+															Description: "Tag key. The maximum size for a key is 255 characters.",
 															Computed:    true,
 														},
 														"read_only": schema.BoolAttribute{
@@ -663,7 +663,7 @@ func ListDataSourceSchema(ctx context.Context) schema.Schema {
 															Computed:    true,
 														},
 														"value": schema.StringAttribute{
-															Description: "Tag value. The maximum size for a value is 1024 bytes.",
+															Description: "Tag value. The maximum size for a value is 255 characters.",
 															Computed:    true,
 														},
 													},
@@ -857,7 +857,7 @@ func ListDataSourceSchema(ctx context.Context) schema.Schema {
 							NestedObject: schema.NestedAttributeObject{
 								Attributes: map[string]schema.Attribute{
 									"key": schema.StringAttribute{
-										Description: "Tag key. The maximum size for a key is 255 bytes.",
+										Description: "Tag key. The maximum size for a key is 255 characters.",
 										Computed:    true,
 									},
 									"read_only": schema.BoolAttribute{
@@ -865,7 +865,7 @@ func ListDataSourceSchema(ctx context.Context) schema.Schema {
 										Computed:    true,
 									},
 									"value": schema.StringAttribute{
-										Description: "Tag value. The maximum size for a value is 1024 bytes.",
+										Description: "Tag value. The maximum size for a value is 255 characters.",
 										Computed:    true,
 									},
 								},
