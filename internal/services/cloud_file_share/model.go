@@ -16,7 +16,7 @@ type CloudFileShareModel struct {
 	Size             types.Int64                                                `tfsdk:"size" json:"size,required"`
 	Network          *CloudFileShareNetworkModel                                `tfsdk:"network" json:"network,optional,no_refresh"`
 	TypeName         types.String                                               `tfsdk:"type_name" json:"type_name,computed_optional"`
-	AccessRuleIDs    customfield.List[types.String]                             `tfsdk:"access_rule_ids"`
+	AccessRuleIDs    customfield.List[types.String]                             `tfsdk:"access_rule_ids" json:"-,computed,no_refresh"`
 	Name             types.String                                               `tfsdk:"name" json:"name,required"`
 	Tags             *map[string]types.String                                   `tfsdk:"tags" json:"tags,optional,no_refresh"`
 	ShareSettings    customfield.NestedObject[CloudFileShareShareSettingsModel] `tfsdk:"share_settings" json:"share_settings,computed_optional"`
