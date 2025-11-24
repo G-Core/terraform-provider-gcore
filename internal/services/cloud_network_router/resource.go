@@ -12,6 +12,7 @@ import (
 	"github.com/G-Core/gcore-go/cloud"
 	"github.com/G-Core/gcore-go/option"
 	"github.com/G-Core/gcore-go/packages/param"
+	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/types"
@@ -127,60 +128,22 @@ func (r *CloudNetworkRouterResource) Update(ctx context.Context, req resource.Up
 	}
 
 	routerID := data.ID.ValueString()
+	projectIDOpt := int64Opt(data.ProjectID)
+	regionIDOpt := int64Opt(data.RegionID)
 
-	// Compute interface changes once and reuse for attach/detach operations
-	var toAttach, toDetach []string
-
-	if !data.Interfaces.Equal(state.Interfaces) {
-		oldInterfaces, diags := state.Interfaces.AsStructSliceT(ctx)
-		resp.Diagnostics.Append(diags...)
-		if resp.Diagnostics.HasError() {
-			return
-		}
-
-		newInterfaces, diags := data.Interfaces.AsStructSliceT(ctx)
-		resp.Diagnostics.Append(diags...)
-		if resp.Diagnostics.HasError() {
-			return
-		}
-
-		oldInterfaceMap := make(map[string]bool)
-		for _, oldIface := range oldInterfaces {
-			if subnetID := oldIface.SubnetID.ValueString(); subnetID != "" {
-				oldInterfaceMap[subnetID] = true
-			}
-		}
-
-		newInterfaceMap := make(map[string]bool)
-		for _, newIface := range newInterfaces {
-			if subnetID := newIface.SubnetID.ValueString(); subnetID != "" {
-				newInterfaceMap[subnetID] = true
-				if !oldInterfaceMap[subnetID] {
-					toAttach = append(toAttach, subnetID)
-				}
-			}
-		}
-
-		for _, oldIface := range oldInterfaces {
-			if subnetID := oldIface.SubnetID.ValueString(); subnetID != "" {
-				if !newInterfaceMap[subnetID] {
-					toDetach = append(toDetach, subnetID)
-				}
-			}
-		}
+	toAttach, toDetach, diags := diffInterfaces(ctx, data.Interfaces, state.Interfaces)
+	resp.Diagnostics.Append(diags...)
+	if resp.Diagnostics.HasError() {
+		return
 	}
 
 	// Step 1: Attach new interfaces FIRST (before PATCH)
 	// This ensures interfaces exist before routes that reference them are added
 	for _, subnetID := range toAttach {
 		attachParams := cloud.NetworkRouterAttachSubnetParams{
-			SubnetID: subnetID,
-		}
-		if !data.ProjectID.IsNull() {
-			attachParams.ProjectID = param.NewOpt(data.ProjectID.ValueInt64())
-		}
-		if !data.RegionID.IsNull() {
-			attachParams.RegionID = param.NewOpt(data.RegionID.ValueInt64())
+			SubnetID:  subnetID,
+			ProjectID: projectIDOpt,
+			RegionID:  regionIDOpt,
 		}
 
 		_, err := r.client.Cloud.Networks.Routers.AttachSubnet(
@@ -203,12 +166,8 @@ func (r *CloudNetworkRouterResource) Update(ctx context.Context, req resource.Up
 	// - Routes can reference newly attached interfaces (nexthop validation)
 	// - Routes are deleted before interfaces are detached (API constraint)
 	params := cloud.NetworkRouterUpdateParams{}
-	if !data.ProjectID.IsNull() {
-		params.ProjectID = param.NewOpt(data.ProjectID.ValueInt64())
-	}
-	if !data.RegionID.IsNull() {
-		params.RegionID = param.NewOpt(data.RegionID.ValueInt64())
-	}
+	params.ProjectID = projectIDOpt
+	params.RegionID = regionIDOpt
 
 	dataBytes, err := data.MarshalJSONForUpdate(*state)
 	if err != nil {
@@ -216,7 +175,7 @@ func (r *CloudNetworkRouterResource) Update(ctx context.Context, req resource.Up
 		return
 	}
 
-	if len(dataBytes) > 0 && string(dataBytes) != "{}" && string(dataBytes) != "null" {
+	if shouldSendPatch(dataBytes) {
 		res := new(http.Response)
 		_, err = r.client.Cloud.Networks.Routers.Update(
 			ctx,
@@ -231,28 +190,20 @@ func (r *CloudNetworkRouterResource) Update(ctx context.Context, req resource.Up
 			return
 		}
 		bytes, _ := io.ReadAll(res.Body)
-		// Preserve interfaces before unmarshaling PATCH response
-		// PATCH response doesn't include interfaces since they're managed via attach/detach
-		preservedInterfaces := data.Interfaces
 		err = apijson.UnmarshalComputed(bytes, &data)
 		if err != nil {
 			resp.Diagnostics.AddError("failed to deserialize http request", err.Error())
 			return
 		}
-		data.Interfaces = preservedInterfaces
 	}
 
 	// Step 3: Detach old interfaces LAST (after PATCH)
 	// This ensures routes referencing these interfaces are deleted first
 	for _, subnetID := range toDetach {
 		detachParams := cloud.NetworkRouterDetachSubnetParams{
-			SubnetID: cloud.SubnetIDParam{SubnetID: subnetID},
-		}
-		if !data.ProjectID.IsNull() {
-			detachParams.ProjectID = param.NewOpt(data.ProjectID.ValueInt64())
-		}
-		if !data.RegionID.IsNull() {
-			detachParams.RegionID = param.NewOpt(data.RegionID.ValueInt64())
+			SubnetID:  cloud.SubnetIDParam{SubnetID: subnetID},
+			ProjectID: projectIDOpt,
+			RegionID:  regionIDOpt,
 		}
 
 		_, err := r.client.Cloud.Networks.Routers.DetachSubnet(
@@ -272,12 +223,8 @@ func (r *CloudNetworkRouterResource) Update(ctx context.Context, req resource.Up
 
 	// Step 4: GET to refresh final state after all operations
 	getParams := cloud.NetworkRouterGetParams{}
-	if !data.ProjectID.IsNull() {
-		getParams.ProjectID = param.NewOpt(data.ProjectID.ValueInt64())
-	}
-	if !data.RegionID.IsNull() {
-		getParams.RegionID = param.NewOpt(data.RegionID.ValueInt64())
-	}
+	getParams.ProjectID = projectIDOpt
+	getParams.RegionID = regionIDOpt
 
 	readRes := new(http.Response)
 	_, err = r.client.Cloud.Networks.Routers.Get(
@@ -463,4 +410,61 @@ func (r *CloudNetworkRouterResource) ModifyPlan(ctx context.Context, req resourc
 		plan.Routes = customfield.NewObjectListMust(ctx, []CloudNetworkRouterRoutesModel{})
 		resp.Diagnostics.Append(resp.Plan.Set(ctx, plan)...)
 	}
+}
+
+func diffInterfaces(ctx context.Context, plan customfield.NestedObjectList[CloudNetworkRouterInterfacesModel], state customfield.NestedObjectList[CloudNetworkRouterInterfacesModel]) (toAttach []string, toDetach []string, diags diag.Diagnostics) {
+	if plan.Equal(state) {
+		return
+	}
+
+	oldInterfaces, diagnostics := state.AsStructSliceT(ctx)
+	diags.Append(diagnostics...)
+	if diags.HasError() {
+		return
+	}
+
+	newInterfaces, diagnostics := plan.AsStructSliceT(ctx)
+	diags.Append(diagnostics...)
+	if diags.HasError() {
+		return
+	}
+
+	oldInterfaceMap := make(map[string]struct{}, len(oldInterfaces))
+	for _, oldIface := range oldInterfaces {
+		if subnetID := oldIface.SubnetID.ValueString(); subnetID != "" {
+			oldInterfaceMap[subnetID] = struct{}{}
+		}
+	}
+
+	newInterfaceMap := make(map[string]struct{}, len(newInterfaces))
+	for _, newIface := range newInterfaces {
+		if subnetID := newIface.SubnetID.ValueString(); subnetID != "" {
+			newInterfaceMap[subnetID] = struct{}{}
+			if _, exists := oldInterfaceMap[subnetID]; !exists {
+				toAttach = append(toAttach, subnetID)
+			}
+		}
+	}
+
+	for _, oldIface := range oldInterfaces {
+		if subnetID := oldIface.SubnetID.ValueString(); subnetID != "" {
+			if _, exists := newInterfaceMap[subnetID]; !exists {
+				toDetach = append(toDetach, subnetID)
+			}
+		}
+	}
+
+	return
+}
+
+func shouldSendPatch(dataBytes []byte) bool {
+	return len(dataBytes) > 0 && string(dataBytes) != "{}" && string(dataBytes) != "null"
+}
+
+func int64Opt(value types.Int64) param.Opt[int64] {
+	if value.IsNull() {
+		return param.Opt[int64]{}
+	}
+
+	return param.NewOpt(value.ValueInt64())
 }
