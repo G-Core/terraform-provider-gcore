@@ -3,7 +3,6 @@
 package cloud_security_group
 
 import (
-	"github.com/hashicorp/terraform-plugin-framework-jsontypes/jsontypes"
 	"github.com/hashicorp/terraform-plugin-framework-timetypes/timetypes"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/stainless-sdks/gcore-terraform/internal/apijson"
@@ -40,7 +39,7 @@ type CloudSecurityGroupSecurityGroupModel struct {
 	Name               types.String                                               `tfsdk:"name" json:"name,required"`
 	Description        types.String                                               `tfsdk:"description" json:"description,optional"`
 	SecurityGroupRules *[]*CloudSecurityGroupSecurityGroupSecurityGroupRulesModel `tfsdk:"security_group_rules" json:"security_group_rules,optional"`
-	Tags               *map[string]jsontypes.Normalized                           `tfsdk:"tags" json:"tags,optional"`
+	Tags               *map[string]types.String                                   `tfsdk:"tags" json:"tags,optional"`
 }
 
 type CloudSecurityGroupSecurityGroupSecurityGroupRulesModel struct {

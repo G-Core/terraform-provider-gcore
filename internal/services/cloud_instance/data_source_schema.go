@@ -155,7 +155,7 @@ func DataSourceSchema(ctx context.Context) schema.Schema {
 				NestedObject: schema.NestedAttributeObject{
 					Attributes: map[string]schema.Attribute{
 						"alarm_end": schema.StringAttribute{
-							Description: "A date-time string giving the time that the alarm ended",
+							Description: "A date-time string giving the time that the alarm ended. If not yet ended, time will be given as 0001-01-01T00:00:00Z",
 							Computed:    true,
 							CustomType:  timetypes.RFC3339Type{},
 						},
@@ -524,7 +524,7 @@ func DataSourceSchema(ctx context.Context) schema.Schema {
 				NestedObject: schema.NestedAttributeObject{
 					Attributes: map[string]schema.Attribute{
 						"key": schema.StringAttribute{
-							Description: "Tag key. The maximum size for a key is 255 bytes.",
+							Description: "Tag key. The maximum size for a key is 255 characters.",
 							Computed:    true,
 						},
 						"read_only": schema.BoolAttribute{
@@ -532,7 +532,7 @@ func DataSourceSchema(ctx context.Context) schema.Schema {
 							Computed:    true,
 						},
 						"value": schema.StringAttribute{
-							Description: "Tag value. The maximum size for a value is 1024 bytes.",
+							Description: "Tag value. The maximum size for a value is 255 characters.",
 							Computed:    true,
 						},
 					},
