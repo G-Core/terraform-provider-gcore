@@ -1,3 +1,17 @@
+resource "gcore_file_share" "vast" {
+  name       = "tf-file-share-vast"
+  size       = 10
+  project_id = data.gcore_project.project.id
+  region_id  = data.gcore_region.region.id
+  type_name  = "vast"
+  protocol   = "NFS"
+  share_settings {
+    allowed_characters = "LCD"
+    path_length = "LCD"
+    root_squash = true
+  }
+}
+
 resource "gcore_ai_cluster" "gpu_cluster" {
   flavor          = "bm3-ai-1xlarge-h200-141-8"
   image_id        = "aab83c98-7c9c-4942-a488-6c8b63dd42bd"
@@ -23,8 +37,8 @@ resource "gcore_ai_cluster" "gpu_cluster" {
   // Without it, mounting the NFS share will fail.
   interface {
     type       = "subnet"
-    network_id = data.gcore_file_share.vast.network_id
-    subnet_id  = data.gcore_file_share.vast.subnet_id
+    network_id = gcore_file_share.vast.network[0].network_id
+    subnet_id  = gcore_file_share.vast.network[0].subnet_id
   }
 
   cluster_metadata = {
