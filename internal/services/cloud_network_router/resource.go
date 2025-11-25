@@ -12,9 +12,12 @@ import (
 	"github.com/G-Core/gcore-go/cloud"
 	"github.com/G-Core/gcore-go/option"
 	"github.com/G-Core/gcore-go/packages/param"
+	"github.com/hashicorp/terraform-plugin-framework/diag"
+	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/stainless-sdks/gcore-terraform/internal/apijson"
+	"github.com/stainless-sdks/gcore-terraform/internal/customfield"
 	"github.com/stainless-sdks/gcore-terraform/internal/importpath"
 	"github.com/stainless-sdks/gcore-terraform/internal/logging"
 )
@@ -75,6 +78,7 @@ func (r *CloudNetworkRouterResource) Create(ctx context.Context, req resource.Cr
 		params.RegionID = param.NewOpt(data.RegionID.ValueInt64())
 	}
 
+	// According to API docs, interfaces and routes can be created in a single POST call
 	dataBytes, err := data.MarshalJSON()
 	if err != nil {
 		resp.Diagnostics.AddError("failed to serialize http request", err.Error())
@@ -125,126 +129,61 @@ func (r *CloudNetworkRouterResource) Update(ctx context.Context, req resource.Up
 
 	routerID := data.ID.ValueString()
 
-	// Handle interface attach/detach operations
-	if !data.Interfaces.Equal(state.Interfaces) {
-		// Get old and new interface lists
-		oldInterfaces, diags := state.Interfaces.AsStructSliceT(ctx)
-		resp.Diagnostics.Append(diags...)
-		if resp.Diagnostics.HasError() {
+	var projectIDOpt param.Opt[int64]
+	if !data.ProjectID.IsNull() {
+		projectIDOpt = param.NewOpt(data.ProjectID.ValueInt64())
+	}
+
+	var regionIDOpt param.Opt[int64]
+	if !data.RegionID.IsNull() {
+		regionIDOpt = param.NewOpt(data.RegionID.ValueInt64())
+	}
+
+	toAttach, toDetach, diags := diffInterfaces(ctx, data.Interfaces, state.Interfaces)
+	resp.Diagnostics.Append(diags...)
+	if resp.Diagnostics.HasError() {
+		return
+	}
+
+	// Step 1: Attach new interfaces FIRST (before PATCH)
+	// This ensures interfaces exist before routes that reference them are added
+	for _, subnetID := range toAttach {
+		attachParams := cloud.NetworkRouterAttachSubnetParams{
+			SubnetID:  subnetID,
+			ProjectID: projectIDOpt,
+			RegionID:  regionIDOpt,
+		}
+
+		_, err := r.client.Cloud.Networks.Routers.AttachSubnet(
+			ctx,
+			routerID,
+			attachParams,
+			option.WithMiddleware(logging.Middleware(ctx)),
+		)
+		if err != nil {
+			resp.Diagnostics.AddError(
+				"failed to attach subnet to router",
+				fmt.Sprintf("SubnetID: %s, Error: %s", subnetID, err.Error()),
+			)
 			return
-		}
-
-		newInterfaces, diags := data.Interfaces.AsStructSliceT(ctx)
-		resp.Diagnostics.Append(diags...)
-		if resp.Diagnostics.HasError() {
-			return
-		}
-
-		// Create a map of old interfaces for quick lookup
-		oldInterfaceMap := make(map[string]bool)
-		for _, oldIface := range oldInterfaces {
-			if oldIface.SubnetID.ValueString() != "" {
-				oldInterfaceMap[oldIface.SubnetID.ValueString()] = true
-			}
-		}
-
-		// Process new interfaces: attach those that don't exist in old
-		newInterfaceMap := make(map[string]bool)
-		for _, newIface := range newInterfaces {
-			subnetID := newIface.SubnetID.ValueString()
-			if subnetID == "" {
-				continue
-			}
-			newInterfaceMap[subnetID] = true
-
-			// If this interface is not in old set, attach it
-			if !oldInterfaceMap[subnetID] {
-				attachParams := cloud.NetworkRouterAttachSubnetParams{
-					SubnetID: subnetID,
-				}
-				if !data.ProjectID.IsNull() {
-					attachParams.ProjectID = param.NewOpt(data.ProjectID.ValueInt64())
-				}
-				if !data.RegionID.IsNull() {
-					attachParams.RegionID = param.NewOpt(data.RegionID.ValueInt64())
-				}
-
-				_, err := r.client.Cloud.Networks.Routers.AttachSubnet(
-					ctx,
-					routerID,
-					attachParams,
-					option.WithMiddleware(logging.Middleware(ctx)),
-				)
-				if err != nil {
-					resp.Diagnostics.AddError(
-						"failed to attach subnet to router",
-						fmt.Sprintf("SubnetID: %s, Error: %s", subnetID, err.Error()),
-					)
-					return
-				}
-			}
-		}
-
-		// Process old interfaces: detach those that are not in new set
-		for _, oldIface := range oldInterfaces {
-			subnetID := oldIface.SubnetID.ValueString()
-			if subnetID == "" {
-				continue
-			}
-
-			// If this interface is not in new set, detach it
-			if !newInterfaceMap[subnetID] {
-				detachParams := cloud.NetworkRouterDetachSubnetParams{
-					SubnetID: cloud.SubnetIDParam{SubnetID: subnetID},
-				}
-				if !data.ProjectID.IsNull() {
-					detachParams.ProjectID = param.NewOpt(data.ProjectID.ValueInt64())
-				}
-				if !data.RegionID.IsNull() {
-					detachParams.RegionID = param.NewOpt(data.RegionID.ValueInt64())
-				}
-
-				_, err := r.client.Cloud.Networks.Routers.DetachSubnet(
-					ctx,
-					routerID,
-					detachParams,
-					option.WithMiddleware(logging.Middleware(ctx)),
-				)
-				if err != nil {
-					resp.Diagnostics.AddError(
-						"failed to detach subnet from router",
-						fmt.Sprintf("SubnetID: %s, Error: %s", subnetID, err.Error()),
-					)
-					return
-				}
-			}
 		}
 	}
 
-	// Update other router attributes (name, routes, external_gateway_info)
-	// Only send PATCH request if fields OTHER than interfaces have changed
-	needsUpdate := !data.Name.Equal(state.Name) ||
-		!data.Routes.Equal(state.Routes) ||
-		!data.ExternalGatewayInfo.Equal(state.ExternalGatewayInfo)
+	// Step 2: Send PATCH for all field updates (routes, name, external_gateway_info)
+	// This happens after attach and before detach to satisfy both:
+	// - Routes can reference newly attached interfaces (nexthop validation)
+	// - Routes are deleted before interfaces are detached (API constraint)
+	params := cloud.NetworkRouterUpdateParams{}
+	params.ProjectID = projectIDOpt
+	params.RegionID = regionIDOpt
 
-	var err error
-	if needsUpdate {
-		params := cloud.NetworkRouterUpdateParams{}
+	dataBytes, err := data.MarshalJSONForUpdate(*state)
+	if err != nil {
+		resp.Diagnostics.AddError("failed to serialize http request", err.Error())
+		return
+	}
 
-		if !data.ProjectID.IsNull() {
-			params.ProjectID = param.NewOpt(data.ProjectID.ValueInt64())
-		}
-
-		if !data.RegionID.IsNull() {
-			params.RegionID = param.NewOpt(data.RegionID.ValueInt64())
-		}
-
-		var dataBytes []byte
-		dataBytes, err = data.MarshalJSONForUpdate(*state)
-		if err != nil {
-			resp.Diagnostics.AddError("failed to serialize http request", err.Error())
-			return
-		}
+	if shouldSendPatch(dataBytes) {
 		res := new(http.Response)
 		_, err = r.client.Cloud.Networks.Routers.Update(
 			ctx,
@@ -266,14 +205,34 @@ func (r *CloudNetworkRouterResource) Update(ctx context.Context, req resource.Up
 		}
 	}
 
-	// Do a final Read to get consistent state after attach/detach and update operations
+	// Step 3: Detach old interfaces LAST (after PATCH)
+	// This ensures routes referencing these interfaces are deleted first
+	for _, subnetID := range toDetach {
+		detachParams := cloud.NetworkRouterDetachSubnetParams{
+			SubnetID:  cloud.SubnetIDParam{SubnetID: subnetID},
+			ProjectID: projectIDOpt,
+			RegionID:  regionIDOpt,
+		}
+
+		_, err := r.client.Cloud.Networks.Routers.DetachSubnet(
+			ctx,
+			routerID,
+			detachParams,
+			option.WithMiddleware(logging.Middleware(ctx)),
+		)
+		if err != nil {
+			resp.Diagnostics.AddError(
+				"failed to detach subnet from router",
+				fmt.Sprintf("SubnetID: %s, Error: %s", subnetID, err.Error()),
+			)
+			return
+		}
+	}
+
+	// Step 4: GET to refresh final state after all operations
 	getParams := cloud.NetworkRouterGetParams{}
-	if !data.ProjectID.IsNull() {
-		getParams.ProjectID = param.NewOpt(data.ProjectID.ValueInt64())
-	}
-	if !data.RegionID.IsNull() {
-		getParams.RegionID = param.NewOpt(data.RegionID.ValueInt64())
-	}
+	getParams.ProjectID = projectIDOpt
+	getParams.RegionID = regionIDOpt
 
 	readRes := new(http.Response)
 	_, err = r.client.Cloud.Networks.Routers.Get(
@@ -423,6 +382,89 @@ func (r *CloudNetworkRouterResource) ImportState(ctx context.Context, req resour
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
 }
 
-func (r *CloudNetworkRouterResource) ModifyPlan(_ context.Context, _ resource.ModifyPlanRequest, _ *resource.ModifyPlanResponse) {
+func (r *CloudNetworkRouterResource) ModifyPlan(ctx context.Context, req resource.ModifyPlanRequest, resp *resource.ModifyPlanResponse) {
+	if req.State.Raw.IsNull() || req.Plan.Raw.IsNull() {
+		return
+	}
 
+	var plan *CloudNetworkRouterModel
+	resp.Diagnostics.Append(req.Plan.Get(ctx, &plan)...)
+	if resp.Diagnostics.HasError() {
+		return
+	}
+
+	var state *CloudNetworkRouterModel
+	resp.Diagnostics.Append(req.State.Get(ctx, &state)...)
+	if resp.Diagnostics.HasError() {
+		return
+	}
+
+	var configRoutes customfield.NestedObjectList[CloudNetworkRouterRoutesModel]
+	diagsRoutes := req.Config.GetAttribute(ctx, path.Root("routes"), &configRoutes)
+
+	var configRoutesList []CloudNetworkRouterRoutesModel
+	configRoutesEmpty := false
+	if !diagsRoutes.HasError() && !configRoutes.IsNull() {
+		configRoutes.ElementsAs(ctx, &configRoutesList, false)
+		configRoutesEmpty = len(configRoutesList) == 0
+	}
+
+	routesRemovedFromConfig := !diagsRoutes.HasError() &&
+		(configRoutes.IsNull() || configRoutesEmpty) &&
+		!state.Routes.IsNull() &&
+		!state.Routes.IsUnknown()
+
+	if routesRemovedFromConfig {
+		plan.Routes = customfield.NewObjectListMust(ctx, []CloudNetworkRouterRoutesModel{})
+		resp.Diagnostics.Append(resp.Plan.Set(ctx, plan)...)
+	}
+}
+
+func diffInterfaces(ctx context.Context, plan customfield.NestedObjectList[CloudNetworkRouterInterfacesModel], state customfield.NestedObjectList[CloudNetworkRouterInterfacesModel]) (toAttach []string, toDetach []string, diags diag.Diagnostics) {
+	if plan.Equal(state) {
+		return
+	}
+
+	oldInterfaces, diagnostics := state.AsStructSliceT(ctx)
+	diags.Append(diagnostics...)
+	if diags.HasError() {
+		return
+	}
+
+	newInterfaces, diagnostics := plan.AsStructSliceT(ctx)
+	diags.Append(diagnostics...)
+	if diags.HasError() {
+		return
+	}
+
+	oldInterfaceMap := make(map[string]struct{}, len(oldInterfaces))
+	for _, oldIface := range oldInterfaces {
+		if subnetID := oldIface.SubnetID.ValueString(); subnetID != "" {
+			oldInterfaceMap[subnetID] = struct{}{}
+		}
+	}
+
+	newInterfaceMap := make(map[string]struct{}, len(newInterfaces))
+	for _, newIface := range newInterfaces {
+		if subnetID := newIface.SubnetID.ValueString(); subnetID != "" {
+			newInterfaceMap[subnetID] = struct{}{}
+			if _, exists := oldInterfaceMap[subnetID]; !exists {
+				toAttach = append(toAttach, subnetID)
+			}
+		}
+	}
+
+	for _, oldIface := range oldInterfaces {
+		if subnetID := oldIface.SubnetID.ValueString(); subnetID != "" {
+			if _, exists := newInterfaceMap[subnetID]; !exists {
+				toDetach = append(toDetach, subnetID)
+			}
+		}
+	}
+
+	return
+}
+
+func shouldSendPatch(dataBytes []byte) bool {
+	return len(dataBytes) > 0 && string(dataBytes) != "{}" && string(dataBytes) != "null"
 }

@@ -32,10 +32,10 @@ func (m CloudNetworkRouterModel) MarshalJSON() (data []byte, err error) {
 }
 
 func (m CloudNetworkRouterModel) MarshalJSONForUpdate(state CloudNetworkRouterModel) (data []byte, err error) {
-	// Create a copy of the model to marshal, but force interfaces to equal state
-	// so they're not included in the PATCH request (interfaces are managed via attach/detach)
+	// Interfaces are managed via attach/detach API calls, exclude from PATCH
 	mCopy := m
 	mCopy.Interfaces = state.Interfaces
+
 	return apijson.MarshalForPatch(mCopy, state)
 }
 
@@ -47,7 +47,7 @@ type CloudNetworkRouterInterfacesModel struct {
 type CloudNetworkRouterExternalGatewayInfoModel struct {
 	NetworkID  types.String `tfsdk:"network_id" json:"network_id,computed_optional"`
 	EnableSnat types.Bool   `tfsdk:"enable_snat" json:"enable_snat,computed_optional"`
-	Type       types.String `tfsdk:"type" json:"type,computed_optional,no_refresh"`
+	Type       types.String `tfsdk:"type" json:"type,computed_optional"`
 }
 
 type CloudNetworkRouterRoutesModel struct {
