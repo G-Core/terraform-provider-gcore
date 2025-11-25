@@ -40,7 +40,7 @@ type CloudInstancesDataSourceModel struct {
 	TagValue                *[]types.String                                                  `tfsdk:"tag_value" query:"tag_value,optional"`
 	IncludeAI               types.Bool                                                       `tfsdk:"include_ai" query:"include_ai,computed_optional"`
 	IncludeBaremetal        types.Bool                                                       `tfsdk:"include_baremetal" query:"include_baremetal,computed_optional"`
-	IncludeK8s              types.Bool                                                       `tfsdk:"include_k8s" query:"include_k8s,computed_optional"`
+	IncludeK8S              types.Bool                                                       `tfsdk:"include_k8s" query:"include_k8s,computed_optional"`
 	OnlyIsolated            types.Bool                                                       `tfsdk:"only_isolated" query:"only_isolated,computed_optional"`
 	OrderBy                 types.String                                                     `tfsdk:"order_by" query:"order_by,computed_optional"`
 	WithDDOS                types.Bool                                                       `tfsdk:"with_ddos" query:"with_ddos,computed_optional"`
@@ -98,8 +98,8 @@ func (m *CloudInstancesDataSourceModel) toListParams(_ context.Context) (params 
 	if !m.IncludeBaremetal.IsNull() {
 		params.IncludeBaremetal = param.NewOpt(m.IncludeBaremetal.ValueBool())
 	}
-	if !m.IncludeK8s.IsNull() {
-		params.IncludeK8s = param.NewOpt(m.IncludeK8s.ValueBool())
+	if !m.IncludeK8S.IsNull() {
+		params.IncludeK8S = param.NewOpt(m.IncludeK8S.ValueBool())
 	}
 	if !m.IP.IsNull() {
 		params.IP = param.NewOpt(m.IP.ValueString())
