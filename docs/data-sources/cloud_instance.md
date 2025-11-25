@@ -95,7 +95,7 @@ Available values: "basic", "advanced".
 
 Read-Only:
 
-- `alarm_end` (String) A date-time string giving the time that the alarm ended
+- `alarm_end` (String) A date-time string giving the time that the alarm ended. If not yet ended, time will be given as 0001-01-01T00:00:00Z
 - `alarm_start` (String) A date-time string giving the time that the alarm started
 - `alarm_state` (String) Current state of alarm
 Available values: "ACK_REQ", "ALARM", "ARCHIVED", "CLEAR", "CLEARING", "CLEARING_FAIL", "END_GRACE", "END_WAIT", "MANUAL_CLEAR", "MANUAL_CLEARING", "MANUAL_CLEARING_FAIL", "MANUAL_MITIGATING", "MANUAL_STARTING", "MANUAL_STARTING_FAIL", "MITIGATING", "STARTING", "STARTING_FAIL", "START_WAIT", "ack_req", "alarm", "archived", "clear", "clearing", "clearing_fail", "end_grace", "end_wait", "manual_clear", "manual_clearing", "manual_clearing_fail", "manual_mitigating", "manual_starting", "manual_starting_fail", "mitigating", "start_wait", "starting", "starting_fail".
@@ -249,9 +249,9 @@ Read-Only:
 
 Read-Only:
 
-- `key` (String) Tag key. The maximum size for a key is 255 bytes.
+- `key` (String) Tag key. The maximum size for a key is 255 characters.
 - `read_only` (Boolean) If true, the tag is read-only and cannot be modified by the user
-- `value` (String) Tag value. The maximum size for a value is 1024 bytes.
+- `value` (String) Tag value. The maximum size for a value is 255 characters.
 
 
 <a id="nestedatt--volumes"></a>

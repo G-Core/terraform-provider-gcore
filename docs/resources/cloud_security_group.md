@@ -30,7 +30,7 @@ resource "gcore_cloud_security_group" "example_cloud_security_group" {
       remote_ip_prefix = "10.0.0.0/8"
     }]
     tags = {
-      my-tag = "bar"
+      my-tag = "my-tag-value"
     }
   }
   instances = ["00000000-0000-4000-8000-000000000000"]
@@ -89,7 +89,7 @@ Optional:
 
 - `description` (String) Security group description
 - `security_group_rules` (Attributes List) Security group rules (see [below for nested schema](#nestedatt--security_group--security_group_rules))
-- `tags` (Map of String) Key-value tags to associate with the resource. A tag is a key-value pair that can be associated with a resource, enabling efficient filtering and grouping for better organization and management. Some tags are read-only and cannot be modified by the user. Tags are also integrated with cost reports, allowing cost data to be filtered based on tag keys or values.
+- `tags` (Map of String) Key-value tags to associate with the resource. A tag is a key-value pair that can be associated with a resource, enabling efficient filtering and grouping for better organization and management. Both tag keys and values have a maximum length of 255 characters. Some tags are read-only and cannot be modified by the user. Tags are also integrated with cost reports, allowing cost data to be filtered based on tag keys or values.
 
 <a id="nestedatt--security_group--security_group_rules"></a>
 ### Nested Schema for `security_group.security_group_rules`
@@ -162,9 +162,9 @@ Available values: "ah", "any", "dccp", "egp", "esp", "gre", "icmp", "igmp", "ipe
 
 Read-Only:
 
-- `key` (String) Tag key. The maximum size for a key is 255 bytes.
+- `key` (String) Tag key. The maximum size for a key is 255 characters.
 - `read_only` (Boolean) If true, the tag is read-only and cannot be modified by the user
-- `value` (String) Tag value. The maximum size for a value is 1024 bytes.
+- `value` (String) Tag value. The maximum size for a value is 255 characters.
 
 ## Import
 

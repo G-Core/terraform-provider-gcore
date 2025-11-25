@@ -81,6 +81,6 @@ Available values: "ah", "any", "dccp", "egp", "esp", "gre", "icmp", "igmp", "ipe
 
 Read-Only:
 
-- `key` (String) Tag key. The maximum size for a key is 255 bytes.
+- `key` (String) Tag key. The maximum size for a key is 255 characters.
 - `read_only` (Boolean) If true, the tag is read-only and cannot be modified by the user
-- `value` (String) Tag value. The maximum size for a value is 1024 bytes.
+- `value` (String) Tag value. The maximum size for a value is 255 characters.

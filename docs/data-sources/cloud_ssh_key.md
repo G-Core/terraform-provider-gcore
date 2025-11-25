@@ -44,5 +44,6 @@ Available values: "ACTIVE", "DELETING".
 
 Optional:
 
+- `name` (String) SSH key name. Partial substring match. Example: `name=abc` matches any key containing `abc` in name.
 - `order_by` (String) Sort order for the SSH keys
 Available values: "created_at.asc", "created_at.desc", "name.asc", "name.desc".

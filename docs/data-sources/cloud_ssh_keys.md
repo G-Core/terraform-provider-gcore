@@ -15,6 +15,7 @@ description: |-
 ```terraform
 data "gcore_cloud_ssh_keys" "example_cloud_ssh_keys" {
   project_id = 1
+  name = "my-ssh-key"
 }
 ```
 
@@ -24,6 +25,7 @@ data "gcore_cloud_ssh_keys" "example_cloud_ssh_keys" {
 ### Optional
 
 - `max_items` (Number) Max items to fetch, default: 1000
+- `name` (String) SSH key name. Partial substring match. Example: `name=abc` matches any key containing `abc` in name.
 - `order_by` (String) Sort order for the SSH keys
 Available values: "created_at.asc", "created_at.desc", "name.asc", "name.desc".
 - `project_id` (Number) Project ID
