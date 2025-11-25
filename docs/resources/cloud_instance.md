@@ -185,7 +185,7 @@ Optional:
 - `name` (String) The name of the volume. If not specified, a name will be generated automatically.
 - `size` (Number) Volume size in GiB.
 - `snapshot_id` (String) Snapshot ID.
-- `tags` (Map of String) Key-value tags to associate with the resource. A tag is a key-value pair that can be associated with a resource, enabling efficient filtering and grouping for better organization and management. Some tags are read-only and cannot be modified by the user. Tags are also integrated with cost reports, allowing cost data to be filtered based on tag keys or values.
+- `tags` (Map of String) Key-value tags to associate with the resource. A tag is a key-value pair that can be associated with a resource, enabling efficient filtering and grouping for better organization and management. Both tag keys and values have a maximum length of 255 characters. Some tags are read-only and cannot be modified by the user. Tags are also integrated with cost reports, allowing cost data to be filtered based on tag keys or values.
 - `type_name` (String) Volume type name. Supported values:
 - `standard` - Network SSD block storage offering stable performance with high random I/O and data reliability (6 IOPS per 1 GiB, 0.4 MB/s per 1 GiB). Max IOPS: 4500. Max bandwidth: 300 MB/s.
 - `ssd_hiiops` - High-performance SSD storage for latency-sensitive transactional workloads (60 IOPS per 1 GiB, 2.5 MB/s per 1 GiB). Max IOPS: 9000. Max bandwidth: 500 MB/s.
@@ -207,7 +207,7 @@ Required:
 
 Read-Only:
 
-- `alarm_end` (String) A date-time string giving the time that the alarm ended
+- `alarm_end` (String) A date-time string giving the time that the alarm ended. If not yet ended, time will be given as 0001-01-01T00:00:00Z
 - `alarm_start` (String) A date-time string giving the time that the alarm started
 - `alarm_state` (String) Current state of alarm
 Available values: "ACK_REQ", "ALARM", "ARCHIVED", "CLEAR", "CLEARING", "CLEARING_FAIL", "END_GRACE", "END_WAIT", "MANUAL_CLEAR", "MANUAL_CLEARING", "MANUAL_CLEARING_FAIL", "MANUAL_MITIGATING", "MANUAL_STARTING", "MANUAL_STARTING_FAIL", "MITIGATING", "STARTING", "STARTING_FAIL", "START_WAIT", "ack_req", "alarm", "archived", "clear", "clearing", "clearing_fail", "end_grace", "end_wait", "manual_clear", "manual_clearing", "manual_clearing_fail", "manual_mitigating", "manual_starting", "manual_starting_fail", "mitigating", "start_wait", "starting", "starting_fail".

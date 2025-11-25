@@ -112,9 +112,9 @@ Read-Only:
 
 Read-Only:
 
-- `key` (String) Tag key. The maximum size for a key is 255 bytes.
+- `key` (String) Tag key. The maximum size for a key is 255 characters.
 - `read_only` (Boolean) If true, the tag is read-only and cannot be modified by the user
-- `value` (String) Tag value. The maximum size for a value is 1024 bytes.
+- `value` (String) Tag value. The maximum size for a value is 255 characters.
 
 
 <a id="nestedatt--items--instance--volumes"></a>
@@ -292,9 +292,9 @@ Available values: "ACTIVE", "DOWN", "ERROR".
 
 Read-Only:
 
-- `key` (String) Tag key. The maximum size for a key is 255 bytes.
+- `key` (String) Tag key. The maximum size for a key is 255 characters.
 - `read_only` (Boolean) If true, the tag is read-only and cannot be modified by the user
-- `value` (String) Tag value. The maximum size for a value is 1024 bytes.
+- `value` (String) Tag value. The maximum size for a value is 255 characters.
 
 
 
@@ -342,9 +342,9 @@ Read-Only:
 
 Read-Only:
 
-- `key` (String) Tag key. The maximum size for a key is 255 bytes.
+- `key` (String) Tag key. The maximum size for a key is 255 characters.
 - `read_only` (Boolean) If true, the tag is read-only and cannot be modified by the user
-- `value` (String) Tag value. The maximum size for a value is 1024 bytes.
+- `value` (String) Tag value. The maximum size for a value is 255 characters.
 
 
 <a id="nestedatt--items--loadbalancer--vrrp_ips"></a>
@@ -364,6 +364,6 @@ Available values: "BACKUP", "MASTER", "STANDALONE".
 
 Read-Only:
 
-- `key` (String) Tag key. The maximum size for a key is 255 bytes.
+- `key` (String) Tag key. The maximum size for a key is 255 characters.
 - `read_only` (Boolean) If true, the tag is read-only and cannot be modified by the user
-- `value` (String) Tag value. The maximum size for a value is 1024 bytes.
+- `value` (String) Tag value. The maximum size for a value is 255 characters.
