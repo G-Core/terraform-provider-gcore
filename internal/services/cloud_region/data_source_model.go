@@ -30,7 +30,7 @@ type CloudRegionDataSourceModel struct {
 	HasBasicVm           types.Bool                                                      `tfsdk:"has_basic_vm" json:"has_basic_vm,computed"`
 	HasDbaas             types.Bool                                                      `tfsdk:"has_dbaas" json:"has_dbaas,computed"`
 	HasDDOS              types.Bool                                                      `tfsdk:"has_ddos" json:"has_ddos,computed"`
-	HasK8s               types.Bool                                                      `tfsdk:"has_k8s" json:"has_k8s,computed"`
+	HasK8S               types.Bool                                                      `tfsdk:"has_k8s" json:"has_k8s,computed"`
 	HasKvm               types.Bool                                                      `tfsdk:"has_kvm" json:"has_kvm,computed"`
 	HasSfs               types.Bool                                                      `tfsdk:"has_sfs" json:"has_sfs,computed"`
 	ID                   types.Int64                                                     `tfsdk:"id" json:"id,computed"`

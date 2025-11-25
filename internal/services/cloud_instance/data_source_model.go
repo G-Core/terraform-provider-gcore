@@ -103,8 +103,8 @@ func (m *CloudInstanceDataSourceModel) toListParams(_ context.Context) (params c
 	if !m.FindOneBy.IncludeBaremetal.IsNull() {
 		params.IncludeBaremetal = param.NewOpt(m.FindOneBy.IncludeBaremetal.ValueBool())
 	}
-	if !m.FindOneBy.IncludeK8s.IsNull() {
-		params.IncludeK8s = param.NewOpt(m.FindOneBy.IncludeK8s.ValueBool())
+	if !m.FindOneBy.IncludeK8S.IsNull() {
+		params.IncludeK8S = param.NewOpt(m.FindOneBy.IncludeK8S.ValueBool())
 	}
 	if !m.FindOneBy.IP.IsNull() {
 		params.IP = param.NewOpt(m.FindOneBy.IP.ValueString())
@@ -279,7 +279,7 @@ type CloudInstanceFindOneByDataSourceModel struct {
 	FlavorPrefix            types.String      `tfsdk:"flavor_prefix" query:"flavor_prefix,optional"`
 	IncludeAI               types.Bool        `tfsdk:"include_ai" query:"include_ai,computed_optional"`
 	IncludeBaremetal        types.Bool        `tfsdk:"include_baremetal" query:"include_baremetal,computed_optional"`
-	IncludeK8s              types.Bool        `tfsdk:"include_k8s" query:"include_k8s,computed_optional"`
+	IncludeK8S              types.Bool        `tfsdk:"include_k8s" query:"include_k8s,computed_optional"`
 	IP                      types.String      `tfsdk:"ip" query:"ip,optional"`
 	Name                    types.String      `tfsdk:"name" query:"name,optional"`
 	OnlyIsolated            types.Bool        `tfsdk:"only_isolated" query:"only_isolated,computed_optional"`
