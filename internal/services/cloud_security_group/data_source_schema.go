@@ -188,12 +188,12 @@ func DataSourceSchema(ctx context.Context) schema.Schema {
 				Optional: true,
 				Attributes: map[string]schema.Attribute{
 					"tag_key": schema.ListAttribute{
-						Description: "Filter by tag keys.",
+						Description: "Optional. Filter by tag keys.",
 						Optional:    true,
 						ElementType: types.StringType,
 					},
 					"tag_key_value": schema.StringAttribute{
-						Description: "Filter by tag key-value pairs. Must be a valid JSON string.",
+						Description: "Optional. Filter by tag key-value pairs. Must be a valid JSON string.",
 						Optional:    true,
 					},
 				},
