@@ -21,17 +21,19 @@ func ListDataSourceSchema(ctx context.Context) schema.Schema {
 	return schema.Schema{
 		Attributes: map[string]schema.Attribute{
 			"project_id": schema.Int64Attribute{
-				Optional: true,
+				Description: "Project ID",
+				Optional:    true,
 			},
 			"region_id": schema.Int64Attribute{
-				Optional: true,
+				Description: "Region ID",
+				Optional:    true,
 			},
 			"tag_key_value": schema.StringAttribute{
-				Description: "Filter by tag key-value pairs. Must be a valid JSON string.",
+				Description: "Optional. Filter by tag key-value pairs. Must be a valid JSON string.",
 				Optional:    true,
 			},
 			"tag_key": schema.ListAttribute{
-				Description: "Filter by tag keys.",
+				Description: "Optional. Filter by tag keys.",
 				Optional:    true,
 				ElementType: types.StringType,
 			},

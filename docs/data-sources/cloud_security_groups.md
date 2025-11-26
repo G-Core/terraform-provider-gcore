@@ -14,9 +14,9 @@ description: |-
 
 ```terraform
 data "gcore_cloud_security_groups" "example_cloud_security_groups" {
-  project_id = 0
-  region_id = 0
-  tag_key = ["string"]
+  project_id = 1
+  region_id = 1
+  tag_key = ["my-tag"]
   tag_key_value = "tag_key_value"
 }
 ```
@@ -27,10 +27,10 @@ data "gcore_cloud_security_groups" "example_cloud_security_groups" {
 ### Optional
 
 - `max_items` (Number) Max items to fetch, default: 1000
-- `project_id` (Number)
-- `region_id` (Number)
-- `tag_key` (List of String) Filter by tag keys.
-- `tag_key_value` (String) Filter by tag key-value pairs. Must be a valid JSON string.
+- `project_id` (Number) Project ID
+- `region_id` (Number) Region ID
+- `tag_key` (List of String) Optional. Filter by tag keys.
+- `tag_key_value` (String) Optional. Filter by tag key-value pairs. Must be a valid JSON string.
 
 ### Read-Only
 

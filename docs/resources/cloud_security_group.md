@@ -14,8 +14,8 @@ description: |-
 
 ```terraform
 resource "gcore_cloud_security_group" "example_cloud_security_group" {
-  project_id = 0
-  region_id = 0
+  project_id = 1
+  region_id = 1
   security_group = {
     name = "my_security_group"
     description = "Some description"
@@ -49,8 +49,8 @@ resource "gcore_cloud_security_group" "example_cloud_security_group" {
 - `changed_rules` (Attributes List) List of rules to create or delete (see [below for nested schema](#nestedatt--changed_rules))
 - `instances` (List of String) List of instances
 - `name` (String) Name
-- `project_id` (Number)
-- `region_id` (Number)
+- `project_id` (Number) Project ID
+- `region_id` (Number) Region ID
 - `tags` (Map of String) Update key-value tags using JSON Merge Patch semantics (RFC 7386). Provide key-value pairs to add or update tags. Set tag values to `null` to remove tags. Unspecified tags remain unchanged. Read-only tags are always preserved and cannot be modified.
 
 **Examples:**

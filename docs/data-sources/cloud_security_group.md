@@ -47,8 +47,8 @@ data "gcore_cloud_security_group" "example_cloud_security_group" {
 
 Optional:
 
-- `tag_key` (List of String) Filter by tag keys.
-- `tag_key_value` (String) Filter by tag key-value pairs. Must be a valid JSON string.
+- `tag_key` (List of String) Optional. Filter by tag keys.
+- `tag_key_value` (String) Optional. Filter by tag key-value pairs. Must be a valid JSON string.
 
 
 <a id="nestedatt--security_group_rules"></a>
