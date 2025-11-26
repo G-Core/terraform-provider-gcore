@@ -23,6 +23,7 @@ github.com/G-Core/gcorelabscloud-go v0.28.3-0.20251106160830-40d4754d8329 h1:UeL
 github.com/G-Core/gcorelabscloud-go v0.28.3-0.20251106160830-40d4754d8329/go.mod h1:y0j2JVc+sDBZxGrTtGAR8pxolYKoyyY8CFUK/GEsqbI=
 github.com/G-Core/gcorelabscloud-go v0.29.0 h1:fi8bwS0PVtosbZCOumvRHnu/cj4YCMdssV9mRQYwtlo=
 github.com/G-Core/gcorelabscloud-go v0.29.0/go.mod h1:y0j2JVc+sDBZxGrTtGAR8pxolYKoyyY8CFUK/GEsqbI=
+github.com/G-Core/gcorelabscloud-go v0.29.1 h1:L87F24W0ApMJwGrY2qrNRJfBTPVTmQWFqcBfazzQhhk=
 github.com/G-Core/gcorelabscloud-go v0.29.1/go.mod h1:y0j2JVc+sDBZxGrTtGAR8pxolYKoyyY8CFUK/GEsqbI=
 github.com/Kunde21/markdownfmt/v3 v3.1.0 h1:KiZu9LKs+wFFBQKhrZJrFZwtLnCCWJahL+S+E/3VnM0=
 github.com/Kunde21/markdownfmt/v3 v3.1.0/go.mod h1:tPXN1RTyOzJwhfHoon9wUr4HGYmWgVxSQN6VBJDkrVc=
