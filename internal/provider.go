@@ -20,6 +20,7 @@ import (
 	"github.com/stainless-sdks/gcore-terraform/internal/services/cloud_file_share_access_rule"
 	"github.com/stainless-sdks/gcore-terraform/internal/services/cloud_floating_ip"
 	"github.com/stainless-sdks/gcore-terraform/internal/services/cloud_gpu_baremetal_cluster_image"
+	"github.com/stainless-sdks/gcore-terraform/internal/services/cloud_gpu_virtual_cluster_image"
 	"github.com/stainless-sdks/gcore-terraform/internal/services/cloud_inference_registry_credential"
 	"github.com/stainless-sdks/gcore-terraform/internal/services/cloud_inference_secret"
 	"github.com/stainless-sdks/gcore-terraform/internal/services/cloud_instance"
@@ -190,6 +191,7 @@ func (p *GcoreProvider) Resources(ctx context.Context) []func() resource.Resourc
 		cloud_file_share.NewResource,
 		cloud_file_share_access_rule.NewResource,
 		cloud_gpu_baremetal_cluster_image.NewResource,
+		cloud_gpu_virtual_cluster_image.NewResource,
 		cloud_instance.NewResource,
 	}
 }
@@ -230,6 +232,7 @@ func (p *GcoreProvider) DataSources(ctx context.Context) []func() datasource.Dat
 		cloud_file_share.NewCloudFileShareDataSource,
 		cloud_file_share.NewCloudFileSharesDataSource,
 		cloud_gpu_baremetal_cluster_image.NewCloudGPUBaremetalClusterImageDataSource,
+		cloud_gpu_virtual_cluster_image.NewCloudGPUVirtualClusterImageDataSource,
 		cloud_instance.NewCloudInstanceDataSource,
 		cloud_instance.NewCloudInstancesDataSource,
 		cloud_instance_image.NewCloudInstanceImageDataSource,
