@@ -31,9 +31,9 @@ type CloudLoadBalancerListenerModel struct {
 	PoolCount            types.Int64                                                          `tfsdk:"pool_count" json:"pool_count,computed"`
 	ProvisioningStatus   types.String                                                         `tfsdk:"provisioning_status" json:"provisioning_status,computed"`
 	TaskID               types.String                                                         `tfsdk:"task_id" json:"task_id,computed"`
+	InsertHeaders        customfield.Map[jsontypes.Normalized]                                `tfsdk:"insert_headers" json:"insert_headers,computed"`
 	Tasks                customfield.List[types.String]                                       `tfsdk:"tasks" json:"tasks,computed,no_refresh"`
 	Stats                customfield.NestedObject[CloudLoadBalancerListenerStatsModel]        `tfsdk:"stats" json:"stats,computed"`
-	InsertHeaders        jsontypes.Normalized                                                 `tfsdk:"insert_headers" json:"insert_headers,computed"`
 }
 
 func (m CloudLoadBalancerListenerModel) MarshalJSON() (data []byte, err error) {

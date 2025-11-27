@@ -24,8 +24,8 @@ type CloudInstanceModel struct {
 	SSHKeyName          types.String                                                               `tfsdk:"ssh_key_name" json:"ssh_key_name,optional"`
 	UserData            types.String                                                               `tfsdk:"user_data" json:"user_data,optional,no_refresh"`
 	Username            types.String                                                               `tfsdk:"username" json:"username,optional,no_refresh"`
+	Configuration       *map[string]jsontypes.Normalized                                           `tfsdk:"configuration" json:"configuration,optional,no_refresh"`
 	SecurityGroups      *[]*CloudInstanceSecurityGroupsModel                                       `tfsdk:"security_groups" json:"security_groups,optional"`
-	Configuration       jsontypes.Normalized                                                       `tfsdk:"configuration" json:"configuration,optional,no_refresh"`
 	Name                types.String                                                               `tfsdk:"name" json:"name,optional"`
 	Tags                *map[string]types.String                                                   `tfsdk:"tags" json:"tags,optional,no_refresh"`
 	CreatedAt           timetypes.RFC3339                                                          `tfsdk:"created_at" json:"created_at,computed" format:"date-time"`

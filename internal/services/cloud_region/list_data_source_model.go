@@ -73,6 +73,6 @@ type CloudRegionsItemsDataSourceModel struct {
 }
 
 type CloudRegionsCoordinatesDataSourceModel struct {
-	Latitude  types.Float64 `tfsdk:"latitude" json:"latitude,computed"`
-	Longitude types.Float64 `tfsdk:"longitude" json:"longitude,computed"`
+	Latitude  customfield.NormalizedDynamicValue `tfsdk:"latitude" json:"latitude,computed"`
+	Longitude customfield.NormalizedDynamicValue `tfsdk:"longitude" json:"longitude,computed"`
 }

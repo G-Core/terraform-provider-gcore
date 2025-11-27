@@ -180,6 +180,12 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 				Description: "The UUID of the active task that currently holds a lock on the resource. This lock prevents concurrent modifications to ensure consistency. If `null`, the resource is not locked.",
 				Computed:    true,
 			},
+			"insert_headers": schema.MapAttribute{
+				Description: "Dictionary of additional header insertion into HTTP headers. Only used with HTTP and `TERMINATED_HTTPS` protocols.",
+				Computed:    true,
+				CustomType:  customfield.NewMapType[jsontypes.Normalized](ctx),
+				ElementType: jsontypes.NormalizedType{},
+			},
 			"tasks": schema.ListAttribute{
 				Description: "List of task IDs representing asynchronous operations. Use these IDs to monitor operation progress:\n* `GET /v1/tasks/{task_id}` - Check individual task status and details\nPoll task status until completion (`FINISHED`/`ERROR`) before proceeding with dependent operations.",
 				Computed:    true,
@@ -212,11 +218,6 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 						Computed:    true,
 					},
 				},
-			},
-			"insert_headers": schema.StringAttribute{
-				Description: "Dictionary of additional header insertion into HTTP headers. Only used with HTTP and `TERMINATED_HTTPS` protocols.",
-				Computed:    true,
-				CustomType:  jsontypes.NormalizedType{},
 			},
 		},
 	}

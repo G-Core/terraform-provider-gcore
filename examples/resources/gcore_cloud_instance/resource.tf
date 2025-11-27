@@ -23,7 +23,7 @@ resource "gcore_cloud_instance" "example_cloud_instance" {
   }]
   allow_app_ports = true
   configuration = {
-
+    foo = "bar"
   }
   name = "my-instance"
   name_template = "name_template"

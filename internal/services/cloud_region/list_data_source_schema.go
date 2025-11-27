@@ -6,7 +6,6 @@ import (
 	"context"
 
 	"github.com/hashicorp/terraform-plugin-framework-timetypes/timetypes"
-	"github.com/hashicorp/terraform-plugin-framework-validators/float64validator"
 	"github.com/hashicorp/terraform-plugin-framework-validators/int64validator"
 	"github.com/hashicorp/terraform-plugin-framework-validators/listvalidator"
 	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
@@ -14,7 +13,9 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/datasource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
 	"github.com/hashicorp/terraform-plugin-framework/types"
+	"github.com/hashicorp/terraform-plugin-framework/types/basetypes"
 	"github.com/stainless-sdks/gcore-terraform/internal/customfield"
+	"github.com/stainless-sdks/gcore-terraform/internal/customvalidator"
 )
 
 var _ datasource.DataSourceWithConfigValidators = (*CloudRegionsDataSource)(nil)
@@ -82,17 +83,19 @@ func ListDataSourceSchema(ctx context.Context) schema.Schema {
 							Computed:    true,
 							CustomType:  customfield.NewNestedObjectType[CloudRegionsCoordinatesDataSourceModel](ctx),
 							Attributes: map[string]schema.Attribute{
-								"latitude": schema.Float64Attribute{
+								"latitude": schema.DynamicAttribute{
 									Computed: true,
-									Validators: []validator.Float64{
-										float64validator.Between(-90, 90),
+									Validators: []validator.Dynamic{
+										customvalidator.AllowedSubtypes(basetypes.Float64Type{}, basetypes.StringType{}),
 									},
+									CustomType: customfield.NormalizedDynamicType{},
 								},
-								"longitude": schema.Float64Attribute{
+								"longitude": schema.DynamicAttribute{
 									Computed: true,
-									Validators: []validator.Float64{
-										float64validator.Between(-180, 180),
+									Validators: []validator.Dynamic{
+										customvalidator.AllowedSubtypes(basetypes.Float64Type{}, basetypes.StringType{}),
 									},
+									CustomType: customfield.NormalizedDynamicType{},
 								},
 							},
 						},

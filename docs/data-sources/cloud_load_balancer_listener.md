@@ -40,7 +40,7 @@ data "gcore_cloud_load_balancer_listener" "example_cloud_load_balancer_listener"
 - `connection_limit` (Number) Limit of simultaneous connections
 - `creator_task_id` (String) Task that created this entity
 - `id` (String) Listener ID
-- `insert_headers` (String) Dictionary of additional header insertion into HTTP headers. Only used with HTTP and `TERMINATED_HTTPS` protocols.
+- `insert_headers` (Map of String) Dictionary of additional header insertion into HTTP headers. Only used with HTTP and `TERMINATED_HTTPS` protocols.
 - `load_balancer_id` (String) Load balancer ID
 - `name` (String) Load balancer listener name
 - `operating_status` (String) Listener operating status

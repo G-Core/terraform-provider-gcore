@@ -148,6 +148,12 @@ func DataSourceSchema(ctx context.Context) schema.Schema {
 				CustomType:  customfield.NewListType[types.String](ctx),
 				ElementType: types.StringType,
 			},
+			"insert_headers": schema.MapAttribute{
+				Description: "Dictionary of additional header insertion into HTTP headers. Only used with HTTP and `TERMINATED_HTTPS` protocols.",
+				Computed:    true,
+				CustomType:  customfield.NewMapType[jsontypes.Normalized](ctx),
+				ElementType: jsontypes.NormalizedType{},
+			},
 			"sni_secret_id": schema.ListAttribute{
 				Description: "List of secret's ID containing PKCS12 format certificate/key bundles for `TERMINATED_HTTPS` or PROMETHEUS listeners",
 				Computed:    true,
@@ -197,11 +203,6 @@ func DataSourceSchema(ctx context.Context) schema.Schema {
 						},
 					},
 				},
-			},
-			"insert_headers": schema.StringAttribute{
-				Description: "Dictionary of additional header insertion into HTTP headers. Only used with HTTP and `TERMINATED_HTTPS` protocols.",
-				Computed:    true,
-				CustomType:  jsontypes.NormalizedType{},
 			},
 		},
 	}
