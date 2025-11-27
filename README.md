@@ -7,7 +7,7 @@ It is generated with [Stainless](https://www.stainless.com/).
 
 ## Requirements
 
-This provider requires Terraform CLI 1.0 or later. You can [install it for your system](https://developer.hashicorp.com/terraform/install)
+This provider requires Terraform CLI 1.11 or later. You can [install it for your system](https://developer.hashicorp.com/terraform/install)
 on Hashicorp's website.
 
 ## Usage
