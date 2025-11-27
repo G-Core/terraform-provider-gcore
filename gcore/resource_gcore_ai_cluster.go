@@ -304,7 +304,7 @@ func resourceAICluster() *schema.Resource {
 						"type": {
 							Type:        schema.TypeString,
 							Description: "Network type",
-							Optional:    true,
+							Required:    true,
 							ValidateDiagFunc: func(val interface{}, key cty.Path) diag.Diagnostics {
 								v := val.(string)
 								if types.InterfaceType(v) == types.ExternalInterfaceType || types.InterfaceType(v) == types.SubnetInterfaceType {
@@ -321,13 +321,14 @@ func resourceAICluster() *schema.Resource {
 						},
 						"subnet_id": {
 							Type:        schema.TypeString,
-							Description: "Port is assigned to IP address from the subnet",
+							Description: "Network ID the subnet belongs to. Port will be plugged in this network",
 							Optional:    true,
+							Computed:    true,
 						},
 						"port_id": {
 							Type:        schema.TypeString,
-							Description: "Network ID the subnet belongs to. Port will be plugged in this network",
-							Optional:    true,
+							Description: "Port is assigned to IP address from the subnet",
+							Computed:    true,
 						},
 					},
 				},
