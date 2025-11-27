@@ -6,14 +6,15 @@ import (
 	"context"
 
 	"github.com/hashicorp/terraform-plugin-framework-timetypes/timetypes"
-	"github.com/hashicorp/terraform-plugin-framework-validators/float64validator"
 	"github.com/hashicorp/terraform-plugin-framework-validators/listvalidator"
 	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/datasource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
 	"github.com/hashicorp/terraform-plugin-framework/types"
+	"github.com/hashicorp/terraform-plugin-framework/types/basetypes"
 	"github.com/stainless-sdks/gcore-terraform/internal/customfield"
+	"github.com/stainless-sdks/gcore-terraform/internal/customvalidator"
 )
 
 var _ datasource.DataSourceWithConfigValidators = (*CloudRegionDataSource)(nil)
@@ -186,17 +187,19 @@ func DataSourceSchema(ctx context.Context) schema.Schema {
 				Computed:    true,
 				CustomType:  customfield.NewNestedObjectType[CloudRegionCoordinatesDataSourceModel](ctx),
 				Attributes: map[string]schema.Attribute{
-					"latitude": schema.Float64Attribute{
+					"latitude": schema.DynamicAttribute{
 						Computed: true,
-						Validators: []validator.Float64{
-							float64validator.Between(-90, 90),
+						Validators: []validator.Dynamic{
+							customvalidator.AllowedSubtypes(basetypes.Float64Type{}, basetypes.StringType{}),
 						},
+						CustomType: customfield.NormalizedDynamicType{},
 					},
-					"longitude": schema.Float64Attribute{
+					"longitude": schema.DynamicAttribute{
 						Computed: true,
-						Validators: []validator.Float64{
-							float64validator.Between(-180, 180),
+						Validators: []validator.Dynamic{
+							customvalidator.AllowedSubtypes(basetypes.Float64Type{}, basetypes.StringType{}),
 						},
+						CustomType: customfield.NormalizedDynamicType{},
 					},
 				},
 			},

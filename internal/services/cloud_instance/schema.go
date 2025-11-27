@@ -16,6 +16,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/boolplanmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/int64planmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/listplanmodifier"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/mapplanmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringplanmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
@@ -245,6 +246,12 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 				Optional:      true,
 				PlanModifiers: []planmodifier.String{stringplanmodifier.RequiresReplace()},
 			},
+			"configuration": schema.MapAttribute{
+				Description:   "Parameters for the application template if creating the instance from an `apptemplate`.",
+				Optional:      true,
+				ElementType:   jsontypes.NormalizedType{},
+				PlanModifiers: []planmodifier.Map{mapplanmodifier.RequiresReplace()},
+			},
 			"security_groups": schema.ListNestedAttribute{
 				Description: "Specifies security group UUIDs to be applied to all instance network interfaces.",
 				Optional:    true,
@@ -257,11 +264,6 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 					},
 				},
 				PlanModifiers: []planmodifier.List{listplanmodifier.RequiresReplace()},
-			},
-			"configuration": schema.StringAttribute{
-				Description: "Parameters for the application template if creating the instance from an `apptemplate`.",
-				Optional:    true,
-				CustomType:  jsontypes.NormalizedType{},
 			},
 			"name": schema.StringAttribute{
 				Description: "Name",

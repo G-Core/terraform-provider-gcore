@@ -34,10 +34,10 @@ type CloudLoadBalancerListenerDataSourceModel struct {
 	TimeoutMemberConnect types.Int64                                                                    `tfsdk:"timeout_member_connect" json:"timeout_member_connect,computed"`
 	TimeoutMemberData    types.Int64                                                                    `tfsdk:"timeout_member_data" json:"timeout_member_data,computed"`
 	AllowedCidrs         customfield.List[types.String]                                                 `tfsdk:"allowed_cidrs" json:"allowed_cidrs,computed"`
+	InsertHeaders        customfield.Map[jsontypes.Normalized]                                          `tfsdk:"insert_headers" json:"insert_headers,computed"`
 	SniSecretID          customfield.List[types.String]                                                 `tfsdk:"sni_secret_id" json:"sni_secret_id,computed"`
 	Stats                customfield.NestedObject[CloudLoadBalancerListenerStatsDataSourceModel]        `tfsdk:"stats" json:"stats,computed"`
 	UserList             customfield.NestedObjectList[CloudLoadBalancerListenerUserListDataSourceModel] `tfsdk:"user_list" json:"user_list,computed"`
-	InsertHeaders        jsontypes.Normalized                                                           `tfsdk:"insert_headers" json:"insert_headers,computed"`
 }
 
 func (m *CloudLoadBalancerListenerDataSourceModel) toReadParams(_ context.Context) (params cloud.LoadBalancerListenerGetParams, diags diag.Diagnostics) {

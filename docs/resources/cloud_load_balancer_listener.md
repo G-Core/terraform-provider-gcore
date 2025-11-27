@@ -64,7 +64,7 @@ Available values: "HTTP", "HTTPS", "PROMETHEUS", "TCP", "TERMINATED_HTTPS", "UDP
 
 - `creator_task_id` (String) Task that created this entity
 - `id` (String) The ID of this resource.
-- `insert_headers` (String) Dictionary of additional header insertion into HTTP headers. Only used with HTTP and `TERMINATED_HTTPS` protocols.
+- `insert_headers` (Map of String) Dictionary of additional header insertion into HTTP headers. Only used with HTTP and `TERMINATED_HTTPS` protocols.
 - `operating_status` (String) Listener operating status
 Available values: "DEGRADED", "DRAINING", "ERROR", "NO_MONITOR", "OFFLINE", "ONLINE".
 - `pool_count` (Number) Number of pools (for UI)
