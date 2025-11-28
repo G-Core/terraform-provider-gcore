@@ -247,9 +247,10 @@ func dataSourceAICluster() *schema.Resource {
 				},
 			},
 			"interface": {
-				Type:        schema.TypeList,
+				Type:        schema.TypeSet,
 				Description: "Networks managed by user and associated with the cluster",
 				Computed:    true,
+				Set:         aiInterfaceHash,
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
 						"type": {
@@ -680,30 +681,30 @@ func setAIClusterResourcerData(d *schema.ResourceData, provider *gcorecloud.Prov
 				}
 				aiClusterInterfaces = append(aiClusterInterfaces, ifaceParent)
 			}
+		}
 
-			// check if there are more interfaces, if yes, they are inside subports
-			if len(iface.SubPorts) > 0 {
-				for _, subPort := range iface.SubPorts {
-					if subPort.NetworkDetails.External {
-						ifaceType = string(types.ExternalInterfaceType)
-						// external network has multiple subnets, leaving SubnetID empty
+		// check if there are more interfaces, if yes, they are inside subports
+		if len(iface.SubPorts) > 0 {
+			for _, subPort := range iface.SubPorts {
+				if subPort.NetworkDetails.External {
+					ifaceType = string(types.ExternalInterfaceType)
+					// external network has multiple subnets, leaving SubnetID empty
+					ifaceSubPort := ai.AIClusterInterface{
+						Type:      ifaceType,
+						PortID:    subPort.PortID,
+						NetworkID: subPort.NetworkID,
+					}
+					aiClusterInterfaces = append(aiClusterInterfaces, ifaceSubPort)
+				} else {
+					ifaceType = string(types.SubnetInterfaceType)
+					for _, subnet := range subPort.NetworkDetails.Subnets {
 						ifaceSubPort := ai.AIClusterInterface{
 							Type:      ifaceType,
 							PortID:    subPort.PortID,
 							NetworkID: subPort.NetworkID,
+							SubnetID:  subnet.ID,
 						}
 						aiClusterInterfaces = append(aiClusterInterfaces, ifaceSubPort)
-					} else {
-						ifaceType = string(types.SubnetInterfaceType)
-						for _, subnet := range subPort.NetworkDetails.Subnets {
-							ifaceSubPort := ai.AIClusterInterface{
-								Type:      ifaceType,
-								PortID:    subPort.PortID,
-								NetworkID: subPort.NetworkID,
-								SubnetID:  subnet.ID,
-							}
-							aiClusterInterfaces = append(aiClusterInterfaces, ifaceSubPort)
-						}
 					}
 				}
 			}

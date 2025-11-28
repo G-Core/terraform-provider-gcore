@@ -296,9 +296,10 @@ func resourceAICluster() *schema.Resource {
 				},
 			},
 			"interface": {
-				Type:        schema.TypeList,
+				Type:        schema.TypeSet,
 				Description: "Networks managed by user and associated with the cluster",
 				Required:    true,
+				Set:         aiInterfaceHash,
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
 						"type": {
@@ -610,7 +611,7 @@ func resourceAIClusterCreate(ctx context.Context, d *schema.ResourceData, m inte
 		createOpts.Volumes = vs
 	}
 
-	ifs := d.Get("interface").([]interface{})
+	ifs := d.Get("interface").(*schema.Set).List()
 	if len(ifs) > 0 {
 		ifaces, err := extractAIClusterInterfacesMap(ifs)
 		if err != nil {
@@ -945,11 +946,11 @@ func resourceAIClusterUpdate(ctx context.Context, d *schema.ResourceData, m inte
 
 	if d.HasChanges("interface") && !IsResize {
 		oldIfaces, newIfaces := d.GetChange("interface")
-		newAttachInterfaces := map2AttachInterfaceOpts(newIfaces.([]interface{}))
+		newAttachInterfaces := map2AttachInterfaceOpts(newIfaces.(*schema.Set).List())
 		if len(newAttachInterfaces) == 0 {
 			return diag.FromErr(errors.New("no interfaces is configured, at least one is required"))
 		}
-		oldAttachInterfaces := map2AttachInterfaceOpts(oldIfaces.([]interface{}))
+		oldAttachInterfaces := map2AttachInterfaceOpts(oldIfaces.(*schema.Set).List())
 		if !areInterfacesUnique(newAttachInterfaces) {
 			return diag.FromErr(errors.New("ai cluster don't support attach equal interfaces"))
 		}
