@@ -657,44 +657,55 @@ func setAIClusterResourcerData(d *schema.ResourceData, provider *gcorecloud.Prov
 	// we don't know how many interfaces we will have
 	var aiClusterInterfaces []ai.AIClusterInterface
 	for _, iface := range clusterInterfaces {
-		// get parent interface
+		// get parent interface (pub or private and private might have multiple subnets)
+		// we add one interface per subnet
 		var ifaceType string
 		if iface.NetworkDetails.External {
 			ifaceType = string(types.ExternalInterfaceType)
+			// external network has multiple subnets, leaving SubnetID empty
+			ifaceParent := ai.AIClusterInterface{
+				Type:      ifaceType,
+				PortID:    iface.PortID,
+				NetworkID: iface.NetworkID,
+			}
+			aiClusterInterfaces = append(aiClusterInterfaces, ifaceParent)
 		} else {
 			ifaceType = string(types.SubnetInterfaceType)
-		}
-		ifaceParent := ai.AIClusterInterface{
-			Type:      ifaceType,
-			PortID:    iface.PortID,
-			NetworkID: iface.NetworkID,
-		}
-		// external network has multiple subnets, leaving subnet_id empty
-		if ifaceType == string(types.SubnetInterfaceType) && len(iface.NetworkDetails.Subnets) > 0 {
-			ifaceParent.SubnetID = iface.NetworkDetails.Subnets[0].ID
-		}
-		// append parent interface (root of iface)
-		aiClusterInterfaces = append(aiClusterInterfaces, ifaceParent)
-
-		// check if there are more interfaces, if yes, they are inside subports
-		if len(iface.SubPorts) > 0 {
-			for _, subPort := range iface.SubPorts {
-				if subPort.NetworkDetails.External {
-					ifaceType = string(types.ExternalInterfaceType)
-				} else {
-					ifaceType = string(types.SubnetInterfaceType)
-				}
-				ifaceSubPort := ai.AIClusterInterface{
+			for _, subnet := range iface.NetworkDetails.Subnets {
+				ifaceParent := ai.AIClusterInterface{
 					Type:      ifaceType,
-					PortID:    subPort.PortID,
-					NetworkID: subPort.NetworkID,
+					PortID:    iface.PortID,
+					NetworkID: iface.NetworkID,
+					SubnetID:  subnet.ID,
 				}
-				// external network has multiple subnets, leaving subnet_id empty
-				if ifaceType == string(types.SubnetInterfaceType) && len(subPort.NetworkDetails.Subnets) > 0 {
-					ifaceSubPort.SubnetID = subPort.NetworkDetails.Subnets[0].ID
+				aiClusterInterfaces = append(aiClusterInterfaces, ifaceParent)
+			}
+
+			// check if there are more interfaces, if yes, they are inside subports
+			if len(iface.SubPorts) > 0 {
+				for _, subPort := range iface.SubPorts {
+					if subPort.NetworkDetails.External {
+						ifaceType = string(types.ExternalInterfaceType)
+						// external network has multiple subnets, leaving SubnetID empty
+						ifaceSubPort := ai.AIClusterInterface{
+							Type:      ifaceType,
+							PortID:    subPort.PortID,
+							NetworkID: subPort.NetworkID,
+						}
+						aiClusterInterfaces = append(aiClusterInterfaces, ifaceSubPort)
+					} else {
+						ifaceType = string(types.SubnetInterfaceType)
+						for _, subnet := range subPort.NetworkDetails.Subnets {
+							ifaceSubPort := ai.AIClusterInterface{
+								Type:      ifaceType,
+								PortID:    subPort.PortID,
+								NetworkID: subPort.NetworkID,
+								SubnetID:  subnet.ID,
+							}
+							aiClusterInterfaces = append(aiClusterInterfaces, ifaceSubPort)
+						}
+					}
 				}
-				// append parent interface (root of iface)
-				aiClusterInterfaces = append(aiClusterInterfaces, ifaceSubPort)
 			}
 		}
 	}
