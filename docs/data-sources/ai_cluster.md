@@ -61,7 +61,7 @@ output "view" {
 - `id` (String) The ID of this resource.
 - `image_id` (String) Image ID
 - `image_name` (String) Image name
-- `interface` (List of Object) Networks managed by user and associated with the cluster (see [below for nested schema](#nestedatt--interface))
+- `interface` (Set of Object) Networks managed by user and associated with the cluster (see [below for nested schema](#nestedatt--interface))
 - `keypair_name` (String) Ssh keypair name
 - `password` (String) A password for baremetal instance. This parameter is used to set a password for the Admin user on a Windows instance, a default user or a new user on a Linux instance
 - `poplar_servers` (List of Object) GPU cluster servers list (see [below for nested schema](#nestedatt--poplar_servers))

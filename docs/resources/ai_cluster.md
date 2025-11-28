@@ -174,7 +174,7 @@ resource "gcore_ai_cluster" "gpu_cluster" {
 - `cluster_name` (String) GPU Cluster Name
 - `flavor` (String) Flavor ID (name)
 - `image_id` (String) Image ID
-- `interface` (Block List, Min: 1) Networks managed by user and associated with the cluster (see [below for nested schema](#nestedblock--interface))
+- `interface` (Block Set, Min: 1) Networks managed by user and associated with the cluster (see [below for nested schema](#nestedblock--interface))
 
 ### Optional
 
@@ -205,12 +205,18 @@ resource "gcore_ai_cluster" "gpu_cluster" {
 <a id="nestedblock--interface"></a>
 ### Nested Schema for `interface`
 
+Required:
+
+- `type` (String) Network type
+
 Optional:
 
 - `network_id` (String) Network ID
-- `port_id` (String) Network ID the subnet belongs to. Port will be plugged in this network
-- `subnet_id` (String) Port is assigned to IP address from the subnet
-- `type` (String) Network type
+- `subnet_id` (String) Network ID the subnet belongs to. Port will be plugged in this network
+
+Read-Only:
+
+- `port_id` (String) Port is assigned to IP address from the subnet
 
 
 <a id="nestedblock--security_group"></a>
