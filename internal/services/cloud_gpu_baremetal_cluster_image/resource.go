@@ -80,20 +80,17 @@ func (r *CloudGPUBaremetalClusterImageResource) Create(ctx context.Context, req 
 		resp.Diagnostics.AddError("failed to serialize http request", err.Error())
 		return
 	}
-	res := new(http.Response)
-	_, err = r.client.Cloud.GPUBaremetalClusters.Images.Upload(
+	image, err := r.client.Cloud.GPUBaremetalClusters.Images.UploadAndPoll(
 		ctx,
 		params,
 		option.WithRequestBody("application/json", dataBytes),
-		option.WithResponseBodyInto(&res),
 		option.WithMiddleware(logging.Middleware(ctx)),
 	)
 	if err != nil {
 		resp.Diagnostics.AddError("failed to make http request", err.Error())
 		return
 	}
-	bytes, _ := io.ReadAll(res.Body)
-	err = apijson.UnmarshalComputed(bytes, &data)
+	err = apijson.UnmarshalComputed([]byte(image.RawJSON()), &data)
 	if err != nil {
 		resp.Diagnostics.AddError("failed to deserialize http request", err.Error())
 		return
@@ -171,7 +168,7 @@ func (r *CloudGPUBaremetalClusterImageResource) Delete(ctx context.Context, req 
 		params.RegionID = param.NewOpt(data.RegionID.ValueInt64())
 	}
 
-	_, err := r.client.Cloud.GPUBaremetalClusters.Images.Delete(
+	err := r.client.Cloud.GPUBaremetalClusters.Images.DeleteAndPoll(
 		ctx,
 		data.ID.ValueString(),
 		params,
