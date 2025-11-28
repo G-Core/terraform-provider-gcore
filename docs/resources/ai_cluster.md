@@ -160,7 +160,7 @@ resource "gcore_ai_cluster" "gpu_cluster" {
 - `cluster_name` (String) GPU Cluster Name
 - `flavor` (String) Flavor ID (name)
 - `image_id` (String) Image ID
-- `interface` (Block List, Min: 1) Networks managed by user and associated with the cluster (see [below for nested schema](#nestedblock--interface))
+- `interface` (Block Set, Min: 1) Networks managed by user and associated with the cluster (see [below for nested schema](#nestedblock--interface))
 
 ### Optional
 
