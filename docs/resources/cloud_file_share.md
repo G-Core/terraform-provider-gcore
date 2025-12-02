@@ -40,6 +40,7 @@ resource "gcore_cloud_file_share" "example_cloud_file_share" {
 
 ### Required
 
+- `name` (String) File share name
 - `protocol` (String) File share protocol
 Available values: "NFS".
 - `size` (Number) File share size in GiB
@@ -47,26 +48,11 @@ Available values: "NFS".
 ### Optional
 
 - `access` (Attributes List) Access Rules (see [below for nested schema](#nestedatt--access))
-- `name` (String) Name
 - `network` (Attributes) File share network configuration (see [below for nested schema](#nestedatt--network))
 - `project_id` (Number) Project ID
 - `region_id` (Number) Region ID
 - `share_settings` (Attributes) Configuration settings for the share (see [below for nested schema](#nestedatt--share_settings))
-- `tags` (Map of String) Update key-value tags using JSON Merge Patch semantics (RFC 7386). Provide key-value pairs to add or update tags. Set tag values to `null` to remove tags. Unspecified tags remain unchanged. Read-only tags are always preserved and cannot be modified.
-
-**Examples:**
-
-* **Add/update tags:** `{'tags': {'environment': 'production', 'team': 'backend'}}` adds new tags or updates existing ones.
-
-* **Delete tags:** `{'tags': {'old_tag': null}}` removes specific tags.
-
-* **Remove all tags:** `{'tags': null}` removes all user-managed tags (read-only tags are preserved).
-
-* **Partial update:** `{'tags': {'environment': 'staging'}}` only updates specified tags.
-
-* **Mixed operations:** `{'tags': {'environment': 'production', 'cost_center': 'engineering', 'deprecated_tag': null}}` adds/updates 'environment' and '`cost_center`' while removing '`deprecated_tag`', preserving other existing tags.
-
-* **Replace all:** first delete existing tags with null values, then add new ones in the same request.
+- `tags` (Map of String) Key-value tags to associate with the resource. A tag is a key-value pair that can be associated with a resource, enabling efficient filtering and grouping for better organization and management. Both tag keys and values have a maximum length of 255 characters. Some tags are read-only and cannot be modified by the user. Tags are also integrated with cost reports, allowing cost data to be filtered based on tag keys or values.
 - `type_name` (String) Standard file share type
 Available values: "standard", "vast".
 - `volume_type` (String, Deprecated) Deprecated. Use `type_name` instead.

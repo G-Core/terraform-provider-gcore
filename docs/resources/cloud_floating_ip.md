@@ -33,21 +33,7 @@ resource "gcore_cloud_floating_ip" "example_cloud_floating_ip" {
 - `port_id` (String) If provided, the floating IP will be immediately attached to the specified port.
 - `project_id` (Number) Project ID
 - `region_id` (Number) Region ID
-- `tags` (Map of String) Update key-value tags using JSON Merge Patch semantics (RFC 7386). Provide key-value pairs to add or update tags. Set tag values to `null` to remove tags. Unspecified tags remain unchanged. Read-only tags are always preserved and cannot be modified.
-
-**Examples:**
-
-* **Add/update tags:** `{'tags': {'environment': 'production', 'team': 'backend'}}` adds new tags or updates existing ones.
-
-* **Delete tags:** `{'tags': {'old_tag': null}}` removes specific tags.
-
-* **Remove all tags:** `{'tags': null}` removes all user-managed tags (read-only tags are preserved).
-
-* **Partial update:** `{'tags': {'environment': 'staging'}}` only updates specified tags.
-
-* **Mixed operations:** `{'tags': {'environment': 'production', 'cost_center': 'engineering', 'deprecated_tag': null}}` adds/updates 'environment' and '`cost_center`' while removing '`deprecated_tag`', preserving other existing tags.
-
-* **Replace all:** first delete existing tags with null values, then add new ones in the same request.
+- `tags` (Map of String) Key-value tags to associate with the resource. A tag is a key-value pair that can be associated with a resource, enabling efficient filtering and grouping for better organization and management. Both tag keys and values have a maximum length of 255 characters. Some tags are read-only and cannot be modified by the user. Tags are also integrated with cost reports, allowing cost data to be filtered based on tag keys or values.
 
 ### Read-Only
 

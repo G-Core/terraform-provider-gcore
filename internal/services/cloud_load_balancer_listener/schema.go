@@ -11,6 +11,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/boolplanmodifier"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/int64default"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/int64planmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringplanmodifier"
@@ -71,25 +72,27 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 				Optional:      true,
 				PlanModifiers: []planmodifier.Bool{boolplanmodifier.RequiresReplace()},
 			},
-			"connection_limit": schema.Int64Attribute{
-				Description: "Limit of simultaneous connections. If -1 is provided, it is translated to the default value 100000.",
-				Optional:    true,
-				Validators: []validator.Int64{
-					int64validator.Between(-1, 1000000),
-				},
-			},
 			"name": schema.StringAttribute{
 				Description: "Load balancer listener name",
-				Optional:    true,
+				Required:    true,
 			},
 			"secret_id": schema.StringAttribute{
-				Description: "ID of the secret where PKCS12 file is stored for `TERMINATED_HTTPS` or PROMETHEUS load balancer",
+				Description: "ID of the secret where PKCS12 file is stored for `TERMINATED_HTTPS` or PROMETHEUS listener",
 				Optional:    true,
 			},
 			"allowed_cidrs": schema.ListAttribute{
 				Description: "Network CIDRs from which service will be accessible",
 				Optional:    true,
 				ElementType: types.StringType,
+			},
+			"connection_limit": schema.Int64Attribute{
+				Description: "Limit of the simultaneous connections. If -1 is provided, it is translated to the default value 100000.",
+				Computed:    true,
+				Optional:    true,
+				Validators: []validator.Int64{
+					int64validator.Between(-1, 1000000),
+				},
+				Default: int64default.StaticInt64(100000),
 			},
 			"timeout_client_data": schema.Int64Attribute{
 				Description: "Frontend client inactivity timeout in milliseconds",
