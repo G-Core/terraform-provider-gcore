@@ -777,18 +777,40 @@ func getDetachOptions(instanceInterfaces []instances.Interface, detachIface ai.A
 				PortID:    instanceIface.PortID,
 				IpAddress: instanceIface.IPAssignments[0].IPAddress.String(),
 			}, nil
+		} else {
+			for _, ipAssignment := range instanceIface.IPAssignments {
+				allDetachMap[ipAssignment.SubnetID] = ai.DetachInterfaceOpts{
+					PortID:    instanceIface.PortID,
+					IpAddress: ipAssignment.IPAddress.String(),
+				}
+			}
+			// check if we already found the needed (same subnetID) detach options
+			if detachOpts, found := allDetachMap[detachIface.SubnetID]; found {
+				return &detachOpts, nil
+			}
 		}
-		for _, ipAssignment := range instanceIface.IPAssignments {
-			allDetachMap[ipAssignment.SubnetID] = ai.DetachInterfaceOpts{
-				PortID:    instanceIface.PortID,
-				IpAddress: ipAssignment.IPAddress.String(),
+
+		// if we haven't found it yet, check subports
+		for _, subport := range instanceIface.SubPorts {
+			if detachIface.Type == types.ExternalInterfaceType && subport.NetworkDetails.External {
+				return &ai.DetachInterfaceOpts{
+					PortID:    subport.PortID,
+					IpAddress: subport.IPAssignments[0].IPAddress.String(),
+				}, nil
+			} else {
+				for _, ipAssignment := range subport.IPAssignments {
+					allDetachMap[ipAssignment.SubnetID] = ai.DetachInterfaceOpts{
+						PortID:    subport.PortID,
+						IpAddress: ipAssignment.IPAddress.String(),
+					}
+				}
 			}
 		}
 	}
 	if detachOpts, found := allDetachMap[detachIface.SubnetID]; found {
 		return &detachOpts, nil
 	} else {
-		return nil, fmt.Errorf("couldn't found detach options for interface: %v", detachIface)
+		return nil, fmt.Errorf("couldn't find detach options for interface: %+v", detachIface)
 	}
 }
 

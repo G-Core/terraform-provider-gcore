@@ -672,12 +672,12 @@ func setAIClusterResourcerData(d *schema.ResourceData, provider *gcorecloud.Prov
 			aiClusterInterfaces = append(aiClusterInterfaces, ifaceParent)
 		} else {
 			ifaceType = string(types.SubnetInterfaceType)
-			for _, subnet := range iface.NetworkDetails.Subnets {
+			for _, ipAssignment := range iface.IPAssignments {
 				ifaceParent := ai.AIClusterInterface{
 					Type:      ifaceType,
 					PortID:    iface.PortID,
 					NetworkID: iface.NetworkID,
-					SubnetID:  subnet.ID,
+					SubnetID:  ipAssignment.SubnetID,
 				}
 				aiClusterInterfaces = append(aiClusterInterfaces, ifaceParent)
 			}
@@ -697,12 +697,12 @@ func setAIClusterResourcerData(d *schema.ResourceData, provider *gcorecloud.Prov
 					aiClusterInterfaces = append(aiClusterInterfaces, ifaceSubPort)
 				} else {
 					ifaceType = string(types.SubnetInterfaceType)
-					for _, subnet := range subPort.NetworkDetails.Subnets {
+					for _, ipAssignment := range subPort.IPAssignments {
 						ifaceSubPort := ai.AIClusterInterface{
 							Type:      ifaceType,
 							PortID:    subPort.PortID,
 							NetworkID: subPort.NetworkID,
-							SubnetID:  subnet.ID,
+							SubnetID:  ipAssignment.SubnetID,
 						}
 						aiClusterInterfaces = append(aiClusterInterfaces, ifaceSubPort)
 					}
