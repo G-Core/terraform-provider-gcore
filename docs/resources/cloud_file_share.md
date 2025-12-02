@@ -42,6 +42,7 @@ Available values: "NFS".
 
 ### Optional
 
+
 - `network` (Attributes) File share network configuration (see [below for nested schema](#nestedatt--network))
 - `project_id` (Number) Project ID
 - `region_id` (Number) Region ID
@@ -49,6 +50,11 @@ Available values: "NFS".
 - `tags` (Map of String) Key-value tags to associate with the resource. A tag is a key-value pair that can be associated with a resource, enabling efficient filtering and grouping for better organization and management. Some tags are read-only and cannot be modified by the user. Tags are also integrated with cost reports, allowing cost data to be filtered based on tag keys or values.
 - `type_name` (String) Standard file share type
 Available values: "standard", "vast".
+
+- `type_name` (String) Standard file share type
+Available values: "standard", "vast".
+- `volume_type` (String, Deprecated) Deprecated. Use `type_name` instead.
+Available values: "default_share_type", "vast_share_type".
 
 ### Read-Only
 

@@ -266,11 +266,11 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 				PlanModifiers: []planmodifier.List{listplanmodifier.RequiresReplace()},
 			},
 			"name": schema.StringAttribute{
-				Description: "Name",
+				Description: "Instance name.",
 				Optional:    true,
 			},
 			"tags": schema.MapAttribute{
-				Description: "Update key-value tags using JSON Merge Patch semantics (RFC 7386). Provide key-value pairs to add or update tags. Set tag values to `null` to remove tags. Unspecified tags remain unchanged. Read-only tags are always preserved and cannot be modified.\n\n**Examples:**\n\n* **Add/update tags:** `{'tags': {'environment': 'production', 'team': 'backend'}}` adds new tags or updates existing ones.\n\n* **Delete tags:** `{'tags': {'old_tag': null}}` removes specific tags.\n\n* **Remove all tags:** `{'tags': null}` removes all user-managed tags (read-only tags are preserved).\n\n* **Partial update:** `{'tags': {'environment': 'staging'}}` only updates specified tags.\n\n* **Mixed operations:** `{'tags': {'environment': 'production', 'cost_center': 'engineering', 'deprecated_tag': null}}` adds/updates 'environment' and '`cost_center`' while removing '`deprecated_tag`', preserving other existing tags.\n\n* **Replace all:** first delete existing tags with null values, then add new ones in the same request.",
+				Description: "Key-value tags to associate with the resource. A tag is a key-value pair that can be associated with a resource, enabling efficient filtering and grouping for better organization and management. Both tag keys and values have a maximum length of 255 characters. Some tags are read-only and cannot be modified by the user. Tags are also integrated with cost reports, allowing cost data to be filtered based on tag keys or values.",
 				Optional:    true,
 				ElementType: types.StringType,
 			},

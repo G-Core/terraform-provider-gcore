@@ -69,7 +69,7 @@ resource "gcore_cloud_instance" "example_cloud_instance" {
 
 - `allow_app_ports` (Boolean) Set to `true` if creating the instance from an `apptemplate`. This allows application ports in the security group for instances created from a marketplace application template.
 - `configuration` (Map of String) Parameters for the application template if creating the instance from an `apptemplate`.
-- `name` (String) Name
+- `name` (String) Instance name.
 - `name_template` (String) If you want the instance name to be automatically generated based on IP addresses, you can provide a name template instead of specifying the name manually. The template should include a placeholder that will be replaced during provisioning. Supported placeholders are: `{ip_octets}` (last 3 octets of the IP), `{two_ip_octets}`, and `{one_ip_octet}`.
 - `password` (String) For Linux instances, 'username' and 'password' are used to create a new user. When only 'password' is provided, it is set as the password for the default user of the image. For Windows instances, 'username' cannot be specified. Use the 'password' field to set the password for the 'Admin' user on Windows. Use the '`user_data`' field to provide a script to create new users on Windows. The password of the Admin user cannot be updated via '`user_data`'.
 - `project_id` (Number) Project ID
@@ -83,21 +83,7 @@ Supported group types:
 - `soft-anti-affinity`: Tries to place instances on different hosts but allows sharing if needed.
 - `ssh_key_name` (String) Specifies the name of the SSH keypair, created via the
 [/v1/`ssh_keys` endpoint](/docs/api-reference/cloud/ssh-keys/add-or-generate-ssh-key).
-- `tags` (Map of String) Update key-value tags using JSON Merge Patch semantics (RFC 7386). Provide key-value pairs to add or update tags. Set tag values to `null` to remove tags. Unspecified tags remain unchanged. Read-only tags are always preserved and cannot be modified.
-
-**Examples:**
-
-* **Add/update tags:** `{'tags': {'environment': 'production', 'team': 'backend'}}` adds new tags or updates existing ones.
-
-* **Delete tags:** `{'tags': {'old_tag': null}}` removes specific tags.
-
-* **Remove all tags:** `{'tags': null}` removes all user-managed tags (read-only tags are preserved).
-
-* **Partial update:** `{'tags': {'environment': 'staging'}}` only updates specified tags.
-
-* **Mixed operations:** `{'tags': {'environment': 'production', 'cost_center': 'engineering', 'deprecated_tag': null}}` adds/updates 'environment' and '`cost_center`' while removing '`deprecated_tag`', preserving other existing tags.
-
-* **Replace all:** first delete existing tags with null values, then add new ones in the same request.
+- `tags` (Map of String) Key-value tags to associate with the resource. A tag is a key-value pair that can be associated with a resource, enabling efficient filtering and grouping for better organization and management. Both tag keys and values have a maximum length of 255 characters. Some tags are read-only and cannot be modified by the user. Tags are also integrated with cost reports, allowing cost data to be filtered based on tag keys or values.
 - `user_data` (String) String in base64 format. For Linux instances, '`user_data`' is ignored when 'password' field is provided. For Windows instances, Admin user password is set by 'password' field and cannot be updated via '`user_data`'. Examples of the `user_data`: https://cloudinit.readthedocs.io/en/latest/topics/examples.html
 - `username` (String) For Linux instances, 'username' and 'password' are used to create a new user. For Windows instances, 'username' cannot be specified. Use 'password' field to set the password for the 'Admin' user on Windows.
 

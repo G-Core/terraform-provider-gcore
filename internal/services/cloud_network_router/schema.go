@@ -62,14 +62,13 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 				},
 			},
 			"name": schema.StringAttribute{
-				Description: "New name of router",
-				Optional:    true,
+				Description: "name of router",
+				Required:    true,
 			},
 			"external_gateway_info": schema.SingleNestedAttribute{
-				Description: "New external gateway.",
-				Computed:    true,
-				Optional:    true,
-				CustomType:  customfield.NewNestedObjectType[CloudNetworkRouterExternalGatewayInfoModel](ctx),
+				Computed:   true,
+				Optional:   true,
+				CustomType: customfield.NewNestedObjectType[CloudNetworkRouterExternalGatewayInfoModel](ctx),
 				Attributes: map[string]schema.Attribute{
 					"network_id": schema.StringAttribute{
 						Description:   "id of the external network.",
@@ -84,14 +83,13 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 						Default:     booldefault.StaticBool(true),
 					},
 					"type": schema.StringAttribute{
-						Description: "must be 'manual'.\nAvailable values: \"manual\".",
+						Description: "must be 'manual'.\nAvailable values: \"manual\", \"default\".",
 						Computed:    true,
 						Optional:    true,
 						PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
 						Validators: []validator.String{
-							stringvalidator.OneOfCaseInsensitive("manual"),
+							stringvalidator.OneOfCaseInsensitive("manual", "default"),
 						},
-						Default: stringdefault.StaticString("manual"),
 					},
 				},
 			},

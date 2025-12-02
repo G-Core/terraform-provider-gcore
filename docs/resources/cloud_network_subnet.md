@@ -41,6 +41,7 @@ resource "gcore_cloud_network_subnet" "example_cloud_network_subnet" {
 ### Required
 
 - `cidr` (String) CIDR
+- `name` (String) Subnet name
 - `network_id` (String) Network ID
 
 ### Optional
@@ -52,25 +53,10 @@ resource "gcore_cloud_network_subnet" "example_cloud_network_subnet" {
 - `host_routes` (Attributes List) List of custom static routes to advertise via DHCP. (see [below for nested schema](#nestedatt--host_routes))
 - `ip_version` (Number) IP version
 Available values: 4, 6.
-- `name` (String) Name
 - `project_id` (Number) Project ID
 - `region_id` (Number) Region ID
 - `router_id_to_connect` (String) ID of the router to connect to. Requires `connect_to_network_router` set to true. If not specified, attempts to find a router created during network creation.
-- `tags` (Map of String) Update key-value tags using JSON Merge Patch semantics (RFC 7386). Provide key-value pairs to add or update tags. Set tag values to `null` to remove tags. Unspecified tags remain unchanged. Read-only tags are always preserved and cannot be modified.
-
-**Examples:**
-
-* **Add/update tags:** `{'tags': {'environment': 'production', 'team': 'backend'}}` adds new tags or updates existing ones.
-
-* **Delete tags:** `{'tags': {'old_tag': null}}` removes specific tags.
-
-* **Remove all tags:** `{'tags': null}` removes all user-managed tags (read-only tags are preserved).
-
-* **Partial update:** `{'tags': {'environment': 'staging'}}` only updates specified tags.
-
-* **Mixed operations:** `{'tags': {'environment': 'production', 'cost_center': 'engineering', 'deprecated_tag': null}}` adds/updates 'environment' and '`cost_center`' while removing '`deprecated_tag`', preserving other existing tags.
-
-* **Replace all:** first delete existing tags with null values, then add new ones in the same request.
+- `tags` (Map of String) Key-value tags to associate with the resource. A tag is a key-value pair that can be associated with a resource, enabling efficient filtering and grouping for better organization and management. Both tag keys and values have a maximum length of 255 characters. Some tags are read-only and cannot be modified by the user. Tags are also integrated with cost reports, allowing cost data to be filtered based on tag keys or values.
 
 ### Read-Only
 

@@ -14,7 +14,7 @@ type CloudNetworkRouterModel struct {
 	ProjectID           types.Int64                                                          `tfsdk:"project_id" path:"project_id,optional"`
 	RegionID            types.Int64                                                          `tfsdk:"region_id" path:"region_id,optional"`
 	Interfaces          customfield.NestedObjectList[CloudNetworkRouterInterfacesModel]      `tfsdk:"interfaces" json:"interfaces,computed_optional"`
-	Name                types.String                                                         `tfsdk:"name" json:"name,optional"`
+	Name                types.String                                                         `tfsdk:"name" json:"name,required"`
 	ExternalGatewayInfo customfield.NestedObject[CloudNetworkRouterExternalGatewayInfoModel] `tfsdk:"external_gateway_info" json:"external_gateway_info,computed_optional"`
 	Routes              customfield.NestedObjectList[CloudNetworkRouterRoutesModel]          `tfsdk:"routes" json:"routes,computed_optional"`
 	CreatedAt           timetypes.RFC3339                                                    `tfsdk:"created_at" json:"created_at,computed" format:"date-time"`
