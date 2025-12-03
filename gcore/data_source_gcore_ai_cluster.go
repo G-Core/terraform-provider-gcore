@@ -458,6 +458,7 @@ func aiInterfaceHash(i interface{}) int {
 		buf.WriteString(string(types.SubnetInterfaceType))
 		buf.WriteString(iface["network_id"].(string))
 		buf.WriteString(iface["subnet_id"].(string))
+		buf.WriteString(iface["port_id"].(string))
 	case iface["type"].(string) == string(types.AnySubnetInterfaceType):
 		buf.WriteString(string(types.AnySubnetInterfaceType))
 		buf.WriteString(iface["network_id"].(string))
@@ -658,6 +659,13 @@ func setAIClusterResourcerData(d *schema.ResourceData, provider *gcorecloud.Prov
 	// we don't know how many interfaces we will have
 	var aiClusterInterfaces []ai.AIClusterInterface
 	for _, iface := range clusterInterfaces {
+
+		//TODO: remove this workaround after API adds the hpnID that allows one to filter HPN/IB interfaces
+		// skip HPN (IB) interfaces as they are not managed by users
+		if strings.Contains(iface.NetworkDetails.Name, "ib-network") {
+			continue
+		}
+
 		// get parent interface (pub or private and private might have multiple subnets)
 		// we add one interface per subnet
 		var ifaceType string

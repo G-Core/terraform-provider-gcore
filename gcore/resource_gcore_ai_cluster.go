@@ -772,6 +772,12 @@ func AICluserSgRefreshedFunc(client *gcorecloud.ServiceClient, clusterID string,
 func getDetachOptions(instanceInterfaces []instances.Interface, detachIface ai.AttachInterfaceOpts) (*ai.DetachInterfaceOpts, error) {
 	allDetachMap := make(map[string]ai.DetachInterfaceOpts, len(instanceInterfaces))
 	for _, instanceIface := range instanceInterfaces {
+		//TODO: remove this workaround after API adds the hpnID that allows one to filter HPN/IB interfaces
+		// skip HPN (IB) interfaces as they are not managed by users
+		if strings.Contains(instanceIface.NetworkDetails.Name, "ib-network") {
+			continue
+		}
+
 		if detachIface.Type == types.ExternalInterfaceType && instanceIface.NetworkDetails.External {
 			return &ai.DetachInterfaceOpts{
 				PortID:    instanceIface.PortID,
