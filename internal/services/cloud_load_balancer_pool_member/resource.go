@@ -325,5 +325,5 @@ func (r *CloudLoadBalancerPoolMemberResource) Delete(ctx context.Context, req re
 	}
 }
 
-func (r *CloudLoadBalancerPoolMemberResource) ModifyPlan(ctx context.Context, req resource.ModifyPlanRequest, resp *resource.ModifyPlanResponse) {
+func (r *CloudLoadBalancerPoolMemberResource) ModifyPlan(_ context.Context, _ resource.ModifyPlanRequest, _ *resource.ModifyPlanResponse) {
 }
