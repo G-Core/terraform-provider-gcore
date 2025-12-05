@@ -52,6 +52,7 @@ output "view" {
 
 ### Read-Only
 
+- `attached_interfaces` (List of Object) List of attached interfaces to all instances of the cluster. (see [below for nested schema](#nestedatt--attached_interfaces))
 - `cluster_metadata` (Map of String) Cluster metadata (simple key-value pairs)
 - `cluster_name` (String) AI Cluster Name
 - `cluster_status` (String) AI Cluster status
@@ -61,7 +62,7 @@ output "view" {
 - `id` (String) The ID of this resource.
 - `image_id` (String) Image ID
 - `image_name` (String) Image name
-- `interface` (List of Object) Networks managed by user and associated with the cluster (see [below for nested schema](#nestedatt--interface))
+- `interface` (Set of Object) Networks managed by user and associated with the cluster (see [below for nested schema](#nestedatt--interface))
 - `keypair_name` (String) Ssh keypair name
 - `password` (String) A password for baremetal instance. This parameter is used to set a password for the Admin user on a Windows instance, a default user or a new user on a Linux instance
 - `poplar_servers` (List of Object) GPU cluster servers list (see [below for nested schema](#nestedatt--poplar_servers))
@@ -71,6 +72,18 @@ output "view" {
 - `user_data` (String) String in base64 format. Must not be passed together with 'username' or 'password'. Examples of the user_data: https://cloudinit.readthedocs.io/en/latest/topics/examples.html
 - `username` (String) A name of a new user in the Linux instance. It may be passed with a 'password' parameter
 - `volume` (Set of Object) List of volumes attached to the cluster (see [below for nested schema](#nestedatt--volume))
+
+<a id="nestedatt--attached_interfaces"></a>
+### Nested Schema for `attached_interfaces`
+
+Read-Only:
+
+- `ip_address` (String)
+- `network_id` (String)
+- `port_id` (String)
+- `subnet_id` (String)
+- `type` (String)
+
 
 <a id="nestedatt--interface"></a>
 ### Nested Schema for `interface`
