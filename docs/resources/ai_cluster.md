@@ -180,6 +180,7 @@ resource "gcore_ai_cluster" "gpu_cluster" {
 
 ### Read-Only
 
+- `attached_interfaces` (List of Object) List of attached interfaces to all instances of the cluster. (see [below for nested schema](#nestedatt--attached_interfaces))
 - `created_at` (String) Datetime when the GPU cluster was created
 - `creator_task_id` (String) Task that created this entity
 - `id` (String) The ID of this resource.
@@ -193,16 +194,13 @@ resource "gcore_ai_cluster" "gpu_cluster" {
 
 Required:
 
-- `type` (String) Network type
+- `type` (String) Network type only available values are 'external' and 'subnet'
 
 Optional:
 
-- `network_id` (String) Network ID
-- `subnet_id` (String) Network ID the subnet belongs to. Port will be plugged in this network
-
-Read-Only:
-
-- `port_id` (String) Port is assigned to IP address from the subnet
+- `network_id` (String) Network ID the interface belongs to. Required for external type.
+- `port_id` (String, Deprecated) Port is assigned to IP address from the subnet
+- `subnet_id` (String) Subnet ID the subnet belongs to. Port will be plugged in this subnet. Required for subnet type.
 
 
 <a id="nestedblock--security_group"></a>
@@ -249,6 +247,18 @@ Read-Only:
 - `server_id` (String) Instance ID
 - `volume_id` (String) Volume ID
 
+
+
+<a id="nestedatt--attached_interfaces"></a>
+### Nested Schema for `attached_interfaces`
+
+Read-Only:
+
+- `ip_address` (String)
+- `network_id` (String)
+- `port_id` (String)
+- `subnet_id` (String)
+- `type` (String)
 
 
 <a id="nestedatt--poplar_servers"></a>
