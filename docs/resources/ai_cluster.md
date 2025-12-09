@@ -174,7 +174,7 @@ resource "gcore_ai_cluster" "gpu_cluster" {
 - `cluster_name` (String) GPU Cluster Name
 - `flavor` (String) Flavor ID (name)
 - `image_id` (String) Image ID
-- `interface` (Block List, Min: 1) Networks managed by user and associated with the cluster (see [below for nested schema](#nestedblock--interface))
+- `interface` (Block Set, Min: 1) Networks managed by user and associated with the cluster (see [below for nested schema](#nestedblock--interface))
 
 ### Optional
 
@@ -194,6 +194,7 @@ resource "gcore_ai_cluster" "gpu_cluster" {
 
 ### Read-Only
 
+- `attached_interfaces` (List of Object) List of attached interfaces to all instances of the cluster. (see [below for nested schema](#nestedatt--attached_interfaces))
 - `created_at` (String) Datetime when the GPU cluster was created
 - `creator_task_id` (String) Task that created this entity
 - `id` (String) The ID of this resource.
@@ -205,12 +206,15 @@ resource "gcore_ai_cluster" "gpu_cluster" {
 <a id="nestedblock--interface"></a>
 ### Nested Schema for `interface`
 
+Required:
+
+- `type` (String) Network type only available values are 'external' and 'subnet'
+
 Optional:
 
-- `network_id` (String) Network ID
-- `port_id` (String) Network ID the subnet belongs to. Port will be plugged in this network
-- `subnet_id` (String) Port is assigned to IP address from the subnet
-- `type` (String) Network type
+- `network_id` (String) Network ID the interface belongs to. Required for external type.
+- `port_id` (String, Deprecated) Port is assigned to IP address from the subnet
+- `subnet_id` (String) Subnet ID the subnet belongs to. Port will be plugged in this subnet. Required for subnet type.
 
 
 <a id="nestedblock--security_group"></a>
@@ -257,6 +261,18 @@ Read-Only:
 - `server_id` (String) Instance ID
 - `volume_id` (String) Volume ID
 
+
+
+<a id="nestedatt--attached_interfaces"></a>
+### Nested Schema for `attached_interfaces`
+
+Read-Only:
+
+- `ip_address` (String)
+- `network_id` (String)
+- `port_id` (String)
+- `subnet_id` (String)
+- `type` (String)
 
 
 <a id="nestedatt--poplar_servers"></a>

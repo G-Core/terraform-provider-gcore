@@ -296,15 +296,16 @@ func resourceAICluster() *schema.Resource {
 				},
 			},
 			"interface": {
-				Type:        schema.TypeList,
+				Type:        schema.TypeSet,
 				Description: "Networks managed by user and associated with the cluster",
 				Required:    true,
+				Set:         aiInterfaceHash,
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
 						"type": {
 							Type:        schema.TypeString,
-							Description: "Network type",
-							Optional:    true,
+							Description: "Network type only available values are 'external' and 'subnet'",
+							Required:    true,
 							ValidateDiagFunc: func(val interface{}, key cty.Path) diag.Diagnostics {
 								v := val.(string)
 								if types.InterfaceType(v) == types.ExternalInterfaceType || types.InterfaceType(v) == types.SubnetInterfaceType {
@@ -315,19 +316,55 @@ func resourceAICluster() *schema.Resource {
 						},
 						"network_id": {
 							Type:        schema.TypeString,
-							Description: "Network ID",
+							Description: "Network ID the interface belongs to. Required for external type.",
 							Optional:    true,
 							Computed:    true,
 						},
 						"subnet_id": {
 							Type:        schema.TypeString,
-							Description: "Port is assigned to IP address from the subnet",
+							Description: "Subnet ID the subnet belongs to. Port will be plugged in this subnet. Required for subnet type.",
 							Optional:    true,
+							Computed:    true,
 						},
 						"port_id": {
 							Type:        schema.TypeString,
-							Description: "Network ID the subnet belongs to. Port will be plugged in this network",
+							Description: "Port is assigned to IP address from the subnet",
 							Optional:    true,
+							Deprecated:  "port_id was never populated and will be removed. Use the new instance_interfaces attribute to access port information.",
+						},
+					},
+				},
+			},
+			"attached_interfaces": {
+				Type:        schema.TypeList,
+				Description: "List of attached interfaces to all instances of the cluster.",
+				Computed:    true,
+				Elem: &schema.Resource{
+					Schema: map[string]*schema.Schema{
+						"type": {
+							Type:        schema.TypeString,
+							Description: "Type of interface to attach to. Possible values are 'external' and 'subnet'",
+							Computed:    true,
+						},
+						"network_id": {
+							Type:        schema.TypeString,
+							Description: "Network ID the interface is attached to",
+							Computed:    true,
+						},
+						"subnet_id": {
+							Type:        schema.TypeString,
+							Description: "Subnet ID the interface is attached to",
+							Computed:    true,
+						},
+						"port_id": {
+							Type:        schema.TypeString,
+							Description: "Port is assigned to IP address from the subnet",
+							Computed:    true,
+						},
+						"ip_address": {
+							Type:        schema.TypeString,
+							Description: "IP address assigned to the interface",
+							Computed:    true,
 						},
 					},
 				},
@@ -512,25 +549,13 @@ func extractAIClusterInterfacesMap(interfaces []interface{}) ([]instances.Interf
 		var IfaceOpts instances.InterfaceOpts
 		switch {
 		case ifaceMap["type"].(string) == string(types.ExternalInterfaceType):
-			{
-				IfaceOpts.Type = types.ExternalInterfaceType
-			}
-		case ifaceMap["type"].(string) == string(types.AnySubnetInterfaceType):
-			{
-				IfaceOpts.Type = types.AnySubnetInterfaceType
-				IfaceOpts.NetworkID = ifaceMap["network_id"].(string)
-			}
+			IfaceOpts.Type = types.ExternalInterfaceType
 		case ifaceMap["type"].(string) == string(types.SubnetInterfaceType):
-			{
-				IfaceOpts.Type = types.SubnetInterfaceType
-				IfaceOpts.NetworkID = ifaceMap["network_id"].(string)
-				IfaceOpts.SubnetID = ifaceMap["subnet_id"].(string)
-			}
-		case ifaceMap["type"].(string) == string(types.ReservedFixedIpType):
-			{
-				IfaceOpts.Type = types.ReservedFixedIpType
-				IfaceOpts.SubnetID = ifaceMap["port_id"].(string)
-			}
+			IfaceOpts.Type = types.SubnetInterfaceType
+			IfaceOpts.NetworkID = ifaceMap["network_id"].(string)
+			IfaceOpts.SubnetID = ifaceMap["subnet_id"].(string)
+		default:
+			return nil, fmt.Errorf("unsupported interface type: %s", ifaceMap["type"].(string))
 		}
 		Interfaces[index] = instances.InterfaceInstanceCreateOpts{
 			InterfaceOpts: IfaceOpts,
@@ -609,7 +634,7 @@ func resourceAIClusterCreate(ctx context.Context, d *schema.ResourceData, m inte
 		createOpts.Volumes = vs
 	}
 
-	ifs := d.Get("interface").([]interface{})
+	ifs := d.Get("interface").(*schema.Set).List()
 	if len(ifs) > 0 {
 		ifaces, err := extractAIClusterInterfacesMap(ifs)
 		if err != nil {
@@ -743,7 +768,6 @@ func map2AttachInterfaceOpts(interfaces []interface{}) []ai.AttachInterfaceOpts 
 			Type:      types.InterfaceType(ifaceMap["type"].(string)),
 			NetworkID: ifaceMap["network_id"].(string),
 			SubnetID:  ifaceMap["subnet_id"].(string),
-			PortID:    ifaceMap["port_id"].(string),
 		}
 	}
 	return result
@@ -770,23 +794,51 @@ func AICluserSgRefreshedFunc(client *gcorecloud.ServiceClient, clusterID string,
 func getDetachOptions(instanceInterfaces []instances.Interface, detachIface ai.AttachInterfaceOpts) (*ai.DetachInterfaceOpts, error) {
 	allDetachMap := make(map[string]ai.DetachInterfaceOpts, len(instanceInterfaces))
 	for _, instanceIface := range instanceInterfaces {
+		//TODO: remove this workaround after API adds the hpnID that allows one to filter HPN/IB interfaces
+		// skip HPN (IB) interfaces as they are not managed by users
+		if strings.Contains(instanceIface.NetworkDetails.Name, "ib-network") {
+			continue
+		}
+
 		if detachIface.Type == types.ExternalInterfaceType && instanceIface.NetworkDetails.External {
 			return &ai.DetachInterfaceOpts{
 				PortID:    instanceIface.PortID,
 				IpAddress: instanceIface.IPAssignments[0].IPAddress.String(),
 			}, nil
+		} else {
+			for _, ipAssignment := range instanceIface.IPAssignments {
+				allDetachMap[ipAssignment.SubnetID] = ai.DetachInterfaceOpts{
+					PortID:    instanceIface.PortID,
+					IpAddress: ipAssignment.IPAddress.String(),
+				}
+			}
+			// check if we already found the needed (same subnetID) detach options
+			if detachOpts, found := allDetachMap[detachIface.SubnetID]; found {
+				return &detachOpts, nil
+			}
 		}
-		for _, ipAssignment := range instanceIface.IPAssignments {
-			allDetachMap[ipAssignment.SubnetID] = ai.DetachInterfaceOpts{
-				PortID:    instanceIface.PortID,
-				IpAddress: ipAssignment.IPAddress.String(),
+
+		// if we haven't found it yet, check subports
+		for _, subport := range instanceIface.SubPorts {
+			if detachIface.Type == types.ExternalInterfaceType && subport.NetworkDetails.External {
+				return &ai.DetachInterfaceOpts{
+					PortID:    subport.PortID,
+					IpAddress: subport.IPAssignments[0].IPAddress.String(),
+				}, nil
+			} else {
+				for _, ipAssignment := range subport.IPAssignments {
+					allDetachMap[ipAssignment.SubnetID] = ai.DetachInterfaceOpts{
+						PortID:    subport.PortID,
+						IpAddress: ipAssignment.IPAddress.String(),
+					}
+				}
 			}
 		}
 	}
 	if detachOpts, found := allDetachMap[detachIface.SubnetID]; found {
 		return &detachOpts, nil
 	} else {
-		return nil, fmt.Errorf("couldn't found detach options for interface: %v", detachIface)
+		return nil, fmt.Errorf("couldn't find detach options for interface: %+v", detachIface)
 	}
 }
 
@@ -944,11 +996,11 @@ func resourceAIClusterUpdate(ctx context.Context, d *schema.ResourceData, m inte
 
 	if d.HasChanges("interface") && !IsResize {
 		oldIfaces, newIfaces := d.GetChange("interface")
-		newAttachInterfaces := map2AttachInterfaceOpts(newIfaces.([]interface{}))
+		newAttachInterfaces := map2AttachInterfaceOpts(newIfaces.(*schema.Set).List())
 		if len(newAttachInterfaces) == 0 {
 			return diag.FromErr(errors.New("no interfaces is configured, at least one is required"))
 		}
-		oldAttachInterfaces := map2AttachInterfaceOpts(oldIfaces.([]interface{}))
+		oldAttachInterfaces := map2AttachInterfaceOpts(oldIfaces.(*schema.Set).List())
 		if !areInterfacesUnique(newAttachInterfaces) {
 			return diag.FromErr(errors.New("ai cluster don't support attach equal interfaces"))
 		}

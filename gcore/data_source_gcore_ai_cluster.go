@@ -247,9 +247,10 @@ func dataSourceAICluster() *schema.Resource {
 				},
 			},
 			"interface": {
-				Type:        schema.TypeList,
+				Type:        schema.TypeSet,
 				Description: "Networks managed by user and associated with the cluster",
 				Computed:    true,
+				Set:         aiInterfaceHash,
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
 						"type": {
@@ -264,12 +265,47 @@ func dataSourceAICluster() *schema.Resource {
 						},
 						"subnet_id": {
 							Type:        schema.TypeString,
-							Description: "Port is assigned to IP address from the subnet",
+							Description: "Subnet ID the subnet belongs to. Port will be plugged in this network",
 							Computed:    true,
 						},
 						"port_id": {
 							Type:        schema.TypeString,
-							Description: "Network ID the subnet belongs to. Port will be plugged in this network",
+							Description: "Port is assigned to IP address from the subnet",
+							Computed:    true,
+							Deprecated:  "This field is deprecated and will be removed in future versions",
+						},
+					},
+				},
+			},
+			"attached_interfaces": {
+				Type:        schema.TypeList,
+				Description: "List of attached interfaces to all instances of the cluster.",
+				Computed:    true,
+				Elem: &schema.Resource{
+					Schema: map[string]*schema.Schema{
+						"type": {
+							Type:        schema.TypeString,
+							Description: "Type of interface to attach to. Possible values are 'external' and 'subnet'",
+							Computed:    true,
+						},
+						"network_id": {
+							Type:        schema.TypeString,
+							Description: "Network ID the interface is attached to",
+							Computed:    true,
+						},
+						"subnet_id": {
+							Type:        schema.TypeString,
+							Description: "Subnet ID the interface is attached to",
+							Computed:    true,
+						},
+						"port_id": {
+							Type:        schema.TypeString,
+							Description: "Port is assigned to IP address from the subnet",
+							Computed:    true,
+						},
+						"ip_address": {
+							Type:        schema.TypeString,
+							Description: "IP address assigned to the interface",
 							Computed:    true,
 						},
 					},
@@ -457,12 +493,6 @@ func aiInterfaceHash(i interface{}) int {
 		buf.WriteString(string(types.SubnetInterfaceType))
 		buf.WriteString(iface["network_id"].(string))
 		buf.WriteString(iface["subnet_id"].(string))
-	case iface["type"].(string) == string(types.AnySubnetInterfaceType):
-		buf.WriteString(string(types.AnySubnetInterfaceType))
-		buf.WriteString(iface["network_id"].(string))
-	case iface["type"].(string) == string(types.ReservedFixedIpType):
-		buf.WriteString(string(types.ReservedFixedIpType))
-		buf.WriteString(iface["port_id"].(string))
 	}
 	return schema.HashString(buf.String())
 }
@@ -501,13 +531,10 @@ func flattenInterfaces(interfaces []ai.AIClusterInterface) []map[string]interfac
 	for index, iface := range interfaces {
 		interfaceMap := make(map[string]interface{})
 		interfaceMap["type"] = iface.Type
-		interfaceMap["port_id"] = iface.PortID
 		interfaceMap["network_id"] = iface.NetworkID
 		interfaceMap["subnet_id"] = iface.SubnetID
 		clusterInterfaces[index] = interfaceMap
-
 	}
-
 	return clusterInterfaces
 }
 
@@ -653,21 +680,68 @@ func setAIClusterResourcerData(d *schema.ResourceData, provider *gcorecloud.Prov
 	if err != nil {
 		return err
 	}
-	aiClusterInterfaces := make([]ai.AIClusterInterface, len(clusterInterfaces))
-	for ifaceIndex, iface := range clusterInterfaces {
+
+	// we don't know how many interfaces we will have, as some variants like Arista-based networks have a trunk port
+	// with subports
+	var attachedInterfaces []map[string]interface{}
+	var managedInterfaces []map[string]interface{}
+	for _, iface := range clusterInterfaces {
+
+		//TODO: remove this workaround after API adds the hpnID that allows one to filter HPN/IB interfaces
+		// skip HPN (IB) interfaces as they are not managed by users
+		if strings.Contains(iface.NetworkDetails.Name, "ib-network") {
+			continue
+		}
+
+		// get parent interface (we add one interface per subnet in IP assignments)
+		var ifaceType string
 		if iface.NetworkDetails.External {
-			aiClusterInterfaces[ifaceIndex] = ai.AIClusterInterface{
-				Type: string(types.ExternalInterfaceType),
-			}
+			ifaceType = string(types.ExternalInterfaceType)
 		} else {
-			aiClusterInterfaces[ifaceIndex] = ai.AIClusterInterface{
-				Type:     string(types.SubnetInterfaceType),
-				SubnetID: iface.NetworkDetails.Subnets[0].ID,
+			ifaceType = string(types.SubnetInterfaceType)
+		}
+		for _, ipAssignment := range iface.IPAssignments {
+			attachedInterface := make(map[string]interface{})
+			attachedInterface["type"] = ifaceType
+			attachedInterface["port_id"] = iface.PortID
+			attachedInterface["network_id"] = iface.NetworkID
+			attachedInterface["subnet_id"] = ipAssignment.SubnetID
+			attachedInterface["ip_address"] = ipAssignment.IPAddress.String()
+			attachedInterfaces = append(attachedInterfaces, attachedInterface)
+			managedInterface := make(map[string]interface{})
+			managedInterface["type"] = ifaceType
+			managedInterface["network_id"] = iface.NetworkID
+			managedInterface["subnet_id"] = ipAssignment.SubnetID
+			managedInterfaces = append(managedInterfaces, managedInterface)
+		}
+
+		// check if there are more interfaces, if yes, they are inside subports
+		if len(iface.SubPorts) > 0 {
+			for _, subPort := range iface.SubPorts {
+				if subPort.NetworkDetails.External {
+					ifaceType = string(types.ExternalInterfaceType)
+				} else {
+					ifaceType = string(types.SubnetInterfaceType)
+				}
+				for _, ipAssignment := range subPort.IPAssignments {
+					attachedInterface := make(map[string]interface{})
+					attachedInterface["type"] = ifaceType
+					attachedInterface["port_id"] = subPort.PortID
+					attachedInterface["network_id"] = subPort.NetworkID
+					attachedInterface["subnet_id"] = ipAssignment.SubnetID
+					attachedInterface["ip_address"] = ipAssignment.IPAddress.String()
+					attachedInterfaces = append(attachedInterfaces, attachedInterface)
+					managedInterface := make(map[string]interface{})
+					managedInterface["type"] = ifaceType
+					managedInterface["network_id"] = subPort.NetworkID
+					managedInterface["subnet_id"] = ipAssignment.SubnetID
+					managedInterfaces = append(managedInterfaces, managedInterface)
+				}
 			}
 		}
 	}
-
-	d.Set("interface", flattenInterfaces(aiClusterInterfaces))
+	d.Set("attached_interfaces", attachedInterfaces)
+	d.Set("interface", managedInterfaces)
 	d.Set("cluster_metadata", cluster.Metadata)
 	d.Set("poplar_servers", flattenPoplarServers(cluster.PoplarServer))
 
