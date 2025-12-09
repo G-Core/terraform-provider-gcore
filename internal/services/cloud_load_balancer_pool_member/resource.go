@@ -60,7 +60,7 @@ func (r *CloudLoadBalancerPoolMemberResource) Create(ctx context.Context, req re
 		return
 	}
 
-	params := cloud.LoadBalancerPoolMemberAddParams{}
+	params := cloud.LoadBalancerPoolMemberNewParams{}
 
 	if !data.ProjectID.IsNull() {
 		params.ProjectID = param.NewOpt(data.ProjectID.ValueInt64())
@@ -75,7 +75,7 @@ func (r *CloudLoadBalancerPoolMemberResource) Create(ctx context.Context, req re
 		resp.Diagnostics.AddError("failed to serialize http request", err.Error())
 		return
 	}
-	member, err := r.client.Cloud.LoadBalancers.Pools.Members.AddAndPoll(
+	member, err := r.client.Cloud.LoadBalancers.Pools.Members.NewAndPoll(
 		ctx,
 		data.PoolID.ValueString(),
 		params,
@@ -301,7 +301,7 @@ func (r *CloudLoadBalancerPoolMemberResource) Delete(ctx context.Context, req re
 		return
 	}
 
-	params := cloud.LoadBalancerPoolMemberRemoveParams{
+	params := cloud.LoadBalancerPoolMemberDeleteParams{
 		PoolID: data.PoolID.ValueString(),
 	}
 
@@ -313,7 +313,7 @@ func (r *CloudLoadBalancerPoolMemberResource) Delete(ctx context.Context, req re
 		params.RegionID = param.NewOpt(data.RegionID.ValueInt64())
 	}
 
-	err := r.client.Cloud.LoadBalancers.Pools.Members.RemoveAndPoll(
+	err := r.client.Cloud.LoadBalancers.Pools.Members.DeleteAndPoll(
 		ctx,
 		data.ID.ValueString(),
 		params,
