@@ -9,11 +9,8 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/booldefault"
-	"github.com/hashicorp/terraform-plugin-framework/resource/schema/boolplanmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/int64planmodifier"
-	"github.com/hashicorp/terraform-plugin-framework/resource/schema/mapplanmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
-	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringplanmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/stainless-sdks/gcore-terraform/internal/customfield"
 )
@@ -25,60 +22,50 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 		Attributes: map[string]schema.Attribute{
 			"id": schema.Int64Attribute{
 				Computed:      true,
-				PlanModifiers: []planmodifier.Int64{int64planmodifier.UseStateForUnknown(), int64planmodifier.RequiresReplace()},
+				PlanModifiers: []planmodifier.Int64{int64planmodifier.UseStateForUnknown()},
 			},
 			"name": schema.StringAttribute{
-				Description:   "name of DNS zone",
-				Required:      true,
-				PlanModifiers: []planmodifier.String{stringplanmodifier.RequiresReplace()},
+				Description: "name of DNS zone",
+				Required:    true,
 			},
 			"contact": schema.StringAttribute{
-				Description:   "email address of the administrator responsible for this zone",
-				Optional:      true,
-				PlanModifiers: []planmodifier.String{stringplanmodifier.RequiresReplace()},
+				Description: "email address of the administrator responsible for this zone",
+				Optional:    true,
 			},
 			"expiry": schema.Int64Attribute{
-				Description:   "number of seconds after which secondary name servers should stop answering request for this zone",
-				Optional:      true,
-				PlanModifiers: []planmodifier.Int64{int64planmodifier.RequiresReplace()},
+				Description: "number of seconds after which secondary name servers should stop answering request for this zone",
+				Optional:    true,
 			},
 			"nx_ttl": schema.Int64Attribute{
-				Description:   "Time To Live of cache",
-				Optional:      true,
-				PlanModifiers: []planmodifier.Int64{int64planmodifier.RequiresReplace()},
+				Description: "Time To Live of cache",
+				Optional:    true,
 			},
 			"primary_server": schema.StringAttribute{
-				Description:   "primary master name server for zone",
-				Optional:      true,
-				PlanModifiers: []planmodifier.String{stringplanmodifier.RequiresReplace()},
+				Description: "primary master name server for zone",
+				Optional:    true,
 			},
 			"refresh": schema.Int64Attribute{
-				Description:   "number of seconds after which secondary name servers should query the master for the SOA record, to detect zone changes.",
-				Optional:      true,
-				PlanModifiers: []planmodifier.Int64{int64planmodifier.RequiresReplace()},
+				Description: "number of seconds after which secondary name servers should query the master for the SOA record, to detect zone changes.",
+				Optional:    true,
 			},
 			"retry": schema.Int64Attribute{
-				Description:   "number of seconds after which secondary name servers should retry to request the serial number",
-				Optional:      true,
-				PlanModifiers: []planmodifier.Int64{int64planmodifier.RequiresReplace()},
+				Description: "number of seconds after which secondary name servers should retry to request the serial number",
+				Optional:    true,
 			},
 			"serial": schema.Int64Attribute{
-				Description:   "Serial number for this zone or Timestamp of zone modification moment.\nIf a secondary name server slaved to this one observes an increase in this number,\nthe slave will assume that the zone has been updated and initiate a zone transfer.",
-				Optional:      true,
-				PlanModifiers: []planmodifier.Int64{int64planmodifier.RequiresReplace()},
+				Description: "Serial number for this zone or Timestamp of zone modification moment.\nIf a secondary name server slaved to this one observes an increase in this number,\nthe slave will assume that the zone has been updated and initiate a zone transfer.",
+				Optional:    true,
 			},
 			"meta": schema.MapAttribute{
-				Description:   "arbitrarily data of zone in json format\nyou can specify `webhook` url and `webhook_method` here\nwebhook will get a map with three arrays: for created, updated and deleted rrsets\n`webhook_method` can be omitted, POST will be used by default",
-				Optional:      true,
-				ElementType:   jsontypes.NormalizedType{},
-				PlanModifiers: []planmodifier.Map{mapplanmodifier.RequiresReplace()},
+				Description: "arbitrarily data of zone in json format\nyou can specify `webhook` url and `webhook_method` here\nwebhook will get a map with three arrays: for created, updated and deleted rrsets\n`webhook_method` can be omitted, POST will be used by default",
+				Optional:    true,
+				ElementType: jsontypes.NormalizedType{},
 			},
 			"enabled": schema.BoolAttribute{
-				Description:   "If a zone is disabled, then its records will not be resolved on dns servers",
-				Computed:      true,
-				Optional:      true,
-				PlanModifiers: []planmodifier.Bool{boolplanmodifier.RequiresReplaceIfConfigured()},
-				Default:       booldefault.StaticBool(true),
+				Description: "If a zone is disabled, then its records will not be resolved on dns servers",
+				Computed:    true,
+				Optional:    true,
+				Default:     booldefault.StaticBool(true),
 			},
 			"warnings": schema.ListAttribute{
 				Computed:    true,
