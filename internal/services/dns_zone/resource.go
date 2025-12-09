@@ -7,7 +7,6 @@ import (
 	"fmt"
 	"io"
 	"net/http"
-	"strconv"
 
 	"github.com/G-Core/gcore-go"
 	"github.com/G-Core/gcore-go/dns"
@@ -88,6 +87,7 @@ func (r *DNSZoneResource) Create(ctx context.Context, req resource.CreateRequest
 		resp.Diagnostics.AddError("failed to deserialize http request", err.Error())
 		return
 	}
+	data.ID = data.Name
 
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
 }
@@ -117,7 +117,7 @@ func (r *DNSZoneResource) Update(ctx context.Context, req resource.UpdateRequest
 	res := new(http.Response)
 	_, err = r.client.DNS.Zones.Replace(
 		ctx,
-		strconv.FormatInt(data.ID.ValueInt64(), 10),
+		data.Name.ValueString(),
 		dns.ZoneReplaceParams{},
 		option.WithRequestBody("application/json", dataBytes),
 		option.WithResponseBodyInto(&res),
@@ -133,6 +133,7 @@ func (r *DNSZoneResource) Update(ctx context.Context, req resource.UpdateRequest
 		resp.Diagnostics.AddError("failed to deserialize http request", err.Error())
 		return
 	}
+	data.ID = data.Name
 
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
 }
@@ -149,7 +150,7 @@ func (r *DNSZoneResource) Read(ctx context.Context, req resource.ReadRequest, re
 	res := new(http.Response)
 	_, err := r.client.DNS.Zones.Get(
 		ctx,
-		strconv.FormatInt(data.ID.ValueInt64(), 10),
+		data.Name.ValueString(),
 		option.WithResponseBodyInto(&res),
 		option.WithMiddleware(logging.Middleware(ctx)),
 	)
@@ -168,6 +169,7 @@ func (r *DNSZoneResource) Read(ctx context.Context, req resource.ReadRequest, re
 		resp.Diagnostics.AddError("failed to deserialize http request", err.Error())
 		return
 	}
+	data.ID = data.Name
 
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
 }
@@ -183,13 +185,14 @@ func (r *DNSZoneResource) Delete(ctx context.Context, req resource.DeleteRequest
 
 	_, err := r.client.DNS.Zones.Delete(
 		ctx,
-		strconv.FormatInt(data.ID.ValueInt64(), 10),
+		data.Name.ValueString(),
 		option.WithMiddleware(logging.Middleware(ctx)),
 	)
 	if err != nil {
 		resp.Diagnostics.AddError("failed to make http request", err.Error())
 		return
 	}
+	data.ID = data.Name
 
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
 }
@@ -227,6 +230,7 @@ func (r *DNSZoneResource) ImportState(ctx context.Context, req resource.ImportSt
 		resp.Diagnostics.AddError("failed to deserialize http request", err.Error())
 		return
 	}
+	data.ID = data.Name
 
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
 }

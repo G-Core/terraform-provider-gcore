@@ -10,8 +10,8 @@ import (
 )
 
 type DNSZoneModel struct {
-	ID            types.Int64                                `tfsdk:"id" json:"id,computed"`
-	Name          types.String                               `tfsdk:"name" json:"name,required,no_refresh"`
+	ID            types.String                               `tfsdk:"id" json:"-,computed"`
+	Name          types.String                               `tfsdk:"name" json:"name,required"`
 	Contact       types.String                               `tfsdk:"contact" json:"contact,optional,no_refresh"`
 	Expiry        types.Int64                                `tfsdk:"expiry" json:"expiry,optional,no_refresh"`
 	NxTtl         types.Int64                                `tfsdk:"nx_ttl" json:"nx_ttl,optional,no_refresh"`
