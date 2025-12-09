@@ -25,6 +25,7 @@ import (
 	"github.com/stainless-sdks/gcore-terraform/internal/services/cloud_inference_secret"
 	"github.com/stainless-sdks/gcore-terraform/internal/services/cloud_instance"
 	"github.com/stainless-sdks/gcore-terraform/internal/services/cloud_instance_image"
+	"github.com/stainless-sdks/gcore-terraform/internal/services/cloud_k8s_cluster"
 	"github.com/stainless-sdks/gcore-terraform/internal/services/cloud_load_balancer"
 	"github.com/stainless-sdks/gcore-terraform/internal/services/cloud_load_balancer_listener"
 	"github.com/stainless-sdks/gcore-terraform/internal/services/cloud_load_balancer_pool"
@@ -203,6 +204,10 @@ func (p *GcoreProvider) Resources(ctx context.Context) []func() resource.Resourc
 		dns_zone.NewResource,
 		dns_zone_rrset.NewResource,
 		dns_network_mapping.NewResource,
+		cloud_k8s_cluster.NewResource,
+		dns_zone.NewResource,
+		dns_zone_rrset.NewResource,
+		dns_network_mapping.NewResource,
 	}
 }
 
@@ -246,6 +251,10 @@ func (p *GcoreProvider) DataSources(ctx context.Context) []func() datasource.Dat
 		cloud_instance.NewCloudInstanceDataSource,
 		cloud_instance.NewCloudInstancesDataSource,
 		cloud_instance_image.NewCloudInstanceImageDataSource,
+		dns_zone.NewDNSZoneDataSource,
+		dns_zone_rrset.NewDNSZoneRrsetDataSource,
+		dns_network_mapping.NewDNSNetworkMappingDataSource,
+		cloud_k8s_cluster.NewCloudK8SClusterDataSource,
 		dns_zone.NewDNSZoneDataSource,
 		dns_zone_rrset.NewDNSZoneRrsetDataSource,
 		dns_network_mapping.NewDNSNetworkMappingDataSource,
