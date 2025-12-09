@@ -777,21 +777,67 @@ func resourceBmInstanceUpdate(ctx context.Context, d *schema.ResourceData, m int
 			}
 		}
 
-		for _, fip := range fips {
-			log.Printf("[DEBUG] Reassign floatin IP %s to fixed IP %s port id %s", fip.FloatingIPAddress, fip.FixedIPAddress, fip.PortID)
-			mm := make(map[string]string)
-			for _, i := range fip.Metadata {
-				mm[i.Key] = i.Value
+		currentIfs, err = instances.ListInterfacesAll(client, d.Id())
+		if err != nil {
+			return diag.FromErr(err)
+		}
+
+		desired := map[string]string{} // fipID -> portID
+		ifsCfg := d.Get("interface").([]interface{})
+		for _, raw := range ifsCfg {
+			iface := raw.(map[string]interface{})
+			fipID, _ := iface["existing_fip_id"].(string)
+			if fipID == "" {
+				continue
 			}
+			var portID string
+			switch types.InterfaceType(iface["type"].(string)) {
+			case types.ReservedFixedIpType:
+				portID = iface["port_id"].(string)
+			case types.SubnetInterfaceType:
+				for _, ci := range currentIfs {
+					for _, a := range ci.IPAssignments {
+						if a.SubnetID == iface["subnet_id"].(string) {
+							portID = ci.PortID
+							break
+						}
+					}
+				}
+			case types.AnySubnetInterfaceType:
+				for _, ci := range currentIfs {
+					if ci.NetworkID == iface["network_id"].(string) {
+						portID = ci.PortID
+						break
+					}
+				}
+			}
+			if portID != "" {
+				desired[fipID] = portID
+			}
+		}
 
-			_, err := floatingips.Assign(fipClient, fip.ID, floatingips.CreateOpts{
-				PortID:         fip.PortID,
-				FixedIPAddress: fip.FixedIPAddress,
-				Metadata:       mm,
-			}).Extract()
+		current := map[string]string{}
+		for _, ci := range currentIfs {
+			for _, f := range ci.FloatingIPDetails {
+				current[f.ID] = ci.PortID
+			}
+		}
 
-			if err != nil {
-				return diag.Errorf("cannot reassign floating IP %s to fixed IP %s port id %s. Error: %v", fip.FloatingIPAddress, fip.FixedIPAddress, fip.PortID, err)
+		for fipID, havePort := range current {
+			if _, ok := desired[fipID]; !ok && havePort != "" {
+				log.Printf("[DEBUG] Unassign floating IP %s (not in desired)", fipID)
+				if _, err := floatingips.UnAssign(fipClient, fipID).Extract(); err != nil {
+					return diag.Errorf("failed to unassign floating IP %s: %v", fipID, err)
+				}
+			}
+		}
+
+		for fipID, wantPort := range desired {
+			if havePort, ok := current[fipID]; !ok || havePort != wantPort {
+				log.Printf("[DEBUG] Assign floating IP %s -> port %s", fipID, wantPort)
+				if _, err := floatingips.Assign(fipClient, fipID, floatingips.CreateOpts{PortID: wantPort}).Extract(); err != nil {
+					return diag.Errorf("failed to assign floating IP %s to port %s: %v", fipID, wantPort, err)
+				}
 			}
 		}
 	}
