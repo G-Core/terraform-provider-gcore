@@ -31,8 +31,14 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 	return schema.Schema{
 		Attributes: map[string]schema.Attribute{
 			"id": schema.StringAttribute{
+				Description:   "The name of the cluster",
 				Computed:      true,
-				PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
+				PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown(), stringplanmodifier.RequiresReplace()},
+			},
+			"name": schema.StringAttribute{
+				Description:   "The name of the cluster",
+				Required:      true,
+				PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown(), stringplanmodifier.RequiresReplace()},
 			},
 			"project_id": schema.Int64Attribute{
 				Optional:      true,
@@ -44,11 +50,6 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 			},
 			"keypair": schema.StringAttribute{
 				Description:   "The keypair of the cluster",
-				Required:      true,
-				PlanModifiers: []planmodifier.String{stringplanmodifier.RequiresReplace()},
-			},
-			"name": schema.StringAttribute{
-				Description:   "The name of the cluster",
 				Required:      true,
 				PlanModifiers: []planmodifier.String{stringplanmodifier.RequiresReplace()},
 			},

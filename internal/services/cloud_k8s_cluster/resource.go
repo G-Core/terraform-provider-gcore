@@ -98,6 +98,7 @@ func (r *CloudK8SClusterResource) Create(ctx context.Context, req resource.Creat
 		resp.Diagnostics.AddError("failed to deserialize http request", err.Error())
 		return
 	}
+	data.ID = data.Name
 
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
 }
@@ -137,7 +138,7 @@ func (r *CloudK8SClusterResource) Update(ctx context.Context, req resource.Updat
 	res := new(http.Response)
 	_, err = r.client.Cloud.K8S.Clusters.Update(
 		ctx,
-		data.ID.ValueString(),
+		data.Name.ValueString(),
 		params,
 		option.WithRequestBody("application/json", dataBytes),
 		option.WithResponseBodyInto(&res),
@@ -153,6 +154,7 @@ func (r *CloudK8SClusterResource) Update(ctx context.Context, req resource.Updat
 		resp.Diagnostics.AddError("failed to deserialize http request", err.Error())
 		return
 	}
+	data.ID = data.Name
 
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
 }
@@ -179,7 +181,7 @@ func (r *CloudK8SClusterResource) Read(ctx context.Context, req resource.ReadReq
 	res := new(http.Response)
 	_, err := r.client.Cloud.K8S.Clusters.Get(
 		ctx,
-		data.ID.ValueString(),
+		data.Name.ValueString(),
 		params,
 		option.WithResponseBodyInto(&res),
 		option.WithMiddleware(logging.Middleware(ctx)),
@@ -199,6 +201,7 @@ func (r *CloudK8SClusterResource) Read(ctx context.Context, req resource.ReadReq
 		resp.Diagnostics.AddError("failed to deserialize http request", err.Error())
 		return
 	}
+	data.ID = data.Name
 
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
 }
@@ -224,7 +227,7 @@ func (r *CloudK8SClusterResource) Delete(ctx context.Context, req resource.Delet
 
 	_, err := r.client.Cloud.K8S.Clusters.Delete(
 		ctx,
-		data.ID.ValueString(),
+		data.Name.ValueString(),
 		params,
 		option.WithMiddleware(logging.Middleware(ctx)),
 	)
@@ -232,6 +235,7 @@ func (r *CloudK8SClusterResource) Delete(ctx context.Context, req resource.Delet
 		resp.Diagnostics.AddError("failed to make http request", err.Error())
 		return
 	}
+	data.ID = data.Name
 
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
 }
@@ -256,7 +260,7 @@ func (r *CloudK8SClusterResource) ImportState(ctx context.Context, req resource.
 
 	data.ProjectID = types.Int64Value(path_project_id)
 	data.RegionID = types.Int64Value(path_region_id)
-	data.ID = types.StringValue(path_cluster_name)
+	data.Name = types.StringValue(path_cluster_name)
 
 	res := new(http.Response)
 	_, err := r.client.Cloud.K8S.Clusters.Get(
@@ -279,6 +283,7 @@ func (r *CloudK8SClusterResource) ImportState(ctx context.Context, req resource.
 		resp.Diagnostics.AddError("failed to deserialize http request", err.Error())
 		return
 	}
+	data.ID = data.Name
 
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
 }
