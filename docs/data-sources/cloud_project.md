@@ -14,7 +14,7 @@ description: |-
 
 ```terraform
 data "gcore_cloud_project" "example_cloud_project" {
-  project_id = 0
+  project_id = 4
 }
 ```
 
@@ -23,7 +23,7 @@ data "gcore_cloud_project" "example_cloud_project" {
 
 ### Optional
 
-- `project_id` (Number)
+- `project_id` (Number) Project ID
 
 ### Read-Only
 
