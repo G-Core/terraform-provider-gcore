@@ -10,11 +10,11 @@ import (
 )
 
 type CloudK8SClusterModel struct {
-	ID               types.String                                              `tfsdk:"id" json:"id,computed"`
+	ID               types.String                                              `tfsdk:"id" json:"-,computed"`
+	Name             types.String                                              `tfsdk:"name" json:"name,required"`
 	ProjectID        types.Int64                                               `tfsdk:"project_id" path:"project_id,optional"`
 	RegionID         types.Int64                                               `tfsdk:"region_id" path:"region_id,optional"`
 	Keypair          types.String                                              `tfsdk:"keypair" json:"keypair,required"`
-	Name             types.String                                              `tfsdk:"name" json:"name,required"`
 	Version          types.String                                              `tfsdk:"version" json:"version,required"`
 	Pools            *[]*CloudK8SClusterPoolsModel                             `tfsdk:"pools" json:"pools,required"`
 	PodsIPPool       types.String                                              `tfsdk:"pods_ip_pool" json:"pods_ip_pool,optional"`
