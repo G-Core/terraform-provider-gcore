@@ -187,7 +187,6 @@ Poll task status until completion (`FINISHED`/`ERROR`) before proceeding with de
 Required:
 
 - `flavor_id` (String) Flavor ID
-- `min_node_count` (Number) Minimum node count
 - `name` (String) Pool's name
 
 Optional:
@@ -201,6 +200,7 @@ Available values: "cold", "ssd_hiiops", "ssd_local", "ssd_lowlatency", "standard
 - `kubelet_config` (Map of String) Kubelet configuration for pool nodes
 - `labels` (Map of String) Labels applied to the cluster pool
 - `max_node_count` (Number) Maximum node count
+- `min_node_count` (Number) Minimum node count
 - `servergroup_policy` (String) Server group policy: anti-affinity, soft-anti-affinity or affinity
 Available values: "affinity", "anti-affinity", "soft-anti-affinity".
 - `taints` (Map of String) Taints applied to the cluster pool

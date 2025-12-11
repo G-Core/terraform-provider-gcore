@@ -10,33 +10,33 @@ import (
 )
 
 type CloudK8SClusterModel struct {
-	ID               types.String                                              `tfsdk:"id" json:"-,computed"`
-	Name             types.String                                              `tfsdk:"name" json:"name,required"`
-	ProjectID        types.Int64                                               `tfsdk:"project_id" path:"project_id,optional"`
-	RegionID         types.Int64                                               `tfsdk:"region_id" path:"region_id,optional"`
-	Keypair          types.String                                              `tfsdk:"keypair" json:"keypair,required"`
-	Version          types.String                                              `tfsdk:"version" json:"version,required"`
-	Pools            *[]*CloudK8SClusterPoolsModel                             `tfsdk:"pools" json:"pools,required"`
-	PodsIPPool       types.String                                              `tfsdk:"pods_ip_pool" json:"pods_ip_pool,optional"`
-	PodsIpv6Pool     types.String                                              `tfsdk:"pods_ipv6_pool" json:"pods_ipv6_pool,optional"`
-	ServicesIPPool   types.String                                              `tfsdk:"services_ip_pool" json:"services_ip_pool,optional"`
-	ServicesIpv6Pool types.String                                              `tfsdk:"services_ipv6_pool" json:"services_ipv6_pool,optional"`
-	FixedNetwork     types.String                                              `tfsdk:"fixed_network" json:"fixed_network,computed_optional"`
-	FixedSubnet      types.String                                              `tfsdk:"fixed_subnet" json:"fixed_subnet,computed_optional"`
-	IsIpv6           types.Bool                                                `tfsdk:"is_ipv6" json:"is_ipv6,computed_optional"`
-	Csi              customfield.NestedObject[CloudK8SClusterCsiModel]         `tfsdk:"csi" json:"csi,computed_optional"`
-	AutoscalerConfig *map[string]types.String                                  `tfsdk:"autoscaler_config" json:"autoscaler_config,optional"`
-	AddOns           *CloudK8SClusterAddOnsModel                               `tfsdk:"add_ons" json:"add_ons,optional"`
-	Authentication   *CloudK8SClusterAuthenticationModel                       `tfsdk:"authentication" json:"authentication,optional"`
-	Cni              customfield.NestedObject[CloudK8SClusterCniModel]         `tfsdk:"cni" json:"cni,computed_optional"`
-	DDOSProfile      customfield.NestedObject[CloudK8SClusterDDOSProfileModel] `tfsdk:"ddos_profile" json:"ddos_profile,computed_optional"`
-	Logging          customfield.NestedObject[CloudK8SClusterLoggingModel]     `tfsdk:"logging" json:"logging,computed_optional"`
-	CreatedAt        types.String                                              `tfsdk:"created_at" json:"created_at,computed"`
-	CreatorTaskID    types.String                                              `tfsdk:"creator_task_id" json:"creator_task_id,computed"`
-	IsPublic         types.Bool                                                `tfsdk:"is_public" json:"is_public,computed"`
-	Status           types.String                                              `tfsdk:"status" json:"status,computed"`
-	TaskID           types.String                                              `tfsdk:"task_id" json:"task_id,computed"`
-	Tasks            customfield.List[types.String]                            `tfsdk:"tasks" json:"tasks,computed,no_refresh"`
+	ID               types.String                                                 `tfsdk:"id" json:"-,computed"`
+	Name             types.String                                                 `tfsdk:"name" json:"name,required"`
+	ProjectID        types.Int64                                                  `tfsdk:"project_id" path:"project_id,optional"`
+	RegionID         types.Int64                                                  `tfsdk:"region_id" path:"region_id,optional"`
+	Keypair          types.String                                                 `tfsdk:"keypair" json:"keypair,required"`
+	Version          types.String                                                 `tfsdk:"version" json:"version,required"`
+	Pools            *[]*CloudK8SClusterPoolsModel                                `tfsdk:"pools" json:"pools,required"`
+	FixedNetwork     types.String                                                 `tfsdk:"fixed_network" json:"fixed_network,computed_optional"`
+	FixedSubnet      types.String                                                 `tfsdk:"fixed_subnet" json:"fixed_subnet,computed_optional"`
+	IsIpv6           types.Bool                                                   `tfsdk:"is_ipv6" json:"is_ipv6,computed_optional"`
+	PodsIPPool       types.String                                                 `tfsdk:"pods_ip_pool" json:"pods_ip_pool,computed_optional"`
+	PodsIpv6Pool     types.String                                                 `tfsdk:"pods_ipv6_pool" json:"pods_ipv6_pool,computed_optional"`
+	ServicesIPPool   types.String                                                 `tfsdk:"services_ip_pool" json:"services_ip_pool,computed_optional"`
+	ServicesIpv6Pool types.String                                                 `tfsdk:"services_ipv6_pool" json:"services_ipv6_pool,computed_optional"`
+	Csi              customfield.NestedObject[CloudK8SClusterCsiModel]            `tfsdk:"csi" json:"csi,computed_optional"`
+	AutoscalerConfig *map[string]types.String                                     `tfsdk:"autoscaler_config" json:"autoscaler_config,optional"`
+	AddOns           *CloudK8SClusterAddOnsModel                                  `tfsdk:"add_ons" json:"add_ons,optional"`
+	Authentication   customfield.NestedObject[CloudK8SClusterAuthenticationModel] `tfsdk:"authentication" json:"authentication,computed_optional"`
+	Cni              customfield.NestedObject[CloudK8SClusterCniModel]            `tfsdk:"cni" json:"cni,computed_optional"`
+	DDOSProfile      customfield.NestedObject[CloudK8SClusterDDOSProfileModel]    `tfsdk:"ddos_profile" json:"ddos_profile,computed_optional"`
+	Logging          customfield.NestedObject[CloudK8SClusterLoggingModel]        `tfsdk:"logging" json:"logging,computed_optional"`
+	CreatedAt        types.String                                                 `tfsdk:"created_at" json:"created_at,computed"`
+	CreatorTaskID    types.String                                                 `tfsdk:"creator_task_id" json:"creator_task_id,computed"`
+	IsPublic         types.Bool                                                   `tfsdk:"is_public" json:"is_public,computed"`
+	Status           types.String                                                 `tfsdk:"status" json:"status,computed"`
+	TaskID           types.String                                                 `tfsdk:"task_id" json:"task_id,computed"`
+	Tasks            customfield.List[types.String]                               `tfsdk:"tasks" json:"tasks,computed,no_refresh"`
 }
 
 func (m CloudK8SClusterModel) MarshalJSON() (data []byte, err error) {
@@ -49,16 +49,16 @@ func (m CloudK8SClusterModel) MarshalJSONForUpdate(state CloudK8SClusterModel) (
 
 type CloudK8SClusterPoolsModel struct {
 	FlavorID           types.String                  `tfsdk:"flavor_id" json:"flavor_id,required"`
-	MinNodeCount       types.Int64                   `tfsdk:"min_node_count" json:"min_node_count,required"`
+	MinNodeCount       types.Int64                   `tfsdk:"min_node_count" json:"min_node_count,computed_optional"`
 	Name               types.String                  `tfsdk:"name" json:"name,required"`
 	AutoHealingEnabled types.Bool                    `tfsdk:"auto_healing_enabled" json:"auto_healing_enabled,computed_optional"`
-	BootVolumeSize     types.Int64                   `tfsdk:"boot_volume_size" json:"boot_volume_size,optional"`
-	BootVolumeType     types.String                  `tfsdk:"boot_volume_type" json:"boot_volume_type,optional"`
-	CrioConfig         *map[string]types.String      `tfsdk:"crio_config" json:"crio_config,optional"`
+	BootVolumeSize     types.Int64                   `tfsdk:"boot_volume_size" json:"boot_volume_size,computed_optional"`
+	BootVolumeType     types.String                  `tfsdk:"boot_volume_type" json:"boot_volume_type,computed_optional"`
+	CrioConfig         customfield.Map[types.String] `tfsdk:"crio_config" json:"crio_config,computed_optional"`
 	IsPublicIpv4       types.Bool                    `tfsdk:"is_public_ipv4" json:"is_public_ipv4,computed_optional"`
-	KubeletConfig      *map[string]types.String      `tfsdk:"kubelet_config" json:"kubelet_config,optional"`
+	KubeletConfig      customfield.Map[types.String] `tfsdk:"kubelet_config" json:"kubelet_config,computed_optional"`
 	Labels             customfield.Map[types.String] `tfsdk:"labels" json:"labels,computed_optional"`
-	MaxNodeCount       types.Int64                   `tfsdk:"max_node_count" json:"max_node_count,optional"`
+	MaxNodeCount       types.Int64                   `tfsdk:"max_node_count" json:"max_node_count,computed_optional"`
 	ServergroupPolicy  types.String                  `tfsdk:"servergroup_policy" json:"servergroup_policy,optional"`
 	Taints             customfield.Map[types.String] `tfsdk:"taints" json:"taints,computed_optional"`
 }
@@ -83,18 +83,18 @@ type CloudK8SClusterAddOnsSlurmModel struct {
 }
 
 type CloudK8SClusterAuthenticationModel struct {
-	Oidc *CloudK8SClusterAuthenticationOidcModel `tfsdk:"oidc" json:"oidc,optional"`
+	Oidc customfield.NestedObject[CloudK8SClusterAuthenticationOidcModel] `tfsdk:"oidc" json:"oidc,computed_optional"`
 }
 
 type CloudK8SClusterAuthenticationOidcModel struct {
-	ClientID       types.String             `tfsdk:"client_id" json:"client_id,optional"`
-	GroupsClaim    types.String             `tfsdk:"groups_claim" json:"groups_claim,optional"`
-	GroupsPrefix   types.String             `tfsdk:"groups_prefix" json:"groups_prefix,optional"`
-	IssuerURL      types.String             `tfsdk:"issuer_url" json:"issuer_url,optional"`
-	RequiredClaims *map[string]types.String `tfsdk:"required_claims" json:"required_claims,optional"`
-	SigningAlgs    *[]types.String          `tfsdk:"signing_algs" json:"signing_algs,optional"`
-	UsernameClaim  types.String             `tfsdk:"username_claim" json:"username_claim,optional"`
-	UsernamePrefix types.String             `tfsdk:"username_prefix" json:"username_prefix,optional"`
+	ClientID       types.String                   `tfsdk:"client_id" json:"client_id,computed_optional"`
+	GroupsClaim    types.String                   `tfsdk:"groups_claim" json:"groups_claim,computed_optional"`
+	GroupsPrefix   types.String                   `tfsdk:"groups_prefix" json:"groups_prefix,computed_optional"`
+	IssuerURL      types.String                   `tfsdk:"issuer_url" json:"issuer_url,computed_optional"`
+	RequiredClaims customfield.Map[types.String]  `tfsdk:"required_claims" json:"required_claims,computed_optional"`
+	SigningAlgs    customfield.List[types.String] `tfsdk:"signing_algs" json:"signing_algs,computed_optional"`
+	UsernameClaim  types.String                   `tfsdk:"username_claim" json:"username_claim,computed_optional"`
+	UsernamePrefix types.String                   `tfsdk:"username_prefix" json:"username_prefix,computed_optional"`
 }
 
 type CloudK8SClusterCniModel struct {
