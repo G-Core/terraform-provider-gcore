@@ -6,6 +6,7 @@ resource "gcore_inference_deployment" "inf" {
   flavor_name = "inference-4vcpu-16gib"
   containers {
     region_id  = data.gcore_region.region.id
+    cooldown_period = 30
     scale_min = 2
     scale_max = 2
     triggers_cpu_threshold = 80
