@@ -69,7 +69,8 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 						},
 						"min_node_count": schema.Int64Attribute{
 							Description: "Minimum node count",
-							Required:    true,
+							Computed:    true,
+							Optional:    true,
 							Validators: []validator.Int64{
 								int64validator.Between(1, 200),
 							},
@@ -86,6 +87,7 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 						},
 						"boot_volume_size": schema.Int64Attribute{
 							Description: "Boot volume size",
+							Computed:    true,
 							Optional:    true,
 							Validators: []validator.Int64{
 								int64validator.Between(10, 2000),
@@ -93,6 +95,7 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 						},
 						"boot_volume_type": schema.StringAttribute{
 							Description: "Boot volume type\nAvailable values: \"cold\", \"ssd_hiiops\", \"ssd_local\", \"ssd_lowlatency\", \"standard\", \"ultra\".",
+							Computed:    true,
 							Optional:    true,
 							Validators: []validator.String{
 								stringvalidator.OneOfCaseInsensitive(
@@ -107,7 +110,9 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 						},
 						"crio_config": schema.MapAttribute{
 							Description: "Cri-o configuration for pool nodes",
+							Computed:    true,
 							Optional:    true,
+							CustomType:  customfield.NewMapType[types.String](ctx),
 							ElementType: types.StringType,
 						},
 						"is_public_ipv4": schema.BoolAttribute{
@@ -118,7 +123,9 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 						},
 						"kubelet_config": schema.MapAttribute{
 							Description: "Kubelet configuration for pool nodes",
+							Computed:    true,
 							Optional:    true,
+							CustomType:  customfield.NewMapType[types.String](ctx),
 							ElementType: types.StringType,
 						},
 						"labels": schema.MapAttribute{
@@ -130,6 +137,7 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 						},
 						"max_node_count": schema.Int64Attribute{
 							Description: "Maximum node count",
+							Computed:    true,
 							Optional:    true,
 							Validators: []validator.Int64{
 								int64validator.Between(1, 200),
@@ -157,26 +165,6 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 				},
 				PlanModifiers: []planmodifier.List{listplanmodifier.RequiresReplace()},
 			},
-			"pods_ip_pool": schema.StringAttribute{
-				Description:   "The IP pool for the pods",
-				Optional:      true,
-				PlanModifiers: []planmodifier.String{stringplanmodifier.RequiresReplace()},
-			},
-			"pods_ipv6_pool": schema.StringAttribute{
-				Description:   "The IPv6 pool for the pods",
-				Optional:      true,
-				PlanModifiers: []planmodifier.String{stringplanmodifier.RequiresReplace()},
-			},
-			"services_ip_pool": schema.StringAttribute{
-				Description:   "The IP pool for the services",
-				Optional:      true,
-				PlanModifiers: []planmodifier.String{stringplanmodifier.RequiresReplace()},
-			},
-			"services_ipv6_pool": schema.StringAttribute{
-				Description:   "The IPv6 pool for the services",
-				Optional:      true,
-				PlanModifiers: []planmodifier.String{stringplanmodifier.RequiresReplace()},
-			},
 			"fixed_network": schema.StringAttribute{
 				Description:   "The network of the cluster",
 				Computed:      true,
@@ -197,6 +185,30 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 				Optional:      true,
 				PlanModifiers: []planmodifier.Bool{boolplanmodifier.RequiresReplaceIfConfigured()},
 				Default:       booldefault.StaticBool(false),
+			},
+			"pods_ip_pool": schema.StringAttribute{
+				Description:   "The IP pool for the pods",
+				Computed:      true,
+				Optional:      true,
+				PlanModifiers: []planmodifier.String{stringplanmodifier.RequiresReplaceIfConfigured()},
+			},
+			"pods_ipv6_pool": schema.StringAttribute{
+				Description:   "The IPv6 pool for the pods",
+				Computed:      true,
+				Optional:      true,
+				PlanModifiers: []planmodifier.String{stringplanmodifier.RequiresReplaceIfConfigured()},
+			},
+			"services_ip_pool": schema.StringAttribute{
+				Description:   "The IP pool for the services",
+				Computed:      true,
+				Optional:      true,
+				PlanModifiers: []planmodifier.String{stringplanmodifier.RequiresReplaceIfConfigured()},
+			},
+			"services_ipv6_pool": schema.StringAttribute{
+				Description:   "The IPv6 pool for the services",
+				Computed:      true,
+				Optional:      true,
+				PlanModifiers: []planmodifier.String{stringplanmodifier.RequiresReplaceIfConfigured()},
 			},
 			"csi": schema.SingleNestedAttribute{
 				Description: "Container Storage Interface (CSI) driver settings",
@@ -260,35 +272,46 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 			},
 			"authentication": schema.SingleNestedAttribute{
 				Description: "Authentication settings",
+				Computed:    true,
 				Optional:    true,
+				CustomType:  customfield.NewNestedObjectType[CloudK8SClusterAuthenticationModel](ctx),
 				Attributes: map[string]schema.Attribute{
 					"oidc": schema.SingleNestedAttribute{
 						Description: "OIDC authentication settings",
+						Computed:    true,
 						Optional:    true,
+						CustomType:  customfield.NewNestedObjectType[CloudK8SClusterAuthenticationOidcModel](ctx),
 						Attributes: map[string]schema.Attribute{
 							"client_id": schema.StringAttribute{
 								Description: "Client ID",
+								Computed:    true,
 								Optional:    true,
 							},
 							"groups_claim": schema.StringAttribute{
 								Description: "JWT claim to use as the user's group",
+								Computed:    true,
 								Optional:    true,
 							},
 							"groups_prefix": schema.StringAttribute{
 								Description: "Prefix prepended to group claims",
+								Computed:    true,
 								Optional:    true,
 							},
 							"issuer_url": schema.StringAttribute{
 								Description: "Issuer URL",
+								Computed:    true,
 								Optional:    true,
 							},
 							"required_claims": schema.MapAttribute{
 								Description: "Key-value pairs that describe required claims in the token",
+								Computed:    true,
 								Optional:    true,
+								CustomType:  customfield.NewMapType[types.String](ctx),
 								ElementType: types.StringType,
 							},
 							"signing_algs": schema.ListAttribute{
 								Description: "Accepted signing algorithms",
+								Computed:    true,
 								Optional:    true,
 								Validators: []validator.List{
 									listvalidator.ValueStringsAre(
@@ -305,14 +328,17 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 										),
 									),
 								},
+								CustomType:  customfield.NewListType[types.String](ctx),
 								ElementType: types.StringType,
 							},
 							"username_claim": schema.StringAttribute{
 								Description: "JWT claim to use as the user name",
+								Computed:    true,
 								Optional:    true,
 							},
 							"username_prefix": schema.StringAttribute{
 								Description: "Prefix prepended to username claims to prevent clashes",
+								Computed:    true,
 								Optional:    true,
 							},
 						},
