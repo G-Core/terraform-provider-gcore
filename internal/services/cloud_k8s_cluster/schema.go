@@ -240,28 +240,37 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 			},
 			"add_ons": schema.SingleNestedAttribute{
 				Description: "Cluster add-ons configuration",
+				Computed:    true,
 				Optional:    true,
+				CustomType:  customfield.NewNestedObjectType[CloudK8SClusterAddOnsModel](ctx),
 				Attributes: map[string]schema.Attribute{
 					"slurm": schema.SingleNestedAttribute{
 						Description: "Slurm add-on configuration",
+						Computed:    true,
 						Optional:    true,
+						CustomType:  customfield.NewNestedObjectType[CloudK8SClusterAddOnsSlurmModel](ctx),
 						Attributes: map[string]schema.Attribute{
 							"enabled": schema.BoolAttribute{
 								Description: "The Slurm add-on will be enabled in the cluster.\n\nThis add-on is only supported in clusters running Kubernetes v1.31 and v1.32 with at least 1 GPU cluster pool and VAST NFS support enabled.",
-								Required:    true,
+								Computed:    true,
+								Optional:    true,
 							},
 							"file_share_id": schema.StringAttribute{
 								Description: "ID of a VAST file share to be used as Slurm storage.\n\nThe Slurm add-on will create separate Persistent Volume Claims for different purposes (controller spool, worker spool, jail) on that file share.\n\nThe file share must have `root_squash` disabled, while `path_length` and `allowed_characters` settings must be set to `NPL`.",
-								Required:    true,
+								Computed:    true,
+								Optional:    true,
 							},
 							"ssh_key_ids": schema.ListAttribute{
 								Description: "IDs of SSH keys to authorize for SSH connection to Slurm login nodes.",
-								Required:    true,
+								Computed:    true,
+								Optional:    true,
+								CustomType:  customfield.NewListType[types.String](ctx),
 								ElementType: types.StringType,
 							},
 							"worker_count": schema.Int64Attribute{
 								Description: "Size of the worker pool, i.e. the number of Slurm worker nodes.\n\nEach Slurm worker node will be backed by a Pod scheduled on one of cluster's GPU nodes.",
-								Required:    true,
+								Computed:    true,
+								Optional:    true,
 								Validators: []validator.Int64{
 									int64validator.AtLeast(1),
 								},
