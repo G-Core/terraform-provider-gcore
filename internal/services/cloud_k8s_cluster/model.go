@@ -26,7 +26,7 @@ type CloudK8SClusterModel struct {
 	ServicesIpv6Pool types.String                                                 `tfsdk:"services_ipv6_pool" json:"services_ipv6_pool,computed_optional"`
 	Csi              customfield.NestedObject[CloudK8SClusterCsiModel]            `tfsdk:"csi" json:"csi,computed_optional"`
 	AutoscalerConfig *map[string]types.String                                     `tfsdk:"autoscaler_config" json:"autoscaler_config,optional"`
-	AddOns           *CloudK8SClusterAddOnsModel                                  `tfsdk:"add_ons" json:"add_ons,optional"`
+	AddOns           customfield.NestedObject[CloudK8SClusterAddOnsModel]         `tfsdk:"add_ons" json:"add_ons,computed_optional"`
 	Authentication   customfield.NestedObject[CloudK8SClusterAuthenticationModel] `tfsdk:"authentication" json:"authentication,computed_optional"`
 	Cni              customfield.NestedObject[CloudK8SClusterCniModel]            `tfsdk:"cni" json:"cni,computed_optional"`
 	DDOSProfile      customfield.NestedObject[CloudK8SClusterDDOSProfileModel]    `tfsdk:"ddos_profile" json:"ddos_profile,computed_optional"`
@@ -72,14 +72,14 @@ type CloudK8SClusterCsiNfsModel struct {
 }
 
 type CloudK8SClusterAddOnsModel struct {
-	Slurm *CloudK8SClusterAddOnsSlurmModel `tfsdk:"slurm" json:"slurm,optional"`
+	Slurm customfield.NestedObject[CloudK8SClusterAddOnsSlurmModel] `tfsdk:"slurm" json:"slurm,computed_optional"`
 }
 
 type CloudK8SClusterAddOnsSlurmModel struct {
-	Enabled     types.Bool      `tfsdk:"enabled" json:"enabled,required"`
-	FileShareID types.String    `tfsdk:"file_share_id" json:"file_share_id,required"`
-	SSHKeyIDs   *[]types.String `tfsdk:"ssh_key_ids" json:"ssh_key_ids,required"`
-	WorkerCount types.Int64     `tfsdk:"worker_count" json:"worker_count,required"`
+	Enabled     types.Bool                     `tfsdk:"enabled" json:"enabled,computed_optional"`
+	FileShareID types.String                   `tfsdk:"file_share_id" json:"file_share_id,computed_optional"`
+	SSHKeyIDs   customfield.List[types.String] `tfsdk:"ssh_key_ids" json:"ssh_key_ids,computed_optional"`
+	WorkerCount types.Int64                    `tfsdk:"worker_count" json:"worker_count,computed_optional"`
 }
 
 type CloudK8SClusterAuthenticationModel struct {

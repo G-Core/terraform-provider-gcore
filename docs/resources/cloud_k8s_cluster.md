@@ -216,7 +216,7 @@ Optional:
 <a id="nestedatt--add_ons--slurm"></a>
 ### Nested Schema for `add_ons.slurm`
 
-Required:
+Optional:
 
 - `enabled` (Boolean) The Slurm add-on will be enabled in the cluster.
 
