@@ -25,7 +25,7 @@ type CloudK8SClusterModel struct {
 	ServicesIPPool   types.String                                                 `tfsdk:"services_ip_pool" json:"services_ip_pool,computed_optional"`
 	ServicesIpv6Pool types.String                                                 `tfsdk:"services_ipv6_pool" json:"services_ipv6_pool,computed_optional"`
 	Csi              customfield.NestedObject[CloudK8SClusterCsiModel]            `tfsdk:"csi" json:"csi,computed_optional"`
-	AutoscalerConfig *map[string]types.String                                     `tfsdk:"autoscaler_config" json:"autoscaler_config,optional"`
+	AutoscalerConfig customfield.Map[types.String]                                `tfsdk:"autoscaler_config" json:"autoscaler_config,computed_optional"`
 	AddOns           customfield.NestedObject[CloudK8SClusterAddOnsModel]         `tfsdk:"add_ons" json:"add_ons,computed_optional"`
 	Authentication   customfield.NestedObject[CloudK8SClusterAuthenticationModel] `tfsdk:"authentication" json:"authentication,computed_optional"`
 	Cni              customfield.NestedObject[CloudK8SClusterCniModel]            `tfsdk:"cni" json:"cni,computed_optional"`
