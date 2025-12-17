@@ -19,7 +19,7 @@ provider gcore {
 
 resource "gcore_storage_s3" "example_s3" {
   name     = "example"
-  location = "s-ed1"
+  location = "s-region-1"
 }
 ```
 
@@ -28,7 +28,7 @@ resource "gcore_storage_s3" "example_s3" {
 
 ### Required
 
-- `location` (String) A location of new storage resource. One of (s-ed1, s-darz, s-darz1, s-ws1, s-dt2, s-drc2)
+- `location` (String) A location of new storage resource.
 - `name` (String) A name of new storage resource.
 
 ### Optional

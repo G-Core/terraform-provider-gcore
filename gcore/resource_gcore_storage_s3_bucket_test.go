@@ -25,7 +25,7 @@ func TestAccStorageS3Bucket(t *testing.T) {
 		return fmt.Sprintf(`
 resource "gcore_storage_s3" "terraform_test_%d_s3" {
   name = "terraform_test_%d"
-  location = "s-ed1"
+  location = "s-region-1"
 }
 
 resource "gcore_storage_s3_bucket" "terraform_test_%d_s3_bucket" {

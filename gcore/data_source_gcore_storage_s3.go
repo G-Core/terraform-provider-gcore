@@ -44,7 +44,7 @@ func dataSourceStorageS3() *schema.Resource {
 			StorageSchemaLocation: {
 				Type:        schema.TypeString,
 				Computed:    true,
-				Description: "A location of new storage resource. One of (s-ed1, s-darz, s-darz1, s-ws1, s-dt2, s-drc2)",
+				Description: "A location of new storage resource.",
 			},
 			StorageSchemaGenerateHTTPEndpoint: {
 				Type:        schema.TypeString,

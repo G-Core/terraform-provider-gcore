@@ -82,20 +82,10 @@ func resourceStorageSFTP() *schema.Resource {
 				Description: "A expires date of storage resource.",
 			},
 			StorageSchemaLocation: {
-				Type:     schema.TypeString,
-				Required: true,
-				ForceNew: true,
-				ValidateDiagFunc: func(v interface{}, path cty.Path) diag.Diagnostics {
-					val := v.(string)
-					allowed := []string{"ams", "sin", "fra", "mia"}
-					for _, el := range allowed {
-						if el == val {
-							return nil
-						}
-					}
-					return diag.Errorf(`must be one of %+v`, allowed)
-				},
-				Description: "A location of new storage resource. One of (ams, sin, fra, mia)",
+				Type:        schema.TypeString,
+				Required:    true,
+				ForceNew:    true,
+				Description: "A location of new storage resource.",
 			},
 			StorageSFTPSchemaSftpPassword: {
 				Type:     schema.TypeString,

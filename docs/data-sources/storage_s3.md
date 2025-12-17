@@ -37,4 +37,4 @@ data "gcore_storage_s3" "example_s3" {
 - `generated_http_endpoint` (String) A http s3 entry point for new storage resource.
 - `generated_s3_endpoint` (String) A s3 endpoint for new storage resource.
 - `id` (String) The ID of this resource.
-- `location` (String) A location of new storage resource. One of (s-ed1, s-darz, s-darz1, s-ws1, s-dt2, s-drc2)
+- `location` (String) A location of new storage resource.
