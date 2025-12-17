@@ -4,5 +4,5 @@ provider gcore {
 
 resource "gcore_storage_s3" "example_s3" {
   name     = "example"
-  location = "s-ed1"
+  location = "s-region-1"
 }
