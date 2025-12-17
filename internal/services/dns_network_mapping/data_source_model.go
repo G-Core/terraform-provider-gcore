@@ -3,7 +3,6 @@
 package dns_network_mapping
 
 import (
-	"github.com/hashicorp/terraform-plugin-framework-jsontypes/jsontypes"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/stainless-sdks/gcore-terraform/internal/customfield"
 )
@@ -15,7 +14,7 @@ type DNSNetworkMappingDataSourceModel struct {
 }
 
 type DNSNetworkMappingMappingDataSourceModel struct {
-	Cidr4 customfield.List[jsontypes.Normalized] `tfsdk:"cidr4" json:"cidr4,computed"`
-	Cidr6 customfield.List[jsontypes.Normalized] `tfsdk:"cidr6" json:"cidr6,computed"`
-	Tags  customfield.List[types.String]         `tfsdk:"tags" json:"tags,computed"`
+	Cidr4 customfield.List[types.String] `tfsdk:"cidr4" json:"cidr4,computed"`
+	Cidr6 customfield.List[types.String] `tfsdk:"cidr6" json:"cidr6,computed"`
+	Tags  customfield.List[types.String] `tfsdk:"tags" json:"tags,computed"`
 }

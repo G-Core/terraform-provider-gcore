@@ -5,7 +5,6 @@ package dns_network_mapping
 import (
 	"context"
 
-	"github.com/hashicorp/terraform-plugin-framework-jsontypes/jsontypes"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/int64planmodifier"
@@ -19,8 +18,8 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 	return schema.Schema{
 		Attributes: map[string]schema.Attribute{
 			"id": schema.Int64Attribute{
-				Required:      true,
-				PlanModifiers: []planmodifier.Int64{int64planmodifier.UseStateForUnknown(), int64planmodifier.RequiresReplace()},
+				Computed:      true,
+				PlanModifiers: []planmodifier.Int64{int64planmodifier.UseStateForUnknown()},
 			},
 			"name": schema.StringAttribute{
 				Optional: true,
@@ -31,11 +30,11 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 					Attributes: map[string]schema.Attribute{
 						"cidr4": schema.ListAttribute{
 							Optional:    true,
-							ElementType: jsontypes.NormalizedType{},
+							ElementType: types.StringType,
 						},
 						"cidr6": schema.ListAttribute{
 							Optional:    true,
-							ElementType: jsontypes.NormalizedType{},
+							ElementType: types.StringType,
 						},
 						"tags": schema.ListAttribute{
 							Optional:    true,
