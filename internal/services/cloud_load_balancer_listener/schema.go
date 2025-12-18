@@ -40,7 +40,7 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 				PlanModifiers: []planmodifier.Int64{int64planmodifier.RequiresReplace()},
 			},
 			"load_balancer_id": schema.StringAttribute{
-				Description:   "Load balancer ID",
+				Description:   "ID of already existent Load Balancer.",
 				Required:      true,
 				PlanModifiers: []planmodifier.String{stringplanmodifier.RequiresReplace()},
 			},
@@ -66,6 +66,11 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 					int64validator.Between(1, 65535),
 				},
 				PlanModifiers: []planmodifier.Int64{int64planmodifier.RequiresReplace()},
+			},
+			"default_pool_id": schema.StringAttribute{
+				Description:   "ID of already existent Load Balancer Pool to attach listener to.",
+				Optional:      true,
+				PlanModifiers: []planmodifier.String{stringplanmodifier.RequiresReplace()},
 			},
 			"insert_x_forwarded": schema.BoolAttribute{
 				Description:   "Add headers X-Forwarded-For, X-Forwarded-Port, X-Forwarded-Proto to requests. Only used with HTTP or `TERMINATED_HTTPS` protocols.",

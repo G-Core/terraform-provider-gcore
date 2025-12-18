@@ -16,6 +16,7 @@ type CloudLoadBalancerListenerModel struct {
 	LoadBalancerID       types.String                                                         `tfsdk:"load_balancer_id" json:"load_balancer_id,required"`
 	Protocol             types.String                                                         `tfsdk:"protocol" json:"protocol,required"`
 	ProtocolPort         types.Int64                                                          `tfsdk:"protocol_port" json:"protocol_port,required"`
+	DefaultPoolID        types.String                                                         `tfsdk:"default_pool_id" json:"default_pool_id,optional,no_refresh"`
 	InsertXForwarded     types.Bool                                                           `tfsdk:"insert_x_forwarded" json:"insert_x_forwarded,optional,no_refresh"`
 	Name                 types.String                                                         `tfsdk:"name" json:"name,required"`
 	SecretID             types.String                                                         `tfsdk:"secret_id" json:"secret_id,optional"`

@@ -22,6 +22,7 @@ resource "gcore_cloud_load_balancer_listener" "example_cloud_load_balancer_liste
   protocol_port = 80
   allowed_cidrs = ["10.0.0.0/8"]
   connection_limit = 100000
+  default_pool_id = "00000000-0000-4000-8000-000000000000"
   insert_x_forwarded = false
   secret_id = "f2e734d0-fa2b-42c2-ad33-4c6db5101e00"
   sni_secret_id = ["f2e734d0-fa2b-42c2-ad33-4c6db5101e00", "eb121225-7ded-4ff3-ae1f-599e145dd7cb"]
@@ -40,7 +41,7 @@ resource "gcore_cloud_load_balancer_listener" "example_cloud_load_balancer_liste
 
 ### Required
 
-- `load_balancer_id` (String) Load balancer ID
+- `load_balancer_id` (String) ID of already existent Load Balancer.
 - `name` (String) Load balancer listener name
 - `protocol` (String) Load balancer listener protocol
 Available values: "HTTP", "HTTPS", "PROMETHEUS", "TCP", "TERMINATED_HTTPS", "UDP".
@@ -50,6 +51,7 @@ Available values: "HTTP", "HTTPS", "PROMETHEUS", "TCP", "TERMINATED_HTTPS", "UDP
 
 - `allowed_cidrs` (List of String) Network CIDRs from which service will be accessible
 - `connection_limit` (Number) Limit of the simultaneous connections. If -1 is provided, it is translated to the default value 100000.
+- `default_pool_id` (String) ID of already existent Load Balancer Pool to attach listener to.
 - `insert_x_forwarded` (Boolean) Add headers X-Forwarded-For, X-Forwarded-Port, X-Forwarded-Proto to requests. Only used with HTTP or `TERMINATED_HTTPS` protocols.
 - `project_id` (Number) Project ID
 - `region_id` (Number) Region ID
