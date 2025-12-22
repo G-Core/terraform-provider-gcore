@@ -13,6 +13,8 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/boolplanmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/int64default"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/int64planmodifier"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/listplanmodifier"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/objectplanmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringplanmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
@@ -106,6 +108,9 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 				Validators: []validator.Int64{
 					int64validator.Between(0, 86400000),
 				},
+				PlanModifiers: []planmodifier.Int64{
+					int64planmodifier.UseStateForUnknown(),
+				},
 			},
 			"timeout_member_connect": schema.Int64Attribute{
 				Description: "Backend member connection timeout in milliseconds",
@@ -113,6 +118,9 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 				Optional:    true,
 				Validators: []validator.Int64{
 					int64validator.Between(0, 86400000),
+				},
+				PlanModifiers: []planmodifier.Int64{
+					int64planmodifier.UseStateForUnknown(),
 				},
 			},
 			"timeout_member_data": schema.Int64Attribute{
@@ -122,6 +130,9 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 				Validators: []validator.Int64{
 					int64validator.Between(0, 86400000),
 				},
+				PlanModifiers: []planmodifier.Int64{
+					int64planmodifier.UseStateForUnknown(),
+				},
 			},
 			"sni_secret_id": schema.ListAttribute{
 				Description: "List of secrets IDs containing PKCS12 format certificate/key bundles for `TERMINATED_HTTPS` or PROMETHEUS listeners",
@@ -129,12 +140,18 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 				Optional:    true,
 				CustomType:  customfield.NewListType[types.String](ctx),
 				ElementType: types.StringType,
+				PlanModifiers: []planmodifier.List{
+					listplanmodifier.UseStateForUnknown(),
+				},
 			},
 			"user_list": schema.ListNestedAttribute{
 				Description: "Load balancer listener list of username and encrypted password items",
 				Computed:    true,
 				Optional:    true,
 				CustomType:  customfield.NewNestedObjectListType[CloudLoadBalancerListenerUserListModel](ctx),
+				PlanModifiers: []planmodifier.List{
+					listplanmodifier.UseStateForUnknown(),
+				},
 				NestedObject: schema.NestedAttributeObject{
 					Attributes: map[string]schema.Attribute{
 						"encrypted_password": schema.StringAttribute{
@@ -151,6 +168,9 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 			"creator_task_id": schema.StringAttribute{
 				Description: "Task that created this entity",
 				Computed:    true,
+				PlanModifiers: []planmodifier.String{
+					stringplanmodifier.UseStateForUnknown(),
+				},
 			},
 			"operating_status": schema.StringAttribute{
 				Description: "Listener operating status\nAvailable values: \"DEGRADED\", \"DRAINING\", \"ERROR\", \"NO_MONITOR\", \"OFFLINE\", \"ONLINE\".",
@@ -165,10 +185,16 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 						"ONLINE",
 					),
 				},
+				PlanModifiers: []planmodifier.String{
+					stringplanmodifier.UseStateForUnknown(),
+				},
 			},
 			"pool_count": schema.Int64Attribute{
 				Description: "Number of pools (for UI)",
 				Computed:    true,
+				PlanModifiers: []planmodifier.Int64{
+					int64planmodifier.UseStateForUnknown(),
+				},
 			},
 			"provisioning_status": schema.StringAttribute{
 				Description: "Listener lifecycle status\nAvailable values: \"ACTIVE\", \"DELETED\", \"ERROR\", \"PENDING_CREATE\", \"PENDING_DELETE\", \"PENDING_UPDATE\".",
@@ -183,27 +209,25 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 						"PENDING_UPDATE",
 					),
 				},
+				PlanModifiers: []planmodifier.String{
+					stringplanmodifier.UseStateForUnknown(),
+				},
 			},
-			"task_id": schema.StringAttribute{
-				Description: "The UUID of the active task that currently holds a lock on the resource. This lock prevents concurrent modifications to ensure consistency. If `null`, the resource is not locked.",
-				Computed:    true,
-			},
-			"insert_headers": schema.MapAttribute{
+			"insert_headers": schema.StringAttribute{
 				Description: "Dictionary of additional header insertion into HTTP headers. Only used with HTTP and `TERMINATED_HTTPS` protocols.",
 				Computed:    true,
-				CustomType:  customfield.NewMapType[jsontypes.Normalized](ctx),
-				ElementType: jsontypes.NormalizedType{},
-			},
-			"tasks": schema.ListAttribute{
-				Description: "List of task IDs representing asynchronous operations. Use these IDs to monitor operation progress:\n* `GET /v1/tasks/{task_id}` - Check individual task status and details\nPoll task status until completion (`FINISHED`/`ERROR`) before proceeding with dependent operations.",
-				Computed:    true,
-				CustomType:  customfield.NewListType[types.String](ctx),
-				ElementType: types.StringType,
+				CustomType:  jsontypes.NormalizedType{},
+				PlanModifiers: []planmodifier.String{
+					stringplanmodifier.UseStateForUnknown(),
+				},
 			},
 			"stats": schema.SingleNestedAttribute{
 				Description: "Statistics of the load balancer. It is available only in get functions by a flag.",
 				Computed:    true,
 				CustomType:  customfield.NewNestedObjectType[CloudLoadBalancerListenerStatsModel](ctx),
+				PlanModifiers: []planmodifier.Object{
+					objectplanmodifier.UseStateForUnknown(),
+				},
 				Attributes: map[string]schema.Attribute{
 					"active_connections": schema.Int64Attribute{
 						Description: "Currently active connections",

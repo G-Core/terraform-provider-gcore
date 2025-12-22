@@ -41,8 +41,9 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 				PlanModifiers: []planmodifier.Int64{int64planmodifier.RequiresReplace()},
 			},
 			"flavor": schema.StringAttribute{
-				Description: "Load balancer flavor name",
-				Optional:    true,
+				Description:   "Load balancer flavor name",
+				Optional:      true,
+				PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
 			},
 			"name_template": schema.StringAttribute{
 				Description:   "Load balancer name which will be changed by template. Either `name` or `name_template` should be specified.",
@@ -88,13 +89,19 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 						"ipv6",
 					),
 				},
-				PlanModifiers: []planmodifier.String{stringplanmodifier.RequiresReplaceIfConfigured()},
+				PlanModifiers: []planmodifier.String{
+					stringplanmodifier.RequiresReplaceIfConfigured(),
+					stringplanmodifier.UseStateForUnknown(),
+				},
 			},
 			"vip_port_id": schema.StringAttribute{
-				Description:   "Existing Reserved Fixed IP port ID for load balancer. Mutually exclusive with `vip_network_id`",
-				Computed:      true,
-				Optional:      true,
-				PlanModifiers: []planmodifier.String{stringplanmodifier.RequiresReplaceIfConfigured()},
+				Description: "Existing Reserved Fixed IP port ID for load balancer. Mutually exclusive with `vip_network_id`",
+				Computed:    true,
+				Optional:    true,
+				PlanModifiers: []planmodifier.String{
+					stringplanmodifier.RequiresReplaceIfConfigured(),
+					stringplanmodifier.UseStateForUnknown(),
+				},
 			},
 			"listeners": schema.ListNestedAttribute{
 				Description: "Load balancer listeners. Maximum 50 per LB (excluding Prometheus endpoint listener).",
@@ -430,7 +437,10 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 						},
 					},
 				},
-				PlanModifiers: []planmodifier.List{listplanmodifier.RequiresReplaceIfConfigured()},
+				PlanModifiers: []planmodifier.List{
+					listplanmodifier.RequiresReplaceIfConfigured(),
+					listplanmodifier.UseStateForUnknown(),
+				},
 			},
 			"name": schema.StringAttribute{
 				Description: "Load balancer name. Either `name` or `name_template` should be specified.",
@@ -455,6 +465,9 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 				Computed:    true,
 				Optional:    true,
 				CustomType:  customfield.NewNestedObjectType[CloudLoadBalancerLoggingModel](ctx),
+				PlanModifiers: []planmodifier.Object{
+					objectplanmodifier.UseStateForUnknown(),
+				},
 				Attributes: map[string]schema.Attribute{
 					"destination_region_id": schema.Int64Attribute{
 						Description: "Destination region id to which the logs will be written",
@@ -489,10 +502,16 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 				Description: "Datetime when the load balancer was created",
 				Computed:    true,
 				CustomType:  timetypes.RFC3339Type{},
+				PlanModifiers: []planmodifier.String{
+					stringplanmodifier.UseStateForUnknown(),
+				},
 			},
 			"creator_task_id": schema.StringAttribute{
 				Description: "Task that created this entity",
 				Computed:    true,
+				PlanModifiers: []planmodifier.String{
+					stringplanmodifier.UseStateForUnknown(),
+				},
 			},
 			"operating_status": schema.StringAttribute{
 				Description: "Load balancer operating status\nAvailable values: \"DEGRADED\", \"DRAINING\", \"ERROR\", \"NO_MONITOR\", \"OFFLINE\", \"ONLINE\".",
@@ -525,10 +544,9 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 			"region": schema.StringAttribute{
 				Description: "Region name",
 				Computed:    true,
-			},
-			"task_id": schema.StringAttribute{
-				Description: "The UUID of the active task that currently holds a lock on the resource. This lock prevents concurrent modifications to ensure consistency. If `null`, the resource is not locked.",
-				Computed:    true,
+				PlanModifiers: []planmodifier.String{
+					stringplanmodifier.UseStateForUnknown(),
+				},
 			},
 			"updated_at": schema.StringAttribute{
 				Description: "Datetime when the load balancer was last updated",
@@ -538,17 +556,17 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 			"vip_address": schema.StringAttribute{
 				Description: "Load balancer IP address",
 				Computed:    true,
-			},
-			"tasks": schema.ListAttribute{
-				Description: "List of task IDs representing asynchronous operations. Use these IDs to monitor operation progress:\n* `GET /v1/tasks/{task_id}` - Check individual task status and details\nPoll task status until completion (`FINISHED`/`ERROR`) before proceeding with dependent operations.",
-				Computed:    true,
-				CustomType:  customfield.NewListType[types.String](ctx),
-				ElementType: types.StringType,
+				PlanModifiers: []planmodifier.String{
+					stringplanmodifier.UseStateForUnknown(),
+				},
 			},
 			"additional_vips": schema.ListNestedAttribute{
 				Description: "List of additional IP addresses",
 				Computed:    true,
 				CustomType:  customfield.NewNestedObjectListType[CloudLoadBalancerAdditionalVipsModel](ctx),
+				PlanModifiers: []planmodifier.List{
+					listplanmodifier.UseStateForUnknown(),
+				},
 				NestedObject: schema.NestedAttributeObject{
 					Attributes: map[string]schema.Attribute{
 						"ip_address": schema.StringAttribute{
@@ -566,6 +584,9 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 				Description: "Loadbalancer advanced DDoS protection profile.",
 				Computed:    true,
 				CustomType:  customfield.NewNestedObjectType[CloudLoadBalancerDDOSProfileModel](ctx),
+				PlanModifiers: []planmodifier.Object{
+					objectplanmodifier.UseStateForUnknown(),
+				},
 				Attributes: map[string]schema.Attribute{
 					"id": schema.Int64Attribute{
 						Description: "Unique identifier for the DDoS protection profile",
@@ -746,6 +767,9 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 				Description: "List of assigned floating IPs",
 				Computed:    true,
 				CustomType:  customfield.NewNestedObjectListType[CloudLoadBalancerFloatingIPsModel](ctx),
+				PlanModifiers: []planmodifier.List{
+					listplanmodifier.UseStateForUnknown(),
+				},
 				NestedObject: schema.NestedAttributeObject{
 					Attributes: map[string]schema.Attribute{
 						"id": schema.StringAttribute{
@@ -821,10 +845,6 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 								},
 							},
 						},
-						"task_id": schema.StringAttribute{
-							Description: "The UUID of the active task that currently holds a lock on the resource. This lock prevents concurrent modifications to ensure consistency. If `null`, the resource is not locked.",
-							Computed:    true,
-						},
 						"updated_at": schema.StringAttribute{
 							Description: "Datetime when the floating IP was last updated",
 							Computed:    true,
@@ -837,6 +857,9 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 				Description: "Statistics of load balancer.",
 				Computed:    true,
 				CustomType:  customfield.NewNestedObjectType[CloudLoadBalancerStatsModel](ctx),
+				PlanModifiers: []planmodifier.Object{
+					objectplanmodifier.UseStateForUnknown(),
+				},
 				Attributes: map[string]schema.Attribute{
 					"active_connections": schema.Int64Attribute{
 						Description: "Currently active connections",
@@ -864,6 +887,9 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 				Description: "List of key-value tags associated with the resource. A tag is a key-value pair that can be associated with a resource, enabling efficient filtering and grouping for better organization and management. Some tags are read-only and cannot be modified by the user. Tags are also integrated with cost reports, allowing cost data to be filtered based on tag keys or values.",
 				Computed:    true,
 				CustomType:  customfield.NewNestedObjectListType[CloudLoadBalancerTagsV2Model](ctx),
+				// NOTE: Removed UseStateForUnknown() to fix GCLOUD2-20778 tags inconsistency error
+				// tags_v2 is derived from tags input, so it should always refresh from API
+				PlanModifiers: []planmodifier.List{},
 				NestedObject: schema.NestedAttributeObject{
 					Attributes: map[string]schema.Attribute{
 						"key": schema.StringAttribute{

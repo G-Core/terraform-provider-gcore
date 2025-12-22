@@ -66,7 +66,17 @@ func (r *CloudLoadBalancerListenerResource) Create(ctx context.Context, req reso
 		return
 	}
 
+	dataBytes, err := data.MarshalJSON()
+	if err != nil {
+		resp.Diagnostics.AddError("failed to serialize http request", err.Error())
+		return
+	}
+
 	params := cloud.LoadBalancerListenerNewParams{}
+	if err := params.UnmarshalJSON(dataBytes); err != nil {
+		resp.Diagnostics.AddError("failed to deserialize into params", err.Error())
+		return
+	}
 
 	if !data.ProjectID.IsNull() {
 		params.ProjectID = param.NewOpt(data.ProjectID.ValueInt64())
@@ -76,15 +86,9 @@ func (r *CloudLoadBalancerListenerResource) Create(ctx context.Context, req reso
 		params.RegionID = param.NewOpt(data.RegionID.ValueInt64())
 	}
 
-	dataBytes, err := data.MarshalJSON()
-	if err != nil {
-		resp.Diagnostics.AddError("failed to serialize http request", err.Error())
-		return
-	}
 	listener, err := r.client.Cloud.LoadBalancers.Listeners.NewAndPoll(
 		ctx,
 		params,
-		option.WithRequestBody("application/json", dataBytes),
 		option.WithMiddleware(logging.Middleware(ctx)),
 	)
 	if err != nil {
@@ -118,16 +122,6 @@ func (r *CloudLoadBalancerListenerResource) Update(ctx context.Context, req reso
 		return
 	}
 
-	params := cloud.LoadBalancerListenerUpdateParams{}
-
-	if !data.ProjectID.IsNull() {
-		params.ProjectID = param.NewOpt(data.ProjectID.ValueInt64())
-	}
-
-	if !data.RegionID.IsNull() {
-		params.RegionID = param.NewOpt(data.RegionID.ValueInt64())
-	}
-
 	dataBytes, err := data.MarshalJSONForUpdate(*state)
 	if err != nil {
 		resp.Diagnostics.AddError("failed to serialize http request", err.Error())
@@ -139,14 +133,18 @@ func (r *CloudLoadBalancerListenerResource) Update(ctx context.Context, req reso
 	// If no fields have changed, skip the update and just refresh from API
 	if dataStr == "{}" || dataStr == "null" || len(dataBytes) == 0 {
 		// No changes to send - just read current state
+		getParams := cloud.LoadBalancerListenerGetParams{}
+		if !data.ProjectID.IsNull() {
+			getParams.ProjectID = param.NewOpt(data.ProjectID.ValueInt64())
+		}
+		if !data.RegionID.IsNull() {
+			getParams.RegionID = param.NewOpt(data.RegionID.ValueInt64())
+		}
 		res := new(http.Response)
 		_, err := r.client.Cloud.LoadBalancers.Listeners.Get(
 			ctx,
 			data.ID.ValueString(),
-			cloud.LoadBalancerListenerGetParams{
-				ProjectID: params.ProjectID,
-				RegionID:  params.RegionID,
-			},
+			getParams,
 			option.WithResponseBodyInto(&res),
 			option.WithMiddleware(logging.Middleware(ctx)),
 		)
@@ -164,11 +162,24 @@ func (r *CloudLoadBalancerListenerResource) Update(ctx context.Context, req reso
 		return
 	}
 
+	params := cloud.LoadBalancerListenerUpdateParams{}
+	if err := params.UnmarshalJSON(dataBytes); err != nil {
+		resp.Diagnostics.AddError("failed to deserialize into params", err.Error())
+		return
+	}
+
+	if !data.ProjectID.IsNull() {
+		params.ProjectID = param.NewOpt(data.ProjectID.ValueInt64())
+	}
+
+	if !data.RegionID.IsNull() {
+		params.RegionID = param.NewOpt(data.RegionID.ValueInt64())
+	}
+
 	listener, err := r.client.Cloud.LoadBalancers.Listeners.UpdateAndPoll(
 		ctx,
 		data.ID.ValueString(),
 		params,
-		option.WithRequestBody("application/json", dataBytes),
 		option.WithMiddleware(logging.Middleware(ctx)),
 	)
 	if err != nil {
@@ -222,7 +233,7 @@ func (r *CloudLoadBalancerListenerResource) Read(ctx context.Context, req resour
 		return
 	}
 	bytes, _ := io.ReadAll(res.Body)
-	err = apijson.Unmarshal(bytes, &data)
+	err = apijson.UnmarshalComputed(bytes, &data)
 	if err != nil {
 		resp.Diagnostics.AddError("failed to deserialize http request", err.Error())
 		return

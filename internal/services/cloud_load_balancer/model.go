@@ -31,10 +31,8 @@ type CloudLoadBalancerModel struct {
 	OperatingStatus       types.String                                                       `tfsdk:"operating_status" json:"operating_status,computed"`
 	ProvisioningStatus    types.String                                                       `tfsdk:"provisioning_status" json:"provisioning_status,computed"`
 	Region                types.String                                                       `tfsdk:"region" json:"region,computed"`
-	TaskID                types.String                                                       `tfsdk:"task_id" json:"task_id,computed"`
 	UpdatedAt             timetypes.RFC3339                                                  `tfsdk:"updated_at" json:"updated_at,computed" format:"date-time"`
 	VipAddress            types.String                                                       `tfsdk:"vip_address" json:"vip_address,computed"`
-	Tasks                 customfield.List[types.String]                                     `tfsdk:"tasks" json:"tasks,computed,no_refresh"`
 	AdditionalVips        customfield.NestedObjectList[CloudLoadBalancerAdditionalVipsModel] `tfsdk:"additional_vips" json:"additional_vips,computed"`
 	DDOSProfile           customfield.NestedObject[CloudLoadBalancerDDOSProfileModel]        `tfsdk:"ddos_profile" json:"ddos_profile,computed"`
 	FloatingIPs           customfield.NestedObjectList[CloudLoadBalancerFloatingIPsModel]    `tfsdk:"floating_ips" json:"floating_ips,computed"`
@@ -210,7 +208,6 @@ type CloudLoadBalancerFloatingIPsModel struct {
 	RouterID          types.String                                                        `tfsdk:"router_id" json:"router_id,computed"`
 	Status            types.String                                                        `tfsdk:"status" json:"status,computed"`
 	Tags              customfield.NestedObjectList[CloudLoadBalancerFloatingIPsTagsModel] `tfsdk:"tags" json:"tags,computed"`
-	TaskID            types.String                                                        `tfsdk:"task_id" json:"task_id,computed"`
 	UpdatedAt         timetypes.RFC3339                                                   `tfsdk:"updated_at" json:"updated_at,computed" format:"date-time"`
 }
 

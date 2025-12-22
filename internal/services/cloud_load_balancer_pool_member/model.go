@@ -5,7 +5,6 @@ package cloud_load_balancer_pool_member
 import (
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/stainless-sdks/gcore-terraform/internal/apijson"
-	"github.com/stainless-sdks/gcore-terraform/internal/customfield"
 )
 
 type CloudLoadBalancerPoolMemberModel struct {
@@ -22,7 +21,6 @@ type CloudLoadBalancerPoolMemberModel struct {
 	Weight         types.Int64                    `tfsdk:"weight" json:"weight,optional"`
 	AdminStateUp   types.Bool                     `tfsdk:"admin_state_up" json:"admin_state_up,computed_optional"`
 	Backup         types.Bool                     `tfsdk:"backup" json:"backup,computed_optional"`
-	Tasks          customfield.List[types.String] `tfsdk:"tasks" json:"tasks,computed"`
 }
 
 func (m CloudLoadBalancerPoolMemberModel) MarshalJSON() (data []byte, err error) {

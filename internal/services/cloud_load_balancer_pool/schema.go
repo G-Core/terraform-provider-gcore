@@ -7,16 +7,56 @@ import (
 
 	"github.com/hashicorp/terraform-plugin-framework-validators/int64validator"
 	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
+	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/booldefault"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/int64planmodifier"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/listplanmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringplanmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/stainless-sdks/gcore-terraform/internal/customfield"
 )
+
+// useEmptyListWhenConfigNull is a plan modifier that sets the plan value to an empty list
+// when the config value is null (attribute omitted from .tf file).
+// This is needed for computed_optional list attributes where omitting the attribute
+// should mean "clear the list" rather than "keep state value".
+// See: GCLOUD2-20778
+type useEmptyListWhenConfigNull struct{}
+
+func UseEmptyListWhenConfigNull() planmodifier.List {
+	return useEmptyListWhenConfigNull{}
+}
+
+func (m useEmptyListWhenConfigNull) Description(_ context.Context) string {
+	return "Sets plan to empty list when config is null, preserving state when plan is unknown during create."
+}
+
+func (m useEmptyListWhenConfigNull) MarkdownDescription(ctx context.Context) string {
+	return m.Description(ctx)
+}
+
+func (m useEmptyListWhenConfigNull) PlanModifyList(ctx context.Context, req planmodifier.ListRequest, resp *planmodifier.ListResponse) {
+	// If config is null (user omitted the attribute), set plan to empty list
+	// This ensures "no members in config" means "clear all members"
+	if req.ConfigValue.IsNull() {
+		// Only set to empty list if we have existing state (update scenario)
+		// During create, let the plan remain unknown so API can provide defaults
+		if !req.StateValue.IsNull() && !req.StateValue.IsUnknown() {
+			resp.PlanValue = types.ListValueMust(req.StateValue.ElementType(ctx), []attr.Value{})
+		}
+		return
+	}
+
+	// If plan is unknown and state has a value, use state (like UseStateForUnknown)
+	// This handles computed defaults during create
+	if req.PlanValue.IsUnknown() && !req.StateValue.IsNull() && !req.StateValue.IsUnknown() {
+		resp.PlanValue = req.StateValue
+	}
+}
 
 var _ resource.ResourceWithConfigValidators = (*CloudLoadBalancerPoolResource)(nil)
 
@@ -40,12 +80,12 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 			"listener_id": schema.StringAttribute{
 				Description:   "Listener ID",
 				Optional:      true,
-				PlanModifiers: []planmodifier.String{stringplanmodifier.RequiresReplace()},
+				PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown(), stringplanmodifier.RequiresReplace()},
 			},
 			"load_balancer_id": schema.StringAttribute{
 				Description:   "Loadbalancer ID",
 				Optional:      true,
-				PlanModifiers: []planmodifier.String{stringplanmodifier.RequiresReplace()},
+				PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown(), stringplanmodifier.RequiresReplace()},
 			},
 			"lb_algorithm": schema.StringAttribute{
 				Description: "Load balancer algorithm\nAvailable values: \"LEAST_CONNECTIONS\", \"ROUND_ROBIN\", \"SOURCE_IP\".",
@@ -155,6 +195,7 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 					},
 					"http_method": schema.StringAttribute{
 						Description: "HTTP method. Can only be used together with `HTTP` or `HTTPS` health monitor type.\nAvailable values: \"CONNECT\", \"DELETE\", \"GET\", \"HEAD\", \"OPTIONS\", \"PATCH\", \"POST\", \"PUT\", \"TRACE\".",
+						Computed:    true,
 						Optional:    true,
 						Validators: []validator.String{
 							stringvalidator.OneOfCaseInsensitive(
@@ -172,6 +213,7 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 					},
 					"max_retries_down": schema.Int64Attribute{
 						Description: "Number of failures before the member is switched to ERROR state.",
+						Computed:    true,
 						Optional:    true,
 						Validators: []validator.Int64{
 							int64validator.Between(1, 10),
@@ -217,6 +259,12 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 				Computed:    true,
 				Optional:    true,
 				CustomType:  customfield.NewNestedObjectListType[CloudLoadBalancerPoolMembersModel](ctx),
+				PlanModifiers: []planmodifier.List{
+					// Use custom modifier that sets empty list when config is null
+					// This ensures omitting `members` from .tf file removes all members
+					// See: GCLOUD2-20778
+					UseEmptyListWhenConfigNull(),
+				},
 				NestedObject: schema.NestedAttributeObject{
 					Attributes: map[string]schema.Attribute{
 						"address": schema.StringAttribute{
@@ -268,6 +316,9 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 			"creator_task_id": schema.StringAttribute{
 				Description: "Task that created this entity",
 				Computed:    true,
+				PlanModifiers: []planmodifier.String{
+					stringplanmodifier.UseStateForUnknown(),
+				},
 			},
 			"operating_status": schema.StringAttribute{
 				Description: "Pool operating status\nAvailable values: \"DEGRADED\", \"DRAINING\", \"ERROR\", \"NO_MONITOR\", \"OFFLINE\", \"ONLINE\".",
@@ -297,20 +348,13 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 					),
 				},
 			},
-			"task_id": schema.StringAttribute{
-				Description: "The UUID of the active task that currently holds a lock on the resource. This lock prevents concurrent modifications to ensure consistency. If `null`, the resource is not locked.",
-				Computed:    true,
-			},
-			"tasks": schema.ListAttribute{
-				Description: "List of task IDs representing asynchronous operations. Use these IDs to monitor operation progress:\n* `GET /v1/tasks/{task_id}` - Check individual task status and details\nPoll task status until completion (`FINISHED`/`ERROR`) before proceeding with dependent operations.",
-				Computed:    true,
-				CustomType:  customfield.NewListType[types.String](ctx),
-				ElementType: types.StringType,
-			},
 			"listeners": schema.ListNestedAttribute{
 				Description: "Listeners IDs",
 				Computed:    true,
 				CustomType:  customfield.NewNestedObjectListType[CloudLoadBalancerPoolListenersModel](ctx),
+				PlanModifiers: []planmodifier.List{
+					listplanmodifier.UseStateForUnknown(),
+				},
 				NestedObject: schema.NestedAttributeObject{
 					Attributes: map[string]schema.Attribute{
 						"id": schema.StringAttribute{
@@ -324,6 +368,9 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 				Description: "Load balancers IDs",
 				Computed:    true,
 				CustomType:  customfield.NewNestedObjectListType[CloudLoadBalancerPoolLoadbalancersModel](ctx),
+				PlanModifiers: []planmodifier.List{
+					listplanmodifier.UseStateForUnknown(),
+				},
 				NestedObject: schema.NestedAttributeObject{
 					Attributes: map[string]schema.Attribute{
 						"id": schema.StringAttribute{

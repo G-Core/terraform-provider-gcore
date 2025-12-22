@@ -41,9 +41,6 @@ import (
 	"github.com/stainless-sdks/gcore-terraform/internal/services/cloud_security_group"
 	"github.com/stainless-sdks/gcore-terraform/internal/services/cloud_ssh_key"
 	"github.com/stainless-sdks/gcore-terraform/internal/services/cloud_volume"
-	"github.com/stainless-sdks/gcore-terraform/internal/services/dns_network_mapping"
-	"github.com/stainless-sdks/gcore-terraform/internal/services/dns_zone"
-	"github.com/stainless-sdks/gcore-terraform/internal/services/dns_zone_rrset"
 )
 
 var _ provider.ProviderWithConfigValidators = (*GcoreProvider)(nil)
@@ -202,9 +199,6 @@ func (p *GcoreProvider) Resources(ctx context.Context) []func() resource.Resourc
 		cloud_gpu_virtual_cluster_image.NewResource,
 		cloud_instance.NewResource,
 		cloud_k8s_cluster.NewResource,
-		dns_zone.NewResource,
-		dns_zone_rrset.NewResource,
-		dns_network_mapping.NewResource,
 	}
 }
 
@@ -249,9 +243,6 @@ func (p *GcoreProvider) DataSources(ctx context.Context) []func() datasource.Dat
 		cloud_instance.NewCloudInstancesDataSource,
 		cloud_instance_image.NewCloudInstanceImageDataSource,
 		cloud_k8s_cluster.NewCloudK8SClusterDataSource,
-		dns_zone.NewDNSZoneDataSource,
-		dns_zone_rrset.NewDNSZoneRrsetDataSource,
-		dns_network_mapping.NewDNSNetworkMappingDataSource,
 	}
 }
 

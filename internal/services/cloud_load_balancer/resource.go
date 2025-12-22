@@ -4,6 +4,7 @@ package cloud_load_balancer
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"io"
 	"net/http"
@@ -66,7 +67,17 @@ func (r *CloudLoadBalancerResource) Create(ctx context.Context, req resource.Cre
 		return
 	}
 
+	dataBytes, err := data.MarshalJSON()
+	if err != nil {
+		resp.Diagnostics.AddError("failed to serialize http request", err.Error())
+		return
+	}
+
 	params := cloud.LoadBalancerNewParams{}
+	if err := params.UnmarshalJSON(dataBytes); err != nil {
+		resp.Diagnostics.AddError("failed to deserialize into params", err.Error())
+		return
+	}
 
 	if !data.ProjectID.IsNull() {
 		params.ProjectID = param.NewOpt(data.ProjectID.ValueInt64())
@@ -76,17 +87,10 @@ func (r *CloudLoadBalancerResource) Create(ctx context.Context, req resource.Cre
 		params.RegionID = param.NewOpt(data.RegionID.ValueInt64())
 	}
 
-	dataBytes, err := data.MarshalJSON()
-	if err != nil {
-		resp.Diagnostics.AddError("failed to serialize http request", err.Error())
-		return
-	}
-
 	// Use NewAndPoll to get the LoadBalancer directly instead of task_id
 	loadBalancer, err := r.client.Cloud.LoadBalancers.NewAndPoll(
 		ctx,
 		params,
-		option.WithRequestBody("application/json", dataBytes),
 		option.WithMiddleware(logging.Middleware(ctx)),
 	)
 	if err != nil {
@@ -206,12 +210,30 @@ func (r *CloudLoadBalancerResource) Update(ctx context.Context, req resource.Upd
 		return
 	}
 
-	res := new(http.Response)
+	// Call Update - note: API returns empty vrrp_ips despite docs claiming otherwise
 	_, err = r.client.Cloud.LoadBalancers.Update(
 		ctx,
 		data.ID.ValueString(),
 		params,
 		option.WithRequestBody("application/json", dataBytes),
+		option.WithMiddleware(logging.Middleware(ctx)),
+	)
+	if err != nil {
+		resp.Diagnostics.AddError("failed to update load balancer", err.Error())
+		return
+	}
+
+	// IMPORTANT: The PATCH endpoint returns vrrp_ips: [] (empty array) even though docs say otherwise.
+	// We must do an explicit GET to retrieve all computed fields including vrrp_ips.
+	// This matches the old provider behavior: resourceLoadBalancerV2Read(ctx, d, m)
+	res := new(http.Response)
+	_, err = r.client.Cloud.LoadBalancers.Get(
+		ctx,
+		data.ID.ValueString(),
+		cloud.LoadBalancerGetParams{
+			ProjectID: params.ProjectID,
+			RegionID:  params.RegionID,
+		},
 		option.WithResponseBodyInto(&res),
 		option.WithMiddleware(logging.Middleware(ctx)),
 	)
@@ -266,7 +288,7 @@ func (r *CloudLoadBalancerResource) Read(ctx context.Context, req resource.ReadR
 		return
 	}
 	bytes, _ := io.ReadAll(res.Body)
-	err = apijson.Unmarshal(bytes, &data)
+	err = apijson.UnmarshalComputed(bytes, &data)
 	if err != nil {
 		resp.Diagnostics.AddError("failed to deserialize http request", err.Error())
 		return
@@ -350,6 +372,23 @@ func (r *CloudLoadBalancerResource) ImportState(ctx context.Context, req resourc
 	if err != nil {
 		resp.Diagnostics.AddError("failed to deserialize http request", err.Error())
 		return
+	}
+
+	// Populate flavor from the nested flavor object in API response.
+	// The API returns flavor as {"flavor_id": "...", "flavor_name": "lb1-1-2", ...}
+	// but Terraform expects just the flavor name string.
+	// Without this, terraform plan after import would show flavor changing from null
+	// to the config value, triggering an unnecessary resize operation.
+	// See: GCLOUD2-20778
+	if data.Flavor.IsNull() || data.Flavor.IsUnknown() {
+		var rawResponse struct {
+			Flavor *struct {
+				FlavorName string `json:"flavor_name"`
+			} `json:"flavor"`
+		}
+		if err := json.Unmarshal(bytes, &rawResponse); err == nil && rawResponse.Flavor != nil && rawResponse.Flavor.FlavorName != "" {
+			data.Flavor = types.StringValue(rawResponse.Flavor.FlavorName)
+		}
 	}
 
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)

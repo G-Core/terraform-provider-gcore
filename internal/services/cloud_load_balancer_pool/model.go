@@ -29,8 +29,6 @@ type CloudLoadBalancerPoolModel struct {
 	CreatorTaskID        types.String                                                          `tfsdk:"creator_task_id" json:"creator_task_id,computed"`
 	OperatingStatus      types.String                                                          `tfsdk:"operating_status" json:"operating_status,computed"`
 	ProvisioningStatus   types.String                                                          `tfsdk:"provisioning_status" json:"provisioning_status,computed"`
-	TaskID               types.String                                                          `tfsdk:"task_id" json:"task_id,computed"`
-	Tasks                customfield.List[types.String]                                        `tfsdk:"tasks" json:"tasks,computed,no_refresh"`
 	Listeners            customfield.NestedObjectList[CloudLoadBalancerPoolListenersModel]     `tfsdk:"listeners" json:"listeners,computed"`
 	Loadbalancers        customfield.NestedObjectList[CloudLoadBalancerPoolLoadbalancersModel] `tfsdk:"loadbalancers" json:"loadbalancers,computed"`
 }
@@ -49,8 +47,8 @@ type CloudLoadBalancerPoolHealthmonitorModel struct {
 	Timeout        types.Int64  `tfsdk:"timeout" json:"timeout,required"`
 	Type           types.String `tfsdk:"type" json:"type,required"`
 	ExpectedCodes  types.String `tfsdk:"expected_codes" json:"expected_codes,optional"`
-	HTTPMethod     types.String `tfsdk:"http_method" json:"http_method,optional"`
-	MaxRetriesDown types.Int64  `tfsdk:"max_retries_down" json:"max_retries_down,optional"`
+	HTTPMethod     types.String `tfsdk:"http_method" json:"http_method,computed_optional"`
+	MaxRetriesDown types.Int64  `tfsdk:"max_retries_down" json:"max_retries_down,computed_optional"`
 	URLPath        types.String `tfsdk:"url_path" json:"url_path,optional"`
 }
 

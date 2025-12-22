@@ -73,10 +73,6 @@ Available values: "DEGRADED", "DRAINING", "ERROR", "NO_MONITOR", "OFFLINE", "ONL
 - `provisioning_status` (String) Listener lifecycle status
 Available values: "ACTIVE", "DELETED", "ERROR", "PENDING_CREATE", "PENDING_DELETE", "PENDING_UPDATE".
 - `stats` (Attributes) Statistics of the load balancer. It is available only in get functions by a flag. (see [below for nested schema](#nestedatt--stats))
-- `task_id` (String) The UUID of the active task that currently holds a lock on the resource. This lock prevents concurrent modifications to ensure consistency. If `null`, the resource is not locked.
-- `tasks` (List of String) List of task IDs representing asynchronous operations. Use these IDs to monitor operation progress:
-* `GET /v1/tasks/{task_id}` - Check individual task status and details
-Poll task status until completion (`FINISHED`/`ERROR`) before proceeding with dependent operations.
 
 <a id="nestedatt--user_list"></a>
 ### Nested Schema for `user_list`
