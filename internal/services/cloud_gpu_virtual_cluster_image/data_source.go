@@ -64,7 +64,7 @@ func (d *CloudGPUVirtualClusterImageDataSource) Read(ctx context.Context, req da
 	}
 
 	res := new(http.Response)
-	_, err := d.client.Cloud.GPUVirtualClusters.Images.Get(
+	_, err := d.client.Cloud.GPUVirtual.Clusters.Images.Get(
 		ctx,
 		data.ImageID.ValueString(),
 		params,
