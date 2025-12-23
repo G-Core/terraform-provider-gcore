@@ -81,7 +81,7 @@ func (r *CloudGPUVirtualClusterImageResource) Create(ctx context.Context, req re
 		return
 	}
 	res := new(http.Response)
-	_, err = r.client.Cloud.GPUVirtualClusters.Images.Upload(
+	_, err = r.client.Cloud.GPUVirtual.Clusters.Images.Upload(
 		ctx,
 		params,
 		option.WithRequestBody("application/json", dataBytes),
@@ -126,7 +126,7 @@ func (r *CloudGPUVirtualClusterImageResource) Read(ctx context.Context, req reso
 	}
 
 	res := new(http.Response)
-	_, err := r.client.Cloud.GPUVirtualClusters.Images.Get(
+	_, err := r.client.Cloud.GPUVirtual.Clusters.Images.Get(
 		ctx,
 		data.ID.ValueString(),
 		params,
@@ -171,7 +171,7 @@ func (r *CloudGPUVirtualClusterImageResource) Delete(ctx context.Context, req re
 		params.RegionID = param.NewOpt(data.RegionID.ValueInt64())
 	}
 
-	_, err := r.client.Cloud.GPUVirtualClusters.Images.Delete(
+	_, err := r.client.Cloud.GPUVirtual.Clusters.Images.Delete(
 		ctx,
 		data.ID.ValueString(),
 		params,
@@ -208,7 +208,7 @@ func (r *CloudGPUVirtualClusterImageResource) ImportState(ctx context.Context, r
 	data.ID = types.StringValue(path_image_id)
 
 	res := new(http.Response)
-	_, err := r.client.Cloud.GPUVirtualClusters.Images.Get(
+	_, err := r.client.Cloud.GPUVirtual.Clusters.Images.Get(
 		ctx,
 		path_image_id,
 		cloud.GPUVirtualClusterImageGetParams{
