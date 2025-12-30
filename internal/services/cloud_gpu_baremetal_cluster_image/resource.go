@@ -81,7 +81,7 @@ func (r *CloudGPUBaremetalClusterImageResource) Create(ctx context.Context, req 
 		return
 	}
 	res := new(http.Response)
-	_, err = r.client.Cloud.GPUBaremetalClusters.Images.Upload(
+	_, err = r.client.Cloud.GPUBaremetal.Clusters.Images.Upload(
 		ctx,
 		params,
 		option.WithRequestBody("application/json", dataBytes),
@@ -126,7 +126,7 @@ func (r *CloudGPUBaremetalClusterImageResource) Read(ctx context.Context, req re
 	}
 
 	res := new(http.Response)
-	_, err := r.client.Cloud.GPUBaremetalClusters.Images.Get(
+	_, err := r.client.Cloud.GPUBaremetal.Clusters.Images.Get(
 		ctx,
 		data.ID.ValueString(),
 		params,
@@ -171,7 +171,7 @@ func (r *CloudGPUBaremetalClusterImageResource) Delete(ctx context.Context, req 
 		params.RegionID = param.NewOpt(data.RegionID.ValueInt64())
 	}
 
-	_, err := r.client.Cloud.GPUBaremetalClusters.Images.Delete(
+	_, err := r.client.Cloud.GPUBaremetal.Clusters.Images.Delete(
 		ctx,
 		data.ID.ValueString(),
 		params,
@@ -208,7 +208,7 @@ func (r *CloudGPUBaremetalClusterImageResource) ImportState(ctx context.Context,
 	data.ID = types.StringValue(path_image_id)
 
 	res := new(http.Response)
-	_, err := r.client.Cloud.GPUBaremetalClusters.Images.Get(
+	_, err := r.client.Cloud.GPUBaremetal.Clusters.Images.Get(
 		ctx,
 		path_image_id,
 		cloud.GPUBaremetalClusterImageGetParams{
