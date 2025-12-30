@@ -80,7 +80,7 @@ func (r *CloudGPUBaremetalClusterImageResource) Create(ctx context.Context, req 
 		resp.Diagnostics.AddError("failed to serialize http request", err.Error())
 		return
 	}
-	image, err := r.client.Cloud.GPUBaremetalClusters.Images.UploadAndPoll(
+	image, err := r.client.Cloud.GPUBaremetal.Clusters.Images.UploadAndPoll(
 		ctx,
 		params,
 		option.WithRequestBody("application/json", dataBytes),
@@ -123,7 +123,7 @@ func (r *CloudGPUBaremetalClusterImageResource) Read(ctx context.Context, req re
 	}
 
 	res := new(http.Response)
-	_, err := r.client.Cloud.GPUBaremetalClusters.Images.Get(
+	_, err := r.client.Cloud.GPUBaremetal.Clusters.Images.Get(
 		ctx,
 		data.ID.ValueString(),
 		params,
@@ -168,7 +168,7 @@ func (r *CloudGPUBaremetalClusterImageResource) Delete(ctx context.Context, req 
 		params.RegionID = param.NewOpt(data.RegionID.ValueInt64())
 	}
 
-	err := r.client.Cloud.GPUBaremetalClusters.Images.DeleteAndPoll(
+	err := r.client.Cloud.GPUBaremetal.Clusters.Images.DeleteAndPoll(
 		ctx,
 		data.ID.ValueString(),
 		params,
@@ -205,7 +205,7 @@ func (r *CloudGPUBaremetalClusterImageResource) ImportState(ctx context.Context,
 	data.ID = types.StringValue(path_image_id)
 
 	res := new(http.Response)
-	_, err := r.client.Cloud.GPUBaremetalClusters.Images.Get(
+	_, err := r.client.Cloud.GPUBaremetal.Clusters.Images.Get(
 		ctx,
 		path_image_id,
 		cloud.GPUBaremetalClusterImageGetParams{

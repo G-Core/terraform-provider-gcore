@@ -64,7 +64,7 @@ func (d *CloudGPUBaremetalClusterImageDataSource) Read(ctx context.Context, req 
 	}
 
 	res := new(http.Response)
-	_, err := d.client.Cloud.GPUBaremetalClusters.Images.Get(
+	_, err := d.client.Cloud.GPUBaremetal.Clusters.Images.Get(
 		ctx,
 		data.ImageID.ValueString(),
 		params,
