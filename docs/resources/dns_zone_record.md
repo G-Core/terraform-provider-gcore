@@ -193,7 +193,6 @@ Optional:
 - `countries` (List of String) Countries ISO codes meta (eg. us) of DNS Zone Record resource.
 - `default` (Boolean) Fallback meta equals true marks records which are used as a default answer (when nothing was selected by specified meta fields).
 - `failover` (Map of String) Computed UUID of failover healtcheck property
-- `fallback` (Boolean) Set as fallback record
 - `ip` (List of String) An ip meta (eg. 127.0.0.0) of DNS Zone Record resource.
 - `latlong` (List of Number) A latlong meta (eg. 27.988056, 86.925278) of DNS Zone Record resource.
 - `notes` (String) A notes meta (eg. Miami DC) of DNS Zone Record resource.

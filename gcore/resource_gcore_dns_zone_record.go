@@ -45,7 +45,6 @@ const (
 	DNSZoneRecordSchemaMetaFailover   = "failover"
 	DNSZoneRecordSchemaMetaWeight     = "weight"
 	DNSZoneRecordSchemaMetaBackup     = "backup"
-	DNSZoneRecordSchemaMetaFallback   = "fallback"
 
 	// DNSZoneRRSetSchemaMeta failover meta is inside rrset, not inside resource record
 	DNSZoneRRSetSchemaMeta = "meta"
@@ -82,7 +81,6 @@ var dnsZoneRecordSchemaMetaList = []string{
 	DNSZoneRecordSchemaMetaFailover,
 	DNSZoneRecordSchemaMetaWeight,
 	DNSZoneRecordSchemaMetaBackup,
-	DNSZoneRecordSchemaMetaFallback,
 	DNSZoneRecordSchemaMetaCidrLabels,
 }
 
@@ -279,11 +277,6 @@ func resourceDNSZoneRecord() *schema.Resource {
 										Type:        schema.TypeInt,
 										Optional:    true,
 										Description: "A weight for this record",
-									},
-									DNSZoneRecordSchemaMetaFallback: {
-										Type:        schema.TypeBool,
-										Optional:    true,
-										Description: "Set as fallback record",
 									},
 									DNSZoneRecordSchemaMetaBackup: {
 										Type:        schema.TypeBool,
@@ -834,11 +827,6 @@ func fillRRSet(d *schema.ResourceData, rType string, rrSet *dnssdk.RRSet) error 
 			valBool, ok := meta[DNSZoneRecordSchemaMetaBackup].(bool)
 			if ok && valBool {
 				rr.AddMeta(validWrap(dnssdk.NewResourceMetaBackup()))
-			}
-
-			valBool, ok = meta[DNSZoneRecordSchemaMetaFallback].(bool)
-			if ok && valBool {
-				rr.AddMeta(validWrap(dnssdk.NewResourceMetaFallback()))
 			}
 
 			valInt, ok := meta[DNSZoneRecordSchemaMetaWeight].(int)
