@@ -69,117 +69,66 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 				Optional:    true,
 				Default:     booldefault.StaticBool(true),
 			},
+			"dnssec_enabled": schema.BoolAttribute{
+				Description: "describe dnssec status\ntrue means dnssec is enabled for the zone\nfalse means dnssec is disabled for the zone",
+				Computed:    true,
+			},
+			"status": schema.StringAttribute{
+				Computed: true,
+			},
 			"warnings": schema.ListAttribute{
 				Computed:    true,
 				CustomType:  customfield.NewListType[types.String](ctx),
 				ElementType: types.StringType,
 			},
-			"zone": schema.SingleNestedAttribute{
-				Description: "OutputZone",
-				Computed:    true,
-				CustomType:  customfield.NewNestedObjectType[DNSZoneZoneModel](ctx),
-				Attributes: map[string]schema.Attribute{
-					"id": schema.Int64Attribute{
-						Description: "ID of zone.\nThis field usually is omitted in response and available only in\ncase of getting deleted zones by admin.",
-						Computed:    true,
-					},
-					"client_id": schema.Int64Attribute{
-						Computed: true,
-					},
-					"contact": schema.StringAttribute{
-						Description: "email address of the administrator responsible for this zone",
-						Computed:    true,
-					},
-					"dnssec_enabled": schema.BoolAttribute{
-						Description: "describe dnssec status\ntrue means dnssec is enabled for the zone\nfalse means dnssec is disabled for the zone",
-						Computed:    true,
-					},
-					"expiry": schema.Int64Attribute{
-						Description: "number of seconds after which secondary name servers should stop answering request for this zone",
-						Computed:    true,
-					},
-					"meta": schema.StringAttribute{
-						Description: "arbitrarily data of zone in json format",
-						Computed:    true,
-						CustomType:  jsontypes.NormalizedType{},
-					},
-					"name": schema.StringAttribute{
-						Description: "name of DNS zone",
-						Computed:    true,
-					},
-					"nx_ttl": schema.Int64Attribute{
-						Description: "Time To Live of cache",
-						Computed:    true,
-					},
-					"primary_server": schema.StringAttribute{
-						Description: "primary master name server for zone",
-						Computed:    true,
-					},
-					"records": schema.ListNestedAttribute{
-						Computed:   true,
-						CustomType: customfield.NewNestedObjectListType[DNSZoneZoneRecordsModel](ctx),
-						NestedObject: schema.NestedAttributeObject{
-							Attributes: map[string]schema.Attribute{
-								"name": schema.StringAttribute{
-									Computed: true,
-								},
-								"short_answers": schema.ListAttribute{
-									Computed:    true,
-									CustomType:  customfield.NewListType[types.String](ctx),
-									ElementType: types.StringType,
-								},
-								"ttl": schema.Int64Attribute{
-									Computed: true,
-								},
-								"type": schema.StringAttribute{
-									Computed: true,
-								},
-							},
+			"records": schema.ListNestedAttribute{
+				Computed:   true,
+				CustomType: customfield.NewNestedObjectListType[DNSZoneRecordsModel](ctx),
+				NestedObject: schema.NestedAttributeObject{
+					Attributes: map[string]schema.Attribute{
+						"name": schema.StringAttribute{
+							Computed: true,
+						},
+						"short_answers": schema.ListAttribute{
+							Computed:    true,
+							CustomType:  customfield.NewListType[types.String](ctx),
+							ElementType: types.StringType,
+						},
+						"ttl": schema.Int64Attribute{
+							Computed: true,
+						},
+						"type": schema.StringAttribute{
+							Computed: true,
 						},
 					},
-					"refresh": schema.Int64Attribute{
-						Description: "number of seconds after which secondary name servers should query the master for the SOA record, to detect zone changes.",
+				},
+			},
+			"rrsets_amount": schema.SingleNestedAttribute{
+				Computed:   true,
+				CustomType: customfield.NewNestedObjectType[DNSZoneRrsetsAmountModel](ctx),
+				Attributes: map[string]schema.Attribute{
+					"dynamic": schema.SingleNestedAttribute{
+						Description: "Amount of dynamic RRsets in zone",
 						Computed:    true,
-					},
-					"retry": schema.Int64Attribute{
-						Description: "number of seconds after which secondary name servers should retry to request the serial number",
-						Computed:    true,
-					},
-					"rrsets_amount": schema.SingleNestedAttribute{
-						Computed:   true,
-						CustomType: customfield.NewNestedObjectType[DNSZoneZoneRrsetsAmountModel](ctx),
+						CustomType:  customfield.NewNestedObjectType[DNSZoneRrsetsAmountDynamicModel](ctx),
 						Attributes: map[string]schema.Attribute{
-							"dynamic": schema.SingleNestedAttribute{
-								Description: "Amount of dynamic RRsets in zone",
-								Computed:    true,
-								CustomType:  customfield.NewNestedObjectType[DNSZoneZoneRrsetsAmountDynamicModel](ctx),
-								Attributes: map[string]schema.Attribute{
-									"healthcheck": schema.Int64Attribute{
-										Description: "Amount of RRsets with enabled healthchecks",
-										Computed:    true,
-									},
-									"total": schema.Int64Attribute{
-										Description: "Total amount of dynamic RRsets in zone",
-										Computed:    true,
-									},
-								},
-							},
-							"static": schema.Int64Attribute{
-								Description: "Amount of static RRsets in zone",
+							"healthcheck": schema.Int64Attribute{
+								Description: "Amount of RRsets with enabled healthchecks",
 								Computed:    true,
 							},
 							"total": schema.Int64Attribute{
-								Description: "Total amount of RRsets in zone",
+								Description: "Total amount of dynamic RRsets in zone",
 								Computed:    true,
 							},
 						},
 					},
-					"serial": schema.Int64Attribute{
-						Description: "Serial number for this zone or Timestamp of zone modification moment.\nIf a secondary name server slaved to this one observes an increase in this number,\nthe slave will assume that the zone has been updated and initiate a zone transfer.",
+					"static": schema.Int64Attribute{
+						Description: "Amount of static RRsets in zone",
 						Computed:    true,
 					},
-					"status": schema.StringAttribute{
-						Computed: true,
+					"total": schema.Int64Attribute{
+						Description: "Total amount of RRsets in zone",
+						Computed:    true,
 					},
 				},
 			},

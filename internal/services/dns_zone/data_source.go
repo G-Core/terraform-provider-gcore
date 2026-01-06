@@ -74,7 +74,6 @@ func (d *DNSZoneDataSource) Read(ctx context.Context, req datasource.ReadRequest
 		resp.Diagnostics.AddError("failed to deserialize http request", err.Error())
 		return
 	}
-	data.ID = data.Name
 
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
 }
