@@ -10,19 +10,22 @@ import (
 )
 
 type DNSZoneModel struct {
-	ID            types.String                               `tfsdk:"id" json:"-,computed"`
-	Name          types.String                               `tfsdk:"name" json:"name,required"`
-	Contact       types.String                               `tfsdk:"contact" json:"contact,optional,no_refresh"`
-	Expiry        types.Int64                                `tfsdk:"expiry" json:"expiry,optional,no_refresh"`
-	NxTtl         types.Int64                                `tfsdk:"nx_ttl" json:"nx_ttl,optional,no_refresh"`
-	PrimaryServer types.String                               `tfsdk:"primary_server" json:"primary_server,optional,no_refresh"`
-	Refresh       types.Int64                                `tfsdk:"refresh" json:"refresh,optional,no_refresh"`
-	Retry         types.Int64                                `tfsdk:"retry" json:"retry,optional,no_refresh"`
-	Serial        types.Int64                                `tfsdk:"serial" json:"serial,optional,no_refresh"`
-	Meta          *map[string]jsontypes.Normalized           `tfsdk:"meta" json:"meta,optional,no_refresh"`
-	Enabled       types.Bool                                 `tfsdk:"enabled" json:"enabled,computed_optional,no_refresh"`
-	Warnings      customfield.List[types.String]             `tfsdk:"warnings" json:"warnings,computed,no_refresh"`
-	Zone          customfield.NestedObject[DNSZoneZoneModel] `tfsdk:"zone" json:"Zone,computed"`
+	ID            types.String                                       `tfsdk:"id" json:"-,computed"`
+	Name          types.String                                       `tfsdk:"name" json:"name,required"`
+	Contact       types.String                                       `tfsdk:"contact" json:"contact,optional"`
+	Expiry        types.Int64                                        `tfsdk:"expiry" json:"expiry,optional"`
+	NxTtl         types.Int64                                        `tfsdk:"nx_ttl" json:"nx_ttl,optional"`
+	PrimaryServer types.String                                       `tfsdk:"primary_server" json:"primary_server,optional"`
+	Refresh       types.Int64                                        `tfsdk:"refresh" json:"refresh,optional"`
+	Retry         types.Int64                                        `tfsdk:"retry" json:"retry,optional"`
+	Serial        types.Int64                                        `tfsdk:"serial" json:"serial,optional"`
+	Meta          *map[string]jsontypes.Normalized                   `tfsdk:"meta" json:"meta,optional"`
+	Enabled       types.Bool                                         `tfsdk:"enabled" json:"enabled,computed_optional"`
+	DnssecEnabled types.Bool                                         `tfsdk:"dnssec_enabled" json:"dnssec_enabled,computed"`
+	Status        types.String                                       `tfsdk:"status" json:"status,computed"`
+	Warnings      customfield.List[types.String]                     `tfsdk:"warnings" json:"warnings,computed,no_refresh"`
+	Records       customfield.NestedObjectList[DNSZoneRecordsModel]  `tfsdk:"records" json:"records,computed"`
+	RrsetsAmount  customfield.NestedObject[DNSZoneRrsetsAmountModel] `tfsdk:"rrsets_amount" json:"rrsets_amount,computed"`
 }
 
 func (m DNSZoneModel) MarshalJSON() (data []byte, err error) {
@@ -33,38 +36,20 @@ func (m DNSZoneModel) MarshalJSONForUpdate(state DNSZoneModel) (data []byte, err
 	return apijson.MarshalForUpdate(m, state)
 }
 
-type DNSZoneZoneModel struct {
-	ID            types.Int64                                            `tfsdk:"id" json:"id,computed"`
-	ClientID      types.Int64                                            `tfsdk:"client_id" json:"client_id,computed"`
-	Contact       types.String                                           `tfsdk:"contact" json:"contact,computed"`
-	DnssecEnabled types.Bool                                             `tfsdk:"dnssec_enabled" json:"dnssec_enabled,computed"`
-	Expiry        types.Int64                                            `tfsdk:"expiry" json:"expiry,computed"`
-	Meta          jsontypes.Normalized                                   `tfsdk:"meta" json:"meta,computed"`
-	Name          types.String                                           `tfsdk:"name" json:"name,computed"`
-	NxTtl         types.Int64                                            `tfsdk:"nx_ttl" json:"nx_ttl,computed"`
-	PrimaryServer types.String                                           `tfsdk:"primary_server" json:"primary_server,computed"`
-	Records       customfield.NestedObjectList[DNSZoneZoneRecordsModel]  `tfsdk:"records" json:"records,computed"`
-	Refresh       types.Int64                                            `tfsdk:"refresh" json:"refresh,computed"`
-	Retry         types.Int64                                            `tfsdk:"retry" json:"retry,computed"`
-	RrsetsAmount  customfield.NestedObject[DNSZoneZoneRrsetsAmountModel] `tfsdk:"rrsets_amount" json:"rrsets_amount,computed"`
-	Serial        types.Int64                                            `tfsdk:"serial" json:"serial,computed"`
-	Status        types.String                                           `tfsdk:"status" json:"status,computed"`
-}
-
-type DNSZoneZoneRecordsModel struct {
+type DNSZoneRecordsModel struct {
 	Name         types.String                   `tfsdk:"name" json:"name,computed"`
 	ShortAnswers customfield.List[types.String] `tfsdk:"short_answers" json:"short_answers,computed"`
 	Ttl          types.Int64                    `tfsdk:"ttl" json:"ttl,computed"`
 	Type         types.String                   `tfsdk:"type" json:"type,computed"`
 }
 
-type DNSZoneZoneRrsetsAmountModel struct {
-	Dynamic customfield.NestedObject[DNSZoneZoneRrsetsAmountDynamicModel] `tfsdk:"dynamic" json:"dynamic,computed"`
-	Static  types.Int64                                                   `tfsdk:"static" json:"static,computed"`
-	Total   types.Int64                                                   `tfsdk:"total" json:"total,computed"`
+type DNSZoneRrsetsAmountModel struct {
+	Dynamic customfield.NestedObject[DNSZoneRrsetsAmountDynamicModel] `tfsdk:"dynamic" json:"dynamic,computed"`
+	Static  types.Int64                                               `tfsdk:"static" json:"static,computed"`
+	Total   types.Int64                                               `tfsdk:"total" json:"total,computed"`
 }
 
-type DNSZoneZoneRrsetsAmountDynamicModel struct {
+type DNSZoneRrsetsAmountDynamicModel struct {
 	Healthcheck types.Int64 `tfsdk:"healthcheck" json:"healthcheck,computed"`
 	Total       types.Int64 `tfsdk:"total" json:"total,computed"`
 }

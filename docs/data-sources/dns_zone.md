@@ -27,38 +27,29 @@ data "gcore_dns_zone" "example_dns_zone" {
 
 ### Read-Only
 
-- `id` (String) The ID of this resource.
-- `zone` (Attributes) OutputZone (see [below for nested schema](#nestedatt--zone))
-
-<a id="nestedatt--zone"></a>
-### Nested Schema for `zone`
-
-Read-Only:
-
-- `client_id` (Number)
 - `contact` (String) email address of the administrator responsible for this zone
 - `dnssec_enabled` (Boolean) describe dnssec status
 true means dnssec is enabled for the zone
 false means dnssec is disabled for the zone
+- `enabled` (Boolean)
 - `expiry` (Number) number of seconds after which secondary name servers should stop answering request for this zone
 - `id` (Number) ID of zone.
 This field usually is omitted in response and available only in
 case of getting deleted zones by admin.
-- `meta` (String) arbitrarily data of zone in json format
-- `name` (String) name of DNS zone
+- `meta` (Map of String) arbitrarily data of zone in json format
 - `nx_ttl` (Number) Time To Live of cache
 - `primary_server` (String) primary master name server for zone
-- `records` (Attributes List) (see [below for nested schema](#nestedatt--zone--records))
+- `records` (Attributes List) (see [below for nested schema](#nestedatt--records))
 - `refresh` (Number) number of seconds after which secondary name servers should query the master for the SOA record, to detect zone changes.
 - `retry` (Number) number of seconds after which secondary name servers should retry to request the serial number
-- `rrsets_amount` (Attributes) (see [below for nested schema](#nestedatt--zone--rrsets_amount))
+- `rrsets_amount` (Attributes) (see [below for nested schema](#nestedatt--rrsets_amount))
 - `serial` (Number) Serial number for this zone or Timestamp of zone modification moment.
 If a secondary name server slaved to this one observes an increase in this number,
 the slave will assume that the zone has been updated and initiate a zone transfer.
 - `status` (String)
 
-<a id="nestedatt--zone--records"></a>
-### Nested Schema for `zone.records`
+<a id="nestedatt--records"></a>
+### Nested Schema for `records`
 
 Read-Only:
 
@@ -68,17 +59,17 @@ Read-Only:
 - `type` (String)
 
 
-<a id="nestedatt--zone--rrsets_amount"></a>
-### Nested Schema for `zone.rrsets_amount`
+<a id="nestedatt--rrsets_amount"></a>
+### Nested Schema for `rrsets_amount`
 
 Read-Only:
 
-- `dynamic` (Attributes) Amount of dynamic RRsets in zone (see [below for nested schema](#nestedatt--zone--rrsets_amount--dynamic))
+- `dynamic` (Attributes) Amount of dynamic RRsets in zone (see [below for nested schema](#nestedatt--rrsets_amount--dynamic))
 - `static` (Number) Amount of static RRsets in zone
 - `total` (Number) Total amount of RRsets in zone
 
-<a id="nestedatt--zone--rrsets_amount--dynamic"></a>
-### Nested Schema for `zone.rrsets_amount.dynamic`
+<a id="nestedatt--rrsets_amount--dynamic"></a>
+### Nested Schema for `rrsets_amount.dynamic`
 
 Read-Only:
 
