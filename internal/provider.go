@@ -16,6 +16,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/provider/schema"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/types"
+	"github.com/stainless-sdks/gcore-terraform/internal/services/cdn_origin_group"
 	"github.com/stainless-sdks/gcore-terraform/internal/services/cloud_file_share"
 	"github.com/stainless-sdks/gcore-terraform/internal/services/cloud_file_share_access_rule"
 	"github.com/stainless-sdks/gcore-terraform/internal/services/cloud_floating_ip"
@@ -201,6 +202,7 @@ func (p *GcoreProvider) Resources(ctx context.Context) []func() resource.Resourc
 		cloud_gpu_virtual_cluster_image.NewResource,
 		cloud_instance.NewResource,
 		cloud_k8s_cluster.NewResource,
+		cdn_origin_group.NewResource,
 	}
 }
 
@@ -247,6 +249,7 @@ func (p *GcoreProvider) DataSources(ctx context.Context) []func() datasource.Dat
 		cloud_instance.NewCloudInstancesDataSource,
 		cloud_instance_image.NewCloudInstanceImageDataSource,
 		cloud_k8s_cluster.NewCloudK8SClusterDataSource,
+		cdn_origin_group.NewCdnOriginGroupDataSource,
 	}
 }
 

@@ -1,0 +1,19 @@
+// File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
+
+package cdn_origin_group_test
+
+import (
+	"context"
+	"testing"
+
+	"github.com/stainless-sdks/gcore-terraform/internal/services/cdn_origin_group"
+	"github.com/stainless-sdks/gcore-terraform/internal/test_helpers"
+)
+
+func TestCdnOriginGroupDataSourceModelSchemaParity(t *testing.T) {
+	t.Parallel()
+	model := (*cdn_origin_group.CdnOriginGroupDataSourceModel)(nil)
+	schema := cdn_origin_group.DataSourceSchema(context.TODO())
+	errs := test_helpers.ValidateDataSourceModelSchemaIntegrity(model, schema)
+	errs.Report(t)
+}
