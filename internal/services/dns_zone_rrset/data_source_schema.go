@@ -122,7 +122,7 @@ func DataSourceSchema(ctx context.Context) schema.Schema {
 							Computed: true,
 						},
 						"meta": schema.MapAttribute{
-							Description: "Meta information for record\nMap with string key and any valid json as value, with valid keys\n1. `asn` (array of int)\n2. `continents` (array of string)\n3. `countries` (array of string)\n4. `latlong` (array of float64, latitude and longitude)\n5. `fallback` (bool)\n6. `backup` (bool)\n7. `notes` (string)\n8. `weight` (float)\n9. `ip` (string)\n\nSome keys are reserved for balancing, @see https://api.gcore.com/dns/v2/info/meta\n\nThis meta will be used to decide which resource record should pass\nthrough filters from the filter set",
+							Description: "Meta information for record\nMap with string key and any valid json as value, with valid keys\n1. `asn` (array of int)\n2. `continents` (array of string)\n3. `countries` (array of string)\n4. `latlong` (array of float64, latitude and longitude)\n5. `backup` (bool)\n6. `notes` (string)\n7. `weight` (float)\n8. `ip` (string)\n9. `default` (bool)\n\nSome keys are reserved for balancing, @see https://api.gcore.com/dns/v2/info/meta\n\nThis meta will be used to decide which resource record should pass\nthrough filters from the filter set",
 							Computed:    true,
 							CustomType:  customfield.NewMapType[jsontypes.Normalized](ctx),
 							ElementType: jsontypes.NormalizedType{},
