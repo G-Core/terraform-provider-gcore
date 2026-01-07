@@ -34,12 +34,12 @@ func (m CloudGPUVirtualClusterModel) MarshalJSONForUpdate(state CloudGPUVirtualC
 }
 
 type CloudGPUVirtualClusterServersSettingsModel struct {
-	Interfaces     *[]*CloudGPUVirtualClusterServersSettingsInterfacesModel     `tfsdk:"interfaces" json:"interfaces,required"`
-	Volumes        *[]*CloudGPUVirtualClusterServersSettingsVolumesModel        `tfsdk:"volumes" json:"volumes,required"`
-	Credentials    *CloudGPUVirtualClusterServersSettingsCredentialsModel       `tfsdk:"credentials" json:"credentials,optional,no_refresh"`
-	FileShares     *[]*CloudGPUVirtualClusterServersSettingsFileSharesModel     `tfsdk:"file_shares" json:"file_shares,optional"`
-	SecurityGroups *[]*CloudGPUVirtualClusterServersSettingsSecurityGroupsModel `tfsdk:"security_groups" json:"security_groups,optional"`
-	UserData       types.String                                                 `tfsdk:"user_data" json:"user_data,optional"`
+	Interfaces     *[]*CloudGPUVirtualClusterServersSettingsInterfacesModel                           `tfsdk:"interfaces" json:"interfaces,required"`
+	Volumes        *[]*CloudGPUVirtualClusterServersSettingsVolumesModel                              `tfsdk:"volumes" json:"volumes,required"`
+	Credentials    *CloudGPUVirtualClusterServersSettingsCredentialsModel                             `tfsdk:"credentials" json:"credentials,optional,no_refresh"`
+	FileShares     customfield.NestedObjectList[CloudGPUVirtualClusterServersSettingsFileSharesModel] `tfsdk:"file_shares" json:"file_shares,computed_optional"`
+	SecurityGroups *[]*CloudGPUVirtualClusterServersSettingsSecurityGroupsModel                       `tfsdk:"security_groups" json:"security_groups,optional"`
+	UserData       types.String                                                                       `tfsdk:"user_data" json:"user_data,optional"`
 }
 
 type CloudGPUVirtualClusterServersSettingsInterfacesModel struct {

@@ -191,7 +191,9 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 					},
 					"file_shares": schema.ListNestedAttribute{
 						Description: "List of file shares to be mounted across the cluster.",
+						Computed:    true,
 						Optional:    true,
+						CustomType:  customfield.NewNestedObjectListType[CloudGPUVirtualClusterServersSettingsFileSharesModel](ctx),
 						NestedObject: schema.NestedAttributeObject{
 							Attributes: map[string]schema.Attribute{
 								"id": schema.StringAttribute{
