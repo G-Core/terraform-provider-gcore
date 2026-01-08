@@ -39,7 +39,7 @@ func DataSourceSchema(ctx context.Context) schema.Schema {
 				},
 			},
 			"country": schema.StringAttribute{
-				Description: "Country",
+				Description: "Two-letter country code, ISO 3166-1 alpha-2",
 				Computed:    true,
 			},
 			"created_at": schema.StringAttribute{

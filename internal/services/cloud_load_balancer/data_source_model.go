@@ -19,8 +19,8 @@ type CloudLoadBalancerDataSourceModel struct {
 	LoadBalancerID        types.String                                                                 `tfsdk:"load_balancer_id" path:"load_balancer_id,optional"`
 	ProjectID             types.Int64                                                                  `tfsdk:"project_id" path:"project_id,optional"`
 	RegionID              types.Int64                                                                  `tfsdk:"region_id" path:"region_id,optional"`
-	ShowStats             types.Bool                                                                   `tfsdk:"show_stats" query:"show_stats,optional"`
-	WithDDOS              types.Bool                                                                   `tfsdk:"with_ddos" query:"with_ddos,optional"`
+	ShowStats             types.Bool                                                                   `tfsdk:"show_stats" query:"show_stats,computed_optional"`
+	WithDDOS              types.Bool                                                                   `tfsdk:"with_ddos" query:"with_ddos,computed_optional"`
 	CreatedAt             timetypes.RFC3339                                                            `tfsdk:"created_at" json:"created_at,computed" format:"date-time"`
 	CreatorTaskID         types.String                                                                 `tfsdk:"creator_task_id" json:"creator_task_id,computed"`
 	Name                  types.String                                                                 `tfsdk:"name" json:"name,computed"`
@@ -92,7 +92,7 @@ func (m *CloudLoadBalancerDataSourceModel) toListParams(_ context.Context) (para
 		params.Name = param.NewOpt(m.FindOneBy.Name.ValueString())
 	}
 	if !m.FindOneBy.OrderBy.IsNull() {
-		params.OrderBy = param.NewOpt(m.FindOneBy.OrderBy.ValueString())
+		params.OrderBy = cloud.LoadBalancerListParamsOrderBy(m.FindOneBy.OrderBy.ValueString())
 	}
 	if !m.ShowStats.IsNull() {
 		params.ShowStats = param.NewOpt(m.ShowStats.ValueBool())
@@ -238,7 +238,7 @@ type CloudLoadBalancerFindOneByDataSourceModel struct {
 	AssignedFloating types.Bool      `tfsdk:"assigned_floating" query:"assigned_floating,optional"`
 	LoggingEnabled   types.Bool      `tfsdk:"logging_enabled" query:"logging_enabled,optional"`
 	Name             types.String    `tfsdk:"name" query:"name,optional"`
-	OrderBy          types.String    `tfsdk:"order_by" query:"order_by,optional"`
+	OrderBy          types.String    `tfsdk:"order_by" query:"order_by,computed_optional"`
 	TagKey           *[]types.String `tfsdk:"tag_key" query:"tag_key,optional"`
 	TagKeyValue      types.String    `tfsdk:"tag_key_value" query:"tag_key_value,optional"`
 }

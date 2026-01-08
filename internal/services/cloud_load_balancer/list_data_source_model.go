@@ -24,11 +24,11 @@ type CloudLoadBalancersDataSourceModel struct {
 	AssignedFloating types.Bool                                                           `tfsdk:"assigned_floating" query:"assigned_floating,optional"`
 	LoggingEnabled   types.Bool                                                           `tfsdk:"logging_enabled" query:"logging_enabled,optional"`
 	Name             types.String                                                         `tfsdk:"name" query:"name,optional"`
-	OrderBy          types.String                                                         `tfsdk:"order_by" query:"order_by,optional"`
-	ShowStats        types.Bool                                                           `tfsdk:"show_stats" query:"show_stats,optional"`
 	TagKeyValue      types.String                                                         `tfsdk:"tag_key_value" query:"tag_key_value,optional"`
-	WithDDOS         types.Bool                                                           `tfsdk:"with_ddos" query:"with_ddos,optional"`
 	TagKey           *[]types.String                                                      `tfsdk:"tag_key" query:"tag_key,optional"`
+	OrderBy          types.String                                                         `tfsdk:"order_by" query:"order_by,computed_optional"`
+	ShowStats        types.Bool                                                           `tfsdk:"show_stats" query:"show_stats,computed_optional"`
+	WithDDOS         types.Bool                                                           `tfsdk:"with_ddos" query:"with_ddos,computed_optional"`
 	MaxItems         types.Int64                                                          `tfsdk:"max_items"`
 	Items            customfield.NestedObjectList[CloudLoadBalancersItemsDataSourceModel] `tfsdk:"items"`
 }
@@ -61,7 +61,7 @@ func (m *CloudLoadBalancersDataSourceModel) toListParams(_ context.Context) (par
 		params.Name = param.NewOpt(m.Name.ValueString())
 	}
 	if !m.OrderBy.IsNull() {
-		params.OrderBy = param.NewOpt(m.OrderBy.ValueString())
+		params.OrderBy = cloud.LoadBalancerListParamsOrderBy(m.OrderBy.ValueString())
 	}
 	if !m.ShowStats.IsNull() {
 		params.ShowStats = param.NewOpt(m.ShowStats.ValueBool())
