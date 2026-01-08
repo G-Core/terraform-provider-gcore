@@ -5,8 +5,8 @@ resource "gcore_cloud_security_group" "example_cloud_security_group" {
     name = "my_security_group"
     description = "Some description"
     security_group_rules = [{
-      description = "Some description"
       direction = "ingress"
+      description = "Some description"
       ethertype = "IPv4"
       port_range_max = 80
       port_range_min = 80

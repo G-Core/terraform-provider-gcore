@@ -79,8 +79,6 @@ type CloudLoadBalancerListenersPoolsModel struct {
 	CaSecretID           types.String                                                              `tfsdk:"ca_secret_id" json:"ca_secret_id,optional"`
 	CrlSecretID          types.String                                                              `tfsdk:"crl_secret_id" json:"crl_secret_id,optional"`
 	Healthmonitor        *CloudLoadBalancerListenersPoolsHealthmonitorModel                        `tfsdk:"healthmonitor" json:"healthmonitor,optional"`
-	ListenerID           types.String                                                              `tfsdk:"listener_id" json:"listener_id,optional"`
-	LoadBalancerID       types.String                                                              `tfsdk:"load_balancer_id" json:"load_balancer_id,optional"`
 	Members              customfield.NestedObjectList[CloudLoadBalancerListenersPoolsMembersModel] `tfsdk:"members" json:"members,computed_optional"`
 	SecretID             types.String                                                              `tfsdk:"secret_id" json:"secret_id,optional"`
 	SessionPersistence   *CloudLoadBalancerListenersPoolsSessionPersistenceModel                   `tfsdk:"session_persistence" json:"session_persistence,optional"`

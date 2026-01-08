@@ -33,10 +33,12 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 				PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
 			},
 			"project_id": schema.Int64Attribute{
+				Description:   "Project ID",
 				Optional:      true,
 				PlanModifiers: []planmodifier.Int64{int64planmodifier.RequiresReplace()},
 			},
 			"region_id": schema.Int64Attribute{
+				Description:   "Region ID",
 				Optional:      true,
 				PlanModifiers: []planmodifier.Int64{int64planmodifier.RequiresReplace()},
 			},
@@ -264,14 +266,6 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 												Optional:    true,
 											},
 										},
-									},
-									"listener_id": schema.StringAttribute{
-										Description: "Listener ID",
-										Optional:    true,
-									},
-									"load_balancer_id": schema.StringAttribute{
-										Description: "Loadbalancer ID",
-										Optional:    true,
 									},
 									"members": schema.ListNestedAttribute{
 										Description: "Pool members",

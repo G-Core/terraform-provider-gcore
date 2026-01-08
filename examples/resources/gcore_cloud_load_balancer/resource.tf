@@ -1,6 +1,6 @@
 resource "gcore_cloud_load_balancer" "example_cloud_load_balancer" {
-  project_id = 0
-  region_id = 0
+  project_id = 1
+  region_id = 7
   flavor = "lb1-1-2"
   floating_ip = {
     existing_floating_id = "c64e5db1-5f1f-43ec-a8d9-5090df85b82d"
@@ -29,8 +29,6 @@ resource "gcore_cloud_load_balancer" "example_cloud_load_balancer" {
         max_retries_down = 3
         url_path = "/"
       }
-      listener_id = "listener_id"
-      load_balancer_id = "bbb35f84-35cc-4b2f-84c2-a6a29bba68aa"
       members = [{
         address = "192.168.1.101"
         protocol_port = 8000

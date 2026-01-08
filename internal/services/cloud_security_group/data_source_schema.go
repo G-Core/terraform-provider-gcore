@@ -23,16 +23,20 @@ func DataSourceSchema(ctx context.Context) schema.Schema {
 	return schema.Schema{
 		Attributes: map[string]schema.Attribute{
 			"id": schema.StringAttribute{
-				Computed: true,
+				Description: "Group ID",
+				Computed:    true,
 			},
 			"group_id": schema.StringAttribute{
-				Optional: true,
+				Description: "Group ID",
+				Optional:    true,
 			},
 			"project_id": schema.Int64Attribute{
-				Optional: true,
+				Description: "Project ID",
+				Optional:    true,
 			},
 			"region_id": schema.Int64Attribute{
-				Optional: true,
+				Description: "Region ID",
+				Optional:    true,
 			},
 			"created_at": schema.StringAttribute{
 				Description: "Datetime when the security group was created",
@@ -75,29 +79,16 @@ func DataSourceSchema(ctx context.Context) schema.Schema {
 							Computed:    true,
 							CustomType:  timetypes.RFC3339Type{},
 						},
+						"description": schema.StringAttribute{
+							Description: "Rule description",
+							Computed:    true,
+						},
 						"direction": schema.StringAttribute{
 							Description: "Ingress or egress, which is the direction in which the security group rule is applied\nAvailable values: \"egress\", \"ingress\".",
 							Computed:    true,
 							Validators: []validator.String{
 								stringvalidator.OneOfCaseInsensitive("egress", "ingress"),
 							},
-						},
-						"revision_number": schema.Int64Attribute{
-							Description: "The revision number of the resource",
-							Computed:    true,
-						},
-						"security_group_id": schema.StringAttribute{
-							Description: "The security group ID to associate with this security group rule",
-							Computed:    true,
-						},
-						"updated_at": schema.StringAttribute{
-							Description: "Datetime when the rule was last updated",
-							Computed:    true,
-							CustomType:  timetypes.RFC3339Type{},
-						},
-						"description": schema.StringAttribute{
-							Description: "Rule description",
-							Computed:    true,
 						},
 						"ethertype": schema.StringAttribute{
 							Description: "Must be IPv4 or IPv6, and addresses represented in CIDR must match the ingress or egress rules.\nAvailable values: \"IPv4\", \"IPv6\".",
@@ -159,6 +150,19 @@ func DataSourceSchema(ctx context.Context) schema.Schema {
 						"remote_ip_prefix": schema.StringAttribute{
 							Description: "The remote IP prefix that is matched by this security group rule",
 							Computed:    true,
+						},
+						"revision_number": schema.Int64Attribute{
+							Description: "The revision number of the resource",
+							Computed:    true,
+						},
+						"security_group_id": schema.StringAttribute{
+							Description: "The security group ID to associate with this security group rule",
+							Computed:    true,
+						},
+						"updated_at": schema.StringAttribute{
+							Description: "Datetime when the rule was last updated",
+							Computed:    true,
+							CustomType:  timetypes.RFC3339Type{},
 						},
 					},
 				},

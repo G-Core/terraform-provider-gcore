@@ -70,17 +70,17 @@ func (m *CloudSecurityGroupDataSourceModel) toListParams(_ context.Context) (par
 type CloudSecurityGroupSecurityGroupRulesDataSourceModel struct {
 	ID              types.String      `tfsdk:"id" json:"id,computed"`
 	CreatedAt       timetypes.RFC3339 `tfsdk:"created_at" json:"created_at,computed" format:"date-time"`
-	Direction       types.String      `tfsdk:"direction" json:"direction,computed"`
-	RevisionNumber  types.Int64       `tfsdk:"revision_number" json:"revision_number,computed"`
-	SecurityGroupID types.String      `tfsdk:"security_group_id" json:"security_group_id,computed"`
-	UpdatedAt       timetypes.RFC3339 `tfsdk:"updated_at" json:"updated_at,computed" format:"date-time"`
 	Description     types.String      `tfsdk:"description" json:"description,computed"`
+	Direction       types.String      `tfsdk:"direction" json:"direction,computed"`
 	Ethertype       types.String      `tfsdk:"ethertype" json:"ethertype,computed"`
 	PortRangeMax    types.Int64       `tfsdk:"port_range_max" json:"port_range_max,computed"`
 	PortRangeMin    types.Int64       `tfsdk:"port_range_min" json:"port_range_min,computed"`
 	Protocol        types.String      `tfsdk:"protocol" json:"protocol,computed"`
 	RemoteGroupID   types.String      `tfsdk:"remote_group_id" json:"remote_group_id,computed"`
 	RemoteIPPrefix  types.String      `tfsdk:"remote_ip_prefix" json:"remote_ip_prefix,computed"`
+	RevisionNumber  types.Int64       `tfsdk:"revision_number" json:"revision_number,computed"`
+	SecurityGroupID types.String      `tfsdk:"security_group_id" json:"security_group_id,computed"`
+	UpdatedAt       timetypes.RFC3339 `tfsdk:"updated_at" json:"updated_at,computed" format:"date-time"`
 }
 
 type CloudSecurityGroupTagsV2DataSourceModel struct {

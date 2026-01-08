@@ -24,23 +24,29 @@ func DataSourceSchema(ctx context.Context) schema.Schema {
 	return schema.Schema{
 		Attributes: map[string]schema.Attribute{
 			"id": schema.StringAttribute{
-				Computed: true,
+				Description: "Load-Balancer ID",
+				Computed:    true,
 			},
 			"load_balancer_id": schema.StringAttribute{
-				Optional: true,
+				Description: "Load-Balancer ID",
+				Optional:    true,
 			},
 			"project_id": schema.Int64Attribute{
-				Optional: true,
+				Description: "Project ID",
+				Optional:    true,
 			},
 			"region_id": schema.Int64Attribute{
-				Optional: true,
+				Description: "Region ID",
+				Optional:    true,
 			},
 			"show_stats": schema.BoolAttribute{
 				Description: "Show statistics",
+				Computed:    true,
 				Optional:    true,
 			},
 			"with_ddos": schema.BoolAttribute{
-				Description: "Show DDoS profile",
+				Description: "Show Advanced DDoS protection profile, if exists",
+				Computed:    true,
 				Optional:    true,
 			},
 			"created_at": schema.StringAttribute{
@@ -564,7 +570,7 @@ func DataSourceSchema(ctx context.Context) schema.Schema {
 						Optional:    true,
 					},
 					"logging_enabled": schema.BoolAttribute{
-						Description: "With or without logging",
+						Description: "With or without logging enabled",
 						Optional:    true,
 					},
 					"name": schema.StringAttribute{
@@ -572,16 +578,37 @@ func DataSourceSchema(ctx context.Context) schema.Schema {
 						Optional:    true,
 					},
 					"order_by": schema.StringAttribute{
-						Description: "Ordering Load Balancer list result by name, `created_at`, `updated_at`, `operating_status`, `provisioning_status`, `vip_address`, `vip_ip_family` and flavor fields of the load balancer and directions (name.asc), default is \"`created_at`.asc\"",
+						Description: "Order by field and direction.\nAvailable values: \"created_at.asc\", \"created_at.desc\", \"flavor.asc\", \"flavor.desc\", \"name.asc\", \"name.desc\", \"operating_status.asc\", \"operating_status.desc\", \"provisioning_status.asc\", \"provisioning_status.desc\", \"updated_at.asc\", \"updated_at.desc\", \"vip_address.asc\", \"vip_address.desc\", \"vip_ip_family.asc\", \"vip_ip_family.desc\".",
+						Computed:    true,
 						Optional:    true,
+						Validators: []validator.String{
+							stringvalidator.OneOfCaseInsensitive(
+								"created_at.asc",
+								"created_at.desc",
+								"flavor.asc",
+								"flavor.desc",
+								"name.asc",
+								"name.desc",
+								"operating_status.asc",
+								"operating_status.desc",
+								"provisioning_status.asc",
+								"provisioning_status.desc",
+								"updated_at.asc",
+								"updated_at.desc",
+								"vip_address.asc",
+								"vip_address.desc",
+								"vip_ip_family.asc",
+								"vip_ip_family.desc",
+							),
+						},
 					},
 					"tag_key": schema.ListAttribute{
-						Description: "Filter by tag keys.",
+						Description: "Optional. Filter by tag keys. ?`tag_key`=key1&`tag_key`=key2",
 						Optional:    true,
 						ElementType: types.StringType,
 					},
 					"tag_key_value": schema.StringAttribute{
-						Description: "Filter by tag key-value pairs. Must be a valid JSON string.",
+						Description: "Optional. Filter by tag key-value pairs.",
 						Optional:    true,
 					},
 				},
