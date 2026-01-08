@@ -200,6 +200,7 @@ func (p *GcoreProvider) Resources(ctx context.Context) []func() resource.Resourc
 		cloud_gpu_virtual_cluster.NewResource,
 		cloud_gpu_virtual_cluster_image.NewResource,
 		cloud_instance.NewResource,
+		cloud_instance_image.NewResource,
 		cloud_k8s_cluster.NewResource,
 		dns_zone.NewResource,
 		dns_zone_rrset.NewResource,
