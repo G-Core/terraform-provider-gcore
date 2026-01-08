@@ -14,6 +14,7 @@ import (
 )
 
 type CloudInstanceImageDataSourceModel struct {
+	ID               types.String                                                        `tfsdk:"id" path:"image_id,computed"`
 	ImageID          types.String                                                        `tfsdk:"image_id" path:"image_id,required"`
 	ProjectID        types.Int64                                                         `tfsdk:"project_id" path:"project_id,optional"`
 	RegionID         types.Int64                                                         `tfsdk:"region_id" path:"region_id,optional"`
@@ -29,7 +30,6 @@ type CloudInstanceImageDataSourceModel struct {
 	GPUDriverVersion types.String                                                        `tfsdk:"gpu_driver_version" json:"gpu_driver_version,computed"`
 	HwFirmwareType   types.String                                                        `tfsdk:"hw_firmware_type" json:"hw_firmware_type,computed"`
 	HwMachineType    types.String                                                        `tfsdk:"hw_machine_type" json:"hw_machine_type,computed"`
-	ID               types.String                                                        `tfsdk:"id" json:"id,computed"`
 	IsBaremetal      types.Bool                                                          `tfsdk:"is_baremetal" json:"is_baremetal,computed"`
 	MinDisk          types.Int64                                                         `tfsdk:"min_disk" json:"min_disk,computed"`
 	MinRam           types.Int64                                                         `tfsdk:"min_ram" json:"min_ram,computed"`

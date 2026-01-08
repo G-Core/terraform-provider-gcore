@@ -18,6 +18,9 @@ var _ datasource.DataSourceWithConfigValidators = (*CloudInstanceImageDataSource
 func DataSourceSchema(ctx context.Context) schema.Schema {
 	return schema.Schema{
 		Attributes: map[string]schema.Attribute{
+			"id": schema.StringAttribute{
+				Computed: true,
+			},
 			"image_id": schema.StringAttribute{
 				Required: true,
 			},
@@ -83,10 +86,6 @@ func DataSourceSchema(ctx context.Context) schema.Schema {
 				Validators: []validator.String{
 					stringvalidator.OneOfCaseInsensitive("pc", "q35"),
 				},
-			},
-			"id": schema.StringAttribute{
-				Description: "Image ID",
-				Computed:    true,
 			},
 			"is_baremetal": schema.BoolAttribute{
 				Description: "Set to true if the image will be used by bare metal servers. Defaults to false.",
