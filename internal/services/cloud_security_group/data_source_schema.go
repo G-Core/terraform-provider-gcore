@@ -191,6 +191,10 @@ func DataSourceSchema(ctx context.Context) schema.Schema {
 			"find_one_by": schema.SingleNestedAttribute{
 				Optional: true,
 				Attributes: map[string]schema.Attribute{
+					"name": schema.StringAttribute{
+						Description: "Optional. Filter by name. Must be specified a full name of the security group.",
+						Optional:    true,
+					},
 					"tag_key": schema.ListAttribute{
 						Description: "Optional. Filter by tag keys. ?`tag_key`=key1&`tag_key`=key2",
 						Optional:    true,

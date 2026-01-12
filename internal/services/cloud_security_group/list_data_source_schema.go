@@ -28,6 +28,10 @@ func ListDataSourceSchema(ctx context.Context) schema.Schema {
 				Description: "Region ID",
 				Optional:    true,
 			},
+			"name": schema.StringAttribute{
+				Description: "Optional. Filter by name. Must be specified a full name of the security group.",
+				Optional:    true,
+			},
 			"tag_key_value": schema.StringAttribute{
 				Description: "Optional. Filter by tag key-value pairs.",
 				Optional:    true,
