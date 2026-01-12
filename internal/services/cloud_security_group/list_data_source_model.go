@@ -20,6 +20,7 @@ type CloudSecurityGroupsResultsListDataSourceEnvelope struct {
 type CloudSecurityGroupsDataSourceModel struct {
 	ProjectID   types.Int64                                                           `tfsdk:"project_id" path:"project_id,optional"`
 	RegionID    types.Int64                                                           `tfsdk:"region_id" path:"region_id,optional"`
+	Name        types.String                                                          `tfsdk:"name" query:"name,optional"`
 	TagKeyValue types.String                                                          `tfsdk:"tag_key_value" query:"tag_key_value,optional"`
 	TagKey      *[]types.String                                                       `tfsdk:"tag_key" query:"tag_key,optional"`
 	MaxItems    types.Int64                                                           `tfsdk:"max_items"`
@@ -43,6 +44,9 @@ func (m *CloudSecurityGroupsDataSourceModel) toListParams(_ context.Context) (pa
 	}
 	if !m.RegionID.IsNull() {
 		params.RegionID = param.NewOpt(m.RegionID.ValueInt64())
+	}
+	if !m.Name.IsNull() {
+		params.Name = param.NewOpt(m.Name.ValueString())
 	}
 	if !m.TagKeyValue.IsNull() {
 		params.TagKeyValue = param.NewOpt(m.TagKeyValue.ValueString())

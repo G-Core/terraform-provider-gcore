@@ -242,15 +242,20 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 				CustomType:  timetypes.RFC3339Type{},
 			},
 			"status": schema.StringAttribute{
-				Description: "Cluster status\nAvailable values: \"active\", \"deleting\", \"error\", \"new\", \"resizing\".",
+				Description: "Cluster status\nAvailable values: \"active\", \"creating\", \"degraded\", \"deleting\", \"error\", \"new\", \"rebooting\", \"rebuilding\", \"resizing\", \"shutoff\".",
 				Computed:    true,
 				Validators: []validator.String{
 					stringvalidator.OneOfCaseInsensitive(
 						"active",
+						"creating",
+						"degraded",
 						"deleting",
 						"error",
 						"new",
+						"rebooting",
+						"rebuilding",
 						"resizing",
+						"shutoff",
 					),
 				},
 			},

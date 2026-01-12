@@ -244,15 +244,20 @@ func ListDataSourceSchema(ctx context.Context) schema.Schema {
 							},
 						},
 						"status": schema.StringAttribute{
-							Description: "Cluster status\nAvailable values: \"active\", \"deleting\", \"error\", \"new\", \"resizing\".",
+							Description: "Cluster status\nAvailable values: \"active\", \"creating\", \"degraded\", \"deleting\", \"error\", \"new\", \"rebooting\", \"rebuilding\", \"resizing\", \"shutoff\".",
 							Computed:    true,
 							Validators: []validator.String{
 								stringvalidator.OneOfCaseInsensitive(
 									"active",
+									"creating",
+									"degraded",
 									"deleting",
 									"error",
 									"new",
+									"rebooting",
+									"rebuilding",
 									"resizing",
+									"shutoff",
 								),
 							},
 						},
