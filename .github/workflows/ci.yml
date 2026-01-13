@@ -24,6 +24,10 @@ jobs:
         with:
           go-version-file: ./go.mod
 
+      - name: Configure Git for private modules
+        run: |
+          git config --global url."https://x-access-token:${{ secrets.GH_PRIVATE_TOKEN }}@github.com/".insteadOf "https://github.com/"
+
       - name: Bootstrap
         run: ./scripts/bootstrap
 
@@ -40,6 +44,10 @@ jobs:
         uses: actions/setup-go@v5
         with:
           go-version-file: ./go.mod
+
+      - name: Configure Git for private modules
+        run: |
+          git config --global url."https://x-access-token:${{ secrets.GH_PRIVATE_TOKEN }}@github.com/".insteadOf "https://github.com/"
 
       - name: Bootstrap
         run: ./scripts/bootstrap
