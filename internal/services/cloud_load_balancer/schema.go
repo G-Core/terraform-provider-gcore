@@ -281,6 +281,9 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 												"protocol_port": schema.Int64Attribute{
 													Description: "Member IP port",
 													Required:    true,
+													Validators: []validator.Int64{
+														int64validator.Between(1, 65535),
+													},
 												},
 												"admin_state_up": schema.BoolAttribute{
 													Description: "Administrative state of the resource. When set to true, the resource is enabled and operational. When set to false, the resource is disabled and will not process traffic. When null is passed, the value is skipped and defaults to true.",
@@ -305,6 +308,9 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 												"monitor_port": schema.Int64Attribute{
 													Description: "An alternate protocol port used for health monitoring of a backend member. Default is null which monitors the member `protocol_port`.",
 													Optional:    true,
+													Validators: []validator.Int64{
+														int64validator.Between(1, 65535),
+													},
 												},
 												"subnet_id": schema.StringAttribute{
 													Description: "`subnet_id` in which `address` is present. Either `subnet_id` or `instance_id` should be provided",

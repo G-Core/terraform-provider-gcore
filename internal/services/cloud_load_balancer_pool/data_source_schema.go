@@ -308,6 +308,9 @@ func DataSourceSchema(ctx context.Context) schema.Schema {
 						"protocol_port": schema.Int64Attribute{
 							Description: "Member IP port",
 							Computed:    true,
+							Validators: []validator.Int64{
+								int64validator.Between(1, 65535),
+							},
 						},
 						"provisioning_status": schema.StringAttribute{
 							Description: "Pool member lifecycle status\nAvailable values: \"ACTIVE\", \"DELETED\", \"ERROR\", \"PENDING_CREATE\", \"PENDING_DELETE\", \"PENDING_UPDATE\".",
@@ -341,6 +344,9 @@ func DataSourceSchema(ctx context.Context) schema.Schema {
 						"monitor_port": schema.Int64Attribute{
 							Description: "An alternate protocol port used for health monitoring of a backend member. Default is null which monitors the member `protocol_port`.",
 							Computed:    true,
+							Validators: []validator.Int64{
+								int64validator.Between(1, 65535),
+							},
 						},
 					},
 				},

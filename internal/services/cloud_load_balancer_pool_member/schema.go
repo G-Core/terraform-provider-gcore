@@ -48,8 +48,11 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 				PlanModifiers: []planmodifier.String{stringplanmodifier.RequiresReplace()},
 			},
 			"protocol_port": schema.Int64Attribute{
-				Description:   "Member IP port",
-				Required:      true,
+				Description: "Member IP port",
+				Required:    true,
+				Validators: []validator.Int64{
+					int64validator.Between(1, 65535),
+				},
 				PlanModifiers: []planmodifier.Int64{int64planmodifier.RequiresReplace()},
 			},
 			"instance_id": schema.StringAttribute{
@@ -63,8 +66,11 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 				PlanModifiers: []planmodifier.String{stringplanmodifier.RequiresReplace()},
 			},
 			"monitor_port": schema.Int64Attribute{
-				Description:   "An alternate protocol port used for health monitoring of a backend member. Default is null which monitors the member `protocol_port`.",
-				Optional:      true,
+				Description: "An alternate protocol port used for health monitoring of a backend member. Default is null which monitors the member `protocol_port`.",
+				Optional:    true,
+				Validators: []validator.Int64{
+					int64validator.Between(1, 65535),
+				},
 				PlanModifiers: []planmodifier.Int64{int64planmodifier.RequiresReplace()},
 			},
 			"subnet_id": schema.StringAttribute{
