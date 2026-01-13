@@ -47,6 +47,9 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 			"protocol_port": schema.Int64Attribute{
 				Description: "Member IP port",
 				Required:    true,
+				Validators: []validator.Int64{
+					int64validator.Between(1, 65535),
+				},
 			},
 			"instance_id": schema.StringAttribute{
 				Description:   "Either `subnet_id` or `instance_id` should be provided",
@@ -60,6 +63,9 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 			"monitor_port": schema.Int64Attribute{
 				Description: "An alternate protocol port used for health monitoring of a backend member. Default is null which monitors the member `protocol_port`.",
 				Optional:    true,
+				Validators: []validator.Int64{
+					int64validator.Between(1, 65535),
+				},
 			},
 			"subnet_id": schema.StringAttribute{
 				Description: "`subnet_id` in which `address` is present. Either `subnet_id` or `instance_id` should be provided",
@@ -67,7 +73,7 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 			},
 			"weight": schema.Int64Attribute{
 				Description: "Member weight. Valid values are 0 < `weight` <= 256, defaults to 1. Controls traffic distribution based on the pool's load balancing algorithm:\n* `ROUND_ROBIN`: Distributes connections to each member in turn according to weights. Higher weight = more turns in the cycle. Example: weights 3 vs 1 = ~75% vs ~25% of requests.\n* `LEAST_CONNECTIONS`: Sends new connections to the member with fewest active connections, performing round-robin within groups of the same normalized load. Higher weight = allowed to hold more simultaneous connections before being considered 'more loaded'. Example: weights 2 vs 1 means 20 vs 10 active connections is treated as balanced.\n* `SOURCE_IP`: Routes clients consistently to the same member by hashing client source IP; hash result is modulo total weight of running members. Higher weight = more hash buckets, so more client IPs map to that member. Example: weights 2 vs 1 = roughly two-thirds of distinct client IPs map to the higher-weight member.",
-				Optional: true,
+				Optional:    true,
 				Validators: []validator.Int64{
 					int64validator.AtMost(256),
 				},
