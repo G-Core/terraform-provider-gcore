@@ -34,18 +34,18 @@ func (m CloudGPUVirtualClusterModel) MarshalJSONForUpdate(state CloudGPUVirtualC
 }
 
 type CloudGPUVirtualClusterServersSettingsModel struct {
-	Interfaces     *[]*CloudGPUVirtualClusterServersSettingsInterfacesModel                           `tfsdk:"interfaces" json:"interfaces,required"`
-	Volumes        *[]*CloudGPUVirtualClusterServersSettingsVolumesModel                              `tfsdk:"volumes" json:"volumes,required"`
-	Credentials    *CloudGPUVirtualClusterServersSettingsCredentialsModel                             `tfsdk:"credentials" json:"credentials,optional,no_refresh"`
-	FileShares     customfield.NestedObjectList[CloudGPUVirtualClusterServersSettingsFileSharesModel] `tfsdk:"file_shares" json:"file_shares,computed_optional"`
-	SecurityGroups *[]*CloudGPUVirtualClusterServersSettingsSecurityGroupsModel                       `tfsdk:"security_groups" json:"security_groups,optional"`
-	UserData       types.String                                                                       `tfsdk:"user_data" json:"user_data,optional"`
+	Interfaces     *[]*CloudGPUVirtualClusterServersSettingsInterfacesModel                               `tfsdk:"interfaces" json:"interfaces,required"`
+	Volumes        *[]*CloudGPUVirtualClusterServersSettingsVolumesModel                                  `tfsdk:"volumes" json:"volumes,required"`
+	Credentials    *CloudGPUVirtualClusterServersSettingsCredentialsModel                                 `tfsdk:"credentials" json:"credentials,optional,no_refresh"`
+	FileShares     customfield.NestedObjectList[CloudGPUVirtualClusterServersSettingsFileSharesModel]     `tfsdk:"file_shares" json:"file_shares,computed_optional"`
+	SecurityGroups customfield.NestedObjectList[CloudGPUVirtualClusterServersSettingsSecurityGroupsModel] `tfsdk:"security_groups" json:"security_groups,computed_optional"`
+	UserData       types.String                                                                           `tfsdk:"user_data" json:"user_data,optional"`
 }
 
 type CloudGPUVirtualClusterServersSettingsInterfacesModel struct {
 	Type       types.String                                                    `tfsdk:"type" json:"type,required"`
 	IPFamily   types.String                                                    `tfsdk:"ip_family" json:"ip_family,computed_optional"`
-	Name       types.String                                                    `tfsdk:"name" json:"name,optional"`
+	Name       types.String                                                    `tfsdk:"name" json:"name,computed_optional"`
 	NetworkID  types.String                                                    `tfsdk:"network_id" json:"network_id,optional"`
 	SubnetID   types.String                                                    `tfsdk:"subnet_id" json:"subnet_id,optional"`
 	FloatingIP *CloudGPUVirtualClusterServersSettingsInterfacesFloatingIPModel `tfsdk:"floating_ip" json:"floating_ip,optional"`
