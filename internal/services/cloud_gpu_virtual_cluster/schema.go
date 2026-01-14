@@ -86,6 +86,7 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 								},
 								"name": schema.StringAttribute{
 									Description: "Interface name",
+									Computed:    true,
 									Optional:    true,
 								},
 								"network_id": schema.StringAttribute{
@@ -209,7 +210,9 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 					},
 					"security_groups": schema.ListNestedAttribute{
 						Description: "List of security groups UUIDs",
+						Computed:    true,
 						Optional:    true,
+						CustomType:  customfield.NewNestedObjectListType[CloudGPUVirtualClusterServersSettingsSecurityGroupsModel](ctx),
 						NestedObject: schema.NestedAttributeObject{
 							Attributes: map[string]schema.Attribute{
 								"id": schema.StringAttribute{
