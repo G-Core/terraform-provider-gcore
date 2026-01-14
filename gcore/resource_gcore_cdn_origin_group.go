@@ -53,14 +53,14 @@ func resourceCDNOriginGroup() *schema.Resource {
 						"enabled": {
 							Type:        schema.TypeBool,
 							Optional:    true,
-							Computed:    true,
-							Description: "The setting allows to enable or disable an Origin source in the Origins group",
+							Default:     true,
+							Description: "The setting allows to enable or disable an Origin source in the Origins group. Default value is true.",
 						},
 						"backup": {
 							Type:        schema.TypeBool,
 							Optional:    true,
-							Computed:    true,
-							Description: "true — The option is active. The origin will not be used until one of active origins become unavailable. false — The option is disabled.",
+							Default:     false,
+							Description: "Defines whether the origin is a backup, meaning that it will not be used until one of active origins become unavailable. Default value is false.",
 						},
 					},
 				},
