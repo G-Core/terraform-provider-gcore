@@ -1,3 +1,5 @@
+github.com/G-Core/gcore-go v0.28.0 h1:Bwmyy1skq44fxjbYgo/DoYIOVdsdDUyIhc0Wn2BFjyg=
+github.com/G-Core/gcore-go v0.28.0/go.mod h1:VHbcTxWqi7XUSd/7yHFwodu4+KlsVR07MBmRr00DLw0=
 github.com/Masterminds/goutils v1.1.1 h1:5nUrii3FMTL5diU80unEVvNevw1nH4+ZV4DSLVJLSYI=
 github.com/Masterminds/goutils v1.1.1/go.mod h1:8cTjp+g8YejhMuvIA5y2vz3BpJxksy863GQaJW2MFNU=
 github.com/Masterminds/semver/v3 v3.1.1 h1:hLg3sBzpNErnxhQtUy/mmLR2I9foDujNK030IGemrRc=
@@ -162,8 +164,6 @@ github.com/skeema/knownhosts v1.1.0/go.mod h1:sKFq3RD6/TKZkSWn8boUbDC7Qkgcv+8XXi
 github.com/spf13/cast v1.3.1/go.mod h1:Qx5cxh0v+4UWYiBimWS+eyWzqEqokIECu5etghLkUJE=
 github.com/spf13/cast v1.5.0 h1:rj3WzYc11XZaIZMPKmwP96zkFEnnAmV8s6XbB2aY32w=
 github.com/spf13/cast v1.5.0/go.mod h1:SpXXQ5YoyJw6s3/6cMTQuxvgRl3PCJiyaX9p6b155UU=
-github.com/stainless-sdks/gcore-go v0.0.0-20251230114415-3293d2b2f5d2 h1:1Jwi1JYUFdg2y1rhZ80IvHTZcb3lNHXypiOL/ixsV9o=
-github.com/stainless-sdks/gcore-go v0.0.0-20251230114415-3293d2b2f5d2/go.mod h1:VHbcTxWqi7XUSd/7yHFwodu4+KlsVR07MBmRr00DLw0=
 github.com/stretchr/objx v0.1.0/go.mod h1:HFkY916IF+rwdDfMAkV7OtwuqBVzrE8GR6GFx+wExME=
 github.com/stretchr/testify v1.2.2/go.mod h1:a8OnRcib4nhh0OaRAV+Yts87kKdq0PP7pXfy6kDkUVs=
 github.com/stretchr/testify v1.4.0/go.mod h1:j7eGeouHqKxXV5pUuKE4zz7dFj8WfuZ+81PSLYec5m4=
