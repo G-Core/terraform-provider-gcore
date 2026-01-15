@@ -129,15 +129,17 @@ func DataSourceSchema(ctx context.Context) schema.Schema {
 				},
 			},
 			"timeout_member_connect": schema.Int64Attribute{
-				Description: "Backend member connection timeout in milliseconds",
-				Computed:    true,
+				Description:        "Backend member connection timeout in milliseconds",
+				Computed:           true,
+				DeprecationMessage: "This attribute is deprecated.",
 				Validators: []validator.Int64{
 					int64validator.Between(0, 86400000),
 				},
 			},
 			"timeout_member_data": schema.Int64Attribute{
-				Description: "Backend member inactivity timeout in milliseconds",
-				Computed:    true,
+				Description:        "Backend member inactivity timeout in milliseconds",
+				Computed:           true,
+				DeprecationMessage: "This attribute is deprecated.",
 				Validators: []validator.Int64{
 					int64validator.Between(0, 86400000),
 				},
