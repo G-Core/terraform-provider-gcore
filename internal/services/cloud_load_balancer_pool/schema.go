@@ -89,8 +89,9 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 				Optional:    true,
 			},
 			"timeout_client_data": schema.Int64Attribute{
-				Description: "Frontend client inactivity timeout in milliseconds",
-				Optional:    true,
+				Description:        "Frontend client inactivity timeout in milliseconds. We are recommending to use `listener.timeout_client_data` instead.",
+				Optional:           true,
+				DeprecationMessage: "This attribute is deprecated.",
 				Validators: []validator.Int64{
 					int64validator.Between(0, 86400000),
 				},
