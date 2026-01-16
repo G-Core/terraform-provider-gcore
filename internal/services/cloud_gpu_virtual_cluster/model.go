@@ -39,7 +39,7 @@ type CloudGPUVirtualClusterServersSettingsModel struct {
 	Credentials    *CloudGPUVirtualClusterServersSettingsCredentialsModel                                 `tfsdk:"credentials" json:"credentials,optional,no_refresh"`
 	FileShares     customfield.NestedObjectList[CloudGPUVirtualClusterServersSettingsFileSharesModel]     `tfsdk:"file_shares" json:"file_shares,computed_optional"`
 	SecurityGroups customfield.NestedObjectList[CloudGPUVirtualClusterServersSettingsSecurityGroupsModel] `tfsdk:"security_groups" json:"security_groups,computed_optional"`
-	UserData       types.String                                                                           `tfsdk:"user_data" json:"user_data,optional"`
+	UserData       types.String                                                                           `tfsdk:"user_data" json:"user_data,computed_optional"`
 }
 
 type CloudGPUVirtualClusterServersSettingsInterfacesModel struct {

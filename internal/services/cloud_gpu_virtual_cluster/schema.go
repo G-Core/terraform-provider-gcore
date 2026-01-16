@@ -224,6 +224,7 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 					},
 					"user_data": schema.StringAttribute{
 						Description: "Optional custom user data (Base64-encoded)",
+						Computed:    true,
 						Optional:    true,
 					},
 				},
