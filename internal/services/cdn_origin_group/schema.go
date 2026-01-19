@@ -69,7 +69,7 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 					},
 				},
 			},
-			"sources": schema.ListNestedAttribute{
+			"sources": schema.SetNestedAttribute{
 				Description: "List of origin sources in the origin group.",
 				Optional:    true,
 				NestedObject: schema.NestedAttributeObject{

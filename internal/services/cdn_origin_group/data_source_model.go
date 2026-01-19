@@ -8,16 +8,16 @@ import (
 )
 
 type CdnOriginGroupDataSourceModel struct {
-	ID                  types.Int64                                                        `tfsdk:"id" path:"origin_group_id,computed"`
-	OriginGroupID       types.Int64                                                        `tfsdk:"origin_group_id" path:"origin_group_id,required"`
-	AuthType            types.String                                                       `tfsdk:"auth_type" json:"auth_type,computed"`
-	HasRelatedResources types.Bool                                                         `tfsdk:"has_related_resources" json:"has_related_resources,computed"`
-	Name                types.String                                                       `tfsdk:"name" json:"name,computed"`
-	Path                types.String                                                       `tfsdk:"path" json:"path,computed"`
-	UseNext             types.Bool                                                         `tfsdk:"use_next" json:"use_next,computed"`
-	ProxyNextUpstream   customfield.List[types.String]                                     `tfsdk:"proxy_next_upstream" json:"proxy_next_upstream,computed"`
-	Auth                customfield.NestedObject[CdnOriginGroupAuthDataSourceModel]        `tfsdk:"auth" json:"auth,computed"`
-	Sources             customfield.NestedObjectList[CdnOriginGroupSourcesDataSourceModel] `tfsdk:"sources" json:"sources,computed"`
+	ID                  types.Int64                                                       `tfsdk:"id" path:"origin_group_id,computed"`
+	OriginGroupID       types.Int64                                                       `tfsdk:"origin_group_id" path:"origin_group_id,required"`
+	AuthType            types.String                                                      `tfsdk:"auth_type" json:"auth_type,computed"`
+	HasRelatedResources types.Bool                                                        `tfsdk:"has_related_resources" json:"has_related_resources,computed"`
+	Name                types.String                                                      `tfsdk:"name" json:"name,computed"`
+	Path                types.String                                                      `tfsdk:"path" json:"path,computed"`
+	UseNext             types.Bool                                                        `tfsdk:"use_next" json:"use_next,computed"`
+	ProxyNextUpstream   customfield.List[types.String]                                    `tfsdk:"proxy_next_upstream" json:"proxy_next_upstream,computed"`
+	Auth                customfield.NestedObject[CdnOriginGroupAuthDataSourceModel]       `tfsdk:"auth" json:"auth,computed"`
+	Sources             customfield.NestedObjectSet[CdnOriginGroupSourcesDataSourceModel] `tfsdk:"sources" json:"sources,computed"`
 }
 
 type CdnOriginGroupAuthDataSourceModel struct {
