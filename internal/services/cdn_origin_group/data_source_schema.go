@@ -79,10 +79,10 @@ func DataSourceSchema(ctx context.Context) schema.Schema {
 					},
 				},
 			},
-			"sources": schema.ListNestedAttribute{
+			"sources": schema.SetNestedAttribute{
 				Description: "List of origin sources in the origin group.",
 				Computed:    true,
-				CustomType:  customfield.NewNestedObjectListType[CdnOriginGroupSourcesDataSourceModel](ctx),
+				CustomType:  customfield.NewNestedObjectSetType[CdnOriginGroupSourcesDataSourceModel](ctx),
 				NestedObject: schema.NestedAttributeObject{
 					Attributes: map[string]schema.Attribute{
 						"backup": schema.BoolAttribute{
