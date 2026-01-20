@@ -37,22 +37,20 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 				Optional:      true,
 				PlanModifiers: []planmodifier.Int64{int64planmodifier.RequiresReplace()},
 			},
-			"fixed_ip_address": schema.StringAttribute{
-				Description:   "If the port has multiple IP addresses, a specific one can be selected using this field. If not specified, the first IP in the port's list will be used by default.",
-				Computed:      true,
-				Optional:      true,
-				PlanModifiers: []planmodifier.String{stringplanmodifier.RequiresReplaceIfConfigured()},
-			},
-			"port_id": schema.StringAttribute{
-				Description:   "If provided, the floating IP will be immediately attached to the specified port.",
-				Computed:      true,
-				Optional:      true,
-				PlanModifiers: []planmodifier.String{stringplanmodifier.RequiresReplaceIfConfigured()},
-			},
 			"tags": schema.MapAttribute{
 				Description: "Key-value tags to associate with the resource. A tag is a key-value pair that can be associated with a resource, enabling efficient filtering and grouping for better organization and management. Both tag keys and values have a maximum length of 255 characters. Some tags are read-only and cannot be modified by the user. Tags are also integrated with cost reports, allowing cost data to be filtered based on tag keys or values.",
 				Optional:    true,
 				ElementType: types.StringType,
+			},
+			"fixed_ip_address": schema.StringAttribute{
+				Description: "If the port has multiple IP addresses, a specific one can be selected using this field. If not specified, the first IP in the port's list will be used by default.",
+				Computed:    true,
+				Optional:    true,
+			},
+			"port_id": schema.StringAttribute{
+				Description: "If provided, the floating IP will be immediately attached to the specified port.",
+				Computed:    true,
+				Optional:    true,
 			},
 			"created_at": schema.StringAttribute{
 				Description: "Datetime when the floating IP was created",
