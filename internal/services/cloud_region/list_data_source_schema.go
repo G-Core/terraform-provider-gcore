@@ -73,7 +73,7 @@ func ListDataSourceSchema(ctx context.Context) schema.Schema {
 							},
 						},
 						"available_volume_types": schema.ListAttribute{
-							Description: "List of available volume types, 'standard', '`ssd_hiiops`', 'cold'].",
+							Description: "List of available volume types, 'standard', 'ssd_hiiops', 'cold'].",
 							Computed:    true,
 							CustomType:  customfield.NewListType[types.String](ctx),
 							ElementType: types.StringType,

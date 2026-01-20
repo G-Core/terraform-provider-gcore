@@ -52,7 +52,7 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 						Required:    true,
 					},
 					"s3_secret_access_key": schema.StringAttribute{
-						Description: "Secret access key for the S3 account. \n\nRestrictions:\n- Latin letters (A-Z, a-z), numbers (0-9), pluses, slashes, dashes, colons and underscores.\n- If \"`s3_type`\": amazon, length should be 40 characters.\n- If \"`s3_type`\": other, length should be from 16 to 255 characters.",
+						Description: "Secret access key for the S3 account. \n\nRestrictions:\n- Latin letters (A-Z, a-z), numbers (0-9), pluses, slashes, dashes, colons and underscores.\n- If \"s3_type\": amazon, length should be 40 characters.\n- If \"s3_type\": other, length should be from 16 to 255 characters.",
 						Required:    true,
 					},
 					"s3_type": schema.StringAttribute{
@@ -60,11 +60,11 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 						Required:    true,
 					},
 					"s3_region": schema.StringAttribute{
-						Description: "S3 storage region. \n\nThe parameter is required, if \"`s3_type`\": amazon.",
+						Description: "S3 storage region. \n\nThe parameter is required, if \"s3_type\": amazon.",
 						Optional:    true,
 					},
 					"s3_storage_hostname": schema.StringAttribute{
-						Description: "S3 storage hostname. \n\nThe parameter is required, if \"`s3_type`\": other.",
+						Description: "S3 storage hostname. \n\nThe parameter is required, if \"s3_type\": other.",
 						Optional:    true,
 					},
 				},
