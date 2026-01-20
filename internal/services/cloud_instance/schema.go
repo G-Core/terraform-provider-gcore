@@ -222,7 +222,7 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 				PlanModifiers: []planmodifier.String{stringplanmodifier.RequiresReplace()},
 			},
 			"password": schema.StringAttribute{
-				Description:   "For Linux instances, 'username' and 'password' are used to create a new user. When only 'password' is provided, it is set as the password for the default user of the image. For Windows instances, 'username' cannot be specified. Use the 'password' field to set the password for the 'Admin' user on Windows. Use the '`user_data`' field to provide a script to create new users on Windows. The password of the Admin user cannot be updated via '`user_data`'.",
+				Description:   "For Linux instances, 'username' and 'password' are used to create a new user. When only 'password' is provided, it is set as the password for the default user of the image. For Windows instances, 'username' cannot be specified. Use the 'password' field to set the password for the 'Admin' user on Windows. Use the 'user_data' field to provide a script to create new users on Windows. The password of the Admin user cannot be updated via 'user_data'.",
 				Optional:      true,
 				PlanModifiers: []planmodifier.String{stringplanmodifier.RequiresReplace()},
 			},
@@ -237,7 +237,7 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 				PlanModifiers: []planmodifier.String{stringplanmodifier.RequiresReplace()},
 			},
 			"user_data": schema.StringAttribute{
-				Description:   "String in base64 format. For Linux instances, '`user_data`' is ignored when 'password' field is provided. For Windows instances, Admin user password is set by 'password' field and cannot be updated via '`user_data`'. Examples of the `user_data`: https://cloudinit.readthedocs.io/en/latest/topics/examples.html",
+				Description:   "String in base64 format. For Linux instances, 'user_data' is ignored when 'password' field is provided. For Windows instances, Admin user password is set by 'password' field and cannot be updated via 'user_data'. Examples of the `user_data`: https://cloudinit.readthedocs.io/en/latest/topics/examples.html",
 				Optional:      true,
 				PlanModifiers: []planmodifier.String{stringplanmodifier.RequiresReplace()},
 			},
@@ -495,7 +495,7 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 									Computed:    true,
 								},
 								"field_value": schema.StringAttribute{
-									Description: "Complex value. Only one of 'value' or '`field_value`' must be specified.",
+									Description: "Complex value. Only one of 'value' or 'field_value' must be specified.",
 									Computed:    true,
 									CustomType:  jsontypes.NormalizedType{},
 								},
@@ -513,7 +513,7 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 									CustomType:  jsontypes.NormalizedType{},
 								},
 								"value": schema.StringAttribute{
-									Description: "Basic type value. Only one of 'value' or '`field_value`' must be specified.",
+									Description: "Basic type value. Only one of 'value' or 'field_value' must be specified.",
 									Computed:    true,
 								},
 							},

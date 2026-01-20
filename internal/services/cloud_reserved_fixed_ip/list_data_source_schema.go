@@ -46,7 +46,7 @@ func ListDataSourceSchema(ctx context.Context) schema.Schema {
 				Optional:    true,
 			},
 			"order_by": schema.StringAttribute{
-				Description: "Ordering reserved fixed IP list result by name, status, `updated_at`, `created_at` or `fixed_ip_address` fields and directions (status.asc), default is \"`fixed_ip_address`.asc\"",
+				Description: "Ordering reserved fixed IP list result by name, status, `updated_at`, `created_at` or `fixed_ip_address` fields and directions (status.asc), default is \"fixed_ip_address.asc\"",
 				Optional:    true,
 			},
 			"vip_only": schema.BoolAttribute{

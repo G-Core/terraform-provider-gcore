@@ -233,7 +233,7 @@ func ListDataSourceSchema(ctx context.Context) schema.Schema {
 												Computed:    true,
 											},
 											"field_value": schema.StringAttribute{
-												Description: "Complex value. Only one of 'value' or '`field_value`' must be specified.",
+												Description: "Complex value. Only one of 'value' or 'field_value' must be specified.",
 												Computed:    true,
 												CustomType:  jsontypes.NormalizedType{},
 											},
@@ -251,7 +251,7 @@ func ListDataSourceSchema(ctx context.Context) schema.Schema {
 												CustomType:  jsontypes.NormalizedType{},
 											},
 											"value": schema.StringAttribute{
-												Description: "Basic type value. Only one of 'value' or '`field_value`' must be specified.",
+												Description: "Basic type value. Only one of 'value' or 'field_value' must be specified.",
 												Computed:    true,
 											},
 										},
