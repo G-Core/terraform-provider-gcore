@@ -3,6 +3,8 @@
 package cloud_instance
 
 import (
+	"encoding/json"
+
 	"github.com/hashicorp/terraform-plugin-framework-jsontypes/jsontypes"
 	"github.com/hashicorp/terraform-plugin-framework-timetypes/timetypes"
 	"github.com/hashicorp/terraform-plugin-framework/types"
@@ -14,8 +16,8 @@ type CloudInstanceModel struct {
 	ID                  types.String                                                               `tfsdk:"id" json:"id,computed"`
 	ProjectID           types.Int64                                                                `tfsdk:"project_id" path:"project_id,optional"`
 	RegionID            types.Int64                                                                `tfsdk:"region_id" path:"region_id,optional"`
-	Flavor              types.String                                                               `tfsdk:"flavor" json:"flavor,required,no_refresh"`
-	Interfaces          *[]*CloudInstanceInterfacesModel                                           `tfsdk:"interfaces" json:"interfaces,required,no_refresh"`
+	Flavor              types.String                                                               `tfsdk:"flavor" json:"flavor,required"`
+	Interfaces          *[]*CloudInstanceInterfacesModel                                           `tfsdk:"interfaces" json:"interfaces,required"`
 	Volumes             *[]*CloudInstanceVolumesModel                                              `tfsdk:"volumes" json:"volumes,required"`
 	AllowAppPorts       types.Bool                                                                 `tfsdk:"allow_app_ports" json:"allow_app_ports,optional,no_refresh"`
 	NameTemplate        types.String                                                               `tfsdk:"name_template" json:"name_template,optional,no_refresh"`
@@ -35,9 +37,8 @@ type CloudInstanceModel struct {
 	Status              types.String                                                               `tfsdk:"status" json:"status,computed"`
 	TaskID              types.String                                                               `tfsdk:"task_id" json:"task_id,computed"`
 	TaskState           types.String                                                               `tfsdk:"task_state" json:"task_state,computed"`
-	VmState             types.String                                                               `tfsdk:"vm_state" json:"vm_state,computed"`
+	VmState             types.String                                                               `tfsdk:"vm_state" json:"vm_state,computed_optional"`
 	Addresses           customfield.Map[customfield.NestedObjectList[CloudInstanceAddressesModel]] `tfsdk:"addresses" json:"addresses,computed"`
-	Tasks               customfield.List[types.String]                                             `tfsdk:"tasks" json:"tasks,computed,no_refresh"`
 	BlackholePorts      customfield.NestedObjectList[CloudInstanceBlackholePortsModel]             `tfsdk:"blackhole_ports" json:"blackhole_ports,computed"`
 	DDOSProfile         customfield.NestedObject[CloudInstanceDDOSProfileModel]                    `tfsdk:"ddos_profile" json:"ddos_profile,computed"`
 	FixedIPAssignments  customfield.NestedObjectList[CloudInstanceFixedIPAssignmentsModel]         `tfsdk:"fixed_ip_assignments" json:"fixed_ip_assignments,computed"`
@@ -60,8 +61,8 @@ type CloudInstanceInterfacesModel struct {
 	NetworkID      types.String                                   `tfsdk:"network_id" json:"network_id,optional"`
 	SubnetID       types.String                                   `tfsdk:"subnet_id" json:"subnet_id,optional"`
 	FloatingIP     *CloudInstanceInterfacesFloatingIPModel        `tfsdk:"floating_ip" json:"floating_ip,optional"`
-	IPAddress      types.String                                   `tfsdk:"ip_address" json:"ip_address,optional"`
-	PortID         types.String                                   `tfsdk:"port_id" json:"port_id,optional"`
+	IPAddress      types.String                                   `tfsdk:"ip_address" json:"ip_address,computed_optional"`
+	PortID         types.String                                   `tfsdk:"port_id" json:"port_id,computed_optional"`
 }
 
 type CloudInstanceInterfacesSecurityGroupsModel struct {
@@ -73,19 +74,31 @@ type CloudInstanceInterfacesFloatingIPModel struct {
 	ExistingFloatingID types.String `tfsdk:"existing_floating_id" json:"existing_floating_id,optional"`
 }
 
+// CloudInstanceVolumesModel represents an existing volume to attach to an instance.
+// Only existing volumes are supported - users must create volumes separately using gcore_cloud_volume.
 type CloudInstanceVolumesModel struct {
-	Size                types.Int64              `tfsdk:"size" json:"size,optional,no_refresh"`
-	Source              types.String             `tfsdk:"source" json:"source,required,no_refresh"`
-	AttachmentTag       types.String             `tfsdk:"attachment_tag" json:"attachment_tag,optional,no_refresh"`
-	DeleteOnTermination types.Bool               `tfsdk:"delete_on_termination" json:"delete_on_termination,computed_optional"`
-	Name                types.String             `tfsdk:"name" json:"name,optional,no_refresh"`
-	Tags                *map[string]types.String `tfsdk:"tags" json:"tags,optional,no_refresh"`
-	TypeName            types.String             `tfsdk:"type_name" json:"type_name,optional,no_refresh"`
-	ImageID             types.String             `tfsdk:"image_id" json:"image_id,optional,no_refresh"`
-	BootIndex           types.Int64              `tfsdk:"boot_index" json:"boot_index,optional,no_refresh"`
-	SnapshotID          types.String             `tfsdk:"snapshot_id" json:"snapshot_id,optional,no_refresh"`
-	ApptemplateID       types.String             `tfsdk:"apptemplate_id" json:"apptemplate_id,optional,no_refresh"`
-	VolumeID            types.String             `tfsdk:"volume_id" json:"volume_id,optional,no_refresh"`
+	VolumeID      types.String `tfsdk:"volume_id" json:"volume_id,required"`
+	BootIndex     types.Int64  `tfsdk:"boot_index" json:"boot_index,optional"`
+	AttachmentTag types.String `tfsdk:"attachment_tag" json:"attachment_tag,optional"`
+}
+
+// MarshalJSONWithState implements CustomMarshaler interface for apijson.
+// This adds the hardcoded fields required by the API: source="existing-volume" and delete_on_termination=false.
+func (m CloudInstanceVolumesModel) MarshalJSONWithState(plan any, state any) ([]byte, error) {
+	// Build the volume payload with required fields
+	payload := map[string]interface{}{
+		"source":                "existing-volume",
+		"volume_id":             m.VolumeID.ValueString(),
+		"boot_index":            m.BootIndex.ValueInt64(),
+		"delete_on_termination": false,
+	}
+
+	// Only include attachment_tag if it's set
+	if !m.AttachmentTag.IsNull() && !m.AttachmentTag.IsUnknown() && m.AttachmentTag.ValueString() != "" {
+		payload["attachment_tag"] = m.AttachmentTag.ValueString()
+	}
+
+	return json.Marshal(payload)
 }
 
 type CloudInstanceSecurityGroupsModel struct {
@@ -93,11 +106,11 @@ type CloudInstanceSecurityGroupsModel struct {
 }
 
 type CloudInstanceAddressesModel struct {
-	Addr          types.String `tfsdk:"addr" json:"addr,required"`
-	Type          types.String `tfsdk:"type" json:"type,required"`
-	InterfaceName types.String `tfsdk:"interface_name" json:"interface_name,optional"`
-	SubnetID      types.String `tfsdk:"subnet_id" json:"subnet_id,optional"`
-	SubnetName    types.String `tfsdk:"subnet_name" json:"subnet_name,optional"`
+	Addr          types.String `tfsdk:"addr" json:"addr,computed"`
+	Type          types.String `tfsdk:"type" json:"type,computed"`
+	InterfaceName types.String `tfsdk:"interface_name" json:"interface_name,computed"`
+	SubnetID      types.String `tfsdk:"subnet_id" json:"subnet_id,computed"`
+	SubnetName    types.String `tfsdk:"subnet_name" json:"subnet_name,computed"`
 }
 
 type CloudInstanceBlackholePortsModel struct {

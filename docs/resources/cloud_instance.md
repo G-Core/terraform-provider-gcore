@@ -13,46 +13,51 @@ description: |-
 ## Example Usage
 
 ```terraform
+# Create a boot volume from an image
+resource "gcore_cloud_volume" "boot" {
+  project_id = 1
+  region_id  = 1
+  name       = "boot-volume"
+  source     = "image"
+  image_id   = "your-image-id"
+  size       = 20
+  type_name  = "ssd_hiiops"
+  tags = {
+    my-tag = "my-tag-value"
+  }
+}
+
+# Create an instance with the existing volume
 resource "gcore_cloud_instance" "example_cloud_instance" {
   project_id = 1
-  region_id = 1
-  flavor = "g2-standard-32-64"
+  region_id  = 1
+  name       = "my-instance"
+  flavor     = "g2-standard-32-64"
+
+  # Attach existing volumes by ID (only volume_id is required)
+  volumes = [{ volume_id = gcore_cloud_volume.boot.id }]
+
   interfaces = [{
-    type = "external"
+    type           = "external"
     interface_name = "eth0"
-    ip_family = "ipv4"
+    ip_family      = "ipv4"
     security_groups = [{
       id = "ae74714c-c380-48b4-87f8-758d656cdad6"
     }]
   }]
-  volumes = [{
-    size = 20
-    source = "new-volume"
-    attachment_tag = "boot"
-    delete_on_termination = false
-    name = "boot-volume"
-    tags = {
-      my-tag = "my-tag-value"
-    }
-    type_name = "ssd_hiiops"
-  }]
-  allow_app_ports = true
-  configuration = {
-    foo = "bar"
-  }
-  name = "my-instance"
-  name_template = "name_template"
-  password = "password"
+
   security_groups = [{
     id = "ae74714c-c380-48b4-87f8-758d656cdad6"
   }]
-  servergroup_id = "servergroup_id"
+
   ssh_key_name = "my-ssh-key"
+  user_data    = "user_data"
+  username     = "username"
+  password     = "password"
+
   tags = {
     my-tag = "my-tag-value"
   }
-  user_data = "user_data"
-  username = "username"
 }
 ```
 
@@ -63,7 +68,7 @@ resource "gcore_cloud_instance" "example_cloud_instance" {
 
 - `flavor` (String) The flavor of the instance.
 - `interfaces` (Attributes List) A list of network interfaces for the instance. You can create one or more interfaces - private, public, or both. (see [below for nested schema](#nestedatt--interfaces))
-- `volumes` (Attributes List) List of volumes that will be attached to the instance. (see [below for nested schema](#nestedatt--volumes))
+- `volumes` (Attributes List) List of existing volumes to attach to the instance. Create volumes separately using gcore_cloud_volume resource. (see [below for nested schema](#nestedatt--volumes))
 
 ### Optional
 
@@ -86,6 +91,8 @@ Supported group types:
 - `tags` (Map of String) Key-value tags to associate with the resource. A tag is a key-value pair that can be associated with a resource, enabling efficient filtering and grouping for better organization and management. Both tag keys and values have a maximum length of 255 characters. Some tags are read-only and cannot be modified by the user. Tags are also integrated with cost reports, allowing cost data to be filtered based on tag keys or values.
 - `user_data` (String) String in base64 format. For Linux instances, 'user_data' is ignored when 'password' field is provided. For Windows instances, Admin user password is set by 'password' field and cannot be updated via 'user_data'. Examples of the `user_data`: https://cloudinit.readthedocs.io/en/latest/topics/examples.html
 - `username` (String) For Linux instances, 'username' and 'password' are used to create a new user. For Windows instances, 'username' cannot be specified. Use 'password' field to set the password for the 'Admin' user on Windows.
+- `vm_state` (String) Virtual machine state. Set to 'active' to start the instance or 'stopped' to stop it.
+Available values: "active", "stopped".
 
 ### Read-Only
 
@@ -103,11 +110,7 @@ Supported group types:
 Available values: "ACTIVE", "BUILD", "DELETED", "ERROR", "HARD_REBOOT", "MIGRATING", "PASSWORD", "PAUSED", "REBOOT", "REBUILD", "RESCUE", "RESIZE", "REVERT_RESIZE", "SHELVED", "SHELVED_OFFLOADED", "SHUTOFF", "SOFT_DELETED", "SUSPENDED", "UNKNOWN", "VERIFY_RESIZE".
 - `task_id` (String) The UUID of the active task that currently holds a lock on the resource. This lock prevents concurrent modifications to ensure consistency. If `null`, the resource is not locked.
 - `task_state` (String) Task state
-- `tasks` (List of String) List of task IDs representing asynchronous operations. Use these IDs to monitor operation progress:
-* `GET /v1/tasks/{task_id}` - Check individual task status and details
-Poll task status until completion (`FINISHED`/`ERROR`) before proceeding with dependent operations.
-- `vm_state` (String) Virtual machine state (active)
-Available values: "active", "building", "deleted", "error", "paused", "rescued", "resized", "shelved", "shelved_offloaded", "soft-deleted", "stopped", "suspended".
+- `tasks` (List of String) List of task IDs for async operations. Poll via GET /v1/tasks/{task_id} until FINISHED or ERROR.
 
 <a id="nestedatt--interfaces"></a>
 ### Nested Schema for `interfaces`
@@ -121,13 +124,16 @@ Optional:
 
 - `floating_ip` (Attributes) Allows the instance to have a public IP that can be reached from the internet. (see [below for nested schema](#nestedatt--interfaces--floating_ip))
 - `interface_name` (String) Interface name. Defaults to `null` and is returned as `null` in the API response if not set.
-- `ip_address` (String) You can specify a specific IP address from your subnet.
+- `ip_address` (String) IP address assigned to this interface. Can be specified for subnet type, computed for other types.
 - `ip_family` (String) Specify `ipv4`, `ipv6`, or `dual` to enable both.
 Available values: "dual", "ipv4", "ipv6".
 - `network_id` (String) The network where the instance will be connected.
-- `port_id` (String) Network ID the subnet belongs to. Port will be plugged in this network.
 - `security_groups` (Attributes List) Specifies security group UUIDs to be applied to the instance network interface. (see [below for nested schema](#nestedatt--interfaces--security_groups))
 - `subnet_id` (String) The instance will get an IP address from this subnet.
+
+Read-Only:
+
+- `port_id` (String) Port ID assigned to this interface. Computed after creation.
 
 <a id="nestedatt--interfaces--floating_ip"></a>
 ### Nested Schema for `interfaces.floating_ip`
@@ -156,28 +162,12 @@ Required:
 
 Required:
 
-- `source` (String) New volume will be created from scratch and attached to the instance.
-Available values: "new-volume", "image", "snapshot", "apptemplate", "existing-volume".
+- `volume_id` (String) ID of an existing volume to attach to the instance.
 
 Optional:
 
-- `apptemplate_id` (String) App template ID.
-- `attachment_tag` (String) Block device attachment tag (not exposed in the normal tags)
-- `boot_index` (Number) - `0` means that this is the primary boot device;
-- A unique positive value is set for the secondary bootable devices;
-- A negative number means that the boot is prohibited.
-- `delete_on_termination` (Boolean) Set to `true` to automatically delete the volume when the instance is deleted.
-- `image_id` (String) Image ID.
-- `name` (String) The name of the volume. If not specified, a name will be generated automatically.
-- `size` (Number) Volume size in GiB.
-- `snapshot_id` (String) Snapshot ID.
-- `tags` (Map of String) Key-value tags to associate with the resource. A tag is a key-value pair that can be associated with a resource, enabling efficient filtering and grouping for better organization and management. Both tag keys and values have a maximum length of 255 characters. Some tags are read-only and cannot be modified by the user. Tags are also integrated with cost reports, allowing cost data to be filtered based on tag keys or values.
-- `type_name` (String) Volume type name. Supported values:
-- `standard` - Network SSD block storage offering stable performance with high random I/O and data reliability (6 IOPS per 1 GiB, 0.4 MB/s per 1 GiB). Max IOPS: 4500. Max bandwidth: 300 MB/s.
-- `ssd_hiiops` - High-performance SSD storage for latency-sensitive transactional workloads (60 IOPS per 1 GiB, 2.5 MB/s per 1 GiB). Max IOPS: 9000. Max bandwidth: 500 MB/s.
-- `ssd_lowlatency` - SSD storage optimized for low-latency and real-time processing. Max IOPS: 5000. Average latency: 300 µs. Snapshots and volume resizing are **not** supported for `ssd_lowlatency`.
-Available values: "cold", "ssd_hiiops", "ssd_local", "ssd_lowlatency", "standard", "ultra".
-- `volume_id` (String) Volume ID.
+- `attachment_tag` (String) Block device attachment tag. Used to identify the device in the guest OS (e.g., 'vdb', 'data-disk'). Not exposed in user-visible tags.
+- `boot_index` (Number) Boot device index (creation-only). 0 = primary boot, positive = secondary bootable, negative = not bootable. Cannot be changed after instance creation.
 
 
 <a id="nestedatt--security_groups"></a>

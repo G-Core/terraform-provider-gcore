@@ -4,25 +4,69 @@ package cloud_instance
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/hashicorp/terraform-plugin-framework-jsontypes/jsontypes"
 	"github.com/hashicorp/terraform-plugin-framework-timetypes/timetypes"
-	"github.com/hashicorp/terraform-plugin-framework-validators/int64validator"
 	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
 	"github.com/hashicorp/terraform-plugin-framework/attr"
+	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
-	"github.com/hashicorp/terraform-plugin-framework/resource/schema/booldefault"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/boolplanmodifier"
-	"github.com/hashicorp/terraform-plugin-framework/resource/schema/int64planmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/listplanmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/mapplanmodifier"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/objectplanmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringplanmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/stainless-sdks/gcore-terraform/internal/customfield"
 )
+
+// requiresReplaceIfConfigured is a plan modifier that only requires replacement
+// when the user has explicitly configured a different value. If the config value
+// is null (user relies on environment variables), use the state value without
+// forcing replacement. This mimics the old provider's DiffSuppressFunc behavior
+// for project_id/region_id after import.
+type requiresReplaceIfConfigured struct{}
+
+func RequiresReplaceIfConfigured() planmodifier.Int64 {
+	return requiresReplaceIfConfigured{}
+}
+
+func (m requiresReplaceIfConfigured) Description(_ context.Context) string {
+	return "Requires replacement only when the user has explicitly configured a different value. " +
+		"If config is null (e.g., using environment variables), preserves state value without replacement."
+}
+
+func (m requiresReplaceIfConfigured) MarkdownDescription(ctx context.Context) string {
+	return m.Description(ctx)
+}
+
+func (m requiresReplaceIfConfigured) PlanModifyInt64(ctx context.Context, req planmodifier.Int64Request, resp *planmodifier.Int64Response) {
+	// If config is null (user didn't specify the value, likely using env vars),
+	// preserve the state value. This handles import scenarios where project_id/region_id
+	// are in state (from import ID) but not in the user's .tf config.
+	if req.ConfigValue.IsNull() {
+		if !req.StateValue.IsNull() && !req.StateValue.IsUnknown() {
+			// Preserve state value - user wants to use the imported/existing value
+			resp.PlanValue = req.StateValue
+		}
+		// Don't require replacement - user wants to use env vars / defaults
+		return
+	}
+
+	// If creating a new resource (state is null), no replacement needed
+	if req.StateValue.IsNull() {
+		return
+	}
+
+	// If config has an explicit value different from state, require replacement
+	if !req.ConfigValue.Equal(req.StateValue) {
+		resp.RequiresReplace = true
+	}
+}
 
 var _ resource.ResourceWithConfigValidators = (*CloudInstanceResource)(nil)
 
@@ -34,19 +78,20 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 				PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
 			},
 			"project_id": schema.Int64Attribute{
-				Description:   "Project ID",
+				Description:   "Project ID. If not specified, uses GCORE_CLOUD_PROJECT_ID environment variable.",
+				Computed:      true,
 				Optional:      true,
-				PlanModifiers: []planmodifier.Int64{int64planmodifier.RequiresReplace()},
+				PlanModifiers: []planmodifier.Int64{RequiresReplaceIfConfigured()},
 			},
 			"region_id": schema.Int64Attribute{
-				Description:   "Region ID",
+				Description:   "Region ID. If not specified, uses GCORE_CLOUD_REGION_ID environment variable.",
+				Computed:      true,
 				Optional:      true,
-				PlanModifiers: []planmodifier.Int64{int64planmodifier.RequiresReplace()},
+				PlanModifiers: []planmodifier.Int64{RequiresReplaceIfConfigured()},
 			},
 			"flavor": schema.StringAttribute{
-				Description:   "The flavor of the instance.",
-				Required:      true,
-				PlanModifiers: []planmodifier.String{stringplanmodifier.RequiresReplace()},
+				Description: "The flavor of the instance.",
+				Required:    true,
 			},
 			"interfaces": schema.ListNestedAttribute{
 				Description: "A list of network interfaces for the instance. You can create one or more interfaces - private, public, or both.",
@@ -118,98 +163,39 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 							},
 						},
 						"ip_address": schema.StringAttribute{
-							Description: "You can specify a specific IP address from your subnet.",
-							Optional:    true,
+							Description:   "IP address assigned to this interface. Can be specified for subnet type, computed for other types.",
+							Optional:      true,
+							Computed:      true,
+							PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
 						},
 						"port_id": schema.StringAttribute{
-							Description: "Network ID the subnet belongs to. Port will be plugged in this network.",
-							Optional:    true,
+							Description:   "Port ID for the interface. Required for reserved_fixed_ip type, computed for other types.",
+							Optional:      true,
+							Computed:      true,
+							PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
 						},
 					},
 				},
-				PlanModifiers: []planmodifier.List{listplanmodifier.RequiresReplace()},
 			},
 			"volumes": schema.ListNestedAttribute{
-				Description: "List of volumes that will be attached to the instance.",
+				Description: "List of existing volumes to attach to the instance. Create volumes separately using gcore_cloud_volume resource.",
 				Required:    true,
 				NestedObject: schema.NestedAttributeObject{
 					Attributes: map[string]schema.Attribute{
-						"size": schema.Int64Attribute{
-							Description: "Volume size in GiB.",
-							Optional:    true,
-							Validators: []validator.Int64{
-								int64validator.AtLeast(1),
-							},
-						},
-						"source": schema.StringAttribute{
-							Description: "New volume will be created from scratch and attached to the instance.\nAvailable values: \"new-volume\", \"image\", \"snapshot\", \"apptemplate\", \"existing-volume\".",
+						"volume_id": schema.StringAttribute{
+							Description: "ID of an existing volume to attach to the instance.",
 							Required:    true,
-							Validators: []validator.String{
-								stringvalidator.OneOfCaseInsensitive(
-									"new-volume",
-									"image",
-									"snapshot",
-									"apptemplate",
-									"existing-volume",
-								),
-							},
-						},
-						"attachment_tag": schema.StringAttribute{
-							Description: "Block device attachment tag (not exposed in the normal tags)",
-							Optional:    true,
-						},
-						"delete_on_termination": schema.BoolAttribute{
-							Description: "Set to `true` to automatically delete the volume when the instance is deleted.",
-							Computed:    true,
-							Optional:    true,
-							Default:     booldefault.StaticBool(false),
-						},
-						"name": schema.StringAttribute{
-							Description: "The name of the volume. If not specified, a name will be generated automatically.",
-							Optional:    true,
-						},
-						"tags": schema.MapAttribute{
-							Description: "Key-value tags to associate with the resource. A tag is a key-value pair that can be associated with a resource, enabling efficient filtering and grouping for better organization and management. Both tag keys and values have a maximum length of 255 characters. Some tags are read-only and cannot be modified by the user. Tags are also integrated with cost reports, allowing cost data to be filtered based on tag keys or values.",
-							Optional:    true,
-							ElementType: types.StringType,
-						},
-						"type_name": schema.StringAttribute{
-							Description: "Volume type name. Supported values:\n- `standard` - Network SSD block storage offering stable performance with high random I/O and data reliability (6 IOPS per 1 GiB, 0.4 MB/s per 1 GiB). Max IOPS: 4500. Max bandwidth: 300 MB/s.\n- `ssd_hiiops` - High-performance SSD storage for latency-sensitive transactional workloads (60 IOPS per 1 GiB, 2.5 MB/s per 1 GiB). Max IOPS: 9000. Max bandwidth: 500 MB/s.\n- `ssd_lowlatency` - SSD storage optimized for low-latency and real-time processing. Max IOPS: 5000. Average latency: 300 µs. Snapshots and volume resizing are **not** supported for `ssd_lowlatency`.\nAvailable values: \"cold\", \"ssd_hiiops\", \"ssd_local\", \"ssd_lowlatency\", \"standard\", \"ultra\".",
-							Optional:    true,
-							Validators: []validator.String{
-								stringvalidator.OneOfCaseInsensitive(
-									"cold",
-									"ssd_hiiops",
-									"ssd_local",
-									"ssd_lowlatency",
-									"standard",
-									"ultra",
-								),
-							},
-						},
-						"image_id": schema.StringAttribute{
-							Description: "Image ID.",
-							Optional:    true,
 						},
 						"boot_index": schema.Int64Attribute{
-							Description: "- `0` means that this is the primary boot device;\n- A unique positive value is set for the secondary bootable devices;\n- A negative number means that the boot is prohibited.",
+							Description: "Boot device index (creation-only). 0 = primary boot, positive = secondary bootable, negative = not bootable. Cannot be changed after instance creation.",
 							Optional:    true,
 						},
-						"snapshot_id": schema.StringAttribute{
-							Description: "Snapshot ID.",
-							Optional:    true,
-						},
-						"apptemplate_id": schema.StringAttribute{
-							Description: "App template ID.",
-							Optional:    true,
-						},
-						"volume_id": schema.StringAttribute{
-							Description: "Volume ID.",
+						"attachment_tag": schema.StringAttribute{
+							Description: "Block device attachment tag. Used to identify the device in the guest OS (e.g., 'vdb', 'data-disk'). Not exposed in user-visible tags.",
 							Optional:    true,
 						},
 					},
 				},
-				PlanModifiers: []planmodifier.List{listplanmodifier.RequiresReplace()},
 			},
 			"allow_app_ports": schema.BoolAttribute{
 				Description:   "Set to `true` if creating the instance from an `apptemplate`. This allows application ports in the security group for instances created from a marketplace application template.",
@@ -227,9 +213,8 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 				PlanModifiers: []planmodifier.String{stringplanmodifier.RequiresReplace()},
 			},
 			"servergroup_id": schema.StringAttribute{
-				Description:   "Placement group ID for instance placement policy.\n\nSupported group types:\n- `anti-affinity`: Ensures instances are placed on different hosts for high availability.\n- `affinity`: Places instances on the same host for low-latency communication.\n- `soft-anti-affinity`: Tries to place instances on different hosts but allows sharing if needed.",
-				Optional:      true,
-				PlanModifiers: []planmodifier.String{stringplanmodifier.RequiresReplace()},
+				Description: "Placement group ID for instance placement policy.\n\nSupported group types:\n- `anti-affinity`: Ensures instances are placed on different hosts for high availability.\n- `affinity`: Places instances on the same host for low-latency communication.\n- `soft-anti-affinity`: Tries to place instances on different hosts but allows sharing if needed.",
+				Optional:    true,
 			},
 			"ssh_key_name": schema.StringAttribute{
 				Description:   "Specifies the name of the SSH keypair, created via the\n[/v1/`ssh_keys` endpoint](/docs/api-reference/cloud/ssh-keys/add-or-generate-ssh-key).",
@@ -263,7 +248,6 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 						},
 					},
 				},
-				PlanModifiers: []planmodifier.List{listplanmodifier.RequiresReplace()},
 			},
 			"name": schema.StringAttribute{
 				Description: "Instance name.",
@@ -275,21 +259,25 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 				ElementType: types.StringType,
 			},
 			"created_at": schema.StringAttribute{
-				Description: "Datetime when instance was created",
-				Computed:    true,
-				CustomType:  timetypes.RFC3339Type{},
+				Description:   "Datetime when instance was created",
+				Computed:      true,
+				CustomType:    timetypes.RFC3339Type{},
+				PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
 			},
 			"creator_task_id": schema.StringAttribute{
-				Description: "Task that created this entity",
-				Computed:    true,
+				Description:   "Task that created this entity",
+				Computed:      true,
+				PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
 			},
 			"instance_description": schema.StringAttribute{
-				Description: "Instance description",
-				Computed:    true,
+				Description:   "Instance description",
+				Computed:      true,
+				PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
 			},
 			"region": schema.StringAttribute{
-				Description: "Region name",
-				Computed:    true,
+				Description:   "Region name",
+				Computed:      true,
+				PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
 			},
 			"status": schema.StringAttribute{
 				Description: "Instance status\nAvailable values: \"ACTIVE\", \"BUILD\", \"DELETED\", \"ERROR\", \"HARD_REBOOT\", \"MIGRATING\", \"PASSWORD\", \"PAUSED\", \"REBOOT\", \"REBUILD\", \"RESCUE\", \"RESIZE\", \"REVERT_RESIZE\", \"SHELVED\", \"SHELVED_OFFLOADED\", \"SHUTOFF\", \"SOFT_DELETED\", \"SUSPENDED\", \"UNKNOWN\", \"VERIFY_RESIZE\".",
@@ -328,30 +316,22 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 				Computed:    true,
 			},
 			"vm_state": schema.StringAttribute{
-				Description: "Virtual machine state (active)\nAvailable values: \"active\", \"building\", \"deleted\", \"error\", \"paused\", \"rescued\", \"resized\", \"shelved\", \"shelved_offloaded\", \"soft-deleted\", \"stopped\", \"suspended\".",
-				Computed:    true,
+				Description:   "Virtual machine state. Set to 'active' to start the instance or 'stopped' to stop it.\nAvailable values: \"active\", \"stopped\".",
+				Computed:      true,
+				Optional:      true,
+				PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
 				Validators: []validator.String{
 					stringvalidator.OneOfCaseInsensitive(
 						"active",
-						"building",
-						"deleted",
-						"error",
-						"paused",
-						"rescued",
-						"resized",
-						"shelved",
-						"shelved_offloaded",
-						"soft-deleted",
 						"stopped",
-						"suspended",
 					),
 				},
 			},
 			"addresses": schema.MapAttribute{
-				Description: "Map of `network_name` to list of addresses in that network",
-				Computed:    true,
-				CustomType:  customfield.NewMapType[customfield.NestedObjectList[CloudInstanceAddressesModel]](ctx),
-				ElementType: types.ListType{
+				Description:   "Map of `network_name` to list of addresses in that network",
+				Computed:      true,
+				CustomType:    customfield.NewMapType[customfield.NestedObjectList[CloudInstanceAddressesModel]](ctx),
+					ElementType: types.ListType{
 					ElemType: types.ObjectType{
 						AttrTypes: map[string]attr.Type{"addr": schema.StringAttribute{
 							Description: "Address",
@@ -375,16 +355,11 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 					},
 				},
 			},
-			"tasks": schema.ListAttribute{
-				Description: "List of task IDs representing asynchronous operations. Use these IDs to monitor operation progress:\n* `GET /v1/tasks/{task_id}` - Check individual task status and details\nPoll task status until completion (`FINISHED`/`ERROR`) before proceeding with dependent operations.",
-				Computed:    true,
-				CustomType:  customfield.NewListType[types.String](ctx),
-				ElementType: types.StringType,
-			},
 			"blackhole_ports": schema.ListNestedAttribute{
-				Description: "IP addresses of the instances that are blackholed by DDoS mitigation system",
-				Computed:    true,
-				CustomType:  customfield.NewNestedObjectListType[CloudInstanceBlackholePortsModel](ctx),
+				Description:   "IP addresses of the instances that are blackholed by DDoS mitigation system",
+				Computed:      true,
+				CustomType:    customfield.NewNestedObjectListType[CloudInstanceBlackholePortsModel](ctx),
+				PlanModifiers: []planmodifier.List{listplanmodifier.UseStateForUnknown()},
 				NestedObject: schema.NestedAttributeObject{
 					Attributes: map[string]schema.Attribute{
 						"alarm_end": schema.StringAttribute{
@@ -456,9 +431,10 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 				},
 			},
 			"ddos_profile": schema.SingleNestedAttribute{
-				Description: "Advanced DDoS protection profile. It is always `null` if query parameter `with_ddos=true` is not set.",
-				Computed:    true,
-				CustomType:  customfield.NewNestedObjectType[CloudInstanceDDOSProfileModel](ctx),
+				Description:   "Advanced DDoS protection profile. It is always `null` if query parameter `with_ddos=true` is not set.",
+				Computed:      true,
+				CustomType:    customfield.NewNestedObjectType[CloudInstanceDDOSProfileModel](ctx),
+				PlanModifiers: []planmodifier.Object{objectplanmodifier.UseStateForUnknown()},
 				Attributes: map[string]schema.Attribute{
 					"id": schema.Int64Attribute{
 						Description: "Unique identifier for the DDoS protection profile",
@@ -636,9 +612,10 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 				},
 			},
 			"fixed_ip_assignments": schema.ListNestedAttribute{
-				Description: "Fixed IP assigned to instance",
-				Computed:    true,
-				CustomType:  customfield.NewNestedObjectListType[CloudInstanceFixedIPAssignmentsModel](ctx),
+				Description:   "Fixed IP assigned to instance",
+				Computed:      true,
+				CustomType:    customfield.NewNestedObjectListType[CloudInstanceFixedIPAssignmentsModel](ctx),
+				PlanModifiers: []planmodifier.List{listplanmodifier.UseStateForUnknown()},
 				NestedObject: schema.NestedAttributeObject{
 					Attributes: map[string]schema.Attribute{
 						"external": schema.BoolAttribute{
@@ -657,9 +634,10 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 				},
 			},
 			"instance_isolation": schema.SingleNestedAttribute{
-				Description: "Instance isolation information",
-				Computed:    true,
-				CustomType:  customfield.NewNestedObjectType[CloudInstanceInstanceIsolationModel](ctx),
+				Description:   "Instance isolation information",
+				Computed:      true,
+				CustomType:    customfield.NewNestedObjectType[CloudInstanceInstanceIsolationModel](ctx),
+				PlanModifiers: []planmodifier.Object{objectplanmodifier.UseStateForUnknown()},
 				Attributes: map[string]schema.Attribute{
 					"reason": schema.StringAttribute{
 						Description: "The reason of instance isolation if it is isolated from external internet.",
@@ -676,5 +654,67 @@ func (r *CloudInstanceResource) Schema(ctx context.Context, req resource.SchemaR
 }
 
 func (r *CloudInstanceResource) ConfigValidators(_ context.Context) []resource.ConfigValidator {
-	return []resource.ConfigValidator{}
+	return []resource.ConfigValidator{
+		&interfaceTypeValidator{},
+	}
+}
+
+// interfaceTypeValidator validates that interface type has required fields
+type interfaceTypeValidator struct{}
+
+func (v *interfaceTypeValidator) Description(_ context.Context) string {
+	return "validates interface type requirements: subnet requires subnet_id, any_subnet requires network_id, reserved_fixed_ip requires port_id"
+}
+
+func (v *interfaceTypeValidator) MarkdownDescription(ctx context.Context) string {
+	return v.Description(ctx)
+}
+
+func (v *interfaceTypeValidator) ValidateResource(ctx context.Context, req resource.ValidateConfigRequest, resp *resource.ValidateConfigResponse) {
+	var config CloudInstanceModel
+
+	resp.Diagnostics.Append(req.Config.Get(ctx, &config)...)
+	if resp.Diagnostics.HasError() {
+		return
+	}
+
+	if config.Interfaces == nil {
+		return
+	}
+
+	for i, iface := range *config.Interfaces {
+		if iface == nil {
+			continue
+		}
+
+		ifaceType := iface.Type.ValueString()
+
+		switch ifaceType {
+		case "subnet":
+			// Only check IsNull - IsUnknown is valid during planning (e.g., referencing another resource)
+			if iface.SubnetID.IsNull() {
+				resp.Diagnostics.AddAttributeError(
+					path.Root("interfaces").AtListIndex(i).AtName("subnet_id"),
+					"Missing Required Attribute",
+					fmt.Sprintf("Interface at index %d with type 'subnet' requires subnet_id to be specified.", i),
+				)
+			}
+		case "any_subnet":
+			if iface.NetworkID.IsNull() {
+				resp.Diagnostics.AddAttributeError(
+					path.Root("interfaces").AtListIndex(i).AtName("network_id"),
+					"Missing Required Attribute",
+					fmt.Sprintf("Interface at index %d with type 'any_subnet' requires network_id to be specified.", i),
+				)
+			}
+		case "reserved_fixed_ip":
+			if iface.PortID.IsNull() {
+				resp.Diagnostics.AddAttributeError(
+					path.Root("interfaces").AtListIndex(i).AtName("port_id"),
+					"Missing Required Attribute",
+					fmt.Sprintf("Interface at index %d with type 'reserved_fixed_ip' requires port_id to be specified.", i),
+				)
+			}
+		}
+	}
 }
