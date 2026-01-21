@@ -40,7 +40,7 @@ resource "gcore_cloud_load_balancer_pool" "example_cloud_load_balancer_pool" {
     backup = true
     instance_id = "a7e7e8d6-0bf7-4ac9-8170-831b47ee2ba9"
     monitor_address = "monitor_address"
-    monitor_port = 0
+    monitor_port = 1
     subnet_id = "32283b0b-b560-4690-810c-f672cbb2e28d"
     weight = 2
   }, {
@@ -50,7 +50,7 @@ resource "gcore_cloud_load_balancer_pool" "example_cloud_load_balancer_pool" {
     backup = true
     instance_id = "169942e0-9b53-42df-95ef-1a8b6525c2bd"
     monitor_address = "monitor_address"
-    monitor_port = 0
+    monitor_port = 1
     subnet_id = "32283b0b-b560-4690-810c-f672cbb2e28d"
     weight = 4
   }]
@@ -90,7 +90,7 @@ Available values: "HTTP", "HTTPS", "PROXY", "PROXYV2", "TCP", "UDP".
 - `region_id` (Number) Region ID
 - `secret_id` (String) Secret ID for TLS client authentication to the member servers
 - `session_persistence` (Attributes) Session persistence details (see [below for nested schema](#nestedatt--session_persistence))
-- `timeout_client_data` (Number) Frontend client inactivity timeout in milliseconds
+- `timeout_client_data` (Number, Deprecated) Frontend client inactivity timeout in milliseconds. We are recommending to use `listener.timeout_client_data` instead.
 - `timeout_member_connect` (Number) Backend member connection timeout in milliseconds
 - `timeout_member_data` (Number) Backend member inactivity timeout in milliseconds
 

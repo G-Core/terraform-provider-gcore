@@ -14,16 +14,13 @@ description: |-
 
 ```terraform
 data "gcore_cloud_load_balancers" "example_cloud_load_balancers" {
-  project_id = 0
-  region_id = 0
+  project_id = 1
+  region_id = 7
   assigned_floating = true
   logging_enabled = true
-  name = "name"
-  order_by = "order_by"
-  show_stats = true
-  tag_key = ["string"]
+  name = "lb_name"
+  tag_key = ["key1", "key2"]
   tag_key_value = "tag_key_value"
-  with_ddos = true
 }
 ```
 
@@ -33,15 +30,16 @@ data "gcore_cloud_load_balancers" "example_cloud_load_balancers" {
 ### Optional
 
 - `assigned_floating` (Boolean) With or without assigned floating IP
-- `logging_enabled` (Boolean) With or without logging
+- `logging_enabled` (Boolean) With or without logging enabled
 - `max_items` (Number) Max items to fetch, default: 1000
 - `name` (String) Filter by name
-- `order_by` (String) Ordering Load Balancer list result by name, `created_at`, `updated_at`, `operating_status`, `provisioning_status`, `vip_address`, `vip_ip_family` and flavor fields of the load balancer and directions (name.asc), default is "`created_at`.asc"
-- `project_id` (Number)
-- `region_id` (Number)
+- `order_by` (String) Order by field and direction.
+Available values: "created_at.asc", "created_at.desc", "flavor.asc", "flavor.desc", "name.asc", "name.desc", "operating_status.asc", "operating_status.desc", "provisioning_status.asc", "provisioning_status.desc", "updated_at.asc", "updated_at.desc", "vip_address.asc", "vip_address.desc", "vip_ip_family.asc", "vip_ip_family.desc".
+- `project_id` (Number) Project ID
+- `region_id` (Number) Region ID
 - `show_stats` (Boolean) Show statistics
-- `tag_key` (List of String) Filter by tag keys.
-- `tag_key_value` (String) Filter by tag key-value pairs. Must be a valid JSON string.
+- `tag_key` (List of String) Optional. Filter by tag keys. ?`tag_key`=key1&`tag_key`=key2
+- `tag_key_value` (String) Optional. Filter by tag key-value pairs.
 - `with_ddos` (Boolean) Show Advanced DDoS protection profile, if exists
 
 ### Read-Only
@@ -115,12 +113,12 @@ Read-Only:
 - `description` (String) Detailed description explaining the field's purpose and usage guidelines
 - `field_name` (String) Name of DDoS profile field
 - `field_type` (String) Data type classification of the field (e.g., string, integer, array)
-- `field_value` (String) Complex value. Only one of 'value' or '`field_value`' must be specified.
+- `field_value` (String) Complex value. Only one of 'value' or 'field_value' must be specified.
 - `id` (Number) Unique identifier for the DDoS protection field
 - `name` (String) Human-readable name of the protection field
 - `required` (Boolean) Indicates whether this field must be provided when creating a protection profile
 - `validation_schema` (String) JSON schema defining validation rules and constraints for the field value
-- `value` (String) Basic type value. Only one of 'value' or '`field_value`' must be specified.
+- `value` (String) Basic type value. Only one of 'value' or 'field_value' must be specified.
 
 
 <a id="nestedatt--items--ddos_profile--options"></a>

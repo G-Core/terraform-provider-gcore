@@ -16,6 +16,7 @@ description: |-
 data "gcore_cloud_security_groups" "example_cloud_security_groups" {
   project_id = 1
   region_id = 1
+  name = "my_security_group"
   tag_key = ["key1", "key2"]
   tag_key_value = "tag_key_value"
 }
@@ -27,6 +28,7 @@ data "gcore_cloud_security_groups" "example_cloud_security_groups" {
 ### Optional
 
 - `max_items` (Number) Max items to fetch, default: 1000
+- `name` (String) Optional. Filter by name. Must be specified a full name of the security group.
 - `project_id` (Number) Project ID
 - `region_id` (Number) Region ID
 - `tag_key` (List of String) Optional. Filter by tag keys. ?`tag_key`=key1&`tag_key`=key2

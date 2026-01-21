@@ -16,24 +16,21 @@ description: |-
 resource "gcore_cloud_security_group" "example_cloud_security_group" {
   project_id = 1
   region_id = 1
-  security_group = {
-    name = "my_security_group"
+  name = "my_security_group"
+  description = "My security group description"
+  rules = [{
+    direction = "ingress"
     description = "Some description"
-    security_group_rules = [{
-      description = "Some description"
-      direction = "ingress"
-      ethertype = "IPv4"
-      port_range_max = 80
-      port_range_min = 80
-      protocol = "tcp"
-      remote_group_id = "00000000-0000-4000-8000-000000000000"
-      remote_ip_prefix = "10.0.0.0/8"
-    }]
-    tags = {
-      my-tag = "my-tag-value"
-    }
+    ethertype = "IPv4"
+    port_range_max = 80
+    port_range_min = 80
+    protocol = "tcp"
+    remote_group_id = "00000000-0000-4000-8000-000000000000"
+    remote_ip_prefix = "10.0.0.0/8"
+  }]
+  tags = {
+    my-tag = "my-tag-value"
   }
-  instances = ["00000000-0000-4000-8000-000000000000"]
 }
 ```
 
@@ -42,63 +39,40 @@ resource "gcore_cloud_security_group" "example_cloud_security_group" {
 
 ### Required
 
-- `security_group` (Attributes) Security group (see [below for nested schema](#nestedatt--security_group))
+- `name` (String) Security group name
 
 ### Optional
 
-- `changed_rules` (Attributes List) List of rules to create or delete (see [below for nested schema](#nestedatt--changed_rules))
-- `instances` (List of String) List of instances
-- `name` (String) Name
+- `description` (String) Security group description
 - `project_id` (Number) Project ID
 - `region_id` (Number) Region ID
-- `tags` (Map of String) Update key-value tags using JSON Merge Patch semantics (RFC 7386). Provide key-value pairs to add or update tags. Set tag values to `null` to remove tags. Unspecified tags remain unchanged. Read-only tags are always preserved and cannot be modified.
-
-**Examples:**
-
-* **Add/update tags:** `{'tags': {'environment': 'production', 'team': 'backend'}}` adds new tags or updates existing ones.
-
-* **Delete tags:** `{'tags': {'old_tag': null}}` removes specific tags.
-
-* **Remove all tags:** `{'tags': null}` removes all user-managed tags (read-only tags are preserved).
-
-* **Partial update:** `{'tags': {'environment': 'staging'}}` only updates specified tags.
-
-* **Mixed operations:** `{'tags': {'environment': 'production', 'cost_center': 'engineering', 'deprecated_tag': null}}` adds/updates 'environment' and '`cost_center`' while removing '`deprecated_tag`', preserving other existing tags.
-
-* **Replace all:** first delete existing tags with null values, then add new ones in the same request.
+- `rules` (Attributes List) Security group rules (see [below for nested schema](#nestedatt--rules))
+- `tags` (Map of String) Key-value tags to associate with the resource. A tag is a key-value pair that can be associated with a resource, enabling efficient filtering and grouping for better organization and management. Both tag keys and values have a maximum length of 255 characters. Some tags are read-only and cannot be modified by the user. Tags are also integrated with cost reports, allowing cost data to be filtered based on tag keys or values.
 
 ### Read-Only
 
 - `created_at` (String) Datetime when the security group was created
-- `description` (String) Security group description
-- `id` (String) Security group ID
+- `id` (String) The ID of this resource.
 - `region` (String) Region name
 - `revision_number` (Number) The number of revisions
 - `security_group_rules` (Attributes List) Security group rules (see [below for nested schema](#nestedatt--security_group_rules))
 - `tags_v2` (Attributes List) List of key-value tags associated with the resource. A tag is a key-value pair that can be associated with a resource, enabling efficient filtering and grouping for better organization and management. Some tags are read-only and cannot be modified by the user. Tags are also integrated with cost reports, allowing cost data to be filtered based on tag keys or values. (see [below for nested schema](#nestedatt--tags_v2))
+- `tasks` (List of String) List of task IDs representing asynchronous operations. Use these IDs to monitor operation progress:
+* `GET /v1/tasks/{task_id}` - Check individual task status and details
+Poll task status until completion (`FINISHED`/`ERROR`) before proceeding with dependent operations.
 - `updated_at` (String) Datetime when the security group was last updated
 
-<a id="nestedatt--security_group"></a>
-### Nested Schema for `security_group`
+<a id="nestedatt--rules"></a>
+### Nested Schema for `rules`
 
 Required:
 
-- `name` (String) Security group name
-
-Optional:
-
-- `description` (String) Security group description
-- `security_group_rules` (Attributes List) Security group rules (see [below for nested schema](#nestedatt--security_group--security_group_rules))
-- `tags` (Map of String) Key-value tags to associate with the resource. A tag is a key-value pair that can be associated with a resource, enabling efficient filtering and grouping for better organization and management. Both tag keys and values have a maximum length of 255 characters. Some tags are read-only and cannot be modified by the user. Tags are also integrated with cost reports, allowing cost data to be filtered based on tag keys or values.
-
-<a id="nestedatt--security_group--security_group_rules"></a>
-### Nested Schema for `security_group.security_group_rules`
+- `direction` (String) Ingress or egress, which is the direction in which the security group is applied
+Available values: "egress", "ingress".
 
 Optional:
 
 - `description` (String) Rule description
-- `direction` (String) Ingress or egress, which is the direction in which the security group is applied
-Available values: "egress", "ingress".
 - `ethertype` (String) Ether type
 Available values: "IPv4", "IPv6".
 - `port_range_max` (Number) The maximum port number in the range that is matched by the security group rule
@@ -107,31 +81,6 @@ Available values: "IPv4", "IPv6".
 Available values: "ah", "any", "dccp", "egp", "esp", "gre", "icmp", "igmp", "ipencap", "ipip", "ipv6-encap", "ipv6-frag", "ipv6-icmp", "ipv6-nonxt", "ipv6-opts", "ipv6-route", "ospf", "pgm", "rsvp", "sctp", "tcp", "udp", "udplite", "vrrp".
 - `remote_group_id` (String) The remote group UUID to associate with this security group
 - `remote_ip_prefix` (String) The remote IP prefix that is matched by this security group rule
-
-
-
-<a id="nestedatt--changed_rules"></a>
-### Nested Schema for `changed_rules`
-
-Required:
-
-- `action` (String) Action for a rule
-Available values: "create", "delete".
-
-Optional:
-
-- `description` (String) Security grpup rule description
-- `direction` (String) Ingress or egress, which is the direction in which the security group rule is applied
-Available values: "egress", "ingress".
-- `ethertype` (String) Must be IPv4 or IPv6, and addresses represented in CIDR must match the ingress or egress rules.
-Available values: "IPv4", "IPv6".
-- `port_range_max` (Number) The maximum port number in the range that is matched by the security group rule
-- `port_range_min` (Number) The minimum port number in the range that is matched by the security group rule
-- `protocol` (String) Protocol
-Available values: "ah", "any", "dccp", "egp", "esp", "gre", "icmp", "igmp", "ipencap", "ipip", "ipv6-encap", "ipv6-frag", "ipv6-icmp", "ipv6-nonxt", "ipv6-opts", "ipv6-route", "ospf", "pgm", "rsvp", "sctp", "tcp", "udp", "udplite", "vrrp".
-- `remote_group_id` (String) The remote group UUID to associate with this security group rule
-- `remote_ip_prefix` (String) The remote IP prefix that is matched by this security group rule
-- `security_group_rule_id` (String) UUID of rule to be deleted. Required for action 'delete' only
 
 
 <a id="nestedatt--security_group_rules"></a>

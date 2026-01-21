@@ -14,8 +14,8 @@ description: |-
 
 ```terraform
 resource "gcore_cloud_load_balancer" "example_cloud_load_balancer" {
-  project_id = 0
-  region_id = 0
+  project_id = 1
+  region_id = 7
   flavor = "lb1-1-2"
   floating_ip = {
     existing_floating_id = "c64e5db1-5f1f-43ec-a8d9-5090df85b82d"
@@ -44,8 +44,6 @@ resource "gcore_cloud_load_balancer" "example_cloud_load_balancer" {
         max_retries_down = 3
         url_path = "/"
       }
-      listener_id = "listener_id"
-      load_balancer_id = "bbb35f84-35cc-4b2f-84c2-a6a29bba68aa"
       members = [{
         address = "192.168.1.101"
         protocol_port = 8000
@@ -53,7 +51,7 @@ resource "gcore_cloud_load_balancer" "example_cloud_load_balancer" {
         backup = true
         instance_id = "a7e7e8d6-0bf7-4ac9-8170-831b47ee2ba9"
         monitor_address = "monitor_address"
-        monitor_port = 0
+        monitor_port = 1
         subnet_id = "32283b0b-b560-4690-810c-f672cbb2e28d"
         weight = 2
       }, {
@@ -63,7 +61,7 @@ resource "gcore_cloud_load_balancer" "example_cloud_load_balancer" {
         backup = true
         instance_id = "169942e0-9b53-42df-95ef-1a8b6525c2bd"
         monitor_address = "monitor_address"
-        monitor_port = 0
+        monitor_port = 1
         subnet_id = "32283b0b-b560-4690-810c-f672cbb2e28d"
         weight = 4
       }]
@@ -122,8 +120,8 @@ resource "gcore_cloud_load_balancer" "example_cloud_load_balancer" {
 - `name_template` (String) Load balancer name which will be changed by template. Either `name` or `name_template` should be specified.
 - `preferred_connectivity` (String) Preferred option to establish connectivity between load balancer and its pools members. L2 provides best performance, L3 provides less IPs usage. It is taking effect only if `instance_id` + `ip_address` is provided, not `subnet_id` + `ip_address`, because we're considering this as intentional `subnet_id` specification.
 Available values: "L2", "L3".
-- `project_id` (Number)
-- `region_id` (Number)
+- `project_id` (Number) Project ID
+- `region_id` (Number) Region ID
 - `tags` (Map of String) Key-value tags to associate with the resource. A tag is a key-value pair that can be associated with a resource, enabling efficient filtering and grouping for better organization and management. Both tag keys and values have a maximum length of 255 characters. Some tags are read-only and cannot be modified by the user. Tags are also integrated with cost reports, allowing cost data to be filtered based on tag keys or values.
 - `vip_ip_family` (String) IP family for load balancer subnet auto-selection if `vip_network_id` is specified
 Available values: "dual", "ipv4", "ipv6".
@@ -182,8 +180,8 @@ Optional:
 - `secret_id` (String) ID of the secret where PKCS12 file is stored for `TERMINATED_HTTPS` or PROMETHEUS listener
 - `sni_secret_id` (List of String) List of secrets IDs containing PKCS12 format certificate/key bundles for `TERMINATED_HTTPS` or PROMETHEUS listeners
 - `timeout_client_data` (Number) Frontend client inactivity timeout in milliseconds
-- `timeout_member_connect` (Number) Backend member connection timeout in milliseconds
-- `timeout_member_data` (Number) Backend member inactivity timeout in milliseconds
+- `timeout_member_connect` (Number, Deprecated) Backend member connection timeout in milliseconds. We are recommending to use `pool.timeout_member_connect` instead.
+- `timeout_member_data` (Number, Deprecated) Backend member inactivity timeout in milliseconds. We are recommending to use `pool.timeout_member_data` instead.
 - `user_list` (Attributes List) Load balancer listener list of username and encrypted password items (see [below for nested schema](#nestedatt--listeners--user_list))
 
 <a id="nestedatt--listeners--pools"></a>
@@ -202,12 +200,10 @@ Optional:
 - `ca_secret_id` (String) Secret ID of CA certificate bundle
 - `crl_secret_id` (String) Secret ID of CA revocation list file
 - `healthmonitor` (Attributes) Health monitor details (see [below for nested schema](#nestedatt--listeners--pools--healthmonitor))
-- `listener_id` (String) Listener ID
-- `load_balancer_id` (String) Loadbalancer ID
 - `members` (Attributes List) Pool members (see [below for nested schema](#nestedatt--listeners--pools--members))
 - `secret_id` (String) Secret ID for TLS client authentication to the member servers
 - `session_persistence` (Attributes) Session persistence details (see [below for nested schema](#nestedatt--listeners--pools--session_persistence))
-- `timeout_client_data` (Number) Frontend client inactivity timeout in milliseconds
+- `timeout_client_data` (Number, Deprecated) Frontend client inactivity timeout in milliseconds. We are recommending to use `listener.timeout_client_data` instead.
 - `timeout_member_connect` (Number) Backend member connection timeout in milliseconds
 - `timeout_member_data` (Number) Backend member inactivity timeout in milliseconds
 
@@ -331,12 +327,12 @@ Read-Only:
 - `description` (String) Detailed description explaining the field's purpose and usage guidelines
 - `field_name` (String) Name of DDoS profile field
 - `field_type` (String) Data type classification of the field (e.g., string, integer, array)
-- `field_value` (String) Complex value. Only one of 'value' or '`field_value`' must be specified.
+- `field_value` (String) Complex value. Only one of 'value' or 'field_value' must be specified.
 - `id` (Number) Unique identifier for the DDoS protection field
 - `name` (String) Human-readable name of the protection field
 - `required` (Boolean) Indicates whether this field must be provided when creating a protection profile
 - `validation_schema` (String) JSON schema defining validation rules and constraints for the field value
-- `value` (String) Basic type value. Only one of 'value' or '`field_value`' must be specified.
+- `value` (String) Basic type value. Only one of 'value' or 'field_value' must be specified.
 
 
 <a id="nestedatt--ddos_profile--options"></a>

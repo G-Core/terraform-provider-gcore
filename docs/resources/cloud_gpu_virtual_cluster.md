@@ -78,7 +78,7 @@ resource "gcore_cloud_gpu_virtual_cluster" "example_cloud_gpu_virtual_cluster" {
 - `id` (String) The ID of this resource.
 - `servers_ids` (List of String) List of cluster nodes
 - `status` (String) Cluster status
-Available values: "active", "deleting", "error", "new", "resizing".
+Available values: "active", "creating", "degraded", "deleting", "error", "new", "rebooting", "rebuilding", "resizing", "shutoff".
 - `tasks` (List of String) List of task IDs representing asynchronous operations. Use these IDs to monitor operation progress:
 * `GET /v1/tasks/{task_id}` - Check individual task status and details
 Poll task status until completion (`FINISHED`/`ERROR`) before proceeding with dependent operations.
@@ -148,7 +148,7 @@ Optional:
 
 Optional:
 
-- `password` (String) Used to set the password for the specified 'username' on Linux instances. If 'username' is not provided, the password is applied to the default user of the image. Mutually exclusive with '`user_data`' - only one can be specified.
+- `password` (String) Used to set the password for the specified 'username' on Linux instances. If 'username' is not provided, the password is applied to the default user of the image. Mutually exclusive with 'user_data' - only one can be specified.
 - `ssh_key_name` (String) Specifies the name of the SSH keypair, created via the
 [/v1/`ssh_keys` endpoint](/docs/api-reference/cloud/ssh-keys/add-or-generate-ssh-key).
 - `username` (String) The 'username' and 'password' fields create a new user on the system

@@ -50,7 +50,7 @@ Available values: "aarch64", "x86_64".
 Available values: "bios", "uefi".
 - `hw_machine_type` (String) A virtual chipset type.
 Available values: "pc", "q35".
-- `id` (String) Image ID
+- `id` (String) The ID of this resource.
 - `is_baremetal` (Boolean) Set to true if the image will be used by bare metal servers. Defaults to false.
 - `min_disk` (Number) Minimal boot volume required
 - `min_ram` (Number) Minimal VM RAM required

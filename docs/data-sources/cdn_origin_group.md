@@ -54,7 +54,7 @@ Possible values:
 - **`http_502`** - a origin returned a response with the code 502
 - **`http_503`** - a origin returned a response with the code 503
 - **`http_504`** - a origin returned a response with the code 504
-- `sources` (Attributes List) List of origin sources in the origin group. (see [below for nested schema](#nestedatt--sources))
+- `sources` (Attributes Set) List of origin sources in the origin group. (see [below for nested schema](#nestedatt--sources))
 - `use_next` (Boolean) Defines whether to use the next origin from the origin group if origin responds with the cases specified in `proxy_next_upstream`.
 If you enable it, you must specify cases in `proxy_next_upstream`.
 
@@ -78,16 +78,16 @@ Restrictions:
 - Maximum 128 characters.
 - `s3_region` (String) S3 storage region. 
 
-The parameter is required, if "`s3_type`": amazon.
+The parameter is required, if "s3_type": amazon.
 - `s3_secret_access_key` (String) Secret access key for the S3 account. 
 
 Restrictions:
 - Latin letters (A-Z, a-z), numbers (0-9), pluses, slashes, dashes, colons and underscores.
-- If "`s3_type`": amazon, length should be 40 characters.
-- If "`s3_type`": other, length should be from 16 to 255 characters.
+- If "s3_type": amazon, length should be 40 characters.
+- If "s3_type": other, length should be from 16 to 255 characters.
 - `s3_storage_hostname` (String) S3 storage hostname. 
 
-The parameter is required, if "`s3_type`": other.
+The parameter is required, if "s3_type": other.
 - `s3_type` (String) Storage type compatible with S3.
 
 Possible values:

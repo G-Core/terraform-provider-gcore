@@ -173,8 +173,8 @@ Read-Only:
 Read-Only:
 
 - `base_field` (Number)
-- `field_value` (String) Complex value. Only one of 'value' or '`field_value`' must be specified
-- `value` (String) Basic value. Only one of 'value' or '`field_value`' must be specified
+- `field_value` (String) Complex value. Only one of 'value' or 'field_value' must be specified
+- `value` (String) Basic value. Only one of 'value' or 'field_value' must be specified
 
 
 

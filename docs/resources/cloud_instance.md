@@ -71,7 +71,7 @@ resource "gcore_cloud_instance" "example_cloud_instance" {
 - `configuration` (Map of String) Parameters for the application template if creating the instance from an `apptemplate`.
 - `name` (String) Instance name.
 - `name_template` (String) If you want the instance name to be automatically generated based on IP addresses, you can provide a name template instead of specifying the name manually. The template should include a placeholder that will be replaced during provisioning. Supported placeholders are: `{ip_octets}` (last 3 octets of the IP), `{two_ip_octets}`, and `{one_ip_octet}`.
-- `password` (String) For Linux instances, 'username' and 'password' are used to create a new user. When only 'password' is provided, it is set as the password for the default user of the image. For Windows instances, 'username' cannot be specified. Use the 'password' field to set the password for the 'Admin' user on Windows. Use the '`user_data`' field to provide a script to create new users on Windows. The password of the Admin user cannot be updated via '`user_data`'.
+- `password` (String) For Linux instances, 'username' and 'password' are used to create a new user. When only 'password' is provided, it is set as the password for the default user of the image. For Windows instances, 'username' cannot be specified. Use the 'password' field to set the password for the 'Admin' user on Windows. Use the 'user_data' field to provide a script to create new users on Windows. The password of the Admin user cannot be updated via 'user_data'.
 - `project_id` (Number) Project ID
 - `region_id` (Number) Region ID
 - `security_groups` (Attributes List) Specifies security group UUIDs to be applied to all instance network interfaces. (see [below for nested schema](#nestedatt--security_groups))
@@ -84,7 +84,7 @@ Supported group types:
 - `ssh_key_name` (String) Specifies the name of the SSH keypair, created via the
 [/v1/`ssh_keys` endpoint](/docs/api-reference/cloud/ssh-keys/add-or-generate-ssh-key).
 - `tags` (Map of String) Key-value tags to associate with the resource. A tag is a key-value pair that can be associated with a resource, enabling efficient filtering and grouping for better organization and management. Both tag keys and values have a maximum length of 255 characters. Some tags are read-only and cannot be modified by the user. Tags are also integrated with cost reports, allowing cost data to be filtered based on tag keys or values.
-- `user_data` (String) String in base64 format. For Linux instances, '`user_data`' is ignored when 'password' field is provided. For Windows instances, Admin user password is set by 'password' field and cannot be updated via '`user_data`'. Examples of the `user_data`: https://cloudinit.readthedocs.io/en/latest/topics/examples.html
+- `user_data` (String) String in base64 format. For Linux instances, 'user_data' is ignored when 'password' field is provided. For Windows instances, Admin user password is set by 'password' field and cannot be updated via 'user_data'. Examples of the `user_data`: https://cloudinit.readthedocs.io/en/latest/topics/examples.html
 - `username` (String) For Linux instances, 'username' and 'password' are used to create a new user. For Windows instances, 'username' cannot be specified. Use 'password' field to set the password for the 'Admin' user on Windows.
 
 ### Read-Only
@@ -226,12 +226,12 @@ Read-Only:
 - `description` (String) Detailed description explaining the field's purpose and usage guidelines
 - `field_name` (String) Name of DDoS profile field
 - `field_type` (String) Data type classification of the field (e.g., string, integer, array)
-- `field_value` (String) Complex value. Only one of 'value' or '`field_value`' must be specified.
+- `field_value` (String) Complex value. Only one of 'value' or 'field_value' must be specified.
 - `id` (Number) Unique identifier for the DDoS protection field
 - `name` (String) Human-readable name of the protection field
 - `required` (Boolean) Indicates whether this field must be provided when creating a protection profile
 - `validation_schema` (String) JSON schema defining validation rules and constraints for the field value
-- `value` (String) Basic type value. Only one of 'value' or '`field_value`' must be specified.
+- `value` (String) Basic type value. Only one of 'value' or 'field_value' must be specified.
 
 
 <a id="nestedatt--ddos_profile--options"></a>
