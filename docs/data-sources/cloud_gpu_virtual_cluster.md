@@ -42,7 +42,7 @@ data "gcore_cloud_gpu_virtual_cluster" "example_cloud_gpu_virtual_cluster" {
 - `servers_ids` (List of String) List of cluster nodes
 - `servers_settings` (Attributes) (see [below for nested schema](#nestedatt--servers_settings))
 - `status` (String) Cluster status
-Available values: "active", "deleting", "error", "new", "resizing".
+Available values: "active", "creating", "degraded", "deleting", "error", "new", "rebooting", "rebuilding", "resizing", "shutoff".
 - `tags` (Attributes List) List of key-value tags associated with the resource. A tag is a key-value pair that can be associated with a resource, enabling efficient filtering and grouping for better organization and management. Some tags are read-only and cannot be modified by the user. Tags are also integrated with cost reports, allowing cost data to be filtered based on tag keys or values. (see [below for nested schema](#nestedatt--tags))
 - `updated_at` (String) Cluster update date time
 

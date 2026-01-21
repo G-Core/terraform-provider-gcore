@@ -14,9 +14,9 @@ description: |-
 
 ```terraform
 data "gcore_cloud_security_group" "example_cloud_security_group" {
-  project_id = 0
-  region_id = 0
-  group_id = "group_id"
+  project_id = 1
+  region_id = 1
+  group_id = "024a29e9-b4b7-4c91-9a46-505be123d9f8"
 }
 ```
 
@@ -26,15 +26,15 @@ data "gcore_cloud_security_group" "example_cloud_security_group" {
 ### Optional
 
 - `find_one_by` (Attributes) (see [below for nested schema](#nestedatt--find_one_by))
-- `group_id` (String)
-- `project_id` (Number)
-- `region_id` (Number)
+- `group_id` (String) Group ID
+- `project_id` (Number) Project ID
+- `region_id` (Number) Region ID
 
 ### Read-Only
 
 - `created_at` (String) Datetime when the security group was created
 - `description` (String) Security group description
-- `id` (String) The ID of this resource.
+- `id` (String) Group ID
 - `name` (String) Security group name
 - `region` (String) Region name
 - `revision_number` (Number) The number of revisions
@@ -47,6 +47,7 @@ data "gcore_cloud_security_group" "example_cloud_security_group" {
 
 Optional:
 
+- `name` (String) Optional. Filter by name. Must be specified a full name of the security group.
 - `tag_key` (List of String) Optional. Filter by tag keys. ?`tag_key`=key1&`tag_key`=key2
 - `tag_key_value` (String) Optional. Filter by tag key-value pairs.
 

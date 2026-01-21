@@ -31,9 +31,9 @@ data "gcore_cloud_region" "example_cloud_region" {
 
 - `access_level` (String) The access level of the region.
 Available values: "core", "edge".
-- `available_volume_types` (List of String) List of available volume types, 'standard', '`ssd_hiiops`', 'cold'].
+- `available_volume_types` (List of String) List of available volume types, 'standard', 'ssd_hiiops', 'cold'].
 - `coordinates` (Attributes) Coordinates of the region (see [below for nested schema](#nestedatt--coordinates))
-- `country` (String) Country
+- `country` (String) Two-letter country code, ISO 3166-1 alpha-2
 - `created_at` (String) Region creation date and time
 - `created_on` (String, Deprecated) This field is deprecated. Use `created_at` instead.
 - `ddos_endpoint_id` (Number, Deprecated) DDoS endpoint ID

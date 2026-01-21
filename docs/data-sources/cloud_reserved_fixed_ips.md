@@ -37,7 +37,7 @@ data "gcore_cloud_reserved_fixed_ips" "example_cloud_reserved_fixed_ips" {
 - `internal_only` (Boolean) Set to true if the response should only list private IP addresses
 - `ip_address` (String) An IPv4 address to filter results by. Regular expression allowed
 - `max_items` (Number) Max items to fetch, default: 1000
-- `order_by` (String) Ordering reserved fixed IP list result by name, status, `updated_at`, `created_at` or `fixed_ip_address` fields and directions (status.asc), default is "`fixed_ip_address`.asc"
+- `order_by` (String) Ordering reserved fixed IP list result by name, status, `updated_at`, `created_at` or `fixed_ip_address` fields and directions (status.asc), default is "fixed_ip_address.asc"
 - `project_id` (Number)
 - `region_id` (Number)
 - `vip_only` (Boolean) Set to true if the response should only list VIPs
