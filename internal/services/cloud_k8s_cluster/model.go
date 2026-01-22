@@ -3,10 +3,15 @@
 package cloud_k8s_cluster
 
 import (
+	"context"
+	"fmt"
+	"strings"
+
 	"github.com/hashicorp/terraform-plugin-framework-jsontypes/jsontypes"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/stainless-sdks/gcore-terraform/internal/apijson"
 	"github.com/stainless-sdks/gcore-terraform/internal/customfield"
+	"github.com/tidwall/sjson"
 )
 
 type CloudK8SClusterModel struct {
@@ -35,8 +40,6 @@ type CloudK8SClusterModel struct {
 	CreatorTaskID    types.String                                                 `tfsdk:"creator_task_id" json:"creator_task_id,computed"`
 	IsPublic         types.Bool                                                   `tfsdk:"is_public" json:"is_public,computed"`
 	Status           types.String                                                 `tfsdk:"status" json:"status,computed"`
-	TaskID           types.String                                                 `tfsdk:"task_id" json:"task_id,computed"`
-	Tasks            customfield.List[types.String]                               `tfsdk:"tasks" json:"tasks,computed,no_refresh"`
 }
 
 func (m CloudK8SClusterModel) MarshalJSON() (data []byte, err error) {
@@ -44,7 +47,22 @@ func (m CloudK8SClusterModel) MarshalJSON() (data []byte, err error) {
 }
 
 func (m CloudK8SClusterModel) MarshalJSONForUpdate(state CloudK8SClusterModel) (data []byte, err error) {
-	return apijson.MarshalForPatch(m, state)
+	// First, get the base patch serialization
+	data, err = apijson.MarshalForPatch(m, state)
+	if err != nil {
+		return nil, err
+	}
+
+	// Handle autoscaler_config specially - it needs full replacement, not patch
+	// The API expects all key-value pairs that should be in effect, not a patch with nulls
+	if !m.AutoscalerConfig.Equal(state.AutoscalerConfig) {
+		data, err = overrideAutoscalerConfig(data, m.AutoscalerConfig)
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	return data, nil
 }
 
 type CloudK8SClusterPoolsModel struct {
@@ -136,4 +154,68 @@ type CloudK8SClusterLoggingModel struct {
 
 type CloudK8SClusterLoggingRetentionPolicyModel struct {
 	Period types.Int64 `tfsdk:"period" json:"period,required"`
+}
+
+// overrideAutoscalerConfig replaces the autoscaler_config in the JSON payload
+// with the full map value (no nulls for removed keys)
+func overrideAutoscalerConfig(jsonData []byte, autoscalerConfig customfield.Map[types.String]) ([]byte, error) {
+	ctx := context.Background()
+
+	// If autoscaler_config is null or unknown, send empty object
+	if autoscalerConfig.IsNull() || autoscalerConfig.IsUnknown() {
+		return sjson.SetRawBytes(jsonData, "autoscaler_config", []byte(`{}`))
+	}
+
+	// Get the map values
+	configMap, diags := autoscalerConfig.Value(ctx)
+	if diags.HasError() {
+		return nil, fmt.Errorf("failed to get autoscaler_config values: %v", diags)
+	}
+
+	// Build a plain map with only non-null, non-unknown string values
+	plainMap := make(map[string]string)
+	for k, v := range configMap {
+		if !v.IsNull() && !v.IsUnknown() {
+			plainMap[k] = v.ValueString()
+		}
+	}
+
+	// Serialize the full map
+	autoscalerBytes, err := apijson.Marshal(plainMap)
+	if err != nil {
+		return nil, err
+	}
+
+	// Replace autoscaler_config in the JSON payload
+	return sjson.SetRawBytes(jsonData, "autoscaler_config", autoscalerBytes)
+}
+
+// FilterServerManagedLabels removes server-managed labels from all pools
+// Server-managed labels have prefixes like "gcorecluster.x-k8s.io/"
+func (m *CloudK8SClusterModel) FilterServerManagedLabels(ctx context.Context) {
+	if m.Pools == nil {
+		return
+	}
+
+	for _, pool := range *m.Pools {
+		if pool == nil || pool.Labels.IsNull() || pool.Labels.IsUnknown() {
+			continue
+		}
+
+		labelsMap, diags := pool.Labels.Value(ctx)
+		if diags.HasError() {
+			continue
+		}
+
+		filteredLabels := make(map[string]types.String)
+		for k, v := range labelsMap {
+			// Skip labels with server-managed prefixes
+			if !strings.HasPrefix(k, "gcorecluster.x-k8s.io/") {
+				filteredLabels[k] = v
+			}
+		}
+
+		// Update the pool's labels with filtered version
+		pool.Labels = customfield.NewMapMust[types.String](ctx, filteredLabels)
+	}
 }
