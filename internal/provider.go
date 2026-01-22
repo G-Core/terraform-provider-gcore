@@ -43,6 +43,9 @@ import (
 	"github.com/stainless-sdks/gcore-terraform/internal/services/cloud_security_group"
 	"github.com/stainless-sdks/gcore-terraform/internal/services/cloud_ssh_key"
 	"github.com/stainless-sdks/gcore-terraform/internal/services/cloud_volume"
+	"github.com/stainless-sdks/gcore-terraform/internal/services/dns_network_mapping"
+	"github.com/stainless-sdks/gcore-terraform/internal/services/dns_zone"
+	"github.com/stainless-sdks/gcore-terraform/internal/services/dns_zone_rrset"
 )
 
 var _ provider.ProviderWithConfigValidators = (*GcoreProvider)(nil)
