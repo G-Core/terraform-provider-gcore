@@ -46,14 +46,6 @@ import (
 	"github.com/stainless-sdks/gcore-terraform/internal/services/dns_network_mapping"
 	"github.com/stainless-sdks/gcore-terraform/internal/services/dns_zone"
 	"github.com/stainless-sdks/gcore-terraform/internal/services/dns_zone_rrset"
-	"github.com/stainless-sdks/gcore-terraform/internal/services/waap_custom_page_set"
-	"github.com/stainless-sdks/gcore-terraform/internal/services/waap_domain"
-	"github.com/stainless-sdks/gcore-terraform/internal/services/waap_domain_advanced_rule"
-	"github.com/stainless-sdks/gcore-terraform/internal/services/waap_domain_api_path"
-	"github.com/stainless-sdks/gcore-terraform/internal/services/waap_domain_custom_rule"
-	"github.com/stainless-sdks/gcore-terraform/internal/services/waap_domain_firewall_rule"
-	"github.com/stainless-sdks/gcore-terraform/internal/services/waap_domain_insight_silence"
-	"github.com/stainless-sdks/gcore-terraform/internal/services/waap_tag"
 )
 
 var _ provider.ProviderWithConfigValidators = (*GcoreProvider)(nil)
@@ -210,13 +202,6 @@ func (p *GcoreProvider) Resources(ctx context.Context) []func() resource.Resourc
 		cloud_instance.NewResource,
 		cloud_instance_image.NewResource,
 		cloud_k8s_cluster.NewResource,
-		waap_domain.NewResource,
-		waap_domain_api_path.NewResource,
-		waap_domain_insight_silence.NewResource,
-		waap_domain_custom_rule.NewResource,
-		waap_domain_firewall_rule.NewResource,
-		waap_domain_advanced_rule.NewResource,
-		waap_custom_page_set.NewResource,
 		dns_zone.NewResource,
 		dns_zone_rrset.NewResource,
 		dns_network_mapping.NewResource,
@@ -267,21 +252,6 @@ func (p *GcoreProvider) DataSources(ctx context.Context) []func() datasource.Dat
 		cloud_instance.NewCloudInstancesDataSource,
 		cloud_instance_image.NewCloudInstanceImageDataSource,
 		cloud_k8s_cluster.NewCloudK8SClusterDataSource,
-		waap_domain.NewWaapDomainDataSource,
-		waap_domain.NewWaapDomainsDataSource,
-		waap_domain_api_path.NewWaapDomainAPIPathDataSource,
-		waap_domain_api_path.NewWaapDomainAPIPathsDataSource,
-		waap_domain_insight_silence.NewWaapDomainInsightSilenceDataSource,
-		waap_domain_insight_silence.NewWaapDomainInsightSilencesDataSource,
-		waap_domain_custom_rule.NewWaapDomainCustomRuleDataSource,
-		waap_domain_custom_rule.NewWaapDomainCustomRulesDataSource,
-		waap_domain_firewall_rule.NewWaapDomainFirewallRuleDataSource,
-		waap_domain_firewall_rule.NewWaapDomainFirewallRulesDataSource,
-		waap_domain_advanced_rule.NewWaapDomainAdvancedRuleDataSource,
-		waap_domain_advanced_rule.NewWaapDomainAdvancedRulesDataSource,
-		waap_custom_page_set.NewWaapCustomPageSetDataSource,
-		waap_custom_page_set.NewWaapCustomPageSetsDataSource,
-		waap_tag.NewWaapTagsDataSource,
 		dns_zone.NewDNSZoneDataSource,
 		dns_zone_rrset.NewDNSZoneRrsetDataSource,
 		dns_network_mapping.NewDNSNetworkMappingDataSource,
