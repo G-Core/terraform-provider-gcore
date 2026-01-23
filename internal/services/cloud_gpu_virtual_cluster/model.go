@@ -16,7 +16,7 @@ type CloudGPUVirtualClusterModel struct {
 	Flavor          types.String                                `tfsdk:"flavor" json:"flavor,required"`
 	ServersCount    types.Int64                                 `tfsdk:"servers_count" json:"servers_count,required"`
 	ServersSettings *CloudGPUVirtualClusterServersSettingsModel `tfsdk:"servers_settings" json:"servers_settings,required"`
-	Tags            *map[string]types.String                    `tfsdk:"tags" json:"tags,optional,no_refresh"`
+	Tags            customfield.Map[types.String]               `tfsdk:"tags" json:"tags,computed_optional,no_refresh"`
 	Name            types.String                                `tfsdk:"name" json:"name,required"`
 	CreatedAt       timetypes.RFC3339                           `tfsdk:"created_at" json:"created_at,computed" format:"date-time"`
 	Status          types.String                                `tfsdk:"status" json:"status,computed"`
