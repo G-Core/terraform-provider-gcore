@@ -39,7 +39,7 @@ resource "gcore_cloud_instance_image" "example_cloud_instance_image" {
 ### Required
 
 - `name` (String) Image name
-- `url` (String) URL
+- `url` (String) URL of the image to download.
 
 ### Optional
 
@@ -77,10 +77,6 @@ Available values: "allow", "deny", "required".
 - `region` (String) Region name
 - `size` (Number) Image size in bytes
 - `status` (String) Image status, i.e. active
-- `task_id` (String) The UUID of the active task that currently holds a lock on the resource. This lock prevents concurrent modifications to ensure consistency. If `null`, the resource is not locked.
-- `tasks` (List of String) List of task IDs representing asynchronous operations. Use these IDs to monitor operation progress:
-* `GET /v1/tasks/{task_id}` - Check individual task status and details
-Poll task status until completion (`FINISHED`/`ERROR`) before proceeding with dependent operations.
 - `updated_at` (String) Datetime when the image was updated
 - `visibility` (String) Image visibility. Globally visible images are public
 

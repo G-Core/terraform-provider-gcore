@@ -3,6 +3,7 @@
 package cloud_instance_image
 
 import (
+	"bytes"
 	"context"
 	"fmt"
 	"io"
@@ -80,20 +81,17 @@ func (r *CloudInstanceImageResource) Create(ctx context.Context, req resource.Cr
 		resp.Diagnostics.AddError("failed to serialize http request", err.Error())
 		return
 	}
-	res := new(http.Response)
-	_, err = r.client.Cloud.Instances.Images.Upload(
+	image, err := r.client.Cloud.Instances.Images.UploadAndPoll(
 		ctx,
 		params,
 		option.WithRequestBody("application/json", dataBytes),
-		option.WithResponseBodyInto(&res),
 		option.WithMiddleware(logging.Middleware(ctx)),
 	)
 	if err != nil {
 		resp.Diagnostics.AddError("failed to make http request", err.Error())
 		return
 	}
-	bytes, _ := io.ReadAll(res.Body)
-	err = apijson.UnmarshalComputed(bytes, &data)
+	err = apijson.UnmarshalComputed([]byte(image.RawJSON()), &data)
 	if err != nil {
 		resp.Diagnostics.AddError("failed to deserialize http request", err.Error())
 		return
@@ -133,6 +131,10 @@ func (r *CloudInstanceImageResource) Update(ctx context.Context, req resource.Up
 	if err != nil {
 		resp.Diagnostics.AddError("failed to serialize http request", err.Error())
 		return
+	}
+	// Fix: API rejects "tags":null, expects "tags":{} when removing all tags
+	if data.Tags == nil && state.Tags != nil {
+		dataBytes = bytes.Replace(dataBytes, []byte(`"tags":null`), []byte(`"tags":{}`), 1)
 	}
 	res := new(http.Response)
 	_, err = r.client.Cloud.Instances.Images.Update(
@@ -222,7 +224,7 @@ func (r *CloudInstanceImageResource) Delete(ctx context.Context, req resource.De
 		params.RegionID = param.NewOpt(data.RegionID.ValueInt64())
 	}
 
-	_, err := r.client.Cloud.Instances.Images.Delete(
+	err := r.client.Cloud.Instances.Images.DeleteAndPoll(
 		ctx,
 		data.ID.ValueString(),
 		params,
@@ -232,8 +234,6 @@ func (r *CloudInstanceImageResource) Delete(ctx context.Context, req resource.De
 		resp.Diagnostics.AddError("failed to make http request", err.Error())
 		return
 	}
-
-	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
 }
 
 func (r *CloudInstanceImageResource) ImportState(ctx context.Context, req resource.ImportStateRequest, resp *resource.ImportStateResponse) {

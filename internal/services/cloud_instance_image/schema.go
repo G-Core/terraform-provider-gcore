@@ -17,7 +17,6 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringplanmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
 	"github.com/hashicorp/terraform-plugin-framework/types"
-	"github.com/stainless-sdks/gcore-terraform/internal/customfield"
 )
 
 var _ resource.ResourceWithConfigValidators = (*CloudInstanceImageResource)(nil)
@@ -38,7 +37,7 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 				PlanModifiers: []planmodifier.Int64{int64planmodifier.RequiresReplace()},
 			},
 			"url": schema.StringAttribute{
-				Description:   "URL",
+				Description:   "URL of the image to download.",
 				Required:      true,
 				PlanModifiers: []planmodifier.String{stringplanmodifier.RequiresReplace()},
 			},
@@ -121,59 +120,67 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 				Default: stringdefault.StaticString("allow"),
 			},
 			"created_at": schema.StringAttribute{
-				Description: "Datetime when the image was created",
-				Computed:    true,
-				CustomType:  timetypes.RFC3339Type{},
+				Description:   "Datetime when the image was created",
+				Computed:      true,
+				CustomType:    timetypes.RFC3339Type{},
+				PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
 			},
 			"creator_task_id": schema.StringAttribute{
-				Description: "Task that created this entity",
-				Computed:    true,
+				Description:   "Task that created this entity",
+				Computed:      true,
+				PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
 			},
 			"description": schema.StringAttribute{
-				Description: "Image description",
-				Computed:    true,
+				Description:   "Image description",
+				Computed:      true,
+				PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
 			},
 			"disk_format": schema.StringAttribute{
-				Description: "Disk format",
-				Computed:    true,
+				Description:   "Disk format",
+				Computed:      true,
+				PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
 			},
 			"display_order": schema.Int64Attribute{
-				Computed: true,
+				Computed:      true,
+				PlanModifiers: []planmodifier.Int64{int64planmodifier.UseStateForUnknown()},
 			},
 			"gpu_driver": schema.StringAttribute{
-				Description: "Name of the GPU driver vendor",
-				Computed:    true,
+				Description:   "Name of the GPU driver vendor",
+				Computed:      true,
+				PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
 			},
 			"gpu_driver_type": schema.StringAttribute{
-				Description: "Type of the GPU driver",
-				Computed:    true,
+				Description:   "Type of the GPU driver",
+				Computed:      true,
+				PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
 			},
 			"gpu_driver_version": schema.StringAttribute{
-				Description: "Version of the installed GPU driver",
-				Computed:    true,
+				Description:   "Version of the installed GPU driver",
+				Computed:      true,
+				PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
 			},
 			"min_disk": schema.Int64Attribute{
-				Description: "Minimal boot volume required",
-				Computed:    true,
+				Description:   "Minimal boot volume required",
+				Computed:      true,
+				PlanModifiers: []planmodifier.Int64{int64planmodifier.UseStateForUnknown()},
 			},
 			"min_ram": schema.Int64Attribute{
-				Description: "Minimal VM RAM required",
-				Computed:    true,
+				Description:   "Minimal VM RAM required",
+				Computed:      true,
+				PlanModifiers: []planmodifier.Int64{int64planmodifier.UseStateForUnknown()},
 			},
 			"region": schema.StringAttribute{
-				Description: "Region name",
-				Computed:    true,
+				Description:   "Region name",
+				Computed:      true,
+				PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
 			},
 			"size": schema.Int64Attribute{
-				Description: "Image size in bytes",
-				Computed:    true,
+				Description:   "Image size in bytes",
+				Computed:      true,
+				PlanModifiers: []planmodifier.Int64{int64planmodifier.UseStateForUnknown()},
 			},
 			"status": schema.StringAttribute{
 				Description: "Image status, i.e. active",
-				Computed:    true,
-			},
-			"task_id": schema.StringAttribute{
-				Description: "The UUID of the active task that currently holds a lock on the resource. This lock prevents concurrent modifications to ensure consistency. If `null`, the resource is not locked.",
 				Computed:    true,
 			},
 			"updated_at": schema.StringAttribute{
@@ -182,14 +189,9 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 				CustomType:  timetypes.RFC3339Type{},
 			},
 			"visibility": schema.StringAttribute{
-				Description: "Image visibility. Globally visible images are public",
-				Computed:    true,
-			},
-			"tasks": schema.ListAttribute{
-				Description: "List of task IDs representing asynchronous operations. Use these IDs to monitor operation progress:\n* `GET /v1/tasks/{task_id}` - Check individual task status and details\nPoll task status until completion (`FINISHED`/`ERROR`) before proceeding with dependent operations.",
-				Computed:    true,
-				CustomType:  customfield.NewListType[types.String](ctx),
-				ElementType: types.StringType,
+				Description:   "Image visibility. Globally visible images are public",
+				Computed:      true,
+				PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
 			},
 		},
 	}
