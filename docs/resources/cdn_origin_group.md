@@ -45,7 +45,6 @@ resource "gcore_cdn_origin_group" "example_cdn_origin_group" {
 Possible values:
 - **none** - Used for public origins.
 - **awsSignatureV4** - Used for S3 storage.
-- `path` (String) Parameter is **deprecated**.
 - `proxy_next_upstream` (List of String) Defines cases when the request should be passed on to the next origin.
 
 Possible values:
@@ -59,7 +58,7 @@ Possible values:
 - **`http_502`** - a origin returned a response with the code 502
 - **`http_503`** - a origin returned a response with the code 503
 - **`http_504`** - a origin returned a response with the code 504
-- `sources` (Attributes Set) List of origin sources in the origin group. (see [below for nested schema](#nestedatt--sources))
+- `sources` (Attributes Set) Set of origin sources in the origin group. Duplicates (same source+enabled+backup) are not allowed. (see [below for nested schema](#nestedatt--sources))
 - `use_next` (Boolean) Defines whether to use the next origin from the origin group if origin responds with the cases specified in `proxy_next_upstream`.
 If you enable it, you must specify cases in `proxy_next_upstream`.
 
@@ -81,7 +80,7 @@ Possible values:
 
 Required:
 
-- `s3_access_key_id` (String) Access key ID for the S3 account.
+- `s3_access_key_id` (String) Access key ID for the S3 account. This is a write-only field - it will be sent to the API but never stored in state. 
 
 Restrictions:
 - Latin letters (A-Z, a-z), numbers (0-9), colon, dash, and underscore.
@@ -90,7 +89,8 @@ Restrictions:
 
 Restrictions:
 - Maximum 128 characters.
-- `s3_secret_access_key` (String) Secret access key for the S3 account.
+- `s3_credentials_version` (Number) Version number for S3 credentials. Increment this value to force Terraform to re-send the S3 credentials to the API. Since credentials are write-only and not stored in state, changing this value is the way to update credentials.
+- `s3_secret_access_key` (String) Secret access key for the S3 account. This is a write-only field - it will be sent to the API but never stored in state. 
 
 Restrictions:
 - Latin letters (A-Z, a-z), numbers (0-9), pluses, slashes, dashes, colons and underscores.
@@ -122,6 +122,8 @@ Optional:
 Possible values:
 - **true** - Origin is a backup.
 - **false** - Origin is not a backup.
+
+Default value is false.
 - `enabled` (Boolean) Enables or disables an origin source in the origin group.
 
 Possible values:
@@ -129,6 +131,8 @@ Possible values:
 - **false** - Origin is disabled and the CDN does not use it to pull content.
 
 Origin group must contain at least one enabled origin.
+
+Default value is true.
 - `source` (String) IP address or domain name of the origin and the port, if custom port is used.
 
 ## Import
