@@ -67,25 +67,25 @@ Possible values:
 
 Read-Only:
 
-- `s3_access_key_id` (String) Access key ID for the S3 account. 
+- `s3_access_key_id` (String) Access key ID for the S3 account.
 
 Restrictions:
 - Latin letters (A-Z, a-z), numbers (0-9), colon, dash, and underscore.
 - From 3 to 512 characters.
-- `s3_bucket_name` (String) S3 bucket name. 
+- `s3_bucket_name` (String) S3 bucket name.
 
 Restrictions:
 - Maximum 128 characters.
-- `s3_region` (String) S3 storage region. 
+- `s3_region` (String) S3 storage region.
 
 The parameter is required, if "s3_type": amazon.
-- `s3_secret_access_key` (String) Secret access key for the S3 account. 
+- `s3_secret_access_key` (String) Secret access key for the S3 account.
 
 Restrictions:
 - Latin letters (A-Z, a-z), numbers (0-9), pluses, slashes, dashes, colons and underscores.
 - If "s3_type": amazon, length should be 40 characters.
 - If "s3_type": other, length should be from 16 to 255 characters.
-- `s3_storage_hostname` (String) S3 storage hostname. 
+- `s3_storage_hostname` (String) S3 storage hostname.
 
 The parameter is required, if "s3_type": other.
 - `s3_type` (String) Storage type compatible with S3.
