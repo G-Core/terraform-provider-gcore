@@ -9,14 +9,15 @@ import (
 )
 
 type CdnOriginGroupModel struct {
-	ID                  types.Int64                                             `tfsdk:"id" json:"id,computed"`
-	Name                types.String                                            `tfsdk:"name" json:"name,required"`
-	AuthType            types.String                                            `tfsdk:"auth_type" json:"auth_type,optional"`
-	UseNext             types.Bool                                              `tfsdk:"use_next" json:"use_next,optional"`
-	Auth                *CdnOriginGroupAuthModel                                `tfsdk:"auth" json:"auth,optional"`
-	Sources             customfield.NestedObjectSet[CdnOriginGroupSourcesModel] `tfsdk:"sources" json:"sources,optional"`
-	ProxyNextUpstream   customfield.List[types.String]                          `tfsdk:"proxy_next_upstream" json:"proxy_next_upstream,computed_optional"`
-	HasRelatedResources types.Bool                                              `tfsdk:"has_related_resources" json:"has_related_resources,computed"`
+	ID                  types.Int64                    `tfsdk:"id" json:"id,computed"`
+	Name                types.String                   `tfsdk:"name" json:"name,required"`
+	AuthType            types.String                   `tfsdk:"auth_type" json:"auth_type,optional"`
+	Path                types.String                   `tfsdk:"path" json:"path,optional"`
+	UseNext             types.Bool                     `tfsdk:"use_next" json:"use_next,optional"`
+	Auth                *CdnOriginGroupAuthModel       `tfsdk:"auth" json:"auth,optional"`
+	Sources             *[]*CdnOriginGroupSourcesModel `tfsdk:"sources" json:"sources,optional"`
+	ProxyNextUpstream   customfield.List[types.String] `tfsdk:"proxy_next_upstream" json:"proxy_next_upstream,computed_optional"`
+	HasRelatedResources types.Bool                     `tfsdk:"has_related_resources" json:"has_related_resources,computed"`
 }
 
 func (m CdnOriginGroupModel) MarshalJSON() (data []byte, err error) {
@@ -28,17 +29,16 @@ func (m CdnOriginGroupModel) MarshalJSONForUpdate(state CdnOriginGroupModel) (da
 }
 
 type CdnOriginGroupAuthModel struct {
-	S3AccessKeyID        types.String `tfsdk:"s3_access_key_id" json:"s3_access_key_id,required"`
-	S3BucketName         types.String `tfsdk:"s3_bucket_name" json:"s3_bucket_name,required"`
-	S3SecretAccessKey    types.String `tfsdk:"s3_secret_access_key" json:"s3_secret_access_key,required"`
-	S3Type               types.String `tfsdk:"s3_type" json:"s3_type,required"`
-	S3Region             types.String `tfsdk:"s3_region" json:"s3_region,optional"`
-	S3StorageHostname    types.String `tfsdk:"s3_storage_hostname" json:"s3_storage_hostname,optional"`
-	S3CredentialsVersion types.Int64  `tfsdk:"s3_credentials_version" json:"-"` // Trigger for credential updates, not sent to API
+	S3AccessKeyID     types.String `tfsdk:"s3_access_key_id" json:"s3_access_key_id,required"`
+	S3BucketName      types.String `tfsdk:"s3_bucket_name" json:"s3_bucket_name,required"`
+	S3SecretAccessKey types.String `tfsdk:"s3_secret_access_key" json:"s3_secret_access_key,required"`
+	S3Type            types.String `tfsdk:"s3_type" json:"s3_type,required"`
+	S3Region          types.String `tfsdk:"s3_region" json:"s3_region,optional"`
+	S3StorageHostname types.String `tfsdk:"s3_storage_hostname" json:"s3_storage_hostname,optional"`
 }
 
 type CdnOriginGroupSourcesModel struct {
-	Backup  types.Bool   `tfsdk:"backup" json:"backup,computed_optional"`
-	Enabled types.Bool   `tfsdk:"enabled" json:"enabled,computed_optional"`
+	Backup  types.Bool   `tfsdk:"backup" json:"backup,optional"`
+	Enabled types.Bool   `tfsdk:"enabled" json:"enabled,optional"`
 	Source  types.String `tfsdk:"source" json:"source,optional"`
 }
