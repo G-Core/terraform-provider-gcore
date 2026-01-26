@@ -85,7 +85,7 @@ Available values: "dual", "ipv4", "ipv6".
 - `type` (String) Available values: "external", "subnet", "any_subnet".
 
 <a id="nestedatt--items--servers_settings--interfaces--floating_ip"></a>
-### Nested Schema for `items.servers_settings.interfaces.type`
+### Nested Schema for `items.servers_settings.interfaces.floating_ip`
 
 Read-Only:
 
@@ -117,7 +117,7 @@ Read-Only:
 Available values: "cold", "ssd_hiiops", "ssd_local", "ssd_lowlatency", "standard", "ultra".
 
 <a id="nestedatt--items--servers_settings--volumes--tags"></a>
-### Nested Schema for `items.servers_settings.volumes.type`
+### Nested Schema for `items.servers_settings.volumes.tags`
 
 Read-Only:
 

@@ -22,7 +22,6 @@ type CloudGPUVirtualClusterModel struct {
 	Status          types.String                                `tfsdk:"status" json:"status,computed"`
 	UpdatedAt       timetypes.RFC3339                           `tfsdk:"updated_at" json:"updated_at,computed" format:"date-time"`
 	ServersIDs      customfield.List[types.String]              `tfsdk:"servers_ids" json:"servers_ids,computed"`
-	Tasks           customfield.List[types.String]              `tfsdk:"tasks" json:"tasks,computed,no_refresh"`
 }
 
 func (m CloudGPUVirtualClusterModel) MarshalJSON() (data []byte, err error) {
@@ -39,7 +38,7 @@ type CloudGPUVirtualClusterServersSettingsModel struct {
 	Credentials    *CloudGPUVirtualClusterServersSettingsCredentialsModel                                 `tfsdk:"credentials" json:"credentials,optional,no_refresh"`
 	FileShares     customfield.NestedObjectList[CloudGPUVirtualClusterServersSettingsFileSharesModel]     `tfsdk:"file_shares" json:"file_shares,computed_optional"`
 	SecurityGroups customfield.NestedObjectList[CloudGPUVirtualClusterServersSettingsSecurityGroupsModel] `tfsdk:"security_groups" json:"security_groups,computed_optional"`
-	UserData       types.String                                                                           `tfsdk:"user_data" json:"user_data,computed_optional"`
+	UserData       types.String                                                                           `tfsdk:"user_data" json:"user_data,computed_optional,no_refresh"`
 }
 
 type CloudGPUVirtualClusterServersSettingsInterfacesModel struct {
@@ -67,9 +66,10 @@ type CloudGPUVirtualClusterServersSettingsVolumesModel struct {
 }
 
 type CloudGPUVirtualClusterServersSettingsCredentialsModel struct {
-	Password   types.String `tfsdk:"password" json:"password,optional"`
-	SSHKeyName types.String `tfsdk:"ssh_key_name" json:"ssh_key_name,optional"`
-	Username   types.String `tfsdk:"username" json:"username,optional"`
+	Password          types.String `tfsdk:"password_wo" json:"password,optional,no_refresh"`
+	SSHKeyName        types.String `tfsdk:"ssh_key_name" json:"ssh_key_name,optional"`
+	Username          types.String `tfsdk:"username" json:"username,optional"`
+	PasswordWoVersion types.Int64  `tfsdk:"password_wo_version"`
 }
 
 type CloudGPUVirtualClusterServersSettingsFileSharesModel struct {
