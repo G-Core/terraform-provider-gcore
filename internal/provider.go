@@ -46,6 +46,7 @@ import (
 	"github.com/stainless-sdks/gcore-terraform/internal/services/dns_network_mapping"
 	"github.com/stainless-sdks/gcore-terraform/internal/services/dns_zone"
 	"github.com/stainless-sdks/gcore-terraform/internal/services/dns_zone_rrset"
+	"github.com/stainless-sdks/gcore-terraform/internal/services/fastedge_binary"
 )
 
 var _ provider.ProviderWithConfigValidators = (*GcoreProvider)(nil)
@@ -206,6 +207,7 @@ func (p *GcoreProvider) Resources(ctx context.Context) []func() resource.Resourc
 		cloud_instance.NewResource,
 		cloud_instance_image.NewResource,
 		cloud_k8s_cluster.NewResource,
+		fastedge_binary.NewResource,
 		dns_zone.NewResource,
 		dns_zone_rrset.NewResource,
 		dns_network_mapping.NewResource,
@@ -256,6 +258,7 @@ func (p *GcoreProvider) DataSources(ctx context.Context) []func() datasource.Dat
 		cloud_instance.NewCloudInstancesDataSource,
 		cloud_instance_image.NewCloudInstanceImageDataSource,
 		cloud_k8s_cluster.NewCloudK8SClusterDataSource,
+		fastedge_binary.NewFastedgeBinaryDataSource,
 		cdn_origin_group.NewCdnOriginGroupDataSource,
 	}
 }
