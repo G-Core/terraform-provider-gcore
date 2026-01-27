@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+
+set -e
+
+cd "$(dirname "$0")/.."
+
+echo "==> Running sweepers"
+go test ./internal/sweep -v -sweep=all -sweep-allow-failures -timeout 30m
