@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"net/http"
+	"slices"
 	"strconv"
 	"strings"
 
@@ -198,6 +199,16 @@ func resourceWaapDomainCreate(ctx context.Context, d *schema.ResourceData, m int
 
 	// Update API Discovery settings
 	if apiDiscoverySettings, ok := d.GetOk("api_discovery_settings"); ok {
+		// Check if API Discovery feature is available
+		hasFeature, diags := hasApiDiscoveryFeature(ctx, client)
+		if diags.HasError() {
+			return diags
+		}
+
+		if !hasFeature {
+			return diag.Errorf("API Discovery feature is not available for your account. Please contact support or upgrade your plan to use api_discovery_settings.")
+		}
+
 		updateApiDiscoverySettingsResp, err := updateApiDiscoverySettings(ctx, client, apiDiscoverySettings, domain.Id)
 
 		if err != nil {
@@ -279,40 +290,51 @@ func resourceWaapDomainRead(ctx context.Context, d *schema.ResourceData, m inter
 		d.Set("settings", []interface{}{settings})
 	}
 
-	// Get API Discovery settings
-	apiDiscoverySettingsResp, err := client.GetApiDiscoverySettingsV1DomainsDomainIdApiDiscoverySettingsGetWithResponse(ctx, domainID)
-	if err != nil {
-		return diag.Errorf("Failed to read API Discovery settings: %s", err)
+	// Check if API Discovery feature is available before attempting to fetch settings
+	hasApiDiscovery, diags := hasApiDiscoveryFeature(ctx, client)
+	if diags.HasError() {
+		return diags
 	}
 
-	if apiDiscoverySettingsResp.StatusCode() != http.StatusOK {
-		return diag.Errorf("Failed to read API Discovery settings. Status code: %d with error: %s", apiDiscoverySettingsResp.StatusCode(), apiDiscoverySettingsResp.Body)
-	}
+	if hasApiDiscovery {
+		// Get API Discovery settings
+		apiDiscoverySettingsResp, err := client.GetApiDiscoverySettingsV1DomainsDomainIdApiDiscoverySettingsGetWithResponse(ctx, domainID)
+		if err != nil {
+			return diag.Errorf("Failed to read API Discovery settings: %s", err)
+		}
 
-	apiDiscoverySettings := make(map[string]interface{})
+		if apiDiscoverySettingsResp.StatusCode() != http.StatusOK {
+			return diag.Errorf("Failed to read API Discovery settings. Status code: %d with error: %s", apiDiscoverySettingsResp.StatusCode(), apiDiscoverySettingsResp.Body)
+		}
 
-	if apiDiscoverySettingsResp.JSON200.DescriptionFileLocation != nil {
-		apiDiscoverySettings["description_file_location"] = *apiDiscoverySettingsResp.JSON200.DescriptionFileLocation
-	}
+		apiDiscoverySettings := make(map[string]interface{})
 
-	if apiDiscoverySettingsResp.JSON200.DescriptionFileScanEnabled != nil {
-		apiDiscoverySettings["description_file_scan_enabled"] = *apiDiscoverySettingsResp.JSON200.DescriptionFileScanEnabled
-	}
+		if apiDiscoverySettingsResp.JSON200.DescriptionFileLocation != nil {
+			apiDiscoverySettings["description_file_location"] = *apiDiscoverySettingsResp.JSON200.DescriptionFileLocation
+		}
 
-	if apiDiscoverySettingsResp.JSON200.DescriptionFileScanIntervalHours != nil {
-		apiDiscoverySettings["description_file_scan_interval_hours"] = *apiDiscoverySettingsResp.JSON200.DescriptionFileScanIntervalHours
-	}
+		if apiDiscoverySettingsResp.JSON200.DescriptionFileScanEnabled != nil {
+			apiDiscoverySettings["description_file_scan_enabled"] = *apiDiscoverySettingsResp.JSON200.DescriptionFileScanEnabled
+		}
 
-	if apiDiscoverySettingsResp.JSON200.TrafficScanEnabled != nil {
-		apiDiscoverySettings["traffic_scan_enabled"] = *apiDiscoverySettingsResp.JSON200.TrafficScanEnabled
-	}
+		if apiDiscoverySettingsResp.JSON200.DescriptionFileScanIntervalHours != nil {
+			apiDiscoverySettings["description_file_scan_interval_hours"] = *apiDiscoverySettingsResp.JSON200.DescriptionFileScanIntervalHours
+		}
 
-	if apiDiscoverySettingsResp.JSON200.TrafficScanIntervalHours != nil {
-		apiDiscoverySettings["traffic_scan_interval_hours"] = *apiDiscoverySettingsResp.JSON200.TrafficScanIntervalHours
-	}
+		if apiDiscoverySettingsResp.JSON200.TrafficScanEnabled != nil {
+			apiDiscoverySettings["traffic_scan_enabled"] = *apiDiscoverySettingsResp.JSON200.TrafficScanEnabled
+		}
 
-	if len(apiDiscoverySettings) > 0 {
-		d.Set("api_discovery_settings", []interface{}{apiDiscoverySettings})
+		if apiDiscoverySettingsResp.JSON200.TrafficScanIntervalHours != nil {
+			apiDiscoverySettings["traffic_scan_interval_hours"] = *apiDiscoverySettingsResp.JSON200.TrafficScanIntervalHours
+		}
+
+		if len(apiDiscoverySettings) > 0 {
+			d.Set("api_discovery_settings", []interface{}{apiDiscoverySettings})
+		}
+	} else {
+		// If API Discovery feature is not available, clear the field
+		d.Set("api_discovery_settings", nil)
 	}
 
 	return nil
@@ -362,6 +384,16 @@ func resourceWaapDomainUpdate(ctx context.Context, d *schema.ResourceData, m int
 	// Update API Discovery settings
 	if d.HasChange("api_discovery_settings") {
 		if apiDiscoverySettings, ok := d.GetOk("api_discovery_settings"); ok {
+			// Check if API Discovery feature is available
+			hasFeature, diags := hasApiDiscoveryFeature(ctx, client)
+			if diags.HasError() {
+				return diags
+			}
+
+			if !hasFeature {
+				return diag.Errorf("API Discovery feature is not available for your account. Please contact support or upgrade your plan to use api_discovery_settings.")
+			}
+
 			updateApiDiscoverySettingsResp, err := updateApiDiscoverySettings(ctx, client, apiDiscoverySettings, domainID)
 
 			if err != nil {
@@ -388,6 +420,21 @@ func findDomainByName(response waap.PaginatedResponseSummaryDomainResponse, name
 		}
 	}
 	return nil
+}
+
+func hasApiDiscoveryFeature(ctx context.Context, client *waap.ClientWithResponses) (bool, diag.Diagnostics) {
+	// Check if the client has the API Discovery feature. This needs to be checked during runtime
+	// because the feature availability depends on the account plan.
+	clientResp, err := client.GetClientInfoV1ClientsMeGetWithResponse(ctx)
+	if err != nil {
+		return false, diag.Errorf("Failed to check API Discovery feature availability: %s", err)
+	}
+
+	if clientResp.StatusCode() != http.StatusOK {
+		return false, diag.Errorf("Failed to check API Discovery feature availability. Status code: %d with error: %s", clientResp.StatusCode(), clientResp.Body)
+	}
+
+	return slices.Contains(clientResp.JSON200.Features, "api-discovery"), nil
 }
 
 func updateDomainSettings(ctx context.Context, waapClient *waap.ClientWithResponses, settings any, domainID int) (*waap.UpdateDomainSettingsV1DomainsDomainIdSettingsPatchResponse, error) {
