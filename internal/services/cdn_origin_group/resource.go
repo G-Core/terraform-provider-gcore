@@ -11,6 +11,7 @@ import (
 	"github.com/G-Core/gcore-go"
 	"github.com/G-Core/gcore-go/cdn"
 	"github.com/G-Core/gcore-go/option"
+	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/stainless-sdks/gcore-terraform/internal/apijson"
@@ -59,10 +60,17 @@ func (r *CdnOriginGroupResource) Create(ctx context.Context, req resource.Create
 	var data *CdnOriginGroupModel
 
 	resp.Diagnostics.Append(req.Plan.Get(ctx, &data)...)
-
 	if resp.Diagnostics.HasError() {
 		return
 	}
+
+	// Write-only fields are null in plan, get auth block from config
+	var configAuth *CdnOriginGroupAuthModel
+	resp.Diagnostics.Append(req.Config.GetAttribute(ctx, path.Root("auth"), &configAuth)...)
+	if resp.Diagnostics.HasError() {
+		return
+	}
+	data.Auth = configAuth
 
 	dataBytes, err := data.MarshalJSON()
 	if err != nil {
@@ -95,18 +103,23 @@ func (r *CdnOriginGroupResource) Update(ctx context.Context, req resource.Update
 	var data *CdnOriginGroupModel
 
 	resp.Diagnostics.Append(req.Plan.Get(ctx, &data)...)
-
 	if resp.Diagnostics.HasError() {
 		return
 	}
 
 	var state *CdnOriginGroupModel
-
 	resp.Diagnostics.Append(req.State.Get(ctx, &state)...)
-
 	if resp.Diagnostics.HasError() {
 		return
 	}
+
+	// Write-only fields are null in plan, get auth block from config
+	var configAuth *CdnOriginGroupAuthModel
+	resp.Diagnostics.Append(req.Config.GetAttribute(ctx, path.Root("auth"), &configAuth)...)
+	if resp.Diagnostics.HasError() {
+		return
+	}
+	data.Auth = configAuth
 
 	dataBytes, err := data.MarshalJSONForUpdate(*state)
 	if err != nil {
@@ -162,7 +175,7 @@ func (r *CdnOriginGroupResource) Read(ctx context.Context, req resource.ReadRequ
 		return
 	}
 	bytes, _ := io.ReadAll(res.Body)
-	err = apijson.Unmarshal(bytes, &data)
+	err = apijson.UnmarshalComputed(bytes, &data)
 	if err != nil {
 		resp.Diagnostics.AddError("failed to deserialize http request", err.Error())
 		return
@@ -221,6 +234,9 @@ func (r *CdnOriginGroupResource) ImportState(ctx context.Context, req resource.I
 		return
 	}
 	bytes, _ := io.ReadAll(res.Body)
+	// Use Unmarshal (not UnmarshalComputed) for import to populate ALL fields from API response,
+	// including required and optional fields like name, auth_type, sources.
+	// UnmarshalComputed is for Read/Update where we preserve user-configured values.
 	err = apijson.Unmarshal(bytes, &data)
 	if err != nil {
 		resp.Diagnostics.AddError("failed to deserialize http request", err.Error())
@@ -230,6 +246,31 @@ func (r *CdnOriginGroupResource) ImportState(ctx context.Context, req resource.I
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
 }
 
-func (r *CdnOriginGroupResource) ModifyPlan(_ context.Context, _ resource.ModifyPlanRequest, _ *resource.ModifyPlanResponse) {
+func (r *CdnOriginGroupResource) ModifyPlan(ctx context.Context, req resource.ModifyPlanRequest, resp *resource.ModifyPlanResponse) {
+	// Skip if this is a destroy or create operation
+	if req.Plan.Raw.IsNull() || req.State.Raw.IsNull() {
+		return
+	}
 
+	var plan, state CdnOriginGroupModel
+	resp.Diagnostics.Append(req.Plan.Get(ctx, &plan)...)
+	resp.Diagnostics.Append(req.State.Get(ctx, &state)...)
+	if resp.Diagnostics.HasError() {
+		return
+	}
+
+	// Preserve purely computed fields from state to prevent drift
+	// These fields are not user-configurable
+
+	// has_related_resources: purely computed field - always preserve from state
+	plan.HasRelatedResources = state.HasRelatedResources
+
+	// proxy_next_upstream: computed+optional field
+	// Only preserve from state if user didn't specify in config (IsUnknown)
+	// This allows users to change the value while preventing drift when not specified
+	if plan.ProxyNextUpstream.IsUnknown() {
+		plan.ProxyNextUpstream = state.ProxyNextUpstream
+	}
+
+	resp.Diagnostics.Append(resp.Plan.Set(ctx, &plan)...)
 }
