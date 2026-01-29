@@ -708,18 +708,20 @@ func (r *CloudInstanceResource) Update(ctx context.Context, req resource.UpdateR
 				}
 
 				if fipToUnassign != "" {
-					unassignParams := cloud.FloatingIPUnassignParams{}
+					updateParams := cloud.FloatingIPUpdateParams{
+						PortID: param.Null[string](),
+					}
 					if !data.ProjectID.IsNull() {
-						unassignParams.ProjectID = param.NewOpt(data.ProjectID.ValueInt64())
+						updateParams.ProjectID = param.NewOpt(data.ProjectID.ValueInt64())
 					}
 					if !data.RegionID.IsNull() {
-						unassignParams.RegionID = param.NewOpt(data.RegionID.ValueInt64())
+						updateParams.RegionID = param.NewOpt(data.RegionID.ValueInt64())
 					}
 
-					_, err := r.client.Cloud.FloatingIPs.Unassign(
+					_, err := r.client.Cloud.FloatingIPs.UpdateAndPoll(
 						ctx,
 						fipToUnassign,
-						unassignParams,
+						updateParams,
 						option.WithMiddleware(logging.Middleware(ctx)),
 					)
 					if err != nil {
@@ -746,18 +748,20 @@ func (r *CloudInstanceResource) Update(ctx context.Context, req resource.UpdateR
 
 			// Unassign old floating IP if one was attached
 			if stateFloatingID != "" {
-				unassignParams := cloud.FloatingIPUnassignParams{}
+				updateParams := cloud.FloatingIPUpdateParams{
+					PortID: param.Null[string](),
+				}
 				if !data.ProjectID.IsNull() {
-					unassignParams.ProjectID = param.NewOpt(data.ProjectID.ValueInt64())
+					updateParams.ProjectID = param.NewOpt(data.ProjectID.ValueInt64())
 				}
 				if !data.RegionID.IsNull() {
-					unassignParams.RegionID = param.NewOpt(data.RegionID.ValueInt64())
+					updateParams.RegionID = param.NewOpt(data.RegionID.ValueInt64())
 				}
 
-				_, err := r.client.Cloud.FloatingIPs.Unassign(
+				_, err := r.client.Cloud.FloatingIPs.UpdateAndPoll(
 					ctx,
 					stateFloatingID,
-					unassignParams,
+					updateParams,
 					option.WithMiddleware(logging.Middleware(ctx)),
 				)
 				if err != nil {
@@ -772,20 +776,20 @@ func (r *CloudInstanceResource) Update(ctx context.Context, req resource.UpdateR
 
 			// Assign new floating IP if one is specified
 			if planFloatingID != "" && portID != "" {
-				assignParams := cloud.FloatingIPAssignParams{
-					PortID: portID,
+				updateParams := cloud.FloatingIPUpdateParams{
+					PortID: param.Opt[string]{Value: portID},
 				}
 				if !data.ProjectID.IsNull() {
-					assignParams.ProjectID = param.NewOpt(data.ProjectID.ValueInt64())
+					updateParams.ProjectID = param.NewOpt(data.ProjectID.ValueInt64())
 				}
 				if !data.RegionID.IsNull() {
-					assignParams.RegionID = param.NewOpt(data.RegionID.ValueInt64())
+					updateParams.RegionID = param.NewOpt(data.RegionID.ValueInt64())
 				}
 
-				_, err := r.client.Cloud.FloatingIPs.Assign(
+				_, err := r.client.Cloud.FloatingIPs.UpdateAndPoll(
 					ctx,
 					planFloatingID,
-					assignParams,
+					updateParams,
 					option.WithMiddleware(logging.Middleware(ctx)),
 				)
 				if err != nil {
