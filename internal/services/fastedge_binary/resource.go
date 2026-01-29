@@ -63,25 +63,25 @@ func (r *FastedgeBinaryResource) Create(ctx context.Context, req resource.Create
 		return
 	}
 
-	dataBytes, err := data.MarshalJSON()
-	if err != nil {
-		resp.Diagnostics.AddError("failed to serialize http request", err.Error())
-		return
-	}
+	//dataBytes, err := data.MarshalJSON()
+	//if err != nil {
+	//	resp.Diagnostics.AddError("failed to serialize http request", err.Error())
+	//	return
+	//}
 	res := new(http.Response)
-	_, err = r.client.Fastedge.Binaries.New(
-		ctx,
-		data.Body.ValueString(),
-		option.WithRequestBody("application/json", dataBytes),
-		option.WithResponseBodyInto(&res),
-		option.WithMiddleware(logging.Middleware(ctx)),
-	)
-	if err != nil {
-		resp.Diagnostics.AddError("failed to make http request", err.Error())
-		return
-	}
+	//_, err = r.client.Fastedge.Binaries.New(
+	//	ctx,
+	//	data.Body.ValueString(),
+	//	option.WithRequestBody("application/json", dataBytes),
+	//	option.WithResponseBodyInto(&res),
+	//	option.WithMiddleware(logging.Middleware(ctx)),
+	//)
+	//if err != nil {
+	//	resp.Diagnostics.AddError("failed to make http request", err.Error())
+	//	return
+	//}
 	bytes, _ := io.ReadAll(res.Body)
-	err = apijson.UnmarshalComputed(bytes, data.Body)
+	err := apijson.UnmarshalComputed(bytes, data.Body)
 	if err != nil {
 		resp.Diagnostics.AddError("failed to deserialize http request", err.Error())
 		return
