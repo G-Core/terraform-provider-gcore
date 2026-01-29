@@ -14,7 +14,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringplanmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
 	"github.com/hashicorp/terraform-plugin-framework/types"
-	"github.com/stainless-sdks/gcore-terraform/internal/customfield"
+	"github.com/stainless-sdks/gcore-terraform/internal/planmodifiers"
 )
 
 var _ resource.ResourceWithConfigValidators = (*CloudFloatingIPResource)(nil)
@@ -43,14 +43,16 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 				ElementType: types.StringType,
 			},
 			"fixed_ip_address": schema.StringAttribute{
-				Description: "If the port has multiple IP addresses, a specific one can be selected using this field. If not specified, the first IP in the port's list will be used by default.",
-				Computed:    true,
-				Optional:    true,
+				Description:   "If the port has multiple IP addresses, a specific one can be selected using this field. If not specified, the first IP in the port's list will be used by default.",
+				Computed:      true,
+				Optional:      true,
+				PlanModifiers: []planmodifier.String{ComputedIfPortSet()},
 			},
 			"port_id": schema.StringAttribute{
-				Description: "If provided, the floating IP will be immediately attached to the specified port.",
-				Computed:    true,
-				Optional:    true,
+				Description:   "If provided, the floating IP will be immediately attached to the specified port.",
+				Computed:      true,
+				Optional:      true,
+				PlanModifiers: []planmodifier.String{planmodifiers.UseNullForRemoval()},
 			},
 			"created_at": schema.StringAttribute{
 				Description: "Datetime when the floating IP was created",
@@ -70,12 +72,14 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 				Computed:    true,
 			},
 			"router_id": schema.StringAttribute{
-				Description: "Router ID",
-				Computed:    true,
+				Description:   "Router ID",
+				Computed:      true,
+				PlanModifiers: []planmodifier.String{UnknownOnPortChange()},
 			},
 			"status": schema.StringAttribute{
-				Description: "Floating IP status. DOWN - unassigned (available). ACTIVE - attached to a port (in use). ERROR - error state.\nAvailable values: \"ACTIVE\", \"DOWN\", \"ERROR\".",
-				Computed:    true,
+				Description:   "Floating IP status. DOWN - unassigned (available). ACTIVE - attached to a port (in use). ERROR - error state.\nAvailable values: \"ACTIVE\", \"DOWN\", \"ERROR\".",
+				Computed:      true,
+				PlanModifiers: []planmodifier.String{UnknownOnPortChange()},
 				Validators: []validator.String{
 					stringvalidator.OneOfCaseInsensitive(
 						"ACTIVE",
@@ -83,21 +87,6 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 						"ERROR",
 					),
 				},
-			},
-			"task_id": schema.StringAttribute{
-				Description: "The UUID of the active task that currently holds a lock on the resource. This lock prevents concurrent modifications to ensure consistency. If `null`, the resource is not locked.",
-				Computed:    true,
-			},
-			"updated_at": schema.StringAttribute{
-				Description: "Datetime when the floating IP was last updated",
-				Computed:    true,
-				CustomType:  timetypes.RFC3339Type{},
-			},
-			"tasks": schema.ListAttribute{
-				Description: "List of task IDs representing asynchronous operations. Use these IDs to monitor operation progress:\n- `GET /v1/tasks/{task_id}` - Check individual task status and details\nPoll task status until completion (`FINISHED`/`ERROR`) before proceeding with dependent operations.",
-				Computed:    true,
-				CustomType:  customfield.NewListType[types.String](ctx),
-				ElementType: types.StringType,
 			},
 		},
 	}

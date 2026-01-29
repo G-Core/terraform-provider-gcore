@@ -8,8 +8,6 @@ import (
 	"io"
 	"net/http"
 
-	"github.com/stainless-sdks/gcore-terraform/internal/custom"
-
 	"github.com/G-Core/gcore-go"
 	"github.com/G-Core/gcore-go/cloud"
 	"github.com/G-Core/gcore-go/option"
@@ -128,94 +126,29 @@ func (r *CloudFloatingIPResource) Update(ctx context.Context, req resource.Updat
 		params.RegionID = param.NewOpt(data.RegionID.ValueInt64())
 	}
 
-	// Check if fixed_ip_address or port_id have changed to determine if we need to unassign/assign the floating ip.
-	// If the fields have not been specified in the manifest, they will be unknown, so we don't want to treat that as a
-	// change, otherwise the Equal() method would return false.
-	fixedIPAddressChanged := !data.FixedIPAddress.IsUnknown() && !data.FixedIPAddress.Equal(state.FixedIPAddress)
-	portIDChanged := !data.PortID.IsUnknown() && !data.PortID.Equal(state.PortID)
-
-	if fixedIPAddressChanged || portIDChanged {
-		// check if the floating ip was previously assigned to a port (old values are not null)
-		if !state.FixedIPAddress.IsNull() || !state.PortID.IsNull() {
-			unassignParams := cloud.FloatingIPUnassignParams{}
-			if !data.ProjectID.IsNull() {
-				unassignParams.ProjectID = param.NewOpt(data.ProjectID.ValueInt64())
-			}
-			if !data.RegionID.IsNull() {
-				unassignParams.RegionID = param.NewOpt(data.RegionID.ValueInt64())
-			}
-			_, err := r.client.Cloud.FloatingIPs.Unassign(
-				ctx,
-				data.ID.ValueString(),
-				unassignParams,
-				option.WithMiddleware(logging.Middleware(ctx)),
-			)
-			if err != nil {
-				resp.Diagnostics.AddError("failed to make http request", err.Error())
-				return
-			}
-		}
-		// if the new values are not null, assign the floating ip to the new port
-		if !data.PortID.IsNull() {
-			assignParams := cloud.FloatingIPAssignParams{
-				PortID: data.PortID.ValueString(),
-			}
-			if !data.ProjectID.IsNull() {
-				assignParams.ProjectID = param.NewOpt(data.ProjectID.ValueInt64())
-			}
-			if !data.RegionID.IsNull() {
-				assignParams.RegionID = param.NewOpt(data.RegionID.ValueInt64())
-			}
-			// only set fixed_ip_address if it's not unknown
-			if !data.FixedIPAddress.IsUnknown() {
-				assignParams.FixedIPAddress = param.NewOpt(data.FixedIPAddress.ValueString())
-			}
-			res, err := r.client.Cloud.FloatingIPs.Assign(
-				ctx,
-				data.ID.ValueString(),
-				assignParams,
-				option.WithMiddleware(logging.Middleware(ctx)),
-			)
-			if err != nil {
-				resp.Diagnostics.AddError("failed to make http request", err.Error())
-				return
-			}
-			err = apijson.UnmarshalComputed([]byte(res.RawJSON()), &data)
-			if err != nil {
-				resp.Diagnostics.AddError("failed to deserialize http request", err.Error())
-				return
-			}
-		}
+	dataBytes, err := data.MarshalJSONForUpdate(*state)
+	if err != nil {
+		resp.Diagnostics.AddError("failed to serialize http request", err.Error())
+		return
 	}
-
-	// Check if tags have changed to determine if we need to send an update request
-	tagsChanged := !custom.TagsEqual(data.Tags, state.Tags)
-
-	if tagsChanged {
-		dataBytes, err := data.MarshalJSONForUpdate(*state)
-		if err != nil {
-			resp.Diagnostics.AddError("failed to serialize http request", err.Error())
-			return
-		}
-		res := new(http.Response)
-		_, err = r.client.Cloud.FloatingIPs.Update(
-			ctx,
-			data.ID.ValueString(),
-			params,
-			option.WithRequestBody("application/json", dataBytes),
-			option.WithResponseBodyInto(&res),
-			option.WithMiddleware(logging.Middleware(ctx)),
-		)
-		if err != nil {
-			resp.Diagnostics.AddError("failed to make http request", err.Error())
-			return
-		}
-		bytes, _ := io.ReadAll(res.Body)
-		err = apijson.UnmarshalComputed(bytes, &data)
-		if err != nil {
-			resp.Diagnostics.AddError("failed to deserialize http request", err.Error())
-			return
-		}
+	res := new(http.Response)
+	_, err = r.client.Cloud.FloatingIPs.UpdateAndPoll(
+		ctx,
+		data.ID.ValueString(),
+		params,
+		option.WithRequestBody("application/json", dataBytes),
+		option.WithResponseBodyInto(&res),
+		option.WithMiddleware(logging.Middleware(ctx)),
+	)
+	if err != nil {
+		resp.Diagnostics.AddError("failed to make http request", err.Error())
+		return
+	}
+	bytes, _ := io.ReadAll(res.Body)
+	err = apijson.UnmarshalComputed(bytes, &data)
+	if err != nil {
+		resp.Diagnostics.AddError("failed to deserialize http request", err.Error())
+		return
 	}
 
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)

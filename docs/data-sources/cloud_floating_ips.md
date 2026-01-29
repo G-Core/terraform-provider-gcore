@@ -185,7 +185,7 @@ Read-Only:
 - `status` (Attributes) Current operational status and any error information for the profile (see [below for nested schema](#nestedatt--items--loadbalancer--ddos_profile--status))
 
 <a id="nestedatt--items--loadbalancer--ddos_profile--fields"></a>
-### Nested Schema for `items.loadbalancer.ddos_profile.status`
+### Nested Schema for `items.loadbalancer.ddos_profile.fields`
 
 Read-Only:
 
@@ -203,7 +203,7 @@ Read-Only:
 
 
 <a id="nestedatt--items--loadbalancer--ddos_profile--options"></a>
-### Nested Schema for `items.loadbalancer.ddos_profile.status`
+### Nested Schema for `items.loadbalancer.ddos_profile.options`
 
 Read-Only:
 
@@ -212,17 +212,17 @@ Read-Only:
 
 
 <a id="nestedatt--items--loadbalancer--ddos_profile--profile_template"></a>
-### Nested Schema for `items.loadbalancer.ddos_profile.status`
+### Nested Schema for `items.loadbalancer.ddos_profile.profile_template`
 
 Read-Only:
 
 - `description` (String) Detailed description explaining the template's purpose and use cases
-- `fields` (Attributes List) List of configurable fields that define the template's protection parameters (see [below for nested schema](#nestedatt--items--loadbalancer--ddos_profile--status--fields))
+- `fields` (Attributes List) List of configurable fields that define the template's protection parameters (see [below for nested schema](#nestedatt--items--loadbalancer--ddos_profile--profile_template--fields))
 - `id` (Number) Unique identifier for the DDoS protection template
 - `name` (String) Human-readable name of the protection template
 
-<a id="nestedatt--items--loadbalancer--ddos_profile--status--fields"></a>
-### Nested Schema for `items.loadbalancer.ddos_profile.status.fields`
+<a id="nestedatt--items--loadbalancer--ddos_profile--profile_template--fields"></a>
+### Nested Schema for `items.loadbalancer.ddos_profile.profile_template.fields`
 
 Read-Only:
 
@@ -237,7 +237,7 @@ Read-Only:
 
 
 <a id="nestedatt--items--loadbalancer--ddos_profile--protocols"></a>
-### Nested Schema for `items.loadbalancer.ddos_profile.status`
+### Nested Schema for `items.loadbalancer.ddos_profile.protocols`
 
 Read-Only:
 
@@ -288,7 +288,7 @@ Available values: "ACTIVE", "DOWN", "ERROR".
 - `updated_at` (String) Datetime when the floating IP was last updated
 
 <a id="nestedatt--items--loadbalancer--floating_ips--tags"></a>
-### Nested Schema for `items.loadbalancer.floating_ips.updated_at`
+### Nested Schema for `items.loadbalancer.floating_ips.tags`
 
 Read-Only:
 
@@ -317,7 +317,7 @@ Read-Only:
 - `topic_name` (String) The topic name to stream logs to
 
 <a id="nestedatt--items--loadbalancer--logging--retention_policy"></a>
-### Nested Schema for `items.loadbalancer.logging.topic_name`
+### Nested Schema for `items.loadbalancer.logging.retention_policy`
 
 Read-Only:
 
