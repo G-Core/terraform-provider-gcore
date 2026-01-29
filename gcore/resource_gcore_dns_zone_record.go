@@ -702,10 +702,28 @@ func fillRRSet(d *schema.ResourceData, rType string, rrSet *dnssdk.RRSet) error 
 							return fmt.Errorf("invalid type of rrset meta.healthchecks.*, expected map[string]any, got %T %v", kv2, kv2)
 						}
 						for k2, v2 := range m2 {
-							fMap[k2] = v2
+							// Only include non-zero/non-empty values
+							switch val := v2.(type) {
+							case string:
+								if val != "" {
+									fMap[k2] = v2
+								}
+							case int:
+								if val != 0 {
+									fMap[k2] = v2
+								}
+							case bool:
+								// Only include true booleans (false is default)
+								if val {
+									fMap[k2] = v2
+								}
+							default:
+								fMap[k2] = v2
+							}
 						}
 					}
-					rrSet.Meta[DNSZoneRRSetSchemaMetaHealthchecks] = fMap
+					// API expects "failover" not "healthchecks"
+					rrSet.Meta[DNSZoneRRSetSchemaMetaFailover] = fMap
 				}
 			case DNSZoneRRSetSchemaMetaFailover:
 				failoverObj, ok := v.(*schema.Set)
