@@ -132,7 +132,7 @@ resource "gcore_dns_zone_record" "examplezone_failover" {
 
   // failover/healthchecks is on rrset meta, not resource record meta
   meta {
-    healthchecks {
+    failover {
       frequency = 300
       host = "failover.examplezone.com"
       http_status_code = 200
@@ -219,11 +219,13 @@ Optional:
 Optional:
 
 - `cidr_mapping` (String) Cidr mapping rule name of DNS Zone RRSet resource.
+- `failover` (Block Set) Failover meta (eg. {"frequency": 60,"host": "www.gcore.com","http_status_code": null,"method": "GET","port": 80,"protocol": "HTTP","regexp": "","timeout": 10,"tls": false,"url": "/"}). (see [below for nested schema](#nestedblock--meta--failover))
 - `geodns_link` (String) Geodns link (domain, or cl-) of DNS Zone RRSet resource.
-- `healthchecks` (Block Set) Failover meta (eg. {"frequency": 60,"host": "www.gcore.com","http_status_code": null,"method": "GET","port": 80,"protocol": "HTTP","regexp": "","timeout": 10,"tls": false,"url": "/"}). (see [below for nested schema](#nestedblock--meta--healthchecks))
+- `healthchecks` (Block Set) **Deprecated:** Use 'failover' instead. This field is deprecated and will be removed in a future version. (see [below for nested schema](#nestedblock--meta--healthchecks))
 
-<a id="nestedblock--meta--healthchecks"></a>
-### Nested Schema for `meta.healthchecks`
+<a id="nestedblock--meta--failover"></a>
+
+### Nested Schema for `meta.failover`
 
 Required:
 
@@ -242,7 +244,28 @@ Optional:
 - `tls` (Boolean) TLS/HTTPS enabled if protocol=HTTP, must be empty for non-HTTP.
 - `url` (String) URL path to check required if protocol=HTTP, must be empty for non-HTTP.
 
+<a id="nestedblock--meta--healthchecks"></a>
 
+### Nested Schema for `meta.healthchecks`
+
+**Deprecated:** Use 'failover' instead. This field is deprecated and will be removed in a future version.
+
+Required:
+
+- `frequency` (Number) Frequency in seconds (10-3600).
+- `protocol` (String) Protocol, possible value: HTTP, TCP, UDP, ICMP.
+- `timeout` (Number) Timeout in seconds (1-10).
+
+Optional:
+
+- `command` (String) Command to send if protocol=TCP/UDP, maximum length: 255.
+- `host` (String) Request host/virtualhost to send if protocol=HTTP, must be empty for non-HTTP
+- `http_status_code` (Number) Expected status code if protocol=HTTP, must be empty for non-HTTP.
+- `method` (String) HTTP Method required if protocol=HTTP, must be empty for non-HTTP.
+- `port` (Number) Port to check (1-65535).
+- `regexp` (String) HTTP body or response payload to check if protocol<>ICMP, must be empty for ICMP.
+- `tls` (Boolean) TLS/HTTPS enabled if protocol=HTTP, must be empty for non-HTTP.
+- `url` (String) URL path to check required if protocol=HTTP, must be empty for non-HTTP.
 
 <a id="nestedblock--timeouts"></a>
 ### Nested Schema for `timeouts`
