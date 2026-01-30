@@ -800,10 +800,28 @@ func fillRRSet(d *schema.ResourceData, rType string, rrSet *dnssdk.RRSet) error 
 							return fmt.Errorf("invalid type of rrset meta.healthchecks.*, expected map[string]any, got %T %v", kv2, kv2)
 						}
 						for k2, v2 := range m2 {
-							fMap[k2] = v2
+							// Filter out zero/empty values
+							switch val := v2.(type) {
+							case string:
+								if val != "" {
+									fMap[k2] = v2
+								}
+							case int:
+								if val != 0 {
+									fMap[k2] = v2
+								}
+							case bool:
+								if val {
+									fMap[k2] = v2
+								}
+							default:
+								fMap[k2] = v2
+							}
 						}
 					}
-					rrSet.Meta[DNSZoneRRSetSchemaMetaHealthchecks] = fMap
+					if len(fMap) > 0 {
+						rrSet.Meta[DNSZoneRRSetSchemaMetaHealthchecks] = fMap
+					}
 				}
 			case DNSZoneRRSetSchemaMetaFailover:
 				failoverObj, ok := v.(*schema.Set)
@@ -818,10 +836,28 @@ func fillRRSet(d *schema.ResourceData, rType string, rrSet *dnssdk.RRSet) error 
 							return fmt.Errorf("invalid type of rrset meta.failover.*, expected map[string]any, got %T %v", kv2, kv2)
 						}
 						for k2, v2 := range m2 {
-							fMap[k2] = v2
+							// Filter out zero/empty values
+							switch val := v2.(type) {
+							case string:
+								if val != "" {
+									fMap[k2] = v2
+								}
+							case int:
+								if val != 0 {
+									fMap[k2] = v2
+								}
+							case bool:
+								if val {
+									fMap[k2] = v2
+								}
+							default:
+								fMap[k2] = v2
+							}
 						}
 					}
-					rrSet.Meta[DNSZoneRRSetSchemaMetaFailover] = fMap
+					if len(fMap) > 0 {
+						rrSet.Meta[DNSZoneRRSetSchemaMetaFailover] = fMap
+					}
 				}
 			case DNSZoneRRSetSchemaMetaGeodnsLink:
 				geodnsLink, ok := v.(string)

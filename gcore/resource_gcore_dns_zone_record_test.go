@@ -291,9 +291,7 @@ resource "%s" "%s" {
       method = "GET"
       port = 80
       protocol = "HTTP"
-      regexp = ""
       timeout = 10
-      tls = false
       url = "/"
     }
     geodns_link = "test.com"
@@ -336,13 +334,7 @@ resource "%s" "%s" {
 							DNSZoneRRSetSchemaMeta, DNSZoneRRSetSchemaMetaHealthchecks, DNSZoneRRSetSchemaMetaFailoverProtocol), "HTTP"),
 					resource.TestCheckResourceAttr(resourceName,
 						fmt.Sprintf("%s.0.%s.0.%s",
-							DNSZoneRRSetSchemaMeta, DNSZoneRRSetSchemaMetaHealthchecks, DNSZoneRRSetSchemaMetaFailoverRegexp), ""),
-					resource.TestCheckResourceAttr(resourceName,
-						fmt.Sprintf("%s.0.%s.0.%s",
 							DNSZoneRRSetSchemaMeta, DNSZoneRRSetSchemaMetaHealthchecks, DNSZoneRRSetSchemaMetaFailoverTimeout), "10"),
-					resource.TestCheckResourceAttr(resourceName,
-						fmt.Sprintf("%s.0.%s.0.%s",
-							DNSZoneRRSetSchemaMeta, DNSZoneRRSetSchemaMetaHealthchecks, DNSZoneRRSetSchemaMetaFailoverTLS), "false"),
 					resource.TestCheckResourceAttr(resourceName,
 						fmt.Sprintf("%s.0.%s.0.%s",
 							DNSZoneRRSetSchemaMeta, DNSZoneRRSetSchemaMetaHealthchecks, DNSZoneRRSetSchemaMetaFailoverURL), "/"),
