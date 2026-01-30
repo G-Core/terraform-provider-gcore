@@ -19,24 +19,24 @@ import (
 )
 
 // Ensure provider defined types fully satisfy framework interfaces.
-var _ resource.ResourceWithConfigure = (*CdnOriginGroupResource)(nil)
-var _ resource.ResourceWithModifyPlan = (*CdnOriginGroupResource)(nil)
-var _ resource.ResourceWithImportState = (*CdnOriginGroupResource)(nil)
+var _ resource.ResourceWithConfigure = (*CDNOriginGroupResource)(nil)
+var _ resource.ResourceWithModifyPlan = (*CDNOriginGroupResource)(nil)
+var _ resource.ResourceWithImportState = (*CDNOriginGroupResource)(nil)
 
 func NewResource() resource.Resource {
-	return &CdnOriginGroupResource{}
+	return &CDNOriginGroupResource{}
 }
 
-// CdnOriginGroupResource defines the resource implementation.
-type CdnOriginGroupResource struct {
+// CDNOriginGroupResource defines the resource implementation.
+type CDNOriginGroupResource struct {
 	client *gcore.Client
 }
 
-func (r *CdnOriginGroupResource) Metadata(ctx context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
+func (r *CDNOriginGroupResource) Metadata(ctx context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
 	resp.TypeName = req.ProviderTypeName + "_cdn_origin_group"
 }
 
-func (r *CdnOriginGroupResource) Configure(ctx context.Context, req resource.ConfigureRequest, resp *resource.ConfigureResponse) {
+func (r *CDNOriginGroupResource) Configure(ctx context.Context, req resource.ConfigureRequest, resp *resource.ConfigureResponse) {
 	if req.ProviderData == nil {
 		return
 	}
@@ -55,8 +55,8 @@ func (r *CdnOriginGroupResource) Configure(ctx context.Context, req resource.Con
 	r.client = client
 }
 
-func (r *CdnOriginGroupResource) Create(ctx context.Context, req resource.CreateRequest, resp *resource.CreateResponse) {
-	var data *CdnOriginGroupModel
+func (r *CDNOriginGroupResource) Create(ctx context.Context, req resource.CreateRequest, resp *resource.CreateResponse) {
+	var data *CDNOriginGroupModel
 
 	resp.Diagnostics.Append(req.Plan.Get(ctx, &data)...)
 
@@ -70,7 +70,7 @@ func (r *CdnOriginGroupResource) Create(ctx context.Context, req resource.Create
 		return
 	}
 	res := new(http.Response)
-	_, err = r.client.Cdn.OriginGroups.New(
+	_, err = r.client.CDN.OriginGroups.New(
 		ctx,
 		cdn.OriginGroupNewParams{},
 		option.WithRequestBody("application/json", dataBytes),
@@ -91,8 +91,8 @@ func (r *CdnOriginGroupResource) Create(ctx context.Context, req resource.Create
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
 }
 
-func (r *CdnOriginGroupResource) Update(ctx context.Context, req resource.UpdateRequest, resp *resource.UpdateResponse) {
-	var data *CdnOriginGroupModel
+func (r *CDNOriginGroupResource) Update(ctx context.Context, req resource.UpdateRequest, resp *resource.UpdateResponse) {
+	var data *CDNOriginGroupModel
 
 	resp.Diagnostics.Append(req.Plan.Get(ctx, &data)...)
 
@@ -100,7 +100,7 @@ func (r *CdnOriginGroupResource) Update(ctx context.Context, req resource.Update
 		return
 	}
 
-	var state *CdnOriginGroupModel
+	var state *CDNOriginGroupModel
 
 	resp.Diagnostics.Append(req.State.Get(ctx, &state)...)
 
@@ -114,7 +114,7 @@ func (r *CdnOriginGroupResource) Update(ctx context.Context, req resource.Update
 		return
 	}
 	res := new(http.Response)
-	_, err = r.client.Cdn.OriginGroups.Update(
+	_, err = r.client.CDN.OriginGroups.Update(
 		ctx,
 		data.ID.ValueInt64(),
 		cdn.OriginGroupUpdateParams{},
@@ -136,8 +136,8 @@ func (r *CdnOriginGroupResource) Update(ctx context.Context, req resource.Update
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
 }
 
-func (r *CdnOriginGroupResource) Read(ctx context.Context, req resource.ReadRequest, resp *resource.ReadResponse) {
-	var data *CdnOriginGroupModel
+func (r *CDNOriginGroupResource) Read(ctx context.Context, req resource.ReadRequest, resp *resource.ReadResponse) {
+	var data *CDNOriginGroupModel
 
 	resp.Diagnostics.Append(req.State.Get(ctx, &data)...)
 
@@ -146,7 +146,7 @@ func (r *CdnOriginGroupResource) Read(ctx context.Context, req resource.ReadRequ
 	}
 
 	res := new(http.Response)
-	_, err := r.client.Cdn.OriginGroups.Get(
+	_, err := r.client.CDN.OriginGroups.Get(
 		ctx,
 		data.ID.ValueInt64(),
 		option.WithResponseBodyInto(&res),
@@ -171,8 +171,8 @@ func (r *CdnOriginGroupResource) Read(ctx context.Context, req resource.ReadRequ
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
 }
 
-func (r *CdnOriginGroupResource) Delete(ctx context.Context, req resource.DeleteRequest, resp *resource.DeleteResponse) {
-	var data *CdnOriginGroupModel
+func (r *CDNOriginGroupResource) Delete(ctx context.Context, req resource.DeleteRequest, resp *resource.DeleteResponse) {
+	var data *CDNOriginGroupModel
 
 	resp.Diagnostics.Append(req.State.Get(ctx, &data)...)
 
@@ -180,7 +180,7 @@ func (r *CdnOriginGroupResource) Delete(ctx context.Context, req resource.Delete
 		return
 	}
 
-	err := r.client.Cdn.OriginGroups.Delete(
+	err := r.client.CDN.OriginGroups.Delete(
 		ctx,
 		data.ID.ValueInt64(),
 		option.WithMiddleware(logging.Middleware(ctx)),
@@ -193,8 +193,8 @@ func (r *CdnOriginGroupResource) Delete(ctx context.Context, req resource.Delete
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
 }
 
-func (r *CdnOriginGroupResource) ImportState(ctx context.Context, req resource.ImportStateRequest, resp *resource.ImportStateResponse) {
-	var data = new(CdnOriginGroupModel)
+func (r *CDNOriginGroupResource) ImportState(ctx context.Context, req resource.ImportStateRequest, resp *resource.ImportStateResponse) {
+	var data = new(CDNOriginGroupModel)
 
 	path := int64(0)
 	diags := importpath.ParseImportID(
@@ -210,7 +210,7 @@ func (r *CdnOriginGroupResource) ImportState(ctx context.Context, req resource.I
 	data.ID = types.Int64Value(path)
 
 	res := new(http.Response)
-	_, err := r.client.Cdn.OriginGroups.Get(
+	_, err := r.client.CDN.OriginGroups.Get(
 		ctx,
 		path,
 		option.WithResponseBodyInto(&res),
@@ -230,6 +230,6 @@ func (r *CdnOriginGroupResource) ImportState(ctx context.Context, req resource.I
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
 }
 
-func (r *CdnOriginGroupResource) ModifyPlan(_ context.Context, _ resource.ModifyPlanRequest, _ *resource.ModifyPlanResponse) {
+func (r *CDNOriginGroupResource) ModifyPlan(_ context.Context, _ resource.ModifyPlanRequest, _ *resource.ModifyPlanResponse) {
 
 }

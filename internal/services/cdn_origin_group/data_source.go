@@ -15,21 +15,21 @@ import (
 	"github.com/stainless-sdks/gcore-terraform/internal/logging"
 )
 
-type CdnOriginGroupDataSource struct {
+type CDNOriginGroupDataSource struct {
 	client *gcore.Client
 }
 
-var _ datasource.DataSourceWithConfigure = (*CdnOriginGroupDataSource)(nil)
+var _ datasource.DataSourceWithConfigure = (*CDNOriginGroupDataSource)(nil)
 
-func NewCdnOriginGroupDataSource() datasource.DataSource {
-	return &CdnOriginGroupDataSource{}
+func NewCDNOriginGroupDataSource() datasource.DataSource {
+	return &CDNOriginGroupDataSource{}
 }
 
-func (d *CdnOriginGroupDataSource) Metadata(ctx context.Context, req datasource.MetadataRequest, resp *datasource.MetadataResponse) {
+func (d *CDNOriginGroupDataSource) Metadata(ctx context.Context, req datasource.MetadataRequest, resp *datasource.MetadataResponse) {
 	resp.TypeName = req.ProviderTypeName + "_cdn_origin_group"
 }
 
-func (d *CdnOriginGroupDataSource) Configure(ctx context.Context, req datasource.ConfigureRequest, resp *datasource.ConfigureResponse) {
+func (d *CDNOriginGroupDataSource) Configure(ctx context.Context, req datasource.ConfigureRequest, resp *datasource.ConfigureResponse) {
 	if req.ProviderData == nil {
 		return
 	}
@@ -48,8 +48,8 @@ func (d *CdnOriginGroupDataSource) Configure(ctx context.Context, req datasource
 	d.client = client
 }
 
-func (d *CdnOriginGroupDataSource) Read(ctx context.Context, req datasource.ReadRequest, resp *datasource.ReadResponse) {
-	var data *CdnOriginGroupDataSourceModel
+func (d *CDNOriginGroupDataSource) Read(ctx context.Context, req datasource.ReadRequest, resp *datasource.ReadResponse) {
+	var data *CDNOriginGroupDataSourceModel
 
 	resp.Diagnostics.Append(req.Config.Get(ctx, &data)...)
 
@@ -58,7 +58,7 @@ func (d *CdnOriginGroupDataSource) Read(ctx context.Context, req datasource.Read
 	}
 
 	res := new(http.Response)
-	_, err := d.client.Cdn.OriginGroups.Get(
+	_, err := d.client.CDN.OriginGroups.Get(
 		ctx,
 		data.OriginGroupID.ValueInt64(),
 		option.WithResponseBodyInto(&res),

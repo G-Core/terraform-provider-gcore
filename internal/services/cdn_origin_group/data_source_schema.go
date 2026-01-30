@@ -11,7 +11,7 @@ import (
 	"github.com/stainless-sdks/gcore-terraform/internal/customfield"
 )
 
-var _ datasource.DataSourceWithConfigValidators = (*CdnOriginGroupDataSource)(nil)
+var _ datasource.DataSourceWithConfigValidators = (*CDNOriginGroupDataSource)(nil)
 
 func DataSourceSchema(ctx context.Context) schema.Schema {
 	return schema.Schema{
@@ -51,7 +51,7 @@ func DataSourceSchema(ctx context.Context) schema.Schema {
 			"auth": schema.SingleNestedAttribute{
 				Description: "Credentials to access the private bucket.",
 				Computed:    true,
-				CustomType:  customfield.NewNestedObjectType[CdnOriginGroupAuthDataSourceModel](ctx),
+				CustomType:  customfield.NewNestedObjectType[CDNOriginGroupAuthDataSourceModel](ctx),
 				Attributes: map[string]schema.Attribute{
 					"s3_access_key_id": schema.StringAttribute{
 						Description: "Access key ID for the S3 account.\n\nRestrictions:\n- Latin letters (A-Z, a-z), numbers (0-9), colon, dash, and underscore.\n- From 3 to 512 characters.",
@@ -82,7 +82,7 @@ func DataSourceSchema(ctx context.Context) schema.Schema {
 			"sources": schema.SetNestedAttribute{
 				Description: "List of origin sources in the origin group.",
 				Computed:    true,
-				CustomType:  customfield.NewNestedObjectSetType[CdnOriginGroupSourcesDataSourceModel](ctx),
+				CustomType:  customfield.NewNestedObjectSetType[CDNOriginGroupSourcesDataSourceModel](ctx),
 				NestedObject: schema.NestedAttributeObject{
 					Attributes: map[string]schema.Attribute{
 						"backup": schema.BoolAttribute{
@@ -104,10 +104,10 @@ func DataSourceSchema(ctx context.Context) schema.Schema {
 	}
 }
 
-func (d *CdnOriginGroupDataSource) Schema(ctx context.Context, req datasource.SchemaRequest, resp *datasource.SchemaResponse) {
+func (d *CDNOriginGroupDataSource) Schema(ctx context.Context, req datasource.SchemaRequest, resp *datasource.SchemaResponse) {
 	resp.Schema = DataSourceSchema(ctx)
 }
 
-func (d *CdnOriginGroupDataSource) ConfigValidators(_ context.Context) []datasource.ConfigValidator {
+func (d *CDNOriginGroupDataSource) ConfigValidators(_ context.Context) []datasource.ConfigValidator {
 	return []datasource.ConfigValidator{}
 }

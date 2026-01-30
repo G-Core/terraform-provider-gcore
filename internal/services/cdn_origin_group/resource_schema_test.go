@@ -10,9 +10,9 @@ import (
 	"github.com/stainless-sdks/gcore-terraform/internal/test_helpers"
 )
 
-func TestCdnOriginGroupModelSchemaParity(t *testing.T) {
+func TestCDNOriginGroupModelSchemaParity(t *testing.T) {
 	t.Parallel()
-	model := (*cdn_origin_group.CdnOriginGroupModel)(nil)
+	model := (*cdn_origin_group.CDNOriginGroupModel)(nil)
 	schema := cdn_origin_group.ResourceSchema(context.TODO())
 	errs := test_helpers.ValidateResourceModelSchemaIntegrity(model, schema)
 	errs.Report(t)

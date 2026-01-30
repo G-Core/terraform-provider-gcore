@@ -262,7 +262,7 @@ func (p *GcoreProvider) DataSources(ctx context.Context) []func() datasource.Dat
 		dns_zone.NewDNSZoneDataSource,
 		dns_zone_rrset.NewDNSZoneRrsetDataSource,
 		dns_network_mapping.NewDNSNetworkMappingDataSource,
-		cdn_origin_group.NewCdnOriginGroupDataSource,
+		cdn_origin_group.NewCDNOriginGroupDataSource,
 	}
 }
 
