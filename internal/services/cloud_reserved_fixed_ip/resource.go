@@ -137,7 +137,7 @@ func (r *CloudReservedFixedIPResource) Update(ctx context.Context, req resource.
 	res := new(http.Response)
 	_, err = r.client.Cloud.ReservedFixedIPs.Update(
 		ctx,
-		data.ID.ValueString(),
+		data.PortID.ValueString(),
 		params,
 		option.WithRequestBody("application/json", dataBytes),
 		option.WithResponseBodyInto(&res),
@@ -179,7 +179,7 @@ func (r *CloudReservedFixedIPResource) Read(ctx context.Context, req resource.Re
 	res := new(http.Response)
 	_, err := r.client.Cloud.ReservedFixedIPs.Get(
 		ctx,
-		data.ID.ValueString(),
+		data.PortID.ValueString(),
 		params,
 		option.WithResponseBodyInto(&res),
 		option.WithMiddleware(logging.Middleware(ctx)),
@@ -224,7 +224,7 @@ func (r *CloudReservedFixedIPResource) Delete(ctx context.Context, req resource.
 
 	_, err := r.client.Cloud.ReservedFixedIPs.Delete(
 		ctx,
-		data.ID.ValueString(),
+		data.PortID.ValueString(),
 		params,
 		option.WithMiddleware(logging.Middleware(ctx)),
 	)
