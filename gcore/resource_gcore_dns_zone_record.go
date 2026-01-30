@@ -311,6 +311,108 @@ func resourceDNSZoneRecord() *schema.Resource {
 						DNSZoneRRSetSchemaMetaHealthchecks: {
 							Type:        schema.TypeSet,
 							Optional:    true,
+							Deprecated:  "Use 'failover' instead. This field is deprecated and will be removed in a future version.",
+							Description: `Failover meta (eg. {"frequency": 60,"host": "www.gcore.com","http_status_code": null,"method": "GET","port": 80,"protocol": "HTTP","regexp": "","timeout": 10,"tls": false,"url": "/"}).`,
+							Elem: &schema.Resource{
+								Schema: map[string]*schema.Schema{
+									DNSZoneRRSetSchemaMetaFailoverFrequency: {
+										Type:        schema.TypeInt,
+										Description: "Frequency in seconds (10-3600).",
+										Required:    true,
+										ValidateDiagFunc: func(i interface{}, path cty.Path) diag.Diagnostics {
+											v, dtv := toInt(i)
+											if dtv != dtvInt {
+												return diag.Errorf("dns record meta failover frequency %v must be integer, got: %v", path, i)
+											}
+											if v < 10 || v > 3600 {
+												return diag.Errorf("dns record meta failover frequency %v must be in range 10-3600, got: %v", path, i)
+											}
+											return nil
+										},
+									},
+									DNSZoneRRSetSchemaMetaFailoverHost: {
+										Type:        schema.TypeString,
+										Optional:    true,
+										Description: "Request host/virtualhost to send if protocol=HTTP, must be empty for non-HTTP",
+									},
+									DNSZoneRRSetSchemaMetaFailoverCommand: {
+										Type:        schema.TypeString,
+										Description: "Command to send if protocol=TCP/UDP, maximum length: 255.",
+										Optional:    true,
+										ValidateDiagFunc: func(i interface{}, path cty.Path) diag.Diagnostics {
+											v, _ := toString(i)
+											if len(v) > 255 {
+												return diag.Errorf("dns record meta failover command %v must be less then 255, got: %v", path, i)
+											}
+											return nil
+										},
+									},
+									DNSZoneRRSetSchemaMetaFailoverHTTPStatusCode: {
+										Type:        schema.TypeInt,
+										Description: "Expected status code if protocol=HTTP, must be empty for non-HTTP.",
+										Optional:    true,
+									},
+									DNSZoneRRSetSchemaMetaFailoverMethod: {
+										Type:        schema.TypeString,
+										Description: "HTTP Method required if protocol=HTTP, must be empty for non-HTTP.",
+										Optional:    true,
+									},
+									DNSZoneRRSetSchemaMetaFailoverPort: {
+										Type:        schema.TypeInt,
+										Description: "Port to check (1-65535).",
+										Optional:    true,
+									},
+									DNSZoneRRSetSchemaMetaFailoverProtocol: {
+										Type:        schema.TypeString,
+										Description: "Protocol, possible value: HTTP, TCP, UDP, ICMP.",
+										Required:    true,
+										ValidateDiagFunc: func(i interface{}, path cty.Path) diag.Diagnostics {
+											v, dtv := toString(i)
+											if dtv != dtvString {
+												return diag.Errorf("dns record meta failover protocol %v must be string, got: %v", path, i)
+											}
+											if v != "HTTP" && v != "TCP" && v != `UDP` && v != "ICMP" {
+												return diag.Errorf("dns record meta failover protocol %v must be one of HTTP, TCP, UDP, ICMP, got: %v", path, i)
+											}
+											return nil
+										},
+									},
+									DNSZoneRRSetSchemaMetaFailoverRegexp: {
+										Type:        schema.TypeString,
+										Description: "HTTP body or response payload to check if protocol<>ICMP, must be empty for ICMP.",
+										Optional:    true,
+									},
+									DNSZoneRRSetSchemaMetaFailoverTimeout: {
+										Type:        schema.TypeInt,
+										Description: "Timeout in seconds (1-10).",
+										Required:    true,
+										ValidateDiagFunc: func(i interface{}, path cty.Path) diag.Diagnostics {
+											v, dtv := toInt(i)
+											if dtv != dtvInt {
+												return diag.Errorf("dns record meta failover timeout %v must be an integer, got %v", path, i)
+											}
+											if v < 1 || v > 10 {
+												return diag.Errorf("dns record meta failover timeout %v must be between 1 and 10, got %v", path, i)
+											}
+											return nil
+										},
+									},
+									DNSZoneRRSetSchemaMetaFailoverTLS: {
+										Type:        schema.TypeBool,
+										Description: "TLS/HTTPS enabled if protocol=HTTP, must be empty for non-HTTP.",
+										Optional:    true,
+									},
+									DNSZoneRRSetSchemaMetaFailoverURL: {
+										Type:        schema.TypeString,
+										Description: "URL path to check required if protocol=HTTP, must be empty for non-HTTP.",
+										Optional:    true,
+									},
+								},
+							},
+						},
+						DNSZoneRRSetSchemaMetaFailover: {
+							Type:        schema.TypeSet,
+							Optional:    true,
 							Description: `Failover meta (eg. {"frequency": 60,"host": "www.gcore.com","http_status_code": null,"method": "GET","port": 80,"protocol": "HTTP","regexp": "","timeout": 10,"tls": false,"url": "/"}).`,
 							Elem: &schema.Resource{
 								Schema: map[string]*schema.Schema{
@@ -615,11 +717,7 @@ func resourceDNSZoneRecordRead(ctx context.Context, d *schema.ResourceData, m in
 	for key, val := range result.Meta {
 		v, ok := val.(map[string]any)
 		if ok {
-			if key == DNSZoneRRSetSchemaMetaFailover { // copy to healthcheck
-				rrMeta[DNSZoneRRSetSchemaMetaHealthchecks] = []map[string]any{v}
-			} else {
-				rrMeta[key] = []map[string]any{v}
-			}
+			rrMeta[key] = []map[string]any{v}
 			continue
 		}
 		s, ok := val.(string)

@@ -117,17 +117,17 @@ resource "gcore_dns_zone_record" "examplezone_failover" {
 
   // failover/healthchecks is on rrset meta, not resource record meta
   meta {
-    healthchecks {
-      frequency = 300
-      host = "failover.examplezone.com"
+    failover {
+      frequency        = 300
+      host             = "failover.examplezone.com"
       http_status_code = 200
-      method = "GET"
-      port = 80
-      protocol = "HTTP"
-      regexp = ""
-      timeout = 10
-      tls = false
-      url = "/"
+      method           = "GET"
+      port             = 80
+      protocol         = "HTTP"
+      regexp           = ""
+      timeout          = 10
+      tls              = false
+      url              = "/"
     }
   }
 }
