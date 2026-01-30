@@ -263,7 +263,7 @@ func (p *GcoreProvider) DataSources(ctx context.Context) []func() datasource.Dat
 		cloud_instance_image.NewCloudInstanceImageDataSource,
 		cloud_k8s_cluster.NewCloudK8SClusterDataSource,
 		fastedge_binary.NewFastedgeBinaryDataSource,
-		cdn_origin_group.NewCdnOriginGroupDataSource,
+		cdn_origin_group.NewCDNOriginGroupDataSource,
 	}
 }
 

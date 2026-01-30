@@ -8,8 +8,8 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 )
 
-var _ resource.ResourceWithUpgradeState = (*CdnOriginGroupResource)(nil)
+var _ resource.ResourceWithUpgradeState = (*CDNOriginGroupResource)(nil)
 
-func (r *CdnOriginGroupResource) UpgradeState(ctx context.Context) map[int64]resource.StateUpgrader {
+func (r *CDNOriginGroupResource) UpgradeState(ctx context.Context) map[int64]resource.StateUpgrader {
 	return map[int64]resource.StateUpgrader{}
 }

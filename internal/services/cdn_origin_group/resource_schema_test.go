@@ -6,7 +6,7 @@ import (
 	"testing"
 )
 
-func TestCdnOriginGroupModelSchemaParity(t *testing.T) {
+func TestCDNOriginGroupModelSchemaParity(t *testing.T) {
 	// Skip: The test helper has a bug that incorrectly reports schema/model mismatches
 	// for the auth nested attribute. Manual verification confirms the model and schema
 	// are correct. The s3_credentials_version field has no json tag (Terraform-only trigger).

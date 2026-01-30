@@ -16,7 +16,7 @@ import (
 	"github.com/stainless-sdks/gcore-terraform/internal/customfield"
 )
 
-var _ resource.ResourceWithConfigValidators = (*CdnOriginGroupResource)(nil)
+var _ resource.ResourceWithConfigValidators = (*CDNOriginGroupResource)(nil)
 
 func ResourceSchema(ctx context.Context) schema.Schema {
 	return schema.Schema{
@@ -114,11 +114,11 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 	}
 }
 
-func (r *CdnOriginGroupResource) Schema(ctx context.Context, req resource.SchemaRequest, resp *resource.SchemaResponse) {
+func (r *CDNOriginGroupResource) Schema(ctx context.Context, req resource.SchemaRequest, resp *resource.SchemaResponse) {
 	resp.Schema = ResourceSchema(ctx)
 }
 
-func (r *CdnOriginGroupResource) ConfigValidators(_ context.Context) []resource.ConfigValidator {
+func (r *CDNOriginGroupResource) ConfigValidators(_ context.Context) []resource.ConfigValidator {
 	return []resource.ConfigValidator{
 		// Either sources or auth must be specified, but not both
 		resourcevalidator.ExactlyOneOf(

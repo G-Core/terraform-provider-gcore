@@ -10,9 +10,9 @@ import (
 	"github.com/stainless-sdks/gcore-terraform/internal/test_helpers"
 )
 
-func TestCdnOriginGroupDataSourceModelSchemaParity(t *testing.T) {
+func TestCDNOriginGroupDataSourceModelSchemaParity(t *testing.T) {
 	t.Parallel()
-	model := (*cdn_origin_group.CdnOriginGroupDataSourceModel)(nil)
+	model := (*cdn_origin_group.CDNOriginGroupDataSourceModel)(nil)
 	schema := cdn_origin_group.DataSourceSchema(context.TODO())
 	errs := test_helpers.ValidateDataSourceModelSchemaIntegrity(model, schema)
 	errs.Report(t)
