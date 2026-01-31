@@ -77,7 +77,7 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 			"sources": schema.SetNestedAttribute{
 				Description: "Set of origin sources in the origin group. Duplicates (same source+enabled+backup) are not allowed.",
 				Optional:    true,
-				CustomType:  customfield.NewNestedObjectSetType[CdnOriginGroupSourcesModel](ctx),
+				CustomType:  customfield.NewNestedObjectSetType[CDNOriginGroupSourcesModel](ctx),
 				NestedObject: schema.NestedAttributeObject{
 					Attributes: map[string]schema.Attribute{
 						"backup": schema.BoolAttribute{

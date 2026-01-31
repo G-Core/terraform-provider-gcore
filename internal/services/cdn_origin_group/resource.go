@@ -65,7 +65,7 @@ func (r *CDNOriginGroupResource) Create(ctx context.Context, req resource.Create
 	}
 
 	// Write-only fields are null in plan, get auth block from config
-	var configAuth *CdnOriginGroupAuthModel
+	var configAuth *CDNOriginGroupAuthModel
 	resp.Diagnostics.Append(req.Config.GetAttribute(ctx, path.Root("auth"), &configAuth)...)
 	if resp.Diagnostics.HasError() {
 		return
@@ -114,7 +114,7 @@ func (r *CDNOriginGroupResource) Update(ctx context.Context, req resource.Update
 	}
 
 	// Write-only fields are null in plan, get auth block from config
-	var configAuth *CdnOriginGroupAuthModel
+	var configAuth *CDNOriginGroupAuthModel
 	resp.Diagnostics.Append(req.Config.GetAttribute(ctx, path.Root("auth"), &configAuth)...)
 	if resp.Diagnostics.HasError() {
 		return
@@ -252,7 +252,7 @@ func (r *CDNOriginGroupResource) ModifyPlan(ctx context.Context, req resource.Mo
 		return
 	}
 
-	var plan, state CdnOriginGroupModel
+	var plan, state CDNOriginGroupModel
 	resp.Diagnostics.Append(req.Plan.Get(ctx, &plan)...)
 	resp.Diagnostics.Append(req.State.Get(ctx, &state)...)
 	if resp.Diagnostics.HasError() {
