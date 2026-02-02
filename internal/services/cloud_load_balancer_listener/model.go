@@ -19,6 +19,7 @@ type CloudLoadBalancerListenerModel struct {
 	DefaultPoolID        types.String                                                         `tfsdk:"default_pool_id" json:"default_pool_id,optional,no_refresh"`
 	InsertXForwarded     types.Bool                                                           `tfsdk:"insert_x_forwarded" json:"insert_x_forwarded,optional,no_refresh"`
 	Name                 types.String                                                         `tfsdk:"name" json:"name,required"`
+	AdminStateUp         types.Bool                                                           `tfsdk:"admin_state_up" json:"admin_state_up,optional"`
 	SecretID             types.String                                                         `tfsdk:"secret_id" json:"secret_id,optional"`
 	AllowedCidrs         *[]types.String                                                      `tfsdk:"allowed_cidrs" json:"allowed_cidrs,optional"`
 	ConnectionLimit      types.Int64                                                          `tfsdk:"connection_limit" json:"connection_limit,computed_optional"`

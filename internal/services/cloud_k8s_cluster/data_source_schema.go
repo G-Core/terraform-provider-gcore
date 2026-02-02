@@ -23,16 +23,20 @@ func DataSourceSchema(ctx context.Context) schema.Schema {
 	return schema.Schema{
 		Attributes: map[string]schema.Attribute{
 			"id": schema.StringAttribute{
-				Computed: true,
+				Description: "Cluster name",
+				Computed:    true,
 			},
 			"cluster_name": schema.StringAttribute{
-				Required: true,
+				Description: "Cluster name",
+				Required:    true,
 			},
 			"project_id": schema.Int64Attribute{
-				Optional: true,
+				Description: "Project ID",
+				Optional:    true,
 			},
 			"region_id": schema.Int64Attribute{
-				Optional: true,
+				Description: "Region ID",
+				Optional:    true,
 			},
 			"created_at": schema.StringAttribute{
 				Description: "Function creation date",
@@ -132,7 +136,7 @@ func DataSourceSchema(ctx context.Context) schema.Schema {
 								ElementType: types.StringType,
 							},
 							"worker_count": schema.Int64Attribute{
-								Description: "Size of the worker pool, i.e. number of worker nodes.\n\nEach Slurm worker node is backed by a Pod scheduled on one of cluster's GPU nodes.",
+								Description: "Size of the worker pool, i.e. number of worker nodes.\n\nEach Slurm worker node is backed by a Pod scheduled on one of cluster's GPU nodes.\n\nNote: Downscaling (reducing worker count) is not supported.",
 								Computed:    true,
 							},
 						},

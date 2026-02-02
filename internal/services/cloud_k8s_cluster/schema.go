@@ -41,10 +41,12 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 				PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown(), stringplanmodifier.RequiresReplace()},
 			},
 			"project_id": schema.Int64Attribute{
+				Description:   "Project ID",
 				Optional:      true,
 				PlanModifiers: []planmodifier.Int64{int64planmodifier.RequiresReplace()},
 			},
 			"region_id": schema.Int64Attribute{
+				Description:   "Region ID",
 				Optional:      true,
 				PlanModifiers: []planmodifier.Int64{int64planmodifier.RequiresReplace()},
 			},
@@ -270,7 +272,7 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 								ElementType: types.StringType,
 							},
 							"worker_count": schema.Int64Attribute{
-								Description: "Size of the worker pool, i.e. the number of Slurm worker nodes.\n\nEach Slurm worker node will be backed by a Pod scheduled on one of cluster's GPU nodes.",
+								Description: "Size of the worker pool, i.e. the number of Slurm worker nodes.\n\nEach Slurm worker node will be backed by a Pod scheduled on one of cluster's GPU nodes.\n\nNote: Downscaling (reducing worker count) is not supported.",
 								Computed:    true,
 								Optional:    true,
 								Validators: []validator.Int64{

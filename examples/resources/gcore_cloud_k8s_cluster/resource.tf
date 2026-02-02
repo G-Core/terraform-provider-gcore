@@ -1,6 +1,6 @@
 resource "gcore_cloud_k8s_cluster" "example_cloud_k8s_cluster" {
-  project_id = 0
-  region_id = 0
+  project_id = 1
+  region_id = 7
   keypair = "some_keypair"
   name = "string"
   pools = [{

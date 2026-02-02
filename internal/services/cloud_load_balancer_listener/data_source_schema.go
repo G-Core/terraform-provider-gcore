@@ -41,6 +41,10 @@ func DataSourceSchema(ctx context.Context) schema.Schema {
 				Computed:    true,
 				Optional:    true,
 			},
+			"admin_state_up": schema.BoolAttribute{
+				Description: "Administrative state of the resource. When set to true, the resource is enabled and operational. When set to false, the resource is disabled and will not process traffic. Defaults to true.",
+				Computed:    true,
+			},
 			"connection_limit": schema.Int64Attribute{
 				Description: "Limit of simultaneous connections",
 				Computed:    true,

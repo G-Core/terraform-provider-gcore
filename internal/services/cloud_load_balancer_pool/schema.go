@@ -76,6 +76,10 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 					),
 				},
 			},
+			"admin_state_up": schema.BoolAttribute{
+				Description: "Administrative state of the resource. When set to true, the resource is enabled and operational. When set to false, the resource is disabled and will not process traffic. Defaults to true.",
+				Optional:    true,
+			},
 			"ca_secret_id": schema.StringAttribute{
 				Description: "Secret ID of CA certificate bundle",
 				Optional:    true,
@@ -149,6 +153,10 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 								"UDP-CONNECT",
 							),
 						},
+					},
+					"admin_state_up": schema.BoolAttribute{
+						Description: "Administrative state of the resource. When set to true, the resource is enabled and operational. When set to false, the resource is disabled and will not process traffic. Defaults to true.",
+						Optional:    true,
 					},
 					"expected_codes": schema.StringAttribute{
 						Description: "Expected HTTP response codes. Can be a single code or a range of codes. Can only be used together with `HTTP` or `HTTPS` health monitor type. For example, 200,202,300-302,401,403,404,500-504. If not specified, the default is 200.",
@@ -232,7 +240,7 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 							},
 						},
 						"admin_state_up": schema.BoolAttribute{
-							Description: "Administrative state of the resource. When set to true, the resource is enabled and operational. When set to false, the resource is disabled and will not process traffic. When null is passed, the value is skipped and defaults to true.",
+							Description: "Administrative state of the resource. When set to true, the resource is enabled and operational. When set to false, the resource is disabled and will not process traffic. Defaults to true.",
 							Computed:    true,
 							Optional:    true,
 							Default:     booldefault.StaticBool(true),

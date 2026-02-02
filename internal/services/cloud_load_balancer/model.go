@@ -26,6 +26,7 @@ type CloudLoadBalancerModel struct {
 	Tags                  *map[string]types.String                                           `tfsdk:"tags" json:"tags,optional,no_refresh"`
 	PreferredConnectivity types.String                                                       `tfsdk:"preferred_connectivity" json:"preferred_connectivity,computed_optional"`
 	Logging               customfield.NestedObject[CloudLoadBalancerLoggingModel]            `tfsdk:"logging" json:"logging,computed_optional"`
+	AdminStateUp          types.Bool                                                         `tfsdk:"admin_state_up" json:"admin_state_up,computed"`
 	CreatedAt             timetypes.RFC3339                                                  `tfsdk:"created_at" json:"created_at,computed" format:"date-time"`
 	CreatorTaskID         types.String                                                       `tfsdk:"creator_task_id" json:"creator_task_id,computed"`
 	OperatingStatus       types.String                                                       `tfsdk:"operating_status" json:"operating_status,computed"`
@@ -92,6 +93,7 @@ type CloudLoadBalancerListenersPoolsHealthmonitorModel struct {
 	MaxRetries     types.Int64  `tfsdk:"max_retries" json:"max_retries,required"`
 	Timeout        types.Int64  `tfsdk:"timeout" json:"timeout,required"`
 	Type           types.String `tfsdk:"type" json:"type,required"`
+	AdminStateUp   types.Bool   `tfsdk:"admin_state_up" json:"admin_state_up,optional"`
 	ExpectedCodes  types.String `tfsdk:"expected_codes" json:"expected_codes,optional"`
 	HTTPMethod     types.String `tfsdk:"http_method" json:"http_method,optional"`
 	MaxRetriesDown types.Int64  `tfsdk:"max_retries_down" json:"max_retries_down,optional"`

@@ -24,6 +24,7 @@ resource "gcore_cloud_load_balancer" "example_cloud_load_balancer" {
         max_retries = 3
         timeout = 5
         type = "HTTP"
+        admin_state_up = true
         expected_codes = "200,301,302"
         http_method = "GET"
         max_retries_down = 3

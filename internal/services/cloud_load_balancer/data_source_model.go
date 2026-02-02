@@ -21,6 +21,7 @@ type CloudLoadBalancerDataSourceModel struct {
 	RegionID              types.Int64                                                                  `tfsdk:"region_id" path:"region_id,optional"`
 	ShowStats             types.Bool                                                                   `tfsdk:"show_stats" query:"show_stats,computed_optional"`
 	WithDDOS              types.Bool                                                                   `tfsdk:"with_ddos" query:"with_ddos,computed_optional"`
+	AdminStateUp          types.Bool                                                                   `tfsdk:"admin_state_up" json:"admin_state_up,computed"`
 	CreatedAt             timetypes.RFC3339                                                            `tfsdk:"created_at" json:"created_at,computed" format:"date-time"`
 	CreatorTaskID         types.String                                                                 `tfsdk:"creator_task_id" json:"creator_task_id,computed"`
 	Name                  types.String                                                                 `tfsdk:"name" json:"name,computed"`

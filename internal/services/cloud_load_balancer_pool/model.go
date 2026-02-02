@@ -17,6 +17,7 @@ type CloudLoadBalancerPoolModel struct {
 	LbAlgorithm          types.String                                                          `tfsdk:"lb_algorithm" json:"lb_algorithm,required"`
 	Name                 types.String                                                          `tfsdk:"name" json:"name,required"`
 	Protocol             types.String                                                          `tfsdk:"protocol" json:"protocol,required"`
+	AdminStateUp         types.Bool                                                            `tfsdk:"admin_state_up" json:"admin_state_up,optional"`
 	CaSecretID           types.String                                                          `tfsdk:"ca_secret_id" json:"ca_secret_id,optional"`
 	CrlSecretID          types.String                                                          `tfsdk:"crl_secret_id" json:"crl_secret_id,optional"`
 	SecretID             types.String                                                          `tfsdk:"secret_id" json:"secret_id,optional"`
@@ -48,6 +49,7 @@ type CloudLoadBalancerPoolHealthmonitorModel struct {
 	MaxRetries     types.Int64  `tfsdk:"max_retries" json:"max_retries,required"`
 	Timeout        types.Int64  `tfsdk:"timeout" json:"timeout,required"`
 	Type           types.String `tfsdk:"type" json:"type,required"`
+	AdminStateUp   types.Bool   `tfsdk:"admin_state_up" json:"admin_state_up,optional"`
 	ExpectedCodes  types.String `tfsdk:"expected_codes" json:"expected_codes,optional"`
 	HTTPMethod     types.String `tfsdk:"http_method" json:"http_method,optional"`
 	MaxRetriesDown types.Int64  `tfsdk:"max_retries_down" json:"max_retries_down,optional"`

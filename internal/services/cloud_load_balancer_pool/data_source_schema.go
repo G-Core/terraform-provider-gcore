@@ -34,6 +34,10 @@ func DataSourceSchema(ctx context.Context) schema.Schema {
 				Description: "Region ID",
 				Optional:    true,
 			},
+			"admin_state_up": schema.BoolAttribute{
+				Description: "Administrative state of the resource. When set to true, the resource is enabled and operational. When set to false, the resource is disabled and will not process traffic. Defaults to true.",
+				Computed:    true,
+			},
 			"ca_secret_id": schema.StringAttribute{
 				Description: "Secret ID of CA certificate bundle",
 				Computed:    true,
@@ -143,7 +147,7 @@ func DataSourceSchema(ctx context.Context) schema.Schema {
 						Computed:    true,
 					},
 					"admin_state_up": schema.BoolAttribute{
-						Description: "Administrative state of the resource. When set to true, the resource is enabled and operational. When set to false, the resource is disabled and will not process traffic. When null is passed, the value is skipped and defaults to true.",
+						Description: "Administrative state of the resource. When set to true, the resource is enabled and operational. When set to false, the resource is disabled and will not process traffic. Defaults to true.",
 						Computed:    true,
 					},
 					"delay": schema.Int64Attribute{
@@ -285,7 +289,7 @@ func DataSourceSchema(ctx context.Context) schema.Schema {
 							Computed:    true,
 						},
 						"admin_state_up": schema.BoolAttribute{
-							Description: "Administrative state of the resource. When set to true, the resource is enabled and operational. When set to false, the resource is disabled and will not process traffic. When null is passed, the value is skipped and defaults to true.",
+							Description: "Administrative state of the resource. When set to true, the resource is enabled and operational. When set to false, the resource is disabled and will not process traffic. Defaults to true.",
 							Computed:    true,
 						},
 						"backup": schema.BoolAttribute{
