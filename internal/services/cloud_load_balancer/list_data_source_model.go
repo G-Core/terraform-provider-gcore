@@ -78,6 +78,7 @@ func (m *CloudLoadBalancersDataSourceModel) toListParams(_ context.Context) (par
 
 type CloudLoadBalancersItemsDataSourceModel struct {
 	ID                    types.String                                                                  `tfsdk:"id" json:"id,computed"`
+	AdminStateUp          types.Bool                                                                    `tfsdk:"admin_state_up" json:"admin_state_up,computed"`
 	CreatedAt             timetypes.RFC3339                                                             `tfsdk:"created_at" json:"created_at,computed" format:"date-time"`
 	Name                  types.String                                                                  `tfsdk:"name" json:"name,computed"`
 	OperatingStatus       types.String                                                                  `tfsdk:"operating_status" json:"operating_status,computed"`

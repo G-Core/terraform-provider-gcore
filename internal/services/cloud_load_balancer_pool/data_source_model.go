@@ -17,6 +17,7 @@ type CloudLoadBalancerPoolDataSourceModel struct {
 	PoolID               types.String                                                                     `tfsdk:"pool_id" path:"pool_id,required"`
 	ProjectID            types.Int64                                                                      `tfsdk:"project_id" path:"project_id,optional"`
 	RegionID             types.Int64                                                                      `tfsdk:"region_id" path:"region_id,optional"`
+	AdminStateUp         types.Bool                                                                       `tfsdk:"admin_state_up" json:"admin_state_up,computed"`
 	CaSecretID           types.String                                                                     `tfsdk:"ca_secret_id" json:"ca_secret_id,computed"`
 	CreatorTaskID        types.String                                                                     `tfsdk:"creator_task_id" json:"creator_task_id,computed"`
 	CrlSecretID          types.String                                                                     `tfsdk:"crl_secret_id" json:"crl_secret_id,computed"`

@@ -19,6 +19,7 @@ type CloudLoadBalancerListenerDataSourceModel struct {
 	ProjectID            types.Int64                                                                    `tfsdk:"project_id" path:"project_id,optional"`
 	RegionID             types.Int64                                                                    `tfsdk:"region_id" path:"region_id,optional"`
 	ShowStats            types.Bool                                                                     `tfsdk:"show_stats" query:"show_stats,computed_optional"`
+	AdminStateUp         types.Bool                                                                     `tfsdk:"admin_state_up" json:"admin_state_up,computed"`
 	ConnectionLimit      types.Int64                                                                    `tfsdk:"connection_limit" json:"connection_limit,computed"`
 	CreatorTaskID        types.String                                                                   `tfsdk:"creator_task_id" json:"creator_task_id,computed"`
 	LoadBalancerID       types.String                                                                   `tfsdk:"load_balancer_id" json:"load_balancer_id,computed"`

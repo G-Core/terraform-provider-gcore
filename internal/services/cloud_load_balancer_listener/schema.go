@@ -83,6 +83,10 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 				Description: "Load balancer listener name",
 				Required:    true,
 			},
+			"admin_state_up": schema.BoolAttribute{
+				Description: "Administrative state of the resource. When set to true, the resource is enabled and operational. When set to false, the resource is disabled and will not process traffic. Defaults to true.",
+				Optional:    true,
+			},
 			"secret_id": schema.StringAttribute{
 				Description: "ID of the secret where PKCS12 file is stored for `TERMINATED_HTTPS` or PROMETHEUS listener",
 				Optional:    true,

@@ -79,7 +79,7 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 				},
 			},
 			"admin_state_up": schema.BoolAttribute{
-				Description:   "Administrative state of the resource. When set to true, the resource is enabled and operational. When set to false, the resource is disabled and will not process traffic. When null is passed, the value is skipped and defaults to true.",
+				Description:   "Administrative state of the resource. When set to true, the resource is enabled and operational. When set to false, the resource is disabled and will not process traffic. Defaults to true.",
 				Computed:      true,
 				Optional:      true,
 				PlanModifiers: []planmodifier.Bool{boolplanmodifier.RequiresReplaceIfConfigured()},
