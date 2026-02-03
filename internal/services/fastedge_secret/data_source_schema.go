@@ -30,10 +30,10 @@ func DataSourceSchema(ctx context.Context) schema.Schema {
 				Description: "The unique name of the secret.",
 				Computed:    true,
 			},
-			"secret_slots": schema.ListNestedAttribute{
+			"secret_slots": schema.SetNestedAttribute{
 				Description: "A list of secret slots associated with this secret.",
 				Computed:    true,
-				CustomType:  customfield.NewNestedObjectListType[FastedgeSecretSecretSlotsDataSourceModel](ctx),
+				CustomType:  customfield.NewNestedObjectSetType[FastedgeSecretSecretSlotsDataSourceModel](ctx),
 				NestedObject: schema.NestedAttributeObject{
 					Attributes: map[string]schema.Attribute{
 						"slot": schema.Int64Attribute{

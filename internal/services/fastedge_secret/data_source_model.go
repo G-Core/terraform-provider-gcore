@@ -8,11 +8,11 @@ import (
 )
 
 type FastedgeSecretDataSourceModel struct {
-	ID          types.Int64                                                            `tfsdk:"id" path:"id,required"`
-	AppCount    types.Int64                                                            `tfsdk:"app_count" json:"app_count,computed"`
-	Comment     types.String                                                           `tfsdk:"comment" json:"comment,computed"`
-	Name        types.String                                                           `tfsdk:"name" json:"name,computed"`
-	SecretSlots customfield.NestedObjectList[FastedgeSecretSecretSlotsDataSourceModel] `tfsdk:"secret_slots" json:"secret_slots,computed"`
+	ID          types.Int64                                                           `tfsdk:"id" path:"id,required"`
+	AppCount    types.Int64                                                           `tfsdk:"app_count" json:"app_count,computed"`
+	Comment     types.String                                                          `tfsdk:"comment" json:"comment,computed"`
+	Name        types.String                                                          `tfsdk:"name" json:"name,computed"`
+	SecretSlots customfield.NestedObjectSet[FastedgeSecretSecretSlotsDataSourceModel] `tfsdk:"secret_slots" json:"secret_slots,computed"`
 }
 
 type FastedgeSecretSecretSlotsDataSourceModel struct {

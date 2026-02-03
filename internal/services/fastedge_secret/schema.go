@@ -30,11 +30,11 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 				Description: "A description or comment about the secret.",
 				Optional:    true,
 			},
-			"secret_slots": schema.ListNestedAttribute{
+			"secret_slots": schema.SetNestedAttribute{
 				Description: "A list of secret slots associated with this secret.",
 				Computed:    true,
 				Optional:    true,
-				CustomType:  customfield.NewNestedObjectListType[FastedgeSecretSecretSlotsModel](ctx),
+				CustomType:  customfield.NewNestedObjectSetType[FastedgeSecretSecretSlotsModel](ctx),
 				NestedObject: schema.NestedAttributeObject{
 					Attributes: map[string]schema.Attribute{
 						"slot": schema.Int64Attribute{
