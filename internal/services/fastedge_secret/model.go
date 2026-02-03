@@ -9,11 +9,11 @@ import (
 )
 
 type FastedgeSecretModel struct {
-	ID          types.Int64                                                  `tfsdk:"id" json:"id,computed"`
-	Name        types.String                                                 `tfsdk:"name" json:"name,required"`
-	Comment     types.String                                                 `tfsdk:"comment" json:"comment,optional"`
-	SecretSlots customfield.NestedObjectList[FastedgeSecretSecretSlotsModel] `tfsdk:"secret_slots" json:"secret_slots,computed_optional"`
-	AppCount    types.Int64                                                  `tfsdk:"app_count" json:"app_count,computed"`
+	ID          types.Int64                                                 `tfsdk:"id" json:"id,computed"`
+	Name        types.String                                                `tfsdk:"name" json:"name,required"`
+	Comment     types.String                                                `tfsdk:"comment" json:"comment,optional"`
+	SecretSlots customfield.NestedObjectSet[FastedgeSecretSecretSlotsModel] `tfsdk:"secret_slots" json:"secret_slots,computed_optional"`
+	AppCount    types.Int64                                                 `tfsdk:"app_count" json:"app_count,computed"`
 }
 
 func (m FastedgeSecretModel) MarshalJSON() (data []byte, err error) {
