@@ -1,0 +1,60 @@
+---
+page_title: "{{ .Name }} {{ .Type }} - {{ .ProviderName }}"
+subcategory: ""
+description: |-
+  {{ .Description }}
+---
+
+# {{ .Name }} ({{ .Type }})
+
+{{ .Description }}
+
+## Example Usage
+
+#### Prerequisite
+
+{{tffile "examples/resources/gcore_router/main.tf"}}
+
+### Basic Router
+
+{{tffile "examples/resources/gcore_router/basic-router.tf"}}
+
+### Router with Default External Gateway
+
+Uses the default external network for internet access. This is the simplest way to give your router internet connectivity.
+
+{{tffile "examples/resources/gcore_router/router-default-gateway.tf"}}
+
+### Router with Manual External Gateway
+
+Specifies a particular external network for the gateway. Use this when you need control over which external network to use.
+
+{{tffile "examples/resources/gcore_router/router-manual-gateway.tf"}}
+
+### Router with Interfaces
+
+Connects the router to multiple subnets, enabling routing between them.
+
+{{tffile "examples/resources/gcore_router/router-with-interfaces.tf"}}
+
+### Router with Static Routes
+
+Configures custom static routes for directing traffic to specific destinations.
+
+{{tffile "examples/resources/gcore_router/router-with-routes.tf"}}
+
+### Complete Setup
+
+Full example creating a private network, subnet, and router with internet connectivity.
+
+{{tffile "examples/resources/gcore_router/complete-setup.tf"}}
+
+{{ .SchemaMarkdown }}
+
+{{ if .HasImport }}
+## Import
+
+Import is supported using the following syntax:
+
+{{ codefile "shell" .ImportFile }}
+{{ end }}

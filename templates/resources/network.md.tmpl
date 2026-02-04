@@ -1,0 +1,48 @@
+---
+page_title: "{{ .Name }} {{ .Type }} - {{ .ProviderName }}"
+subcategory: ""
+description: |-
+  {{ .Description }}
+---
+
+# {{ .Name }} ({{ .Type }})
+
+{{ .Description }}
+
+## Example Usage
+
+#### Prerequisite
+
+{{tffile "examples/resources/gcore_network/main.tf"}}
+
+### Basic Network
+
+{{tffile "examples/resources/gcore_network/basic-network.tf"}}
+
+### Network with Metadata
+
+Creates a network with custom metadata tags for organization and management.
+
+{{tffile "examples/resources/gcore_network/network-with-metadata.tf"}}
+
+### Network without Router
+
+Creates an isolated network without automatic external router creation. Useful for internal-only networks.
+
+{{tffile "examples/resources/gcore_network/network-no-router.tf"}}
+
+### Complete Setup
+
+Full example creating a network with a subnet, demonstrating a typical workflow.
+
+{{tffile "examples/resources/gcore_network/complete-setup.tf"}}
+
+{{ .SchemaMarkdown }}
+
+{{ if .HasImport }}
+## Import
+
+Import is supported using the following syntax:
+
+{{ codefile "shell" .ImportFile }}
+{{ end }}
