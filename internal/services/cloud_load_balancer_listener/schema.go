@@ -86,8 +86,11 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 				Optional:    true,
 			},
 			"secret_id": schema.StringAttribute{
-				Description: "ID of the secret where PKCS12 file is stored for `TERMINATED_HTTPS` or PROMETHEUS listener",
+				Description: "ID of the secret where PKCS12 file is stored for `TERMINATED_HTTPS` or PROMETHEUS listener\nAvailable values: \"\".",
 				Optional:    true,
+				Validators: []validator.String{
+					stringvalidator.OneOfCaseInsensitive(""),
+				},
 			},
 			"allowed_cidrs": schema.ListAttribute{
 				Description: "Network CIDRs from which service will be accessible",

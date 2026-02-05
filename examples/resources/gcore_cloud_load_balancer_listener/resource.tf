@@ -9,7 +9,7 @@ resource "gcore_cloud_load_balancer_listener" "example_cloud_load_balancer_liste
   connection_limit = 100000
   default_pool_id = "00000000-0000-4000-8000-000000000000"
   insert_x_forwarded = false
-  secret_id = "f2e734d0-fa2b-42c2-ad33-4c6db5101e00"
+  secret_id = ""
   sni_secret_id = ["f2e734d0-fa2b-42c2-ad33-4c6db5101e00", "eb121225-7ded-4ff3-ae1f-599e145dd7cb"]
   timeout_client_data = 50000
   timeout_member_connect = 50000
