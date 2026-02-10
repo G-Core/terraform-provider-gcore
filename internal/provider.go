@@ -47,6 +47,7 @@ import (
 	"github.com/stainless-sdks/gcore-terraform/internal/services/dns_network_mapping"
 	"github.com/stainless-sdks/gcore-terraform/internal/services/dns_zone"
 	"github.com/stainless-sdks/gcore-terraform/internal/services/dns_zone_rrset"
+	"github.com/stainless-sdks/gcore-terraform/internal/services/fastedge_app"
 	"github.com/stainless-sdks/gcore-terraform/internal/services/fastedge_binary"
 	"github.com/stainless-sdks/gcore-terraform/internal/services/fastedge_secret"
 )
@@ -212,6 +213,7 @@ func (p *GcoreProvider) Resources(ctx context.Context) []func() resource.Resourc
 		cloud_k8s_cluster.NewResource,
 		fastedge_secret.NewResource,
 		fastedge_binary.NewResource,
+		fastedge_app.NewResource,
 		dns_zone.NewResource,
 		dns_zone_rrset.NewResource,
 		dns_network_mapping.NewResource,
@@ -266,6 +268,8 @@ func (p *GcoreProvider) DataSources(ctx context.Context) []func() datasource.Dat
 		cloud_k8s_cluster.NewCloudK8SClusterDataSource,
 		fastedge_secret.NewFastedgeSecretDataSource,
 		fastedge_binary.NewFastedgeBinaryDataSource,
+		fastedge_app.NewFastedgeAppDataSource,
+		fastedge_app.NewFastedgeAppsDataSource,
 		cdn_origin_group.NewCDNOriginGroupDataSource,
 	}
 }
