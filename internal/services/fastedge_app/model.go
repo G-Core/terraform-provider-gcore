@@ -1,0 +1,53 @@
+// File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
+
+package fastedge_app
+
+import (
+	"github.com/hashicorp/terraform-plugin-framework-timetypes/timetypes"
+	"github.com/hashicorp/terraform-plugin-framework/types"
+	"github.com/stainless-sdks/gcore-terraform/internal/apijson"
+	"github.com/stainless-sdks/gcore-terraform/internal/customfield"
+)
+
+type FastedgeAppModel struct {
+	ID            types.Int64                                          `tfsdk:"id" json:"id,computed"`
+	Binary        types.Int64                                          `tfsdk:"binary" json:"binary,optional"`
+	Comment       types.String                                         `tfsdk:"comment" json:"comment,optional"`
+	Log           types.String                                         `tfsdk:"log" json:"log,optional"`
+	Name          types.String                                         `tfsdk:"name" json:"name,optional"`
+	Status        types.Int64                                          `tfsdk:"status" json:"status,optional"`
+	Template      types.Int64                                          `tfsdk:"template" json:"template,optional"`
+	Env           *map[string]types.String                             `tfsdk:"env" json:"env,optional"`
+	RspHeaders    *map[string]types.String                             `tfsdk:"rsp_headers" json:"rsp_headers,optional"`
+	Debug         types.Bool                                           `tfsdk:"debug" json:"debug,computed_optional"`
+	Secrets       customfield.NestedObjectMap[FastedgeAppSecretsModel] `tfsdk:"secrets" json:"secrets,computed_optional"`
+	Stores        customfield.NestedObjectMap[FastedgeAppStoresModel]  `tfsdk:"stores" json:"stores,computed_optional"`
+	APIType       types.String                                         `tfsdk:"api_type" json:"api_type,computed"`
+	DebugUntil    timetypes.RFC3339                                    `tfsdk:"debug_until" json:"debug_until,computed" format:"date-time"`
+	Plan          types.String                                         `tfsdk:"plan" json:"plan,computed"`
+	PlanID        types.Int64                                          `tfsdk:"plan_id" json:"plan_id,computed"`
+	TemplateName  types.String                                         `tfsdk:"template_name" json:"template_name,computed"`
+	UpgradeableTo types.Int64                                          `tfsdk:"upgradeable_to" json:"upgradeable_to,computed,no_refresh"`
+	URL           types.String                                         `tfsdk:"url" json:"url,computed"`
+	Networks      customfield.List[types.String]                       `tfsdk:"networks" json:"networks,computed"`
+}
+
+func (m FastedgeAppModel) MarshalJSON() (data []byte, err error) {
+	return apijson.MarshalRoot(m)
+}
+
+func (m FastedgeAppModel) MarshalJSONForUpdate(state FastedgeAppModel) (data []byte, err error) {
+	return apijson.MarshalForPatch(m, state)
+}
+
+type FastedgeAppSecretsModel struct {
+	ID      types.Int64  `tfsdk:"id" json:"id,required"`
+	Comment types.String `tfsdk:"comment" json:"comment,computed"`
+	Name    types.String `tfsdk:"name" json:"name,computed"`
+}
+
+type FastedgeAppStoresModel struct {
+	ID      types.Int64  `tfsdk:"id" json:"id,required"`
+	Name    types.String `tfsdk:"name" json:"name,computed"`
+	Comment types.String `tfsdk:"comment" json:"comment,computed"`
+}
