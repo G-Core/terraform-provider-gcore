@@ -27,21 +27,6 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 				Computed:      true,
 				PlanModifiers: []planmodifier.Int64{int64planmodifier.UseStateForUnknown()},
 			},
-			"binary": schema.Int64Attribute{
-				Description: "Binary ID",
-				Optional:    true,
-			},
-			"comment": schema.StringAttribute{
-				Description: "App description",
-				Optional:    true,
-			},
-			"log": schema.StringAttribute{
-				Description: "Logging channel (by default - kafka, which allows exploring logs with API)\nAvailable values: \"kafka\", \"none\".",
-				Optional:    true,
-				Validators: []validator.String{
-					stringvalidator.OneOfCaseInsensitive("kafka", "none"),
-				},
-			},
 			"name": schema.StringAttribute{
 				Description: "App name",
 				Optional:    true,
@@ -64,11 +49,29 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 				Optional:    true,
 				ElementType: types.StringType,
 			},
+			"binary": schema.Int64Attribute{
+				Description: "Binary ID",
+				Computed:    true,
+				Optional:    true,
+			},
+			"comment": schema.StringAttribute{
+				Description: "App description",
+				Computed:    true,
+				Optional:    true,
+			},
 			"debug": schema.BoolAttribute{
 				Description: "Switch on logging for 30 minutes (switched off by default)",
 				Computed:    true,
 				Optional:    true,
 				Default:     booldefault.StaticBool(false),
+			},
+			"log": schema.StringAttribute{
+				Description: "Logging channel (by default - kafka, which allows exploring logs with API)\nAvailable values: \"kafka\", \"none\".",
+				Computed:    true,
+				Optional:    true,
+				Validators: []validator.String{
+					stringvalidator.OneOfCaseInsensitive("kafka", "none"),
+				},
 			},
 			"secrets": schema.MapNestedAttribute{
 				Description: "Application secrets",
