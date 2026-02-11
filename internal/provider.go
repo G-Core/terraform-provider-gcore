@@ -271,6 +271,9 @@ func (p *GcoreProvider) DataSources(ctx context.Context) []func() datasource.Dat
 		fastedge_app.NewFastedgeAppDataSource,
 		fastedge_app.NewFastedgeAppsDataSource,
 		cdn_origin_group.NewCDNOriginGroupDataSource,
+		dns_zone.NewDNSZoneDataSource,
+		dns_zone_rrset.NewDNSZoneRrsetDataSource,
+		dns_network_mapping.NewDNSNetworkMappingDataSource,
 	}
 }
 
