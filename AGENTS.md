@@ -319,6 +319,10 @@ If custom code is absolutely necessary:
 3. Document why custom code was needed vs fixing the OpenAPI spec
 4. Be prepared to resolve merge conflicts on regeneration
 
+## Plan Modifiers
+
+See the `plan-modifiers` skill (`.agents/skills/plan-modifiers/SKILL.md`) for conventions on creating and organizing custom Terraform plan modifiers.
+
 ## Local Development
 
 1. Build: `./scripts/build`
