@@ -72,8 +72,8 @@ type FastedgeAppSecretsDataSourceModel struct {
 
 type FastedgeAppStoresDataSourceModel struct {
 	ID      types.Int64  `tfsdk:"id" json:"id,computed"`
-	Name    types.String `tfsdk:"name" json:"name,computed"`
 	Comment types.String `tfsdk:"comment" json:"comment,computed"`
+	Name    types.String `tfsdk:"name" json:"name,computed"`
 }
 
 type FastedgeAppFindOneByDataSourceModel struct {
