@@ -48,6 +48,6 @@ type FastedgeAppSecretsModel struct {
 
 type FastedgeAppStoresModel struct {
 	ID      types.Int64  `tfsdk:"id" json:"id,required"`
-	Name    types.String `tfsdk:"name" json:"name,computed"`
 	Comment types.String `tfsdk:"comment" json:"comment,computed"`
+	Name    types.String `tfsdk:"name" json:"name,computed"`
 }

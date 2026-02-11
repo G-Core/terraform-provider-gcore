@@ -106,12 +106,12 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 							Description: "The identifier of the store",
 							Required:    true,
 						},
-						"name": schema.StringAttribute{
-							Description: "The name of the store",
-							Computed:    true,
-						},
 						"comment": schema.StringAttribute{
 							Description: "A description of the store",
+							Computed:    true,
+						},
+						"name": schema.StringAttribute{
+							Description: "The name of the store",
 							Computed:    true,
 						},
 					},
