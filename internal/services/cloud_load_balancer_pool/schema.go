@@ -7,7 +7,6 @@ import (
 
 	"github.com/hashicorp/terraform-plugin-framework-validators/int64validator"
 	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
-	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/booldefault"
@@ -16,47 +15,9 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringplanmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
-	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/stainless-sdks/gcore-terraform/internal/customfield"
+	"github.com/stainless-sdks/gcore-terraform/internal/planmodifiers"
 )
-
-// useEmptyListWhenConfigNull is a plan modifier that sets the plan value to an empty list
-// when the config value is null (attribute omitted from .tf file).
-// This is needed for computed_optional list attributes where omitting the attribute
-// should mean "clear the list" rather than "keep state value".
-// See: GCLOUD2-20778
-type useEmptyListWhenConfigNull struct{}
-
-func UseEmptyListWhenConfigNull() planmodifier.List {
-	return useEmptyListWhenConfigNull{}
-}
-
-func (m useEmptyListWhenConfigNull) Description(_ context.Context) string {
-	return "Sets plan to empty list when config is null, preserving state when plan is unknown during create."
-}
-
-func (m useEmptyListWhenConfigNull) MarkdownDescription(ctx context.Context) string {
-	return m.Description(ctx)
-}
-
-func (m useEmptyListWhenConfigNull) PlanModifyList(ctx context.Context, req planmodifier.ListRequest, resp *planmodifier.ListResponse) {
-	// If config is null (user omitted the attribute), set plan to empty list
-	// This ensures "no members in config" means "clear all members"
-	if req.ConfigValue.IsNull() {
-		// Only set to empty list if we have existing state (update scenario)
-		// During create, let the plan remain unknown so API can provide defaults
-		if !req.StateValue.IsNull() && !req.StateValue.IsUnknown() {
-			resp.PlanValue = types.ListValueMust(req.StateValue.ElementType(ctx), []attr.Value{})
-		}
-		return
-	}
-
-	// If plan is unknown and state has a value, use state (like UseStateForUnknown)
-	// This handles computed defaults during create
-	if req.PlanValue.IsUnknown() && !req.StateValue.IsNull() && !req.StateValue.IsUnknown() {
-		resp.PlanValue = req.StateValue
-	}
-}
 
 var _ resource.ResourceWithConfigValidators = (*CloudLoadBalancerPoolResource)(nil)
 
@@ -272,7 +233,7 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 					// Use custom modifier that sets empty list when config is null
 					// This ensures omitting `members` from .tf file removes all members
 					// See: GCLOUD2-20778
-					UseEmptyListWhenConfigNull(),
+					planmodifiers.UseEmptyListWhenConfigNull(),
 				},
 				NestedObject: schema.NestedAttributeObject{
 					Attributes: map[string]schema.Attribute{

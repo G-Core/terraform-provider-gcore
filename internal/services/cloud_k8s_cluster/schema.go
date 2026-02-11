@@ -28,6 +28,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-framework/types/basetypes"
 	"github.com/stainless-sdks/gcore-terraform/internal/customfield"
+	"github.com/stainless-sdks/gcore-terraform/internal/planmodifiers"
 )
 
 var _ resource.ResourceWithConfigValidators = (*CloudK8SClusterResource)(nil)
@@ -212,7 +213,7 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 				Description:   "The IPv6 pool for the pods",
 				Computed:      true,
 				Optional:      true,
-				PlanModifiers: []planmodifier.String{useStateForUnknownIncludingNullString(), stringplanmodifier.RequiresReplaceIfConfigured()},
+				PlanModifiers: []planmodifier.String{planmodifiers.UseStateForUnknownIncludingNullString(), stringplanmodifier.RequiresReplaceIfConfigured()},
 			},
 			"services_ip_pool": schema.StringAttribute{
 				Description:   "The IP pool for the services",
@@ -224,7 +225,7 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 				Description:   "The IPv6 pool for the services",
 				Computed:      true,
 				Optional:      true,
-				PlanModifiers: []planmodifier.String{useStateForUnknownIncludingNullString(), stringplanmodifier.RequiresReplaceIfConfigured()},
+				PlanModifiers: []planmodifier.String{planmodifiers.UseStateForUnknownIncludingNullString(), stringplanmodifier.RequiresReplaceIfConfigured()},
 			},
 			"csi": schema.SingleNestedAttribute{
 				Description: "Container Storage Interface (CSI) driver settings",
@@ -485,7 +486,7 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 				Computed:      true,
 				Optional:      true,
 				CustomType:    customfield.NewNestedObjectType[CloudK8SClusterDDOSProfileModel](ctx),
-				PlanModifiers: []planmodifier.Object{useStateForUnknownIncludingNullObject()},
+				PlanModifiers: []planmodifier.Object{planmodifiers.UseStateForUnknownIncludingNullObject()},
 				Attributes: map[string]schema.Attribute{
 					"enabled": schema.BoolAttribute{
 						Description: "Enable advanced DDoS protection",
@@ -528,7 +529,7 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 				Computed:      true,
 				Optional:      true,
 				CustomType:    customfield.NewNestedObjectType[CloudK8SClusterLoggingModel](ctx),
-				PlanModifiers: []planmodifier.Object{useStateForUnknownIncludingNullObject()},
+				PlanModifiers: []planmodifier.Object{planmodifiers.UseStateForUnknownIncludingNullObject()},
 				Attributes: map[string]schema.Attribute{
 					"destination_region_id": schema.Int64Attribute{
 						Description: "Destination region id to which the logs will be written",
@@ -1050,67 +1051,4 @@ func (v poolNamesUniqueValidator) ValidateList(_ context.Context, req validator.
 		}
 		namesSeen[name] = true
 	}
-}
-
-// useStateForUnknownIncludingNull is a plan modifier that preserves the state value
-// when the plan value is unknown, INCLUDING when the state value is null.
-// This differs from UseStateForUnknown() which leaves unknown plans as unknown when state is null.
-func useStateForUnknownIncludingNullString() planmodifier.String {
-	return useStateForUnknownIncludingNullStringModifier{}
-}
-
-type useStateForUnknownIncludingNullStringModifier struct{}
-
-func (m useStateForUnknownIncludingNullStringModifier) Description(_ context.Context) string {
-	return "Preserves the state value (including null) when the plan value is unknown"
-}
-
-func (m useStateForUnknownIncludingNullStringModifier) MarkdownDescription(_ context.Context) string {
-	return "Preserves the state value (including null) when the plan value is unknown"
-}
-
-func (m useStateForUnknownIncludingNullStringModifier) PlanModifyString(_ context.Context, req planmodifier.StringRequest, resp *planmodifier.StringResponse) {
-	// Do nothing if there is no state value (resource is being created)
-	if req.StateValue.IsNull() && req.PlanValue.IsUnknown() && req.State.Raw.IsNull() {
-		return
-	}
-
-	// If the plan value is not unknown, do nothing
-	if !req.PlanValue.IsUnknown() {
-		return
-	}
-
-	// Preserve the state value (including null) in the plan
-	resp.PlanValue = req.StateValue
-}
-
-// useStateForUnknownIncludingNullObject is a plan modifier for objects that preserves the state value
-// when the plan value is unknown, INCLUDING when the state value is null.
-func useStateForUnknownIncludingNullObject() planmodifier.Object {
-	return useStateForUnknownIncludingNullObjectModifier{}
-}
-
-type useStateForUnknownIncludingNullObjectModifier struct{}
-
-func (m useStateForUnknownIncludingNullObjectModifier) Description(_ context.Context) string {
-	return "Preserves the state value (including null) when the plan value is unknown"
-}
-
-func (m useStateForUnknownIncludingNullObjectModifier) MarkdownDescription(_ context.Context) string {
-	return "Preserves the state value (including null) when the plan value is unknown"
-}
-
-func (m useStateForUnknownIncludingNullObjectModifier) PlanModifyObject(_ context.Context, req planmodifier.ObjectRequest, resp *planmodifier.ObjectResponse) {
-	// Do nothing if there is no state (resource is being created)
-	if req.StateValue.IsNull() && req.PlanValue.IsUnknown() && req.State.Raw.IsNull() {
-		return
-	}
-
-	// If the plan value is not unknown, do nothing
-	if !req.PlanValue.IsUnknown() {
-		return
-	}
-
-	// Preserve the state value (including null) in the plan
-	resp.PlanValue = req.StateValue
 }

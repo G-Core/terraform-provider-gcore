@@ -29,7 +29,7 @@ func (m useNullForRemovalModifier) MarkdownDescription(_ context.Context) string
 	return "Uses null when the config value is explicitly removed, preserving state only when unknown."
 }
 
-func (m useNullForRemovalModifier) PlanModifyString(ctx context.Context, req planmodifier.StringRequest, resp *planmodifier.StringResponse) {
+func (m useNullForRemovalModifier) PlanModifyString(_ context.Context, req planmodifier.StringRequest, resp *planmodifier.StringResponse) {
 	// If the config value is unknown, use the state value (computed behavior)
 	if req.ConfigValue.IsUnknown() {
 		resp.PlanValue = req.StateValue

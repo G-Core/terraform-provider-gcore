@@ -22,51 +22,8 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/stainless-sdks/gcore-terraform/internal/customfield"
+	"github.com/stainless-sdks/gcore-terraform/internal/planmodifiers"
 )
-
-// requiresReplaceIfConfigured is a plan modifier that only requires replacement
-// when the user has explicitly configured a different value. If the config value
-// is null (user relies on environment variables), use the state value without
-// forcing replacement. This mimics the old provider's DiffSuppressFunc behavior
-// for project_id/region_id after import.
-type requiresReplaceIfConfigured struct{}
-
-func RequiresReplaceIfConfigured() planmodifier.Int64 {
-	return requiresReplaceIfConfigured{}
-}
-
-func (m requiresReplaceIfConfigured) Description(_ context.Context) string {
-	return "Requires replacement only when the user has explicitly configured a different value. " +
-		"If config is null (e.g., using environment variables), preserves state value without replacement."
-}
-
-func (m requiresReplaceIfConfigured) MarkdownDescription(ctx context.Context) string {
-	return m.Description(ctx)
-}
-
-func (m requiresReplaceIfConfigured) PlanModifyInt64(ctx context.Context, req planmodifier.Int64Request, resp *planmodifier.Int64Response) {
-	// If config is null (user didn't specify the value, likely using env vars),
-	// preserve the state value. This handles import scenarios where project_id/region_id
-	// are in state (from import ID) but not in the user's .tf config.
-	if req.ConfigValue.IsNull() {
-		if !req.StateValue.IsNull() && !req.StateValue.IsUnknown() {
-			// Preserve state value - user wants to use the imported/existing value
-			resp.PlanValue = req.StateValue
-		}
-		// Don't require replacement - user wants to use env vars / defaults
-		return
-	}
-
-	// If creating a new resource (state is null), no replacement needed
-	if req.StateValue.IsNull() {
-		return
-	}
-
-	// If config has an explicit value different from state, require replacement
-	if !req.ConfigValue.Equal(req.StateValue) {
-		resp.RequiresReplace = true
-	}
-}
 
 var _ resource.ResourceWithConfigValidators = (*CloudInstanceResource)(nil)
 
@@ -81,13 +38,13 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 				Description:   "Project ID. If not specified, uses GCORE_CLOUD_PROJECT_ID environment variable.",
 				Computed:      true,
 				Optional:      true,
-				PlanModifiers: []planmodifier.Int64{RequiresReplaceIfConfigured()},
+				PlanModifiers: []planmodifier.Int64{planmodifiers.RequiresReplaceIfConfiguredPreservingState()},
 			},
 			"region_id": schema.Int64Attribute{
 				Description:   "Region ID. If not specified, uses GCORE_CLOUD_REGION_ID environment variable.",
 				Computed:      true,
 				Optional:      true,
-				PlanModifiers: []planmodifier.Int64{RequiresReplaceIfConfigured()},
+				PlanModifiers: []planmodifier.Int64{planmodifiers.RequiresReplaceIfConfiguredPreservingState()},
 			},
 			"flavor": schema.StringAttribute{
 				Description: "The flavor of the instance.",
@@ -328,10 +285,10 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 				},
 			},
 			"addresses": schema.MapAttribute{
-				Description:   "Map of `network_name` to list of addresses in that network",
-				Computed:      true,
-				CustomType:    customfield.NewMapType[customfield.NestedObjectList[CloudInstanceAddressesModel]](ctx),
-					ElementType: types.ListType{
+				Description: "Map of `network_name` to list of addresses in that network",
+				Computed:    true,
+				CustomType:  customfield.NewMapType[customfield.NestedObjectList[CloudInstanceAddressesModel]](ctx),
+				ElementType: types.ListType{
 					ElemType: types.ObjectType{
 						AttrTypes: map[string]attr.Type{"addr": schema.StringAttribute{
 							Description: "Address",
