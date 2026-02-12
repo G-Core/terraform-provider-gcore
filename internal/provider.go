@@ -16,7 +16,6 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/provider/schema"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/types"
-	"github.com/stainless-sdks/gcore-terraform/internal/services/cdn_client_config"
 	"github.com/stainless-sdks/gcore-terraform/internal/services/cdn_origin_group"
 	"github.com/stainless-sdks/gcore-terraform/internal/services/cloud_file_share"
 	"github.com/stainless-sdks/gcore-terraform/internal/services/cloud_file_share_access_rule"
@@ -215,7 +214,6 @@ func (p *GcoreProvider) Resources(ctx context.Context) []func() resource.Resourc
 		dns_zone_rrset.NewResource,
 		dns_network_mapping.NewResource,
 		cdn_origin_group.NewResource,
-		cdn_client_config.NewResource,
 	}
 }
 
@@ -272,7 +270,6 @@ func (p *GcoreProvider) DataSources(ctx context.Context) []func() datasource.Dat
 		dns_zone_rrset.NewDNSZoneRrsetDataSource,
 		dns_network_mapping.NewDNSNetworkMappingDataSource,
 		cdn_origin_group.NewCDNOriginGroupDataSource,
-		cdn_client_config.NewCDNClientConfigDataSource,
 	}
 }
 
