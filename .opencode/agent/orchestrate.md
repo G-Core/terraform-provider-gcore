@@ -9,7 +9,6 @@ permission:
     "*": "allow"
     "explore": "allow"
     "general": "allow"
-    "acctest": "allow"
     "configurability": "allow"
   edit: "ask"
   bash: "ask"
@@ -38,7 +37,6 @@ Follow this loop for every task:
 |-------|-------|---------|
 | `explore` | Sonnet | Fast codebase exploration, finding files by pattern, searching code for keywords |
 | `general` | Sonnet | Complex multi-step research, executing tasks requiring multiple tools |
-| `acctest` | **Opus** | Generate and run acceptance tests, can delegate to `configurability` on errors |
 | `configurability` | **Opus** | Analyze and **fix** schema configurability issues (schema.go, model.go) |
 
 **Model Strategy:** This orchestrator uses Sonnet for lightweight coordination. Heavy lifting (test generation, schema fixes) is delegated to Opus-powered specialists.
@@ -56,16 +54,6 @@ Follow this loop for every task:
 - Tasks needing file reads + analysis + synthesis
 - Multi-step operations with dependencies between steps
 
-**Use `acctest` when:**
-- Planning acceptance test strategies for resources and data sources
-- Generating acceptance test files (`resource_test.go`, `data_source_test.go`)
-- Running acceptance tests with `TF_ACC=1 go test`
-- Creating sweeper implementations (`sweep.go`) for resource cleanup
-- Updating sweep registration in `internal/sweep/sweep_test.go`
-- Diagnosing and fixing test failures
-- Reviewing existing tests for best practice violations
-- Do NOT use for schema parity tests (those are Stainless-generated, not acceptance tests)
-
 **Use `configurability` when:**
 - Test fails with configurability errors (e.g., "cannot set computed attribute", "missing required argument")
 - Need to fix Required/Optional/Computed flags for attributes
@@ -73,12 +61,6 @@ Follow this loop for every task:
 - Adding plan modifiers (UseStateForUnknown, RequiresReplace)
 - Detecting and fixing contradictions in schema flag combinations
 - Proactively reviewing and fixing schema before running tests
-
-**Typical workflow: acctest → configurability (automatic)**
-The `acctest` agent can now **directly call `configurability`** when it encounters configurability errors. This means:
-- You can delegate to `acctest` and it will handle configurability issues autonomously
-- The `configurability` agent will **apply fixes** directly to schema.go and model.go
-- After fixes are applied, `acctest` can re-run tests to verify
 
 **What `configurability` does:**
 - Analyzes the error and identifies root cause
@@ -144,16 +126,11 @@ This is a **Stainless-generated** Terraform provider for Gcore cloud services.
 **User request:** "Test the cloud_ssh_key resource"
 
 **Your approach:**
-1. Delegate to `acctest`: Generate and run acceptance test
-2. Wait for results - `acctest` will:
-   - Run the test
-   - If configurability error occurs, **automatically delegate to `configurability`**
-   - `configurability` will **apply fixes** to schema.go/model.go
-   - `acctest` can re-run the test to verify
-3. Synthesize: Report test results and any fixes that were applied
-4. Evaluate: Test passes? Output completion marker.
-
-**Note:** You no longer need to manually coordinate between `acctest` and `configurability` - `acctest` handles this internally.
+1. Use the `acctest` skill to generate and run the acceptance test
+2. If configurability errors occur, delegate to `configurability` to fix schema.go/model.go
+3. Re-run the test to verify fixes
+4. Synthesize: Report test results and any fixes that were applied
+5. Evaluate: Test passes? Output completion marker.
 
 ### Example 3: Proactive Schema Review and Fix
 
@@ -181,7 +158,7 @@ This is a **Stainless-generated** Terraform provider for Gcore cloud services.
 
 ## Configurability Error Patterns
 
-These errors are now **handled automatically by `acctest`** (which delegates to `configurability`):
+When acceptance tests fail with these patterns, delegate to `configurability` to fix them:
 
 | Error Pattern | What Happens |
 |--------------|--------------|
@@ -190,8 +167,6 @@ These errors are now **handled automatically by `acctest`** (which delegates to 
 | `Provider produced inconsistent result` | `configurability` analyzes and fixes plan/state mismatch |
 | `unexpected value for "X"` | `configurability` adds appropriate modifiers |
 | `attribute "X" cannot be null` | `configurability` fixes nullability |
-
-**You typically don't need to manually delegate to `configurability`** - let `acctest` handle it. Only delegate directly to `configurability` for proactive schema reviews (before running tests).
 
 ## Response Style
 

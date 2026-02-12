@@ -72,7 +72,7 @@ TF_ACC=1 go test -parallel=4 -timeout=120m ./internal/services/cloud_load_balanc
 ```
 
 **AI Agent Support:**
-For generating, running, and debugging acceptance tests, use the `acctest` agent (`.opencode/agent/acctest.md`). This specialized agent can plan test strategies, generate complete test files, create sweeper implementations, and diagnose test failures.
+For generating, running, and debugging acceptance tests, use the `acctest` skill. This skill provides patterns for planning test strategies, generating complete test files, creating sweeper implementations, and diagnosing test failures.
 
 ### Test File Naming Convention
 
@@ -148,7 +148,7 @@ go test ./internal/sweep -v -sweep=all -sweep-allow-failures
 - 🤖 **Run sweepers periodically** (e.g., nightly in CI/CD) to prevent cost accumulation
 - 📝 **Implement sweepers for any resource that creates infrastructure**
 
-See `.opencode/agent/acctest.md` for detailed sweeper implementation guide.
+See the `acctest` skill for detailed sweeper implementation guide.
 
 ## Code Style Guidelines
 
