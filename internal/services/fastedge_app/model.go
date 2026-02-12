@@ -11,15 +11,15 @@ import (
 
 type FastedgeAppModel struct {
 	ID            types.Int64                                          `tfsdk:"id" json:"id,computed"`
-	Name          types.String                                         `tfsdk:"name" json:"name,optional"`
 	Status        types.Int64                                          `tfsdk:"status" json:"status,optional"`
 	Template      types.Int64                                          `tfsdk:"template" json:"template,optional"`
-	Env           *map[string]types.String                             `tfsdk:"env" json:"env,optional"`
-	RspHeaders    *map[string]types.String                             `tfsdk:"rsp_headers" json:"rsp_headers,optional"`
 	Binary        types.Int64                                          `tfsdk:"binary" json:"binary,computed_optional"`
 	Comment       types.String                                         `tfsdk:"comment" json:"comment,computed_optional"`
 	Debug         types.Bool                                           `tfsdk:"debug" json:"debug,computed_optional"`
 	Log           types.String                                         `tfsdk:"log" json:"log,computed_optional"`
+	Name          types.String                                         `tfsdk:"name" json:"name,computed_optional"`
+	Env           customfield.Map[types.String]                        `tfsdk:"env" json:"env,computed_optional"`
+	RspHeaders    customfield.Map[types.String]                        `tfsdk:"rsp_headers" json:"rsp_headers,computed_optional"`
 	Secrets       customfield.NestedObjectMap[FastedgeAppSecretsModel] `tfsdk:"secrets" json:"secrets,computed_optional"`
 	Stores        customfield.NestedObjectMap[FastedgeAppStoresModel]  `tfsdk:"stores" json:"stores,computed_optional"`
 	APIType       types.String                                         `tfsdk:"api_type" json:"api_type,computed"`
