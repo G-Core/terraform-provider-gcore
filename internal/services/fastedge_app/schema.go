@@ -27,10 +27,6 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 				Computed:      true,
 				PlanModifiers: []planmodifier.Int64{int64planmodifier.UseStateForUnknown()},
 			},
-			"name": schema.StringAttribute{
-				Description: "App name",
-				Optional:    true,
-			},
 			"status": schema.Int64Attribute{
 				Description: "Status code:  \n0 - draft (inactive)  \n1 - enabled  \n2 - disabled  \n3 - hourly call limit exceeded  \n4 - daily call limit exceeded  \n5 - suspended",
 				Optional:    true,
@@ -38,16 +34,6 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 			"template": schema.Int64Attribute{
 				Description: "Template ID",
 				Optional:    true,
-			},
-			"env": schema.MapAttribute{
-				Description: "Environment variables",
-				Optional:    true,
-				ElementType: types.StringType,
-			},
-			"rsp_headers": schema.MapAttribute{
-				Description: "Extra headers to add to the response",
-				Optional:    true,
-				ElementType: types.StringType,
 			},
 			"binary": schema.Int64Attribute{
 				Description: "Binary ID",
@@ -72,6 +58,25 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 				Validators: []validator.String{
 					stringvalidator.OneOfCaseInsensitive("kafka", "none"),
 				},
+			},
+			"name": schema.StringAttribute{
+				Description: "App name",
+				Computed:    true,
+				Optional:    true,
+			},
+			"env": schema.MapAttribute{
+				Description: "Environment variables",
+				Computed:    true,
+				Optional:    true,
+				CustomType:  customfield.NewMapType[types.String](ctx),
+				ElementType: types.StringType,
+			},
+			"rsp_headers": schema.MapAttribute{
+				Description: "Extra headers to add to the response",
+				Computed:    true,
+				Optional:    true,
+				CustomType:  customfield.NewMapType[types.String](ctx),
+				ElementType: types.StringType,
 			},
 			"secrets": schema.MapNestedAttribute{
 				Description: "Application secrets",
