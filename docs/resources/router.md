@@ -240,35 +240,35 @@ output "router_id" {
 
 ### Required
 
-- `name` (String)
+- `name` (String) The name of the router.
 
 ### Optional
 
-- `external_gateway_info` (Block List, Max: 1) (see [below for nested schema](#nestedblock--external_gateway_info))
-- `interfaces` (Block Set) (see [below for nested schema](#nestedblock--interfaces))
-- `project_id` (Number)
-- `project_name` (String)
-- `region_id` (Number)
-- `region_name` (String)
-- `routes` (Block List) (see [below for nested schema](#nestedblock--routes))
+- `external_gateway_info` (Block List, Max: 1) External gateway configuration for the router. (see [below for nested schema](#nestedblock--external_gateway_info))
+- `interfaces` (Block Set) Set of interfaces attached to the router. Each interface connects the router to a subnet. (see [below for nested schema](#nestedblock--interfaces))
+- `project_id` (Number) The id of the project. Either 'project_id' or 'project_name' must be specified.
+- `project_name` (String) The name of the project. Either 'project_id' or 'project_name' must be specified.
+- `region_id` (Number) The id of the region. Either 'region_id' or 'region_name' must be specified.
+- `region_name` (String) The name of the region. Either 'region_id' or 'region_name' must be specified.
+- `routes` (Block List) List of custom static routes to be advertised by the router. (see [below for nested schema](#nestedblock--routes))
 
 ### Read-Only
 
 - `id` (String) The ID of this resource.
-- `last_updated` (String)
+- `last_updated` (String) The timestamp of the last update.
 
 <a id="nestedblock--external_gateway_info"></a>
 ### Nested Schema for `external_gateway_info`
 
 Optional:
 
-- `enable_snat` (Boolean)
+- `enable_snat` (Boolean) Whether SNAT (Source Network Address Translation) is enabled on the external gateway.
 - `network_id` (String) Id of the external network
 - `type` (String) Must be 'manual' or 'default'
 
 Read-Only:
 
-- `external_fixed_ips` (List of Object) (see [below for nested schema](#nestedatt--external_gateway_info--external_fixed_ips))
+- `external_fixed_ips` (List of Object) List of external fixed IPs assigned to the router's gateway. (see [below for nested schema](#nestedatt--external_gateway_info--external_fixed_ips))
 
 <a id="nestedatt--external_gateway_info--external_fixed_ips"></a>
 ### Nested Schema for `external_gateway_info.external_fixed_ips`
@@ -290,10 +290,10 @@ Required:
 
 Read-Only:
 
-- `ip_address` (String)
-- `mac_address` (String)
-- `network_id` (String)
-- `port_id` (String)
+- `ip_address` (String) The IP address assigned to the router interface.
+- `mac_address` (String) The MAC address of the router interface.
+- `network_id` (String) The network ID the interface is connected to.
+- `port_id` (String) The port ID of the router interface.
 
 
 <a id="nestedblock--routes"></a>
@@ -301,7 +301,7 @@ Read-Only:
 
 Required:
 
-- `destination` (String)
+- `destination` (String) The CIDR of the destination network.
 - `nexthop` (String) IPv4 address to forward traffic to if it's destination IP matches 'destination' CIDR
 
 

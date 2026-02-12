@@ -118,24 +118,24 @@ output "subnet_id" {
 
 ### Required
 
-- `name` (String)
+- `name` (String) The name of the network.
 
 ### Optional
 
 - `create_router` (Boolean) Create external router to the network, default true
-- `metadata_map` (Map of String)
-- `project_id` (Number)
-- `project_name` (String)
-- `region_id` (Number)
-- `region_name` (String)
+- `metadata_map` (Map of String) A map of metadata key-value pairs to associate with the network.
+- `project_id` (Number) The id of the project. Either 'project_id' or 'project_name' must be specified.
+- `project_name` (String) The name of the project. Either 'project_id' or 'project_name' must be specified.
+- `region_id` (Number) The id of the region. Either 'region_id' or 'region_name' must be specified.
+- `region_name` (String) The name of the region. Either 'region_id' or 'region_name' must be specified.
 - `type` (String) 'vlan' or 'vxlan' network type is allowed. Default value is 'vxlan'
 
 ### Read-Only
 
 - `id` (String) The ID of this resource.
-- `last_updated` (String)
-- `metadata_read_only` (List of Object) (see [below for nested schema](#nestedatt--metadata_read_only))
-- `mtu` (Number)
+- `last_updated` (String) The timestamp of the last update.
+- `metadata_read_only` (List of Object) A list of read-only metadata items, e.g. tags set by the platform. (see [below for nested schema](#nestedatt--metadata_read_only))
+- `mtu` (Number) Maximum transmission unit (MTU) for the network.
 
 <a id="nestedatt--metadata_read_only"></a>
 ### Nested Schema for `metadata_read_only`
