@@ -27,10 +27,6 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 				Computed:      true,
 				PlanModifiers: []planmodifier.Int64{int64planmodifier.UseStateForUnknown()},
 			},
-			"status": schema.Int64Attribute{
-				Description: "Status code:  \n0 - draft (inactive)  \n1 - enabled  \n2 - disabled  \n3 - hourly call limit exceeded  \n4 - daily call limit exceeded  \n5 - suspended",
-				Optional:    true,
-			},
 			"template": schema.Int64Attribute{
 				Description: "Template ID",
 				Optional:    true,
@@ -61,6 +57,11 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 			},
 			"name": schema.StringAttribute{
 				Description: "App name",
+				Computed:    true,
+				Optional:    true,
+			},
+			"status": schema.Int64Attribute{
+				Description: "Status code:  \n0 - draft (inactive)  \n1 - enabled  \n2 - disabled  \n3 - hourly call limit exceeded  \n4 - daily call limit exceeded  \n5 - suspended",
 				Computed:    true,
 				Optional:    true,
 			},
