@@ -46,15 +46,17 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 							Computed:    true,
 						},
 						"value": schema.StringAttribute{
-							Description: "The value of the secret.",
+							Description: "The value of the secret. Write-only: sent to the API but never stored in state. Changes are detected by comparing the local SHA-256 hash with the server checksum.",
 							Optional:    true,
+							Sensitive:   true,
 						},
 					},
 				},
 			},
 			"app_count": schema.Int64Attribute{
-				Description: "The number of applications that use this secret.",
-				Computed:    true,
+				Description:   "The number of applications that use this secret.",
+				Computed:      true,
+				PlanModifiers: []planmodifier.Int64{int64planmodifier.UseStateForUnknown()},
 			},
 		},
 	}
