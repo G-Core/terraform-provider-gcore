@@ -1,3 +1,3 @@
-resource "gcore_fastedge_binary" "example_fastedge_binary" {
-  body = null
+resource "gcore_fastedge_binary" "example" {
+  filename = "path/to/your/wasm/binary.wasm"
 }

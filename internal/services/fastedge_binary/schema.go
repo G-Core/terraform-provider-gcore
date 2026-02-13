@@ -16,35 +16,41 @@ var _ resource.ResourceWithConfigValidators = (*FastedgeBinaryResource)(nil)
 
 func ResourceSchema(ctx context.Context) schema.Schema {
 	return schema.Schema{
+		Description: "Manages a FastEdge WebAssembly binary. Binaries are immutable - any change to the file content will trigger resource replacement.",
 		Attributes: map[string]schema.Attribute{
 			"id": schema.Int64Attribute{
 				Description:   "Binary ID",
 				Computed:      true,
 				PlanModifiers: []planmodifier.Int64{int64planmodifier.UseStateForUnknown(), int64planmodifier.RequiresReplace()},
 			},
-			"body": schema.StringAttribute{
-				Required:      true,
-				PlanModifiers: []planmodifier.String{stringplanmodifier.RequiresReplace()},
+			"filename": schema.StringAttribute{
+				Description: "Path to the WebAssembly binary file to upload. Changes to file content (detected via checksum) will trigger resource replacement.",
+				Required:    true,
 			},
 			"api_type": schema.StringAttribute{
-				Description: "Wasm API type",
-				Computed:    true,
+				Description:   "Wasm API type",
+				Computed:      true,
+				PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
 			},
 			"checksum": schema.StringAttribute{
-				Description: "MD5 hash of the binary",
-				Computed:    true,
+				Description:   "MD5 hash of the binary. Computed from the local file and verified against the API response.",
+				Computed:      true,
+				PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown(), stringplanmodifier.RequiresReplace()},
 			},
 			"source": schema.Int64Attribute{
-				Description: "Source language:  \n0 - unknown  \n1 - Rust  \n2 - JavaScript",
-				Computed:    true,
+				Description:   "Source language:  \n0 - unknown  \n1 - Rust  \n2 - JavaScript",
+				Computed:      true,
+				PlanModifiers: []planmodifier.Int64{int64planmodifier.UseStateForUnknown()},
 			},
 			"status": schema.Int64Attribute{
-				Description: "Status code:  \n0 - pending  \n1 - compiled  \n2 - compilation failed (errors available)  \n3 - compilation failed (errors not available)  \n4 - resulting binary exceeded the limit  \n5 - unsupported source language",
-				Computed:    true,
+				Description:   "Status code:  \n0 - pending  \n1 - compiled  \n2 - compilation failed (errors available)  \n3 - compilation failed (errors not available)  \n4 - resulting binary exceeded the limit  \n5 - unsupported source language",
+				Computed:      true,
+				PlanModifiers: []planmodifier.Int64{int64planmodifier.UseStateForUnknown()},
 			},
 			"unref_since": schema.StringAttribute{
-				Description: "Not used since (UTC)",
-				Computed:    true,
+				Description:   "Not used since (UTC)",
+				Computed:      true,
+				PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
 			},
 		},
 	}
