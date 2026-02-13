@@ -43,48 +43,54 @@ func resourceNetwork() *schema.Resource {
 		},
 
 		Schema: map[string]*schema.Schema{
-			"project_id": &schema.Schema{
-				Type:     schema.TypeInt,
-				Optional: true,
-				ExactlyOneOf: []string{
-					"project_id",
-					"project_name",
-				},
-				DiffSuppressFunc: suppressDiffProjectID,
+		"project_id": &schema.Schema{
+			Type:        schema.TypeInt,
+			Optional:    true,
+			Description: "The id of the project. Either 'project_id' or 'project_name' must be specified.",
+			ExactlyOneOf: []string{
+				"project_id",
+				"project_name",
 			},
-			"region_id": &schema.Schema{
-				Type:     schema.TypeInt,
-				Optional: true,
-				ExactlyOneOf: []string{
-					"region_id",
-					"region_name",
-				},
-				DiffSuppressFunc: suppressDiffRegionID,
+			DiffSuppressFunc: suppressDiffProjectID,
+		},
+		"region_id": &schema.Schema{
+			Type:        schema.TypeInt,
+			Optional:    true,
+			Description: "The id of the region. Either 'region_id' or 'region_name' must be specified.",
+			ExactlyOneOf: []string{
+				"region_id",
+				"region_name",
 			},
-			"project_name": &schema.Schema{
-				Type:     schema.TypeString,
-				Optional: true,
-				ExactlyOneOf: []string{
-					"project_id",
-					"project_name",
-				},
+			DiffSuppressFunc: suppressDiffRegionID,
+		},
+		"project_name": &schema.Schema{
+			Type:        schema.TypeString,
+			Optional:    true,
+			Description: "The name of the project. Either 'project_id' or 'project_name' must be specified.",
+			ExactlyOneOf: []string{
+				"project_id",
+				"project_name",
 			},
-			"region_name": &schema.Schema{
-				Type:     schema.TypeString,
-				Optional: true,
-				ExactlyOneOf: []string{
-					"region_id",
-					"region_name",
-				},
+		},
+		"region_name": &schema.Schema{
+			Type:        schema.TypeString,
+			Optional:    true,
+			Description: "The name of the region. Either 'region_id' or 'region_name' must be specified.",
+			ExactlyOneOf: []string{
+				"region_id",
+				"region_name",
 			},
-			"name": &schema.Schema{
-				Type:     schema.TypeString,
-				Required: true,
-			},
-			"mtu": &schema.Schema{
-				Type:     schema.TypeInt,
-				Computed: true,
-			},
+		},
+		"name": &schema.Schema{
+			Type:        schema.TypeString,
+			Required:    true,
+			Description: "The name of the network.",
+		},
+		"mtu": &schema.Schema{
+			Type:        schema.TypeInt,
+			Computed:    true,
+			Description: "Maximum transmission unit (MTU) for the network.",
+		},
 			"type": &schema.Schema{
 				Type:        schema.TypeString,
 				Optional:    true,
@@ -97,37 +103,43 @@ func resourceNetwork() *schema.Resource {
 				Default:     true,
 				Description: "Create external router to the network, default true",
 			},
-			"last_updated": &schema.Schema{
-				Type:     schema.TypeString,
-				Computed: true,
+		"last_updated": &schema.Schema{
+			Type:        schema.TypeString,
+			Computed:    true,
+			Description: "The timestamp of the last update.",
+		},
+		"metadata_map": &schema.Schema{
+			Type:        schema.TypeMap,
+			Optional:    true,
+			Description: "A map of metadata key-value pairs to associate with the network.",
+			Elem: &schema.Schema{
+				Type: schema.TypeString,
 			},
-			"metadata_map": &schema.Schema{
-				Type:     schema.TypeMap,
-				Optional: true,
-				Elem: &schema.Schema{
-					Type: schema.TypeString,
-				},
-			},
-			"metadata_read_only": &schema.Schema{
-				Type:     schema.TypeList,
-				Computed: true,
-				Elem: &schema.Resource{
-					Schema: map[string]*schema.Schema{
-						"key": {
-							Type:     schema.TypeString,
-							Computed: true,
-						},
-						"value": {
-							Type:     schema.TypeString,
-							Computed: true,
-						},
-						"read_only": {
-							Type:     schema.TypeBool,
-							Computed: true,
-						},
+		},
+		"metadata_read_only": &schema.Schema{
+			Type:        schema.TypeList,
+			Computed:    true,
+			Description: "A list of read-only metadata items, e.g. tags set by the platform.",
+			Elem: &schema.Resource{
+				Schema: map[string]*schema.Schema{
+					"key": {
+						Type:        schema.TypeString,
+						Computed:    true,
+						Description: "Metadata key.",
+					},
+					"value": {
+						Type:        schema.TypeString,
+						Computed:    true,
+						Description: "Metadata value.",
+					},
+					"read_only": {
+						Type:        schema.TypeBool,
+						Computed:    true,
+						Description: "Whether this metadata item is read-only.",
 					},
 				},
 			},
+		},
 		},
 	}
 }

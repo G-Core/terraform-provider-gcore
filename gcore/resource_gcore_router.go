@@ -41,143 +41,161 @@ func resourceRouter() *schema.Resource {
 		},
 
 		Schema: map[string]*schema.Schema{
-			"project_id": &schema.Schema{
-				Type:     schema.TypeInt,
-				Optional: true,
-				ExactlyOneOf: []string{
-					"project_id",
-					"project_name",
-				},
-				DiffSuppressFunc: suppressDiffProjectID,
+		"project_id": &schema.Schema{
+			Type:        schema.TypeInt,
+			Optional:    true,
+			Description: "The id of the project. Either 'project_id' or 'project_name' must be specified.",
+			ExactlyOneOf: []string{
+				"project_id",
+				"project_name",
 			},
-			"region_id": &schema.Schema{
-				Type:     schema.TypeInt,
-				Optional: true,
-				ExactlyOneOf: []string{
-					"region_id",
-					"region_name",
-				},
-				DiffSuppressFunc: suppressDiffRegionID,
+			DiffSuppressFunc: suppressDiffProjectID,
+		},
+		"region_id": &schema.Schema{
+			Type:        schema.TypeInt,
+			Optional:    true,
+			Description: "The id of the region. Either 'region_id' or 'region_name' must be specified.",
+			ExactlyOneOf: []string{
+				"region_id",
+				"region_name",
 			},
-			"project_name": &schema.Schema{
-				Type:     schema.TypeString,
-				Optional: true,
-				ExactlyOneOf: []string{
-					"project_id",
-					"project_name",
-				},
+			DiffSuppressFunc: suppressDiffRegionID,
+		},
+		"project_name": &schema.Schema{
+			Type:        schema.TypeString,
+			Optional:    true,
+			Description: "The name of the project. Either 'project_id' or 'project_name' must be specified.",
+			ExactlyOneOf: []string{
+				"project_id",
+				"project_name",
 			},
-			"region_name": &schema.Schema{
-				Type:     schema.TypeString,
-				Optional: true,
-				ExactlyOneOf: []string{
-					"region_id",
-					"region_name",
-				},
+		},
+		"region_name": &schema.Schema{
+			Type:        schema.TypeString,
+			Optional:    true,
+			Description: "The name of the region. Either 'region_id' or 'region_name' must be specified.",
+			ExactlyOneOf: []string{
+				"region_id",
+				"region_name",
 			},
-			"name": &schema.Schema{
-				Type:     schema.TypeString,
-				Required: true,
-			},
-			"external_gateway_info": {
-				Type:     schema.TypeList,
-				Optional: true,
-				Computed: true,
-				MaxItems: 1,
-				Elem: &schema.Resource{
-					Schema: map[string]*schema.Schema{
-						"type": {
-							Type:        schema.TypeString,
-							Description: "Must be 'manual' or 'default'",
-							Optional:    true,
-							Computed:    true,
-						},
-						"enable_snat": {
-							Type:     schema.TypeBool,
-							Optional: true,
-							Computed: true,
-						},
-						"network_id": {
-							Type:        schema.TypeString,
-							Description: "Id of the external network",
-							Optional:    true,
-							Computed:    true,
-						},
-						"external_fixed_ips": {
-							Type:     schema.TypeList,
-							Computed: true,
-							Elem: &schema.Resource{
-								Schema: map[string]*schema.Schema{
-									"ip_address": {
-										Type:     schema.TypeString,
-										Required: true,
-									},
-									"subnet_id": {
-										Type:     schema.TypeString,
-										Required: true,
-									},
+		},
+		"name": &schema.Schema{
+			Type:        schema.TypeString,
+			Required:    true,
+			Description: "The name of the router.",
+		},
+		"external_gateway_info": {
+			Type:        schema.TypeList,
+			Optional:    true,
+			Computed:    true,
+			MaxItems:    1,
+			Description: "External gateway configuration for the router.",
+			Elem: &schema.Resource{
+				Schema: map[string]*schema.Schema{
+					"type": {
+						Type:        schema.TypeString,
+						Description: "Must be 'manual' or 'default'",
+						Optional:    true,
+						Computed:    true,
+					},
+					"enable_snat": {
+						Type:        schema.TypeBool,
+						Optional:    true,
+						Computed:    true,
+						Description: "Whether SNAT (Source Network Address Translation) is enabled on the external gateway.",
+					},
+					"network_id": {
+						Type:        schema.TypeString,
+						Description: "Id of the external network",
+						Optional:    true,
+						Computed:    true,
+					},
+					"external_fixed_ips": {
+						Type:        schema.TypeList,
+						Computed:    true,
+						Description: "List of external fixed IPs assigned to the router's gateway.",
+						Elem: &schema.Resource{
+							Schema: map[string]*schema.Schema{
+								"ip_address": {
+									Type:        schema.TypeString,
+									Required:    true,
+									Description: "The external IP address assigned to the router.",
+								},
+								"subnet_id": {
+									Type:        schema.TypeString,
+									Required:    true,
+									Description: "The subnet ID of the external fixed IP.",
 								},
 							},
 						},
 					},
 				},
 			},
-			"interfaces": &schema.Schema{
-				Type:     schema.TypeSet,
-				Optional: true,
-				Set:      routerInterfaceUniqueID,
-				Elem: &schema.Resource{
-					Schema: map[string]*schema.Schema{
-						"type": {
-							Type:        schema.TypeString,
-							Description: "must be 'subnet'",
-							Required:    true,
-						},
-						"subnet_id": {
-							Type:        schema.TypeString,
-							Description: "Subnet for router interface must have a gateway IP",
-							Required:    true,
-						},
-						"port_id": {
-							Type:     schema.TypeString,
-							Computed: true,
-						},
-						"network_id": {
-							Type:     schema.TypeString,
-							Computed: true,
-						},
-						"mac_address": {
-							Type:     schema.TypeString,
-							Computed: true,
-						},
-						"ip_address": {
-							Type:     schema.TypeString,
-							Computed: true,
-						},
+		},
+		"interfaces": &schema.Schema{
+			Type:        schema.TypeSet,
+			Optional:    true,
+			Set:         routerInterfaceUniqueID,
+			Description: "Set of interfaces attached to the router. Each interface connects the router to a subnet.",
+			Elem: &schema.Resource{
+				Schema: map[string]*schema.Schema{
+					"type": {
+						Type:        schema.TypeString,
+						Description: "must be 'subnet'",
+						Required:    true,
+					},
+					"subnet_id": {
+						Type:        schema.TypeString,
+						Description: "Subnet for router interface must have a gateway IP",
+						Required:    true,
+					},
+					"port_id": {
+						Type:        schema.TypeString,
+						Computed:    true,
+						Description: "The port ID of the router interface.",
+					},
+					"network_id": {
+						Type:        schema.TypeString,
+						Computed:    true,
+						Description: "The network ID the interface is connected to.",
+					},
+					"mac_address": {
+						Type:        schema.TypeString,
+						Computed:    true,
+						Description: "The MAC address of the router interface.",
+					},
+					"ip_address": {
+						Type:        schema.TypeString,
+						Computed:    true,
+						Description: "The IP address assigned to the router interface.",
 					},
 				},
 			},
-			"routes": &schema.Schema{
-				Type:     schema.TypeList,
-				Optional: true,
-				Elem: &schema.Resource{
-					Schema: map[string]*schema.Schema{
-						"destination": &schema.Schema{
-							Type:     schema.TypeString,
-							Required: true,
-						},
-						"nexthop": &schema.Schema{
-							Type:        schema.TypeString,
-							Required:    true,
-							Description: "IPv4 address to forward traffic to if it's destination IP matches 'destination' CIDR",
-						},
+		},
+		"routes": &schema.Schema{
+			Type:        schema.TypeList,
+			Optional:    true,
+			Description: "List of custom static routes to be advertised by the router.",
+			Elem: &schema.Resource{
+				Schema: map[string]*schema.Schema{
+					"destination": &schema.Schema{
+						Type:        schema.TypeString,
+						Required:    true,
+						Description: "The CIDR of the destination network.",
+					},
+					"nexthop": &schema.Schema{
+						Type:        schema.TypeString,
+						Required:    true,
+						Description: "IPv4 address to forward traffic to if it's destination IP matches 'destination' CIDR",
 					},
 				},
 			},
-			"last_updated": &schema.Schema{
-				Type:     schema.TypeString,
-				Computed: true,
-			},
+		},
+		"last_updated": &schema.Schema{
+			Type:        schema.TypeString,
+			Computed:    true,
+			Description: "The timestamp of the last update.",
+		},
 		},
 	}
 }
