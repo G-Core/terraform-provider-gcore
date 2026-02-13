@@ -26,3 +26,11 @@ if [ "$REPO_STATUS" = "404" ]; then
   export GOPRIVATE=github.com/G-Core/gcore-go
 fi
 go mod tidy -e || true
+
+echo "==> Installing git hooks…"
+if command -v lefthook &> /dev/null; then
+  lefthook install
+else
+  echo "  lefthook not found. Install with: brew install lefthook"
+  echo "  Then run: lefthook install"
+fi

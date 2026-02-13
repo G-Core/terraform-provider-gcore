@@ -1,0 +1,16 @@
+pre-commit:
+  commands:
+    format:
+      glob: "*.go"
+      run: gofmt -s -w {staged_files}
+      stage_fixed: true
+
+pre-push:
+  commands:
+    build:
+      run: go build ./...
+    # Compile test files without running tests (catches build errors in _test.go)
+    build_tests:
+      run: go test -run=^$ ./...
+    test:
+      run: go test ./...
