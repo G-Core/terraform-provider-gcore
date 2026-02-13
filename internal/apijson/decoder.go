@@ -180,7 +180,7 @@ func (d *decoderBuilder) newTypeDecoder(t reflect.Type) decoderFunc {
 	if t.ConvertibleTo(reflect.TypeOf(time.Time{})) {
 		return d.newTimeTypeDecoder(t)
 	}
-	if t != reflect.TypeOf(jsontypes.Normalized{}) && t.ConvertibleTo(reflect.TypeOf(timetypes.RFC3339{})) {
+	if t != reflect.TypeOf(jsontypes.Normalized{}) && t != reflect.TypeOf(customfield.MetaStringValue{}) && t.ConvertibleTo(reflect.TypeOf(timetypes.RFC3339{})) {
 		return d.newCustomTimeTypeDecoder(t)
 	}
 	unmarshalerType := reflect.TypeOf((*json.Unmarshaler)(nil)).Elem()
@@ -933,6 +933,21 @@ func (d *decoderBuilder) newTerraformTypeDecoder(t reflect.Type) decoderFunc {
 			}
 			return nil
 		}
+	}
+
+	if t == reflect.TypeOf(customfield.MetaStringValue{}) {
+		// MetaStringValue stores plain strings (not JSON). We decode JSON strings and store the content.
+		return d.decodeTerraformPrimitive(func() any { return customfield.MetaStringNull() }, func(node gjson.Result, value reflect.Value, state *decoderState) error {
+			// For meta fields, the API returns JSON string values. We extract the actual string.
+			if node.Type == gjson.String {
+				value.Set(reflect.ValueOf(customfield.NewMetaStringValue(node.String())))
+				return nil
+			}
+			// For other JSON types (objects, arrays, numbers), store the raw JSON representation
+			// This handles edge cases where meta values might be complex types
+			value.Set(reflect.ValueOf(customfield.NewMetaStringValue(node.Raw)))
+			return nil
+		})
 	}
 
 	if (t == reflect.TypeOf(jsontypes.Normalized{})) {
