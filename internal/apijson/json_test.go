@@ -156,11 +156,6 @@ type JsonModel struct {
 	Map2 map[string]jsontypes.Normalized `tfsdk:"tfsdk_map2" json:"map2"`
 }
 
-// MetaStringModel simulates DNS zone meta field structure
-type MetaStringModel struct {
-	Meta *map[string]customfield.MetaStringValue `tfsdk:"tfsdk_meta" json:"meta,optional"`
-}
-
 func time2time(t time.Time) timetypes.RFC3339 {
 	return timetypes.NewRFC3339TimePointerValue(&t)
 }
@@ -399,17 +394,6 @@ var tests = map[string]struct {
 
 	"json_struct_nil1": {`{}`, JsonModel{}},
 	"json_struct_nil2": {`{}`, JsonModel{}},
-
-	// MetaStringValue encode/decode roundtrip tests
-	"meta_string_roundtrip_simple": {
-		`{"meta":{"geodns_link":"my-link","webhook":"https://example.com"}}`,
-		MetaStringModel{
-			Meta: &map[string]customfield.MetaStringValue{
-				"webhook":     customfield.NewMetaStringValue("https://example.com"),
-				"geodns_link": customfield.NewMetaStringValue("my-link"),
-			},
-		},
-	},
 }
 
 type ListWithNestedObj struct {
@@ -580,82 +564,6 @@ var encodeOnlyTests = map[string]struct {
 			Outer: P([]*structWithMap{
 				P(structWithMap{A: P(map[string]types.String{"a.b.*": types.StringValue("*")})}),
 			}),
-		},
-	},
-
-	// MetaStringValue tests - simulating DNS zone meta field
-	"meta_string_simple": {
-		`{"meta":{"webhook":"https://example.com/hook","webhook_method":"POST"}}`,
-		MetaStringModel{
-			Meta: &map[string]customfield.MetaStringValue{
-				"webhook":        customfield.NewMetaStringValue("https://example.com/hook"),
-				"webhook_method": customfield.NewMetaStringValue("POST"),
-			},
-		},
-	},
-
-	"meta_string_special_chars": {
-		`{"meta":{"special":"hello \"world\""}}`,
-		MetaStringModel{
-			Meta: &map[string]customfield.MetaStringValue{
-				"special": customfield.NewMetaStringValue(`hello "world"`),
-			},
-		},
-	},
-
-	"meta_string_empty": {
-		`{"meta":{"empty":""}}`,
-		MetaStringModel{
-			Meta: &map[string]customfield.MetaStringValue{
-				"empty": customfield.NewMetaStringValue(""),
-			},
-		},
-	},
-
-	"meta_string_nil": {
-		`{}`,
-		MetaStringModel{
-			Meta: nil,
-		},
-	},
-
-	// MetaStringValue with typed JSON values (record-level meta)
-	"meta_string_typed_number": {
-		`{"meta":{"weight":50}}`,
-		MetaStringModel{
-			Meta: &map[string]customfield.MetaStringValue{
-				"weight": customfield.NewMetaStringValue("50"),
-			},
-		},
-	},
-
-	"meta_string_typed_boolean": {
-		`{"meta":{"default":true}}`,
-		MetaStringModel{
-			Meta: &map[string]customfield.MetaStringValue{
-				"default": customfield.NewMetaStringValue("true"),
-			},
-		},
-	},
-
-	"meta_string_typed_array": {
-		`{"meta":{"countries":["US","CA"]}}`,
-		MetaStringModel{
-			Meta: &map[string]customfield.MetaStringValue{
-				"countries": customfield.NewMetaStringValue(`["US","CA"]`),
-			},
-		},
-	},
-
-	"meta_string_mixed_types": {
-		`{"meta":{"countries":["DE","FR"],"default":true,"notes":"Europe servers","weight":50}}`,
-		MetaStringModel{
-			Meta: &map[string]customfield.MetaStringValue{
-				"countries": customfield.NewMetaStringValue(`["DE","FR"]`),
-				"default":   customfield.NewMetaStringValue("true"),
-				"notes":     customfield.NewMetaStringValue("Europe servers"),
-				"weight":    customfield.NewMetaStringValue("50"),
-			},
 		},
 	},
 }

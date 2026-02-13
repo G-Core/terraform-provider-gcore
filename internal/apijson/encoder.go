@@ -167,7 +167,7 @@ func (e *encoder) newTypeEncoder(t reflect.Type) encoderFunc {
 	if t.ConvertibleTo(reflect.TypeOf(time.Time{})) {
 		return e.newTimeTypeEncoder()
 	}
-	if t != reflect.TypeOf(jsontypes.Normalized{}) && t != reflect.TypeOf(customfield.MetaStringValue{}) && t.ConvertibleTo(reflect.TypeOf(timetypes.RFC3339{})) {
+	if t != reflect.TypeOf(jsontypes.Normalized{}) && t.ConvertibleTo(reflect.TypeOf(timetypes.RFC3339{})) {
 		return e.newCustomTimeTypeEncoder()
 	}
 	if t == reflect.TypeOf((*big.Float)(nil)) {
@@ -555,18 +555,6 @@ func (e encoder) newTerraformTypeEncoder(t reflect.Type) encoderFunc {
 	} else if t.Implements(reflect.TypeOf((*customfield.MapLike)(nil)).Elem()) {
 		return e.terraformUnwrappedDynamicEncoder(func(value attr.Value) (any, diag.Diagnostics) {
 			return value.(customfield.MapLike).ValueAttr(ctx)
-		})
-	} else if t == reflect.TypeOf(customfield.MetaStringValue{}) {
-		// MetaStringValue stores plain strings. If the value is already valid JSON
-		// (number, boolean, array, object), pass it through as-is so the API receives
-		// the correct type. Otherwise, marshal it as a JSON string.
-		return e.handleNullAndUndefined(func(plan attr.Value, state attr.Value) ([]byte, error) {
-			val := plan.(customfield.MetaStringValue).ValueString()
-			raw := []byte(val)
-			if stdjson.Valid(raw) {
-				return raw, nil
-			}
-			return stdjson.Marshal(val)
 		})
 	} else if t == reflect.TypeOf(jsontypes.Normalized{}) {
 		return e.handleNullAndUndefined(func(plan attr.Value, state attr.Value) ([]byte, error) {

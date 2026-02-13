@@ -133,39 +133,6 @@ func (r *DNSZoneResource) Update(ctx context.Context, req resource.UpdateRequest
 		resp.Diagnostics.AddError("failed to deserialize http request", err.Error())
 		return
 	}
-
-	// The Replace API returns a partial response missing computed-only fields
-	// (status, records, rrsets_amount, dnssec_enabled, warnings).
-	// Do a follow-up GET and selectively populate only the missing computed fields.
-	readRes := new(http.Response)
-	_, err = r.client.DNS.Zones.Get(
-		ctx,
-		data.Name.ValueString(),
-		option.WithResponseBodyInto(&readRes),
-		option.WithMiddleware(logging.Middleware(ctx)),
-	)
-	if err != nil {
-		resp.Diagnostics.AddError("failed to read zone after update", err.Error())
-		return
-	}
-	var readData DNSZoneModel
-	readBytes, _ := io.ReadAll(readRes.Body)
-	err = apijson.Unmarshal(readBytes, &readData)
-	if err != nil {
-		resp.Diagnostics.AddError("failed to deserialize read response", err.Error())
-		return
-	}
-
-	// Copy computed-only fields from the GET response that the Replace didn't return
-	if data.DnssecEnabled.IsNull() || data.DnssecEnabled.IsUnknown() {
-		data.DnssecEnabled = readData.DnssecEnabled
-	}
-	if data.Status.IsNull() || data.Status.IsUnknown() {
-		data.Status = readData.Status
-	}
-	data.Warnings = readData.Warnings
-	data.Records = readData.Records
-	data.RrsetsAmount = readData.RrsetsAmount
 	data.ID = data.Name
 
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)

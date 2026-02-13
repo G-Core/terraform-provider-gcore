@@ -7,14 +7,11 @@ import (
 	"fmt"
 	"io"
 	"net/http"
-	"strings"
 
 	"github.com/G-Core/gcore-go"
 	"github.com/G-Core/gcore-go/dns"
 	"github.com/G-Core/gcore-go/option"
-	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
-	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/stainless-sdks/gcore-terraform/internal/apijson"
 	"github.com/stainless-sdks/gcore-terraform/internal/logging"
 )
@@ -22,7 +19,6 @@ import (
 // Ensure provider defined types fully satisfy framework interfaces.
 var _ resource.ResourceWithConfigure = (*DNSZoneRrsetResource)(nil)
 var _ resource.ResourceWithModifyPlan = (*DNSZoneRrsetResource)(nil)
-var _ resource.ResourceWithImportState = (*DNSZoneRrsetResource)(nil)
 
 func NewResource() resource.Resource {
 	return &DNSZoneRrsetResource{}
@@ -97,45 +93,7 @@ func (r *DNSZoneRrsetResource) Create(ctx context.Context, req resource.CreateRe
 }
 
 func (r *DNSZoneRrsetResource) Update(ctx context.Context, req resource.UpdateRequest, resp *resource.UpdateResponse) {
-	var data *DNSZoneRrsetModel
-	var state *DNSZoneRrsetModel
-
-	resp.Diagnostics.Append(req.Plan.Get(ctx, &data)...)
-	resp.Diagnostics.Append(req.State.Get(ctx, &state)...)
-
-	if resp.Diagnostics.HasError() {
-		return
-	}
-
-	dataBytes, err := data.MarshalJSONForUpdate(*state)
-	if err != nil {
-		resp.Diagnostics.AddError("failed to serialize http request", err.Error())
-		return
-	}
-	res := new(http.Response)
-	_, err = r.client.DNS.Zones.Rrsets.Replace(
-		ctx,
-		data.RrsetType.ValueString(),
-		dns.ZoneRrsetReplaceParams{
-			ZoneName:  data.ZoneName.ValueString(),
-			RrsetName: data.RrsetName.ValueString(),
-		},
-		option.WithRequestBody("application/json", dataBytes),
-		option.WithResponseBodyInto(&res),
-		option.WithMiddleware(logging.Middleware(ctx)),
-	)
-	if err != nil {
-		resp.Diagnostics.AddError("failed to make http request", err.Error())
-		return
-	}
-	bytes, _ := io.ReadAll(res.Body)
-	err = apijson.UnmarshalComputed(bytes, &data)
-	if err != nil {
-		resp.Diagnostics.AddError("failed to deserialize http request", err.Error())
-		return
-	}
-
-	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
+	// Update is not supported for this resource
 }
 
 func (r *DNSZoneRrsetResource) Read(ctx context.Context, req resource.ReadRequest, resp *resource.ReadResponse) {
@@ -168,7 +126,7 @@ func (r *DNSZoneRrsetResource) Read(ctx context.Context, req resource.ReadReques
 		return
 	}
 	bytes, _ := io.ReadAll(res.Body)
-	err = apijson.UnmarshalComputed(bytes, &data)
+	err = apijson.Unmarshal(bytes, &data)
 	if err != nil {
 		resp.Diagnostics.AddError("failed to deserialize http request", err.Error())
 		return
@@ -186,7 +144,6 @@ func (r *DNSZoneRrsetResource) Delete(ctx context.Context, req resource.DeleteRe
 		return
 	}
 
-	res := new(http.Response)
 	_, err := r.client.DNS.Zones.Rrsets.Delete(
 		ctx,
 		data.RrsetType.ValueString(),
@@ -194,13 +151,8 @@ func (r *DNSZoneRrsetResource) Delete(ctx context.Context, req resource.DeleteRe
 			ZoneName:  data.ZoneName.ValueString(),
 			RrsetName: data.RrsetName.ValueString(),
 		},
-		option.WithResponseBodyInto(&res),
 		option.WithMiddleware(logging.Middleware(ctx)),
 	)
-	// If resource already deleted externally, treat as success
-	if res != nil && res.StatusCode == 404 {
-		return
-	}
 	if err != nil {
 		resp.Diagnostics.AddError("failed to make http request", err.Error())
 		return
@@ -211,25 +163,4 @@ func (r *DNSZoneRrsetResource) Delete(ctx context.Context, req resource.DeleteRe
 
 func (r *DNSZoneRrsetResource) ModifyPlan(_ context.Context, _ resource.ModifyPlanRequest, _ *resource.ModifyPlanResponse) {
 
-}
-
-func (r *DNSZoneRrsetResource) ImportState(ctx context.Context, req resource.ImportStateRequest, resp *resource.ImportStateResponse) {
-	// Import format: zone_name/rrset_name/rrset_type
-	// Example: maxima.lt/www.maxima.lt/A
-	parts := strings.Split(req.ID, "/")
-	if len(parts) != 3 {
-		resp.Diagnostics.AddError(
-			"Invalid import ID",
-			fmt.Sprintf("Expected format: zone_name/rrset_name/rrset_type, got: %s", req.ID),
-		)
-		return
-	}
-
-	zoneName := parts[0]
-	rrsetName := parts[1]
-	rrsetType := parts[2]
-
-	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("zone_name"), types.StringValue(zoneName))...)
-	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("rrset_name"), types.StringValue(rrsetName))...)
-	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("rrset_type"), types.StringValue(rrsetType))...)
 }
