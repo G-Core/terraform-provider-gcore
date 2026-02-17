@@ -3,6 +3,7 @@
 package cloud_network
 
 import (
+	"github.com/hashicorp/terraform-plugin-framework-jsontypes/jsontypes"
 	"github.com/hashicorp/terraform-plugin-framework-timetypes/timetypes"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/stainless-sdks/gcore-terraform/internal/apijson"
@@ -16,7 +17,7 @@ type CloudNetworkModel struct {
 	CreateRouter        types.Bool                     `tfsdk:"create_router" json:"create_router,computed_optional,no_refresh"`
 	Type                types.String                   `tfsdk:"type" json:"type,computed_optional"`
 	Name                types.String                   `tfsdk:"name" json:"name,required"`
-	Tags                *map[string]types.String       `tfsdk:"tags" json:"tags,optional,no_refresh"`
+	Tags                jsontypes.Normalized           `tfsdk:"tags" json:"tags,optional,no_refresh"`
 	CreatedAt           timetypes.RFC3339              `tfsdk:"created_at" json:"created_at,computed" format:"date-time"`
 	CreatorTaskID       types.String                   `tfsdk:"creator_task_id" json:"creator_task_id,computed"`
 	Default             types.Bool                     `tfsdk:"default" json:"default,computed"`
