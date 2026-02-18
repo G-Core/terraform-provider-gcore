@@ -2,8 +2,6 @@ module github.com/stainless-sdks/gcore-terraform
 
 go 1.24.0
 
-toolchain go1.24.12
-
 require (
 	github.com/G-Core/gcore-go v0.33.0
 	github.com/davecgh/go-spew v1.1.1
