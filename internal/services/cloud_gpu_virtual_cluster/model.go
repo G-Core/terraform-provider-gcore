@@ -3,6 +3,7 @@
 package cloud_gpu_virtual_cluster
 
 import (
+	"github.com/hashicorp/terraform-plugin-framework-jsontypes/jsontypes"
 	"github.com/hashicorp/terraform-plugin-framework-timetypes/timetypes"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/stainless-sdks/gcore-terraform/internal/apijson"
@@ -16,7 +17,7 @@ type CloudGPUVirtualClusterModel struct {
 	Flavor          types.String                                `tfsdk:"flavor" json:"flavor,required"`
 	ServersCount    types.Int64                                 `tfsdk:"servers_count" json:"servers_count,required"`
 	ServersSettings *CloudGPUVirtualClusterServersSettingsModel `tfsdk:"servers_settings" json:"servers_settings,required"`
-	Tags            customfield.Map[types.String]               `tfsdk:"tags" json:"tags,computed_optional,no_refresh"`
+	Tags            jsontypes.Normalized                        `tfsdk:"tags" json:"tags,computed_optional,no_refresh"`
 	Name            types.String                                `tfsdk:"name" json:"name,required"`
 	CreatedAt       timetypes.RFC3339                           `tfsdk:"created_at" json:"created_at,computed" format:"date-time"`
 	Status          types.String                                `tfsdk:"status" json:"status,computed"`
