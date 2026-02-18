@@ -14,11 +14,11 @@ import (
 	"github.com/G-Core/gcore-go/cloud"
 	"github.com/G-Core/gcore-go/option"
 	"github.com/G-Core/gcore-go/packages/param"
+	"github.com/hashicorp/terraform-plugin-framework-jsontypes/jsontypes"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/stainless-sdks/gcore-terraform/internal/apijson"
-	"github.com/stainless-sdks/gcore-terraform/internal/customfield"
 	"github.com/stainless-sdks/gcore-terraform/internal/importpath"
 	"github.com/stainless-sdks/gcore-terraform/internal/logging"
 )
@@ -173,9 +173,8 @@ func (r *CloudGPUVirtualClusterResource) Update(ctx context.Context, req resourc
 			params.RegionID = param.NewOpt(data.RegionID.ValueInt64())
 		}
 		tagsMap := make(map[string]string)
-		tagsValue, _ := data.Tags.Value(ctx)
-		for k, v := range tagsValue {
-			tagsMap[k] = v.ValueString()
+		if tagsStr := data.Tags.ValueString(); tagsStr != "" {
+			_ = json.Unmarshal([]byte(tagsStr), &tagsMap)
 		}
 		params.OfUpdateTags = &cloud.GPUVirtualClusterActionParamsBodyUpdateTags{
 			Tags: tagsMap,
@@ -382,13 +381,14 @@ func (r *CloudGPUVirtualClusterResource) ImportState(ctx context.Context, req re
 		} `json:"servers_settings"`
 	}
 	if err := json.Unmarshal(bytes, &rawResponse); err == nil {
-		// tags: API returns array of {key, value} objects, but model expects map[string]string.
+		// tags: API returns array of {key, value} objects, but model expects JSON string.
 		if len(rawResponse.Tags) > 0 {
-			tagsMap := make(map[string]types.String, len(rawResponse.Tags))
+			tagsMap := make(map[string]string, len(rawResponse.Tags))
 			for _, tag := range rawResponse.Tags {
-				tagsMap[tag.Key] = types.StringValue(tag.Value)
+				tagsMap[tag.Key] = tag.Value
 			}
-			data.Tags = customfield.NewMapMust[types.String](ctx, tagsMap)
+			tagsJSON, _ := json.Marshal(tagsMap)
+			data.Tags = jsontypes.NewNormalizedValue(string(tagsJSON))
 		}
 
 		// user_data: API returns plain text, but users send base64 encoded.

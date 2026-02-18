@@ -15,7 +15,6 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/stainless-sdks/gcore-terraform/internal/apijson"
-	"github.com/stainless-sdks/gcore-terraform/internal/custom"
 	"github.com/stainless-sdks/gcore-terraform/internal/customfield"
 	"github.com/stainless-sdks/gcore-terraform/internal/importpath"
 	"github.com/stainless-sdks/gcore-terraform/internal/logging"
@@ -121,7 +120,7 @@ func (r *CloudFileShareResource) Update(ctx context.Context, req resource.Update
 	}
 
 	// Check if fields that can be updated using the Update method have changed
-	if !data.Name.Equal(state.Name) || !custom.TagsEqual(data.Tags, state.Tags) || !data.ShareSettings.Equal(state.ShareSettings) {
+	if !data.Name.Equal(state.Name) || !data.Tags.Equal(state.Tags) || !data.ShareSettings.Equal(state.ShareSettings) {
 		params := cloud.FileShareUpdateParams{}
 
 		if !data.ProjectID.IsNull() {
