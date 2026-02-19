@@ -40,6 +40,19 @@ func (m FastedgeAppModel) MarshalJSONForUpdate(state FastedgeAppModel) (data []b
 	return apijson.MarshalForPatch(m, state)
 }
 
+// MergeWithState fills in unknown plan values from state for fields that
+// the PUT schema requires but the user may not have set explicitly.
+// "binary" is computed from "template" by the API, and "status" defaults
+// to 1 (enabled) on creation — both are required by the PUT schema.
+func (m *FastedgeAppModel) MergeWithState(state *FastedgeAppModel) {
+	if m.Binary.IsUnknown() {
+		m.Binary = state.Binary
+	}
+	if m.Status.IsUnknown() {
+		m.Status = state.Status
+	}
+}
+
 type FastedgeAppSecretsModel struct {
 	ID      types.Int64  `tfsdk:"id" json:"id,required"`
 	Comment types.String `tfsdk:"comment" json:"comment,computed"`

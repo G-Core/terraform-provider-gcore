@@ -22,6 +22,7 @@ import (
 var _ resource.ResourceWithConfigure = (*FastedgeAppResource)(nil)
 var _ resource.ResourceWithModifyPlan = (*FastedgeAppResource)(nil)
 var _ resource.ResourceWithImportState = (*FastedgeAppResource)(nil)
+var _ resource.ResourceWithValidateConfig = (*FastedgeAppResource)(nil)
 
 func NewResource() resource.Resource {
 	return &FastedgeAppResource{}
@@ -88,6 +89,31 @@ func (r *FastedgeAppResource) Create(ctx context.Context, req resource.CreateReq
 		return
 	}
 
+	// Read the app back via GET to populate all computed fields that the
+	// Create response does not include (e.g. log, networks, template_name).
+	res = new(http.Response)
+	_, err = r.client.Fastedge.Apps.Get(
+		ctx,
+		data.ID.ValueInt64(),
+		option.WithResponseBodyInto(&res),
+		option.WithMiddleware(logging.Middleware(ctx)),
+	)
+	if err != nil {
+		resp.Diagnostics.AddError("failed to make http request", err.Error())
+		return
+	}
+	id := data.ID
+	bytes, _ = io.ReadAll(res.Body)
+	err = apijson.Unmarshal(bytes, &data)
+	if err != nil {
+		resp.Diagnostics.AddError("failed to deserialize http request", err.Error())
+		return
+	}
+	data.ID = id
+	if data.Debug.IsNull() {
+		data.Debug = types.BoolValue(false)
+	}
+
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
 }
 
@@ -108,16 +134,21 @@ func (r *FastedgeAppResource) Update(ctx context.Context, req resource.UpdateReq
 		return
 	}
 
-	dataBytes, err := data.MarshalJSONForUpdate(*state)
+	// The PUT schema requires "binary" and "status" but the user may not have
+	// set them (binary is computed from template, status defaults on create).
+	// Fill them in from state so the PUT body is valid.
+	data.MergeWithState(state)
+
+	dataBytes, err := data.MarshalJSON()
 	if err != nil {
 		resp.Diagnostics.AddError("failed to serialize http request", err.Error())
 		return
 	}
 	res := new(http.Response)
-	_, err = r.client.Fastedge.Apps.Update(
+	_, err = r.client.Fastedge.Apps.Replace(
 		ctx,
 		data.ID.ValueInt64(),
-		fastedge.AppUpdateParams{},
+		fastedge.AppReplaceParams{},
 		option.WithRequestBody("application/json", dataBytes),
 		option.WithResponseBodyInto(&res),
 		option.WithMiddleware(logging.Middleware(ctx)),
@@ -133,6 +164,31 @@ func (r *FastedgeAppResource) Update(ctx context.Context, req resource.UpdateReq
 		return
 	}
 
+	// Read the app back via GET to populate all computed fields that the
+	// Update response does not include (e.g. log, networks, template_name).
+	res = new(http.Response)
+	_, err = r.client.Fastedge.Apps.Get(
+		ctx,
+		data.ID.ValueInt64(),
+		option.WithResponseBodyInto(&res),
+		option.WithMiddleware(logging.Middleware(ctx)),
+	)
+	if err != nil {
+		resp.Diagnostics.AddError("failed to make http request", err.Error())
+		return
+	}
+	id := data.ID
+	bytes, _ = io.ReadAll(res.Body)
+	err = apijson.Unmarshal(bytes, &data)
+	if err != nil {
+		resp.Diagnostics.AddError("failed to deserialize http request", err.Error())
+		return
+	}
+	data.ID = id
+	if data.Debug.IsNull() {
+		data.Debug = types.BoolValue(false)
+	}
+
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
 }
 
@@ -144,6 +200,9 @@ func (r *FastedgeAppResource) Read(ctx context.Context, req resource.ReadRequest
 	if resp.Diagnostics.HasError() {
 		return
 	}
+
+	// Preserve the ID from state since the API GET response does not include it.
+	id := data.ID
 
 	res := new(http.Response)
 	_, err := r.client.Fastedge.Apps.Get(
@@ -166,6 +225,13 @@ func (r *FastedgeAppResource) Read(ctx context.Context, req resource.ReadRequest
 	if err != nil {
 		resp.Diagnostics.AddError("failed to deserialize http request", err.Error())
 		return
+	}
+
+	data.ID = id
+
+	// The API omits "debug" when false; default to false so state stays consistent.
+	if data.Debug.IsNull() {
+		data.Debug = types.BoolValue(false)
 	}
 
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
@@ -207,8 +273,6 @@ func (r *FastedgeAppResource) ImportState(ctx context.Context, req resource.Impo
 		return
 	}
 
-	data.ID = types.Int64Value(path)
-
 	res := new(http.Response)
 	_, err := r.client.Fastedge.Apps.Get(
 		ctx,
@@ -227,9 +291,43 @@ func (r *FastedgeAppResource) ImportState(ctx context.Context, req resource.Impo
 		return
 	}
 
+	// The API GET response does not include the ID; set it from the import path.
+	data.ID = types.Int64Value(path)
+
+	if data.Debug.IsNull() {
+		data.Debug = types.BoolValue(false)
+	}
+
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
 }
 
 func (r *FastedgeAppResource) ModifyPlan(_ context.Context, _ resource.ModifyPlanRequest, _ *resource.ModifyPlanResponse) {
 
+}
+
+func (r *FastedgeAppResource) ValidateConfig(ctx context.Context, req resource.ValidateConfigRequest, resp *resource.ValidateConfigResponse) {
+	var data FastedgeAppModel
+
+	resp.Diagnostics.Append(req.Config.Get(ctx, &data)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
+
+	templateSet := !data.Template.IsNull() && !data.Template.IsUnknown()
+	binarySet := !data.Binary.IsNull() && !data.Binary.IsUnknown()
+
+	if !templateSet && !binarySet {
+		resp.Diagnostics.AddError(
+			"Missing required attribute",
+			"Exactly one of \"template\" or \"binary\" must be specified.",
+		)
+	}
+
+	if templateSet && binarySet {
+		resp.Diagnostics.AddError(
+			"Conflicting attributes",
+			"Exactly one of \"template\" or \"binary\" must be specified, not both.",
+		)
+	}
 }
