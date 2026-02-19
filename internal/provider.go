@@ -18,6 +18,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/stainless-sdks/gcore-terraform/internal/services/cdn_certificate"
 	"github.com/stainless-sdks/gcore-terraform/internal/services/cdn_origin_group"
+	"github.com/stainless-sdks/gcore-terraform/internal/services/cdn_trusted_ca_certificate"
 	"github.com/stainless-sdks/gcore-terraform/internal/services/cloud_file_share"
 	"github.com/stainless-sdks/gcore-terraform/internal/services/cloud_file_share_access_rule"
 	"github.com/stainless-sdks/gcore-terraform/internal/services/cloud_floating_ip"
@@ -218,6 +219,7 @@ func (p *GcoreProvider) Resources(ctx context.Context) []func() resource.Resourc
 		dns_network_mapping.NewResource,
 		cdn_origin_group.NewResource,
 		cdn_certificate.NewResource,
+		cdn_trusted_ca_certificate.NewResource,
 	}
 }
 
@@ -277,6 +279,7 @@ func (p *GcoreProvider) DataSources(ctx context.Context) []func() datasource.Dat
 		dns_network_mapping.NewDNSNetworkMappingDataSource,
 		cdn_origin_group.NewCDNOriginGroupDataSource,
 		cdn_certificate.NewCDNCertificateDataSource,
+		cdn_trusted_ca_certificate.NewCDNTrustedCaCertificateDataSource,
 	}
 }
 

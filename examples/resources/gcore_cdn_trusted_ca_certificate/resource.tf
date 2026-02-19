@@ -1,0 +1,24 @@
+resource "gcore_cdn_trusted_ca_certificate" "example_cdn_trusted_ca_certificate" {
+  name = "Example CA cert"
+  ssl_certificate = <<EOT
+  -----BEGIN CERTIFICATE-----
+  MIIC0zCCAbugAwIBAgICA+gwDQYJKoZIhvcNAQELBQAwFjEUMBIGA1UEAwwLZXhh
+  bXBsZS5jb20wHhcNMjAwNjI2MTIwMzUzWhcNMjEwNjI2MTIwMzUzWjAWMRQwEgYD
+  VQQDDAtleGFtcGxlLmNvbTCCASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoCggEB
+  AN4nnSfTsMEnfPgL7rkbImxZAQoND+bpPoX8q16iXZz3fFfqdRk+uEIpU3Brleeg
+  p0zrrT2eI3+c2h/PRod0Fam4TO6EcfwuboUFzV3j6yw6aWdfBjWZsWBR/FoqWLYq
+  b3UejN7yiTYNSiIy3zVpi9pnFM8N8qT+VGBrRDGef2v9JCzhsSSU7wAYM5HKZTp+
+  WHojjiyB2hOYqft7A2WlTEDmHFa5UcPHMRZKATUYI1T2TRVqLlSiE2mJ3dFRXGM2
+  ZAS33J0NVUjkx3w8RmJ7DNflEFJt/6IXdfaokVgfza7LFarrQFQP/YURXEeJT7jm
+  DvKpZ/a8wu3ve6N4ykC+CBsCAwEAAaMrMCkwDwYDVR0TBAgwBgEB/wIBADAWBgNV
+  HREEDzANggtleGFtcGxlLmNvbTANBgkqhkiG9w0BAQsFAAOCAQEAovxY5lm89Eod
+  L8CH3dZzIH7nv8MXtwgpv2vth4PDq2btLS8xrqm2SsA/cV+DsbDjh5CxQLoDX+8V
+  g8NtY+ipOE0hdJAUo7UVlsxuAY4frkmLL1/RwpjZg+Z2NAxpR7xGWgoMn7CH481w
+  AOBypAuCxcfcyyAOttdS+YMRJnpL6z8/C3W0LGkNOs26Qhu1/U8lfz1f9F4XummD
+  u2SCmJsAd1PrL1shsyh4HtmFjuY698aTjYUDUleAnx7ytrGlZuLOIeoQi7tcsLJJ
+  TPMbxTLgGN2HEkdJerFRBNViuWvqioEyYlzZ3MshOCR2wsL4wrXrCF0Y3cNOYcIh
+  Z8z+wUAP2g==
+  -----END CERTIFICATE-----
+
+  EOT
+}
