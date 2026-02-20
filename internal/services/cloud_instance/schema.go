@@ -168,10 +168,10 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 							Description: "The name of the volume. If not specified, a name will be generated automatically.",
 							Optional:    true,
 						},
-						"tags": schema.MapAttribute{
+						"tags": schema.StringAttribute{
 							Description: "Key-value tags to associate with the resource. A tag is a key-value pair that can be associated with a resource, enabling efficient filtering and grouping for better organization and management. Both tag keys and values have a maximum length of 255 characters. Some tags are read-only and cannot be modified by the user. Tags are also integrated with cost reports, allowing cost data to be filtered based on tag keys or values.",
 							Optional:    true,
-							ElementType: types.StringType,
+							CustomType:  jsontypes.NormalizedType{},
 						},
 						"type_name": schema.StringAttribute{
 							Description: "Volume type name. Supported values:\n- `standard` - Network SSD block storage offering stable performance with high random I/O and data reliability (6 IOPS per 1 GiB, 0.4 MB/s per 1 GiB). Max IOPS: 4500. Max bandwidth: 300 MB/s.\n- `ssd_hiiops` - High-performance SSD storage for latency-sensitive transactional workloads (60 IOPS per 1 GiB, 2.5 MB/s per 1 GiB). Max IOPS: 9000. Max bandwidth: 500 MB/s.\n- `ssd_lowlatency` - SSD storage optimized for low-latency and real-time processing. Max IOPS: 5000. Average latency: 300 µs. Snapshots and volume resizing are **not** supported for `ssd_lowlatency`.\nAvailable values: \"cold\", \"ssd_hiiops\", \"ssd_local\", \"ssd_lowlatency\", \"standard\", \"ultra\".",
@@ -269,10 +269,10 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 				Description: "Instance name.",
 				Optional:    true,
 			},
-			"tags": schema.MapAttribute{
+			"tags": schema.StringAttribute{
 				Description: "Key-value tags to associate with the resource. A tag is a key-value pair that can be associated with a resource, enabling efficient filtering and grouping for better organization and management. Both tag keys and values have a maximum length of 255 characters. Some tags are read-only and cannot be modified by the user. Tags are also integrated with cost reports, allowing cost data to be filtered based on tag keys or values.",
 				Optional:    true,
-				ElementType: types.StringType,
+				CustomType:  jsontypes.NormalizedType{},
 			},
 			"created_at": schema.StringAttribute{
 				Description: "Datetime when instance was created",
