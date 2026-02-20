@@ -856,7 +856,9 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 					},
 					"response_headers_hiding_policy": schema.SingleNestedAttribute{
 						Description: "Hides HTTP headers from an origin server in the CDN response.",
+						Computed:    true,
 						Optional:    true,
+						CustomType:  customfield.NewNestedObjectType[CDNCDNResourceRuleOptionsResponseHeadersHidingPolicyModel](ctx),
 						Attributes: map[string]schema.Attribute{
 							"enabled": schema.BoolAttribute{
 								Description: "Controls the option state.\n\nPossible values:\n- **true** - Option is enabled.\n- **false** - Option is disabled.",
@@ -864,7 +866,9 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 							},
 							"excepted": schema.SetAttribute{
 								Description: "List of HTTP headers.\n\nParameter meaning depends on the value of the `mode` field:\n- **show** - List of HTTP headers to hide from response.\n- **hide** - List of HTTP headers to include in response. Other HTTP headers will be hidden.\n\nThe following headers are required and cannot be hidden from response:\n- `Connection`\n- `Content-Length`\n- `Content-Type`\n- `Date`\n- `Server`",
-								Required:    true,
+								Computed:    true,
+								Optional:    true,
+								CustomType:  customfield.NewSetType[types.String](ctx),
 								ElementType: types.StringType,
 							},
 							"mode": schema.StringAttribute{
