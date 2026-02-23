@@ -3,7 +3,6 @@
 package cloud_instance_image
 
 import (
-	"github.com/hashicorp/terraform-plugin-framework-jsontypes/jsontypes"
 	"github.com/hashicorp/terraform-plugin-framework-timetypes/timetypes"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/stainless-sdks/gcore-terraform/internal/apijson"
@@ -21,7 +20,7 @@ type CloudInstanceImageModel struct {
 	Name             types.String             `tfsdk:"name" json:"name,required"`
 	HwFirmwareType   types.String             `tfsdk:"hw_firmware_type" json:"hw_firmware_type,optional"`
 	HwMachineType    types.String             `tfsdk:"hw_machine_type" json:"hw_machine_type,optional"`
-	Tags             jsontypes.Normalized           `tfsdk:"tags" json:"tags,optional,no_refresh"`
+	Tags             *map[string]types.String       `tfsdk:"tags" json:"tags,optional,no_refresh"`
 	IsBaremetal      types.Bool               `tfsdk:"is_baremetal" json:"is_baremetal,computed_optional"`
 	OsType           types.String             `tfsdk:"os_type" json:"os_type,computed_optional"`
 	SSHKey           types.String             `tfsdk:"ssh_key" json:"ssh_key,computed_optional"`
