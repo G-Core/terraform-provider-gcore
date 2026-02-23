@@ -30,38 +30,15 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 				Required:      true,
 				PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown(), stringplanmodifier.RequiresReplace()},
 			},
-			"contact": schema.StringAttribute{
-				Description: "email address of the administrator responsible for this zone",
-				Optional:    true,
-			},
-			"expiry": schema.Int64Attribute{
-				Description: "number of seconds after which secondary name servers should stop answering request for this zone",
-				Optional:    true,
-			},
-			"nx_ttl": schema.Int64Attribute{
-				Description: "Time To Live of cache",
-				Optional:    true,
-			},
-			"primary_server": schema.StringAttribute{
-				Description: "primary master name server for zone",
-				Optional:    true,
-			},
-			"refresh": schema.Int64Attribute{
-				Description: "number of seconds after which secondary name servers should query the master for the SOA record, to detect zone changes.",
-				Optional:    true,
-			},
-			"retry": schema.Int64Attribute{
-				Description: "number of seconds after which secondary name servers should retry to request the serial number",
-				Optional:    true,
-			},
-			"serial": schema.Int64Attribute{
-				Description: "Serial number for this zone or Timestamp of zone modification moment.\nIf a secondary name server slaved to this one observes an increase in this number,\nthe slave will assume that the zone has been updated and initiate a zone transfer.",
-				Optional:    true,
-			},
 			"meta": schema.MapAttribute{
 				Description: "arbitrarily data of zone in json format\nyou can specify `webhook` url and `webhook_method` here\nwebhook will get a map with three arrays: for created, updated and deleted rrsets\n`webhook_method` can be omitted, POST will be used by default",
 				Optional:    true,
 				ElementType: jsontypes.NormalizedType{},
+			},
+			"contact": schema.StringAttribute{
+				Description: "email address of the administrator responsible for this zone",
+				Computed:    true,
+				Optional:    true,
 			},
 			"enabled": schema.BoolAttribute{
 				Description: "If a zone is disabled, then its records will not be resolved on dns servers",
@@ -69,8 +46,37 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 				Optional:    true,
 				Default:     booldefault.StaticBool(true),
 			},
+			"expiry": schema.Int64Attribute{
+				Description: "number of seconds after which secondary name servers should stop answering request for this zone",
+				Computed:    true,
+				Optional:    true,
+			},
+			"nx_ttl": schema.Int64Attribute{
+				Description: "Time To Live of cache",
+				Computed:    true,
+				Optional:    true,
+			},
+			"primary_server": schema.StringAttribute{
+				Description: "primary master name server for zone",
+				Computed:    true,
+				Optional:    true,
+			},
+			"refresh": schema.Int64Attribute{
+				Description: "number of seconds after which secondary name servers should query the master for the SOA record, to detect zone changes.",
+				Computed:    true,
+				Optional:    true,
+			},
+			"retry": schema.Int64Attribute{
+				Description: "number of seconds after which secondary name servers should retry to request the serial number",
+				Computed:    true,
+				Optional:    true,
+			},
 			"dnssec_enabled": schema.BoolAttribute{
 				Description: "describe dnssec status\ntrue means dnssec is enabled for the zone\nfalse means dnssec is disabled for the zone",
+				Computed:    true,
+			},
+			"serial": schema.Int64Attribute{
+				Description: "Serial number for this zone or Timestamp of zone modification moment.\nIf a secondary name server slaved to this one observes an increase in this number,\nthe slave will assume that the zone has been updated and initiate a zone transfer.",
 				Computed:    true,
 			},
 			"status": schema.StringAttribute{

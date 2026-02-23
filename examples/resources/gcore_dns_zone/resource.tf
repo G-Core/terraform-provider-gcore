@@ -12,5 +12,4 @@ resource "gcore_dns_zone" "example_dns_zone" {
   primary_server = "primary_server"
   refresh = 0
   retry = 0
-  serial = 0
 }
