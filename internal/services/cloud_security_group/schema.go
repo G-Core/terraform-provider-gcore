@@ -5,7 +5,6 @@ package cloud_security_group
 import (
 	"context"
 
-	"github.com/hashicorp/terraform-plugin-framework-jsontypes/jsontypes"
 	"github.com/hashicorp/terraform-plugin-framework-timetypes/timetypes"
 	"github.com/hashicorp/terraform-plugin-framework-validators/int64validator"
 	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
@@ -45,6 +44,11 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 			"description": schema.StringAttribute{
 				Description: "Security group description",
 				Optional:    true,
+			},
+			"tags": schema.MapAttribute{
+				Description: "Key-value tags to associate with the resource. A tag is a key-value pair that can be associated with a resource, enabling efficient filtering and grouping for better organization and management. Both tag keys and values have a maximum length of 255 characters. Some tags are read-only and cannot be modified by the user. Tags are also integrated with cost reports, allowing cost data to be filtered based on tag keys or values.",
+				Optional:    true,
+				ElementType: types.StringType,
 			},
 			"rules": schema.ListNestedAttribute{
 				Description: "Security group rules",
@@ -125,11 +129,6 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 						},
 					},
 				},
-			},
-			"tags": schema.StringAttribute{
-				Description: "Key-value tags to associate with the resource. A tag is a key-value pair that can be associated with a resource, enabling efficient filtering and grouping for better organization and management. Both tag keys and values have a maximum length of 255 characters. Some tags are read-only and cannot be modified by the user. Tags are also integrated with cost reports, allowing cost data to be filtered based on tag keys or values.",
-				Optional:    true,
-				CustomType:  jsontypes.NormalizedType{},
 			},
 			"created_at": schema.StringAttribute{
 				Description: "Datetime when the security group was created",
