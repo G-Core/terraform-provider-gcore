@@ -70,6 +70,7 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 			},
 			"weight": schema.Int64Attribute{
 				Description: "Rule execution order: from lowest (1) to highest.\n\nIf requested URI matches multiple rules, the one higher in the order of the rules will be applied.",
+				Computed:    true,
 				Optional:    true,
 				Validators: []validator.Int64{
 					int64validator.Between(1, 2147483647),

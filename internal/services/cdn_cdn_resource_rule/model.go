@@ -18,7 +18,7 @@ type CDNCDNResourceRuleModel struct {
 	Active                 types.Bool                                               `tfsdk:"active" json:"active,optional"`
 	OriginGroup            types.Int64                                              `tfsdk:"origin_group" json:"originGroup,optional"`
 	OverrideOriginProtocol types.String                                             `tfsdk:"override_origin_protocol" json:"overrideOriginProtocol,optional"`
-	Weight                 types.Int64                                              `tfsdk:"weight" json:"weight,optional"`
+	Weight                 types.Int64                                              `tfsdk:"weight" json:"weight,computed_optional"`
 	Options                customfield.NestedObject[CDNCDNResourceRuleOptionsModel] `tfsdk:"options" json:"options,computed_optional"`
 	Deleted                types.Bool                                               `tfsdk:"deleted" json:"deleted,computed"`
 	OriginProtocol         types.String                                             `tfsdk:"origin_protocol" json:"originProtocol,computed"`
