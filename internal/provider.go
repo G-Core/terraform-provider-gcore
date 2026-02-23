@@ -45,6 +45,7 @@ import (
 	"github.com/stainless-sdks/gcore-terraform/internal/services/cloud_reserved_fixed_ip"
 	"github.com/stainless-sdks/gcore-terraform/internal/services/cloud_secret"
 	"github.com/stainless-sdks/gcore-terraform/internal/services/cloud_security_group"
+	"github.com/stainless-sdks/gcore-terraform/internal/services/cloud_security_group_rule"
 	"github.com/stainless-sdks/gcore-terraform/internal/services/cloud_ssh_key"
 	"github.com/stainless-sdks/gcore-terraform/internal/services/cloud_volume"
 	"github.com/stainless-sdks/gcore-terraform/internal/services/dns_network_mapping"
@@ -203,6 +204,7 @@ func (p *GcoreProvider) Resources(ctx context.Context) []func() resource.Resourc
 		cloud_volume.NewResource,
 		cloud_floating_ip.NewResource,
 		cloud_security_group.NewResource,
+		cloud_security_group_rule.NewResource,
 		cloud_inference_deployment.NewResource,
 		cloud_inference_registry_credential.NewResource,
 		cloud_inference_secret.NewResource,
