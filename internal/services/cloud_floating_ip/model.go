@@ -3,7 +3,6 @@
 package cloud_floating_ip
 
 import (
-	"github.com/hashicorp/terraform-plugin-framework-jsontypes/jsontypes"
 	"github.com/hashicorp/terraform-plugin-framework-timetypes/timetypes"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/stainless-sdks/gcore-terraform/internal/apijson"
@@ -14,7 +13,7 @@ type CloudFloatingIPModel struct {
 	ID                types.String                   `tfsdk:"id" json:"id,computed"`
 	ProjectID         types.Int64                    `tfsdk:"project_id" path:"project_id,optional"`
 	RegionID          types.Int64                    `tfsdk:"region_id" path:"region_id,optional"`
-	Tags              jsontypes.Normalized           `tfsdk:"tags" json:"tags,optional,no_refresh"`
+	Tags              *map[string]types.String       `tfsdk:"tags" json:"tags,optional,no_refresh"`
 	FixedIPAddress    types.String                   `tfsdk:"fixed_ip_address" json:"fixed_ip_address,computed_optional"`
 	PortID            types.String                   `tfsdk:"port_id" json:"port_id,computed_optional"`
 	CreatedAt         timetypes.RFC3339              `tfsdk:"created_at" json:"created_at,computed" format:"date-time"`

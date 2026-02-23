@@ -27,7 +27,7 @@ type CloudInstanceModel struct {
 	Configuration       *map[string]jsontypes.Normalized                                           `tfsdk:"configuration" json:"configuration,optional,no_refresh"`
 	SecurityGroups      *[]*CloudInstanceSecurityGroupsModel                                       `tfsdk:"security_groups" json:"security_groups,optional"`
 	Name                types.String                                                               `tfsdk:"name" json:"name,optional"`
-	Tags                jsontypes.Normalized                                                       `tfsdk:"tags" json:"tags,optional,no_refresh"`
+	Tags                *map[string]types.String                                                   `tfsdk:"tags" json:"tags,optional,no_refresh"`
 	CreatedAt           timetypes.RFC3339                                                          `tfsdk:"created_at" json:"created_at,computed" format:"date-time"`
 	CreatorTaskID       types.String                                                               `tfsdk:"creator_task_id" json:"creator_task_id,computed"`
 	InstanceDescription types.String                                                               `tfsdk:"instance_description" json:"instance_description,computed"`
@@ -74,18 +74,18 @@ type CloudInstanceInterfacesFloatingIPModel struct {
 }
 
 type CloudInstanceVolumesModel struct {
-	Size                types.Int64          `tfsdk:"size" json:"size,optional,no_refresh"`
-	Source              types.String         `tfsdk:"source" json:"source,required,no_refresh"`
-	AttachmentTag       types.String         `tfsdk:"attachment_tag" json:"attachment_tag,optional,no_refresh"`
-	DeleteOnTermination types.Bool           `tfsdk:"delete_on_termination" json:"delete_on_termination,computed_optional"`
-	Name                types.String         `tfsdk:"name" json:"name,optional,no_refresh"`
-	Tags                jsontypes.Normalized `tfsdk:"tags" json:"tags,optional,no_refresh"`
-	TypeName            types.String         `tfsdk:"type_name" json:"type_name,optional,no_refresh"`
-	ImageID             types.String         `tfsdk:"image_id" json:"image_id,optional,no_refresh"`
-	BootIndex           types.Int64          `tfsdk:"boot_index" json:"boot_index,optional,no_refresh"`
-	SnapshotID          types.String         `tfsdk:"snapshot_id" json:"snapshot_id,optional,no_refresh"`
-	ApptemplateID       types.String         `tfsdk:"apptemplate_id" json:"apptemplate_id,optional,no_refresh"`
-	VolumeID            types.String         `tfsdk:"volume_id" json:"volume_id,optional,no_refresh"`
+	Size                types.Int64              `tfsdk:"size" json:"size,optional,no_refresh"`
+	Source              types.String             `tfsdk:"source" json:"source,required,no_refresh"`
+	AttachmentTag       types.String             `tfsdk:"attachment_tag" json:"attachment_tag,optional,no_refresh"`
+	DeleteOnTermination types.Bool               `tfsdk:"delete_on_termination" json:"delete_on_termination,computed_optional"`
+	Name                types.String             `tfsdk:"name" json:"name,optional,no_refresh"`
+	Tags                *map[string]types.String `tfsdk:"tags" json:"tags,optional,no_refresh"`
+	TypeName            types.String             `tfsdk:"type_name" json:"type_name,optional,no_refresh"`
+	ImageID             types.String             `tfsdk:"image_id" json:"image_id,optional,no_refresh"`
+	BootIndex           types.Int64              `tfsdk:"boot_index" json:"boot_index,optional,no_refresh"`
+	SnapshotID          types.String             `tfsdk:"snapshot_id" json:"snapshot_id,optional,no_refresh"`
+	ApptemplateID       types.String             `tfsdk:"apptemplate_id" json:"apptemplate_id,optional,no_refresh"`
+	VolumeID            types.String             `tfsdk:"volume_id" json:"volume_id,optional,no_refresh"`
 }
 
 type CloudInstanceSecurityGroupsModel struct {
