@@ -23,6 +23,10 @@ var _ datasource.DataSourceWithConfigValidators = (*CloudRegionsDataSource)(nil)
 func ListDataSourceSchema(ctx context.Context) schema.Schema {
 	return schema.Schema{
 		Attributes: map[string]schema.Attribute{
+			"display_name": schema.StringAttribute{
+				Description: "Filter regions by display name. Case-insensitive exact match.",
+				Optional:    true,
+			},
 			"product": schema.StringAttribute{
 				Description: "If defined then return only regions that support given product.\nAvailable values: \"containers\", \"inference\".",
 				Optional:    true,
