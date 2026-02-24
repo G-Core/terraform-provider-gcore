@@ -2,3 +2,5 @@
 dist/
 terraform-provider-gcore
 .lefthook-local.yml
+.env
+.envrc
