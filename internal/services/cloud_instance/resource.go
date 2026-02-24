@@ -15,7 +15,6 @@ import (
 	"github.com/G-Core/gcore-go/option"
 	"github.com/G-Core/gcore-go/packages/param"
 	"github.com/G-Core/gcore-go/shared/constant"
-	"github.com/hashicorp/terraform-plugin-framework-jsontypes/jsontypes"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-log/tflog"
@@ -1325,10 +1324,10 @@ func (r *CloudInstanceResource) ImportState(ctx context.Context, req resource.Im
 
 		// Extract tags from API response
 		// API returns: "tags": [{"key": "k1", "value": "v1", "read_only": bool}, ...]
-		// Resource model uses: jsontypes.Normalized (JSON string)
+		// Resource model uses: map[string]string
 		// Note: Skip read_only tags as they are system-generated (e.g., image_id, os_distro)
 		if tagsArr, ok := rawResponse["tags"].([]interface{}); ok && len(tagsArr) > 0 {
-			tags := make(map[string]string, len(tagsArr))
+			tags := make(map[string]types.String, len(tagsArr))
 			for _, tag := range tagsArr {
 				tagMap, ok := tag.(map[string]interface{})
 				if !ok {
@@ -1341,12 +1340,11 @@ func (r *CloudInstanceResource) ImportState(ctx context.Context, req resource.Im
 				key, keyOk := tagMap["key"].(string)
 				value, valueOk := tagMap["value"].(string)
 				if keyOk && valueOk {
-					tags[key] = value
+					tags[key] = types.StringValue(value)
 				}
 			}
 			if len(tags) > 0 {
-				tagsJSON, _ := json.Marshal(tags)
-				data.Tags = jsontypes.NewNormalizedValue(string(tagsJSON))
+				data.Tags = &tags
 			}
 		}
 	}

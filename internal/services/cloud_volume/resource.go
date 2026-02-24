@@ -15,6 +15,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/stainless-sdks/gcore-terraform/internal/apijson"
+	"github.com/stainless-sdks/gcore-terraform/internal/custom"
 	"github.com/stainless-sdks/gcore-terraform/internal/importpath"
 	"github.com/stainless-sdks/gcore-terraform/internal/logging"
 )
@@ -152,7 +153,7 @@ func (r *CloudVolumeResource) Update(ctx context.Context, req resource.UpdateReq
 
 	// Check if name or tags have changed before sending update request
 	nameChanged := !data.Name.Equal(state.Name)
-	tagsChanged := !data.Tags.Equal(state.Tags)
+	tagsChanged := !custom.TagsEqual(data.Tags, state.Tags)
 
 	// Only send update request if name or tags changed
 	if nameChanged || tagsChanged {
