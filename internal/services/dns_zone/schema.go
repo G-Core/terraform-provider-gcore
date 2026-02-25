@@ -5,10 +5,12 @@ package dns_zone
 import (
 	"context"
 
-	"github.com/hashicorp/terraform-plugin-framework-jsontypes/jsontypes"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/booldefault"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/boolplanmodifier"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/int64planmodifier"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/objectplanmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringplanmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/types"
@@ -30,15 +32,50 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 				Required:      true,
 				PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown(), stringplanmodifier.RequiresReplace()},
 			},
+			"contact": schema.StringAttribute{
+				Description:   "email address of the administrator responsible for this zone",
+				Computed:      true,
+				Optional:      true,
+				PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
+			},
+			"expiry": schema.Int64Attribute{
+				Description:   "number of seconds after which secondary name servers should stop answering request for this zone",
+				Computed:      true,
+				Optional:      true,
+				PlanModifiers: []planmodifier.Int64{int64planmodifier.UseStateForUnknown()},
+			},
+			"nx_ttl": schema.Int64Attribute{
+				Description:   "Time To Live of cache",
+				Computed:      true,
+				Optional:      true,
+				PlanModifiers: []planmodifier.Int64{int64planmodifier.UseStateForUnknown()},
+			},
+			"primary_server": schema.StringAttribute{
+				Description:   "primary master name server for zone",
+				Computed:      true,
+				Optional:      true,
+				PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
+			},
+			"refresh": schema.Int64Attribute{
+				Description:   "number of seconds after which secondary name servers should query the master for the SOA record, to detect zone changes.",
+				Computed:      true,
+				Optional:      true,
+				PlanModifiers: []planmodifier.Int64{int64planmodifier.UseStateForUnknown()},
+			},
+			"retry": schema.Int64Attribute{
+				Description:   "number of seconds after which secondary name servers should retry to request the serial number",
+				Computed:      true,
+				Optional:      true,
+				PlanModifiers: []planmodifier.Int64{int64planmodifier.UseStateForUnknown()},
+			},
+			"serial": schema.Int64Attribute{
+				Description: "Serial number for this zone. Server-managed: always derived from the zone's last modification timestamp.",
+				Computed:    true,
+			},
 			"meta": schema.MapAttribute{
 				Description: "arbitrarily data of zone in json format\nyou can specify `webhook` url and `webhook_method` here\nwebhook will get a map with three arrays: for created, updated and deleted rrsets\n`webhook_method` can be omitted, POST will be used by default",
 				Optional:    true,
-				ElementType: jsontypes.NormalizedType{},
-			},
-			"contact": schema.StringAttribute{
-				Description: "email address of the administrator responsible for this zone",
-				Computed:    true,
-				Optional:    true,
+				ElementType: customfield.MetaStringType{},
 			},
 			"enabled": schema.BoolAttribute{
 				Description: "If a zone is disabled, then its records will not be resolved on dns servers",
@@ -46,41 +83,15 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 				Optional:    true,
 				Default:     booldefault.StaticBool(true),
 			},
-			"expiry": schema.Int64Attribute{
-				Description: "number of seconds after which secondary name servers should stop answering request for this zone",
-				Computed:    true,
-				Optional:    true,
-			},
-			"nx_ttl": schema.Int64Attribute{
-				Description: "Time To Live of cache",
-				Computed:    true,
-				Optional:    true,
-			},
-			"primary_server": schema.StringAttribute{
-				Description: "primary master name server for zone",
-				Computed:    true,
-				Optional:    true,
-			},
-			"refresh": schema.Int64Attribute{
-				Description: "number of seconds after which secondary name servers should query the master for the SOA record, to detect zone changes.",
-				Computed:    true,
-				Optional:    true,
-			},
-			"retry": schema.Int64Attribute{
-				Description: "number of seconds after which secondary name servers should retry to request the serial number",
-				Computed:    true,
-				Optional:    true,
-			},
 			"dnssec_enabled": schema.BoolAttribute{
-				Description: "describe dnssec status\ntrue means dnssec is enabled for the zone\nfalse means dnssec is disabled for the zone",
-				Computed:    true,
-			},
-			"serial": schema.Int64Attribute{
-				Description: "Serial number for this zone or Timestamp of zone modification moment.\nIf a secondary name server slaved to this one observes an increase in this number,\nthe slave will assume that the zone has been updated and initiate a zone transfer.",
-				Computed:    true,
+				Description:   "Whether DNSSEC is enabled for the zone. Set to true to enable DNSSEC, false to disable. Managed via a separate API endpoint.",
+				Computed:      true,
+				Optional:      true,
+				PlanModifiers: []planmodifier.Bool{boolplanmodifier.UseStateForUnknown()},
 			},
 			"status": schema.StringAttribute{
-				Computed: true,
+				Computed:      true,
+				PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
 			},
 			"warnings": schema.ListAttribute{
 				Computed:    true,
@@ -110,8 +121,9 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 				},
 			},
 			"rrsets_amount": schema.SingleNestedAttribute{
-				Computed:   true,
-				CustomType: customfield.NewNestedObjectType[DNSZoneRrsetsAmountModel](ctx),
+				Computed:      true,
+				CustomType:    customfield.NewNestedObjectType[DNSZoneRrsetsAmountModel](ctx),
+				PlanModifiers: []planmodifier.Object{objectplanmodifier.UseStateForUnknown()},
 				Attributes: map[string]schema.Attribute{
 					"dynamic": schema.SingleNestedAttribute{
 						Description: "Amount of dynamic RRsets in zone",

@@ -395,6 +395,21 @@ var tests = map[string]struct {
 
 	"json_struct_nil1": {`{}`, JsonModel{}},
 	"json_struct_nil2": {`{}`, JsonModel{}},
+
+	"meta_string_simple": {
+		`{"meta":{"webhook":"https://example.com"}}`,
+		MetaStringModel{Meta: &map[string]customfield.MetaStringValue{"webhook": customfield.NewMetaStringValue("https://example.com")}},
+	},
+
+	"meta_string_special_chars": {
+		`{"meta":{"key":"hello \"world\""}}`,
+		MetaStringModel{Meta: &map[string]customfield.MetaStringValue{"key": customfield.NewMetaStringValue(`hello "world"`)}},
+	},
+
+	"meta_string_nil": {
+		`{}`,
+		MetaStringModel{},
+	},
 }
 
 type ListWithNestedObj struct {
@@ -459,6 +474,30 @@ var decode_only_tests = map[string]struct {
 	},
 
 	"json_struct_nil3": {`{"nil":null}`, JsonModel{}},
+
+	"meta_string_decode_number": {
+		`{"meta":{"count":42}}`,
+		MetaStringModel{Meta: &map[string]customfield.MetaStringValue{"count": customfield.NewMetaStringValue("42")}},
+	},
+
+	"meta_string_decode_boolean": {
+		`{"meta":{"active":true}}`,
+		MetaStringModel{Meta: &map[string]customfield.MetaStringValue{"active": customfield.NewMetaStringValue("true")}},
+	},
+
+	"meta_string_decode_array": {
+		`{"meta":{"tags":["a","b"]}}`,
+		MetaStringModel{Meta: &map[string]customfield.MetaStringValue{"tags": customfield.NewMetaStringValue(`["a","b"]`)}},
+	},
+
+	"meta_string_decode_mixed": {
+		`{"meta":{"name":"test","count":5,"active":false}}`,
+		MetaStringModel{Meta: &map[string]customfield.MetaStringValue{
+			"name":   customfield.NewMetaStringValue("test"),
+			"count":  customfield.NewMetaStringValue("5"),
+			"active": customfield.NewMetaStringValue("false"),
+		}},
+	},
 
 	"nested_object_list_missing_nested_field": {
 		`{"a":[{"b":"foo"}}]}`,
@@ -557,6 +596,21 @@ var encodeOnlyTests = map[string]struct {
 		},
 	},
 
+	"meta_string_encode_number": {
+		`{"meta":{"count":42}}`,
+		MetaStringModel{Meta: &map[string]customfield.MetaStringValue{"count": customfield.NewMetaStringValue("42")}},
+	},
+
+	"meta_string_encode_boolean": {
+		`{"meta":{"active":true}}`,
+		MetaStringModel{Meta: &map[string]customfield.MetaStringValue{"active": customfield.NewMetaStringValue("true")}},
+	},
+
+	"meta_string_encode_array": {
+		`{"meta":{"tags":["a","b"]}}`,
+		MetaStringModel{Meta: &map[string]customfield.MetaStringValue{"tags": customfield.NewMetaStringValue(`["a","b"]`)}},
+	},
+
 	"nested_map_pointer": {
 		`{"outer":[{"a":{"a.b.*":"*"}}]}`,
 		struct {
@@ -571,6 +625,10 @@ var encodeOnlyTests = map[string]struct {
 
 type structWithMap struct {
 	A *map[string]types.String `json:"a,required"`
+}
+
+type MetaStringModel struct {
+	Meta *map[string]customfield.MetaStringValue `tfsdk:"meta" json:"meta,optional"`
 }
 
 func TestDecode(t *testing.T) {
