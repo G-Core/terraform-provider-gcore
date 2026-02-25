@@ -9,7 +9,7 @@ resource "gcore_cloud_volume" "example_cloud_volume" {
   instance_id_to_attach_to = "88f3e0bd-ca86-4cf7-be8b-dd2988e23c2d"
   lifecycle_policy_ids = [1, 2]
   tags = {
-    foo = "string"
+    my-tag = "my-tag-value"
   }
   type_name = "standard"
 }
