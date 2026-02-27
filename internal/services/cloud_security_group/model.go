@@ -10,20 +10,17 @@ import (
 )
 
 type CloudSecurityGroupModel struct {
-	ID                 types.String                                                            `tfsdk:"id" json:"id,computed"`
-	ProjectID          types.Int64                                                             `tfsdk:"project_id" path:"project_id,optional"`
-	RegionID           types.Int64                                                             `tfsdk:"region_id" path:"region_id,optional"`
-	Name               types.String                                                            `tfsdk:"name" json:"name,required"`
-	Description        types.String                                                            `tfsdk:"description" json:"description,optional"`
-	Tags               *map[string]types.String                                                `tfsdk:"tags" json:"tags,optional,no_refresh"`
-	Rules              *[]*CloudSecurityGroupRulesModel                                        `tfsdk:"rules" json:"rules,optional,no_refresh"`
-	CreatedAt          timetypes.RFC3339                                                       `tfsdk:"created_at" json:"created_at,computed" format:"date-time"`
-	Region             types.String                                                            `tfsdk:"region" json:"region,computed"`
-	RevisionNumber     types.Int64                                                             `tfsdk:"revision_number" json:"revision_number,computed"`
-	UpdatedAt          timetypes.RFC3339                                                       `tfsdk:"updated_at" json:"updated_at,computed" format:"date-time"`
-	Tasks              customfield.List[types.String]                                          `tfsdk:"tasks" json:"tasks,computed,no_refresh"`
-	SecurityGroupRules customfield.NestedObjectList[CloudSecurityGroupSecurityGroupRulesModel] `tfsdk:"security_group_rules" json:"security_group_rules,computed"`
-	TagsV2             customfield.NestedObjectList[CloudSecurityGroupTagsV2Model]             `tfsdk:"tags_v2" json:"tags_v2,computed"`
+	ID             types.String                                                `tfsdk:"id" json:"id,computed"`
+	ProjectID      types.Int64                                                 `tfsdk:"project_id" path:"project_id,optional"`
+	RegionID       types.Int64                                                 `tfsdk:"region_id" path:"region_id,optional"`
+	Name           types.String                                                `tfsdk:"name" json:"name,required"`
+	Description    types.String                                                `tfsdk:"description" json:"description,computed_optional"`
+	Tags           *map[string]types.String                                    `tfsdk:"tags" json:"tags,optional,no_refresh"`
+	CreatedAt      timetypes.RFC3339                                           `tfsdk:"created_at" json:"created_at,computed" format:"date-time"`
+	Region         types.String                                                `tfsdk:"region" json:"region,computed"`
+	RevisionNumber types.Int64                                                 `tfsdk:"revision_number" json:"revision_number,computed"`
+	UpdatedAt      timetypes.RFC3339                                           `tfsdk:"updated_at" json:"updated_at,computed" format:"date-time"`
+	TagsV2         customfield.NestedObjectList[CloudSecurityGroupTagsV2Model] `tfsdk:"tags_v2" json:"tags_v2,computed"`
 }
 
 func (m CloudSecurityGroupModel) MarshalJSON() (data []byte, err error) {
@@ -32,33 +29,6 @@ func (m CloudSecurityGroupModel) MarshalJSON() (data []byte, err error) {
 
 func (m CloudSecurityGroupModel) MarshalJSONForUpdate(state CloudSecurityGroupModel) (data []byte, err error) {
 	return apijson.MarshalForPatch(m, state)
-}
-
-type CloudSecurityGroupRulesModel struct {
-	Direction      types.String `tfsdk:"direction" json:"direction,required"`
-	Description    types.String `tfsdk:"description" json:"description,optional"`
-	Ethertype      types.String `tfsdk:"ethertype" json:"ethertype,optional"`
-	PortRangeMax   types.Int64  `tfsdk:"port_range_max" json:"port_range_max,optional"`
-	PortRangeMin   types.Int64  `tfsdk:"port_range_min" json:"port_range_min,optional"`
-	Protocol       types.String `tfsdk:"protocol" json:"protocol,optional"`
-	RemoteGroupID  types.String `tfsdk:"remote_group_id" json:"remote_group_id,optional"`
-	RemoteIPPrefix types.String `tfsdk:"remote_ip_prefix" json:"remote_ip_prefix,optional"`
-}
-
-type CloudSecurityGroupSecurityGroupRulesModel struct {
-	ID              types.String      `tfsdk:"id" json:"id,computed"`
-	CreatedAt       timetypes.RFC3339 `tfsdk:"created_at" json:"created_at,computed" format:"date-time"`
-	Description     types.String      `tfsdk:"description" json:"description,computed"`
-	Direction       types.String      `tfsdk:"direction" json:"direction,computed"`
-	Ethertype       types.String      `tfsdk:"ethertype" json:"ethertype,computed"`
-	PortRangeMax    types.Int64       `tfsdk:"port_range_max" json:"port_range_max,computed"`
-	PortRangeMin    types.Int64       `tfsdk:"port_range_min" json:"port_range_min,computed"`
-	Protocol        types.String      `tfsdk:"protocol" json:"protocol,computed"`
-	RemoteGroupID   types.String      `tfsdk:"remote_group_id" json:"remote_group_id,computed"`
-	RemoteIPPrefix  types.String      `tfsdk:"remote_ip_prefix" json:"remote_ip_prefix,computed"`
-	RevisionNumber  types.Int64       `tfsdk:"revision_number" json:"revision_number,computed"`
-	SecurityGroupID types.String      `tfsdk:"security_group_id" json:"security_group_id,computed"`
-	UpdatedAt       timetypes.RFC3339 `tfsdk:"updated_at" json:"updated_at,computed" format:"date-time"`
 }
 
 type CloudSecurityGroupTagsV2Model struct {

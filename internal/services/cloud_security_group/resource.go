@@ -80,20 +80,20 @@ func (r *CloudSecurityGroupResource) Create(ctx context.Context, req resource.Cr
 		resp.Diagnostics.AddError("failed to serialize http request", err.Error())
 		return
 	}
-	res := new(http.Response)
-	_, err = r.client.Cloud.SecurityGroups.New(
+	// Send "rules":[] so the API creates no default egress rules.
+	// Per OAS: "If rules are explicitly set to empty, no rules will be created."
+	securityGroup, err := r.client.Cloud.SecurityGroups.NewAndPoll(
 		ctx,
 		params,
 		option.WithRequestBody("application/json", dataBytes),
-		option.WithResponseBodyInto(&res),
+		option.WithJSONSet("rules", []any{}),
 		option.WithMiddleware(logging.Middleware(ctx)),
 	)
 	if err != nil {
 		resp.Diagnostics.AddError("failed to make http request", err.Error())
 		return
 	}
-	bytes, _ := io.ReadAll(res.Body)
-	err = apijson.UnmarshalComputed(bytes, &data)
+	err = apijson.UnmarshalComputed([]byte(securityGroup.RawJSON()), &data)
 	if err != nil {
 		resp.Diagnostics.AddError("failed to deserialize http request", err.Error())
 		return
@@ -134,21 +134,18 @@ func (r *CloudSecurityGroupResource) Update(ctx context.Context, req resource.Up
 		resp.Diagnostics.AddError("failed to serialize http request", err.Error())
 		return
 	}
-	res := new(http.Response)
-	_, err = r.client.Cloud.SecurityGroups.Update(
+	securityGroup, err := r.client.Cloud.SecurityGroups.UpdateAndPoll(
 		ctx,
 		data.ID.ValueString(),
 		params,
 		option.WithRequestBody("application/json", dataBytes),
-		option.WithResponseBodyInto(&res),
 		option.WithMiddleware(logging.Middleware(ctx)),
 	)
 	if err != nil {
 		resp.Diagnostics.AddError("failed to make http request", err.Error())
 		return
 	}
-	bytes, _ := io.ReadAll(res.Body)
-	err = apijson.UnmarshalComputed(bytes, &data)
+	err = apijson.UnmarshalComputed([]byte(securityGroup.RawJSON()), &data)
 	if err != nil {
 		resp.Diagnostics.AddError("failed to deserialize http request", err.Error())
 		return
