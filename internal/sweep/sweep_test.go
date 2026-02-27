@@ -10,6 +10,7 @@ import (
 	_ "github.com/stainless-sdks/gcore-terraform/internal/services/cdn_certificate"
 
 	// Cloud
+	_ "github.com/stainless-sdks/gcore-terraform/internal/services/cloud_placement_group"
 	_ "github.com/stainless-sdks/gcore-terraform/internal/services/cloud_ssh_key"
 )
 
