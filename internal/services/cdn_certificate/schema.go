@@ -5,8 +5,11 @@ package cdn_certificate
 import (
 	"context"
 
+	"github.com/hashicorp/terraform-plugin-framework-validators/resourcevalidator"
+	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/booldefault"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/boolplanmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/int64planmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
@@ -19,69 +22,85 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 	return schema.Schema{
 		Attributes: map[string]schema.Attribute{
 			"ssl_id": schema.Int64Attribute{
-				Optional:      true,
-				PlanModifiers: []planmodifier.Int64{int64planmodifier.RequiresReplace()},
+				Computed:      true,
+				PlanModifiers: []planmodifier.Int64{int64planmodifier.UseStateForUnknown()},
 			},
 			"name": schema.StringAttribute{
-				Description:   "SSL certificate name.\n\nIt must be unique.",
-				Required:      true,
-				PlanModifiers: []planmodifier.String{stringplanmodifier.RequiresReplace()},
+				Description: "SSL certificate name.\n\nIt must be unique.",
+				Required:    true,
 			},
 			"automated": schema.BoolAttribute{
 				Description:   "Must be **true** to issue certificate automatically.",
 				Optional:      true,
 				PlanModifiers: []planmodifier.Bool{boolplanmodifier.RequiresReplace()},
 			},
-			"ssl_certificate": schema.StringAttribute{
-				Description:   "Public part of the SSL certificate.\n\nAll chain of the SSL certificate should be added.",
-				Optional:      true,
-				PlanModifiers: []planmodifier.String{stringplanmodifier.RequiresReplace()},
+			"ssl_certificate_wo": schema.StringAttribute{
+				Description: "Public part of the SSL certificate.\n\nAll chain of the SSL certificate should be added. " +
+					"This is a write-only field — it will be sent to the API but never stored in state.",
+				Optional:  true,
+				WriteOnly: true,
 			},
-			"ssl_private_key": schema.StringAttribute{
-				Description:   "Private key of the SSL certificate.",
-				Optional:      true,
-				PlanModifiers: []planmodifier.String{stringplanmodifier.RequiresReplace()},
+			"ssl_private_key_wo": schema.StringAttribute{
+				Description: "Private key of the SSL certificate. " +
+					"This is a write-only field — it will be sent to the API but never stored in state.",
+				Optional:  true,
+				WriteOnly: true,
+			},
+			"ssl_certificate_wo_version": schema.Int64Attribute{
+				Description: "SSL certificate write-only version. Increment this value to force Terraform to " +
+					"re-send the SSL certificate and private key to the API.",
+				Optional: true,
 			},
 			"validate_root_ca": schema.BoolAttribute{
-				Description:   "Defines whether to check the SSL certificate for a signature from a trusted certificate authority.\n\nPossible values:\n\n- **true** - SSL certificate must be verified to be signed by a trusted certificate authority.\n- **false** - SSL certificate will not be verified to be signed by a trusted certificate authority.",
-				Optional:      true,
-				PlanModifiers: []planmodifier.Bool{boolplanmodifier.RequiresReplace()},
+				Description: "Defines whether to check the SSL certificate for a signature from a trusted certificate authority.\n\nPossible values:\n\n- **true** - SSL certificate must be verified to be signed by a trusted certificate authority.\n- **false** - SSL certificate will not be verified to be signed by a trusted certificate authority.",
+				Optional:    true,
+				Computed:    true,
+				Default:     booldefault.StaticBool(false),
 			},
 			"cert_issuer": schema.StringAttribute{
-				Description: "Name of the certification center issued the SSL certificate.",
-				Computed:    true,
+				Description:   "Name of the certification center issued the SSL certificate.",
+				Computed:      true,
+				PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
 			},
 			"cert_subject_alt": schema.StringAttribute{
-				Description: "Alternative domain names that the SSL certificate secures.",
-				Computed:    true,
+				Description:   "Alternative domain names that the SSL certificate secures.",
+				Computed:      true,
+				PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
 			},
 			"cert_subject_cn": schema.StringAttribute{
-				Description: "Domain name that the SSL certificate secures.",
-				Computed:    true,
+				Description:   "Domain name that the SSL certificate secures.",
+				Computed:      true,
+				PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
 			},
 			"deleted": schema.BoolAttribute{
-				Description: "Defines whether the certificate has been deleted. Parameter is **deprecated**.\n\nPossible values:\n- **true** - Certificate has been deleted.\n- **false** - Certificate has not been deleted.",
-				Computed:    true,
+				Description:   "Defines whether the certificate has been deleted. Parameter is **deprecated**.\n\nPossible values:\n- **true** - Certificate has been deleted.\n- **false** - Certificate has not been deleted.",
+				Computed:      true,
+				PlanModifiers: []planmodifier.Bool{boolplanmodifier.UseStateForUnknown()},
 			},
 			"has_related_resources": schema.BoolAttribute{
-				Description: "Defines whether the SSL certificate is used by a CDN resource.\n\nPossible values:\n- **true** - Certificate is used by a CDN resource.\n- **false** - Certificate is not used by a CDN resource.",
-				Computed:    true,
+				Description:   "Defines whether the SSL certificate is used by a CDN resource.\n\nPossible values:\n- **true** - Certificate is used by a CDN resource.\n- **false** - Certificate is not used by a CDN resource.",
+				Computed:      true,
+				PlanModifiers: []planmodifier.Bool{boolplanmodifier.UseStateForUnknown()},
 			},
 			"id": schema.Int64Attribute{
-				Description: "SSL certificate ID.",
-				Computed:    true,
+				Description:   "SSL certificate ID.",
+				Computed:      true,
+				PlanModifiers: []planmodifier.Int64{int64planmodifier.UseStateForUnknown()},
 			},
 			"ssl_certificate_chain": schema.StringAttribute{
-				Description: "Parameter is **deprecated**.",
-				Computed:    true,
+				Description:   "Parameter is **deprecated**.",
+				Computed:      true,
+				PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
 			},
 			"validity_not_after": schema.StringAttribute{
-				Description: "Date when certificate become untrusted (ISO 8601/RFC 3339 format, UTC.)",
-				Computed:    true,
+				Description:   "Date when certificate become untrusted (ISO 8601/RFC 3339 format, UTC.)",
+				Computed:      true,
+				PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
 			},
 			"validity_not_before": schema.StringAttribute{
-				Description: "Date when certificate become valid (ISO 8601/RFC 3339 format, UTC.)",
-				Computed:    true,
+				Description:   "Date when certificate become valid (ISO 8601/RFC 3339 format, UTC.)",
+				Computed:      true,
+				PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
 			},
 		},
 	}
@@ -92,5 +111,10 @@ func (r *CDNCertificateResource) Schema(ctx context.Context, req resource.Schema
 }
 
 func (r *CDNCertificateResource) ConfigValidators(_ context.Context) []resource.ConfigValidator {
-	return []resource.ConfigValidator{}
+	return []resource.ConfigValidator{
+		resourcevalidator.RequiredTogether(
+			path.MatchRoot("ssl_certificate_wo"),
+			path.MatchRoot("ssl_private_key_wo"),
+		),
+	}
 }

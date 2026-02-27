@@ -1,41 +1,19 @@
-resource "gcore_cdn_certificate" "example_cdn_certificate" {
-  name = "New certificate"
-  ssl_certificate = <<EOT
-  -----BEGIN CERTIFICATE-----
-  MIIFWzCCBEOgAwIBAgISBK6qoNitg//89H/YJamujpWlMA0GCSqGSIb3DQEBCwUA
-  MEoxCzAJBgNVBAYTAlVTMRYwFAYDVQQKEw1MZXQncyBFbmNyeXB0MSMwIQYDVQQD
-  ExpMZXQncyBFbmNyeXB0IEF1dGhvcml0eSBYMzAeFw0xODExMTMxMjQwMDJaFw0x
-  OTAyMTExMjQwMDJaMBwxGjAYBgNVBAMTEWNkbjIudG50LWNsdWIuY29tMIIBIjAN
-  BgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAzaHExDEXNSf6ELS0WUR7qq8gs9cc
-  xx99sM2zs3Jld0twPmuldkVNe5xte/Hj03r4SesfOBczR7pn+t60YujPvUQDN8lx
-  WYpvRuetOneyf4gNPatwzR/W1GWGlahet1xPVYGrttqL4gCJeShIXvU4aCyzW941
-  Pt0wCs+bg9u+59fXFkigWrWJPkwbR7bJ14XTStYynMbYLfCg+VPeGWj3d8wOhQcf
-  AD86o8TLTbVfK2BDXwS5S8Dgf5u8g+WvmVHYDIkYKCxcLj0jP61Y7uHoFbSg41oN
-  A9yPOa+0cYxA7U702V2WjxbfIeATYtNLZvH17lk+DYlQl8q3MLwguqZdgwIDAQAB
-  iIqI2xquGONtHFDOKJvy1O2qYTVRtNRVZqhc1ol+mw==
-  -----END CERTIFICATE-----
-  -----BEGIN CERTIFICATE-----
-  MIIEkjCCA3qgAwIBAgIQCgFBQgAAAVOFc2oLheynCDANBgkqhkiG9w0BAQsFADA/
-  MSQwIgYDVQQKExtEaWdpdGFsIFNpZ25hdHVyZSBUcnVzdCBDby4xFzAVBgNVBAMT
-  DkRTVCBSb290IENBIFgzMB4XDTE2MDMxNzE2NDA0NloXDTIxMDMxNzE2NDA0Nlow
-  SjELMAkGA1UEBhMCVVMxFjAUBgNVBAoTDUxldCdzIEVuY3J5cHQxIzAhBgNVBAMT
-  GkxldCdzIEVuY3J5cHQgQXV0aG9yaXR5IFgzMIIBIjANBgkqhkiG9w0BAQEFAAOC
-  AQ8AMIIBCgKCAQEAnNMM8FrlLke3cl03g7NoYzDq1zUmGSXhvb418XCSL7e4S0EF
-  q6meNQhY7LEqxGiHC6PjdeTm86dicbp5gWAf15Gan/PQeGdxyGkOlZHP/uaZ6WA8
-  SMx+yk13EiSdRxta67nsHjcAHJyse6cF6s5K671B5TaYucv9bTyWaN8jKkKQDIZ0
-  KOqkqm57TH2H3eDJAkSnh6/DNFu0Qg==
-  -----END CERTIFICATE-----
+# Example: Own SSL certificate
+resource "gcore_cdn_certificate" "own_cert" {
+  name = "My SSL Certificate"
 
-  EOT
-  ssl_private_key = <<EOT
-  -----BEGIN PRIVATE KEY-----
-  MIIEvgIBADANBgkqhkiG9w0BAQEFAASCBKgwggSkAgEAAoIBAQDZcNCZiNNHfX2O
-  dZpf12mv2rAZwqGZBAdpox0wntEPK3JciQ7ZRloLJeHuCNIJs9MidnH7Xk8zveju
-  mab6HmfIzvMJAAm88OYWMFQRiYe1ggJEHMe7yYPQbtXwTqWDYdWmjPPma3Ujqqmb
-  hmVX2rsYILD7cUjS+e0Ucfqx3QODQj/aujTt1rS0gFhJ0soY5m+C6VimPCx4Bjyw
-  5rhtskJDRrfXxrIhVXOvSPFRyxDSfjt3win8vjhhZ3oFPWgrl9lVhn0zaB5hjDsd
-  -----END PRIVATE KEY-----
+  # Write-only — values are sent to the API but never stored in state
+  ssl_certificate_wo = file("cert.pem")
+  ssl_private_key_wo = file("key.pem")
 
-  EOT
+  # Increment to force re-send of cert/key
+  ssl_certificate_wo_version = 1
+
   validate_root_ca = true
+}
+
+# Example: Automated Let's Encrypt certificate
+resource "gcore_cdn_certificate" "automated_cert" {
+  name      = "Auto LE Certificate"
+  automated = true
 }

@@ -11,14 +11,18 @@ import (
 	"github.com/G-Core/gcore-go"
 	"github.com/G-Core/gcore-go/cdn"
 	"github.com/G-Core/gcore-go/option"
+	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
+	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/stainless-sdks/gcore-terraform/internal/apijson"
+	"github.com/stainless-sdks/gcore-terraform/internal/importpath"
 	"github.com/stainless-sdks/gcore-terraform/internal/logging"
 )
 
 // Ensure provider defined types fully satisfy framework interfaces.
 var _ resource.ResourceWithConfigure = (*CDNCertificateResource)(nil)
 var _ resource.ResourceWithModifyPlan = (*CDNCertificateResource)(nil)
+var _ resource.ResourceWithImportState = (*CDNCertificateResource)(nil)
 
 func NewResource() resource.Resource {
 	return &CDNCertificateResource{}
@@ -61,6 +65,13 @@ func (r *CDNCertificateResource) Create(ctx context.Context, req resource.Create
 		return
 	}
 
+	// Write-only fields are null in plan; read from config
+	resp.Diagnostics.Append(req.Config.GetAttribute(ctx, path.Root("ssl_certificate_wo"), &data.SslCertificate)...)
+	resp.Diagnostics.Append(req.Config.GetAttribute(ctx, path.Root("ssl_private_key_wo"), &data.SslPrivateKey)...)
+	if resp.Diagnostics.HasError() {
+		return
+	}
+
 	dataBytes, err := data.MarshalJSON()
 	if err != nil {
 		resp.Diagnostics.AddError("failed to serialize http request", err.Error())
@@ -85,11 +96,57 @@ func (r *CDNCertificateResource) Create(ctx context.Context, req resource.Create
 		return
 	}
 
+	data.SslID = data.ID
+
+	// POST response returns "deleted":true while GET returns false.
+	// Override to avoid one-time drift on first refresh.
+	data.Deleted = types.BoolValue(false)
+
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
 }
 
 func (r *CDNCertificateResource) Update(ctx context.Context, req resource.UpdateRequest, resp *resource.UpdateResponse) {
-	// Update is not supported for this resource
+	var data *CDNCertificateModel
+
+	resp.Diagnostics.Append(req.Plan.Get(ctx, &data)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
+
+	// Write-only fields are null in plan; read from config
+	resp.Diagnostics.Append(req.Config.GetAttribute(ctx, path.Root("ssl_certificate_wo"), &data.SslCertificate)...)
+	resp.Diagnostics.Append(req.Config.GetAttribute(ctx, path.Root("ssl_private_key_wo"), &data.SslPrivateKey)...)
+	if resp.Diagnostics.HasError() {
+		return
+	}
+
+	dataBytes, err := data.MarshalJSON()
+	if err != nil {
+		resp.Diagnostics.AddError("failed to serialize http request", err.Error())
+		return
+	}
+	res := new(http.Response)
+	_, err = r.client.CDN.Certificates.Replace(
+		ctx,
+		data.SslID.ValueInt64(),
+		cdn.CertificateReplaceParams{},
+		option.WithRequestBody("application/json", dataBytes),
+		option.WithResponseBodyInto(&res),
+		option.WithMiddleware(logging.Middleware(ctx)),
+	)
+	if err != nil {
+		resp.Diagnostics.AddError("failed to make http request", err.Error())
+		return
+	}
+	bytes, _ := io.ReadAll(res.Body)
+	err = apijson.UnmarshalComputed(bytes, &data)
+	if err != nil {
+		resp.Diagnostics.AddError("failed to deserialize http request", err.Error())
+		return
+	}
+
+	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
 }
 
 func (r *CDNCertificateResource) Read(ctx context.Context, req resource.ReadRequest, resp *resource.ReadResponse) {
@@ -144,6 +201,51 @@ func (r *CDNCertificateResource) Delete(ctx context.Context, req resource.Delete
 	if err != nil {
 		resp.Diagnostics.AddError("failed to make http request", err.Error())
 		return
+	}
+
+	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
+}
+
+func (r *CDNCertificateResource) ImportState(ctx context.Context, req resource.ImportStateRequest, resp *resource.ImportStateResponse) {
+	var data = new(CDNCertificateModel)
+
+	var pathSslID int64
+	diags := importpath.ParseImportID(
+		req.ID,
+		"<ssl_id>",
+		&pathSslID,
+	)
+	resp.Diagnostics.Append(diags...)
+	if resp.Diagnostics.HasError() {
+		return
+	}
+
+	data.SslID = types.Int64Value(pathSslID)
+
+	res := new(http.Response)
+	_, err := r.client.CDN.Certificates.Get(
+		ctx,
+		pathSslID,
+		option.WithResponseBodyInto(&res),
+		option.WithMiddleware(logging.Middleware(ctx)),
+	)
+	if err != nil {
+		resp.Diagnostics.AddError("failed to make http request", err.Error())
+		return
+	}
+	bytes, _ := io.ReadAll(res.Body)
+	err = apijson.Unmarshal(bytes, &data)
+	if err != nil {
+		resp.Diagnostics.AddError("failed to deserialize http request", err.Error())
+		return
+	}
+
+	data.SslID = data.ID
+
+	// validate_root_ca has no_refresh tag so Unmarshal skips it.
+	// Set to schema default to avoid drift from Default(false).
+	if data.ValidateRootCa.IsNull() || data.ValidateRootCa.IsUnknown() {
+		data.ValidateRootCa = types.BoolValue(false)
 	}
 
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
