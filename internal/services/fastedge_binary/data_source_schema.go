@@ -13,6 +13,7 @@ var _ datasource.DataSourceWithConfigValidators = (*FastedgeBinaryDataSource)(ni
 
 func DataSourceSchema(ctx context.Context) schema.Schema {
 	return schema.Schema{
+		Description: "Binaries are WebAssembly executables that are actually executed when app is ran.",
 		Attributes: map[string]schema.Attribute{
 			"id": schema.Int64Attribute{
 				Required: true,

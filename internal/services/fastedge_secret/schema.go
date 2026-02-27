@@ -16,6 +16,7 @@ var _ resource.ResourceWithConfigValidators = (*FastedgeSecretResource)(nil)
 
 func ResourceSchema(ctx context.Context) schema.Schema {
 	return schema.Schema{
+		Description: "Secret values that can be used in apps",
 		Attributes: map[string]schema.Attribute{
 			"id": schema.Int64Attribute{
 				Description:   "The unique identifier of the secret.",

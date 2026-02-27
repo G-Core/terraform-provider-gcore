@@ -19,6 +19,7 @@ var _ datasource.DataSourceWithConfigValidators = (*FastedgeAppsDataSource)(nil)
 
 func ListDataSourceSchema(ctx context.Context) schema.Schema {
 	return schema.Schema{
+		Description: "Apps are descriptions of edge apps, that reference the binary and may contain app-specific settings, such as environment variables.",
 		Attributes: map[string]schema.Attribute{
 			"api_type": schema.StringAttribute{
 				Description: "API type:  \nwasi-http - WASI with HTTP entry point  \nproxy-wasm - Proxy-Wasm app, callable from CDN\nAvailable values: \"wasi-http\", \"proxy-wasm\".",

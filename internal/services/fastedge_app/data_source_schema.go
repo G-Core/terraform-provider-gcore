@@ -20,6 +20,7 @@ var _ datasource.DataSourceWithConfigValidators = (*FastedgeAppDataSource)(nil)
 
 func DataSourceSchema(ctx context.Context) schema.Schema {
 	return schema.Schema{
+		Description: "Apps are descriptions of edge apps, that reference the binary and may contain app-specific settings, such as environment variables.",
 		Attributes: map[string]schema.Attribute{
 			"id": schema.Int64Attribute{
 				Optional: true,
