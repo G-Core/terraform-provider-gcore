@@ -14,6 +14,7 @@ var _ datasource.DataSourceWithConfigValidators = (*FastedgeSecretDataSource)(ni
 
 func DataSourceSchema(ctx context.Context) schema.Schema {
 	return schema.Schema{
+		Description: "Secret values that can be used in apps",
 		Attributes: map[string]schema.Attribute{
 			"id": schema.Int64Attribute{
 				Required: true,
