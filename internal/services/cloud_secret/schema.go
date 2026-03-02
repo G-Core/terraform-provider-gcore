@@ -46,20 +46,32 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 				Description: "Secret payload.",
 				Required:    true,
 				Attributes: map[string]schema.Attribute{
-					"certificate": schema.StringAttribute{
-						Description: "SSL certificate in PEM format.",
-						Required:    true,
+					"certificate_wo": schema.StringAttribute{
+						Description: "SSL certificate in PEM format. " +
+							"This is a write-only field — it will be sent to the API but never stored in state.",
+						Required:  true,
+						WriteOnly: true,
 					},
-					"certificate_chain": schema.StringAttribute{
-						Description: "SSL certificate chain of intermediates and root certificates in PEM format.",
-						Required:    true,
+					"certificate_chain_wo": schema.StringAttribute{
+						Description: "SSL certificate chain of intermediates and root certificates in PEM format. " +
+							"This is a write-only field — it will be sent to the API but never stored in state.",
+						Required:  true,
+						WriteOnly: true,
 					},
-					"private_key": schema.StringAttribute{
-						Description: "SSL private key in PEM format.",
-						Required:    true,
+					"private_key_wo": schema.StringAttribute{
+						Description: "SSL private key in PEM format. " +
+							"This is a write-only field — it will be sent to the API but never stored in state.",
+						Required:  true,
+						WriteOnly: true,
 					},
 				},
 				PlanModifiers: []planmodifier.Object{objectplanmodifier.RequiresReplace()},
+			},
+			"payload_wo_version": schema.Int64Attribute{
+				Description: "The version of the payload sensitive params — increment this value to force " +
+					"Terraform to re-create the secret with updated payload values.",
+				Required:      true,
+				PlanModifiers: []planmodifier.Int64{int64planmodifier.RequiresReplace()},
 			},
 			"expiration": schema.StringAttribute{
 				Description:   "Datetime when the secret will expire. Defaults to None",

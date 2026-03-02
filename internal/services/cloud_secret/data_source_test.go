@@ -48,14 +48,15 @@ resource "gcore_cloud_secret" "test" {
   project_id = %[1]s
   region_id  = %[2]s
   name       = %[3]q
+  payload_wo_version = 1
   payload = {
-    certificate       = <<EOT
+    certificate_wo       = <<EOT
 %[4]s
 EOT
-    certificate_chain = <<EOT
+    certificate_chain_wo = <<EOT
 %[4]s
 EOT
-    private_key       = <<EOT
+    private_key_wo       = <<EOT
 %[5]s
 EOT
   }

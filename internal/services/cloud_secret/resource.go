@@ -12,6 +12,7 @@ import (
 	"github.com/G-Core/gcore-go/cloud"
 	"github.com/G-Core/gcore-go/option"
 	"github.com/G-Core/gcore-go/packages/param"
+	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/stainless-sdks/gcore-terraform/internal/apijson"
@@ -61,6 +62,12 @@ func (r *CloudSecretResource) Create(ctx context.Context, req resource.CreateReq
 
 	resp.Diagnostics.Append(req.Plan.Get(ctx, &data)...)
 
+	if resp.Diagnostics.HasError() {
+		return
+	}
+
+	// Write-only fields are null in plan; read from config
+	resp.Diagnostics.Append(req.Config.GetAttribute(ctx, path.Root("payload"), &data.Payload)...)
 	if resp.Diagnostics.HasError() {
 		return
 	}
