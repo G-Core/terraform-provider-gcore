@@ -21,7 +21,8 @@ type CloudInstanceModel struct {
 	Volumes             *[]*CloudInstanceVolumesModel                                              `tfsdk:"volumes" json:"volumes,required"`
 	AllowAppPorts       types.Bool                                                                 `tfsdk:"allow_app_ports" json:"allow_app_ports,optional,no_refresh"`
 	NameTemplate        types.String                                                               `tfsdk:"name_template" json:"name_template,optional,no_refresh"`
-	Password            types.String                                                               `tfsdk:"password" json:"password,optional,no_refresh"`
+	Password            types.String                                                               `tfsdk:"password_wo" json:"password,optional,no_refresh"`
+	PasswordWoVersion   types.Int64                                                                `tfsdk:"password_wo_version"`
 	ServergroupID       types.String                                                               `tfsdk:"servergroup_id" json:"servergroup_id,optional,no_refresh"`
 	SSHKeyName          types.String                                                               `tfsdk:"ssh_key_name" json:"ssh_key_name,optional"`
 	UserData            types.String                                                               `tfsdk:"user_data" json:"user_data,optional,no_refresh"`

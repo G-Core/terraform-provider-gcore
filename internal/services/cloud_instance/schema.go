@@ -14,6 +14,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/boolplanmodifier"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/int64planmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/listplanmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/mapplanmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/objectplanmodifier"
@@ -142,7 +143,6 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 						"volume_id": schema.StringAttribute{
 							Description: "ID of an existing volume to attach to the instance.",
 							Required:    true,
-
 						},
 						"boot_index": schema.Int64Attribute{
 							Description: "Boot device index (creation-only). 0 = primary boot, positive = secondary bootable, negative = not bootable. Cannot be changed after instance creation.",
@@ -165,10 +165,17 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 				Optional:      true,
 				PlanModifiers: []planmodifier.String{stringplanmodifier.RequiresReplace()},
 			},
-			"password": schema.StringAttribute{
+			"password_wo": schema.StringAttribute{
 				Description:   "For Linux instances, 'username' and 'password' are used to create a new user. When only 'password' is provided, it is set as the password for the default user of the image. For Windows instances, 'username' cannot be specified. Use the 'password' field to set the password for the 'Admin' user on Windows. Use the 'user_data' field to provide a script to create new users on Windows. The password of the Admin user cannot be updated via 'user_data'.",
 				Optional:      true,
+				WriteOnly:     true,
 				PlanModifiers: []planmodifier.String{stringplanmodifier.RequiresReplace()},
+			},
+			"password_wo_version": schema.Int64Attribute{
+				Description: "Instance password write-only version. Used to trigger updates of the " +
+					"write-only password field.",
+				Optional:      true,
+				PlanModifiers: []planmodifier.Int64{int64planmodifier.RequiresReplace()},
 			},
 			"servergroup_id": schema.StringAttribute{
 				Description: "Placement group ID for instance placement policy.\n\nSupported group types:\n- `anti-affinity`: Ensures instances are placed on different hosts for high availability.\n- `affinity`: Places instances on the same host for low-latency communication.\n- `soft-anti-affinity`: Tries to place instances on different hosts but allows sharing if needed.",

@@ -15,6 +15,7 @@ import (
 	"github.com/G-Core/gcore-go/option"
 	"github.com/G-Core/gcore-go/packages/param"
 	"github.com/G-Core/gcore-go/shared/constant"
+	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-log/tflog"
@@ -78,6 +79,8 @@ func (r *CloudInstanceResource) Create(ctx context.Context, req resource.CreateR
 	if !data.RegionID.IsNull() {
 		params.RegionID = param.NewOpt(data.RegionID.ValueInt64())
 	}
+
+	resp.Diagnostics.Append(req.Config.GetAttribute(ctx, path.Root("password_wo"), &data.Password)...)
 
 	dataBytes, err := data.MarshalJSON()
 	if err != nil {
