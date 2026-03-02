@@ -72,13 +72,16 @@ resource "gcore_cloud_instance" "example_cloud_instance" {
 
 ### Optional
 
+> **NOTE**: [Write-only arguments](https://developer.hashicorp.com/terraform/language/resources/ephemeral#write-only-arguments) are supported in Terraform 1.11 and later.
+
 - `allow_app_ports` (Boolean) Set to `true` if creating the instance from an `apptemplate`. This allows application ports in the security group for instances created from a marketplace application template.
 - `configuration` (Map of String) Parameters for the application template if creating the instance from an `apptemplate`.
 - `name` (String) Instance name.
 - `name_template` (String) If you want the instance name to be automatically generated based on IP addresses, you can provide a name template instead of specifying the name manually. The template should include a placeholder that will be replaced during provisioning. Supported placeholders are: `{ip_octets}` (last 3 octets of the IP), `{two_ip_octets}`, and `{one_ip_octet}`.
-- `password` (String) For Linux instances, 'username' and 'password' are used to create a new user. When only 'password' is provided, it is set as the password for the default user of the image. For Windows instances, 'username' cannot be specified. Use the 'password' field to set the password for the 'Admin' user on Windows. Use the 'user_data' field to provide a script to create new users on Windows. The password of the Admin user cannot be updated via 'user_data'.
-- `project_id` (Number) Project ID
-- `region_id` (Number) Region ID
+- `password_wo` (String, [Write-only](https://developer.hashicorp.com/terraform/language/resources/ephemeral#write-only-arguments)) For Linux instances, 'username' and 'password' are used to create a new user. When only 'password' is provided, it is set as the password for the default user of the image. For Windows instances, 'username' cannot be specified. Use the 'password' field to set the password for the 'Admin' user on Windows. Use the 'user_data' field to provide a script to create new users on Windows. The password of the Admin user cannot be updated via 'user_data'.
+- `password_wo_version` (Number) Instance password write-only version. Used to trigger updates of the write-only password field.
+- `project_id` (Number) Project ID. If not specified, uses GCORE_CLOUD_PROJECT_ID environment variable.
+- `region_id` (Number) Region ID. If not specified, uses GCORE_CLOUD_REGION_ID environment variable.
 - `security_groups` (Attributes List) Specifies security group UUIDs to be applied to all instance network interfaces. (see [below for nested schema](#nestedatt--security_groups))
 - `servergroup_id` (String) Placement group ID for instance placement policy.
 
@@ -110,7 +113,6 @@ Available values: "active", "stopped".
 Available values: "ACTIVE", "BUILD", "DELETED", "ERROR", "HARD_REBOOT", "MIGRATING", "PASSWORD", "PAUSED", "REBOOT", "REBUILD", "RESCUE", "RESIZE", "REVERT_RESIZE", "SHELVED", "SHELVED_OFFLOADED", "SHUTOFF", "SOFT_DELETED", "SUSPENDED", "UNKNOWN", "VERIFY_RESIZE".
 - `task_id` (String) The UUID of the active task that currently holds a lock on the resource. This lock prevents concurrent modifications to ensure consistency. If `null`, the resource is not locked.
 - `task_state` (String) Task state
-- `tasks` (List of String) List of task IDs for async operations. Poll via GET /v1/tasks/{task_id} until FINISHED or ERROR.
 
 <a id="nestedatt--interfaces"></a>
 ### Nested Schema for `interfaces`
@@ -128,12 +130,9 @@ Optional:
 - `ip_family` (String) Specify `ipv4`, `ipv6`, or `dual` to enable both.
 Available values: "dual", "ipv4", "ipv6".
 - `network_id` (String) The network where the instance will be connected.
+- `port_id` (String) Port ID for the interface. Required for reserved_fixed_ip type, computed for other types.
 - `security_groups` (Attributes List) Specifies security group UUIDs to be applied to the instance network interface. (see [below for nested schema](#nestedatt--interfaces--security_groups))
 - `subnet_id` (String) The instance will get an IP address from this subnet.
-
-Read-Only:
-
-- `port_id` (String) Port ID assigned to this interface. Computed after creation.
 
 <a id="nestedatt--interfaces--floating_ip"></a>
 ### Nested Schema for `interfaces.floating_ip`

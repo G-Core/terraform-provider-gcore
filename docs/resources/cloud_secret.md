@@ -15,14 +15,15 @@ description: |-
 ```terraform
 resource "gcore_cloud_secret" "example_cloud_secret" {
   project_id = 1
-  region_id = 1
-  name = "Load balancer certificate #1"
+  region_id  = 1
+  name       = "Load balancer certificate #1"
   payload = {
-    certificate = "<certificate>"
-    certificate_chain = "<certificate_chain>"
-    private_key = "<private_key>"
+    certificate_wo       = "<certificate>"
+    certificate_chain_wo = "<certificate_chain>"
+    private_key_wo       = "<private_key>"
   }
-  expiration = "2019-12-27T18:11:19.117Z"
+  payload_wo_version = 1
+  expiration         = "2019-12-27T18:11:19.117Z"
 }
 ```
 
@@ -33,6 +34,7 @@ resource "gcore_cloud_secret" "example_cloud_secret" {
 
 - `name` (String) Secret name
 - `payload` (Attributes) Secret payload. (see [below for nested schema](#nestedatt--payload))
+- `payload_wo_version` (Number) The version of the payload sensitive params — increment this value to force Terraform to re-create the secret with updated payload values.
 
 ### Optional
 
@@ -52,7 +54,7 @@ resource "gcore_cloud_secret" "example_cloud_secret" {
 Available values: "certificate", "opaque", "passphrase", "private", "public", "symmetric".
 - `status` (String) Status
 - `tasks` (List of String) List of task IDs representing asynchronous operations. Use these IDs to monitor operation progress:
-* `GET /v1/tasks/{task_id}` - Check individual task status and details
+- `GET /v1/tasks/{task_id}` - Check individual task status and details
 Poll task status until completion (`FINISHED`/`ERROR`) before proceeding with dependent operations.
 
 <a id="nestedatt--payload"></a>
@@ -60,9 +62,9 @@ Poll task status until completion (`FINISHED`/`ERROR`) before proceeding with de
 
 Required:
 
-- `certificate` (String) SSL certificate in PEM format.
-- `certificate_chain` (String) SSL certificate chain of intermediates and root certificates in PEM format.
-- `private_key` (String) SSL private key in PEM format.
+- `certificate_chain_wo` (String, [Write-only](https://developer.hashicorp.com/terraform/language/resources/ephemeral#write-only-arguments)) SSL certificate chain of intermediates and root certificates in PEM format. This is a write-only field — it will be sent to the API but never stored in state.
+- `certificate_wo` (String, [Write-only](https://developer.hashicorp.com/terraform/language/resources/ephemeral#write-only-arguments)) SSL certificate in PEM format. This is a write-only field — it will be sent to the API but never stored in state.
+- `private_key_wo` (String, [Write-only](https://developer.hashicorp.com/terraform/language/resources/ephemeral#write-only-arguments)) SSL private key in PEM format. This is a write-only field — it will be sent to the API but never stored in state.
 
 ## Import
 
