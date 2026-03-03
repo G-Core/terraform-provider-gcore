@@ -77,6 +77,6 @@ type CloudRegionsItemsDataSourceModel struct {
 }
 
 type CloudRegionsCoordinatesDataSourceModel struct {
-	Latitude  customfield.NormalizedDynamicValue `tfsdk:"latitude" json:"latitude,computed"`
-	Longitude customfield.NormalizedDynamicValue `tfsdk:"longitude" json:"longitude,computed"`
+	Latitude  types.String `tfsdk:"latitude" json:"latitude,computed"`
+	Longitude types.String `tfsdk:"longitude" json:"longitude,computed"`
 }

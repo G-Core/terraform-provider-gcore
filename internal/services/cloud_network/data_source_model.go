@@ -67,11 +67,20 @@ func (m *CloudNetworkDataSourceModel) toListParams(_ context.Context) (params cl
 	if !m.RegionID.IsNull() {
 		params.RegionID = param.NewOpt(m.RegionID.ValueInt64())
 	}
+	if !m.FindOneBy.External.IsNull() {
+		params.External = param.NewOpt(m.FindOneBy.External.ValueBool())
+	}
 	if !m.FindOneBy.Name.IsNull() {
 		params.Name = param.NewOpt(m.FindOneBy.Name.ValueString())
 	}
+	if !m.FindOneBy.NetworkType.IsNull() {
+		params.NetworkType = cloud.NetworkListParamsNetworkType(m.FindOneBy.NetworkType.ValueString())
+	}
 	if !m.FindOneBy.OrderBy.IsNull() {
 		params.OrderBy = cloud.NetworkListParamsOrderBy(m.FindOneBy.OrderBy.ValueString())
+	}
+	if !m.FindOneBy.OwnedBy.IsNull() {
+		params.OwnedBy = cloud.NetworkListParamsOwnedBy(m.FindOneBy.OwnedBy.ValueString())
 	}
 	if !m.FindOneBy.TagKeyValue.IsNull() {
 		params.TagKeyValue = param.NewOpt(m.FindOneBy.TagKeyValue.ValueString())
@@ -87,8 +96,11 @@ type CloudNetworkTagsDataSourceModel struct {
 }
 
 type CloudNetworkFindOneByDataSourceModel struct {
+	External    types.Bool      `tfsdk:"external" query:"external,optional"`
 	Name        types.String    `tfsdk:"name" query:"name,optional"`
+	NetworkType types.String    `tfsdk:"network_type" query:"network_type,optional"`
 	OrderBy     types.String    `tfsdk:"order_by" query:"order_by,computed_optional"`
+	OwnedBy     types.String    `tfsdk:"owned_by" query:"owned_by,computed_optional"`
 	TagKey      *[]types.String `tfsdk:"tag_key" query:"tag_key,optional"`
 	TagKeyValue types.String    `tfsdk:"tag_key_value" query:"tag_key_value,optional"`
 }

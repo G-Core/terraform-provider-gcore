@@ -172,6 +172,14 @@ func DataSourceSchema(ctx context.Context) schema.Schema {
 							),
 						},
 					},
+					"owned_by": schema.StringAttribute{
+						Description: "Controls which subnets are returned. 'project' (default) returns only subnets owned by the project. 'any' returns all subnets from networks available to the project, including subnets from shared networks.\nAvailable values: \"any\", \"project\".",
+						Computed:    true,
+						Optional:    true,
+						Validators: []validator.String{
+							stringvalidator.OneOfCaseInsensitive("any", "project"),
+						},
+					},
 					"tag_key": schema.ListAttribute{
 						Description: "Optional. Filter by tag keys. ?`tag_key`=key1&`tag_key`=key2",
 						Optional:    true,

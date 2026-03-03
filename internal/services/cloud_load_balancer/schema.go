@@ -574,6 +574,10 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 					stringplanmodifier.UseStateForUnknown(),
 				},
 			},
+			"vip_fqdn": schema.StringAttribute{
+				Description: "Fully qualified domain name for the load balancer VIP",
+				Computed:    true,
+			},
 			"additional_vips": schema.ListNestedAttribute{
 				Description: "List of additional IP addresses",
 				Computed:    true,

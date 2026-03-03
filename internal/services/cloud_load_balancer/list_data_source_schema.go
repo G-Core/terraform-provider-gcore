@@ -584,6 +584,10 @@ func ListDataSourceSchema(ctx context.Context) schema.Schema {
 							Description: "Load balancer IP address",
 							Computed:    true,
 						},
+						"vip_fqdn": schema.StringAttribute{
+							Description: "Fully qualified domain name for the load balancer VIP",
+							Computed:    true,
+						},
 						"vip_ip_family": schema.StringAttribute{
 							Description: "Load balancer IP family\nAvailable values: \"dual\", \"ipv4\", \"ipv6\".",
 							Computed:    true,

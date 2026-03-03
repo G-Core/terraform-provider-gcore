@@ -75,6 +75,9 @@ func (m *CloudNetworkSubnetDataSourceModel) toListParams(_ context.Context) (par
 	if !m.FindOneBy.OrderBy.IsNull() {
 		params.OrderBy = cloud.NetworkSubnetListParamsOrderBy(m.FindOneBy.OrderBy.ValueString())
 	}
+	if !m.FindOneBy.OwnedBy.IsNull() {
+		params.OwnedBy = cloud.NetworkSubnetListParamsOwnedBy(m.FindOneBy.OwnedBy.ValueString())
+	}
 	if !m.FindOneBy.TagKeyValue.IsNull() {
 		params.TagKeyValue = param.NewOpt(m.FindOneBy.TagKeyValue.ValueString())
 	}
@@ -96,6 +99,7 @@ type CloudNetworkSubnetTagsDataSourceModel struct {
 type CloudNetworkSubnetFindOneByDataSourceModel struct {
 	NetworkID   types.String    `tfsdk:"network_id" query:"network_id,optional"`
 	OrderBy     types.String    `tfsdk:"order_by" query:"order_by,computed_optional"`
+	OwnedBy     types.String    `tfsdk:"owned_by" query:"owned_by,computed_optional"`
 	TagKey      *[]types.String `tfsdk:"tag_key" query:"tag_key,optional"`
 	TagKeyValue types.String    `tfsdk:"tag_key_value" query:"tag_key_value,optional"`
 }

@@ -34,6 +34,7 @@ type CloudLoadBalancerModel struct {
 	Region                types.String                                                       `tfsdk:"region" json:"region,computed"`
 	UpdatedAt             timetypes.RFC3339                                                  `tfsdk:"updated_at" json:"updated_at,computed" format:"date-time"`
 	VipAddress            types.String                                                       `tfsdk:"vip_address" json:"vip_address,computed"`
+	VipFqdn               types.String                                                       `tfsdk:"vip_fqdn" json:"vip_fqdn,computed"`
 	AdditionalVips        customfield.NestedObjectList[CloudLoadBalancerAdditionalVipsModel] `tfsdk:"additional_vips" json:"additional_vips,computed"`
 	DDOSProfile           customfield.NestedObject[CloudLoadBalancerDDOSProfileModel]        `tfsdk:"ddos_profile" json:"ddos_profile,computed"`
 	FloatingIPs           customfield.NestedObjectList[CloudLoadBalancerFloatingIPsModel]    `tfsdk:"floating_ips" json:"floating_ips,computed"`
