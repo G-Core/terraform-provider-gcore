@@ -1,7 +1,7 @@
 dario.cat/mergo v1.0.0 h1:AGCNq9Evsj31mOgNPcLyXc+4PNABt905YmuqPYYpBWk=
 dario.cat/mergo v1.0.0/go.mod h1:uNxQE+84aUszobStD9th8a29P2fMDhsBdgRYvZOxGmk=
-github.com/G-Core/gcore-go v0.35.0 h1:M+cSSUp91EAW81ohh5fiFgT7GwAT/TvVqE9Ixs5eBfg=
-github.com/G-Core/gcore-go v0.35.0/go.mod h1:VHbcTxWqi7XUSd/7yHFwodu4+KlsVR07MBmRr00DLw0=
+github.com/G-Core/gcore-go v0.36.0 h1:Qhwz3cnHjdGcI5AUCxNlkpR7if0+UQ5L4CysQakiO1U=
+github.com/G-Core/gcore-go v0.36.0/go.mod h1:VHbcTxWqi7XUSd/7yHFwodu4+KlsVR07MBmRr00DLw0=
 github.com/Masterminds/goutils v1.1.1 h1:5nUrii3FMTL5diU80unEVvNevw1nH4+ZV4DSLVJLSYI=
 github.com/Masterminds/goutils v1.1.1/go.mod h1:8cTjp+g8YejhMuvIA5y2vz3BpJxksy863GQaJW2MFNU=
 github.com/Masterminds/semver/v3 v3.1.1/go.mod h1:VPu/7SZ7ePZ3QOrcuXROw5FAcLl4a0cBrbBpGY/8hQs=
