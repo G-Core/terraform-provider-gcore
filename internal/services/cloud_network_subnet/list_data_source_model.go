@@ -24,6 +24,7 @@ type CloudNetworkSubnetsDataSourceModel struct {
 	TagKeyValue types.String                                                          `tfsdk:"tag_key_value" query:"tag_key_value,optional"`
 	TagKey      *[]types.String                                                       `tfsdk:"tag_key" query:"tag_key,optional"`
 	OrderBy     types.String                                                          `tfsdk:"order_by" query:"order_by,computed_optional"`
+	OwnedBy     types.String                                                          `tfsdk:"owned_by" query:"owned_by,computed_optional"`
 	MaxItems    types.Int64                                                           `tfsdk:"max_items"`
 	Items       customfield.NestedObjectList[CloudNetworkSubnetsItemsDataSourceModel] `tfsdk:"items"`
 }
@@ -51,6 +52,9 @@ func (m *CloudNetworkSubnetsDataSourceModel) toListParams(_ context.Context) (pa
 	}
 	if !m.OrderBy.IsNull() {
 		params.OrderBy = cloud.NetworkSubnetListParamsOrderBy(m.OrderBy.ValueString())
+	}
+	if !m.OwnedBy.IsNull() {
+		params.OwnedBy = cloud.NetworkSubnetListParamsOwnedBy(m.OwnedBy.ValueString())
 	}
 	if !m.TagKeyValue.IsNull() {
 		params.TagKeyValue = param.NewOpt(m.TagKeyValue.ValueString())

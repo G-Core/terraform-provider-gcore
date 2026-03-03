@@ -20,10 +20,13 @@ type CloudNetworksResultsListDataSourceEnvelope struct {
 type CloudNetworksDataSourceModel struct {
 	ProjectID   types.Int64                                                     `tfsdk:"project_id" path:"project_id,optional"`
 	RegionID    types.Int64                                                     `tfsdk:"region_id" path:"region_id,optional"`
+	External    types.Bool                                                      `tfsdk:"external" query:"external,optional"`
 	Name        types.String                                                    `tfsdk:"name" query:"name,optional"`
+	NetworkType types.String                                                    `tfsdk:"network_type" query:"network_type,optional"`
 	TagKeyValue types.String                                                    `tfsdk:"tag_key_value" query:"tag_key_value,optional"`
 	TagKey      *[]types.String                                                 `tfsdk:"tag_key" query:"tag_key,optional"`
 	OrderBy     types.String                                                    `tfsdk:"order_by" query:"order_by,computed_optional"`
+	OwnedBy     types.String                                                    `tfsdk:"owned_by" query:"owned_by,computed_optional"`
 	MaxItems    types.Int64                                                     `tfsdk:"max_items"`
 	Items       customfield.NestedObjectList[CloudNetworksItemsDataSourceModel] `tfsdk:"items"`
 }
@@ -46,11 +49,20 @@ func (m *CloudNetworksDataSourceModel) toListParams(_ context.Context) (params c
 	if !m.RegionID.IsNull() {
 		params.RegionID = param.NewOpt(m.RegionID.ValueInt64())
 	}
+	if !m.External.IsNull() {
+		params.External = param.NewOpt(m.External.ValueBool())
+	}
 	if !m.Name.IsNull() {
 		params.Name = param.NewOpt(m.Name.ValueString())
 	}
+	if !m.NetworkType.IsNull() {
+		params.NetworkType = cloud.NetworkListParamsNetworkType(m.NetworkType.ValueString())
+	}
 	if !m.OrderBy.IsNull() {
 		params.OrderBy = cloud.NetworkListParamsOrderBy(m.OrderBy.ValueString())
+	}
+	if !m.OwnedBy.IsNull() {
+		params.OwnedBy = cloud.NetworkListParamsOwnedBy(m.OwnedBy.ValueString())
 	}
 	if !m.TagKeyValue.IsNull() {
 		params.TagKeyValue = param.NewOpt(m.TagKeyValue.ValueString())

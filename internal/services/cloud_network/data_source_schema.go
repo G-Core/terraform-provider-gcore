@@ -121,12 +121,23 @@ func DataSourceSchema(ctx context.Context) schema.Schema {
 			"find_one_by": schema.SingleNestedAttribute{
 				Optional: true,
 				Attributes: map[string]schema.Attribute{
+					"external": schema.BoolAttribute{
+						Description: "Filter by external network status",
+						Optional:    true,
+					},
 					"name": schema.StringAttribute{
 						Description: "Filter networks by name",
 						Optional:    true,
 					},
+					"network_type": schema.StringAttribute{
+						Description: "Filter by network type (vlan or vxlan)\nAvailable values: \"vlan\", \"vxlan\".",
+						Optional:    true,
+						Validators: []validator.String{
+							stringvalidator.OneOfCaseInsensitive("vlan", "vxlan"),
+						},
+					},
 					"order_by": schema.StringAttribute{
-						Description: "Ordering networks list result by `name`, `created_at` fields of the network and directions (`created_at.desc`).\nAvailable values: \"created_at.asc\", \"created_at.desc\", \"name.asc\", \"name.desc\".",
+						Description: "Ordering networks list result by `name`, `created_at` or `priority` fields and directions (e.g. `created_at.desc`). Default is `created_at.desc`. Use `priority.desc` to sort by shared network priority (relevant when `owned_by=any`).\nAvailable values: \"created_at.asc\", \"created_at.desc\", \"name.asc\", \"name.desc\", \"priority.desc\".",
 						Computed:    true,
 						Optional:    true,
 						Validators: []validator.String{
@@ -135,7 +146,16 @@ func DataSourceSchema(ctx context.Context) schema.Schema {
 								"created_at.desc",
 								"name.asc",
 								"name.desc",
+								"priority.desc",
 							),
+						},
+					},
+					"owned_by": schema.StringAttribute{
+						Description: "Controls which networks are returned. 'project' (default) returns only networks owned by the project. 'any' returns all networks that the project can use, including shared networks from other projects.\nAvailable values: \"any\", \"project\".",
+						Computed:    true,
+						Optional:    true,
+						Validators: []validator.String{
+							stringvalidator.OneOfCaseInsensitive("any", "project"),
 						},
 					},
 					"tag_key": schema.ListAttribute{

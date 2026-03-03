@@ -32,6 +32,7 @@ type CloudLoadBalancerDataSourceModel struct {
 	TaskID                types.String                                                                 `tfsdk:"task_id" json:"task_id,computed"`
 	UpdatedAt             timetypes.RFC3339                                                            `tfsdk:"updated_at" json:"updated_at,computed" format:"date-time"`
 	VipAddress            types.String                                                                 `tfsdk:"vip_address" json:"vip_address,computed"`
+	VipFqdn               types.String                                                                 `tfsdk:"vip_fqdn" json:"vip_fqdn,computed"`
 	VipIPFamily           types.String                                                                 `tfsdk:"vip_ip_family" json:"vip_ip_family,computed"`
 	VipPortID             types.String                                                                 `tfsdk:"vip_port_id" json:"vip_port_id,computed"`
 	AdditionalVips        customfield.NestedObjectList[CloudLoadBalancerAdditionalVipsDataSourceModel] `tfsdk:"additional_vips" json:"additional_vips,computed"`

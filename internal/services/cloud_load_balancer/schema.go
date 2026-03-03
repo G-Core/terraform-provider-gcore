@@ -553,6 +553,10 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 				Description: "Load balancer IP address",
 				Computed:    true,
 			},
+			"vip_fqdn": schema.StringAttribute{
+				Description: "Fully qualified domain name for the load balancer VIP",
+				Computed:    true,
+			},
 			"tasks": schema.ListAttribute{
 				Description: "List of task IDs representing asynchronous operations. Use these IDs to monitor operation progress:\n- `GET /v1/tasks/{task_id}` - Check individual task status and details\nPoll task status until completion (`FINISHED`/`ERROR`) before proceeding with dependent operations.",
 				Computed:    true,

@@ -62,6 +62,14 @@ func ListDataSourceSchema(ctx context.Context) schema.Schema {
 					),
 				},
 			},
+			"owned_by": schema.StringAttribute{
+				Description: "Controls which subnets are returned. 'project' (default) returns only subnets owned by the project. 'any' returns all subnets from networks available to the project, including subnets from shared networks.\nAvailable values: \"any\", \"project\".",
+				Computed:    true,
+				Optional:    true,
+				Validators: []validator.String{
+					stringvalidator.OneOfCaseInsensitive("any", "project"),
+				},
+			},
 			"max_items": schema.Int64Attribute{
 				Description: "Max items to fetch, default: 1000",
 				Optional:    true,
