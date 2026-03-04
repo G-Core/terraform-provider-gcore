@@ -4,9 +4,9 @@ import (
 	"os"
 	"testing"
 
+	"github.com/G-Core/terraform-provider-gcore/internal"
 	"github.com/hashicorp/terraform-plugin-framework/providerserver"
 	"github.com/hashicorp/terraform-plugin-go/tfprotov6"
-	"github.com/stainless-sdks/gcore-terraform/internal"
 )
 
 // ProtoV6ProviderFactories is a static map used for basic tests

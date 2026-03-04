@@ -5,12 +5,12 @@ package cloud_k8s_cluster
 import (
 	"context"
 	"fmt"
-	"strings"
+	"github.com/G-Core/terraform-provider-gcore/internal/apijson"
+	"github.com/G-Core/terraform-provider-gcore/internal/customfield"
 	"github.com/hashicorp/terraform-plugin-framework-jsontypes/jsontypes"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/tidwall/sjson"
-	"github.com/G-Core/terraform-provider-gcore/internal/apijson"
-	"github.com/G-Core/terraform-provider-gcore/internal/customfield"
+	"strings"
 )
 
 type CloudK8SClusterModel struct {
