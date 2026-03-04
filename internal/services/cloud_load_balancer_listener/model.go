@@ -10,32 +10,32 @@ import (
 )
 
 type CloudLoadBalancerListenerModel struct {
-	ID                   types.String                                                         `tfsdk:"id" json:"id,computed"`
-	ProjectID            types.Int64                                                          `tfsdk:"project_id" path:"project_id,optional"`
-	RegionID             types.Int64                                                          `tfsdk:"region_id" path:"region_id,optional"`
-	LoadBalancerID       types.String                                                         `tfsdk:"load_balancer_id" json:"load_balancer_id,required"`
-	Protocol             types.String                                                         `tfsdk:"protocol" json:"protocol,required"`
-	ProtocolPort         types.Int64                                                          `tfsdk:"protocol_port" json:"protocol_port,required"`
-	DefaultPoolID        types.String                                                         `tfsdk:"default_pool_id" json:"default_pool_id,optional,no_refresh"`
-	InsertXForwarded     types.Bool                                                           `tfsdk:"insert_x_forwarded" json:"insert_x_forwarded,optional,no_refresh"`
-	Name                 types.String                                                         `tfsdk:"name" json:"name,required"`
-	AdminStateUp         types.Bool                                                           `tfsdk:"admin_state_up" json:"admin_state_up,optional"`
-	SecretID             types.String                                                         `tfsdk:"secret_id" json:"secret_id,optional"`
-	AllowedCidrs         *[]types.String                                                      `tfsdk:"allowed_cidrs" json:"allowed_cidrs,optional"`
-	ConnectionLimit      types.Int64                                                          `tfsdk:"connection_limit" json:"connection_limit,computed_optional"`
-	TimeoutClientData    types.Int64                                                          `tfsdk:"timeout_client_data" json:"timeout_client_data,computed_optional"`
-	TimeoutMemberConnect types.Int64                                                          `tfsdk:"timeout_member_connect" json:"timeout_member_connect,computed_optional"`
-	TimeoutMemberData    types.Int64                                                          `tfsdk:"timeout_member_data" json:"timeout_member_data,computed_optional"`
-	SniSecretID          customfield.List[types.String]                                       `tfsdk:"sni_secret_id" json:"sni_secret_id,computed_optional"`
-	UserList             customfield.NestedObjectList[CloudLoadBalancerListenerUserListModel] `tfsdk:"user_list" json:"user_list,computed_optional"`
-	CreatorTaskID        types.String                                                         `tfsdk:"creator_task_id" json:"creator_task_id,computed"`
-	OperatingStatus      types.String                                                         `tfsdk:"operating_status" json:"operating_status,computed"`
-	PoolCount            types.Int64                                                          `tfsdk:"pool_count" json:"pool_count,computed"`
-	ProvisioningStatus   types.String                                                         `tfsdk:"provisioning_status" json:"provisioning_status,computed"`
-	TaskID               types.String                                                         `tfsdk:"task_id" json:"task_id,computed"`
-	InsertHeaders        customfield.Map[jsontypes.Normalized]                                `tfsdk:"insert_headers" json:"insert_headers,computed"`
-	Tasks                customfield.List[types.String]                                       `tfsdk:"tasks" json:"tasks,computed,no_refresh"`
-	Stats                customfield.NestedObject[CloudLoadBalancerListenerStatsModel]        `tfsdk:"stats" json:"stats,computed"`
+	ID                   types.String                                                  `tfsdk:"id" json:"id,computed"`
+	ProjectID            types.Int64                                                   `tfsdk:"project_id" path:"project_id,optional"`
+	RegionID             types.Int64                                                   `tfsdk:"region_id" path:"region_id,optional"`
+	LoadBalancerID       types.String                                                  `tfsdk:"load_balancer_id" json:"load_balancer_id,required"`
+	Protocol             types.String                                                  `tfsdk:"protocol" json:"protocol,required"`
+	ProtocolPort         types.Int64                                                   `tfsdk:"protocol_port" json:"protocol_port,required"`
+	DefaultPoolID        types.String                                                  `tfsdk:"default_pool_id" json:"default_pool_id,optional,no_refresh"`
+	InsertXForwarded     types.Bool                                                    `tfsdk:"insert_x_forwarded" json:"insert_x_forwarded,optional,no_refresh"`
+	Name                 types.String                                                  `tfsdk:"name" json:"name,required"`
+	AdminStateUp         types.Bool                                                    `tfsdk:"admin_state_up" json:"admin_state_up,optional"`
+	SecretID             types.String                                                  `tfsdk:"secret_id" json:"secret_id,optional"`
+	AllowedCidrs         *[]types.String                                               `tfsdk:"allowed_cidrs" json:"allowed_cidrs,optional"`
+	UserList             *[]*CloudLoadBalancerListenerUserListModel                    `tfsdk:"user_list" json:"user_list,optional"`
+	ConnectionLimit      types.Int64                                                   `tfsdk:"connection_limit" json:"connection_limit,computed_optional"`
+	TimeoutClientData    types.Int64                                                   `tfsdk:"timeout_client_data" json:"timeout_client_data,computed_optional"`
+	TimeoutMemberConnect types.Int64                                                   `tfsdk:"timeout_member_connect" json:"timeout_member_connect,computed_optional"`
+	TimeoutMemberData    types.Int64                                                   `tfsdk:"timeout_member_data" json:"timeout_member_data,computed_optional"`
+	SniSecretID          customfield.List[types.String]                                `tfsdk:"sni_secret_id" json:"sni_secret_id,computed_optional"`
+	CreatorTaskID        types.String                                                  `tfsdk:"creator_task_id" json:"creator_task_id,computed"`
+	OperatingStatus      types.String                                                  `tfsdk:"operating_status" json:"operating_status,computed"`
+	PoolCount            types.Int64                                                   `tfsdk:"pool_count" json:"pool_count,computed"`
+	ProvisioningStatus   types.String                                                  `tfsdk:"provisioning_status" json:"provisioning_status,computed"`
+	TaskID               types.String                                                  `tfsdk:"task_id" json:"task_id,computed"`
+	InsertHeaders        customfield.Map[jsontypes.Normalized]                         `tfsdk:"insert_headers" json:"insert_headers,computed"`
+	Tasks                customfield.List[types.String]                                `tfsdk:"tasks" json:"tasks,computed,no_refresh"`
+	Stats                customfield.NestedObject[CloudLoadBalancerListenerStatsModel] `tfsdk:"stats" json:"stats,computed"`
 }
 
 func (m CloudLoadBalancerListenerModel) MarshalJSON() (data []byte, err error) {

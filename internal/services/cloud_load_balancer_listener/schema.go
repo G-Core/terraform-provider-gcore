@@ -98,6 +98,22 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 				Optional:    true,
 				ElementType: types.StringType,
 			},
+			"user_list": schema.ListNestedAttribute{
+				Description: "Load balancer listener list of username and encrypted password items",
+				Optional:    true,
+				NestedObject: schema.NestedAttributeObject{
+					Attributes: map[string]schema.Attribute{
+						"encrypted_password": schema.StringAttribute{
+							Description: "Encrypted password to auth via Basic Authentication",
+							Required:    true,
+						},
+						"username": schema.StringAttribute{
+							Description: "Username to auth via Basic Authentication",
+							Required:    true,
+						},
+					},
+				},
+			},
 			"connection_limit": schema.Int64Attribute{
 				Description: "Limit of the simultaneous connections. If -1 is provided, it is translated to the default value 100000.",
 				Computed:    true,
@@ -139,24 +155,6 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 				Optional:    true,
 				CustomType:  customfield.NewListType[types.String](ctx),
 				ElementType: types.StringType,
-			},
-			"user_list": schema.ListNestedAttribute{
-				Description: "Load balancer listener list of username and encrypted password items",
-				Computed:    true,
-				Optional:    true,
-				CustomType:  customfield.NewNestedObjectListType[CloudLoadBalancerListenerUserListModel](ctx),
-				NestedObject: schema.NestedAttributeObject{
-					Attributes: map[string]schema.Attribute{
-						"encrypted_password": schema.StringAttribute{
-							Description: "Encrypted password to auth via Basic Authentication",
-							Required:    true,
-						},
-						"username": schema.StringAttribute{
-							Description: "Username to auth via Basic Authentication",
-							Required:    true,
-						},
-					},
-				},
 			},
 			"creator_task_id": schema.StringAttribute{
 				Description: "Task that created this entity",
