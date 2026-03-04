@@ -24,7 +24,7 @@ type CloudLoadBalancerListenerModel struct {
 	TimeoutClientData  types.Int64                                                          `tfsdk:"timeout_client_data" json:"timeout_client_data,computed_optional"`
 	AllowedCidrs       *[]types.String                                                      `tfsdk:"allowed_cidrs" json:"allowed_cidrs,optional"`
 	SniSecretID        customfield.List[types.String]                                       `tfsdk:"sni_secret_id" json:"sni_secret_id,computed_optional"`
-	UserList           customfield.NestedObjectList[CloudLoadBalancerListenerUserListModel] `tfsdk:"user_list" json:"user_list,computed_optional"`
+	UserList             *[]*CloudLoadBalancerListenerUserListModel                    `tfsdk:"user_list" json:"user_list,optional"`
 	ConnectionLimit    types.Int64                                                          `tfsdk:"connection_limit" json:"connection_limit,computed_optional"`
 	CreatorTaskID      types.String                                                         `tfsdk:"creator_task_id" json:"creator_task_id,computed"`
 	OperatingStatus    types.String                                                         `tfsdk:"operating_status" json:"operating_status,computed"`

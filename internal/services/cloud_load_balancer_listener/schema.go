@@ -132,9 +132,7 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 			},
 			"user_list": schema.ListNestedAttribute{
 				Description: "Load balancer listener list of username and encrypted password items",
-				Computed:    true,
 				Optional:    true,
-				CustomType:  customfield.NewNestedObjectListType[CloudLoadBalancerListenerUserListModel](ctx),
 				PlanModifiers: []planmodifier.List{
 					listplanmodifier.UseStateForUnknown(),
 				},
