@@ -21,6 +21,7 @@ var _ resource.ResourceWithConfigValidators = (*DNSZoneResource)(nil)
 
 func ResourceSchema(ctx context.Context) schema.Schema {
 	return schema.Schema{
+		Description: "DNS zones are authoritative containers for domain name records, with support for DNSSEC and SOA configuration.",
 		Attributes: map[string]schema.Attribute{
 			"id": schema.StringAttribute{
 				Description:   "name of DNS zone",

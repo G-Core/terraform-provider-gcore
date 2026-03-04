@@ -16,6 +16,7 @@ var _ datasource.DataSourceWithConfigValidators = (*CloudReservedFixedIPDataSour
 
 func DataSourceSchema(ctx context.Context) schema.Schema {
 	return schema.Schema{
+		Description: "Reserved fixed IPs are static IP addresses that persist independently of instances and can be used as virtual IPs (VIPs) for high availability.",
 		Attributes: map[string]schema.Attribute{
 			"port_id": schema.StringAttribute{
 				Required: true,

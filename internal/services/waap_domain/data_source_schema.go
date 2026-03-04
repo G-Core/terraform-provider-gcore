@@ -17,6 +17,7 @@ var _ datasource.DataSourceWithConfigValidators = (*WaapDomainDataSource)(nil)
 
 func DataSourceSchema(ctx context.Context) schema.Schema {
 	return schema.Schema{
+		Description: "WAAP domains enable Web Application and API Protection for monitoring and defending web applications against security threats.",
 		Attributes: map[string]schema.Attribute{
 			"domain_id": schema.Int64Attribute{
 				Description: "The domain ID",

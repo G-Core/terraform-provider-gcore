@@ -17,6 +17,7 @@ var _ datasource.DataSourceWithConfigValidators = (*CloudNetworkRoutersDataSourc
 
 func ListDataSourceSchema(ctx context.Context) schema.Schema {
 	return schema.Schema{
+		Description: "Routers interconnect subnets and manage network routing, including external gateway connectivity and static routes.",
 		Attributes: map[string]schema.Attribute{
 			"project_id": schema.Int64Attribute{
 				Optional: true,

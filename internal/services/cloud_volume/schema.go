@@ -23,6 +23,7 @@ var _ resource.ResourceWithConfigValidators = (*CloudVolumeResource)(nil)
 
 func ResourceSchema(ctx context.Context) schema.Schema {
 	return schema.Schema{
+		Description: "Volumes are block storage devices that can be attached to instances as boot or data disks, with support for resizing and type changes.",
 		Attributes: map[string]schema.Attribute{
 			"id": schema.StringAttribute{
 				Computed:      true,

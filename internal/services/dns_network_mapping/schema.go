@@ -16,6 +16,7 @@ var _ resource.ResourceWithConfigValidators = (*DNSNetworkMappingResource)(nil)
 
 func ResourceSchema(ctx context.Context) schema.Schema {
 	return schema.Schema{
+		Description: "DNS network mappings associate CIDR ranges with network tags for private DNS resolution and traffic-based routing.",
 		Attributes: map[string]schema.Attribute{
 			"id": schema.Int64Attribute{
 				Computed:      true,

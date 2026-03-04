@@ -23,6 +23,7 @@ var _ resource.ResourceWithConfigValidators = (*CloudLoadBalancerPoolResource)(n
 
 func ResourceSchema(ctx context.Context) schema.Schema {
 	return schema.Schema{
+		Description: "Load balancer pools group backend instances with a load balancing algorithm and health monitoring configuration.",
 		Attributes: map[string]schema.Attribute{
 			"id": schema.StringAttribute{
 				Computed:      true,

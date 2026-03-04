@@ -27,6 +27,7 @@ var _ resource.ResourceWithConfigValidators = (*CloudLoadBalancerResource)(nil)
 
 func ResourceSchema(ctx context.Context) schema.Schema {
 	return schema.Schema{
+		Description: "Load balancers distribute incoming traffic across multiple instances with support for listeners, pools, and health monitoring.",
 		Attributes: map[string]schema.Attribute{
 			"id": schema.StringAttribute{
 				Computed:      true,
