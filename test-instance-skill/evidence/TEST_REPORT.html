@@ -1,0 +1,1074 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>gcore_cloud_instance Test Report - PR #35</title>
+    <style>
+        :root {
+            --bg-dark: #1a1a2e;
+            --bg-card: #16213e;
+            --accent: #0f3460;
+            --success: #00d26a;
+            --danger: #ff6b6b;
+            --warning: #ffc107;
+            --text: #e8e8e8;
+            --text-muted: #a0a0a0;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background: var(--bg-dark);
+            color: var(--text);
+            line-height: 1.6;
+            padding: 2rem;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 3rem;
+            padding: 2rem;
+            background: linear-gradient(135deg, var(--bg-card), var(--accent));
+            border-radius: 16px;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+            background: linear-gradient(90deg, #00d26a, #00b4d8);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .subtitle {
+            color: var(--text-muted);
+            font-size: 1.1rem;
+        }
+
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 3rem;
+        }
+
+        .summary-card {
+            background: var(--bg-card);
+            padding: 1.5rem;
+            border-radius: 12px;
+            text-align: center;
+            border: 1px solid var(--accent);
+        }
+
+        .summary-card .number {
+            font-size: 3rem;
+            font-weight: bold;
+        }
+
+        .summary-card.success .number { color: var(--success); }
+        .summary-card.danger .number { color: var(--danger); }
+        .summary-card.warning .number { color: var(--warning); }
+
+        .section {
+            background: var(--bg-card);
+            border-radius: 12px;
+            margin-bottom: 2rem;
+            overflow: hidden;
+            border: 1px solid var(--accent);
+        }
+
+        .section-header {
+            background: var(--accent);
+            padding: 1rem 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .section-header h2 {
+            font-size: 1.25rem;
+        }
+
+        .section-content {
+            padding: 1.5rem;
+        }
+
+        .test-result {
+            display: flex;
+            align-items: center;
+            padding: 1rem;
+            background: rgba(0,0,0,0.2);
+            border-radius: 8px;
+            margin-bottom: 1rem;
+        }
+
+        .test-result:last-child {
+            margin-bottom: 0;
+        }
+
+        .status-badge {
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            margin-right: 1rem;
+            min-width: 80px;
+            text-align: center;
+        }
+
+        .status-badge.pass { background: var(--success); color: #000; }
+        .status-badge.fail { background: var(--danger); color: #fff; }
+        .status-badge.bug { background: var(--warning); color: #000; }
+
+        .test-name {
+            flex: 1;
+            font-weight: 500;
+        }
+
+        .test-details {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+
+        pre {
+            background: #0d1117;
+            padding: 1rem;
+            border-radius: 8px;
+            overflow-x: auto;
+            font-family: 'Fira Code', 'Consolas', monospace;
+            font-size: 0.85rem;
+            line-height: 1.5;
+            border: 1px solid #30363d;
+        }
+
+        code {
+            font-family: 'Fira Code', 'Consolas', monospace;
+            background: rgba(255,255,255,0.1);
+            padding: 0.2rem 0.4rem;
+            border-radius: 4px;
+        }
+
+        .bug-card {
+            background: rgba(255, 107, 107, 0.1);
+            border: 1px solid var(--danger);
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .bug-card h3 {
+            color: var(--danger);
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .bug-card .location {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            margin-bottom: 0.75rem;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1rem 0;
+        }
+
+        th, td {
+            padding: 0.75rem 1rem;
+            text-align: left;
+            border-bottom: 1px solid var(--accent);
+        }
+
+        th {
+            background: rgba(0,0,0,0.3);
+            font-weight: 600;
+        }
+
+        .file-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1rem;
+        }
+
+        .file-item {
+            background: rgba(0,0,0,0.2);
+            padding: 1rem;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .file-icon {
+            font-size: 1.5rem;
+        }
+
+        .file-info {
+            flex: 1;
+        }
+
+        .file-name {
+            font-weight: 500;
+            word-break: break-all;
+        }
+
+        .file-size {
+            color: var(--text-muted);
+            font-size: 0.85rem;
+        }
+
+        .collapsible {
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .collapsible::after {
+            content: ' ▼';
+            font-size: 0.8rem;
+        }
+
+        .collapsed::after {
+            content: ' ►';
+        }
+
+        .collapsible-content {
+            max-height: 500px;
+            overflow-y: auto;
+        }
+
+        .collapsible-content.hidden {
+            display: none;
+        }
+
+        footer {
+            text-align: center;
+            padding: 2rem;
+            color: var(--text-muted);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>gcore_cloud_instance Test Report</h1>
+            <p class="subtitle">PR #35 Comprehensive Testing - January 13, 2026</p>
+            <p class="subtitle">JIRA Reference: GCLOUD2-21138</p>
+        </header>
+
+        <div class="summary-grid">
+            <div class="summary-card success">
+                <div class="number">3</div>
+                <div>Tests Passed</div>
+            </div>
+            <div class="summary-card danger">
+                <div class="number">3</div>
+                <div>Bugs Found</div>
+            </div>
+            <div class="summary-card warning">
+                <div class="number">5</div>
+                <div>Total Tests</div>
+            </div>
+            <div class="summary-card">
+                <div class="number">1</div>
+                <div>Instance Created</div>
+            </div>
+        </div>
+
+        <div class="section">
+            <div class="section-header">
+                <span>📋</span>
+                <h2>Test Results Summary</h2>
+            </div>
+            <div class="section-content">
+                <div class="test-result">
+                    <span class="status-badge pass">PASS</span>
+                    <span class="test-name">Test 1: Basic Instance Creation</span>
+                    <span class="test-details">Instance created with external interface and boot volume</span>
+                </div>
+                <div class="test-result">
+                    <span class="status-badge pass">PASS</span>
+                    <span class="test-name">Test 1b: Drift Detection</span>
+                    <span class="test-details">No changes on second terraform plan (exit code 0)</span>
+                </div>
+                <div class="test-result">
+                    <span class="status-badge bug">BUG</span>
+                    <span class="test-name">Test 2: Flavor Change (In-Place Update)</span>
+                    <span class="test-details">changeflavor task not awaited - inconsistent result error</span>
+                </div>
+                <div class="test-result">
+                    <span class="status-badge pass">PASS</span>
+                    <span class="test-name">Test 3: Volume Extend</span>
+                    <span class="test-details">Volume extended from 5GB to 10GB successfully</span>
+                </div>
+                <div class="test-result">
+                    <span class="status-badge bug">BUG</span>
+                    <span class="test-name">Test 4: Tags Operations</span>
+                    <span class="test-details">Model type *map[string]types.String can't handle unknown values</span>
+                </div>
+                <div class="test-result">
+                    <span class="status-badge bug">BUG</span>
+                    <span class="test-name">Test 5: Import & boot_index Drift</span>
+                    <span class="test-details">boot_index not populated during import - causes drift</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="section">
+            <div class="section-header">
+                <span>🐛</span>
+                <h2>Bugs Found (3)</h2>
+            </div>
+            <div class="section-content">
+                <div class="bug-card">
+                    <h3>🐛 BUG #1: Flavor Change Task Not Awaited</h3>
+                    <div class="location">File: internal/services/cloud_instance/resource.go</div>
+                    <p><strong>Description:</strong> When changing flavor (e.g., g1-standard-1-2 → g1-standard-2-4), the provider returns before the changeflavor task completes. This causes "inconsistent result" errors because the API still reports the old flavor when state is refreshed.</p>
+                    <p><strong>Expected:</strong> Provider should use <code>ChangeFlavorAndPoll</code> to wait for task completion.</p>
+                    <p><strong>Actual:</strong> Provider reads state immediately, gets old flavor value.</p>
+                    <pre>Error: Provider produced inconsistent result after apply
+
+When applying changes to gcore_cloud_instance.test, provider
+"registry.terraform.io/gcore/gcore" produced an unexpected new value:
+.flavor: was cty.StringVal("g1-standard-2-4"), but now
+cty.StringVal("g1-standard-1-2").</pre>
+                </div>
+
+                <div class="bug-card">
+                    <h3>🐛 BUG #2: Tags Model Type Can't Handle Unknown Values</h3>
+                    <div class="location">File: internal/services/cloud_instance/model.go:45</div>
+                    <p><strong>Description:</strong> The Tags field uses <code>*map[string]types.String</code> which cannot represent unknown values in Terraform's type system.</p>
+                    <p><strong>Expected:</strong> Tags field should use <code>types.Map</code> or <code>customfield.Map</code> to handle unknown values.</p>
+                    <p><strong>Actual:</strong> When tags variable is not set or computed, Terraform fails with:</p>
+                    <pre>Error: Value Conversion Error
+
+Received unknown value, however the target type cannot handle unknown values.
+Path: tags
+Target Type: *map[string]basetypes.StringValue
+Suggested Type: basetypes.MapValue</pre>
+                    <p><strong>Suggested Fix:</strong> Change <code>Tags *map[string]types.String</code> to <code>Tags types.Map</code> in model.go.</p>
+                </div>
+
+                <div class="bug-card">
+                    <h3>🐛 BUG #3: boot_index Not Populated During Import</h3>
+                    <div class="location">File: internal/services/cloud_instance/resource.go (ImportState)</div>
+                    <p><strong>Description:</strong> After importing an instance, the <code>boot_index</code> field in volumes is not read from the API. This causes drift on subsequent plans.</p>
+                    <p><strong>Expected:</strong> After import, terraform plan should show no changes.</p>
+                    <p><strong>Actual:</strong> Terraform plan shows drift:</p>
+                    <pre>  ~ volumes = [
+      ~ {
+          + boot_index = 0
+          # (1 unchanged attribute hidden)
+        },
+    ]</pre>
+                    <p><strong>Impact:</strong> Users importing existing instances will always see drift on first plan.</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="section">
+            <div class="section-header">
+                <span>🔍</span>
+                <h2>Deep Dive: Tags Bug Analysis</h2>
+            </div>
+            <div class="section-content">
+                <h3 style="margin-bottom: 1rem; color: var(--warning);">Root Cause Analysis</h3>
+
+                <p style="margin-bottom: 1rem;"><strong>The Mismatch:</strong></p>
+                <table>
+                    <tr>
+                        <th>Component</th>
+                        <th>Current Implementation</th>
+                        <th>Required Implementation</th>
+                    </tr>
+                    <tr>
+                        <td>Schema (schema.go:209)</td>
+                        <td><code>schema.MapAttribute</code> with <code>ElementType: types.StringType</code></td>
+                        <td>Correct</td>
+                    </tr>
+                    <tr>
+                        <td>Model (model.go:32)</td>
+                        <td><code>*map[string]types.String</code></td>
+                        <td><code>customfield.Map[types.String]</code> or <code>types.Map</code></td>
+                    </tr>
+                </table>
+
+                <h3 style="margin: 1.5rem 0 1rem; color: var(--warning);">Why This Fails</h3>
+                <p>In Terraform Framework, when a variable is not yet known (e.g., <code>default = null</code> or computed from another resource), it's represented as an "unknown" value. The type <code>*map[string]types.String</code> is a Go native map and cannot represent this unknown state.</p>
+
+                <pre style="margin: 1rem 0;">
+// CURRENT (buggy) - Go native map can't be "unknown"
+Tags *map[string]types.String `tfsdk:"tags" json:"tags,optional,no_refresh"`
+
+// FIXED - customfield.Map has UnknownMap() support
+Tags customfield.Map[types.String] `tfsdk:"tags" json:"tags,optional,no_refresh"`</pre>
+
+                <h3 style="margin: 1.5rem 0 1rem; color: var(--warning);">Scope of Impact</h3>
+                <p>This affects <strong>ALL resources</strong> using tags with the same pattern:</p>
+                <ul style="margin: 0.5rem 0 1rem 1.5rem;">
+                    <li>cloud_instance</li>
+                    <li>cloud_load_balancer</li>
+                    <li>cloud_volume</li>
+                    <li>cloud_network</li>
+                    <li>cloud_security_group</li>
+                    <li>cloud_floating_ip</li>
+                    <li>cloud_file_share</li>
+                    <li>cloud_network_subnet</li>
+                    <li>cloud_gpu_virtual_cluster</li>
+                    <li>And more...</li>
+                </ul>
+
+                <h3 style="margin: 1.5rem 0 1rem; color: var(--warning);">How Old Provider Handled It</h3>
+                <p>The old provider used Terraform SDK v2:</p>
+                <pre style="margin: 1rem 0;">
+// Old provider (SDK v2) - schema.TypeMap with Go map[string]string
+"metadata_map": &schema.Schema{
+    Type:     schema.TypeMap,
+    Optional: true,
+    Elem: &schema.Schema{
+        Type: schema.TypeString,
+    },
+}</pre>
+                <p>SDK v2's <code>schema.TypeMap</code> handles unknown values internally. The new Terraform Framework requires explicit handling via <code>types.Map</code> or <code>customfield.Map</code>.</p>
+
+                <h3 style="margin: 1.5rem 0 1rem; color: var(--warning);">Fix Location</h3>
+                <p>This is a <strong>Stainless code generator issue</strong>. When generating model types for <code>MapAttribute</code> fields, it should use <code>customfield.Map[T]</code> instead of <code>*map[string]T</code>.</p>
+
+                <p style="margin-top: 1rem;"><strong>The customfield package already exists</strong> at <code>/internal/customfield/map.go</code> with proper support:</p>
+                <pre style="margin: 1rem 0;">
+// From customfield/map.go - already handles unknown values!
+func UnknownMap[T attr.Value](ctx context.Context) Map[T] {
+    return Map[T]{MapValue: basetypes.NewMapUnknown(elemType[T](ctx))}
+}</pre>
+            </div>
+        </div>
+
+        <div class="section">
+            <div class="section-header">
+                <span>🔬</span>
+                <h2>Test Environment</h2>
+            </div>
+            <div class="section-content">
+                <table>
+                    <tr>
+                        <th>Property</th>
+                        <th>Value</th>
+                    </tr>
+                    <tr>
+                        <td>Provider Branch</td>
+                        <td>terraform-instances (PR #35)</td>
+                    </tr>
+                    <tr>
+                        <td>Test Date</td>
+                        <td>January 13, 2026</td>
+                    </tr>
+                    <tr>
+                        <td>Project ID</td>
+                        <td>379987</td>
+                    </tr>
+                    <tr>
+                        <td>Region ID</td>
+                        <td>76 (Luxembourg-2)</td>
+                    </tr>
+                    <tr>
+                        <td>Instance ID</td>
+                        <td>86973cc4-a805-4ab4-a177-d68d0622a765</td>
+                    </tr>
+                    <tr>
+                        <td>Volume ID</td>
+                        <td>0834f9fb-1fb3-4d11-b1d8-74622f0ca032</td>
+                    </tr>
+                    <tr>
+                        <td>Image</td>
+                        <td>Ubuntu 22.04 (6343932d-0257-4285-bf89-05060f24095a)</td>
+                    </tr>
+                    <tr>
+                        <td>Flavors Tested</td>
+                        <td>g1-standard-1-2, g1-standard-2-4</td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+
+        <div class="section">
+            <div class="section-header collapsible" onclick="toggleSection(this)">
+                <span>📄</span>
+                <h2>Terraform Configuration (main.tf)</h2>
+            </div>
+            <div class="section-content collapsible-content">
+                <pre># Comprehensive test configuration for gcore_cloud_instance
+# Based on JIRA GCLOUD2-21138 bugs and requirements
+# Tests: creation, flavor change, volume extend, tags, floating IPs, import
+#
+# DESIGN NOTE: The new provider uses a "bring your own volume" approach.
+# Volumes must be created separately using gcore_cloud_volume, then attached.
+
+terraform {
+  required_providers {
+    gcore = {
+      source = "gcore/gcore"
+    }
+  }
+}
+
+provider "gcore" {
+  api_key = var.api_key
+}
+
+# ============================================================================
+# Variables
+# ============================================================================
+
+variable "api_key" {
+  type        = string
+  description = "Gcore API key"
+  sensitive   = true
+}
+
+variable "project_id" {
+  type    = number
+  default = 379987
+}
+
+variable "region_id" {
+  type    = number
+  default = 76
+}
+
+variable "instance_name" {
+  type    = string
+  default = "pr35-comprehensive-test"
+}
+
+variable "flavor" {
+  type    = string
+  default = "g1-standard-1-2"  # Initial flavor, change to g1-standard-2-4 for flavor test
+}
+
+variable "volume_size" {
+  type    = number
+  default = 10  # Extended from 5 to 10
+}
+
+# Known Ubuntu 22.04 image ID for Luxembourg-2 region
+variable "image_id" {
+  type    = string
+  default = "6343932d-0257-4285-bf89-05060f24095a"
+}
+
+# Tags for testing (JIRA: JSON Merge Patch for tags) - Now a map of strings
+variable "tags" {
+  type    = map(string)
+  default = null
+}
+
+# Floating IP config (JIRA: FIP on interface)
+variable "enable_floating_ip" {
+  type    = bool
+  default = false
+}
+
+# ============================================================================
+# Boot Volume - Created first, then attached to instance
+# ============================================================================
+
+resource "gcore_cloud_volume" "boot" {
+  project_id = var.project_id
+  region_id  = var.region_id
+
+  name      = "${var.instance_name}-boot"
+  size      = var.volume_size
+  source    = "image"
+  image_id  = var.image_id
+  type_name = "standard"
+}
+
+# ============================================================================
+# Main Instance Resource
+# ============================================================================
+
+resource "gcore_cloud_instance" "test" {
+  project_id = var.project_id
+  region_id  = var.region_id
+
+  name   = var.instance_name
+  flavor = var.flavor
+
+  # External interface - simple setup for initial creation test
+  interfaces = [
+    {
+      type = "external"
+    }
+  ]
+
+  # Attach the pre-created boot volume
+  volumes = [
+    {
+      volume_id  = gcore_cloud_volume.boot.id
+      boot_index = 0
+    }
+  ]
+
+  # Tags (JIRA: JSON Merge Patch update/delete)
+  # BUG: tags type *map[string]types.String can't handle unknown values
+  # tags = var.tags
+}
+
+# ============================================================================
+# Outputs for verification
+# ============================================================================
+
+output "instance_id" {
+  description = "Instance ID for import test"
+  value       = gcore_cloud_instance.test.id
+}
+
+output "instance_status" {
+  value = gcore_cloud_instance.test.status
+}
+
+output "instance_vm_state" {
+  value = gcore_cloud_instance.test.vm_state
+}
+
+output "instance_flavor" {
+  description = "Current flavor - verify in-place change"
+  value       = gcore_cloud_instance.test.flavor
+}
+
+output "instance_addresses" {
+  value = gcore_cloud_instance.test.addresses
+}
+
+output "instance_interfaces" {
+  description = "Interface details including port_id"
+  value       = gcore_cloud_instance.test.interfaces
+}
+
+output "boot_volume_id" {
+  description = "Boot volume ID - should have boot_index=0"
+  value       = gcore_cloud_instance.test.volumes[0].volume_id
+}
+
+output "boot_volume_boot_index" {
+  description = "Boot index - should be 0, no drift after import"
+  value       = gcore_cloud_instance.test.volumes[0].boot_index
+}
+
+output "instance_tags" {
+  description = "Current tags - verify update/delete"
+  value       = gcore_cloud_instance.test.tags
+}
+
+output "volume_size" {
+  description = "Boot volume size - verify extend operation"
+  value       = gcore_cloud_volume.boot.size
+}</pre>
+            </div>
+        </div>
+
+        <div class="section">
+            <div class="section-header collapsible" onclick="toggleSection(this)">
+                <span>📊</span>
+                <h2>Terraform State (Current)</h2>
+            </div>
+            <div class="section-content collapsible-content">
+                <pre>{
+  "version": 4,
+  "terraform_version": "1.12.0",
+  "resources": [
+    {
+      "type": "gcore_cloud_instance",
+      "name": "test",
+      "instances": [
+        {
+          "attributes": {
+            "id": "86973cc4-a805-4ab4-a177-d68d0622a765",
+            "name": "pr35-comprehensive-test",
+            "flavor": "g1-standard-2-4",
+            "status": "ACTIVE",
+            "vm_state": "active",
+            "project_id": 379987,
+            "region_id": 76,
+            "volumes": [
+              {
+                "volume_id": "0834f9fb-1fb3-4d11-b1d8-74622f0ca032",
+                "boot_index": null  // BUG: Should be 0
+              }
+            ],
+            "interfaces": [
+              {
+                "type": "external",
+                "ip_address": "109.61.125.241",
+                "port_id": "95113522-8fa2-4403-9564-4cb9674d8384"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "type": "gcore_cloud_volume",
+      "name": "boot",
+      "instances": [
+        {
+          "attributes": {
+            "id": "0834f9fb-1fb3-4d11-b1d8-74622f0ca032",
+            "name": "pr35-comprehensive-test-boot",
+            "size": 10,
+            "source": "image",
+            "image_id": "6343932d-0257-4285-bf89-05060f24095a",
+            "type_name": "standard",
+            "status": "in-use"
+          }
+        }
+      ]
+    }
+  ]
+}</pre>
+            </div>
+        </div>
+
+        <div class="section">
+            <div class="section-header collapsible" onclick="toggleSection(this)">
+                <span>📝</span>
+                <h2>Test 1: Basic Creation Log</h2>
+            </div>
+            <div class="section-content collapsible-content">
+                <pre>gcore_cloud_volume.boot: Creating...
+gcore_cloud_volume.boot: Still creating... [10s elapsed]
+gcore_cloud_volume.boot: Creation complete after 17s [id=0834f9fb-1fb3-4d11-b1d8-74622f0ca032]
+gcore_cloud_instance.test: Creating...
+gcore_cloud_instance.test: Still creating... [10s elapsed]
+gcore_cloud_instance.test: Still creating... [20s elapsed]
+gcore_cloud_instance.test: Still creating... [30s elapsed]
+gcore_cloud_instance.test: Still creating... [40s elapsed]
+gcore_cloud_instance.test: Still creating... [50s elapsed]
+gcore_cloud_instance.test: Still creating... [1m0s elapsed]
+gcore_cloud_instance.test: Still creating... [1m10s elapsed]
+gcore_cloud_instance.test: Creation complete after 1m16s [id=86973cc4-a805-4ab4-a177-d68d0622a765]
+
+Apply complete! Resources: 2 added, 0 changed, 0 destroyed.
+
+Outputs:
+boot_volume_boot_index = 0
+boot_volume_id = "0834f9fb-1fb3-4d11-b1d8-74622f0ca032"
+instance_addresses = tomap({
+  "pub_net" = tolist([
+    {
+      "addr" = "109.61.125.241"
+      "subnet_id" = "b4c6e91a-9eb9-4c59-ad57-00124eceda00"
+      "subnet_name" = "pub_net11"
+      "type" = "fixed"
+    },
+  ])
+})
+instance_flavor = "g1-standard-1-2"
+instance_id = "86973cc4-a805-4ab4-a177-d68d0622a765"
+instance_status = "ACTIVE"
+instance_vm_state = "active"
+volume_size = 5</pre>
+            </div>
+        </div>
+
+        <div class="section">
+            <div class="section-header collapsible collapsed" onclick="toggleSection(this)">
+                <span>📝</span>
+                <h2>Test 1b: Drift Detection Log</h2>
+            </div>
+            <div class="section-content collapsible-content hidden">
+                <pre>gcore_cloud_volume.boot: Refreshing state... [id=0834f9fb-1fb3-4d11-b1d8-74622f0ca032]
+gcore_cloud_instance.test: Refreshing state... [id=86973cc4-a805-4ab4-a177-d68d0622a765]
+
+No changes. Your infrastructure matches the configuration.
+
+Terraform has compared your real infrastructure against your configuration
+and found no differences, so no changes are needed.
+
+Exit code: 0 (PASS - No drift detected)</pre>
+            </div>
+        </div>
+
+        <div class="section">
+            <div class="section-header collapsible collapsed" onclick="toggleSection(this)">
+                <span>📝</span>
+                <h2>Test 2: Flavor Change Error Log</h2>
+            </div>
+            <div class="section-content collapsible-content hidden">
+                <pre>Terraform will perform the following actions:
+
+  # gcore_cloud_instance.test will be updated in-place
+  ~ resource "gcore_cloud_instance" "test" {
+      ~ flavor = "g1-standard-1-2" -> "g1-standard-2-4"
+        id     = "86973cc4-a805-4ab4-a177-d68d0622a765"
+        name   = "pr35-comprehensive-test"
+        # (7 unchanged attributes hidden)
+    }
+
+Plan: 0 to add, 1 to change, 0 to destroy.
+
+gcore_cloud_instance.test: Modifying... [id=86973cc4-a805-4ab4-a177-d68d0622a765]
+gcore_cloud_instance.test: Still modifying... [id=86973cc4-a805-4ab4-a177-d68d0622a765, 10s elapsed]
+
+╷
+│ Error: Provider produced inconsistent result after apply
+│
+│ When applying changes to gcore_cloud_instance.test, provider
+│ "registry.terraform.io/gcore/gcore" produced an unexpected new value:
+│ .flavor: was cty.StringVal("g1-standard-2-4"), but now
+│ cty.StringVal("g1-standard-1-2").
+│
+│ This is a bug in the provider, which should be reported in the provider's
+│ own issue tracker.
+╵</pre>
+            </div>
+        </div>
+
+        <div class="section">
+            <div class="section-header collapsible collapsed" onclick="toggleSection(this)">
+                <span>📝</span>
+                <h2>Test 3: Volume Extend Log</h2>
+            </div>
+            <div class="section-content collapsible-content hidden">
+                <pre>Terraform will perform the following actions:
+
+  # gcore_cloud_volume.boot will be updated in-place
+  ~ resource "gcore_cloud_volume" "boot" {
+        id   = "0834f9fb-1fb3-4d11-b1d8-74622f0ca032"
+        name = "pr35-comprehensive-test-boot"
+      ~ size = 5 -> 10
+        # (5 unchanged attributes hidden)
+    }
+
+Plan: 0 to add, 1 to change, 0 to destroy.
+
+Changes to Outputs:
+  ~ volume_size = 5 -> 10
+
+gcore_cloud_volume.boot: Modifying... [id=0834f9fb-1fb3-4d11-b1d8-74622f0ca032]
+gcore_cloud_volume.boot: Modifications complete after 6s [id=0834f9fb-1fb3-4d11-b1d8-74622f0ca032]
+
+Apply complete! Resources: 0 added, 1 changed, 0 destroyed.
+
+Outputs:
+boot_volume_boot_index = 0
+volume_size = 10</pre>
+            </div>
+        </div>
+
+        <div class="section">
+            <div class="section-header collapsible collapsed" onclick="toggleSection(this)">
+                <span>📝</span>
+                <h2>Test 4: Tags Error Log</h2>
+            </div>
+            <div class="section-content collapsible-content hidden">
+                <pre>╷
+│ Error: Value Conversion Error
+│
+│   with gcore_cloud_instance.test,
+│   on main.tf line 115, in resource "gcore_cloud_instance" "test":
+│  115:   tags = var.tags
+│
+│ An unexpected error was encountered trying to build a value. This is always
+│ an error in the provider. Please report the following to the provider
+│ developer:
+│
+│ Received unknown value, however the target type cannot handle unknown
+│ values. Use the corresponding `types` package type or a custom type that
+│ handles unknown values.
+│
+│ Path: tags
+│ Target Type: *map[string]basetypes.StringValue
+│ Suggested Type: basetypes.MapValue
+╵
+
+=== BUG FOUND ===
+Provider Issue: Tags model type *map[string]types.String can't handle unknown values.
+Error: "Received unknown value, however the target type cannot handle unknown values"
+Suggested fix: Change Tags field in model.go from *map[string]types.String to types.Map
+
+This is a code generation bug in the Stainless terraform generator.</pre>
+            </div>
+        </div>
+
+        <div class="section">
+            <div class="section-header collapsible collapsed" onclick="toggleSection(this)">
+                <span>📝</span>
+                <h2>Test 5: Import & Drift Log</h2>
+            </div>
+            <div class="section-content collapsible-content hidden">
+                <pre># Import attempt 1 (wrong format)
+gcore_cloud_instance.test: Importing from ID "86973cc4-a805-4ab4-a177-d68d0622a765"...
+╷
+│ Error: invalid ID
+│
+│ expected urlencoded segments "<project_id>/<region_id>/<instance_id>", got
+│ "86973cc4-a805-4ab4-a177-d68d0622a765"
+╵
+
+# Import attempt 2 (correct format)
+gcore_cloud_instance.test: Importing from ID "379987/76/86973cc4-a805-4ab4-a177-d68d0622a765"...
+gcore_cloud_instance.test: Import prepared!
+  Prepared gcore_cloud_instance for import
+gcore_cloud_instance.test: Refreshing state... [id=86973cc4-a805-4ab4-a177-d68d0622a765]
+
+Import successful!
+
+# Drift check after import
+gcore_cloud_volume.boot: Refreshing state... [id=0834f9fb-1fb3-4d11-b1d8-74622f0ca032]
+gcore_cloud_instance.test: Refreshing state... [id=86973cc4-a805-4ab4-a177-d68d0622a765]
+
+Terraform will perform the following actions:
+
+  # gcore_cloud_instance.test will be updated in-place
+  ~ resource "gcore_cloud_instance" "test" {
+        id       = "86973cc4-a805-4ab4-a177-d68d0622a765"
+      ~ volumes  = [
+          ~ {
+              + boot_index = 0   # <-- BUG: Not read during import
+                # (1 unchanged attribute hidden)
+            },
+        ]
+        # (7 unchanged attributes hidden)
+    }
+
+Plan: 0 to add, 1 to change, 0 to destroy.
+
+Exit code: 2 (FAIL - Drift detected after import)</pre>
+            </div>
+        </div>
+
+        <div class="section">
+            <div class="section-header">
+                <span>📁</span>
+                <h2>Evidence Files</h2>
+            </div>
+            <div class="section-content">
+                <div class="file-list">
+                    <div class="file-item">
+                        <span class="file-icon">📄</span>
+                        <div class="file-info">
+                            <div class="file-name">test1_create.log</div>
+                            <div class="file-size">6.6 KB - Creation log</div>
+                        </div>
+                    </div>
+                    <div class="file-item">
+                        <span class="file-icon">📄</span>
+                        <div class="file-info">
+                            <div class="file-name">test1_drift.log</div>
+                            <div class="file-size">983 B - Drift test log</div>
+                        </div>
+                    </div>
+                    <div class="file-item">
+                        <span class="file-icon">📄</span>
+                        <div class="file-info">
+                            <div class="file-name">test2_flavor.log</div>
+                            <div class="file-size">5.4 KB - Flavor change error</div>
+                        </div>
+                    </div>
+                    <div class="file-item">
+                        <span class="file-icon">📄</span>
+                        <div class="file-info">
+                            <div class="file-name">test3_volume.log</div>
+                            <div class="file-size">6.2 KB - Volume extend log</div>
+                        </div>
+                    </div>
+                    <div class="file-item">
+                        <span class="file-icon">📄</span>
+                        <div class="file-info">
+                            <div class="file-name">test4_tags_add.log</div>
+                            <div class="file-size">1.9 KB - Tags error log</div>
+                        </div>
+                    </div>
+                    <div class="file-item">
+                        <span class="file-icon">📄</span>
+                        <div class="file-info">
+                            <div class="file-name">test5_import.log</div>
+                            <div class="file-size">377 B - Initial import error</div>
+                        </div>
+                    </div>
+                    <div class="file-item">
+                        <span class="file-icon">📄</span>
+                        <div class="file-info">
+                            <div class="file-name">test5_import_retry.log</div>
+                            <div class="file-size">505 B - Successful import</div>
+                        </div>
+                    </div>
+                    <div class="file-item">
+                        <span class="file-icon">📄</span>
+                        <div class="file-info">
+                            <div class="file-name">test5_drift_after_import.log</div>
+                            <div class="file-size">4.3 KB - Post-import drift</div>
+                        </div>
+                    </div>
+                    <div class="file-item">
+                        <span class="file-icon">📊</span>
+                        <div class="file-info">
+                            <div class="file-name">terraform.tfstate</div>
+                            <div class="file-size">7.7 KB - Current state</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="section">
+            <div class="section-header">
+                <span>📋</span>
+                <h2>Recommendations</h2>
+            </div>
+            <div class="section-content">
+                <table>
+                    <tr>
+                        <th>Priority</th>
+                        <th>Bug</th>
+                        <th>Recommended Fix</th>
+                    </tr>
+                    <tr>
+                        <td><span class="status-badge fail">HIGH</span></td>
+                        <td>Flavor change task not awaited</td>
+                        <td>Use <code>ChangeFlavorAndPoll</code> in resource.go Update function</td>
+                    </tr>
+                    <tr>
+                        <td><span class="status-badge fail">HIGH</span></td>
+                        <td>Tags model type issue</td>
+                        <td>Change <code>*map[string]types.String</code> to <code>types.Map</code> in model.go</td>
+                    </tr>
+                    <tr>
+                        <td><span class="status-badge bug">MED</span></td>
+                        <td>boot_index not read on import</td>
+                        <td>Populate boot_index from API response in ImportState/Read</td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+
+        <footer>
+            <p>Generated by Terraform Testing Skill | PR #35 Testing | JIRA: GCLOUD2-21138</p>
+            <p>Report Location: test-instance-skill/evidence/TEST_REPORT.html</p>
+        </footer>
+    </div>
+
+    <script>
+        function toggleSection(header) {
+            header.classList.toggle('collapsed');
+            const content = header.nextElementSibling;
+            content.classList.toggle('hidden');
+        }
+    </script>
+</body>
+</html>

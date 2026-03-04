@@ -1,0 +1,37 @@
+
+Warning: Provider development overrides are in effect
+
+The following provider development overrides are set in the CLI
+configuration:
+ - gcore/gcore in /Users/user/repos/gcore-terraform
+
+The behavior may therefore not match any released version of the provider and
+applying changes may cause the state to become incompatible with published
+releases.
+gcore_fastedge_secret.test: Refreshing state... [name=tf-skill-test-renamed]
+
+Terraform used the selected providers to generate the following execution
+plan. Resource actions are indicated with the following symbols:
+  - destroy
+
+Terraform will perform the following actions:
+
+  # gcore_fastedge_secret.test will be destroyed
+  - resource "gcore_fastedge_secret" "test" {
+      - app_count    = 0 -> null
+      - comment      = "Updated comment for testing" -> null
+      - id           = 351 -> null
+      - name         = "tf-skill-test-renamed" -> null
+      - secret_slots = (sensitive value) -> null
+    }
+
+Plan: 0 to add, 0 to change, 1 to destroy.
+
+Changes to Outputs:
+  - app_count   = 0 -> null
+  - secret_id   = 351 -> null
+  - secret_name = "tf-skill-test-renamed" -> null
+gcore_fastedge_secret.test: Destroying... [name=tf-skill-test-renamed]
+gcore_fastedge_secret.test: Destruction complete after 0s
+
+Destroy complete! Resources: 1 destroyed.

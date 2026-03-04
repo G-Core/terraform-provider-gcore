@@ -1,0 +1,192 @@
+{
+  "version": 4,
+  "terraform_version": "1.10.5",
+  "serial": 9,
+  "lineage": "6fac3a02-947a-cca9-c331-ae8f26f9fb4d",
+  "outputs": {
+    "a_record_id": {
+      "value": "{\"Zone\":\"tf-test-22173-gcloud.com\",\"Domain\":\"www.tf-test-22173-gcloud.com\",\"Type\":\"A\"}",
+      "type": "string"
+    },
+    "txt_record_id": {
+      "value": "{\"Zone\":\"tf-test-22173-gcloud.com\",\"Domain\":\"test-txt.tf-test-22173-gcloud.com\",\"Type\":\"TXT\"}",
+      "type": "string"
+    },
+    "zone_id": {
+      "value": "tf-test-22173-gcloud.com",
+      "type": "string"
+    },
+    "zone_name": {
+      "value": "tf-test-22173-gcloud.com",
+      "type": "string"
+    }
+  },
+  "resources": [
+    {
+      "mode": "managed",
+      "type": "gcore_dns_zone",
+      "name": "test_basic",
+      "provider": "provider[\"registry.terraform.io/g-core/gcore\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "contact": "admin@example.com",
+            "dnssec": false,
+            "enabled": true,
+            "expiry": 1209600,
+            "id": "tf-test-22173-gcloud.com",
+            "meta": {},
+            "name": "tf-test-22173-gcloud.com",
+            "nx_ttl": 300,
+            "primary_server": "",
+            "refresh": 7200,
+            "retry": 3600,
+            "serial": 0,
+            "timeouts": null
+          },
+          "sensitive_attributes": [],
+          "private": "eyJlMmJmYjczMC1lY2FhLTExZTYtOGY4OC0zNDM2M2JjN2M0YzAiOnsiY3JlYXRlIjozMDAwMDAwMDAwMDAsImRlbGV0ZSI6MzAwMDAwMDAwMDAwfX0="
+        }
+      ]
+    },
+    {
+      "mode": "managed",
+      "type": "gcore_dns_zone_record",
+      "name": "test_a",
+      "provider": "provider[\"registry.terraform.io/g-core/gcore\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "domain": "www.tf-test-22173-gcloud.com",
+            "filter": [],
+            "id": "{\"Zone\":\"tf-test-22173-gcloud.com\",\"Domain\":\"www.tf-test-22173-gcloud.com\",\"Type\":\"A\"}",
+            "meta": [],
+            "resource_record": [
+              {
+                "content": "192.168.1.100",
+                "enabled": true,
+                "meta": []
+              },
+              {
+                "content": "192.168.1.101",
+                "enabled": true,
+                "meta": []
+              }
+            ],
+            "timeouts": null,
+            "ttl": 300,
+            "type": "A",
+            "zone": "tf-test-22173-gcloud.com"
+          },
+          "sensitive_attributes": [],
+          "private": "eyJlMmJmYjczMC1lY2FhLTExZTYtOGY4OC0zNDM2M2JjN2M0YzAiOnsiY3JlYXRlIjozMDAwMDAwMDAwMDAsImRlbGV0ZSI6MzAwMDAwMDAwMDAwfX0=",
+          "dependencies": [
+            "gcore_dns_zone.test_basic"
+          ]
+        }
+      ]
+    },
+    {
+      "mode": "managed",
+      "type": "gcore_dns_zone_record",
+      "name": "test_cname",
+      "provider": "provider[\"registry.terraform.io/g-core/gcore\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "domain": "alias.tf-test-22173-gcloud.com",
+            "filter": [],
+            "id": "{\"Zone\":\"tf-test-22173-gcloud.com\",\"Domain\":\"alias.tf-test-22173-gcloud.com\",\"Type\":\"CNAME\"}",
+            "meta": [],
+            "resource_record": [
+              {
+                "content": "www.tf-test-22173-gcloud.com.",
+                "enabled": true,
+                "meta": []
+              }
+            ],
+            "timeouts": null,
+            "ttl": 300,
+            "type": "CNAME",
+            "zone": "tf-test-22173-gcloud.com"
+          },
+          "sensitive_attributes": [],
+          "private": "eyJlMmJmYjczMC1lY2FhLTExZTYtOGY4OC0zNDM2M2JjN2M0YzAiOnsiY3JlYXRlIjozMDAwMDAwMDAwMDAsImRlbGV0ZSI6MzAwMDAwMDAwMDAwfX0=",
+          "dependencies": [
+            "gcore_dns_zone.test_basic"
+          ]
+        }
+      ]
+    },
+    {
+      "mode": "managed",
+      "type": "gcore_dns_zone_record",
+      "name": "test_mx",
+      "provider": "provider[\"registry.terraform.io/g-core/gcore\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "domain": "tf-test-22173-gcloud.com",
+            "filter": [],
+            "id": "{\"Zone\":\"tf-test-22173-gcloud.com\",\"Domain\":\"tf-test-22173-gcloud.com\",\"Type\":\"MX\"}",
+            "meta": [],
+            "resource_record": [
+              {
+                "content": "10 mail.tf-test-22173-gcloud.com.",
+                "enabled": true,
+                "meta": []
+              }
+            ],
+            "timeouts": null,
+            "ttl": 300,
+            "type": "MX",
+            "zone": "tf-test-22173-gcloud.com"
+          },
+          "sensitive_attributes": [],
+          "private": "eyJlMmJmYjczMC1lY2FhLTExZTYtOGY4OC0zNDM2M2JjN2M0YzAiOnsiY3JlYXRlIjozMDAwMDAwMDAwMDAsImRlbGV0ZSI6MzAwMDAwMDAwMDAwfX0=",
+          "dependencies": [
+            "gcore_dns_zone.test_basic"
+          ]
+        }
+      ]
+    },
+    {
+      "mode": "managed",
+      "type": "gcore_dns_zone_record",
+      "name": "test_txt",
+      "provider": "provider[\"registry.terraform.io/g-core/gcore\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "domain": "test-txt.tf-test-22173-gcloud.com",
+            "filter": [],
+            "id": "{\"Zone\":\"tf-test-22173-gcloud.com\",\"Domain\":\"test-txt.tf-test-22173-gcloud.com\",\"Type\":\"TXT\"}",
+            "meta": [],
+            "resource_record": [
+              {
+                "content": "v=spf1 include:_spf.google.com ~all",
+                "enabled": true,
+                "meta": []
+              }
+            ],
+            "timeouts": null,
+            "ttl": 600,
+            "type": "TXT",
+            "zone": "tf-test-22173-gcloud.com"
+          },
+          "sensitive_attributes": [],
+          "private": "eyJlMmJmYjczMC1lY2FhLTExZTYtOGY4OC0zNDM2M2JjN2M0YzAiOnsiY3JlYXRlIjozMDAwMDAwMDAwMDAsImRlbGV0ZSI6MzAwMDAwMDAwMDAwfX0=",
+          "dependencies": [
+            "gcore_dns_zone.test_basic"
+          ]
+        }
+      ]
+    }
+  ],
+  "check_results": null
+}

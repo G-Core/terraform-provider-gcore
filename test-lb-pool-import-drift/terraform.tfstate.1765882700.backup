@@ -1,0 +1,168 @@
+{
+  "version": 4,
+  "terraform_version": "1.10.5",
+  "serial": 34,
+  "lineage": "fdfc8a79-404d-e329-968a-054ad2ec1732",
+  "outputs": {
+    "lb_id": {
+      "value": "b0167cec-4a77-4a1a-add4-5370cd7937b2",
+      "type": "string"
+    },
+    "listener_id": {
+      "value": "52d0c216-6123-4156-bb5b-d5bdc093b8f5",
+      "type": "string"
+    },
+    "pool_id": {
+      "value": "fcc620d8-f073-4bff-8bc6-dbb9ecb21721",
+      "type": "string"
+    }
+  },
+  "resources": [
+    {
+      "mode": "managed",
+      "type": "gcore_cloud_load_balancer",
+      "name": "lb",
+      "provider": "provider[\"registry.terraform.io/gcore/gcore\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "additional_vips": [],
+            "created_at": "2025-12-16T10:55:13Z",
+            "creator_task_id": "4e8f3fbc-5f04-4992-bfaf-dbd05f017bf2",
+            "ddos_profile": null,
+            "flavor": "lb1-1-2",
+            "floating_ip": null,
+            "floating_ips": [],
+            "id": "b0167cec-4a77-4a1a-add4-5370cd7937b2",
+            "listeners": [],
+            "logging": {
+              "destination_region_id": null,
+              "enabled": false,
+              "retention_policy": null,
+              "topic_name": null
+            },
+            "name": "test-import-drift-lb",
+            "name_template": null,
+            "operating_status": "ONLINE",
+            "preferred_connectivity": "L2",
+            "project_id": 379987,
+            "provisioning_status": "ACTIVE",
+            "region": "Luxembourg-2",
+            "region_id": 76,
+            "stats": null,
+            "tags": null,
+            "tags_v2": [],
+            "updated_at": "2025-12-16T10:56:29Z",
+            "vip_address": "45.82.160.41",
+            "vip_ip_family": "ipv4",
+            "vip_network_id": null,
+            "vip_port_id": "2af52416-12eb-4bcc-94b4-ae296a658f52",
+            "vip_subnet_id": null,
+            "vrrp_ips": [
+              {
+                "ip_address": "45.82.160.132",
+                "role": "BACKUP",
+                "subnet_id": "e47b6c72-f1d3-44de-bd7a-1bed593cbc29"
+              },
+              {
+                "ip_address": "45.82.160.201",
+                "role": "MASTER",
+                "subnet_id": "e47b6c72-f1d3-44de-bd7a-1bed593cbc29"
+              }
+            ]
+          },
+          "sensitive_attributes": []
+        }
+      ]
+    },
+    {
+      "mode": "managed",
+      "type": "gcore_cloud_load_balancer_listener",
+      "name": "ls",
+      "provider": "provider[\"registry.terraform.io/gcore/gcore\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "allowed_cidrs": null,
+            "connection_limit": 100000,
+            "creator_task_id": "ea9f3bf7-4590-499c-9f2f-0e4d683fc777",
+            "id": "52d0c216-6123-4156-bb5b-d5bdc093b8f5",
+            "insert_headers": "{}",
+            "insert_x_forwarded": null,
+            "load_balancer_id": "b0167cec-4a77-4a1a-add4-5370cd7937b2",
+            "name": "test-listener",
+            "operating_status": "ONLINE",
+            "pool_count": 0,
+            "project_id": 379987,
+            "protocol": "HTTP",
+            "protocol_port": 80,
+            "provisioning_status": "ACTIVE",
+            "region_id": 76,
+            "secret_id": null,
+            "sni_secret_id": [],
+            "stats": null,
+            "timeout_client_data": 50000,
+            "timeout_member_connect": 5000,
+            "timeout_member_data": 50000,
+            "user_list": []
+          },
+          "sensitive_attributes": [],
+          "dependencies": [
+            "gcore_cloud_load_balancer.lb"
+          ]
+        }
+      ]
+    },
+    {
+      "mode": "managed",
+      "type": "gcore_cloud_load_balancer_pool",
+      "name": "pool",
+      "provider": "provider[\"registry.terraform.io/gcore/gcore\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "ca_secret_id": null,
+            "creator_task_id": "cec389b3-962a-44e1-87dc-48a8e011212e",
+            "crl_secret_id": null,
+            "healthmonitor": null,
+            "id": "fcc620d8-f073-4bff-8bc6-dbb9ecb21721",
+            "lb_algorithm": "ROUND_ROBIN",
+            "listener_id": "52d0c216-6123-4156-bb5b-d5bdc093b8f5",
+            "listeners": [
+              {
+                "id": "52d0c216-6123-4156-bb5b-d5bdc093b8f5"
+              }
+            ],
+            "load_balancer_id": null,
+            "loadbalancers": [
+              {
+                "id": "b0167cec-4a77-4a1a-add4-5370cd7937b2"
+              }
+            ],
+            "members": [],
+            "name": "test-pool-import",
+            "operating_status": "ONLINE",
+            "project_id": 379987,
+            "protocol": "HTTP",
+            "provisioning_status": "ACTIVE",
+            "region_id": 76,
+            "secret_id": null,
+            "session_persistence": null,
+            "timeout_client_data": null,
+            "timeout_member_connect": null,
+            "timeout_member_data": null
+          },
+          "sensitive_attributes": [],
+          "dependencies": [
+            "gcore_cloud_load_balancer.lb",
+            "gcore_cloud_load_balancer_listener.ls"
+          ]
+        }
+      ]
+    }
+  ],
+  "check_results": null
+}

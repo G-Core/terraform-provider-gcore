@@ -1,0 +1,150 @@
+127.0.0.1:52691: POST https://api.gcore.com/cloud/v1/downloadimage/379987/76 HTTP/2.0
+    authorization: APIKey 21788$1e278ce67b6aa33f178122658b1dd0210d0edff453d348acb9b68bffea6a635b7791925ddda198d5678a4dc20269fe04a263ca92c7e5aa41ea79075f89b66bf6
+    accept: application/json
+    user-agent: Gcore/Go 0.28.0
+    x-stainless-lang: go
+    x-stainless-arch: arm64
+    x-stainless-retry-count: 0
+    x-stainless-package-version: 0.28.0
+    x-stainless-runtime-version: go1.24.5
+    content-type: application/json
+    x-stainless-runtime: go
+    x-stainless-os: MacOS
+    content-length: 272
+    accept-encoding: gzip
+ << HTTP/2.0 200 OK 51b
+    server: nginx
+    date: Thu, 15 Jan 2026 09:18:42 GMT
+    content-type: application/json; charset=UTF-8
+    content-length: 51
+    x-id-fe: fr5-hw-edge-gc16
+    traceparent: 00-c494aa91aced6bc772f01f34361e8df9-1096c32eee07a1c0-01
+    request_id: c494aa91aced6bc772f01f34361e8df9
+    access-control-allow-origin: *
+    cache-control: no-cache, no-store, must-revalidate
+    strict-transport-security: max-age=15724800; includeSubDomains
+    x-id: fr5-hw-edge-gc16
+    x-robots-tag: noindex, nofollow, noarchive
+    accept-ranges: bytes
+127.0.0.1:52691: GET https://api.gcore.com/cloud/v1/tasks/ed127450-129f-4e25-9291-946a58e1d18a HTTP/2.0
+    accept: application/json
+    user-agent: Gcore/Go 0.28.0
+    authorization: APIKey 21788$1e278ce67b6aa33f178122658b1dd0210d0edff453d348acb9b68bffea6a635b7791925ddda198d5678a4dc20269fe04a263ca92c7e5aa41ea79075f89b66bf6
+    x-stainless-os: MacOS
+    x-stainless-arch: arm64
+    x-stainless-runtime-version: go1.24.5
+    x-stainless-lang: go
+    x-stainless-retry-count: 0
+    x-stainless-runtime: go
+    x-stainless-package-version: 0.28.0
+    accept-encoding: gzip
+ << HTTP/2.0 200 OK 780b
+    server: nginx
+    date: Thu, 15 Jan 2026 09:18:43 GMT
+    content-type: application/json
+    content-length: 780
+    x-id-fe: fr5-hw-edge-gc16
+    traceparent: 00-88926c9156e57704bf02b8a8088e3e75-1db3f6f949b6eb2f-01
+    request_id: 88926c9156e57704bf02b8a8088e3e75
+    access-control-allow-origin: *
+    cache-control: no-cache, no-store, must-revalidate
+    etag: "6364c98730a3b76b62200d01f2f657437d4e2593"
+    strict-transport-security: max-age=15724800; includeSubDomains
+    x-id: fr5-hw-edge-gc16
+    x-robots-tag: noindex, nofollow, noarchive
+    accept-ranges: bytes
+127.0.0.1:52691: GET https://api.gcore.com/cloud/v1/tasks/ed127450-129f-4e25-9291-946a58e1d18a HTTP/2.0
+    x-stainless-arch: arm64
+    x-stainless-runtime-version: go1.24.5
+    x-stainless-retry-count: 0
+    user-agent: Gcore/Go 0.28.0
+    x-stainless-runtime: go
+    x-stainless-os: MacOS
+    authorization: APIKey 21788$1e278ce67b6aa33f178122658b1dd0210d0edff453d348acb9b68bffea6a635b7791925ddda198d5678a4dc20269fe04a263ca92c7e5aa41ea79075f89b66bf6
+    x-stainless-lang: go
+    x-stainless-package-version: 0.28.0
+    accept: application/json
+    accept-encoding: gzip
+ << HTTP/2.0 200 OK 780b
+    server: nginx
+    date: Thu, 15 Jan 2026 09:18:46 GMT
+    content-type: application/json
+    content-length: 780
+    x-id-fe: fr5-hw-edge-gc16
+    traceparent: 00-ffdda04db6da44a35ff7697694aa66ea-b2fb9cd7a4d1278f-01
+    request_id: ffdda04db6da44a35ff7697694aa66ea
+    access-control-allow-origin: *
+    cache-control: no-cache, no-store, must-revalidate
+    etag: "6364c98730a3b76b62200d01f2f657437d4e2593"
+    strict-transport-security: max-age=15724800; includeSubDomains
+    x-id: fr5-hw-edge-gc16
+    x-robots-tag: noindex, nofollow, noarchive
+    accept-ranges: bytes
+127.0.0.1:52691: GET https://api.gcore.com/cloud/v1/tasks/ed127450-129f-4e25-9291-946a58e1d18a HTTP/2.0
+    x-stainless-arch: arm64
+    x-stainless-retry-count: 0
+    user-agent: Gcore/Go 0.28.0
+    x-stainless-lang: go
+    x-stainless-os: MacOS
+    x-stainless-runtime-version: go1.24.5
+    accept: application/json
+    x-stainless-package-version: 0.28.0
+    x-stainless-runtime: go
+    authorization: APIKey 21788$1e278ce67b6aa33f178122658b1dd0210d0edff453d348acb9b68bffea6a635b7791925ddda198d5678a4dc20269fe04a263ca92c7e5aa41ea79075f89b66bf6
+    accept-encoding: gzip
+ << HTTP/2.0 200 OK 780b
+    server: nginx
+    date: Thu, 15 Jan 2026 09:18:49 GMT
+    content-type: application/json
+    content-length: 780
+    x-id-fe: fr5-hw-edge-gc16
+    traceparent: 00-a44fc93e518de079f2495dafc3206c83-ee138c7c635c4901-01
+    request_id: a44fc93e518de079f2495dafc3206c83
+    access-control-allow-origin: *
+    cache-control: no-cache, no-store, must-revalidate
+    etag: "6364c98730a3b76b62200d01f2f657437d4e2593"
+    strict-transport-security: max-age=15724800; includeSubDomains
+    x-id: fr5-hw-edge-gc16
+    x-robots-tag: noindex, nofollow, noarchive
+    accept-ranges: bytes
+127.0.0.1:52691: GET https://api.gcore.com/cloud/v1/tasks/ed127450-129f-4e25-9291-946a58e1d18a HTTP/2.0
+    user-agent: Gcore/Go 0.28.0
+    x-stainless-package-version: 0.28.0
+    x-stainless-arch: arm64
+    x-stainless-runtime: go
+    x-stainless-os: MacOS
+    x-stainless-runtime-version: go1.24.5
+    authorization: APIKey 21788$1e278ce67b6aa33f178122658b1dd0210d0edff453d348acb9b68bffea6a635b7791925ddda198d5678a4dc20269fe04a263ca92c7e5aa41ea79075f89b66bf6
+    x-stainless-retry-count: 0
+    x-stainless-lang: go
+    accept: application/json
+    accept-encoding: gzip
+ << HTTP/2.0 200 OK 780b
+    server: nginx
+    date: Thu, 15 Jan 2026 09:18:52 GMT
+    content-type: application/json
+    content-length: 780
+    x-id-fe: fr5-hw-edge-gc16
+    traceparent: 00-79cdc377ee2041f899402a54deea8c43-3e41bc71a5a36eb6-01
+    request_id: 79cdc377ee2041f899402a54deea8c43
+    access-control-allow-origin: *
+    cache-control: no-cache, no-store, must-revalidate
+    etag: "6364c98730a3b76b62200d01f2f657437d4e2593"
+    strict-transport-security: max-age=15724800; includeSubDomains
+    x-id: fr5-hw-edge-gc16
+    x-robots-tag: noindex, nofollow, noarchive
+    accept-ranges: bytes
+127.0.0.1:52691: GET https://api.gcore.com/cloud/v1/tasks/ed127450-129f-4e25-9291-946a58e1d18a HTTP/2.0
+    user-agent: Gcore/Go 0.28.0
+    x-stainless-arch: arm64
+    x-stainless-package-version: 0.28.0
+    x-stainless-runtime-version: go1.24.5
+    x-stainless-runtime: go
+    x-stainless-os: MacOS
+    authorization: APIKey 21788$1e278ce67b6aa33f178122658b1dd0210d0edff453d348acb9b68bffea6a635b7791925ddda198d5678a4dc20269fe04a263ca92c7e5aa41ea79075f89b66bf6
+    accept: application/json
+    x-stainless-lang: go
+    x-stainless-retry-count: 0
+    accept-encoding: gzip
+ << HTTP/2.0 200 OK 1.4k
+    server: nginx

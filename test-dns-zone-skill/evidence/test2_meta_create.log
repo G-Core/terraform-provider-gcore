@@ -1,0 +1,80 @@
+
+Warning: Provider development overrides are in effect
+
+The following provider development overrides are set in the CLI
+configuration:
+ - gcore/gcore in /Users/user/repos/gcore-terraform
+
+The behavior may therefore not match any released version of the provider and
+applying changes may cause the state to become incompatible with published
+releases.
+gcore_dns_zone.minimal: Refreshing state... [id=test-zone-skill-20260205.com]
+
+Terraform used the selected providers to generate the following execution
+plan. Resource actions are indicated with the following symbols:
+  + create
+  ~ update in-place
+
+Terraform will perform the following actions:
+
+  # gcore_dns_zone.minimal will be updated in-place
+  ~ resource "gcore_dns_zone" "minimal" {
+      - contact        = "support@gcore.com" -> null
+      ~ dnssec_enabled = false -> (known after apply)
+      - expiry         = 1209600 -> null
+        id             = "test-zone-skill-20260205.com"
+        name           = "test-zone-skill-20260205.com"
+      - nx_ttl         = 300 -> null
+      - primary_server = "ns1.gcorelabs.net" -> null
+      ~ records        = [
+          - {
+              - name          = "test-zone-skill-20260205.com" -> null
+              - short_answers = [
+                  - "ns1.gcorelabs.net",
+                  - "ns2.gcdn.services",
+                ] -> null
+              - ttl           = 3600 -> null
+              - type          = "NS" -> null
+            },
+        ] -> (known after apply)
+      - refresh        = 5400 -> null
+      - retry          = 3600 -> null
+      ~ rrsets_amount  = {
+          ~ dynamic = {
+              ~ healthcheck = 0 -> (known after apply)
+              ~ total       = 0 -> (known after apply)
+            } -> (known after apply)
+          ~ static  = 1 -> (known after apply)
+          ~ total   = 1 -> (known after apply)
+        } -> (known after apply)
+      - serial         = 1770287139 -> null
+      ~ status         = "pending" -> (known after apply)
+      ~ warnings       = [
+          - "Your contract has been set to reseller default due to the absence of contact information.",
+        ] -> (known after apply)
+        # (1 unchanged attribute hidden)
+    }
+
+  # gcore_dns_zone.with_meta[0] will be created
+  + resource "gcore_dns_zone" "with_meta" {
+      + dnssec_enabled = (known after apply)
+      + enabled        = true
+      + id             = (known after apply)
+      + meta           = {
+          + "webhook"        = "https://example.com/dns-hook"
+          + "webhook_method" = "POST"
+        }
+      + name           = "test-zone-meta-20260205.com"
+      + records        = (known after apply)
+      + rrsets_amount  = (known after apply)
+      + status         = (known after apply)
+      + warnings       = (known after apply)
+    }
+
+Plan: 1 to add, 1 to change, 0 to destroy.
+gcore_dns_zone.with_meta[0]: Creating...
+gcore_dns_zone.minimal: Modifying... [id=test-zone-skill-20260205.com]
+gcore_dns_zone.minimal: Modifications complete after 0s [id=test-zone-skill-20260205.com]
+gcore_dns_zone.with_meta[0]: Creation complete after 2s [id=test-zone-meta-20260205.com]
+
+Apply complete! Resources: 1 added, 1 changed, 0 destroyed.

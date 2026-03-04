@@ -1,0 +1,42 @@
+
+Warning: Provider development overrides are in effect
+
+The following provider development overrides are set in the CLI
+configuration:
+ - gcore/gcore in /Users/user/repos/gcore-terraform
+
+The behavior may therefore not match any released version of the provider and
+applying changes may cause the state to become incompatible with published
+releases.
+gcore_fastedge_binary.test: Refreshing state...
+
+Terraform used the selected providers to generate the following execution
+plan. Resource actions are indicated with the following symbols:
+  - destroy
+
+Terraform will perform the following actions:
+
+  # gcore_fastedge_binary.test will be destroyed
+  - resource "gcore_fastedge_binary" "test" {
+      - api_type    = "wasi-http" -> null
+      - checksum    = "34524214b83ffe9ccf98bf5601003057" -> null
+      - filename    = "./minimal.wasm" -> null
+      - id          = 3056 -> null
+      - source      = 1 -> null
+      - status      = 1 -> null
+      - unref_since = "2026-02-04T09:58:22Z" -> null
+    }
+
+Plan: 0 to add, 0 to change, 1 to destroy.
+
+Changes to Outputs:
+  - binary_api_type     = "wasi-http" -> null
+  - binary_checksum     = "34524214b83ffe9ccf98bf5601003057" -> null
+  - binary_id           = 3056 -> null
+  - binary_source       = 1 -> null
+  - binary_status       = 1 -> null
+  - datasource_checksum = "N/A" -> null
+gcore_fastedge_binary.test: Destroying...
+gcore_fastedge_binary.test: Destruction complete after 1s
+
+Destroy complete! Resources: 1 destroyed.

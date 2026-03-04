@@ -1,0 +1,35 @@
+
+Warning: Provider development overrides are in effect
+
+The following provider development overrides are set in the CLI
+configuration:
+ - gcore/gcore in /Users/user/repos/gcore-terraform
+
+The behavior may therefore not match any released version of the provider and
+applying changes may cause the state to become incompatible with published
+releases.
+data.gcore_cloud_projects.my_projects: Reading...
+data.gcore_cloud_region.rg: Reading...
+
+Planning failed. Terraform encountered an error while generating this plan.
+
+
+Error: failed to make http request
+
+  with data.gcore_cloud_projects.my_projects,
+  on main.tf line 9, in data "gcore_cloud_projects" "my_projects":
+   9: data "gcore_cloud_projects" "my_projects" {
+
+GET "https://api.gcore.com/cloud/v1/projects?name=default": 401 Unauthorized
+{"exception_class":"UnauthorizedError","message":"Invalid <APIKey>
+authentication token: 21788*****21788"}
+
+Error: failed to make http request
+
+  with data.gcore_cloud_region.rg,
+  on main.tf line 17, in data "gcore_cloud_region" "rg":
+  17: data "gcore_cloud_region" "rg" {
+
+GET "https://api.gcore.com/cloud/v1/regions/76": 401 Unauthorized
+{"exception_class":"UnauthorizedError","message":"Invalid <APIKey>
+authentication token: 21788*****21788"}

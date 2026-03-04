@@ -1,0 +1,7 @@
+provider_installation {
+  dev_overrides {
+    "stainless-sdks/gcore" = "/Users/user/repos/gcore-terraform"
+  }
+  direct {}
+}
+

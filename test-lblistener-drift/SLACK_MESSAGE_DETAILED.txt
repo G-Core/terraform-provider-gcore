@@ -1,0 +1,96 @@
+OPENAPI SPEC - x-stainless attributes are present
+
+Repository: https://github.com/stainless-sdks/gcore-config
+
+File: openapi.yml
+
+PatchLbListenerSerializer starts at line 85512:
+https://github.com/stainless-sdks/gcore-config/blob/main/openapi.yml#L85512
+
+All 5 fields have x-stainless-terraform-configurability: computed_optional:
+
+1. sni_secret_id - line 85561
+https://github.com/stainless-sdks/gcore-config/blob/main/openapi.yml#L85560-L85561
+
+2. timeout_client_data - line 85572
+https://github.com/stainless-sdks/gcore-config/blob/main/openapi.yml#L85571-L85572
+
+3. timeout_member_connect - line 85583
+https://github.com/stainless-sdks/gcore-config/blob/main/openapi.yml#L85582-L85583
+
+4. timeout_member_data - line 85594
+https://github.com/stainless-sdks/gcore-config/blob/main/openapi.yml#L85593-L85594
+
+5. user_list - line 85606
+https://github.com/stainless-sdks/gcore-config/blob/main/openapi.yml#L85605-L85606
+
+
+EXPECTED TERRAFORM CODE - what Stainless should generate
+
+Repository: https://github.com/stainless-sdks/gcore-terraform
+
+Schema should have Computed: true, Optional: true
+Model should have json:"field_name,computed_optional" tags
+List fields should use types.List instead of *[]types.String
+
+
+ACTUAL TERRAFORM CODE - current state missing computed_optional
+
+Schema file - fields only have Optional: true, missing Computed: true
+https://github.com/stainless-sdks/gcore-terraform/blob/main/internal/services/cloud_load_balancer_listener/schema.go#L83-L103
+
+Example timeout_client_data at line 83-89:
+"timeout_client_data": schema.Int64Attribute{
+    Description: "Frontend client inactivity timeout in milliseconds",
+    Optional:    true,
+    Validators: []validator.Int64{
+        int64validator.Between(0, 86400000),
+    },
+},
+
+Should be:
+"timeout_client_data": schema.Int64Attribute{
+    Description: "Frontend client inactivity timeout in milliseconds",
+    Computed:    true,
+    Optional:    true,
+    Validators: []validator.Int64{
+        int64validator.Between(0, 86400000),
+    },
+},
+
+
+Model file - fields have "optional" tags instead of "computed_optional"
+https://github.com/stainless-sdks/gcore-terraform/blob/main/internal/services/cloud_load_balancer_listener/model.go#L22-L27
+
+Example TimeoutClientData at line 22:
+TimeoutClientData types.Int64 `tfsdk:"timeout_client_data" json:"timeout_client_data,optional"`
+
+Should be:
+TimeoutClientData types.Int64 `tfsdk:"timeout_client_data" json:"timeout_client_data,computed_optional"`
+
+
+WORKING EXAMPLE for comparison
+
+The connection_limit field at line 28 in model.go was configured earlier and shows correct generation:
+ConnectionLimit types.Int64 `tfsdk:"connection_limit" json:"connection_limit,computed_optional"`
+
+This proves the computed_optional configuration works when Stainless processes it.
+
+
+QUESTION
+
+Why hasn't Stainless regenerated the Terraform code for these 5 fields?
+
+Things we checked:
+- x-stainless attributes ARE in openapi.yml (confirmed above)
+- Attributes are in INPUT schema PatchLbListenerSerializer not OUTPUT schema
+- Other resources with computed_optional work correctly
+- Latest gcore-config commits show "aggregated API specs update" from past few days
+
+Is there:
+- A manual trigger needed?
+- A cache that needs clearing?
+- Something blocking generation?
+- A different format needed?
+
+The x-stainless-terraform-configurability: computed_optional attributes are definitely in the OpenAPI spec but not being applied to the generated Terraform code.

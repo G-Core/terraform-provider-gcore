@@ -1,0 +1,28 @@
+127.0.0.1:56080: POST https://api.gcore.com/fastedge/v1/binaries/raw HTTP/2.0
+     << HTTP/2.0 200 OK 148b
+127.0.0.1:56080: GET https://api.gcore.com/fastedge/v1/binaries/3069 HTTP/2.0
+     << HTTP/2.0 200 OK 140b
+127.0.0.1:56107: GET https://api.gcore.com/fastedge/v1/binaries/3069 HTTP/2.0
+     << HTTP/2.0 200 OK 140b
+127.0.0.1:56124: GET https://api.gcore.com/fastedge/v1/binaries/3069 HTTP/2.0
+     << HTTP/2.0 200 OK 140b
+127.0.0.1:56124: GET https://api.gcore.com/fastedge/v1/binaries/3069 HTTP/2.0
+     << HTTP/2.0 200 OK 140b
+127.0.0.1:56145: GET https://api.gcore.com/fastedge/v1/binaries/3069 HTTP/2.0
+     << HTTP/2.0 200 OK 140b
+127.0.0.1:56145: GET https://api.gcore.com/fastedge/v1/binaries/3069 HTTP/2.0
+     << HTTP/2.0 200 OK 140b
+127.0.0.1:56165: GET https://api.gcore.com/fastedge/v1/binaries/3069 HTTP/2.0
+     << HTTP/2.0 200 OK 140b
+127.0.0.1:56188: GET https://api.gcore.com/fastedge/v1/binaries/3069 HTTP/2.0
+     << HTTP/2.0 200 OK 140b
+127.0.0.1:56191: GET https://api.gcore.com/fastedge/v1/binaries/3069 HTTP/2.0
+     << HTTP/2.0 200 OK 140b
+127.0.0.1:56219: GET https://api.gcore.com/fastedge/v1/binaries/3069 HTTP/2.0
+     << HTTP/2.0 200 OK 140b
+127.0.0.1:56222: DELETE https://api.gcore.com/fastedge/v1/binaries/3069 HTTP/2.0
+     << HTTP/2.0 204 No Content 0b
+127.0.0.1:56222: POST https://api.gcore.com/fastedge/v1/binaries/raw HTTP/2.0
+     << HTTP/2.0 400 Bad Request 43b
+127.0.0.1:56276: POST https://api.gcore.com/fastedge/v1/binaries/raw HTTP/2.0
+     << HTTP/2.0 200 OK 148b

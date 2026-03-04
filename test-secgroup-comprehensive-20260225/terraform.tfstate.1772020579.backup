@@ -1,0 +1,143 @@
+{
+  "version": 4,
+  "terraform_version": "1.14.3",
+  "serial": 11,
+  "lineage": "c2b56eda-4924-8111-9c16-6405dff87e16",
+  "outputs": {
+    "egress_tcp_rule_id": {
+      "value": "88cdd6f2-0c38-4aba-b5db-48ae6ed147f5",
+      "type": "string"
+    },
+    "ingress_icmp_rule_id": {
+      "value": "773f0f19-030f-4953-8b26-53fa9472bd3c",
+      "type": "string"
+    },
+    "ingress_udp_rule_id": {
+      "value": "8cff8f10-9aea-4fe2-81b6-b41cf182ca4d",
+      "type": "string"
+    },
+    "sg_id": {
+      "value": "e91abc80-c14b-4e13-92ac-8ab44fa2fb1d",
+      "type": "string"
+    }
+  },
+  "resources": [
+    {
+      "mode": "managed",
+      "type": "gcore_cloud_security_group",
+      "name": "test",
+      "provider": "provider[\"registry.terraform.io/gcore/gcore\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "created_at": "2026-02-25T11:54:50Z",
+            "description": "Updated description for testing",
+            "id": "e91abc80-c14b-4e13-92ac-8ab44fa2fb1d",
+            "name": "tf-test-secgroup-renamed",
+            "project_id": 379987,
+            "region": "Luxembourg-2",
+            "region_id": 76,
+            "revision_number": 7,
+            "tags": null,
+            "tags_v2": [],
+            "updated_at": "2026-02-25T11:55:43Z"
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0
+        }
+      ]
+    },
+    {
+      "mode": "managed",
+      "type": "gcore_cloud_security_group_rule",
+      "name": "egress_tcp",
+      "provider": "provider[\"registry.terraform.io/gcore/gcore\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "description": "Allow HTTPS outbound",
+            "direction": "egress",
+            "ethertype": "IPv4",
+            "group_id": "e91abc80-c14b-4e13-92ac-8ab44fa2fb1d",
+            "id": "88cdd6f2-0c38-4aba-b5db-48ae6ed147f5",
+            "port_range_max": 443,
+            "port_range_min": 443,
+            "project_id": null,
+            "protocol": "tcp",
+            "region_id": null,
+            "remote_group_id": null,
+            "remote_ip_prefix": "0.0.0.0/0"
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0,
+          "dependencies": [
+            "gcore_cloud_security_group.test"
+          ]
+        }
+      ]
+    },
+    {
+      "mode": "managed",
+      "type": "gcore_cloud_security_group_rule",
+      "name": "ingress_icmp",
+      "provider": "provider[\"registry.terraform.io/gcore/gcore\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "description": "Allow ICMP from private",
+            "direction": "ingress",
+            "ethertype": "IPv4",
+            "group_id": "e91abc80-c14b-4e13-92ac-8ab44fa2fb1d",
+            "id": "773f0f19-030f-4953-8b26-53fa9472bd3c",
+            "port_range_max": null,
+            "port_range_min": null,
+            "project_id": null,
+            "protocol": "icmp",
+            "region_id": null,
+            "remote_group_id": null,
+            "remote_ip_prefix": "10.0.0.0/8"
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0,
+          "dependencies": [
+            "gcore_cloud_security_group.test"
+          ]
+        }
+      ]
+    },
+    {
+      "mode": "managed",
+      "type": "gcore_cloud_security_group_rule",
+      "name": "ingress_udp",
+      "provider": "provider[\"registry.terraform.io/gcore/gcore\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "description": "Allow UDP 5000-6000 from private",
+            "direction": "ingress",
+            "ethertype": "IPv4",
+            "group_id": "e91abc80-c14b-4e13-92ac-8ab44fa2fb1d",
+            "id": "8cff8f10-9aea-4fe2-81b6-b41cf182ca4d",
+            "port_range_max": 6000,
+            "port_range_min": 5000,
+            "project_id": null,
+            "protocol": "udp",
+            "region_id": null,
+            "remote_group_id": null,
+            "remote_ip_prefix": "192.168.0.0/16"
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0,
+          "dependencies": [
+            "gcore_cloud_security_group.test"
+          ]
+        }
+      ]
+    }
+  ],
+  "check_results": null
+}

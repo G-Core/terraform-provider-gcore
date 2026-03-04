@@ -1,0 +1,271 @@
+[33m╷[0m[0m
+[33m│[0m [0m[1m[33mWarning: [0m[0m[1mProvider development overrides are in effect[0m
+[33m│[0m [0m
+[33m│[0m [0m[0mThe following provider development overrides are set in the CLI
+[33m│[0m [0mconfiguration:
+[33m│[0m [0m - gcore/gcore in /Users/user/repos/gcore-terraform
+[33m│[0m [0m
+[33m│[0m [0mThe behavior may therefore not match any released version of the provider
+[33m│[0m [0mand applying changes may cause the state to become incompatible with
+[33m│[0m [0mpublished releases.
+[33m╵[0m[0m
+[0m[1mdata.gcore_cloud_region.rg: Reading...[0m[0m
+[0m[1mdata.gcore_cloud_region.rg: Read complete after 0s[0m
+
+Terraform used the selected providers to generate the following execution
+plan. Resource actions are indicated with the following symbols:
+  [32m+[0m create[0m
+
+Terraform will perform the following actions:
+
+[1m  # gcore_cloud_instance.i2_subnet[0m will be created
+[0m  [32m+[0m[0m resource "gcore_cloud_instance" "i2_subnet" {
+      [32m+[0m[0m addresses            = (known after apply)
+      [32m+[0m[0m blackhole_ports      = (known after apply)
+      [32m+[0m[0m created_at           = (known after apply)
+      [32m+[0m[0m creator_task_id      = (known after apply)
+      [32m+[0m[0m ddos_profile         = (known after apply)
+      [32m+[0m[0m fixed_ip_assignments = (known after apply)
+      [32m+[0m[0m flavor               = "g1-standard-1-2"
+      [32m+[0m[0m id                   = (known after apply)
+      [32m+[0m[0m instance_description = (known after apply)
+      [32m+[0m[0m instance_isolation   = (known after apply)
+      [32m+[0m[0m interfaces           = [
+          [32m+[0m[0m {
+              [32m+[0m[0m network_id = (known after apply)
+              [32m+[0m[0m subnet_id  = (known after apply)
+              [32m+[0m[0m type       = "subnet"
+            },
+        ]
+      [32m+[0m[0m name                 = "test-i2-subnet"
+      [32m+[0m[0m project_id           = 379987
+      [32m+[0m[0m region               = (known after apply)
+      [32m+[0m[0m region_id            = 76
+      [32m+[0m[0m status               = (known after apply)
+      [32m+[0m[0m task_id              = (known after apply)
+      [32m+[0m[0m task_state           = (known after apply)
+      [32m+[0m[0m tasks                = (known after apply)
+      [32m+[0m[0m vm_state             = (known after apply)
+      [32m+[0m[0m volumes              = [
+          [32m+[0m[0m {
+              [32m+[0m[0m boot_index            = 0
+              [32m+[0m[0m delete_on_termination = false
+              [32m+[0m[0m image_id              = "f84ddba3-7a5a-4199-931a-250e981d16fb"
+              [32m+[0m[0m size                  = 10
+              [32m+[0m[0m source                = "image"
+              [32m+[0m[0m volume_id             = (known after apply)
+            },
+        ]
+    }
+
+[1m  # gcore_cloud_instance.v1_image[0m will be created
+[0m  [32m+[0m[0m resource "gcore_cloud_instance" "v1_image" {
+      [32m+[0m[0m addresses            = (known after apply)
+      [32m+[0m[0m blackhole_ports      = (known after apply)
+      [32m+[0m[0m created_at           = (known after apply)
+      [32m+[0m[0m creator_task_id      = (known after apply)
+      [32m+[0m[0m ddos_profile         = (known after apply)
+      [32m+[0m[0m fixed_ip_assignments = (known after apply)
+      [32m+[0m[0m flavor               = "g1-standard-1-2"
+      [32m+[0m[0m id                   = (known after apply)
+      [32m+[0m[0m instance_description = (known after apply)
+      [32m+[0m[0m instance_isolation   = (known after apply)
+      [32m+[0m[0m interfaces           = [
+          [32m+[0m[0m {
+              [32m+[0m[0m type = "external"
+            },
+        ]
+      [32m+[0m[0m name                 = "test-v1-image"
+      [32m+[0m[0m project_id           = 379987
+      [32m+[0m[0m region               = (known after apply)
+      [32m+[0m[0m region_id            = 76
+      [32m+[0m[0m status               = (known after apply)
+      [32m+[0m[0m task_id              = (known after apply)
+      [32m+[0m[0m task_state           = (known after apply)
+      [32m+[0m[0m tasks                = (known after apply)
+      [32m+[0m[0m vm_state             = (known after apply)
+      [32m+[0m[0m volumes              = [
+          [32m+[0m[0m {
+              [32m+[0m[0m boot_index            = 0
+              [32m+[0m[0m delete_on_termination = false
+              [32m+[0m[0m image_id              = "f84ddba3-7a5a-4199-931a-250e981d16fb"
+              [32m+[0m[0m size                  = 10
+              [32m+[0m[0m source                = "image"
+              [32m+[0m[0m volume_id             = (known after apply)
+            },
+        ]
+    }
+
+[1m  # gcore_cloud_instance.v2_new_volume[0m will be created
+[0m  [32m+[0m[0m resource "gcore_cloud_instance" "v2_new_volume" {
+      [32m+[0m[0m addresses            = (known after apply)
+      [32m+[0m[0m blackhole_ports      = (known after apply)
+      [32m+[0m[0m created_at           = (known after apply)
+      [32m+[0m[0m creator_task_id      = (known after apply)
+      [32m+[0m[0m ddos_profile         = (known after apply)
+      [32m+[0m[0m fixed_ip_assignments = (known after apply)
+      [32m+[0m[0m flavor               = "g1-standard-1-2"
+      [32m+[0m[0m id                   = (known after apply)
+      [32m+[0m[0m instance_description = (known after apply)
+      [32m+[0m[0m instance_isolation   = (known after apply)
+      [32m+[0m[0m interfaces           = [
+          [32m+[0m[0m {
+              [32m+[0m[0m type = "external"
+            },
+        ]
+      [32m+[0m[0m name                 = "test-v2-new-volume"
+      [32m+[0m[0m project_id           = 379987
+      [32m+[0m[0m region               = (known after apply)
+      [32m+[0m[0m region_id            = 76
+      [32m+[0m[0m status               = (known after apply)
+      [32m+[0m[0m task_id              = (known after apply)
+      [32m+[0m[0m task_state           = (known after apply)
+      [32m+[0m[0m tasks                = (known after apply)
+      [32m+[0m[0m vm_state             = (known after apply)
+      [32m+[0m[0m volumes              = [
+          [32m+[0m[0m {
+              [32m+[0m[0m boot_index            = 0
+              [32m+[0m[0m delete_on_termination = false
+              [32m+[0m[0m image_id              = "f84ddba3-7a5a-4199-931a-250e981d16fb"
+              [32m+[0m[0m size                  = 10
+              [32m+[0m[0m source                = "image"
+              [32m+[0m[0m volume_id             = (known after apply)
+            },
+          [32m+[0m[0m {
+              [32m+[0m[0m boot_index            = -1
+              [32m+[0m[0m delete_on_termination = false
+              [32m+[0m[0m size                  = 5
+              [32m+[0m[0m source                = "new-volume"
+              [32m+[0m[0m type_name             = "standard"
+              [32m+[0m[0m volume_id             = (known after apply)
+            },
+        ]
+    }
+
+[1m  # gcore_cloud_instance.v3_existing_volume[0m will be created
+[0m  [32m+[0m[0m resource "gcore_cloud_instance" "v3_existing_volume" {
+      [32m+[0m[0m addresses            = (known after apply)
+      [32m+[0m[0m blackhole_ports      = (known after apply)
+      [32m+[0m[0m created_at           = (known after apply)
+      [32m+[0m[0m creator_task_id      = (known after apply)
+      [32m+[0m[0m ddos_profile         = (known after apply)
+      [32m+[0m[0m fixed_ip_assignments = (known after apply)
+      [32m+[0m[0m flavor               = "g1-standard-1-2"
+      [32m+[0m[0m id                   = (known after apply)
+      [32m+[0m[0m instance_description = (known after apply)
+      [32m+[0m[0m instance_isolation   = (known after apply)
+      [32m+[0m[0m interfaces           = [
+          [32m+[0m[0m {
+              [32m+[0m[0m type = "external"
+            },
+        ]
+      [32m+[0m[0m name                 = "test-v3-existing-volume"
+      [32m+[0m[0m project_id           = 379987
+      [32m+[0m[0m region               = (known after apply)
+      [32m+[0m[0m region_id            = 76
+      [32m+[0m[0m status               = (known after apply)
+      [32m+[0m[0m task_id              = (known after apply)
+      [32m+[0m[0m task_state           = (known after apply)
+      [32m+[0m[0m tasks                = (known after apply)
+      [32m+[0m[0m vm_state             = (known after apply)
+      [32m+[0m[0m volumes              = [
+          [32m+[0m[0m {
+              [32m+[0m[0m boot_index            = 0
+              [32m+[0m[0m delete_on_termination = false
+              [32m+[0m[0m size                  = (known after apply)
+              [32m+[0m[0m source                = "existing-volume"
+              [32m+[0m[0m volume_id             = (known after apply)
+            },
+        ]
+    }
+
+[1m  # gcore_cloud_network.test[0m will be created
+[0m  [32m+[0m[0m resource "gcore_cloud_network" "test" {
+      [32m+[0m[0m create_router         = true
+      [32m+[0m[0m created_at            = (known after apply)
+      [32m+[0m[0m creator_task_id       = (known after apply)
+      [32m+[0m[0m default               = (known after apply)
+      [32m+[0m[0m external              = (known after apply)
+      [32m+[0m[0m id                    = (known after apply)
+      [32m+[0m[0m mtu                   = (known after apply)
+      [32m+[0m[0m name                  = "test-network-i2"
+      [32m+[0m[0m port_security_enabled = (known after apply)
+      [32m+[0m[0m project_id            = 379987
+      [32m+[0m[0m region                = (known after apply)
+      [32m+[0m[0m region_id             = 76
+      [32m+[0m[0m segmentation_id       = (known after apply)
+      [32m+[0m[0m shared                = (known after apply)
+      [32m+[0m[0m subnets               = (known after apply)
+      [32m+[0m[0m task_id               = (known after apply)
+      [32m+[0m[0m tasks                 = (known after apply)
+      [32m+[0m[0m type                  = "vxlan"
+      [32m+[0m[0m updated_at            = (known after apply)
+    }
+
+[1m  # gcore_cloud_network_subnet.test[0m will be created
+[0m  [32m+[0m[0m resource "gcore_cloud_network_subnet" "test" {
+      [32m+[0m[0m available_ips             = (known after apply)
+      [32m+[0m[0m cidr                      = "10.0.1.0/24"
+      [32m+[0m[0m connect_to_network_router = true
+      [32m+[0m[0m created_at                = (known after apply)
+      [32m+[0m[0m creator_task_id           = (known after apply)
+      [32m+[0m[0m dns_nameservers           = (known after apply)
+      [32m+[0m[0m enable_dhcp               = true
+      [32m+[0m[0m gateway_ip                = (known after apply)
+      [32m+[0m[0m has_router                = false
+      [32m+[0m[0m host_routes               = (known after apply)
+      [32m+[0m[0m id                        = (known after apply)
+      [32m+[0m[0m ip_version                = (known after apply)
+      [32m+[0m[0m name                      = "test-subnet-i2"
+      [32m+[0m[0m network_id                = (known after apply)
+      [32m+[0m[0m project_id                = 379987
+      [32m+[0m[0m region                    = (known after apply)
+      [32m+[0m[0m region_id                 = 76
+      [32m+[0m[0m task_id                   = (known after apply)
+      [32m+[0m[0m tasks                     = (known after apply)
+      [32m+[0m[0m total_ips                 = (known after apply)
+      [32m+[0m[0m updated_at                = (known after apply)
+    }
+
+[1m  # gcore_cloud_volume.pre_created[0m will be created
+[0m  [32m+[0m[0m resource "gcore_cloud_volume" "pre_created" {
+      [32m+[0m[0m attachments           = (known after apply)
+      [32m+[0m[0m bootable              = (known after apply)
+      [32m+[0m[0m created_at            = (known after apply)
+      [32m+[0m[0m creator_task_id       = (known after apply)
+      [32m+[0m[0m id                    = (known after apply)
+      [32m+[0m[0m image_id              = "f84ddba3-7a5a-4199-931a-250e981d16fb"
+      [32m+[0m[0m is_root_volume        = (known after apply)
+      [32m+[0m[0m limiter_stats         = (known after apply)
+      [32m+[0m[0m name                  = "pre-created-for-v3"
+      [32m+[0m[0m project_id            = 379987
+      [32m+[0m[0m region                = (known after apply)
+      [32m+[0m[0m region_id             = 76
+      [32m+[0m[0m size                  = 10
+      [32m+[0m[0m snapshot_ids          = (known after apply)
+      [32m+[0m[0m source                = "image"
+      [32m+[0m[0m status                = (known after apply)
+      [32m+[0m[0m task_id               = (known after apply)
+      [32m+[0m[0m tasks                 = (known after apply)
+      [32m+[0m[0m type_name             = "standard"
+      [32m+[0m[0m updated_at            = (known after apply)
+      [32m+[0m[0m volume_image_metadata = (known after apply)
+      [32m+[0m[0m volume_type           = (known after apply)
+    }
+
+[1mPlan:[0m 7 to add, 0 to change, 0 to destroy.
+[0m
+Changes to Outputs:
+  [32m+[0m[0m i2_subnet_id          = (known after apply)
+  [32m+[0m[0m v1_image_addresses    = (known after apply)
+  [32m+[0m[0m v1_image_id           = (known after apply)
+  [32m+[0m[0m v2_new_volume_id      = (known after apply)
+  [32m+[0m[0m v3_existing_volume_id = (known after apply)
+  [32m+[0m[0m v3_volume_id_used     = (known after apply)
+[90m
+─────────────────────────────────────────────────────────────────────────────[0m
+
+Saved the plan to: tfplan
+
+To perform exactly these actions, run the following command to apply:
+    terraform apply "tfplan"

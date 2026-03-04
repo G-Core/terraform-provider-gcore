@@ -1,0 +1,47 @@
+#!/bin/bash
+# Git worktree branch switching script
+# Usage: ./scripts/worktree-switch <branch-name>
+
+set -e
+
+BRANCH_NAME="$1"
+REPO_ROOT="/Users/user/repos/gcore-terraform"
+TREE_DIR="$REPO_ROOT/.tree"
+
+if [ -z "$BRANCH_NAME" ]; then
+    echo "Usage: $0 <branch-name>"
+    echo "Available branches:"
+    git branch -a | grep -v "remotes" | sed 's/^[ *]*//' | sort
+    exit 1
+fi
+
+# Check if branch exists
+if ! git show-ref --verify --quiet "refs/heads/$BRANCH_NAME" && ! git show-ref --verify --quiet "refs/remotes/origin/$BRANCH_NAME"; then
+    echo "Branch '$BRANCH_NAME' does not exist locally or remotely"
+    exit 1
+fi
+
+# If trying to switch to main, just change to main worktree
+if [ "$BRANCH_NAME" = "main" ]; then
+    echo "Switching to main branch in root directory"
+    cd "$REPO_ROOT"
+    git checkout main
+    echo "Now in main branch at: $(pwd)"
+    exit 0
+fi
+
+# Check if worktree already exists
+WORKTREE_PATH="$TREE_DIR/$BRANCH_NAME"
+if [ -d "$WORKTREE_PATH" ]; then
+    echo "Worktree for '$BRANCH_NAME' already exists at $WORKTREE_PATH"
+    echo "Switching to existing worktree..."
+    cd "$WORKTREE_PATH"
+    echo "Now in $BRANCH_NAME branch at: $(pwd)"
+    exit 0
+fi
+
+# Create new worktree
+echo "Creating new worktree for branch '$BRANCH_NAME' at $WORKTREE_PATH"
+git worktree add "$WORKTREE_PATH" "$BRANCH_NAME"
+cd "$WORKTREE_PATH"
+echo "Created and switched to $BRANCH_NAME branch at: $(pwd)"

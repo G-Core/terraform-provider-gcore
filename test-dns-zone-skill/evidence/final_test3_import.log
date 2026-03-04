@@ -1,0 +1,10 @@
+gcore_dns_zone.minimal: Importing from ID "test-zone-skill-20260205.com"...
+gcore_dns_zone.minimal: Import prepared!
+  Prepared gcore_dns_zone for import
+gcore_dns_zone.minimal: Refreshing state... [id=test-zone-skill-20260205.com]
+
+Import successful!
+
+The resources that were imported are shown above. These resources are now in
+your Terraform state and will henceforth be managed by Terraform.
+

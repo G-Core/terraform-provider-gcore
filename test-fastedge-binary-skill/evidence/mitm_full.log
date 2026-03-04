@@ -1,0 +1,391 @@
+127.0.0.1:56080: POST https://api.gcore.com/fastedge/v1/binaries/raw HTTP/2.0
+    x-stainless-lang: go
+    x-stainless-runtime: go
+    x-stainless-arch: arm64
+    x-stainless-runtime-version: go1.24.5
+    x-stainless-package-version: 0.31.0
+    content-type: application/octet-stream
+    accept: application/json
+    x-stainless-os: MacOS
+    authorization: APIKey 21788$1e278ce67b6aa33f178122658b1dd0210d0edff453d348acb9b68bffea6a635b7791925ddda198d5678a4dc20269fe04a263ca92c7e5aa41ea79075f89b66bf6
+    x-stainless-retry-count: 0
+    user-agent: Gcore/Go 0.31.0
+    accept-encoding: gzip
+ << HTTP/2.0 200 OK 148b
+    server: nginx
+    date: Tue, 10 Feb 2026 08:32:37 GMT
+    content-type: application/json
+    content-length: 148
+    x-id-fe: am3-hw-edge-gc119
+    traceparent: 00-9a18cb1217194d2a51dec4ea81aa2c01-5f13c8decf028376-01
+    access-control-allow-credentials: true
+    access-control-allow-headers: *
+    access-control-allow-methods: POST, GET, OPTIONS, PUT, DELETE, PATCH
+    access-control-allow-origin: *
+    cache-control: no-store
+    strict-transport-security: max-age=31536000; includeSubDomains
+    x-id: am3-hw-edge-gc119
+    x-robots-tag: noindex, nofollow, noarchive
+    accept-ranges: bytes
+127.0.0.1:56080: GET https://api.gcore.com/fastedge/v1/binaries/3069 HTTP/2.0
+    x-stainless-arch: arm64
+    x-stainless-package-version: 0.31.0
+    authorization: APIKey 21788$1e278ce67b6aa33f178122658b1dd0210d0edff453d348acb9b68bffea6a635b7791925ddda198d5678a4dc20269fe04a263ca92c7e5aa41ea79075f89b66bf6
+    x-stainless-os: MacOS
+    x-stainless-runtime-version: go1.24.5
+    accept: application/json
+    x-stainless-retry-count: 0
+    x-stainless-lang: go
+    x-stainless-runtime: go
+    user-agent: Gcore/Go 0.31.0
+    accept-encoding: gzip
+ << HTTP/2.0 200 OK 140b
+    server: nginx
+    date: Tue, 10 Feb 2026 08:32:37 GMT
+    content-type: application/json
+    content-length: 140
+    x-id-fe: am3-hw-edge-gc119
+    traceparent: 00-a09a6279f9c5702d978181952caae785-df6314f2024d0007-01
+    access-control-allow-credentials: true
+    access-control-allow-headers: *
+    access-control-allow-methods: POST, GET, OPTIONS, PUT, DELETE, PATCH
+    access-control-allow-origin: *
+    cache-control: no-store
+    strict-transport-security: max-age=31536000; includeSubDomains
+    x-id: am3-hw-edge-gc119
+    x-robots-tag: noindex, nofollow, noarchive
+    accept-ranges: bytes
+127.0.0.1:56107: GET https://api.gcore.com/fastedge/v1/binaries/3069 HTTP/2.0
+    x-stainless-package-version: 0.31.0
+    x-stainless-runtime-version: go1.24.5
+    authorization: APIKey 21788$1e278ce67b6aa33f178122658b1dd0210d0edff453d348acb9b68bffea6a635b7791925ddda198d5678a4dc20269fe04a263ca92c7e5aa41ea79075f89b66bf6
+    user-agent: Gcore/Go 0.31.0
+    x-stainless-lang: go
+    x-stainless-os: MacOS
+    accept: application/json
+    x-stainless-retry-count: 0
+    x-stainless-runtime: go
+    x-stainless-arch: arm64
+    accept-encoding: gzip
+ << HTTP/2.0 200 OK 140b
+    server: nginx
+    date: Tue, 10 Feb 2026 08:32:45 GMT
+    content-type: application/json
+    content-length: 140
+    x-id-fe: am3-hw-edge-gc111
+    traceparent: 00-684ad503a90fc35b6f599cc3884d3fd7-3c6f295e4c4b02b5-01
+    access-control-allow-credentials: true
+    access-control-allow-headers: *
+    access-control-allow-methods: POST, GET, OPTIONS, PUT, DELETE, PATCH
+    access-control-allow-origin: *
+    cache-control: no-store
+    strict-transport-security: max-age=31536000; includeSubDomains
+    x-id: am3-hw-edge-gc111
+    x-robots-tag: noindex, nofollow, noarchive
+    accept-ranges: bytes
+127.0.0.1:56124: GET https://api.gcore.com/fastedge/v1/binaries/3069 HTTP/2.0
+    user-agent: Gcore/Go 0.31.0
+    x-stainless-runtime-version: go1.24.5
+    x-stainless-lang: go
+    x-stainless-runtime: go
+    x-stainless-package-version: 0.31.0
+    authorization: APIKey 21788$1e278ce67b6aa33f178122658b1dd0210d0edff453d348acb9b68bffea6a635b7791925ddda198d5678a4dc20269fe04a263ca92c7e5aa41ea79075f89b66bf6
+    x-stainless-os: MacOS
+    x-stainless-arch: arm64
+    accept: application/json
+    x-stainless-retry-count: 0
+    accept-encoding: gzip
+ << HTTP/2.0 200 OK 140b
+    server: nginx
+    date: Tue, 10 Feb 2026 08:32:52 GMT
+    content-type: application/json
+    content-length: 140
+    x-id-fe: am3-hw-edge-gc118
+    traceparent: 00-14f4a8b39331159da94d771d54d6a758-7ec9a963acc3e2fe-01
+    access-control-allow-credentials: true
+    access-control-allow-headers: *
+    access-control-allow-methods: POST, GET, OPTIONS, PUT, DELETE, PATCH
+    access-control-allow-origin: *
+    cache-control: no-store
+    strict-transport-security: max-age=31536000; includeSubDomains
+    x-id: am3-hw-edge-gc118
+    x-robots-tag: noindex, nofollow, noarchive
+    accept-ranges: bytes
+127.0.0.1:56124: GET https://api.gcore.com/fastedge/v1/binaries/3069 HTTP/2.0
+    x-stainless-retry-count: 0
+    user-agent: Gcore/Go 0.31.0
+    x-stainless-runtime-version: go1.24.5
+    accept: application/json
+    x-stainless-package-version: 0.31.0
+    x-stainless-lang: go
+    x-stainless-runtime: go
+    x-stainless-os: MacOS
+    x-stainless-arch: arm64
+    authorization: APIKey 21788$1e278ce67b6aa33f178122658b1dd0210d0edff453d348acb9b68bffea6a635b7791925ddda198d5678a4dc20269fe04a263ca92c7e5aa41ea79075f89b66bf6
+    accept-encoding: gzip
+ << HTTP/2.0 200 OK 140b
+    server: nginx
+    date: Tue, 10 Feb 2026 08:32:52 GMT
+    content-type: application/json
+    content-length: 140
+    x-id-fe: am3-hw-edge-gc118
+    traceparent: 00-7bf12d04d5dc175af582cbbbd365c208-e46beb50a85f5288-01
+    access-control-allow-credentials: true
+    access-control-allow-headers: *
+    access-control-allow-methods: POST, GET, OPTIONS, PUT, DELETE, PATCH
+    access-control-allow-origin: *
+    cache-control: no-store
+    strict-transport-security: max-age=31536000; includeSubDomains
+    x-id: am3-hw-edge-gc118
+    x-robots-tag: noindex, nofollow, noarchive
+    accept-ranges: bytes
+127.0.0.1:56145: GET https://api.gcore.com/fastedge/v1/binaries/3069 HTTP/2.0
+    authorization: APIKey 21788$1e278ce67b6aa33f178122658b1dd0210d0edff453d348acb9b68bffea6a635b7791925ddda198d5678a4dc20269fe04a263ca92c7e5aa41ea79075f89b66bf6
+    user-agent: Gcore/Go 0.31.0
+    x-stainless-package-version: 0.31.0
+    x-stainless-os: MacOS
+    x-stainless-runtime: go
+    accept: application/json
+    x-stainless-retry-count: 0
+    x-stainless-arch: arm64
+    x-stainless-lang: go
+    x-stainless-runtime-version: go1.24.5
+    accept-encoding: gzip
+ << HTTP/2.0 200 OK 140b
+    server: nginx
+    date: Tue, 10 Feb 2026 08:32:59 GMT
+    content-type: application/json
+    content-length: 140
+    x-id-fe: am3-hw-edge-gc37
+    traceparent: 00-aaa0b9f023c3d54c65af338a53596af8-d7eda5e1833a03af-01
+    access-control-allow-credentials: true
+    access-control-allow-headers: *
+    access-control-allow-methods: POST, GET, OPTIONS, PUT, DELETE, PATCH
+    access-control-allow-origin: *
+    cache-control: no-store
+    strict-transport-security: max-age=31536000; includeSubDomains
+    x-id: am3-hw-edge-gc37
+    x-robots-tag: noindex, nofollow, noarchive
+    accept-ranges: bytes
+127.0.0.1:56145: GET https://api.gcore.com/fastedge/v1/binaries/3069 HTTP/2.0
+    x-stainless-os: MacOS
+    authorization: APIKey 21788$1e278ce67b6aa33f178122658b1dd0210d0edff453d348acb9b68bffea6a635b7791925ddda198d5678a4dc20269fe04a263ca92c7e5aa41ea79075f89b66bf6
+    x-stainless-package-version: 0.31.0
+    x-stainless-runtime: go
+    x-stainless-runtime-version: go1.24.5
+    user-agent: Gcore/Go 0.31.0
+    x-stainless-lang: go
+    x-stainless-arch: arm64
+    accept: application/json
+    x-stainless-retry-count: 0
+    accept-encoding: gzip
+ << HTTP/2.0 200 OK 140b
+    server: nginx
+    date: Tue, 10 Feb 2026 08:33:00 GMT
+    content-type: application/json
+    content-length: 140
+    x-id-fe: am3-hw-edge-gc37
+    traceparent: 00-3e28a6197d377b488bd30050c07b3149-5021a3c8fc992256-01
+    access-control-allow-credentials: true
+    access-control-allow-headers: *
+    access-control-allow-methods: POST, GET, OPTIONS, PUT, DELETE, PATCH
+    access-control-allow-origin: *
+    cache-control: no-store
+    strict-transport-security: max-age=31536000; includeSubDomains
+    x-id: am3-hw-edge-gc37
+    x-robots-tag: noindex, nofollow, noarchive
+    accept-ranges: bytes
+127.0.0.1:56165: GET https://api.gcore.com/fastedge/v1/binaries/3069 HTTP/2.0
+    x-stainless-retry-count: 0
+    user-agent: Gcore/Go 0.31.0
+    x-stainless-runtime-version: go1.24.5
+    x-stainless-package-version: 0.31.0
+    x-stainless-os: MacOS
+    authorization: APIKey 21788$1e278ce67b6aa33f178122658b1dd0210d0edff453d348acb9b68bffea6a635b7791925ddda198d5678a4dc20269fe04a263ca92c7e5aa41ea79075f89b66bf6
+    x-stainless-lang: go
+    x-stainless-runtime: go
+    accept: application/json
+    x-stainless-arch: arm64
+    accept-encoding: gzip
+ << HTTP/2.0 200 OK 140b
+    server: nginx
+    date: Tue, 10 Feb 2026 08:33:06 GMT
+    content-type: application/json
+    content-length: 140
+    x-id-fe: am3-hw-edge-gc37
+    traceparent: 00-cdb18812cb11f62aa336793a4d847946-9e568bf859df727c-01
+    access-control-allow-credentials: true
+    access-control-allow-headers: *
+    access-control-allow-methods: POST, GET, OPTIONS, PUT, DELETE, PATCH
+    access-control-allow-origin: *
+    cache-control: no-store
+    strict-transport-security: max-age=31536000; includeSubDomains
+    x-id: am3-hw-edge-gc37
+    x-robots-tag: noindex, nofollow, noarchive
+    accept-ranges: bytes
+127.0.0.1:56188: GET https://api.gcore.com/fastedge/v1/binaries/3069 HTTP/2.0
+    authorization: APIKey 21788$1e278ce67b6aa33f178122658b1dd0210d0edff453d348acb9b68bffea6a635b7791925ddda198d5678a4dc20269fe04a263ca92c7e5aa41ea79075f89b66bf6
+    x-stainless-retry-count: 0
+    x-stainless-package-version: 0.31.0
+    x-stainless-os: MacOS
+    accept: application/json
+    x-stainless-runtime: go
+    x-stainless-arch: arm64
+    x-stainless-runtime-version: go1.24.5
+    user-agent: Gcore/Go 0.31.0
+    x-stainless-lang: go
+    accept-encoding: gzip
+ << HTTP/2.0 200 OK 140b
+    server: nginx
+    date: Tue, 10 Feb 2026 08:33:15 GMT
+    content-type: application/json
+    content-length: 140
+    x-id-fe: am3-hw-edge-gc113
+    traceparent: 00-38547176110657c32000991456322b01-95f0dd032619034b-01
+    access-control-allow-credentials: true
+    access-control-allow-headers: *
+    access-control-allow-methods: POST, GET, OPTIONS, PUT, DELETE, PATCH
+    access-control-allow-origin: *
+    cache-control: no-store
+    strict-transport-security: max-age=31536000; includeSubDomains
+    x-id: am3-hw-edge-gc113
+    x-robots-tag: noindex, nofollow, noarchive
+    accept-ranges: bytes
+127.0.0.1:56191: GET https://api.gcore.com/fastedge/v1/binaries/3069 HTTP/2.0
+    x-stainless-arch: arm64
+    authorization: APIKey 21788$1e278ce67b6aa33f178122658b1dd0210d0edff453d348acb9b68bffea6a635b7791925ddda198d5678a4dc20269fe04a263ca92c7e5aa41ea79075f89b66bf6
+    accept: application/json
+    user-agent: Gcore/Go 0.31.0
+    x-stainless-lang: go
+    x-stainless-package-version: 0.31.0
+    x-stainless-os: MacOS
+    x-stainless-retry-count: 0
+    x-stainless-runtime-version: go1.24.5
+    x-stainless-runtime: go
+    accept-encoding: gzip
+ << HTTP/2.0 200 OK 140b
+    server: nginx
+    date: Tue, 10 Feb 2026 08:33:15 GMT
+    content-type: application/json
+    content-length: 140
+    x-id-fe: am3-hw-edge-gc111
+    traceparent: 00-4ac03bc6c3ad91dbead44958a77e62e9-83e44b2b2dde3166-01
+    access-control-allow-credentials: true
+    access-control-allow-headers: *
+    access-control-allow-methods: POST, GET, OPTIONS, PUT, DELETE, PATCH
+    access-control-allow-origin: *
+    cache-control: no-store
+    strict-transport-security: max-age=31536000; includeSubDomains
+    x-id: am3-hw-edge-gc111
+    x-robots-tag: noindex, nofollow, noarchive
+    accept-ranges: bytes
+127.0.0.1:56219: GET https://api.gcore.com/fastedge/v1/binaries/3069 HTTP/2.0
+    x-stainless-arch: arm64
+    x-stainless-runtime-version: go1.24.5
+    authorization: APIKey 21788$1e278ce67b6aa33f178122658b1dd0210d0edff453d348acb9b68bffea6a635b7791925ddda198d5678a4dc20269fe04a263ca92c7e5aa41ea79075f89b66bf6
+    x-stainless-retry-count: 0
+    user-agent: Gcore/Go 0.31.0
+    x-stainless-os: MacOS
+    x-stainless-lang: go
+    x-stainless-package-version: 0.31.0
+    x-stainless-runtime: go
+    accept: application/json
+    accept-encoding: gzip
+ << HTTP/2.0 200 OK 140b
+    server: nginx
+    date: Tue, 10 Feb 2026 08:33:30 GMT
+    content-type: application/json
+    content-length: 140
+    x-id-fe: lux-hw-edge-gc23
+    traceparent: 00-4fe452d27d19cdb38b2a07ae4d3e852d-d6997bf6ffc4c76a-01
+    access-control-allow-credentials: true
+    access-control-allow-headers: *
+    access-control-allow-methods: POST, GET, OPTIONS, PUT, DELETE, PATCH
+    access-control-allow-origin: *
+    cache-control: no-store
+    strict-transport-security: max-age=31536000; includeSubDomains
+    x-id: lux-hw-edge-gc23
+    x-robots-tag: noindex, nofollow, noarchive
+    accept-ranges: bytes
+127.0.0.1:56222: DELETE https://api.gcore.com/fastedge/v1/binaries/3069 HTTP/2.0
+    x-stainless-retry-count: 0
+    x-stainless-package-version: 0.31.0
+    x-stainless-os: MacOS
+    authorization: APIKey 21788$1e278ce67b6aa33f178122658b1dd0210d0edff453d348acb9b68bffea6a635b7791925ddda198d5678a4dc20269fe04a263ca92c7e5aa41ea79075f89b66bf6
+    user-agent: Gcore/Go 0.31.0
+    x-stainless-arch: arm64
+    x-stainless-lang: go
+    accept: */*
+    x-stainless-runtime-version: go1.24.5
+    x-stainless-runtime: go
+    accept-encoding: gzip
+ << HTTP/2.0 204 No Content 0b
+    server: nginx
+    date: Tue, 10 Feb 2026 08:33:31 GMT
+    x-id-fe: lux-hw-edge-gc23
+    traceparent: 00-76cdda8cbe83ccefcb33100ca695a5b1-1c244d41f52545d9-01
+    access-control-allow-credentials: true
+    access-control-allow-headers: *
+    access-control-allow-methods: POST, GET, OPTIONS, PUT, DELETE, PATCH
+    access-control-allow-origin: *
+    cache-control: no-store
+    strict-transport-security: max-age=31536000; includeSubDomains
+    x-id: lux-hw-edge-gc23
+    x-robots-tag: noindex, nofollow, noarchive
+127.0.0.1:56222: POST https://api.gcore.com/fastedge/v1/binaries/raw HTTP/2.0
+    user-agent: Gcore/Go 0.31.0
+    x-stainless-runtime: go
+    x-stainless-os: MacOS
+    x-stainless-runtime-version: go1.24.5
+    x-stainless-retry-count: 0
+    x-stainless-package-version: 0.31.0
+    x-stainless-arch: arm64
+    x-stainless-lang: go
+    content-type: application/octet-stream
+    authorization: APIKey 21788$1e278ce67b6aa33f178122658b1dd0210d0edff453d348acb9b68bffea6a635b7791925ddda198d5678a4dc20269fe04a263ca92c7e5aa41ea79075f89b66bf6
+    accept: application/json
+    accept-encoding: gzip
+ << HTTP/2.0 400 Bad Request 43b
+    server: nginx
+    date: Tue, 10 Feb 2026 08:33:33 GMT
+    content-type: application/json
+    content-length: 43
+    x-id-fe: lux-hw-edge-gc23
+    traceparent: 00-d4e9022e53653106fde62a7ab2f49010-f9c0b02c6da6d06c-01
+    access-control-allow-credentials: true
+    access-control-allow-headers: *
+    access-control-allow-methods: POST, GET, OPTIONS, PUT, DELETE, PATCH
+    access-control-allow-origin: *
+    cache-control: no-store
+    strict-transport-security: max-age=31536000; includeSubDomains
+    x-id: lux-hw-edge-gc23
+    x-robots-tag: noindex, nofollow, noarchive
+127.0.0.1:56276: POST https://api.gcore.com/fastedge/v1/binaries/raw HTTP/2.0
+    x-stainless-runtime: go
+    authorization: APIKey 21788$1e278ce67b6aa33f178122658b1dd0210d0edff453d348acb9b68bffea6a635b7791925ddda198d5678a4dc20269fe04a263ca92c7e5aa41ea79075f89b66bf6
+    x-stainless-retry-count: 0
+    x-stainless-lang: go
+    x-stainless-package-version: 0.31.0
+    x-stainless-os: MacOS
+    accept: application/json
+    x-stainless-runtime-version: go1.24.5
+    content-type: application/octet-stream
+    x-stainless-arch: arm64
+    user-agent: Gcore/Go 0.31.0
+    accept-encoding: gzip
+ << HTTP/2.0 200 OK 148b
+    server: nginx
+    date: Tue, 10 Feb 2026 08:33:51 GMT
+    content-type: application/json
+    content-length: 148
+    x-id-fe: lux-hw-edge-gc23
+    traceparent: 00-453a6102152e4833c81ece03b37c55e5-cad7560f558114d6-01
+    access-control-allow-credentials: true
+    access-control-allow-headers: *
+    access-control-allow-methods: POST, GET, OPTIONS, PUT, DELETE, PATCH
+    access-control-allow-origin: *
+    cache-control: no-store
+    strict-transport-security: max-age=31536000; includeSubDomains
+    x-id: lux-hw-edge-gc23
+    x-robots-tag: noindex, nofollow, noarchive
+    accept-ranges: bytes

@@ -1,0 +1,107 @@
+[33m╷[0m[0m
+[33m│[0m [0m[1m[33mWarning: [0m[0m[1mProvider development overrides are in effect[0m
+[33m│[0m [0m
+[33m│[0m [0m[0mThe following provider development overrides are set in the CLI
+[33m│[0m [0mconfiguration:
+[33m│[0m [0m - gcore/gcore in /Users/user/repos/gcore-terraform
+[33m│[0m [0m
+[33m│[0m [0mThe behavior may therefore not match any released version of the provider
+[33m│[0m [0mand applying changes may cause the state to become incompatible with
+[33m│[0m [0mpublished releases.
+[33m╵[0m[0m
+[0m[1mgcore_cloud_load_balancer.test: Refreshing state... [id=bc55fd09-b427-4013-970e-ff2da6af884d][0m
+[0m[1mgcore_cloud_load_balancer_listener.test: Refreshing state... [id=08b1fcd2-5768-4c40-9a0d-5d71aa3e0855][0m
+[0m[1mgcore_cloud_load_balancer_pool.test: Refreshing state... [id=6ab083a0-ddd2-4663-aa6c-9fc81e69b6bd][0m
+
+[1m[36mNote:[0m[1m Objects have changed outside of Terraform
+[0m
+Terraform detected the following changes made outside of Terraform since the
+last "terraform apply" which may have affected this plan:
+
+[1m  # gcore_cloud_load_balancer_pool.test[0m has changed
+[0m  [33m~[0m[0m resource "gcore_cloud_load_balancer_pool" "test" {
+        id                  = "6ab083a0-ddd2-4663-aa6c-9fc81e69b6bd"
+        name                = "tf-test-pool-hm-fix"
+      [33m~[0m[0m operating_status    = "DEGRADED" [33m->[0m[0m "ERROR"
+        [90m# (12 unchanged attributes hidden)[0m[0m
+    }
+
+
+Unless you have made equivalent changes to your configuration, or ignored the
+relevant attributes using ignore_changes, the following plan may include
+actions to undo or respond to these changes.
+[90m
+─────────────────────────────────────────────────────────────────────────────[0m
+
+Terraform used the selected providers to generate the following execution
+plan. Resource actions are indicated with the following symbols:
+  [33m~[0m update in-place[0m
+
+Terraform will perform the following actions:
+
+[1m  # gcore_cloud_load_balancer_pool.test[0m will be updated in-place
+[0m  [33m~[0m[0m resource "gcore_cloud_load_balancer_pool" "test" {
+      [31m-[0m[0m healthmonitor       = {
+          [31m-[0m[0m delay            = 10 [90m-> null[0m[0m
+          [31m-[0m[0m expected_codes   = "200" [90m-> null[0m[0m
+          [31m-[0m[0m http_method      = "GET" [90m-> null[0m[0m
+          [31m-[0m[0m max_retries      = 3 [90m-> null[0m[0m
+          [31m-[0m[0m max_retries_down = 3 [90m-> null[0m[0m
+          [31m-[0m[0m timeout          = 5 [90m-> null[0m[0m
+          [31m-[0m[0m type             = "HTTP" [90m-> null[0m[0m
+          [31m-[0m[0m url_path         = "/health" [90m-> null[0m[0m
+        } [90m-> null[0m[0m
+        id                  = "6ab083a0-ddd2-4663-aa6c-9fc81e69b6bd"
+        name                = "tf-test-pool-hm-fix"
+      [33m~[0m[0m operating_status    = "ERROR" -> (known after apply)
+      [33m~[0m[0m provisioning_status = "ACTIVE" -> (known after apply)
+        [90m# (10 unchanged attributes hidden)[0m[0m
+    }
+
+[1mPlan:[0m 0 to add, 1 to change, 0 to destroy.
+[0m
+Changes to Outputs:
+  [31m-[0m[0m pool_healthmonitor    = {
+      [31m-[0m[0m delay            = 10
+      [31m-[0m[0m expected_codes   = "200"
+      [31m-[0m[0m http_method      = "GET"
+      [31m-[0m[0m max_retries      = 3
+      [31m-[0m[0m max_retries_down = 3
+      [31m-[0m[0m timeout          = 5
+      [31m-[0m[0m type             = "HTTP"
+      [31m-[0m[0m url_path         = "/health"
+    } [90m-> null[0m[0m
+  [33m~[0m[0m pool_operating_status = "DEGRADED" -> (known after apply)
+[0m[1mgcore_cloud_load_balancer_pool.test: Modifying... [id=6ab083a0-ddd2-4663-aa6c-9fc81e69b6bd][0m[0m
+[0m[1mgcore_cloud_load_balancer_pool.test: Modifications complete after 1s [id=6ab083a0-ddd2-4663-aa6c-9fc81e69b6bd][0m
+[0m[1m[32m
+Apply complete! Resources: 0 added, 1 changed, 0 destroyed.
+[0m[0m[1m[32m
+Outputs:
+
+[0mpool_id = "6ab083a0-ddd2-4663-aa6c-9fc81e69b6bd"
+pool_members = tolist([
+  {
+    "address" = "10.0.0.1"
+    "admin_state_up" = true
+    "backup" = false
+    "instance_id" = tostring(null)
+    "monitor_address" = tostring(null)
+    "monitor_port" = tonumber(null)
+    "protocol_port" = 8080
+    "subnet_id" = tostring(null)
+    "weight" = 1
+  },
+  {
+    "address" = "10.0.0.2"
+    "admin_state_up" = true
+    "backup" = false
+    "instance_id" = tostring(null)
+    "monitor_address" = tostring(null)
+    "monitor_port" = tonumber(null)
+    "protocol_port" = 8080
+    "subnet_id" = tostring(null)
+    "weight" = 1
+  },
+])
+pool_operating_status = "ERROR"

@@ -1,0 +1,31 @@
+
+Warning: Provider development overrides are in effect
+
+The following provider development overrides are set in the CLI
+configuration:
+ - gcore/gcore in /Users/user/repos/gcore-terraform
+
+The behavior may therefore not match any released version of the provider and
+applying changes may cause the state to become incompatible with published
+releases.
+gcore_fastedge_secret.test: Refreshing state... [name=tf-checksum-test]
+
+Terraform used the selected providers to generate the following execution
+plan. Resource actions are indicated with the following symbols:
+  ~ update in-place
+
+Terraform will perform the following actions:
+
+  # gcore_fastedge_secret.test will be updated in-place
+  ~ resource "gcore_fastedge_secret" "test" {
+        id           = 343
+        name         = "tf-checksum-test"
+      ~ secret_slots = (sensitive value)
+        # (2 unchanged attributes hidden)
+    }
+
+Plan: 0 to add, 1 to change, 0 to destroy.
+gcore_fastedge_secret.test: Modifying... [name=tf-checksum-test]
+gcore_fastedge_secret.test: Modifications complete after 1s [name=tf-checksum-test]
+
+Apply complete! Resources: 0 added, 1 changed, 0 destroyed.

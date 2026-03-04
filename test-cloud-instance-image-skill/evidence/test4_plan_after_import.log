@@ -1,0 +1,61 @@
+[33m╷[0m[0m
+[33m│[0m [0m[1m[33mWarning: [0m[0m[1mProvider development overrides are in effect[0m
+[33m│[0m [0m
+[33m│[0m [0m[0mThe following provider development overrides are set in the CLI
+[33m│[0m [0mconfiguration:
+[33m│[0m [0m - gcore/gcore in /Users/user/repos/gcore-terraform
+[33m│[0m [0m
+[33m│[0m [0mThe behavior may therefore not match any released version of the provider
+[33m│[0m [0mand applying changes may cause the state to become incompatible with
+[33m│[0m [0mpublished releases.
+[33m╵[0m[0m
+[0m[1mgcore_cloud_instance_image.test_image: Refreshing state... [id=314fde33-4ecb-4d62-a729-cf0fe3b54ebb][0m
+
+Terraform used the selected providers to generate the following execution
+plan. Resource actions are indicated with the following symbols:
+[31m-[0m/[32m+[0m destroy and then create replacement[0m
+
+Terraform will perform the following actions:
+
+[1m  # gcore_cloud_instance_image.test_image[0m must be [1m[31mreplaced[0m
+[0m[31m-[0m/[32m+[0m[0m resource "gcore_cloud_instance_image" "test_image" {
+      [32m+[0m[0m cow_format         = false
+      [33m~[0m[0m created_at         = "2026-01-15T08:21:42Z" -> (known after apply)
+      [33m~[0m[0m creator_task_id    = "5e023b9b-f94d-4614-8539-dd4a39867d49" -> (known after apply)
+      [32m+[0m[0m description        = (known after apply)
+      [33m~[0m[0m disk_format        = "qcow2" -> (known after apply)
+      [32m+[0m[0m display_order      = (known after apply)
+      [32m+[0m[0m gpu_driver         = (known after apply)
+      [32m+[0m[0m gpu_driver_type    = (known after apply)
+      [32m+[0m[0m gpu_driver_version = (known after apply)
+      [33m~[0m[0m id                 = "314fde33-4ecb-4d62-a729-cf0fe3b54ebb" -> (known after apply)
+      [32m+[0m[0m is_baremetal       = false
+      [33m~[0m[0m min_disk           = 1 -> (known after apply)
+      [33m~[0m[0m min_ram            = 0 -> (known after apply)
+      [32m+[0m[0m name               = "test-image-skill"
+      [32m+[0m[0m os_distro          = "cirros" [31m# forces replacement[0m[0m
+      [32m+[0m[0m os_version         = "0.4.0" [31m# forces replacement[0m[0m
+      [33m~[0m[0m region             = "Luxembourg-2" -> (known after apply)
+      [33m~[0m[0m size               = 12716032 -> (known after apply)
+      [33m~[0m[0m status             = "active" -> (known after apply)
+      [32m+[0m[0m tags               = {
+          [32m+[0m[0m "test" = "skill-test"
+        }
+      [32m+[0m[0m task_id            = (known after apply)
+      [33m~[0m[0m updated_at         = "2026-01-15T08:22:54Z" -> (known after apply)
+      [32m+[0m[0m url                = "http://mirror.noris.net/cirros/0.4.0/cirros-0.4.0-x86_64-disk.img" [31m# forces replacement[0m[0m
+      [33m~[0m[0m visibility         = "shared" -> (known after apply)
+        [90m# (5 unchanged attributes hidden)[0m[0m
+    }
+
+[1mPlan:[0m [0m1 to add, 0 to change, 1 to destroy.
+
+Changes to Outputs:
+  [33m~[0m[0m image_id     = "314fde33-4ecb-4d62-a729-cf0fe3b54ebb" -> (known after apply)
+  [33m~[0m[0m image_size   = 12716032 -> (known after apply)
+  [33m~[0m[0m image_status = "active" -> (known after apply)
+[90m
+─────────────────────────────────────────────────────────────────────────────[0m
+
+Note: You didn't use the -out option to save this plan, so Terraform can't
+guarantee to take exactly these actions if you run "terraform apply" now.

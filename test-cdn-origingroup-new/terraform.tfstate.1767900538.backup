@@ -1,0 +1,48 @@
+{
+  "version": 4,
+  "terraform_version": "1.10.5",
+  "serial": 29,
+  "lineage": "1f5fc7fe-95dd-0423-57a5-511e960d026e",
+  "outputs": {
+    "update_test_id": {
+      "value": 1346366,
+      "type": "number"
+    }
+  },
+  "resources": [
+    {
+      "mode": "managed",
+      "type": "gcore_cdn_origin_group",
+      "name": "update_test",
+      "provider": "provider[\"registry.terraform.io/gcore/gcore\"]",
+      "instances": [
+        {
+          "index_key": 0,
+          "schema_version": 0,
+          "attributes": {
+            "auth": null,
+            "auth_type": "none",
+            "has_related_resources": false,
+            "id": 1346366,
+            "name": "renamed-origin-group",
+            "path": null,
+            "proxy_next_upstream": [
+              "error",
+              "timeout"
+            ],
+            "sources": [
+              {
+                "backup": false,
+                "enabled": true,
+                "source": "github.com"
+              }
+            ],
+            "use_next": true
+          },
+          "sensitive_attributes": []
+        }
+      ]
+    }
+  ],
+  "check_results": null
+}

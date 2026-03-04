@@ -1,0 +1,70 @@
+{
+  "version": 4,
+  "terraform_version": "1.14.3",
+  "serial": 2,
+  "lineage": "b6fde790-dae0-7724-fcd8-740b39c68260",
+  "outputs": {
+    "single_slot_id": {
+      "value": 332,
+      "type": "number"
+    },
+    "single_slot_secret_slots": {
+      "value": [
+        {
+          "checksum": "07d2cc8dc78f6f452b1b98cac5d33c7fc650e7dd7c0bcc65ae67598d03731c14",
+          "slot": 0,
+          "value": null
+        }
+      ],
+      "type": [
+        "set",
+        [
+          "object",
+          {
+            "checksum": "string",
+            "slot": "number",
+            "value": "string"
+          }
+        ]
+      ],
+      "sensitive": true
+    }
+  },
+  "resources": [
+    {
+      "mode": "managed",
+      "type": "gcore_fastedge_secret",
+      "name": "test_single",
+      "provider": "provider[\"registry.terraform.io/gcore/gcore\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "app_count": null,
+            "comment": "Skill test - single slot",
+            "id": 332,
+            "name": "tf-skill-test-single-slot",
+            "secret_slots": [
+              {
+                "checksum": "07d2cc8dc78f6f452b1b98cac5d33c7fc650e7dd7c0bcc65ae67598d03731c14",
+                "slot": 0,
+                "value": null
+              }
+            ],
+            "secret_slots_wo_version": null
+          },
+          "sensitive_attributes": [
+            [
+              {
+                "type": "get_attr",
+                "value": "secret_slots"
+              }
+            ]
+          ],
+          "identity_schema_version": 0
+        }
+      ]
+    }
+  ],
+  "check_results": null
+}

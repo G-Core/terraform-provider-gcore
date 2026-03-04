@@ -1,0 +1,1078 @@
+{
+  "generated": "2026-03-02",
+  "branch": "feat/migrate-examples-from-old-provider",
+  "resources": [
+    {
+      "name": "cdn_cdn_resource_rule",
+      "terraform_name": "gcore_cdn_cdn_resource_rule",
+      "has_template": true,
+      "action": "reviewed",
+      "autogen_lines": 263,
+      "files": [
+        "basic.tf",
+        "resource.tf"
+      ],
+      "custom_examples": [
+        "basic.tf"
+      ],
+      "individual_validate": "pass",
+      "quality": "good"
+    },
+    {
+      "name": "cdn_certificate",
+      "terraform_name": "gcore_cdn_certificate",
+      "has_template": true,
+      "action": "template_created",
+      "autogen_lines": 19,
+      "files": [
+        "basic.tf",
+        "resource.tf"
+      ],
+      "custom_examples": [
+        "basic.tf"
+      ],
+      "individual_validate": "pass",
+      "quality": "good"
+    },
+    {
+      "name": "cdn_origin_group",
+      "terraform_name": "gcore_cdn_origin_group",
+      "has_template": true,
+      "action": "reviewed",
+      "autogen_lines": 15,
+      "files": [
+        "basic.tf",
+        "resource.tf",
+        "s3-auth.tf"
+      ],
+      "custom_examples": [
+        "basic.tf",
+        "s3-auth.tf"
+      ],
+      "individual_validate": "pass",
+      "quality": "good"
+    },
+    {
+      "name": "cdn_trusted_ca_certificate",
+      "terraform_name": "gcore_cdn_trusted_ca_certificate",
+      "has_template": true,
+      "action": "reviewed",
+      "autogen_lines": 24,
+      "files": [
+        "basic.tf",
+        "resource.tf"
+      ],
+      "custom_examples": [
+        "basic.tf"
+      ],
+      "individual_validate": "pass",
+      "quality": "good"
+    },
+    {
+      "name": "cloud_file_share",
+      "terraform_name": "gcore_cloud_file_share",
+      "has_template": true,
+      "action": "reviewed",
+      "autogen_lines": 15,
+      "files": [
+        "prereq.tf",
+        "resource.tf",
+        "standard.tf",
+        "vast.tf"
+      ],
+      "custom_examples": [
+        "prereq.tf",
+        "standard.tf",
+        "vast.tf"
+      ],
+      "individual_validate": "pass",
+      "quality": "good"
+    },
+    {
+      "name": "cloud_file_share_access_rule",
+      "terraform_name": "gcore_cloud_file_share_access_rule",
+      "has_template": true,
+      "action": "template_created",
+      "autogen_lines": 7,
+      "files": [
+        "resource.tf"
+      ],
+      "custom_examples": [],
+      "individual_validate": "pass",
+      "quality": "good"
+    },
+    {
+      "name": "cloud_floating_ip",
+      "terraform_name": "gcore_cloud_floating_ip",
+      "has_template": true,
+      "action": "template_created",
+      "autogen_lines": 9,
+      "files": [
+        "basic.tf",
+        "resource.tf"
+      ],
+      "custom_examples": [
+        "basic.tf"
+      ],
+      "individual_validate": "pass",
+      "quality": "good"
+    },
+    {
+      "name": "cloud_gpu_baremetal_cluster_image",
+      "terraform_name": "gcore_cloud_gpu_baremetal_cluster_image",
+      "has_template": true,
+      "action": "template_created",
+      "autogen_lines": 16,
+      "files": [
+        "basic.tf",
+        "resource.tf"
+      ],
+      "custom_examples": [
+        "basic.tf"
+      ],
+      "individual_validate": "pass",
+      "quality": "good"
+    },
+    {
+      "name": "cloud_gpu_virtual_cluster",
+      "terraform_name": "gcore_cloud_gpu_virtual_cluster",
+      "has_template": true,
+      "action": "reviewed",
+      "autogen_lines": 41,
+      "files": [
+        "basic.tf",
+        "resource.tf"
+      ],
+      "custom_examples": [
+        "basic.tf"
+      ],
+      "individual_validate": "pass",
+      "quality": "good"
+    },
+    {
+      "name": "cloud_gpu_virtual_cluster_image",
+      "terraform_name": "gcore_cloud_gpu_virtual_cluster_image",
+      "has_template": true,
+      "action": "template_created",
+      "autogen_lines": 16,
+      "files": [
+        "basic.tf",
+        "resource.tf"
+      ],
+      "custom_examples": [
+        "basic.tf"
+      ],
+      "individual_validate": "pass",
+      "quality": "good"
+    },
+    {
+      "name": "cloud_inference_deployment",
+      "terraform_name": "gcore_cloud_inference_deployment",
+      "has_template": true,
+      "action": "reviewed",
+      "autogen_lines": 142,
+      "files": [
+        "basic.tf",
+        "resource.tf",
+        "with-sqs-trigger.tf"
+      ],
+      "custom_examples": [
+        "basic.tf",
+        "with-sqs-trigger.tf"
+      ],
+      "individual_validate": "pass",
+      "quality": "good"
+    },
+    {
+      "name": "cloud_inference_registry_credential",
+      "terraform_name": "gcore_cloud_inference_registry_credential",
+      "has_template": true,
+      "action": "reviewed",
+      "autogen_lines": 7,
+      "files": [
+        "basic.tf",
+        "resource.tf"
+      ],
+      "custom_examples": [
+        "basic.tf"
+      ],
+      "individual_validate": "pass",
+      "quality": "good"
+    },
+    {
+      "name": "cloud_inference_secret",
+      "terraform_name": "gcore_cloud_inference_secret",
+      "has_template": true,
+      "action": "reviewed",
+      "autogen_lines": 9,
+      "files": [
+        "basic.tf",
+        "resource.tf"
+      ],
+      "custom_examples": [
+        "basic.tf"
+      ],
+      "individual_validate": "pass",
+      "quality": "good"
+    },
+    {
+      "name": "cloud_instance",
+      "terraform_name": "gcore_cloud_instance",
+      "has_template": true,
+      "action": "reviewed",
+      "autogen_lines": 46,
+      "files": [
+        "basic.tf",
+        "custom-sg.tf",
+        "dualstack.tf",
+        "fip.tf",
+        "prereq.tf",
+        "reserved-address.tf",
+        "resource.tf",
+        "two-interface.tf",
+        "windows-userdata.tf",
+        "windows.tf"
+      ],
+      "custom_examples": [
+        "basic.tf",
+        "custom-sg.tf",
+        "dualstack.tf",
+        "fip.tf",
+        "prereq.tf",
+        "reserved-address.tf",
+        "two-interface.tf",
+        "windows-userdata.tf",
+        "windows.tf"
+      ],
+      "individual_validate": "pass",
+      "quality": "good"
+    },
+    {
+      "name": "cloud_instance_image",
+      "terraform_name": "gcore_cloud_instance_image",
+      "has_template": true,
+      "action": "template_created",
+      "autogen_lines": 18,
+      "files": [
+        "basic.tf",
+        "resource.tf"
+      ],
+      "custom_examples": [
+        "basic.tf"
+      ],
+      "individual_validate": "pass",
+      "quality": "good"
+    },
+    {
+      "name": "cloud_k8s_cluster",
+      "terraform_name": "gcore_cloud_k8s_cluster",
+      "has_template": true,
+      "action": "reviewed",
+      "autogen_lines": 99,
+      "files": [
+        "basic.tf",
+        "prereq.tf",
+        "resource.tf",
+        "with-advanced-ddos.tf",
+        "with-vast.tf"
+      ],
+      "custom_examples": [
+        "basic.tf",
+        "prereq.tf",
+        "with-advanced-ddos.tf",
+        "with-vast.tf"
+      ],
+      "individual_validate": "pass",
+      "quality": "good"
+    },
+    {
+      "name": "cloud_load_balancer",
+      "terraform_name": "gcore_cloud_load_balancer",
+      "has_template": true,
+      "action": "reviewed",
+      "autogen_lines": 93,
+      "files": [
+        "prereq.tf",
+        "private-lb-dualstack.tf",
+        "private-lb-fip.tf",
+        "private-lb.tf",
+        "public-lb-rfip.tf",
+        "public-lb.tf",
+        "resource.tf"
+      ],
+      "custom_examples": [
+        "prereq.tf",
+        "private-lb-dualstack.tf",
+        "private-lb-fip.tf",
+        "private-lb.tf",
+        "public-lb-rfip.tf",
+        "public-lb.tf"
+      ],
+      "individual_validate": "pass",
+      "quality": "good"
+    },
+    {
+      "name": "cloud_load_balancer_listener",
+      "terraform_name": "gcore_cloud_load_balancer_listener",
+      "has_template": true,
+      "action": "reviewed",
+      "autogen_lines": 21,
+      "files": [
+        "lb.tf",
+        "prereq.tf",
+        "prometheus-9101.tf",
+        "resource.tf",
+        "tcp-80.tf"
+      ],
+      "custom_examples": [
+        "lb.tf",
+        "prereq.tf",
+        "prometheus-9101.tf",
+        "tcp-80.tf"
+      ],
+      "individual_validate": "pass",
+      "quality": "good"
+    },
+    {
+      "name": "cloud_load_balancer_pool",
+      "terraform_name": "gcore_cloud_load_balancer_pool",
+      "has_template": true,
+      "action": "reviewed",
+      "autogen_lines": 53,
+      "files": [
+        "lb.tf",
+        "prereq.tf",
+        "proxy-8080.tf",
+        "resource.tf",
+        "tcp-80.tf"
+      ],
+      "custom_examples": [
+        "lb.tf",
+        "prereq.tf",
+        "proxy-8080.tf",
+        "tcp-80.tf"
+      ],
+      "individual_validate": "pass",
+      "quality": "good"
+    },
+    {
+      "name": "cloud_load_balancer_pool_member",
+      "terraform_name": "gcore_cloud_load_balancer_pool_member",
+      "has_template": true,
+      "action": "reviewed",
+      "autogen_lines": 14,
+      "files": [
+        "instance-member.tf",
+        "lb.tf",
+        "prereq.tf",
+        "private-member.tf",
+        "public-member.tf",
+        "resource.tf"
+      ],
+      "custom_examples": [
+        "instance-member.tf",
+        "lb.tf",
+        "prereq.tf",
+        "private-member.tf",
+        "public-member.tf"
+      ],
+      "individual_validate": "pass",
+      "quality": "good"
+    },
+    {
+      "name": "cloud_network",
+      "terraform_name": "gcore_cloud_network",
+      "has_template": true,
+      "action": "reviewed",
+      "autogen_lines": 10,
+      "files": [
+        "resource.tf",
+        "with-subnet.tf"
+      ],
+      "custom_examples": [
+        "with-subnet.tf"
+      ],
+      "individual_validate": "pass",
+      "quality": "good"
+    },
+    {
+      "name": "cloud_network_router",
+      "terraform_name": "gcore_cloud_network_router",
+      "has_template": true,
+      "action": "template_created",
+      "autogen_lines": 17,
+      "files": [
+        "basic.tf",
+        "resource.tf"
+      ],
+      "custom_examples": [
+        "basic.tf"
+      ],
+      "individual_validate": "pass",
+      "quality": "good"
+    },
+    {
+      "name": "cloud_network_subnet",
+      "terraform_name": "gcore_cloud_network_subnet",
+      "has_template": true,
+      "action": "reviewed",
+      "autogen_lines": 20,
+      "files": [
+        "ipv4.tf",
+        "ipv6.tf",
+        "prereq.tf",
+        "resource.tf"
+      ],
+      "custom_examples": [
+        "ipv4.tf",
+        "ipv6.tf",
+        "prereq.tf"
+      ],
+      "individual_validate": "pass",
+      "quality": "good"
+    },
+    {
+      "name": "cloud_placement_group",
+      "terraform_name": "gcore_cloud_placement_group",
+      "has_template": true,
+      "action": "reviewed",
+      "autogen_lines": 6,
+      "files": [
+        "basic.tf",
+        "prereq.tf",
+        "resource.tf",
+        "with-two-instances.tf"
+      ],
+      "custom_examples": [
+        "basic.tf",
+        "prereq.tf",
+        "with-two-instances.tf"
+      ],
+      "individual_validate": "pass",
+      "quality": "good"
+    },
+    {
+      "name": "cloud_reserved_fixed_ip",
+      "terraform_name": "gcore_cloud_reserved_fixed_ip",
+      "has_template": true,
+      "action": "reviewed",
+      "autogen_lines": 7,
+      "files": [
+        "any-subnet.tf",
+        "external.tf",
+        "ip-address.tf",
+        "net-prereq.tf",
+        "port.tf",
+        "prereq.tf",
+        "resource.tf",
+        "subnet.tf"
+      ],
+      "custom_examples": [
+        "any-subnet.tf",
+        "external.tf",
+        "ip-address.tf",
+        "net-prereq.tf",
+        "port.tf",
+        "prereq.tf",
+        "subnet.tf"
+      ],
+      "individual_validate": "pass",
+      "quality": "good"
+    },
+    {
+      "name": "cloud_secret",
+      "terraform_name": "gcore_cloud_secret",
+      "has_template": true,
+      "action": "reviewed",
+      "autogen_lines": 11,
+      "files": [
+        "resource.tf",
+        "tls-certificate.tf"
+      ],
+      "custom_examples": [
+        "tls-certificate.tf"
+      ],
+      "individual_validate": "pass",
+      "quality": "good"
+    },
+    {
+      "name": "cloud_security_group",
+      "terraform_name": "gcore_cloud_security_group",
+      "has_template": true,
+      "action": "reviewed",
+      "autogen_lines": 19,
+      "files": [
+        "resource.tf",
+        "web-server.tf"
+      ],
+      "custom_examples": [
+        "web-server.tf"
+      ],
+      "individual_validate": "pass",
+      "quality": "good"
+    },
+    {
+      "name": "cloud_security_group_rule",
+      "terraform_name": "gcore_cloud_security_group_rule",
+      "has_template": true,
+      "action": "template_created",
+      "autogen_lines": 13,
+      "files": [
+        "basic.tf",
+        "resource.tf"
+      ],
+      "custom_examples": [
+        "basic.tf"
+      ],
+      "individual_validate": "pass",
+      "quality": "good"
+    },
+    {
+      "name": "cloud_ssh_key",
+      "terraform_name": "gcore_cloud_ssh_key",
+      "has_template": true,
+      "action": "template_created",
+      "autogen_lines": 6,
+      "files": [
+        "resource.tf"
+      ],
+      "custom_examples": [],
+      "individual_validate": "pass",
+      "quality": "good"
+    },
+    {
+      "name": "cloud_volume",
+      "terraform_name": "gcore_cloud_volume",
+      "has_template": true,
+      "action": "reviewed",
+      "autogen_lines": 15,
+      "files": [
+        "boot-volume.tf",
+        "data-volume.tf",
+        "resource.tf"
+      ],
+      "custom_examples": [
+        "boot-volume.tf",
+        "data-volume.tf"
+      ],
+      "individual_validate": "pass",
+      "quality": "good"
+    },
+    {
+      "name": "dns_network_mapping",
+      "terraform_name": "gcore_dns_network_mapping",
+      "has_template": true,
+      "action": "reviewed",
+      "autogen_lines": 8,
+      "files": [
+        "basic.tf",
+        "resource.tf"
+      ],
+      "custom_examples": [
+        "basic.tf"
+      ],
+      "individual_validate": "pass",
+      "quality": "good"
+    },
+    {
+      "name": "dns_zone",
+      "terraform_name": "gcore_dns_zone",
+      "has_template": true,
+      "action": "reviewed",
+      "autogen_lines": 15,
+      "files": [
+        "basic.tf",
+        "resource.tf",
+        "with-soa.tf"
+      ],
+      "custom_examples": [
+        "basic.tf",
+        "with-soa.tf"
+      ],
+      "individual_validate": "pass",
+      "quality": "good"
+    },
+    {
+      "name": "dns_zone_rrset",
+      "terraform_name": "gcore_dns_zone_rrset",
+      "has_template": true,
+      "action": "reviewed",
+      "autogen_lines": 25,
+      "files": [
+        "a-record.tf",
+        "mx-record.tf",
+        "resource.tf",
+        "txt-record.tf"
+      ],
+      "custom_examples": [
+        "a-record.tf",
+        "mx-record.tf",
+        "txt-record.tf"
+      ],
+      "individual_validate": "pass",
+      "quality": "good"
+    },
+    {
+      "name": "fastedge_app",
+      "terraform_name": "gcore_fastedge_app",
+      "has_template": true,
+      "action": "reviewed",
+      "autogen_lines": 27,
+      "files": [
+        "basic.tf",
+        "resource.tf"
+      ],
+      "custom_examples": [
+        "basic.tf"
+      ],
+      "individual_validate": "pass",
+      "quality": "good"
+    },
+    {
+      "name": "fastedge_binary",
+      "terraform_name": "gcore_fastedge_binary",
+      "has_template": true,
+      "action": "template_created",
+      "autogen_lines": 3,
+      "files": [
+        "resource.tf"
+      ],
+      "custom_examples": [],
+      "individual_validate": "pass",
+      "quality": "good"
+    },
+    {
+      "name": "fastedge_secret",
+      "terraform_name": "gcore_fastedge_secret",
+      "has_template": true,
+      "action": "reviewed",
+      "autogen_lines": 8,
+      "files": [
+        "basic.tf",
+        "resource.tf"
+      ],
+      "custom_examples": [
+        "basic.tf"
+      ],
+      "individual_validate": "pass",
+      "quality": "good"
+    },
+    {
+      "name": "waap_domain",
+      "terraform_name": "gcore_waap_domain",
+      "has_template": true,
+      "action": "template_created",
+      "autogen_lines": 4,
+      "files": [
+        "resource.tf"
+      ],
+      "custom_examples": [],
+      "individual_validate": "pass",
+      "quality": "good"
+    }
+  ],
+  "data_sources": [
+    {
+      "name": "cdn_cdn_resource_rule",
+      "terraform_name": "gcore_cdn_cdn_resource_rule",
+      "lines": 4,
+      "validate": "pass",
+      "action": "reviewed"
+    },
+    {
+      "name": "cdn_certificate",
+      "terraform_name": "gcore_cdn_certificate",
+      "lines": 3,
+      "validate": "pass",
+      "action": "reviewed"
+    },
+    {
+      "name": "cdn_origin_group",
+      "terraform_name": "gcore_cdn_origin_group",
+      "lines": 3,
+      "validate": "pass",
+      "action": "reviewed"
+    },
+    {
+      "name": "cdn_trusted_ca_certificate",
+      "terraform_name": "gcore_cdn_trusted_ca_certificate",
+      "lines": 3,
+      "validate": "pass",
+      "action": "reviewed"
+    },
+    {
+      "name": "cloud_file_share",
+      "terraform_name": "gcore_cloud_file_share",
+      "lines": 5,
+      "validate": "pass",
+      "action": "reviewed"
+    },
+    {
+      "name": "cloud_file_shares",
+      "terraform_name": "gcore_cloud_file_shares",
+      "lines": 6,
+      "validate": "pass",
+      "action": "reviewed"
+    },
+    {
+      "name": "cloud_floating_ip",
+      "terraform_name": "gcore_cloud_floating_ip",
+      "lines": 5,
+      "validate": "pass",
+      "action": "reviewed"
+    },
+    {
+      "name": "cloud_floating_ips",
+      "terraform_name": "gcore_cloud_floating_ips",
+      "lines": 7,
+      "validate": "pass",
+      "action": "reviewed"
+    },
+    {
+      "name": "cloud_gpu_baremetal_cluster_image",
+      "terraform_name": "gcore_cloud_gpu_baremetal_cluster_image",
+      "lines": 5,
+      "validate": "pass",
+      "action": "reviewed"
+    },
+    {
+      "name": "cloud_gpu_virtual_cluster",
+      "terraform_name": "gcore_cloud_gpu_virtual_cluster",
+      "lines": 5,
+      "validate": "pass",
+      "action": "reviewed"
+    },
+    {
+      "name": "cloud_gpu_virtual_cluster_image",
+      "terraform_name": "gcore_cloud_gpu_virtual_cluster_image",
+      "lines": 5,
+      "validate": "pass",
+      "action": "reviewed"
+    },
+    {
+      "name": "cloud_gpu_virtual_clusters",
+      "terraform_name": "gcore_cloud_gpu_virtual_clusters",
+      "lines": 4,
+      "validate": "pass",
+      "action": "reviewed"
+    },
+    {
+      "name": "cloud_inference_deployment",
+      "terraform_name": "gcore_cloud_inference_deployment",
+      "lines": 4,
+      "validate": "pass",
+      "action": "reviewed"
+    },
+    {
+      "name": "cloud_inference_deployments",
+      "terraform_name": "gcore_cloud_inference_deployments",
+      "lines": 3,
+      "validate": "pass",
+      "action": "reviewed"
+    },
+    {
+      "name": "cloud_inference_registry_credential",
+      "terraform_name": "gcore_cloud_inference_registry_credential",
+      "lines": 4,
+      "validate": "pass",
+      "action": "reviewed"
+    },
+    {
+      "name": "cloud_inference_registry_credentials",
+      "terraform_name": "gcore_cloud_inference_registry_credentials",
+      "lines": 3,
+      "validate": "pass",
+      "action": "reviewed"
+    },
+    {
+      "name": "cloud_inference_secret",
+      "terraform_name": "gcore_cloud_inference_secret",
+      "lines": 4,
+      "validate": "pass",
+      "action": "reviewed"
+    },
+    {
+      "name": "cloud_inference_secrets",
+      "terraform_name": "gcore_cloud_inference_secrets",
+      "lines": 3,
+      "validate": "pass",
+      "action": "reviewed"
+    },
+    {
+      "name": "cloud_instance",
+      "terraform_name": "gcore_cloud_instance",
+      "lines": 5,
+      "validate": "pass",
+      "action": "reviewed"
+    },
+    {
+      "name": "cloud_instance_image",
+      "terraform_name": "gcore_cloud_instance_image",
+      "lines": 6,
+      "validate": "pass",
+      "action": "reviewed"
+    },
+    {
+      "name": "cloud_instances",
+      "terraform_name": "gcore_cloud_instances",
+      "lines": 21,
+      "validate": "pass",
+      "action": "reviewed"
+    },
+    {
+      "name": "cloud_k8s_cluster",
+      "terraform_name": "gcore_cloud_k8s_cluster",
+      "lines": 5,
+      "validate": "pass",
+      "action": "reviewed"
+    },
+    {
+      "name": "cloud_load_balancer",
+      "terraform_name": "gcore_cloud_load_balancer",
+      "lines": 7,
+      "validate": "pass",
+      "action": "reviewed"
+    },
+    {
+      "name": "cloud_load_balancer_listener",
+      "terraform_name": "gcore_cloud_load_balancer_listener",
+      "lines": 6,
+      "validate": "pass",
+      "action": "reviewed"
+    },
+    {
+      "name": "cloud_load_balancer_pool",
+      "terraform_name": "gcore_cloud_load_balancer_pool",
+      "lines": 5,
+      "validate": "pass",
+      "action": "reviewed"
+    },
+    {
+      "name": "cloud_load_balancers",
+      "terraform_name": "gcore_cloud_load_balancers",
+      "lines": 9,
+      "validate": "pass",
+      "action": "reviewed"
+    },
+    {
+      "name": "cloud_network",
+      "terraform_name": "gcore_cloud_network",
+      "lines": 5,
+      "validate": "pass",
+      "action": "reviewed"
+    },
+    {
+      "name": "cloud_network_router",
+      "terraform_name": "gcore_cloud_network_router",
+      "lines": 5,
+      "validate": "pass",
+      "action": "reviewed"
+    },
+    {
+      "name": "cloud_network_routers",
+      "terraform_name": "gcore_cloud_network_routers",
+      "lines": 4,
+      "validate": "pass",
+      "action": "reviewed"
+    },
+    {
+      "name": "cloud_network_subnet",
+      "terraform_name": "gcore_cloud_network_subnet",
+      "lines": 5,
+      "validate": "pass",
+      "action": "reviewed"
+    },
+    {
+      "name": "cloud_network_subnets",
+      "terraform_name": "gcore_cloud_network_subnets",
+      "lines": 7,
+      "validate": "pass",
+      "action": "reviewed"
+    },
+    {
+      "name": "cloud_networks",
+      "terraform_name": "gcore_cloud_networks",
+      "lines": 7,
+      "validate": "pass",
+      "action": "reviewed"
+    },
+    {
+      "name": "cloud_placement_group",
+      "terraform_name": "gcore_cloud_placement_group",
+      "lines": 5,
+      "validate": "pass",
+      "action": "reviewed"
+    },
+    {
+      "name": "cloud_project",
+      "terraform_name": "gcore_cloud_project",
+      "lines": 3,
+      "validate": "pass",
+      "action": "reviewed"
+    },
+    {
+      "name": "cloud_projects",
+      "terraform_name": "gcore_cloud_projects",
+      "lines": 4,
+      "validate": "pass",
+      "action": "reviewed"
+    },
+    {
+      "name": "cloud_region",
+      "terraform_name": "gcore_cloud_region",
+      "lines": 4,
+      "validate": "pass",
+      "action": "reviewed"
+    },
+    {
+      "name": "cloud_regions",
+      "terraform_name": "gcore_cloud_regions",
+      "lines": 4,
+      "validate": "pass",
+      "action": "reviewed"
+    },
+    {
+      "name": "cloud_reserved_fixed_ip",
+      "terraform_name": "gcore_cloud_reserved_fixed_ip",
+      "lines": 5,
+      "validate": "pass",
+      "action": "reviewed"
+    },
+    {
+      "name": "cloud_reserved_fixed_ips",
+      "terraform_name": "gcore_cloud_reserved_fixed_ips",
+      "lines": 11,
+      "validate": "pass",
+      "action": "reviewed"
+    },
+    {
+      "name": "cloud_secret",
+      "terraform_name": "gcore_cloud_secret",
+      "lines": 5,
+      "validate": "pass",
+      "action": "reviewed"
+    },
+    {
+      "name": "cloud_secrets",
+      "terraform_name": "gcore_cloud_secrets",
+      "lines": 4,
+      "validate": "pass",
+      "action": "reviewed"
+    },
+    {
+      "name": "cloud_security_group",
+      "terraform_name": "gcore_cloud_security_group",
+      "lines": 5,
+      "validate": "pass",
+      "action": "reviewed"
+    },
+    {
+      "name": "cloud_security_groups",
+      "terraform_name": "gcore_cloud_security_groups",
+      "lines": 7,
+      "validate": "pass",
+      "action": "reviewed"
+    },
+    {
+      "name": "cloud_ssh_key",
+      "terraform_name": "gcore_cloud_ssh_key",
+      "lines": 4,
+      "validate": "pass",
+      "action": "reviewed"
+    },
+    {
+      "name": "cloud_ssh_keys",
+      "terraform_name": "gcore_cloud_ssh_keys",
+      "lines": 4,
+      "validate": "pass",
+      "action": "reviewed"
+    },
+    {
+      "name": "cloud_volume",
+      "terraform_name": "gcore_cloud_volume",
+      "lines": 5,
+      "validate": "pass",
+      "action": "reviewed"
+    },
+    {
+      "name": "cloud_volumes",
+      "terraform_name": "gcore_cloud_volumes",
+      "lines": 12,
+      "validate": "pass",
+      "action": "reviewed"
+    },
+    {
+      "name": "dns_network_mapping",
+      "terraform_name": "gcore_dns_network_mapping",
+      "lines": 3,
+      "validate": "pass",
+      "action": "reviewed"
+    },
+    {
+      "name": "dns_zone",
+      "terraform_name": "gcore_dns_zone",
+      "lines": 3,
+      "validate": "pass",
+      "action": "reviewed"
+    },
+    {
+      "name": "dns_zone_rrset",
+      "terraform_name": "gcore_dns_zone_rrset",
+      "lines": 5,
+      "validate": "pass",
+      "action": "reviewed"
+    },
+    {
+      "name": "fastedge_app",
+      "terraform_name": "gcore_fastedge_app",
+      "lines": 3,
+      "validate": "pass",
+      "action": "reviewed"
+    },
+    {
+      "name": "fastedge_apps",
+      "terraform_name": "gcore_fastedge_apps",
+      "lines": 9,
+      "validate": "pass",
+      "action": "reviewed"
+    },
+    {
+      "name": "fastedge_binary",
+      "terraform_name": "gcore_fastedge_binary",
+      "lines": 3,
+      "validate": "pass",
+      "action": "reviewed"
+    },
+    {
+      "name": "fastedge_secret",
+      "terraform_name": "gcore_fastedge_secret",
+      "lines": 3,
+      "validate": "pass",
+      "action": "reviewed"
+    },
+    {
+      "name": "waap_domain",
+      "terraform_name": "gcore_waap_domain",
+      "lines": 3,
+      "validate": "pass",
+      "action": "reviewed"
+    },
+    {
+      "name": "waap_domains",
+      "terraform_name": "gcore_waap_domains",
+      "lines": 6,
+      "validate": "pass",
+      "action": "reviewed"
+    }
+  ],
+  "summary": {
+    "total_resources": 37,
+    "total_data_sources": 56,
+    "total": 93,
+    "templates_existing": 26,
+    "templates_created": 11,
+    "custom_examples_total": 77,
+    "data_sources_pass": 56,
+    "resources_individual_pass": 37
+  }
+}

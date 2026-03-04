@@ -1,0 +1,45 @@
+[33m╷[0m[0m
+[33m│[0m [0m[1m[33mWarning: [0m[0m[1mProvider development overrides are in effect[0m
+[33m│[0m [0m
+[33m│[0m [0m[0mThe following provider development overrides are set in the CLI
+[33m│[0m [0mconfiguration:
+[33m│[0m [0m - gcore/gcore in /Users/user/repos/gcore-terraform
+[33m│[0m [0m
+[33m│[0m [0mThe behavior may therefore not match any released version of the provider
+[33m│[0m [0mand applying changes may cause the state to become incompatible with
+[33m│[0m [0mpublished releases.
+[33m╵[0m[0m
+[0m[1mgcore_fastedge_binary.test: Refreshing state...[0m
+
+Terraform used the selected providers to generate the following execution
+plan. Resource actions are indicated with the following symbols:
+  [31m-[0m destroy[0m
+
+Terraform will perform the following actions:
+
+[1m  # gcore_fastedge_binary.test[0m will be [1m[31mdestroyed[0m
+[0m  [31m-[0m[0m resource "gcore_fastedge_binary" "test" {
+      [31m-[0m[0m api_type    = "wasi-http" [90m-> null[0m[0m
+      [31m-[0m[0m checksum    = "34524214b83ffe9ccf98bf5601003057" [90m-> null[0m[0m
+      [31m-[0m[0m filename    = "./renamed.wasm" [90m-> null[0m[0m
+      [31m-[0m[0m id          = 3070 [90m-> null[0m[0m
+      [31m-[0m[0m source      = 1 [90m-> null[0m[0m
+      [31m-[0m[0m status      = 1 [90m-> null[0m[0m
+      [31m-[0m[0m unref_since = "2026-02-10T08:33:51Z" [90m-> null[0m[0m
+    }
+
+[1mPlan:[0m [0m0 to add, 0 to change, 1 to destroy.
+
+Changes to Outputs:
+  [31m-[0m[0m binary_api_type     = "wasi-http" [90m-> null[0m[0m
+  [31m-[0m[0m binary_checksum     = "34524214b83ffe9ccf98bf5601003057" [90m-> null[0m[0m
+  [31m-[0m[0m binary_id           = 3070 [90m-> null[0m[0m
+  [31m-[0m[0m binary_source       = 1 [90m-> null[0m[0m
+  [31m-[0m[0m binary_status       = 1 [90m-> null[0m[0m
+  [31m-[0m[0m binary_unref_since  = "2026-02-10T08:33:51Z" [90m-> null[0m[0m
+  [31m-[0m[0m datasource_api_type = "N/A" [90m-> null[0m[0m
+  [31m-[0m[0m datasource_checksum = "N/A" [90m-> null[0m[0m
+[0m[1mgcore_fastedge_binary.test: Destroying...[0m[0m
+[0m[1mgcore_fastedge_binary.test: Destruction complete after 0s[0m
+[0m[1m[32m
+Destroy complete! Resources: 1 destroyed.[0m

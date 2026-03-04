@@ -1,0 +1,28 @@
+[33m╷[0m[0m
+[33m│[0m [0m[1m[33mWarning: [0m[0m[1mProvider development overrides are in effect[0m
+[33m│[0m [0m
+[33m│[0m [0m[0mThe following provider development overrides are set in the CLI
+[33m│[0m [0mconfiguration:
+[33m│[0m [0m - gcore/gcore in /Users/user/repos/gcore-terraform
+[33m│[0m [0m
+[33m│[0m [0mThe behavior may therefore not match any released version of the provider
+[33m│[0m [0mand applying changes may cause the state to become incompatible with
+[33m│[0m [0mpublished releases.
+[33m╵[0m[0m
+[0m[1mgcore_cloud_network_router.test: Refreshing state... [id=edcf5324-508b-47f2-9dc6-e698d18096ca][0m
+[0m[1mgcore_cloud_network.test: Refreshing state... [id=2bb8937c-655e-4508-a5a6-2e5451ab25e4][0m
+[0m[1mgcore_cloud_network_subnet.subnet1: Refreshing state... [id=c646b043-4a6a-4ac0-aa0c-72bcb01cb85e][0m
+[0m[1mgcore_cloud_network_subnet.subnet2: Refreshing state... [id=0f759edf-b74e-4e9a-8832-40442aa669b4][0m
+
+[0m[1m[32mNo changes.[0m[1m Your infrastructure matches the configuration.[0m
+
+[0mTerraform has compared your real infrastructure against your configuration
+and found no differences, so no changes are needed.
+[0m[1m[32m
+Apply complete! Resources: 0 added, 0 changed, 0 destroyed.
+[0m[0m[1m[32m
+Outputs:
+
+[0mrouter_id = "edcf5324-508b-47f2-9dc6-e698d18096ca"
+subnet1_id = "c646b043-4a6a-4ac0-aa0c-72bcb01cb85e"
+subnet2_id = "0f759edf-b74e-4e9a-8832-40442aa669b4"

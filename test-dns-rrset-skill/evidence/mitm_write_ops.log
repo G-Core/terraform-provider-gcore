@@ -1,0 +1,160 @@
+127.0.0.1:54803: POST https://api.gcore.com/dns/v2/zones HTTP/2.0
+    authorization: APIKey 21788$1e278ce67b6aa33f178122658b1dd0210d0edff453d348acb9b68bffea6a635b7791925ddda198d5678a4dc20269fe04a263ca92c7e5aa41ea79075f89b66bf6
+    content-type: application/json
+    accept: application/json
+    x-stainless-runtime: go
+    x-stainless-retry-count: 0
+    x-stainless-package-version: 0.31.0
+    x-stainless-os: MacOS
+    user-agent: Gcore/Go 0.31.0
+    x-stainless-runtime-version: go1.24.5
+    x-stainless-arch: arm64
+    x-stainless-lang: go
+    content-length: 54
+    accept-encoding: gzip
+ << HTTP/2.0 200 OK 128b
+    server: nginx
+    date: Wed, 11 Feb 2026 09:31:11 GMT
+    content-type: application/json; charset=utf-8
+    content-length: 128
+    x-id-fe: lux-hw-edge-gc24
+    traceparent: 00-5b8ecf45e7a7ba4cd66e2fb22d1d6c55-78496a59fdcfb36c-01
+    content-encoding: gzip
+    vary: Accept-Encoding
+    strict-transport-security: max-age=31536000; includeSubDomains
+    x-id: lux-hw-edge-gc24
+    x-robots-tag: noindex, nofollow, noarchive
+    accept-ranges: bytes
+127.0.0.1:54803: POST https://api.gcore.com/dns/v2/zones/test-tf-rrset-1770802269.com/www.test-tf-rrset-1770802269.com/A HTTP/2.0
+    x-stainless-lang: go
+    x-stainless-os: MacOS
+    x-stainless-runtime-version: go1.24.5
+    x-stainless-retry-count: 0
+    user-agent: Gcore/Go 0.31.0
+    x-stainless-package-version: 0.31.0
+    x-stainless-runtime: go
+    authorization: APIKey 21788$1e278ce67b6aa33f178122658b1dd0210d0edff453d348acb9b68bffea6a635b7791925ddda198d5678a4dc20269fe04a263ca92c7e5aa41ea79075f89b66bf6
+    content-type: application/json
+    accept: application/json
+    x-stainless-arch: arm64
+    content-length: 75
+    accept-encoding: gzip
+ << HTTP/2.0 200 OK 207b
+    server: nginx
+    date: Wed, 11 Feb 2026 09:31:11 GMT
+    content-type: application/json; charset=utf-8
+    content-length: 207
+    x-id-fe: lux-hw-edge-gc24
+    traceparent: 00-8c9426baca7b71483ad7ff7bd6df540f-ecbc4f9ffae56066-01
+    content-encoding: gzip
+    vary: Accept-Encoding
+    strict-transport-security: max-age=31536000; includeSubDomains
+    x-id: lux-hw-edge-gc24
+    x-robots-tag: noindex, nofollow, noarchive
+    accept-ranges: bytes
+127.0.0.1:54816: GET https://api.gcore.com/dns/v2/zones/test-tf-rrset-1770802269.com HTTP/2.0
+    x-stainless-package-version: 0.31.0
+    x-stainless-runtime: go
+    x-stainless-arch: arm64
+--
+    x-robots-tag: noindex, nofollow, noarchive
+    accept-ranges: bytes
+127.0.0.1:54887: PUT https://api.gcore.com/dns/v2/zones/test-tf-rrset-1770802269.com/www.test-tf-rrset-1770802269.com/A HTTP/2.0
+    content-type: application/json
+    x-stainless-retry-count: 0
+    x-stainless-package-version: 0.31.0
+    x-stainless-runtime: go
+    x-stainless-lang: go
+    authorization: APIKey 21788$1e278ce67b6aa33f178122658b1dd0210d0edff453d348acb9b68bffea6a635b7791925ddda198d5678a4dc20269fe04a263ca92c7e5aa41ea79075f89b66bf6
+    user-agent: Gcore/Go 0.31.0
+    x-stainless-os: MacOS
+    x-stainless-arch: arm64
+    accept: application/json
+    x-stainless-runtime-version: go1.24.5
+    content-length: 75
+    accept-encoding: gzip
+ << HTTP/2.0 200 OK 207b
+    server: nginx
+    date: Wed, 11 Feb 2026 09:32:01 GMT
+    content-type: application/json; charset=utf-8
+    content-length: 207
+    x-id-fe: am3-hw-edge-gc113
+    traceparent: 00-602ac5991e4a2f9b147916c70db43a30-a2b5dc07e3d42cf5-01
+    content-encoding: gzip
+    vary: Accept-Encoding
+    strict-transport-security: max-age=31536000; includeSubDomains
+    x-id: am3-hw-edge-gc113
+    x-robots-tag: noindex, nofollow, noarchive
+    accept-ranges: bytes
+127.0.0.1:54906: GET https://api.gcore.com/dns/v2/zones/test-tf-rrset-1770802269.com HTTP/2.0
+    user-agent: Gcore/Go 0.31.0
+    x-stainless-package-version: 0.31.0
+    x-stainless-runtime: go
+--
+    x-robots-tag: noindex, nofollow, noarchive
+    accept-ranges: bytes
+127.0.0.1:54927: POST https://api.gcore.com/dns/v2/zones/test-tf-rrset-1770802269.com/test-tf-rrset-1770802269.com/MX HTTP/2.0
+    content-type: application/json
+    x-stainless-runtime: go
+    x-stainless-arch: arm64
+    x-stainless-retry-count: 0
+    x-stainless-runtime-version: go1.24.5
+    accept: application/json
+    user-agent: Gcore/Go 0.31.0
+    x-stainless-lang: go
+    x-stainless-package-version: 0.31.0
+    x-stainless-os: MacOS
+    authorization: APIKey 21788$1e278ce67b6aa33f178122658b1dd0210d0edff453d348acb9b68bffea6a635b7791925ddda198d5678a4dc20269fe04a263ca92c7e5aa41ea79075f89b66bf6
+    content-length: 258
+    accept-encoding: gzip
+ << HTTP/2.0 200 OK 245b
+    server: nginx
+    date: Wed, 11 Feb 2026 09:32:15 GMT
+    content-type: application/json; charset=utf-8
+    content-length: 245
+    x-id-fe: lux-hw-edge-gc23
+    traceparent: 00-01310cfb2ad897490ebdec938eba8acd-c022f300d0fbd03b-01
+    content-encoding: gzip
+    vary: Accept-Encoding
+    strict-transport-security: max-age=31536000; includeSubDomains
+    x-id: lux-hw-edge-gc23
+    x-robots-tag: noindex, nofollow, noarchive
+    accept-ranges: bytes
+127.0.0.1:55094: GET https://api.gcore.com/dns/v2/zones/test-tf-rrset-1770802269.com HTTP/2.0
+    x-stainless-runtime: go
+    authorization: APIKey 21788$1e278ce67b6aa33f178122658b1dd0210d0edff453d348acb9b68bffea6a635b7791925ddda198d5678a4dc20269fe04a263ca92c7e5aa41ea79075f89b66bf6
+    x-stainless-runtime-version: go1.24.5
+--
+    x-robots-tag: noindex, nofollow, noarchive
+    accept-ranges: bytes
+127.0.0.1:55113: POST https://api.gcore.com/dns/v2/zones/test-tf-rrset-1770802269.com/geo.test-tf-rrset-1770802269.com/A HTTP/2.0
+    user-agent: Gcore/Go 0.31.0
+    content-type: application/json
+    x-stainless-retry-count: 0
+    x-stainless-arch: arm64
+    x-stainless-runtime-version: go1.24.5
+    x-stainless-runtime: go
+    x-stainless-os: MacOS
+    authorization: APIKey 21788$1e278ce67b6aa33f178122658b1dd0210d0edff453d348acb9b68bffea6a635b7791925ddda198d5678a4dc20269fe04a263ca92c7e5aa41ea79075f89b66bf6
+    x-stainless-lang: go
+    x-stainless-package-version: 0.31.0
+    accept: application/json
+    content-length: 199
+    accept-encoding: gzip
+ << HTTP/2.0 200 OK 253b
+    server: nginx
+    date: Wed, 11 Feb 2026 09:33:40 GMT
+    content-type: application/json; charset=utf-8
+    content-length: 253
+    x-id-fe: am3-hw-edge-gc117
+    traceparent: 00-21af262ca86305947cdf39ad34c81a44-427edd4423caa9e6-01
+    content-encoding: gzip
+    vary: Accept-Encoding
+    strict-transport-security: max-age=31536000; includeSubDomains
+    x-id: am3-hw-edge-gc117
+    x-robots-tag: noindex, nofollow, noarchive
+    accept-ranges: bytes
+127.0.0.1:55128: GET https://api.gcore.com/dns/v2/zones/test-tf-rrset-1770802269.com HTTP/2.0
+    x-stainless-runtime: go
+    user-agent: Gcore/Go 0.31.0
+    x-stainless-runtime-version: go1.24.5

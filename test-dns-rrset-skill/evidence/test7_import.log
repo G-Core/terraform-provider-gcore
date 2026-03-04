@@ -1,0 +1,10 @@
+[0m[1mgcore_dns_zone_rrset.a_record: Importing from ID "test-tf-rrset-1770802269.com/www.test-tf-rrset-1770802269.com/A"...[0m
+[0m[1m[32mgcore_dns_zone_rrset.a_record: Import prepared![0m
+[0m[32m  Prepared gcore_dns_zone_rrset for import[0m
+[0m[1mgcore_dns_zone_rrset.a_record: Refreshing state...[0m
+[0m[32m
+Import successful!
+
+The resources that were imported are shown above. These resources are now in
+your Terraform state and will henceforth be managed by Terraform.
+[0m

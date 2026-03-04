@@ -1,0 +1,28 @@
+
+Warning: Provider development overrides are in effect
+
+The following provider development overrides are set in the CLI
+configuration:
+ - gcore/gcore in /Users/user/repos/gcore-terraform
+
+The behavior may therefore not match any released version of the provider and
+applying changes may cause the state to become incompatible with published
+releases.
+gcore_cdn_trusted_ca_certificate.test: Refreshing state... [name=tf-test-cacert-basic]
+
+No changes. Your infrastructure matches the configuration.
+
+Terraform has compared your real infrastructure against your configuration
+and found no differences, so no changes are needed.
+
+Apply complete! Resources: 0 added, 0 changed, 0 destroyed.
+
+Outputs:
+
+cert_id = 279586
+cert_issuer = "tf-test-ca.example.com"
+cert_name = "tf-test-cacert-basic"
+cert_subject_cn = "tf-test-ca.example.com"
+has_related_resources = false
+validity_not_after = "2036-02-17T09:53:40Z"
+validity_not_before = "2026-02-19T09:53:40Z"

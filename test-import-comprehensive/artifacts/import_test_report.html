@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>gcore_cloud_instance Import Test Report</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        h1 {
+            color: #333;
+            border-bottom: 3px solid #4CAF50;
+            padding-bottom: 10px;
+        }
+        h2 {
+            color: #555;
+            border-bottom: 1px solid #ddd;
+            padding-bottom: 5px;
+        }
+        .summary {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+            margin-top: 15px;
+        }
+        .stat-box {
+            text-align: center;
+            padding: 15px;
+            border-radius: 8px;
+        }
+        .stat-box.total { background: #e3f2fd; }
+        .stat-box.passed { background: #e8f5e9; }
+        .stat-box.failed { background: #ffebee; }
+        .stat-box.skipped { background: #fff3e0; }
+        .stat-number {
+            font-size: 2.5em;
+            font-weight: bold;
+            display: block;
+        }
+        .stat-label {
+            color: #666;
+            text-transform: uppercase;
+            font-size: 0.8em;
+        }
+        .test-card {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 15px;
+            border-left: 5px solid #ccc;
+        }
+        .test-card.passed { border-left-color: #4CAF50; }
+        .test-card.failed { border-left-color: #f44336; }
+        .test-card.skipped { border-left-color: #ff9800; }
+        .test-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        .test-title {
+            margin: 0;
+            color: #333;
+        }
+        .badge {
+            padding: 5px 15px;
+            border-radius: 20px;
+            color: white;
+            font-weight: bold;
+            font-size: 0.9em;
+        }
+        .badge.passed { background: #4CAF50; }
+        .badge.failed { background: #f44336; }
+        .badge.skipped { background: #ff9800; }
+        .badge.fixed { background: #2196F3; }
+        .test-details {
+            color: #666;
+            margin: 10px 0;
+        }
+        .drift-info {
+            background: #fff3e0;
+            padding: 15px;
+            border-radius: 5px;
+            margin-top: 10px;
+        }
+        .drift-info h4 {
+            margin: 0 0 10px 0;
+            color: #e65100;
+        }
+        .fix-info {
+            background: #e8f5e9;
+            padding: 15px;
+            border-radius: 5px;
+            margin-top: 10px;
+        }
+        .fix-info h4 {
+            margin: 0 0 10px 0;
+            color: #2e7d32;
+        }
+        pre {
+            background: #263238;
+            color: #aed581;
+            padding: 15px;
+            border-radius: 5px;
+            overflow-x: auto;
+            font-size: 0.9em;
+        }
+        .bugs-section {
+            background: #e8f5e9;
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 20px;
+        }
+        .bug-item {
+            background: white;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 10px;
+            border-left: 4px solid #4CAF50;
+        }
+        .bug-title {
+            font-weight: bold;
+            color: #2e7d32;
+            margin-bottom: 5px;
+        }
+        .recommendations {
+            background: #e3f2fd;
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 20px;
+        }
+        .recommendations ul {
+            margin: 0;
+            padding-left: 20px;
+        }
+        .recommendations li {
+            margin-bottom: 8px;
+        }
+        .metadata {
+            color: #999;
+            font-size: 0.9em;
+            margin-top: 30px;
+            text-align: center;
+        }
+        .fixed-tag {
+            background: #4CAF50;
+            color: white;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 0.8em;
+            margin-left: 8px;
+        }
+    </style>
+</head>
+<body>
+    <h1>gcore_cloud_instance Import Test Report</h1>
+
+    <div class="summary">
+        <h2>Summary</h2>
+        <p><strong>Test Date:</strong> 2026-01-05</p>
+        <p><strong>Branch:</strong> terraform-instances</p>
+        <p><strong>Provider:</strong> gcore/gcore (development build)</p>
+        <p><strong>Status:</strong> <span class="fixed-tag">ALL BUGS FIXED</span></p>
+
+        <div class="summary-grid">
+            <div class="stat-box total">
+                <span class="stat-number">5</span>
+                <span class="stat-label">Total Tests</span>
+            </div>
+            <div class="stat-box passed">
+                <span class="stat-number">4</span>
+                <span class="stat-label">Passed</span>
+            </div>
+            <div class="stat-box failed">
+                <span class="stat-number">0</span>
+                <span class="stat-label">Failed</span>
+            </div>
+            <div class="stat-box skipped">
+                <span class="stat-number">1</span>
+                <span class="stat-label">Skipped</span>
+            </div>
+        </div>
+    </div>
+
+    <h2>Test Results</h2>
+
+    <div class="test-card passed">
+        <div class="test-header">
+            <h3 class="test-title">Test 1: Import with Minimal Config</h3>
+            <span class="badge passed">PASSED</span>
+        </div>
+        <div class="test-details">
+            <p><strong>Scenario:</strong> Import an instance with only required fields (name, flavor, volume, interface)</p>
+            <p><strong>Import ID Format:</strong> <code>379987/76/&lt;instance_id&gt;</code></p>
+            <p><strong>Drift Check:</strong> Exit code 0 (No changes detected)</p>
+        </div>
+        <pre>terraform plan -detailed-exitcode
+No changes. Your infrastructure matches the configuration.
+Exit code: 0</pre>
+    </div>
+
+    <div class="test-card passed">
+        <div class="test-header">
+            <h3 class="test-title">Test 2: Import with Two Volumes (boot_index)</h3>
+            <span class="badge passed">PASSED</span>
+        </div>
+        <div class="test-details">
+            <p><strong>Scenario:</strong> Import an instance with boot volume (boot_index=0) and data volume (boot_index=-1)</p>
+            <p><strong>Purpose:</strong> Verify boot_index is correctly populated during import</p>
+            <p><strong>Drift Check:</strong> Exit code 0 (No changes detected)</p>
+        </div>
+        <pre>terraform plan -detailed-exitcode
+No changes. Your infrastructure matches the configuration.
+Exit code: 0</pre>
+    </div>
+
+    <div class="test-card skipped">
+        <div class="test-header">
+            <h3 class="test-title">Test 3: Import with Floating IP</h3>
+            <span class="badge skipped">SKIPPED</span>
+        </div>
+        <div class="test-details">
+            <p><strong>Reason:</strong> Quota limits exceeded (volume_count, router_count)</p>
+            <p><strong>Note:</strong> Floating IP import functionality was validated in prior GCLOUD2-21138 regression testing</p>
+            <p><strong>Prior Validation:</strong> FIP with source="new" lifecycle tested and working</p>
+        </div>
+    </div>
+
+    <div class="test-card passed">
+        <div class="test-header">
+            <h3 class="test-title">Test 4: Import with Tags</h3>
+            <span class="badge passed">PASSED</span> <span class="fixed-tag">FIXED</span>
+        </div>
+        <div class="test-details">
+            <p><strong>Scenario:</strong> Import an instance with tags: env=test, project=import-testing, owner=claude</p>
+            <p><strong>Drift Check:</strong> Exit code 0 (No changes detected)</p>
+        </div>
+        <div class="fix-info">
+            <h4>Fix Applied</h4>
+            <p>Tags are now correctly extracted from API response during import. System-generated tags (with read_only=true) are filtered out.</p>
+            <pre>terraform state show "gcore_cloud_instance.with_tags[0]"
+# Tags successfully imported:
+tags = {
+    "env"     = "test"
+    "owner"   = "claude"
+    "project" = "import-testing"
+}</pre>
+        </div>
+    </div>
+
+    <div class="test-card passed">
+        <div class="test-header">
+            <h3 class="test-title">Test 5: Import with Servergroup</h3>
+            <span class="badge passed">PASSED</span> <span class="fixed-tag">FIXED</span>
+        </div>
+        <div class="test-details">
+            <p><strong>Scenario:</strong> Import an instance that is part of a placement group (servergroup)</p>
+            <p><strong>Drift Check:</strong> Exit code 0 (No changes detected for instance)</p>
+        </div>
+        <div class="fix-info">
+            <h4>Fix Applied</h4>
+            <p>servergroup_id is now correctly populated by querying placement groups during import. Since the instance API doesn't return servergroup_id, we iterate through all placement groups and check membership.</p>
+            <pre>terraform state show "gcore_cloud_instance.with_servergroup[0]"
+# servergroup_id successfully imported:
+servergroup_id = "42df0b54-1c40-4719-9208-2ee191ebe2cb"</pre>
+        </div>
+    </div>
+
+    <div class="bugs-section">
+        <h2>Bugs Found & Fixed</h2>
+
+        <div class="bug-item">
+            <div class="bug-title">BUG 1: Tags not imported <span class="fixed-tag">FIXED</span></div>
+            <p><strong>Location:</strong> internal/services/cloud_instance/resource.go:1589-1613</p>
+            <p><strong>Problem:</strong> Tags were not being read from API response during import.</p>
+            <p><strong>Solution:</strong> Added extraction logic in ImportState function that:</p>
+            <ul>
+                <li>Parses tags from API response format: <code>[{"key": "k", "value": "v", "read_only": bool}, ...]</code></li>
+                <li>Filters out system-generated tags (read_only=true) like image_id, os_distro, etc.</li>
+                <li>Populates the data.Tags map with user-defined tags only</li>
+            </ul>
+        </div>
+
+        <div class="bug-item">
+            <div class="bug-title">BUG 2: servergroup_id not imported <span class="fixed-tag">FIXED</span></div>
+            <p><strong>Location:</strong> internal/services/cloud_instance/resource.go:1616-1656</p>
+            <p><strong>Problem:</strong> Instance API doesn't return servergroup_id, so it was missing after import.</p>
+            <p><strong>Solution:</strong> Added placement group lookup in ImportState function that:</p>
+            <ul>
+                <li>Lists all placement groups in the project/region</li>
+                <li>Gets full details of each placement group (List API returns empty instances array)</li>
+                <li>Checks if the imported instance belongs to any placement group</li>
+                <li>Populates data.ServergroupID if a match is found</li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="recommendations">
+        <h2>Remaining Recommendations</h2>
+        <ul>
+            <li><strong>Add test coverage:</strong> Add automated acceptance tests for import with tags and servergroup_id</li>
+            <li><strong>Document import ID format:</strong> Update documentation to specify import ID format: <code>project_id/region_id/instance_id</code></li>
+            <li><strong>Consider performance:</strong> The servergroup_id lookup iterates through all placement groups - consider caching or optimizing for users with many placement groups</li>
+        </ul>
+    </div>
+
+    <h2>Artifacts</h2>
+    <ul>
+        <li><code>test1_create.log</code> - Minimal instance creation log</li>
+        <li><code>test1_import.log</code> - Minimal instance import log</li>
+        <li><code>test1_drift_after_import.log</code> - Post-import drift check</li>
+        <li><code>test2_create.log</code> - Two volumes instance creation log</li>
+        <li><code>test2_import.log</code> - Two volumes instance import log</li>
+        <li><code>test2_drift_after_import.log</code> - Post-import drift check (boot_index)</li>
+        <li><code>test4_create.log</code> - Tags instance creation log</li>
+        <li><code>test4_import.log</code> - Tags instance import log</li>
+        <li><code>test4_drift_after_import.log</code> - Post-import drift check (FIXED)</li>
+        <li><code>test5_create.log</code> - Servergroup instance creation log</li>
+        <li><code>test5_import.log</code> - Servergroup instance import log</li>
+        <li><code>test5_drift_after_import.log</code> - Post-import drift check (FIXED)</li>
+    </ul>
+
+    <div class="metadata">
+        <p>Report generated by Claude Code on 2026-01-05</p>
+        <p>Test environment: Luxembourg-2 (region_id: 76) | Project: 379987</p>
+    </div>
+</body>
+</html>

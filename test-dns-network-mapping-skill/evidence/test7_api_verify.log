@@ -1,0 +1,12 @@
+{
+  "id": 69,
+  "name": "tf-test-nm-skill",
+  "mapping": [
+    {
+      "tags": [
+        "only-tags",
+        "no-cidrs"
+      ]
+    }
+  ]
+}

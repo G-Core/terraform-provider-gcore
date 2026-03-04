@@ -1,0 +1,10 @@
+[0m[1mgcore_cloud_instance_image.test_image: Importing from ID "379987/76/fa21d4a1-738c-41c5-a3b0-01d3aa17e5be"...[0m
+[0m[1m[32mgcore_cloud_instance_image.test_image: Import prepared![0m
+[0m[32m  Prepared gcore_cloud_instance_image for import[0m
+[0m[1mgcore_cloud_instance_image.test_image: Refreshing state... [id=fa21d4a1-738c-41c5-a3b0-01d3aa17e5be][0m
+[0m[32m
+Import successful!
+
+The resources that were imported are shown above. These resources are now in
+your Terraform state and will henceforth be managed by Terraform.
+[0m

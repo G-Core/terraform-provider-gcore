@@ -1,0 +1,108 @@
+
+Warning: Provider development overrides are in effect
+
+The following provider development overrides are set in the CLI
+configuration:
+ - gcore/gcore in /Users/user/repos/gcore-terraform
+
+The behavior may therefore not match any released version of the provider and
+applying changes may cause the state to become incompatible with published
+releases.
+
+Terraform used the selected providers to generate the following execution
+plan. Resource actions are indicated with the following symbols:
+  + create
+
+Terraform will perform the following actions:
+
+  # gcore_dns_network_mapping.test will be created
+  + resource "gcore_dns_network_mapping" "test" {
+      + id      = (known after apply)
+      + mapping = [
+          + {
+              + cidr4 = [
+                  + "10.0.0.0/24",
+                ]
+              + cidr6 = [
+                  + "2001:db8:1::/48",
+                ]
+              + tags  = [
+                  + "dev",
+                  + "dc1",
+                ]
+            },
+          + {
+              + cidr4 = [
+                  + "10.1.0.0/24",
+                ]
+              + tags  = [
+                  + "prod",
+                  + "dc2",
+                ]
+            },
+        ]
+      + name    = "tf-test-nm-skill"
+    }
+
+Plan: 1 to add, 0 to change, 0 to destroy.
+
+Changes to Outputs:
+  + resource_id      = (known after apply)
+  + resource_mapping = [
+      + {
+          + cidr4 = [
+              + "10.0.0.0/24",
+            ]
+          + cidr6 = [
+              + "2001:db8:1::/48",
+            ]
+          + tags  = [
+              + "dev",
+              + "dc1",
+            ]
+        },
+      + {
+          + cidr4 = [
+              + "10.1.0.0/24",
+            ]
+          + cidr6 = null
+          + tags  = [
+              + "prod",
+              + "dc2",
+            ]
+        },
+    ]
+  + resource_name    = "tf-test-nm-skill"
+gcore_dns_network_mapping.test: Creating...
+gcore_dns_network_mapping.test: Creation complete after 0s [name=tf-test-nm-skill]
+
+Apply complete! Resources: 1 added, 0 changed, 0 destroyed.
+
+Outputs:
+
+resource_id = 69
+resource_mapping = tolist([
+  {
+    "cidr4" = tolist([
+      "10.0.0.0/24",
+    ])
+    "cidr6" = tolist([
+      "2001:db8:1::/48",
+    ])
+    "tags" = tolist([
+      "dev",
+      "dc1",
+    ])
+  },
+  {
+    "cidr4" = tolist([
+      "10.1.0.0/24",
+    ])
+    "cidr6" = tolist(null) /* of string */
+    "tags" = tolist([
+      "prod",
+      "dc2",
+    ])
+  },
+])
+resource_name = "tf-test-nm-skill"

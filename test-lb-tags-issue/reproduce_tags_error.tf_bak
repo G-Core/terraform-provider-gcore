@@ -1,0 +1,128 @@
+terraform {
+  required_providers {
+    gcore = {
+      source = "gcore/gcore"
+    }
+  }
+}
+
+# Provider configuration
+# Assumes credentials are set via environment variables:
+# GCORE_API_KEY, GCORE_CLIENT, GCORE_CLOUD_PROJECT_ID, GCORE_CLOUD_REGION_ID
+
+data "gcore_cloud_projects" "my_projects" {
+  name = "default"
+}
+
+locals {
+  project_id = [for p in data.gcore_cloud_projects.my_projects.items : p.id]
+}
+
+data "gcore_cloud_region" "rg" {
+  region_id = 76  # Luxembourg-2
+}
+
+# ============================================================================
+# SCENARIO 1: Create LB with tags from the start
+# ============================================================================
+resource "gcore_cloud_load_balancer" "lb_with_tags" {
+  project_id = local.project_id[0]
+  region_id  = data.gcore_cloud_region.rg.id
+  flavor     = "lb1-2-4"
+  name       = "qa-lb-with-tags"
+
+  # Tags set from creation
+  tags = {
+    "qa"          = "load-balancer"
+    "environment" = "test"
+  }
+}
+
+# ============================================================================
+# SCENARIO 2: Create LB WITHOUT tags, then add them later (comment/uncomment)
+# ============================================================================
+resource "gcore_cloud_load_balancer" "lb_add_tags_later" {
+  project_id = local.project_id[0]
+  region_id  = data.gcore_cloud_region.rg.id
+  flavor     = "lb1-2-4"
+  name       = "qa-lb-add-tags-later"
+
+  # Step 1: Apply without tags (leave commented)
+  # Step 2: Uncomment and apply again to add tags
+  # tags = {
+  #   "qa" = "load-balancer"
+  # }
+}
+
+# ============================================================================
+# SCENARIO 3: Exact reproduction from Jira issue
+# ============================================================================
+resource "gcore_cloud_load_balancer" "lb" {
+  project_id = local.project_id[0]
+  region_id  = data.gcore_cloud_region.rg.id
+  flavor     = "lb1-2-4"
+  name       = "qa-lb-name"
+
+  tags = {
+    "qa" = "load-balancer"
+  }
+}
+
+# ============================================================================
+# SCENARIO 4: Modify existing tags
+# ============================================================================
+resource "gcore_cloud_load_balancer" "lb_modify_tags" {
+  project_id = local.project_id[0]
+  region_id  = data.gcore_cloud_region.rg.id
+  flavor     = "lb1-2-4"
+  name       = "qa-lb-modify-tags"
+
+  # Step 1: Apply with one tag
+  tags = {
+    "initial" = "tag"
+  }
+
+  # Step 2: Change to different tags
+  # tags = {
+  #   "changed" = "tag"
+  # }
+}
+
+# ============================================================================
+# Outputs to inspect tags and tags_v2
+# ============================================================================
+output "lb_with_tags_info" {
+  description = "Tags information for LB created with tags"
+  value = {
+    id      = gcore_cloud_load_balancer.lb_with_tags.id
+    tags    = gcore_cloud_load_balancer.lb_with_tags.tags
+    tags_v2 = gcore_cloud_load_balancer.lb_with_tags.tags_v2
+  }
+}
+
+output "lb_add_tags_later_info" {
+  description = "Tags information for LB where tags added later"
+  value = {
+    id      = gcore_cloud_load_balancer.lb_add_tags_later.id
+    tags    = gcore_cloud_load_balancer.lb_add_tags_later.tags
+    tags_v2 = gcore_cloud_load_balancer.lb_add_tags_later.tags_v2
+  }
+}
+
+output "lb_main_info" {
+  description = "Tags information for main LB (Jira scenario)"
+  value = {
+    id      = gcore_cloud_load_balancer.lb.id
+    tags    = gcore_cloud_load_balancer.lb.tags
+    tags_v2 = gcore_cloud_load_balancer.lb.tags_v2
+  }
+}
+
+output "lb_modify_tags_info" {
+  description = "Tags information for LB with modified tags"
+  value = {
+    id      = gcore_cloud_load_balancer.lb_modify_tags.id
+    tags    = gcore_cloud_load_balancer.lb_modify_tags.tags
+    tags_v2 = gcore_cloud_load_balancer.lb_modify_tags.tags_v2
+  }
+}

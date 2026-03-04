@@ -1,0 +1,144 @@
+[33m╷[0m[0m
+[33m│[0m [0m[1m[33mWarning: [0m[0m[1mProvider development overrides are in effect[0m
+[33m│[0m [0m
+[33m│[0m [0m[0mThe following provider development overrides are set in the CLI
+[33m│[0m [0mconfiguration:
+[33m│[0m [0m - gcore/gcore in /Users/user/repos/gcore-terraform
+[33m│[0m [0m
+[33m│[0m [0mThe behavior may therefore not match any released version of the provider
+[33m│[0m [0mand applying changes may cause the state to become incompatible with
+[33m│[0m [0mpublished releases.
+[33m╵[0m[0m
+[0m[1mgcore_cloud_placement_group.test: Refreshing state... [id=69ceb86d-e242-4214-b2f1-c7dd628d79a3][0m
+[0m[1mgcore_cloud_network.private: Refreshing state... [id=449555cd-2cff-404a-88d6-dca1bd88bdd8][0m
+[0m[1mgcore_cloud_volume.boot: Refreshing state... [id=f5920f33-7131-4f80-873b-099479487ecd][0m
+[0m[1mgcore_cloud_network_subnet.private: Refreshing state... [id=74d1c1d0-1720-4010-b8e9-b589c412ffea][0m
+[0m[1mgcore_cloud_network_router.main: Refreshing state... [id=7586c5c0-3a0c-4540-91a0-8ce89911bf91][0m
+[0m[1mgcore_cloud_instance.test[0]: Refreshing state... [id=614bb77d-0f33-4cb5-acd6-7331798416c1][0m
+
+Terraform used the selected providers to generate the following execution
+plan. Resource actions are indicated with the following symbols:
+  [33m~[0m update in-place[0m
+
+Terraform will perform the following actions:
+
+[1m  # gcore_cloud_instance.test[0][0m will be updated in-place
+[0m  [33m~[0m[0m resource "gcore_cloud_instance" "test" {
+      [33m~[0m[0m addresses            = {
+          [31m-[0m[0m "regression-test-network" = [
+              [31m-[0m[0m {
+                  [31m-[0m[0m addr        = "192.168.100.85"
+                  [31m-[0m[0m subnet_id   = "74d1c1d0-1720-4010-b8e9-b589c412ffea"
+                  [31m-[0m[0m subnet_name = "regression-test-subnet"
+                  [31m-[0m[0m type        = "fixed"
+                },
+            ]
+        } -> (known after apply)
+      [32m+[0m[0m ddos_profile         = (known after apply)
+      [32m+[0m[0m fixed_ip_assignments = (known after apply)
+        id                   = "614bb77d-0f33-4cb5-acd6-7331798416c1"
+      [32m+[0m[0m instance_description = (known after apply)
+      [32m+[0m[0m instance_isolation   = (known after apply)
+      [33m~[0m[0m interfaces           = [
+          [33m~[0m[0m {
+              [32m+[0m[0m floating_ip = {
+                  [32m+[0m[0m source = "new"
+                }
+              [33m~[0m[0m ip_address  = "192.168.100.85" -> (known after apply)
+              [33m~[0m[0m port_id     = "5b9548a2-fd06-46ef-a4e3-d5cfbdc632a4" -> (known after apply)
+                [90m# (3 unchanged attributes hidden)[0m[0m
+            },
+        ]
+        name                 = "regression-test-instance"
+      [33m~[0m[0m status               = "ACTIVE" -> (known after apply)
+        tags                 = {
+            "env"     = "test"
+            "project" = "regression"
+        }
+      [32m+[0m[0m task_id              = (known after apply)
+      [32m+[0m[0m task_state           = (known after apply)
+      [32m+[0m[0m tasks                = (known after apply)
+      [33m~[0m[0m vm_state             = "active" -> (known after apply)
+        [90m# (8 unchanged attributes hidden)[0m[0m
+    }
+
+[1mPlan:[0m 0 to add, 1 to change, 0 to destroy.
+[0m
+Changes to Outputs:
+  [33m~[0m[0m instance_addresses  = {
+      [31m-[0m[0m regression-test-network = [
+          [31m-[0m[0m {
+              [31m-[0m[0m addr           = "192.168.100.85"
+              [31m-[0m[0m interface_name = [90mnull[0m[0m
+              [31m-[0m[0m subnet_id      = "74d1c1d0-1720-4010-b8e9-b589c412ffea"
+              [31m-[0m[0m subnet_name    = "regression-test-subnet"
+              [31m-[0m[0m type           = "fixed"
+            },
+        ]
+    } -> (known after apply)
+  [33m~[0m[0m instance_interfaces = [
+      [33m~[0m[0m {
+          [33m~[0m[0m floating_ip     = [90mnull[0m[0m [33m->[0m[0m {
+              [32m+[0m[0m existing_floating_id = [90mnull[0m[0m
+              [32m+[0m[0m source               = "new"
+            }
+          [33m~[0m[0m ip_address      = "192.168.100.85" -> (known after apply)
+          [33m~[0m[0m port_id         = "5b9548a2-fd06-46ef-a4e3-d5cfbdc632a4" -> (known after apply)
+            [90m# (6 unchanged attributes hidden)[0m[0m
+        },
+    ]
+  [33m~[0m[0m instance_status     = "ACTIVE" -> (known after apply)
+[0m[1mgcore_cloud_instance.test[0]: Modifying... [id=614bb77d-0f33-4cb5-acd6-7331798416c1][0m[0m
+[0m[1mgcore_cloud_instance.test[0]: Modifications complete after 10s [id=614bb77d-0f33-4cb5-acd6-7331798416c1][0m
+[0m[1m[32m
+Apply complete! Resources: 0 added, 1 changed, 0 destroyed.
+[0m[0m[1m[32m
+Outputs:
+
+[0mboot_volume_id = "f5920f33-7131-4f80-873b-099479487ecd"
+instance_addresses = tomap({
+  "regression-test-network" = tolist([
+    {
+      "addr" = "192.168.100.85"
+      "interface_name" = tostring(null)
+      "subnet_id" = "74d1c1d0-1720-4010-b8e9-b589c412ffea"
+      "subnet_name" = "regression-test-subnet"
+      "type" = "fixed"
+    },
+    {
+      "addr" = "85.234.87.151"
+      "interface_name" = tostring(null)
+      "subnet_id" = tostring(null)
+      "subnet_name" = tostring(null)
+      "type" = "floating"
+    },
+  ])
+})
+instance_id = "614bb77d-0f33-4cb5-acd6-7331798416c1"
+instance_interfaces = tolist([
+  {
+    "floating_ip" = {
+      "existing_floating_id" = tostring(null)
+      "source" = "new"
+    }
+    "interface_name" = tostring(null)
+    "ip_address" = "192.168.100.85"
+    "ip_family" = tostring(null)
+    "network_id" = "449555cd-2cff-404a-88d6-dca1bd88bdd8"
+    "port_id" = "5b9548a2-fd06-46ef-a4e3-d5cfbdc632a4"
+    "security_groups" = tolist(null) /* of object */
+    "subnet_id" = "74d1c1d0-1720-4010-b8e9-b589c412ffea"
+    "type" = "subnet"
+  },
+])
+instance_status = "ACTIVE"
+instance_volumes = tolist([
+  {
+    "attachment_tag" = tostring(null)
+    "boot_index" = 0
+    "volume_id" = "f5920f33-7131-4f80-873b-099479487ecd"
+  },
+])
+placement_group_id = "69ceb86d-e242-4214-b2f1-c7dd628d79a3"
+router_id = "7586c5c0-3a0c-4540-91a0-8ce89911bf91"
+subnet_id = "74d1c1d0-1720-4010-b8e9-b589c412ffea"

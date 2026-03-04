@@ -1,0 +1,823 @@
+2025-11-28T09:40:05.435+0200 [INFO]  Terraform version: 1.10.5
+2025-11-28T09:40:05.435+0200 [DEBUG] using github.com/hashicorp/go-tfe v1.70.0
+2025-11-28T09:40:05.436+0200 [DEBUG] using github.com/hashicorp/hcl/v2 v2.23.0
+2025-11-28T09:40:05.436+0200 [DEBUG] using github.com/hashicorp/terraform-svchost v0.1.1
+2025-11-28T09:40:05.436+0200 [DEBUG] using github.com/zclconf/go-cty v1.16.2
+2025-11-28T09:40:05.436+0200 [INFO]  Go runtime version: go1.23.3
+2025-11-28T09:40:05.436+0200 [INFO]  CLI args: []string{"terraform", "apply", "-auto-approve"}
+2025-11-28T09:40:05.436+0200 [DEBUG] Attempting to open CLI config file: /Users/user/repos/gcore-terraform/.terraformrc
+2025-11-28T09:40:05.438+0200 [INFO]  Loading CLI configuration from /Users/user/repos/gcore-terraform/.terraformrc
+2025-11-28T09:40:05.438+0200 [DEBUG] Not reading CLI config directory because config location is overridden by environment variable
+2025-11-28T09:40:05.439+0200 [DEBUG] checking for credentials in "/Users/user/.terraform.d/plugins"
+2025-11-28T09:40:05.439+0200 [DEBUG] Explicit provider installation configuration is set
+2025-11-28T09:40:05.439+0200 [INFO]  CLI command args: []string{"apply", "-auto-approve"}
+2025-11-28T09:40:05.440+0200 [DEBUG] Provider registry.terraform.io/gcore/gcore is overridden by dev_overrides
+2025-11-28T09:40:05.440+0200 [DEBUG] Provider registry.terraform.io/gcore/gcore is overridden to load from /Users/user/repos/gcore-terraform
+2025-11-28T09:40:05.440+0200 [DEBUG] checking for provisioner in "."
+2025-11-28T09:40:05.445+0200 [DEBUG] checking for provisioner in "/opt/homebrew/bin"
+2025-11-28T09:40:05.445+0200 [DEBUG] checking for provisioner in "/Users/user/.terraform.d/plugins"
+2025-11-28T09:40:05.447+0200 [DEBUG] Provider registry.terraform.io/gcore/gcore is overridden by dev_overrides
+2025-11-28T09:40:05.450+0200 [INFO]  backend/local: starting Apply operation
+2025-11-28T09:40:05.455+0200 [DEBUG] Config.VerifyDependencySelections: skipping registry.terraform.io/gcore/gcore because it's overridden by a special configuration setting
+2025-11-28T09:40:05.456+0200 [DEBUG] created provider logger: level=debug
+2025-11-28T09:40:05.456+0200 [INFO]  provider: configuring client automatic mTLS
+2025-11-28T09:40:05.467+0200 [DEBUG] provider: starting plugin: path=/Users/user/repos/gcore-terraform/terraform-provider-gcore args=["/Users/user/repos/gcore-terraform/terraform-provider-gcore"]
+2025-11-28T09:40:05.470+0200 [DEBUG] provider: plugin started: path=/Users/user/repos/gcore-terraform/terraform-provider-gcore pid=74416
+2025-11-28T09:40:05.470+0200 [DEBUG] provider: waiting for RPC address: plugin=/Users/user/repos/gcore-terraform/terraform-provider-gcore
+2025-11-28T09:40:06.222+0200 [INFO]  provider.terraform-provider-gcore: configuring server automatic mTLS: timestamp="2025-11-28T09:40:06.221+0200"
+2025-11-28T09:40:06.234+0200 [DEBUG] provider.terraform-provider-gcore: plugin address: address=/var/folders/qj/cbb8n0j12tq6j2k955fxwpb80000gn/T/plugin1713262346 network=unix timestamp="2025-11-28T09:40:06.234+0200"
+2025-11-28T09:40:06.235+0200 [DEBUG] provider: using plugin: version=6
+2025-11-28T09:40:06.267+0200 [DEBUG] No provider meta schema returned
+2025-11-28T09:40:06.284+0200 [DEBUG] provider.stdio: received EOF, stopping recv loop: err="rpc error: code = Unavailable desc = error reading from server: EOF"
+2025-11-28T09:40:06.286+0200 [INFO]  provider: plugin process exited: plugin=/Users/user/repos/gcore-terraform/terraform-provider-gcore id=74416
+2025-11-28T09:40:06.286+0200 [DEBUG] provider: plugin exited
+2025-11-28T09:40:06.287+0200 [DEBUG] Building and walking validate graph
+2025-11-28T09:40:06.289+0200 [DEBUG] ProviderTransformer: "gcore_cloud_gpu_virtual_cluster_image.test" (*terraform.NodeValidatableResource) needs provider["registry.terraform.io/gcore/gcore"]
+2025-11-28T09:40:06.289+0200 [DEBUG] ReferenceTransformer: "var.image_name" references: []
+2025-11-28T09:40:06.289+0200 [DEBUG] ReferenceTransformer: "var.test_tags" references: []
+2025-11-28T09:40:06.290+0200 [DEBUG] ReferenceTransformer: "output.image_cow_format (expand)" references: [gcore_cloud_gpu_virtual_cluster_image.test]
+2025-11-28T09:40:06.290+0200 [DEBUG] ReferenceTransformer: "output.image_os_version (expand)" references: [gcore_cloud_gpu_virtual_cluster_image.test]
+2025-11-28T09:40:06.290+0200 [DEBUG] ReferenceTransformer: "output.image_gpu_driver (expand)" references: [gcore_cloud_gpu_virtual_cluster_image.test]
+2025-11-28T09:40:06.290+0200 [DEBUG] ReferenceTransformer: "var.region_id" references: []
+2025-11-28T09:40:06.290+0200 [DEBUG] ReferenceTransformer: "output.image_ssh_key (expand)" references: [gcore_cloud_gpu_virtual_cluster_image.test]
+2025-11-28T09:40:06.290+0200 [DEBUG] ReferenceTransformer: "output.image_size (expand)" references: [gcore_cloud_gpu_virtual_cluster_image.test]
+2025-11-28T09:40:06.290+0200 [DEBUG] ReferenceTransformer: "provider[\"registry.terraform.io/gcore/gcore\"]" references: []
+2025-11-28T09:40:06.290+0200 [DEBUG] ReferenceTransformer: "gcore_cloud_gpu_virtual_cluster_image.test" references: [var.region_id var.project_id var.test_tags var.image_name]
+2025-11-28T09:40:06.290+0200 [DEBUG] ReferenceTransformer: "var.project_id" references: []
+2025-11-28T09:40:06.290+0200 [DEBUG] ReferenceTransformer: "output.image_created_at (expand)" references: [gcore_cloud_gpu_virtual_cluster_image.test]
+2025-11-28T09:40:06.290+0200 [DEBUG] ReferenceTransformer: "output.image_min_disk (expand)" references: [gcore_cloud_gpu_virtual_cluster_image.test]
+2025-11-28T09:40:06.290+0200 [DEBUG] ReferenceTransformer: "output.image_name (expand)" references: [gcore_cloud_gpu_virtual_cluster_image.test]
+2025-11-28T09:40:06.290+0200 [DEBUG] ReferenceTransformer: "output.image_architecture (expand)" references: [gcore_cloud_gpu_virtual_cluster_image.test]
+2025-11-28T09:40:06.290+0200 [DEBUG] ReferenceTransformer: "output.image_os_distro (expand)" references: [gcore_cloud_gpu_virtual_cluster_image.test]
+2025-11-28T09:40:06.290+0200 [DEBUG] ReferenceTransformer: "output.image_hw_firmware_type (expand)" references: [gcore_cloud_gpu_virtual_cluster_image.test]
+2025-11-28T09:40:06.290+0200 [DEBUG] ReferenceTransformer: "output.image_id (expand)" references: [gcore_cloud_gpu_virtual_cluster_image.test]
+2025-11-28T09:40:06.290+0200 [DEBUG] ReferenceTransformer: "output.image_visibility (expand)" references: [gcore_cloud_gpu_virtual_cluster_image.test]
+2025-11-28T09:40:06.290+0200 [DEBUG] ReferenceTransformer: "output.image_status (expand)" references: [gcore_cloud_gpu_virtual_cluster_image.test]
+2025-11-28T09:40:06.290+0200 [DEBUG] ReferenceTransformer: "output.image_min_ram (expand)" references: [gcore_cloud_gpu_virtual_cluster_image.test]
+2025-11-28T09:40:06.290+0200 [DEBUG] ReferenceTransformer: "output.image_updated_at (expand)" references: [gcore_cloud_gpu_virtual_cluster_image.test]
+2025-11-28T09:40:06.290+0200 [DEBUG] ReferenceTransformer: "output.image_os_type (expand)" references: [gcore_cloud_gpu_virtual_cluster_image.test]
+2025-11-28T09:40:06.290+0200 [DEBUG] Starting graph walk: walkValidate
+2025-11-28T09:40:06.294+0200 [DEBUG] created provider logger: level=debug
+2025-11-28T09:40:06.294+0200 [INFO]  provider: configuring client automatic mTLS
+2025-11-28T09:40:06.297+0200 [DEBUG] provider: starting plugin: path=/Users/user/repos/gcore-terraform/terraform-provider-gcore args=["/Users/user/repos/gcore-terraform/terraform-provider-gcore"]
+2025-11-28T09:40:06.300+0200 [DEBUG] provider: plugin started: path=/Users/user/repos/gcore-terraform/terraform-provider-gcore pid=74419
+2025-11-28T09:40:06.300+0200 [DEBUG] provider: waiting for RPC address: plugin=/Users/user/repos/gcore-terraform/terraform-provider-gcore
+2025-11-28T09:40:06.310+0200 [INFO]  provider.terraform-provider-gcore: configuring server automatic mTLS: timestamp="2025-11-28T09:40:06.309+0200"
+2025-11-28T09:40:06.316+0200 [DEBUG] provider.terraform-provider-gcore: plugin address: network=unix address=/var/folders/qj/cbb8n0j12tq6j2k955fxwpb80000gn/T/plugin2500468783 timestamp="2025-11-28T09:40:06.316+0200"
+2025-11-28T09:40:06.316+0200 [DEBUG] provider: using plugin: version=6
+2025-11-28T09:40:06.329+0200 [DEBUG] provider.stdio: received EOF, stopping recv loop: err="rpc error: code = Unavailable desc = error reading from server: EOF"
+2025-11-28T09:40:06.330+0200 [INFO]  provider: plugin process exited: plugin=/Users/user/repos/gcore-terraform/terraform-provider-gcore id=74419
+2025-11-28T09:40:06.330+0200 [DEBUG] provider: plugin exited
+2025-11-28T09:40:06.330+0200 [INFO]  backend/local: apply calling Plan
+2025-11-28T09:40:06.330+0200 [DEBUG] Building and walking plan graph for NormalMode
+2025-11-28T09:40:06.331+0200 [DEBUG] ProviderTransformer: "gcore_cloud_gpu_virtual_cluster_image.test (expand)" (*terraform.nodeExpandPlannableResource) needs provider["registry.terraform.io/gcore/gcore"]
+2025-11-28T09:40:06.331+0200 [DEBUG] ReferenceTransformer: "provider[\"registry.terraform.io/gcore/gcore\"]" references: []
+2025-11-28T09:40:06.331+0200 [DEBUG] ReferenceTransformer: "var.project_id" references: []
+2025-11-28T09:40:06.331+0200 [DEBUG] ReferenceTransformer: "output.image_status (expand)" references: [gcore_cloud_gpu_virtual_cluster_image.test (expand)]
+2025-11-28T09:40:06.331+0200 [DEBUG] ReferenceTransformer: "output.image_ssh_key (expand)" references: [gcore_cloud_gpu_virtual_cluster_image.test (expand)]
+2025-11-28T09:40:06.331+0200 [DEBUG] ReferenceTransformer: "output.image_hw_firmware_type (expand)" references: [gcore_cloud_gpu_virtual_cluster_image.test (expand)]
+2025-11-28T09:40:06.331+0200 [DEBUG] ReferenceTransformer: "output.image_name (expand)" references: [gcore_cloud_gpu_virtual_cluster_image.test (expand)]
+2025-11-28T09:40:06.331+0200 [DEBUG] ReferenceTransformer: "output.image_id (expand)" references: [gcore_cloud_gpu_virtual_cluster_image.test (expand)]
+2025-11-28T09:40:06.331+0200 [DEBUG] ReferenceTransformer: "output.image_size (expand)" references: [gcore_cloud_gpu_virtual_cluster_image.test (expand)]
+2025-11-28T09:40:06.331+0200 [DEBUG] ReferenceTransformer: "gcore_cloud_gpu_virtual_cluster_image.test (expand)" references: [var.image_name var.region_id var.project_id var.test_tags]
+2025-11-28T09:40:06.331+0200 [DEBUG] ReferenceTransformer: "var.region_id" references: []
+2025-11-28T09:40:06.331+0200 [DEBUG] ReferenceTransformer: "var.test_tags" references: []
+2025-11-28T09:40:06.331+0200 [DEBUG] ReferenceTransformer: "output.image_min_ram (expand)" references: [gcore_cloud_gpu_virtual_cluster_image.test (expand)]
+2025-11-28T09:40:06.331+0200 [DEBUG] ReferenceTransformer: "output.image_created_at (expand)" references: [gcore_cloud_gpu_virtual_cluster_image.test (expand)]
+2025-11-28T09:40:06.331+0200 [DEBUG] ReferenceTransformer: "output.image_min_disk (expand)" references: [gcore_cloud_gpu_virtual_cluster_image.test (expand)]
+2025-11-28T09:40:06.331+0200 [DEBUG] ReferenceTransformer: "output.image_os_type (expand)" references: [gcore_cloud_gpu_virtual_cluster_image.test (expand)]
+2025-11-28T09:40:06.331+0200 [DEBUG] ReferenceTransformer: "output.image_gpu_driver (expand)" references: [gcore_cloud_gpu_virtual_cluster_image.test (expand)]
+2025-11-28T09:40:06.331+0200 [DEBUG] ReferenceTransformer: "output.image_visibility (expand)" references: [gcore_cloud_gpu_virtual_cluster_image.test (expand)]
+2025-11-28T09:40:06.331+0200 [DEBUG] ReferenceTransformer: "output.image_cow_format (expand)" references: [gcore_cloud_gpu_virtual_cluster_image.test (expand)]
+2025-11-28T09:40:06.331+0200 [DEBUG] ReferenceTransformer: "var.image_name" references: []
+2025-11-28T09:40:06.331+0200 [DEBUG] ReferenceTransformer: "output.image_os_version (expand)" references: [gcore_cloud_gpu_virtual_cluster_image.test (expand)]
+2025-11-28T09:40:06.331+0200 [DEBUG] ReferenceTransformer: "output.image_os_distro (expand)" references: [gcore_cloud_gpu_virtual_cluster_image.test (expand)]
+2025-11-28T09:40:06.331+0200 [DEBUG] ReferenceTransformer: "output.image_updated_at (expand)" references: [gcore_cloud_gpu_virtual_cluster_image.test (expand)]
+2025-11-28T09:40:06.331+0200 [DEBUG] ReferenceTransformer: "output.image_architecture (expand)" references: [gcore_cloud_gpu_virtual_cluster_image.test (expand)]
+2025-11-28T09:40:06.332+0200 [DEBUG] Starting graph walk: walkPlan
+2025-11-28T09:40:06.332+0200 [DEBUG] created provider logger: level=debug
+2025-11-28T09:40:06.332+0200 [INFO]  provider: configuring client automatic mTLS
+2025-11-28T09:40:06.335+0200 [DEBUG] provider: starting plugin: path=/Users/user/repos/gcore-terraform/terraform-provider-gcore args=["/Users/user/repos/gcore-terraform/terraform-provider-gcore"]
+2025-11-28T09:40:06.337+0200 [DEBUG] provider: plugin started: path=/Users/user/repos/gcore-terraform/terraform-provider-gcore pid=74420
+2025-11-28T09:40:06.337+0200 [DEBUG] provider: waiting for RPC address: plugin=/Users/user/repos/gcore-terraform/terraform-provider-gcore
+2025-11-28T09:40:06.347+0200 [INFO]  provider.terraform-provider-gcore: configuring server automatic mTLS: timestamp="2025-11-28T09:40:06.347+0200"
+2025-11-28T09:40:06.353+0200 [DEBUG] provider: using plugin: version=6
+2025-11-28T09:40:06.353+0200 [DEBUG] provider.terraform-provider-gcore: plugin address: address=/var/folders/qj/cbb8n0j12tq6j2k955fxwpb80000gn/T/plugin2865773588 network=unix timestamp="2025-11-28T09:40:06.353+0200"
+2025-11-28T09:40:06.362+0200 [DEBUG] Resource instance state not found for node "gcore_cloud_gpu_virtual_cluster_image.test", instance gcore_cloud_gpu_virtual_cluster_image.test
+2025-11-28T09:40:06.362+0200 [DEBUG] ReferenceTransformer: "gcore_cloud_gpu_virtual_cluster_image.test" references: []
+2025-11-28T09:40:06.362+0200 [DEBUG] refresh: gcore_cloud_gpu_virtual_cluster_image.test: no state, so not refreshing
+2025-11-28T09:40:06.365+0200 [DEBUG] provider.terraform-provider-gcore: Marking Computed attributes with null configuration values as unknown (known after apply) in the plan to prevent potential Terraform errors: @module=sdk.framework tf_resource_type=gcore_cloud_gpu_virtual_cluster_image tf_rpc=PlanResourceChange @caller=/Users/user/go/pkg/mod/github.com/hashicorp/terraform-plugin-framework@v1.15.0/internal/fwserver/server_planresourcechange.go:250 tf_provider_addr=registry.terraform.io/stainless-sdks/gcore tf_req_id=d7c4f6b1-9e91-5e12-03b2-622af968d49e timestamp="2025-11-28T09:40:06.365+0200"
+2025-11-28T09:40:06.365+0200 [DEBUG] provider.terraform-provider-gcore: marking computed attribute that is null in the config as unknown: tf_resource_type=gcore_cloud_gpu_virtual_cluster_image @module=sdk.framework tf_attribute_path="AttributeName(\"status\")" tf_provider_addr=registry.terraform.io/stainless-sdks/gcore tf_req_id=d7c4f6b1-9e91-5e12-03b2-622af968d49e @caller=/Users/user/go/pkg/mod/github.com/hashicorp/terraform-plugin-framework@v1.15.0/internal/fwserver/server_planresourcechange.go:538 tf_rpc=PlanResourceChange timestamp="2025-11-28T09:40:06.365+0200"
+2025-11-28T09:40:06.365+0200 [DEBUG] provider.terraform-provider-gcore: marking computed attribute that is null in the config as unknown: @caller=/Users/user/go/pkg/mod/github.com/hashicorp/terraform-plugin-framework@v1.15.0/internal/fwserver/server_planresourcechange.go:538 tf_provider_addr=registry.terraform.io/stainless-sdks/gcore @module=sdk.framework tf_attribute_path="AttributeName(\"min_ram\")" tf_req_id=d7c4f6b1-9e91-5e12-03b2-622af968d49e tf_resource_type=gcore_cloud_gpu_virtual_cluster_image tf_rpc=PlanResourceChange timestamp="2025-11-28T09:40:06.365+0200"
+2025-11-28T09:40:06.365+0200 [DEBUG] provider.terraform-provider-gcore: marking computed attribute that is null in the config as unknown: @module=sdk.framework tf_provider_addr=registry.terraform.io/stainless-sdks/gcore tf_req_id=d7c4f6b1-9e91-5e12-03b2-622af968d49e tf_resource_type=gcore_cloud_gpu_virtual_cluster_image tf_rpc=PlanResourceChange @caller=/Users/user/go/pkg/mod/github.com/hashicorp/terraform-plugin-framework@v1.15.0/internal/fwserver/server_planresourcechange.go:538 tf_attribute_path="AttributeName(\"gpu_driver\")" timestamp="2025-11-28T09:40:06.365+0200"
+2025-11-28T09:40:06.365+0200 [DEBUG] provider.terraform-provider-gcore: marking computed attribute that is null in the config as unknown: @module=sdk.framework tf_provider_addr=registry.terraform.io/stainless-sdks/gcore tf_req_id=d7c4f6b1-9e91-5e12-03b2-622af968d49e tf_rpc=PlanResourceChange @caller=/Users/user/go/pkg/mod/github.com/hashicorp/terraform-plugin-framework@v1.15.0/internal/fwserver/server_planresourcechange.go:538 tf_resource_type=gcore_cloud_gpu_virtual_cluster_image tf_attribute_path="AttributeName(\"task_id\")" timestamp="2025-11-28T09:40:06.365+0200"
+2025-11-28T09:40:06.366+0200 [DEBUG] provider.terraform-provider-gcore: marking computed attribute that is null in the config as unknown: tf_resource_type=gcore_cloud_gpu_virtual_cluster_image tf_rpc=PlanResourceChange @caller=/Users/user/go/pkg/mod/github.com/hashicorp/terraform-plugin-framework@v1.15.0/internal/fwserver/server_planresourcechange.go:538 tf_provider_addr=registry.terraform.io/stainless-sdks/gcore @module=sdk.framework tf_attribute_path="AttributeName(\"tasks\")" tf_req_id=d7c4f6b1-9e91-5e12-03b2-622af968d49e timestamp="2025-11-28T09:40:06.365+0200"
+2025-11-28T09:40:06.366+0200 [DEBUG] provider.terraform-provider-gcore: marking computed attribute that is null in the config as unknown: tf_attribute_path="AttributeName(\"gpu_driver_type\")" tf_req_id=d7c4f6b1-9e91-5e12-03b2-622af968d49e @caller=/Users/user/go/pkg/mod/github.com/hashicorp/terraform-plugin-framework@v1.15.0/internal/fwserver/server_planresourcechange.go:538 tf_provider_addr=registry.terraform.io/stainless-sdks/gcore tf_resource_type=gcore_cloud_gpu_virtual_cluster_image tf_rpc=PlanResourceChange @module=sdk.framework timestamp="2025-11-28T09:40:06.365+0200"
+2025-11-28T09:40:06.366+0200 [DEBUG] provider.terraform-provider-gcore: marking computed attribute that is null in the config as unknown: @module=sdk.framework tf_attribute_path="AttributeName(\"visibility\")" @caller=/Users/user/go/pkg/mod/github.com/hashicorp/terraform-plugin-framework@v1.15.0/internal/fwserver/server_planresourcechange.go:538 tf_provider_addr=registry.terraform.io/stainless-sdks/gcore tf_req_id=d7c4f6b1-9e91-5e12-03b2-622af968d49e tf_resource_type=gcore_cloud_gpu_virtual_cluster_image tf_rpc=PlanResourceChange timestamp="2025-11-28T09:40:06.365+0200"
+2025-11-28T09:40:06.366+0200 [DEBUG] provider.terraform-provider-gcore: marking computed attribute that is null in the config as unknown: tf_resource_type=gcore_cloud_gpu_virtual_cluster_image @module=sdk.framework tf_attribute_path="AttributeName(\"id\")" tf_provider_addr=registry.terraform.io/stainless-sdks/gcore tf_req_id=d7c4f6b1-9e91-5e12-03b2-622af968d49e @caller=/Users/user/go/pkg/mod/github.com/hashicorp/terraform-plugin-framework@v1.15.0/internal/fwserver/server_planresourcechange.go:538 tf_rpc=PlanResourceChange timestamp="2025-11-28T09:40:06.365+0200"
+2025-11-28T09:40:06.366+0200 [DEBUG] provider.terraform-provider-gcore: marking computed attribute that is null in the config as unknown: tf_provider_addr=registry.terraform.io/stainless-sdks/gcore @module=sdk.framework tf_attribute_path="AttributeName(\"gpu_driver_version\")" tf_req_id=d7c4f6b1-9e91-5e12-03b2-622af968d49e tf_resource_type=gcore_cloud_gpu_virtual_cluster_image tf_rpc=PlanResourceChange @caller=/Users/user/go/pkg/mod/github.com/hashicorp/terraform-plugin-framework@v1.15.0/internal/fwserver/server_planresourcechange.go:538 timestamp="2025-11-28T09:40:06.365+0200"
+2025-11-28T09:40:06.366+0200 [DEBUG] provider.terraform-provider-gcore: marking computed attribute that is null in the config as unknown: @caller=/Users/user/go/pkg/mod/github.com/hashicorp/terraform-plugin-framework@v1.15.0/internal/fwserver/server_planresourcechange.go:538 tf_provider_addr=registry.terraform.io/stainless-sdks/gcore tf_req_id=d7c4f6b1-9e91-5e12-03b2-622af968d49e @module=sdk.framework tf_attribute_path="AttributeName(\"size\")" tf_resource_type=gcore_cloud_gpu_virtual_cluster_image tf_rpc=PlanResourceChange timestamp="2025-11-28T09:40:06.365+0200"
+2025-11-28T09:40:06.366+0200 [DEBUG] provider.terraform-provider-gcore: marking computed attribute that is null in the config as unknown: @module=sdk.framework tf_attribute_path="AttributeName(\"created_at\")" tf_provider_addr=registry.terraform.io/stainless-sdks/gcore tf_req_id=d7c4f6b1-9e91-5e12-03b2-622af968d49e tf_rpc=PlanResourceChange @caller=/Users/user/go/pkg/mod/github.com/hashicorp/terraform-plugin-framework@v1.15.0/internal/fwserver/server_planresourcechange.go:538 tf_resource_type=gcore_cloud_gpu_virtual_cluster_image timestamp="2025-11-28T09:40:06.365+0200"
+2025-11-28T09:40:06.366+0200 [DEBUG] provider.terraform-provider-gcore: marking computed attribute that is null in the config as unknown: tf_req_id=d7c4f6b1-9e91-5e12-03b2-622af968d49e @caller=/Users/user/go/pkg/mod/github.com/hashicorp/terraform-plugin-framework@v1.15.0/internal/fwserver/server_planresourcechange.go:538 @module=sdk.framework tf_provider_addr=registry.terraform.io/stainless-sdks/gcore tf_attribute_path="AttributeName(\"min_disk\")" tf_resource_type=gcore_cloud_gpu_virtual_cluster_image tf_rpc=PlanResourceChange timestamp="2025-11-28T09:40:06.365+0200"
+2025-11-28T09:40:06.366+0200 [DEBUG] provider.terraform-provider-gcore: marking computed attribute that is null in the config as unknown: tf_attribute_path="AttributeName(\"updated_at\")" tf_provider_addr=registry.terraform.io/stainless-sdks/gcore tf_req_id=d7c4f6b1-9e91-5e12-03b2-622af968d49e tf_rpc=PlanResourceChange @caller=/Users/user/go/pkg/mod/github.com/hashicorp/terraform-plugin-framework@v1.15.0/internal/fwserver/server_planresourcechange.go:538 @module=sdk.framework tf_resource_type=gcore_cloud_gpu_virtual_cluster_image timestamp="2025-11-28T09:40:06.365+0200"
+2025-11-28T09:40:06.370+0200 [DEBUG] provider.stdio: received EOF, stopping recv loop: err="rpc error: code = Unavailable desc = error reading from server: EOF"
+2025-11-28T09:40:06.371+0200 [INFO]  provider: plugin process exited: plugin=/Users/user/repos/gcore-terraform/terraform-provider-gcore id=74420
+2025-11-28T09:40:06.371+0200 [DEBUG] provider: plugin exited
+2025-11-28T09:40:06.371+0200 [DEBUG] building apply graph to check for errors
+2025-11-28T09:40:06.371+0200 [DEBUG] Resource state not found for node "gcore_cloud_gpu_virtual_cluster_image.test", instance gcore_cloud_gpu_virtual_cluster_image.test
+2025-11-28T09:40:06.371+0200 [DEBUG] ProviderTransformer: "gcore_cloud_gpu_virtual_cluster_image.test" (*terraform.NodeApplyableResourceInstance) needs provider["registry.terraform.io/gcore/gcore"]
+2025-11-28T09:40:06.371+0200 [DEBUG] ProviderTransformer: "gcore_cloud_gpu_virtual_cluster_image.test (expand)" (*terraform.nodeExpandApplyableResource) needs provider["registry.terraform.io/gcore/gcore"]
+2025-11-28T09:40:06.371+0200 [DEBUG] ReferenceTransformer: "gcore_cloud_gpu_virtual_cluster_image.test (expand)" references: [var.test_tags var.region_id var.project_id var.image_name]
+2025-11-28T09:40:06.371+0200 [DEBUG] ReferenceTransformer: "output.image_created_at (expand)" references: [gcore_cloud_gpu_virtual_cluster_image.test (expand) gcore_cloud_gpu_virtual_cluster_image.test gcore_cloud_gpu_virtual_cluster_image.test]
+2025-11-28T09:40:06.371+0200 [DEBUG] ReferenceTransformer: "output.image_min_disk (expand)" references: [gcore_cloud_gpu_virtual_cluster_image.test (expand) gcore_cloud_gpu_virtual_cluster_image.test gcore_cloud_gpu_virtual_cluster_image.test]
+2025-11-28T09:40:06.371+0200 [DEBUG] ReferenceTransformer: "output.image_updated_at (expand)" references: [gcore_cloud_gpu_virtual_cluster_image.test (expand) gcore_cloud_gpu_virtual_cluster_image.test gcore_cloud_gpu_virtual_cluster_image.test]
+2025-11-28T09:40:06.372+0200 [DEBUG] ReferenceTransformer: "output.image_name (expand)" references: [gcore_cloud_gpu_virtual_cluster_image.test (expand) gcore_cloud_gpu_virtual_cluster_image.test gcore_cloud_gpu_virtual_cluster_image.test]
+2025-11-28T09:40:06.372+0200 [DEBUG] ReferenceTransformer: "output.image_os_type (expand)" references: [gcore_cloud_gpu_virtual_cluster_image.test (expand) gcore_cloud_gpu_virtual_cluster_image.test gcore_cloud_gpu_virtual_cluster_image.test]
+2025-11-28T09:40:06.372+0200 [DEBUG] ReferenceTransformer: "output.image_hw_firmware_type (expand)" references: [gcore_cloud_gpu_virtual_cluster_image.test (expand) gcore_cloud_gpu_virtual_cluster_image.test gcore_cloud_gpu_virtual_cluster_image.test]
+2025-11-28T09:40:06.372+0200 [DEBUG] ReferenceTransformer: "var.region_id" references: []
+2025-11-28T09:40:06.372+0200 [DEBUG] ReferenceTransformer: "output.image_cow_format (expand)" references: [gcore_cloud_gpu_virtual_cluster_image.test (expand) gcore_cloud_gpu_virtual_cluster_image.test gcore_cloud_gpu_virtual_cluster_image.test]
+2025-11-28T09:40:06.372+0200 [DEBUG] ReferenceTransformer: "output.image_status (expand)" references: [gcore_cloud_gpu_virtual_cluster_image.test (expand) gcore_cloud_gpu_virtual_cluster_image.test gcore_cloud_gpu_virtual_cluster_image.test]
+2025-11-28T09:40:06.372+0200 [DEBUG] ReferenceTransformer: "output.image_os_version (expand)" references: [gcore_cloud_gpu_virtual_cluster_image.test (expand) gcore_cloud_gpu_virtual_cluster_image.test gcore_cloud_gpu_virtual_cluster_image.test]
+2025-11-28T09:40:06.372+0200 [DEBUG] ReferenceTransformer: "output.image_architecture (expand)" references: [gcore_cloud_gpu_virtual_cluster_image.test (expand) gcore_cloud_gpu_virtual_cluster_image.test gcore_cloud_gpu_virtual_cluster_image.test]
+2025-11-28T09:40:06.372+0200 [DEBUG] ReferenceTransformer: "output.image_ssh_key (expand)" references: [gcore_cloud_gpu_virtual_cluster_image.test (expand) gcore_cloud_gpu_virtual_cluster_image.test gcore_cloud_gpu_virtual_cluster_image.test]
+2025-11-28T09:40:06.372+0200 [DEBUG] ReferenceTransformer: "var.test_tags" references: []
+2025-11-28T09:40:06.372+0200 [DEBUG] ReferenceTransformer: "var.project_id" references: []
+2025-11-28T09:40:06.372+0200 [DEBUG] ReferenceTransformer: "var.image_name" references: []
+2025-11-28T09:40:06.372+0200 [DEBUG] ReferenceTransformer: "output.image_min_ram (expand)" references: [gcore_cloud_gpu_virtual_cluster_image.test (expand) gcore_cloud_gpu_virtual_cluster_image.test gcore_cloud_gpu_virtual_cluster_image.test]
+2025-11-28T09:40:06.372+0200 [DEBUG] ReferenceTransformer: "output.image_os_distro (expand)" references: [gcore_cloud_gpu_virtual_cluster_image.test (expand) gcore_cloud_gpu_virtual_cluster_image.test gcore_cloud_gpu_virtual_cluster_image.test]
+2025-11-28T09:40:06.372+0200 [DEBUG] ReferenceTransformer: "output.image_size (expand)" references: [gcore_cloud_gpu_virtual_cluster_image.test (expand) gcore_cloud_gpu_virtual_cluster_image.test gcore_cloud_gpu_virtual_cluster_image.test]
+2025-11-28T09:40:06.372+0200 [DEBUG] ReferenceTransformer: "gcore_cloud_gpu_virtual_cluster_image.test" references: [var.region_id var.project_id var.image_name var.test_tags]
+2025-11-28T09:40:06.372+0200 [DEBUG] ReferenceTransformer: "output.image_id (expand)" references: [gcore_cloud_gpu_virtual_cluster_image.test (expand) gcore_cloud_gpu_virtual_cluster_image.test gcore_cloud_gpu_virtual_cluster_image.test]
+2025-11-28T09:40:06.372+0200 [DEBUG] ReferenceTransformer: "output.image_visibility (expand)" references: [gcore_cloud_gpu_virtual_cluster_image.test (expand) gcore_cloud_gpu_virtual_cluster_image.test gcore_cloud_gpu_virtual_cluster_image.test]
+2025-11-28T09:40:06.372+0200 [DEBUG] ReferenceTransformer: "output.image_gpu_driver (expand)" references: [gcore_cloud_gpu_virtual_cluster_image.test (expand) gcore_cloud_gpu_virtual_cluster_image.test gcore_cloud_gpu_virtual_cluster_image.test]
+2025-11-28T09:40:06.372+0200 [DEBUG] ReferenceTransformer: "provider[\"registry.terraform.io/gcore/gcore\"]" references: []
+2025-11-28T09:40:06.374+0200 [INFO]  backend/local: apply calling Apply
+2025-11-28T09:40:06.374+0200 [DEBUG] Building and walking apply graph for NormalMode plan
+2025-11-28T09:40:06.374+0200 [DEBUG] Resource state not found for node "gcore_cloud_gpu_virtual_cluster_image.test", instance gcore_cloud_gpu_virtual_cluster_image.test
+2025-11-28T09:40:06.375+0200 [DEBUG] ProviderTransformer: "gcore_cloud_gpu_virtual_cluster_image.test (expand)" (*terraform.nodeExpandApplyableResource) needs provider["registry.terraform.io/gcore/gcore"]
+2025-11-28T09:40:06.375+0200 [DEBUG] ProviderTransformer: "gcore_cloud_gpu_virtual_cluster_image.test" (*terraform.NodeApplyableResourceInstance) needs provider["registry.terraform.io/gcore/gcore"]
+2025-11-28T09:40:06.375+0200 [DEBUG] ReferenceTransformer: "var.image_name" references: []
+2025-11-28T09:40:06.375+0200 [DEBUG] ReferenceTransformer: "output.image_id (expand)" references: [gcore_cloud_gpu_virtual_cluster_image.test gcore_cloud_gpu_virtual_cluster_image.test gcore_cloud_gpu_virtual_cluster_image.test (expand)]
+2025-11-28T09:40:06.375+0200 [DEBUG] ReferenceTransformer: "output.image_created_at (expand)" references: [gcore_cloud_gpu_virtual_cluster_image.test gcore_cloud_gpu_virtual_cluster_image.test gcore_cloud_gpu_virtual_cluster_image.test (expand)]
+2025-11-28T09:40:06.375+0200 [DEBUG] ReferenceTransformer: "gcore_cloud_gpu_virtual_cluster_image.test" references: [var.region_id var.test_tags var.project_id var.image_name]
+2025-11-28T09:40:06.375+0200 [DEBUG] ReferenceTransformer: "var.test_tags" references: []
+2025-11-28T09:40:06.375+0200 [DEBUG] ReferenceTransformer: "output.image_gpu_driver (expand)" references: [gcore_cloud_gpu_virtual_cluster_image.test gcore_cloud_gpu_virtual_cluster_image.test gcore_cloud_gpu_virtual_cluster_image.test (expand)]
+2025-11-28T09:40:06.375+0200 [DEBUG] ReferenceTransformer: "output.image_name (expand)" references: [gcore_cloud_gpu_virtual_cluster_image.test gcore_cloud_gpu_virtual_cluster_image.test gcore_cloud_gpu_virtual_cluster_image.test (expand)]
+2025-11-28T09:40:06.375+0200 [DEBUG] ReferenceTransformer: "output.image_os_version (expand)" references: [gcore_cloud_gpu_virtual_cluster_image.test gcore_cloud_gpu_virtual_cluster_image.test gcore_cloud_gpu_virtual_cluster_image.test (expand)]
+2025-11-28T09:40:06.375+0200 [DEBUG] ReferenceTransformer: "output.image_min_ram (expand)" references: [gcore_cloud_gpu_virtual_cluster_image.test gcore_cloud_gpu_virtual_cluster_image.test gcore_cloud_gpu_virtual_cluster_image.test (expand)]
+2025-11-28T09:40:06.375+0200 [DEBUG] ReferenceTransformer: "output.image_architecture (expand)" references: [gcore_cloud_gpu_virtual_cluster_image.test gcore_cloud_gpu_virtual_cluster_image.test gcore_cloud_gpu_virtual_cluster_image.test (expand)]
+2025-11-28T09:40:06.375+0200 [DEBUG] ReferenceTransformer: "gcore_cloud_gpu_virtual_cluster_image.test (expand)" references: [var.project_id var.image_name var.test_tags var.region_id]
+2025-11-28T09:40:06.375+0200 [DEBUG] ReferenceTransformer: "var.region_id" references: []
+2025-11-28T09:40:06.375+0200 [DEBUG] ReferenceTransformer: "output.image_hw_firmware_type (expand)" references: [gcore_cloud_gpu_virtual_cluster_image.test gcore_cloud_gpu_virtual_cluster_image.test gcore_cloud_gpu_virtual_cluster_image.test (expand)]
+2025-11-28T09:40:06.375+0200 [DEBUG] ReferenceTransformer: "output.image_os_type (expand)" references: [gcore_cloud_gpu_virtual_cluster_image.test gcore_cloud_gpu_virtual_cluster_image.test gcore_cloud_gpu_virtual_cluster_image.test (expand)]
+2025-11-28T09:40:06.375+0200 [DEBUG] ReferenceTransformer: "output.image_cow_format (expand)" references: [gcore_cloud_gpu_virtual_cluster_image.test gcore_cloud_gpu_virtual_cluster_image.test gcore_cloud_gpu_virtual_cluster_image.test (expand)]
+2025-11-28T09:40:06.375+0200 [DEBUG] ReferenceTransformer: "output.image_status (expand)" references: [gcore_cloud_gpu_virtual_cluster_image.test gcore_cloud_gpu_virtual_cluster_image.test gcore_cloud_gpu_virtual_cluster_image.test (expand)]
+2025-11-28T09:40:06.375+0200 [DEBUG] ReferenceTransformer: "output.image_ssh_key (expand)" references: [gcore_cloud_gpu_virtual_cluster_image.test gcore_cloud_gpu_virtual_cluster_image.test gcore_cloud_gpu_virtual_cluster_image.test (expand)]
+2025-11-28T09:40:06.375+0200 [DEBUG] ReferenceTransformer: "var.project_id" references: []
+2025-11-28T09:40:06.375+0200 [DEBUG] ReferenceTransformer: "output.image_size (expand)" references: [gcore_cloud_gpu_virtual_cluster_image.test gcore_cloud_gpu_virtual_cluster_image.test gcore_cloud_gpu_virtual_cluster_image.test (expand)]
+2025-11-28T09:40:06.375+0200 [DEBUG] ReferenceTransformer: "output.image_visibility (expand)" references: [gcore_cloud_gpu_virtual_cluster_image.test gcore_cloud_gpu_virtual_cluster_image.test gcore_cloud_gpu_virtual_cluster_image.test (expand)]
+2025-11-28T09:40:06.375+0200 [DEBUG] ReferenceTransformer: "output.image_min_disk (expand)" references: [gcore_cloud_gpu_virtual_cluster_image.test gcore_cloud_gpu_virtual_cluster_image.test gcore_cloud_gpu_virtual_cluster_image.test (expand)]
+2025-11-28T09:40:06.375+0200 [DEBUG] ReferenceTransformer: "output.image_updated_at (expand)" references: [gcore_cloud_gpu_virtual_cluster_image.test gcore_cloud_gpu_virtual_cluster_image.test gcore_cloud_gpu_virtual_cluster_image.test (expand)]
+2025-11-28T09:40:06.375+0200 [DEBUG] ReferenceTransformer: "output.image_os_distro (expand)" references: [gcore_cloud_gpu_virtual_cluster_image.test gcore_cloud_gpu_virtual_cluster_image.test gcore_cloud_gpu_virtual_cluster_image.test (expand)]
+2025-11-28T09:40:06.375+0200 [DEBUG] ReferenceTransformer: "provider[\"registry.terraform.io/gcore/gcore\"]" references: []
+2025-11-28T09:40:06.376+0200 [DEBUG] Starting graph walk: walkApply
+2025-11-28T09:40:06.376+0200 [DEBUG] created provider logger: level=debug
+2025-11-28T09:40:06.376+0200 [INFO]  provider: configuring client automatic mTLS
+2025-11-28T09:40:06.379+0200 [DEBUG] provider: starting plugin: path=/Users/user/repos/gcore-terraform/terraform-provider-gcore args=["/Users/user/repos/gcore-terraform/terraform-provider-gcore"]
+2025-11-28T09:40:06.381+0200 [DEBUG] provider: plugin started: path=/Users/user/repos/gcore-terraform/terraform-provider-gcore pid=74421
+2025-11-28T09:40:06.382+0200 [DEBUG] provider: waiting for RPC address: plugin=/Users/user/repos/gcore-terraform/terraform-provider-gcore
+2025-11-28T09:40:06.392+0200 [INFO]  provider.terraform-provider-gcore: configuring server automatic mTLS: timestamp="2025-11-28T09:40:06.391+0200"
+2025-11-28T09:40:06.398+0200 [DEBUG] provider.terraform-provider-gcore: plugin address: network=unix address=/var/folders/qj/cbb8n0j12tq6j2k955fxwpb80000gn/T/plugin2453693013 timestamp="2025-11-28T09:40:06.398+0200"
+2025-11-28T09:40:06.398+0200 [DEBUG] provider: using plugin: version=6
+2025-11-28T09:40:06.408+0200 [DEBUG] provider.terraform-provider-gcore: Marking Computed attributes with null configuration values as unknown (known after apply) in the plan to prevent potential Terraform errors: tf_provider_addr=registry.terraform.io/stainless-sdks/gcore tf_rpc=PlanResourceChange @caller=/Users/user/go/pkg/mod/github.com/hashicorp/terraform-plugin-framework@v1.15.0/internal/fwserver/server_planresourcechange.go:250 tf_req_id=f0d1f4c7-894a-041f-7d0f-fe7b8867d42e tf_resource_type=gcore_cloud_gpu_virtual_cluster_image @module=sdk.framework timestamp="2025-11-28T09:40:06.408+0200"
+2025-11-28T09:40:06.408+0200 [DEBUG] provider.terraform-provider-gcore: marking computed attribute that is null in the config as unknown: tf_attribute_path="AttributeName(\"gpu_driver\")" tf_rpc=PlanResourceChange @caller=/Users/user/go/pkg/mod/github.com/hashicorp/terraform-plugin-framework@v1.15.0/internal/fwserver/server_planresourcechange.go:538 @module=sdk.framework tf_provider_addr=registry.terraform.io/stainless-sdks/gcore tf_req_id=f0d1f4c7-894a-041f-7d0f-fe7b8867d42e tf_resource_type=gcore_cloud_gpu_virtual_cluster_image timestamp="2025-11-28T09:40:06.408+0200"
+2025-11-28T09:40:06.408+0200 [DEBUG] provider.terraform-provider-gcore: marking computed attribute that is null in the config as unknown: @module=sdk.framework tf_attribute_path="AttributeName(\"status\")" tf_provider_addr=registry.terraform.io/stainless-sdks/gcore tf_resource_type=gcore_cloud_gpu_virtual_cluster_image @caller=/Users/user/go/pkg/mod/github.com/hashicorp/terraform-plugin-framework@v1.15.0/internal/fwserver/server_planresourcechange.go:538 tf_req_id=f0d1f4c7-894a-041f-7d0f-fe7b8867d42e tf_rpc=PlanResourceChange timestamp="2025-11-28T09:40:06.408+0200"
+2025-11-28T09:40:06.408+0200 [DEBUG] provider.terraform-provider-gcore: marking computed attribute that is null in the config as unknown: tf_provider_addr=registry.terraform.io/stainless-sdks/gcore tf_rpc=PlanResourceChange @caller=/Users/user/go/pkg/mod/github.com/hashicorp/terraform-plugin-framework@v1.15.0/internal/fwserver/server_planresourcechange.go:538 @module=sdk.framework tf_attribute_path="AttributeName(\"updated_at\")" tf_req_id=f0d1f4c7-894a-041f-7d0f-fe7b8867d42e tf_resource_type=gcore_cloud_gpu_virtual_cluster_image timestamp="2025-11-28T09:40:06.408+0200"
+2025-11-28T09:40:06.408+0200 [DEBUG] provider.terraform-provider-gcore: marking computed attribute that is null in the config as unknown: tf_attribute_path="AttributeName(\"visibility\")" tf_req_id=f0d1f4c7-894a-041f-7d0f-fe7b8867d42e tf_resource_type=gcore_cloud_gpu_virtual_cluster_image @module=sdk.framework tf_rpc=PlanResourceChange @caller=/Users/user/go/pkg/mod/github.com/hashicorp/terraform-plugin-framework@v1.15.0/internal/fwserver/server_planresourcechange.go:538 tf_provider_addr=registry.terraform.io/stainless-sdks/gcore timestamp="2025-11-28T09:40:06.408+0200"
+2025-11-28T09:40:06.408+0200 [DEBUG] provider.terraform-provider-gcore: marking computed attribute that is null in the config as unknown: @caller=/Users/user/go/pkg/mod/github.com/hashicorp/terraform-plugin-framework@v1.15.0/internal/fwserver/server_planresourcechange.go:538 @module=sdk.framework tf_provider_addr=registry.terraform.io/stainless-sdks/gcore tf_req_id=f0d1f4c7-894a-041f-7d0f-fe7b8867d42e tf_attribute_path="AttributeName(\"tasks\")" tf_resource_type=gcore_cloud_gpu_virtual_cluster_image tf_rpc=PlanResourceChange timestamp="2025-11-28T09:40:06.408+0200"
+2025-11-28T09:40:06.408+0200 [DEBUG] provider.terraform-provider-gcore: marking computed attribute that is null in the config as unknown: @caller=/Users/user/go/pkg/mod/github.com/hashicorp/terraform-plugin-framework@v1.15.0/internal/fwserver/server_planresourcechange.go:538 tf_provider_addr=registry.terraform.io/stainless-sdks/gcore tf_req_id=f0d1f4c7-894a-041f-7d0f-fe7b8867d42e tf_resource_type=gcore_cloud_gpu_virtual_cluster_image tf_rpc=PlanResourceChange @module=sdk.framework tf_attribute_path="AttributeName(\"min_ram\")" timestamp="2025-11-28T09:40:06.408+0200"
+2025-11-28T09:40:06.408+0200 [DEBUG] provider.terraform-provider-gcore: marking computed attribute that is null in the config as unknown: tf_provider_addr=registry.terraform.io/stainless-sdks/gcore tf_resource_type=gcore_cloud_gpu_virtual_cluster_image tf_rpc=PlanResourceChange @module=sdk.framework tf_attribute_path="AttributeName(\"id\")" tf_req_id=f0d1f4c7-894a-041f-7d0f-fe7b8867d42e @caller=/Users/user/go/pkg/mod/github.com/hashicorp/terraform-plugin-framework@v1.15.0/internal/fwserver/server_planresourcechange.go:538 timestamp="2025-11-28T09:40:06.408+0200"
+2025-11-28T09:40:06.408+0200 [DEBUG] provider.terraform-provider-gcore: marking computed attribute that is null in the config as unknown: tf_attribute_path="AttributeName(\"task_id\")" tf_resource_type=gcore_cloud_gpu_virtual_cluster_image @module=sdk.framework tf_provider_addr=registry.terraform.io/stainless-sdks/gcore tf_req_id=f0d1f4c7-894a-041f-7d0f-fe7b8867d42e tf_rpc=PlanResourceChange @caller=/Users/user/go/pkg/mod/github.com/hashicorp/terraform-plugin-framework@v1.15.0/internal/fwserver/server_planresourcechange.go:538 timestamp="2025-11-28T09:40:06.408+0200"
+2025-11-28T09:40:06.408+0200 [DEBUG] provider.terraform-provider-gcore: marking computed attribute that is null in the config as unknown: @caller=/Users/user/go/pkg/mod/github.com/hashicorp/terraform-plugin-framework@v1.15.0/internal/fwserver/server_planresourcechange.go:538 tf_attribute_path="AttributeName(\"min_disk\")" tf_provider_addr=registry.terraform.io/stainless-sdks/gcore tf_req_id=f0d1f4c7-894a-041f-7d0f-fe7b8867d42e tf_resource_type=gcore_cloud_gpu_virtual_cluster_image @module=sdk.framework tf_rpc=PlanResourceChange timestamp="2025-11-28T09:40:06.408+0200"
+2025-11-28T09:40:06.408+0200 [DEBUG] provider.terraform-provider-gcore: marking computed attribute that is null in the config as unknown: tf_attribute_path="AttributeName(\"size\")" tf_resource_type=gcore_cloud_gpu_virtual_cluster_image tf_rpc=PlanResourceChange @caller=/Users/user/go/pkg/mod/github.com/hashicorp/terraform-plugin-framework@v1.15.0/internal/fwserver/server_planresourcechange.go:538 @module=sdk.framework tf_provider_addr=registry.terraform.io/stainless-sdks/gcore tf_req_id=f0d1f4c7-894a-041f-7d0f-fe7b8867d42e timestamp="2025-11-28T09:40:06.408+0200"
+2025-11-28T09:40:06.408+0200 [DEBUG] provider.terraform-provider-gcore: marking computed attribute that is null in the config as unknown: @caller=/Users/user/go/pkg/mod/github.com/hashicorp/terraform-plugin-framework@v1.15.0/internal/fwserver/server_planresourcechange.go:538 @module=sdk.framework tf_attribute_path="AttributeName(\"created_at\")" tf_req_id=f0d1f4c7-894a-041f-7d0f-fe7b8867d42e tf_resource_type=gcore_cloud_gpu_virtual_cluster_image tf_provider_addr=registry.terraform.io/stainless-sdks/gcore tf_rpc=PlanResourceChange timestamp="2025-11-28T09:40:06.408+0200"
+2025-11-28T09:40:06.408+0200 [DEBUG] provider.terraform-provider-gcore: marking computed attribute that is null in the config as unknown: @module=sdk.framework tf_attribute_path="AttributeName(\"gpu_driver_type\")" tf_provider_addr=registry.terraform.io/stainless-sdks/gcore tf_resource_type=gcore_cloud_gpu_virtual_cluster_image tf_rpc=PlanResourceChange @caller=/Users/user/go/pkg/mod/github.com/hashicorp/terraform-plugin-framework@v1.15.0/internal/fwserver/server_planresourcechange.go:538 tf_req_id=f0d1f4c7-894a-041f-7d0f-fe7b8867d42e timestamp="2025-11-28T09:40:06.408+0200"
+2025-11-28T09:40:06.408+0200 [DEBUG] provider.terraform-provider-gcore: marking computed attribute that is null in the config as unknown: @caller=/Users/user/go/pkg/mod/github.com/hashicorp/terraform-plugin-framework@v1.15.0/internal/fwserver/server_planresourcechange.go:538 @module=sdk.framework tf_attribute_path="AttributeName(\"gpu_driver_version\")" tf_provider_addr=registry.terraform.io/stainless-sdks/gcore tf_resource_type=gcore_cloud_gpu_virtual_cluster_image tf_req_id=f0d1f4c7-894a-041f-7d0f-fe7b8867d42e tf_rpc=PlanResourceChange timestamp="2025-11-28T09:40:06.408+0200"
+2025-11-28T09:40:06.410+0200 [INFO]  Starting apply for gcore_cloud_gpu_virtual_cluster_image.test
+2025-11-28T09:40:06.410+0200 [DEBUG] gcore_cloud_gpu_virtual_cluster_image.test: applying the planned Create change
+2025-11-28T09:40:06.411+0200 [DEBUG] provider.terraform-provider-gcore: 
+POST /cloud/v3/gpu/virtual/379987/76/images HTTP/1.1
+> x-stainless-runtime: go
+> x-stainless-runtime-version: go1.24.5
+> accept: application/json
+> x-stainless-package-version: 0.22.0
+> x-stainless-os: MacOS
+> x-stainless-arch: arm64
+> authorization: APIKey 21788$1e278ce67b6aa33f178122658b1dd0210d0edff453d348acb9b68bffea6a635b7791925ddda198d5678a4dc20269fe04a263ca92c7e5aa41ea79075f89b66bf6
+> content-type: application/json
+> x-stainless-retry-count: 0
+> user-agent: Gcore/Go 0.22.0
+> x-stainless-lang: go
+>
+
+{"architecture":"x86_64","cow_format":false,"hw_firmware_type":"bios","name":"test-comprehensive-gpu-image-GCLOUD2-21134","os_distro":"cirros","os_type":"linux","os_version":"0.4.0","ssh_key":"allow","tags":{"jira-ticket":"GCLOUD2-21134","test":"gpu-virtual-image"},"url":"http://mirror.noris.net/cirros/0.4.0/cirros-0.4.0-x86_64-disk.img"}
+
+: tf_req_id=774605b7-63ec-e3a9-7aea-2ec9db203f4d @module=gcore tf_resource_type=gcore_cloud_gpu_virtual_cluster_image tf_rpc=ApplyResourceChange @caller=/Users/user/repos/gcore-terraform/internal/logging/logging.go:60 tf_provider_addr=registry.terraform.io/stainless-sdks/gcore timestamp="2025-11-28T09:40:06.411+0200"
+2025-11-28T09:40:06.788+0200 [DEBUG] provider.terraform-provider-gcore: 
+< HTTP/2.0 200 OK
+< content-type: application/json; charset=UTF-8
+< access-control-allow-origin: *
+< cache-control: no-cache, no-store, must-revalidate
+< strict-transport-security: max-age=15724800; includeSubDomains
+< accept-ranges: bytes
+< date: Fri, 28 Nov 2025 07:40:06 GMT
+< content-length: 51
+< x-id-fe: fr5-hw-edge-gc26
+< traceparent: 00-590aa0c260a738a94b52f0f3ad7365ab-cf2882d1830f0371-01
+< request_id: 590aa0c260a738a94b52f0f3ad7365ab
+< x-id: fr5-hw-edge-gc26
+< x-robots-tag: noindex, nofollow, noarchive
+< server: nginx
+<
+
+{"tasks": ["5dad6b20-13e4-4844-8f66-0d18671f2832"]}
+
+: @caller=/Users/user/repos/gcore-terraform/internal/logging/logging.go:88 tf_provider_addr=registry.terraform.io/stainless-sdks/gcore tf_req_id=774605b7-63ec-e3a9-7aea-2ec9db203f4d tf_rpc=ApplyResourceChange @module=gcore tf_resource_type=gcore_cloud_gpu_virtual_cluster_image timestamp="2025-11-28T09:40:06.788+0200"
+2025-11-28T09:40:24.079+0200 [DEBUG] provider.terraform-provider-gcore: 
+GET /cloud/v3/gpu/virtual/379987/76/images/3a50d4ab-469d-4e51-80d9-727553da684e HTTP/1.1
+> x-stainless-arch: arm64
+> x-stainless-package-version: 0.22.0
+> content-type: application/json
+> x-stainless-lang: go
+> accept: application/json
+> x-stainless-retry-count: 0
+> user-agent: Gcore/Go 0.22.0
+> x-stainless-runtime-version: go1.24.5
+> authorization: APIKey 21788$1e278ce67b6aa33f178122658b1dd0210d0edff453d348acb9b68bffea6a635b7791925ddda198d5678a4dc20269fe04a263ca92c7e5aa41ea79075f89b66bf6
+> x-stainless-runtime: go
+> x-stainless-os: MacOS
+>
+
+{"architecture":"x86_64","cow_format":false,"hw_firmware_type":"bios","name":"test-comprehensive-gpu-image-GCLOUD2-21134","os_distro":"cirros","os_type":"linux","os_version":"0.4.0","ssh_key":"allow","tags":{"jira-ticket":"GCLOUD2-21134","test":"gpu-virtual-image"},"url":"http://mirror.noris.net/cirros/0.4.0/cirros-0.4.0-x86_64-disk.img"}
+
+: @module=gcore tf_req_id=774605b7-63ec-e3a9-7aea-2ec9db203f4d tf_resource_type=gcore_cloud_gpu_virtual_cluster_image @caller=/Users/user/repos/gcore-terraform/internal/logging/logging.go:60 tf_rpc=ApplyResourceChange tf_provider_addr=registry.terraform.io/stainless-sdks/gcore timestamp="2025-11-28T09:40:24.078+0200"
+2025-11-28T09:40:24.945+0200 [DEBUG] provider.terraform-provider-gcore: 
+< HTTP/2.0 200 OK
+< server: nginx
+< date: Fri, 28 Nov 2025 07:40:24 GMT
+< content-type: application/json; charset=UTF-8
+< x-id-fe: fr5-hw-edge-gc26
+< request_id: 4cc5973a405b1a968c425bc2300ec1cc
+< access-control-allow-origin: *
+< cache-control: no-cache, no-store, must-revalidate
+< strict-transport-security: max-age=15724800; includeSubDomains
+< content-length: 695
+< traceparent: 00-4cc5973a405b1a968c425bc2300ec1cc-0e0e08b1bc039868-01
+< etag: "33b7a56bb7bf1cd1e554874720b5f028cf0af26e"
+< x-id: fr5-hw-edge-gc26
+< x-robots-tag: noindex, nofollow, noarchive
+< accept-ranges: bytes
+<
+
+{"id": "3a50d4ab-469d-4e51-80d9-727553da684e", "name": "test-comprehensive-gpu-image-GCLOUD2-21134", "status": "active", "min_disk": 1, "min_ram": 0, "metadata": {"jira-ticket": "GCLOUD2-21134", "test": "gpu-virtual-image"}, "tags": [{"key": "jira-ticket", "value": "GCLOUD2-21134", "read_only": false}, {"key": "test", "value": "gpu-virtual-image", "read_only": false}], "ssh_key": "allow", "size": 12716032, "visibility": "shared", "architecture": "x86_64", "os_distro": "cirros", "os_type": "linux", "os_version": "0.4.0", "created_at": "2025-11-28T07:40:07Z", "updated_at": "2025-11-28T07:40:11Z", "task_id": null, "gpu_driver": "nvidia", "gpu_driver_version": null, "gpu_driver_type": null}
+
+: @module=gcore tf_req_id=774605b7-63ec-e3a9-7aea-2ec9db203f4d tf_resource_type=gcore_cloud_gpu_virtual_cluster_image tf_rpc=ApplyResourceChange @caller=/Users/user/repos/gcore-terraform/internal/logging/logging.go:88 tf_provider_addr=registry.terraform.io/stainless-sdks/gcore timestamp="2025-11-28T09:40:24.945+0200"
+2025-11-28T09:40:24.948+0200 [DEBUG] provider.terraform-provider-gcore: Value switched to prior value due to semantic equality logic: tf_rpc=ApplyResourceChange @caller=/Users/user/go/pkg/mod/github.com/hashicorp/terraform-plugin-framework@v1.15.0/internal/fwschemadata/value_semantic_equality.go:91 tf_provider_addr=registry.terraform.io/stainless-sdks/gcore tf_resource_type=gcore_cloud_gpu_virtual_cluster_image tf_req_id=774605b7-63ec-e3a9-7aea-2ec9db203f4d @module=sdk.framework tf_attribute_path=cow_format timestamp="2025-11-28T09:40:24.948+0200"
+2025-11-28T09:40:24.948+0200 [DEBUG] provider.terraform-provider-gcore: Value switched to prior value due to semantic equality logic: tf_resource_type=gcore_cloud_gpu_virtual_cluster_image @module=sdk.framework tf_provider_addr=registry.terraform.io/stainless-sdks/gcore tf_req_id=774605b7-63ec-e3a9-7aea-2ec9db203f4d tf_rpc=ApplyResourceChange @caller=/Users/user/go/pkg/mod/github.com/hashicorp/terraform-plugin-framework@v1.15.0/internal/fwschemadata/value_semantic_equality.go:91 tf_attribute_path=url timestamp="2025-11-28T09:40:24.948+0200"
+2025-11-28T09:40:24.948+0200 [DEBUG] provider.terraform-provider-gcore: Value switched to prior value due to semantic equality logic: tf_req_id=774605b7-63ec-e3a9-7aea-2ec9db203f4d tf_resource_type=gcore_cloud_gpu_virtual_cluster_image @module=sdk.framework tf_attribute_path=os_type tf_provider_addr=registry.terraform.io/stainless-sdks/gcore tf_rpc=ApplyResourceChange @caller=/Users/user/go/pkg/mod/github.com/hashicorp/terraform-plugin-framework@v1.15.0/internal/fwschemadata/value_semantic_equality.go:91 timestamp="2025-11-28T09:40:24.948+0200"
+2025-11-28T09:40:24.948+0200 [DEBUG] provider.terraform-provider-gcore: Value switched to prior value due to semantic equality logic: tf_provider_addr=registry.terraform.io/stainless-sdks/gcore tf_req_id=774605b7-63ec-e3a9-7aea-2ec9db203f4d tf_rpc=ApplyResourceChange @caller=/Users/user/go/pkg/mod/github.com/hashicorp/terraform-plugin-framework@v1.15.0/internal/fwschemadata/value_semantic_equality.go:91 @module=sdk.framework tf_attribute_path=region_id tf_resource_type=gcore_cloud_gpu_virtual_cluster_image timestamp="2025-11-28T09:40:24.948+0200"
+2025-11-28T09:40:24.948+0200 [DEBUG] provider.terraform-provider-gcore: Value switched to prior value due to semantic equality logic: @caller=/Users/user/go/pkg/mod/github.com/hashicorp/terraform-plugin-framework@v1.15.0/internal/fwschemadata/value_semantic_equality.go:91 tf_attribute_path=os_distro tf_req_id=774605b7-63ec-e3a9-7aea-2ec9db203f4d @module=sdk.framework tf_provider_addr=registry.terraform.io/stainless-sdks/gcore tf_resource_type=gcore_cloud_gpu_virtual_cluster_image tf_rpc=ApplyResourceChange timestamp="2025-11-28T09:40:24.948+0200"
+2025-11-28T09:40:24.949+0200 [DEBUG] provider.terraform-provider-gcore: Value switched to prior value due to semantic equality logic: @module=sdk.framework tf_provider_addr=registry.terraform.io/stainless-sdks/gcore tf_req_id=774605b7-63ec-e3a9-7aea-2ec9db203f4d tf_rpc=ApplyResourceChange tf_attribute_path=os_version tf_resource_type=gcore_cloud_gpu_virtual_cluster_image @caller=/Users/user/go/pkg/mod/github.com/hashicorp/terraform-plugin-framework@v1.15.0/internal/fwschemadata/value_semantic_equality.go:91 timestamp="2025-11-28T09:40:24.948+0200"
+2025-11-28T09:40:24.949+0200 [DEBUG] provider.terraform-provider-gcore: Value switched to prior value due to semantic equality logic: tf_req_id=774605b7-63ec-e3a9-7aea-2ec9db203f4d tf_resource_type=gcore_cloud_gpu_virtual_cluster_image tf_attribute_path=ssh_key tf_provider_addr=registry.terraform.io/stainless-sdks/gcore tf_rpc=ApplyResourceChange @caller=/Users/user/go/pkg/mod/github.com/hashicorp/terraform-plugin-framework@v1.15.0/internal/fwschemadata/value_semantic_equality.go:91 @module=sdk.framework timestamp="2025-11-28T09:40:24.948+0200"
+2025-11-28T09:40:24.949+0200 [DEBUG] provider.terraform-provider-gcore: Value switched to prior value due to semantic equality logic: tf_req_id=774605b7-63ec-e3a9-7aea-2ec9db203f4d tf_resource_type=gcore_cloud_gpu_virtual_cluster_image @caller=/Users/user/go/pkg/mod/github.com/hashicorp/terraform-plugin-framework@v1.15.0/internal/fwschemadata/value_semantic_equality.go:91 @module=sdk.framework tf_attribute_path=hw_firmware_type tf_provider_addr=registry.terraform.io/stainless-sdks/gcore tf_rpc=ApplyResourceChange timestamp="2025-11-28T09:40:24.949+0200"
+2025-11-28T09:40:24.949+0200 [DEBUG] provider.terraform-provider-gcore: Value switched to prior value due to semantic equality logic: @caller=/Users/user/go/pkg/mod/github.com/hashicorp/terraform-plugin-framework@v1.15.0/internal/fwschemadata/value_semantic_equality.go:91 @module=sdk.framework tf_req_id=774605b7-63ec-e3a9-7aea-2ec9db203f4d tf_resource_type=gcore_cloud_gpu_virtual_cluster_image tf_attribute_path=name tf_provider_addr=registry.terraform.io/stainless-sdks/gcore tf_rpc=ApplyResourceChange timestamp="2025-11-28T09:40:24.949+0200"
+2025-11-28T09:40:24.949+0200 [DEBUG] provider.terraform-provider-gcore: Value switched to prior value due to semantic equality logic: tf_provider_addr=registry.terraform.io/stainless-sdks/gcore tf_resource_type=gcore_cloud_gpu_virtual_cluster_image @caller=/Users/user/go/pkg/mod/github.com/hashicorp/terraform-plugin-framework@v1.15.0/internal/fwschemadata/value_semantic_equality.go:91 @module=sdk.framework tf_attribute_path="tags[\"test\"]" tf_req_id=774605b7-63ec-e3a9-7aea-2ec9db203f4d tf_rpc=ApplyResourceChange timestamp="2025-11-28T09:40:24.949+0200"
+2025-11-28T09:40:24.949+0200 [DEBUG] provider.terraform-provider-gcore: Value switched to prior value due to semantic equality logic: @module=sdk.framework tf_attribute_path="tags[\"jira-ticket\"]" tf_rpc=ApplyResourceChange @caller=/Users/user/go/pkg/mod/github.com/hashicorp/terraform-plugin-framework@v1.15.0/internal/fwschemadata/value_semantic_equality.go:91 tf_provider_addr=registry.terraform.io/stainless-sdks/gcore tf_req_id=774605b7-63ec-e3a9-7aea-2ec9db203f4d tf_resource_type=gcore_cloud_gpu_virtual_cluster_image timestamp="2025-11-28T09:40:24.949+0200"
+2025-11-28T09:40:24.949+0200 [DEBUG] provider.terraform-provider-gcore: Value switched to prior value due to semantic equality logic: @module=sdk.framework tf_req_id=774605b7-63ec-e3a9-7aea-2ec9db203f4d @caller=/Users/user/go/pkg/mod/github.com/hashicorp/terraform-plugin-framework@v1.15.0/internal/fwschemadata/value_semantic_equality.go:91 tf_attribute_path=tags tf_provider_addr=registry.terraform.io/stainless-sdks/gcore tf_resource_type=gcore_cloud_gpu_virtual_cluster_image tf_rpc=ApplyResourceChange timestamp="2025-11-28T09:40:24.949+0200"
+2025-11-28T09:40:24.949+0200 [DEBUG] provider.terraform-provider-gcore: Value switched to prior value due to semantic equality logic: @caller=/Users/user/go/pkg/mod/github.com/hashicorp/terraform-plugin-framework@v1.15.0/internal/fwschemadata/value_semantic_equality.go:91 tf_attribute_path=project_id tf_req_id=774605b7-63ec-e3a9-7aea-2ec9db203f4d tf_rpc=ApplyResourceChange @module=sdk.framework tf_provider_addr=registry.terraform.io/stainless-sdks/gcore tf_resource_type=gcore_cloud_gpu_virtual_cluster_image timestamp="2025-11-28T09:40:24.949+0200"
+2025-11-28T09:40:24.949+0200 [DEBUG] provider.terraform-provider-gcore: Value switched to prior value due to semantic equality logic: @module=sdk.framework tf_provider_addr=registry.terraform.io/stainless-sdks/gcore @caller=/Users/user/go/pkg/mod/github.com/hashicorp/terraform-plugin-framework@v1.15.0/internal/fwschemadata/value_semantic_equality.go:91 tf_attribute_path=architecture tf_req_id=774605b7-63ec-e3a9-7aea-2ec9db203f4d tf_resource_type=gcore_cloud_gpu_virtual_cluster_image tf_rpc=ApplyResourceChange timestamp="2025-11-28T09:40:24.949+0200"
+2025-11-28T09:40:24.955+0200 [DEBUG] State storage *statemgr.Filesystem declined to persist a state snapshot
+2025-11-28T09:40:24.957+0200 [DEBUG] provider.stdio: received EOF, stopping recv loop: err="rpc error: code = Unavailable desc = error reading from server: EOF"
+2025-11-28T09:40:24.958+0200 [INFO]  provider: plugin process exited: plugin=/Users/user/repos/gcore-terraform/terraform-provider-gcore id=74421
+2025-11-28T09:40:24.958+0200 [DEBUG] provider: plugin exited
+2025-11-28T09:40:25.051+0200 [INFO]  Terraform version: 1.10.5
+2025-11-28T09:40:25.052+0200 [DEBUG] using github.com/hashicorp/go-tfe v1.70.0
+2025-11-28T09:40:25.052+0200 [DEBUG] using github.com/hashicorp/hcl/v2 v2.23.0
+2025-11-28T09:40:25.052+0200 [DEBUG] using github.com/hashicorp/terraform-svchost v0.1.1
+2025-11-28T09:40:25.052+0200 [DEBUG] using github.com/zclconf/go-cty v1.16.2
+2025-11-28T09:40:25.052+0200 [INFO]  Go runtime version: go1.23.3
+2025-11-28T09:40:25.052+0200 [INFO]  CLI args: []string{"terraform", "plan", "-detailed-exitcode"}
+2025-11-28T09:40:25.052+0200 [DEBUG] Attempting to open CLI config file: /Users/user/repos/gcore-terraform/.terraformrc
+2025-11-28T09:40:25.052+0200 [INFO]  Loading CLI configuration from /Users/user/repos/gcore-terraform/.terraformrc
+2025-11-28T09:40:25.052+0200 [DEBUG] Not reading CLI config directory because config location is overridden by environment variable
+2025-11-28T09:40:25.053+0200 [DEBUG] checking for credentials in "/Users/user/.terraform.d/plugins"
+2025-11-28T09:40:25.053+0200 [DEBUG] Explicit provider installation configuration is set
+2025-11-28T09:40:25.054+0200 [INFO]  CLI command args: []string{"plan", "-detailed-exitcode"}
+2025-11-28T09:40:25.056+0200 [DEBUG] Provider registry.terraform.io/gcore/gcore is overridden by dev_overrides
+2025-11-28T09:40:25.057+0200 [DEBUG] Provider registry.terraform.io/gcore/gcore is overridden to load from /Users/user/repos/gcore-terraform
+2025-11-28T09:40:25.058+0200 [DEBUG] checking for provisioner in "."
+2025-11-28T09:40:25.073+0200 [DEBUG] checking for provisioner in "/opt/homebrew/bin"
+2025-11-28T09:40:25.073+0200 [DEBUG] checking for provisioner in "/Users/user/.terraform.d/plugins"
+2025-11-28T09:40:25.073+0200 [DEBUG] Provider registry.terraform.io/gcore/gcore is overridden by dev_overrides
+2025-11-28T09:40:25.074+0200 [INFO]  backend/local: starting Plan operation
+2025-11-28T09:40:25.082+0200 [DEBUG] Config.VerifyDependencySelections: skipping registry.terraform.io/gcore/gcore because it's overridden by a special configuration setting
+2025-11-28T09:40:25.083+0200 [DEBUG] created provider logger: level=debug
+2025-11-28T09:40:25.083+0200 [INFO]  provider: configuring client automatic mTLS
+2025-11-28T09:40:25.095+0200 [DEBUG] provider: starting plugin: path=/Users/user/repos/gcore-terraform/terraform-provider-gcore args=["/Users/user/repos/gcore-terraform/terraform-provider-gcore"]
+2025-11-28T09:40:25.104+0200 [DEBUG] provider: plugin started: path=/Users/user/repos/gcore-terraform/terraform-provider-gcore pid=75129
+2025-11-28T09:40:25.104+0200 [DEBUG] provider: waiting for RPC address: plugin=/Users/user/repos/gcore-terraform/terraform-provider-gcore
+2025-11-28T09:40:25.135+0200 [INFO]  provider.terraform-provider-gcore: configuring server automatic mTLS: timestamp="2025-11-28T09:40:25.135+0200"
+2025-11-28T09:40:25.148+0200 [DEBUG] provider: using plugin: version=6
+2025-11-28T09:40:25.149+0200 [DEBUG] provider.terraform-provider-gcore: plugin address: address=/var/folders/qj/cbb8n0j12tq6j2k955fxwpb80000gn/T/plugin876775192 network=unix timestamp="2025-11-28T09:40:25.148+0200"
+2025-11-28T09:40:25.171+0200 [DEBUG] No provider meta schema returned
+2025-11-28T09:40:25.177+0200 [DEBUG] provider.stdio: received EOF, stopping recv loop: err="rpc error: code = Unavailable desc = error reading from server: EOF"
+2025-11-28T09:40:25.178+0200 [INFO]  provider: plugin process exited: plugin=/Users/user/repos/gcore-terraform/terraform-provider-gcore id=75129
+2025-11-28T09:40:25.178+0200 [DEBUG] provider: plugin exited
+2025-11-28T09:40:25.178+0200 [DEBUG] Building and walking validate graph
+2025-11-28T09:40:25.178+0200 [DEBUG] ProviderTransformer: "gcore_cloud_gpu_virtual_cluster_image.test" (*terraform.NodeValidatableResource) needs provider["registry.terraform.io/gcore/gcore"]
+2025-11-28T09:40:25.178+0200 [DEBUG] ReferenceTransformer: "var.image_name" references: []
+2025-11-28T09:40:25.178+0200 [DEBUG] ReferenceTransformer: "output.image_architecture (expand)" references: [gcore_cloud_gpu_virtual_cluster_image.test]
+2025-11-28T09:40:25.178+0200 [DEBUG] ReferenceTransformer: "output.image_os_type (expand)" references: [gcore_cloud_gpu_virtual_cluster_image.test]
+2025-11-28T09:40:25.178+0200 [DEBUG] ReferenceTransformer: "output.image_min_ram (expand)" references: [gcore_cloud_gpu_virtual_cluster_image.test]
+2025-11-28T09:40:25.178+0200 [DEBUG] ReferenceTransformer: "output.image_updated_at (expand)" references: [gcore_cloud_gpu_virtual_cluster_image.test]
+2025-11-28T09:40:25.178+0200 [DEBUG] ReferenceTransformer: "output.image_os_version (expand)" references: [gcore_cloud_gpu_virtual_cluster_image.test]
+2025-11-28T09:40:25.178+0200 [DEBUG] ReferenceTransformer: "gcore_cloud_gpu_virtual_cluster_image.test" references: [var.region_id var.test_tags var.image_name var.project_id]
+2025-11-28T09:40:25.178+0200 [DEBUG] ReferenceTransformer: "var.test_tags" references: []
+2025-11-28T09:40:25.178+0200 [DEBUG] ReferenceTransformer: "var.region_id" references: []
+2025-11-28T09:40:25.178+0200 [DEBUG] ReferenceTransformer: "output.image_size (expand)" references: [gcore_cloud_gpu_virtual_cluster_image.test]
+2025-11-28T09:40:25.178+0200 [DEBUG] ReferenceTransformer: "output.image_id (expand)" references: [gcore_cloud_gpu_virtual_cluster_image.test]
+2025-11-28T09:40:25.178+0200 [DEBUG] ReferenceTransformer: "output.image_created_at (expand)" references: [gcore_cloud_gpu_virtual_cluster_image.test]
+2025-11-28T09:40:25.178+0200 [DEBUG] ReferenceTransformer: "var.project_id" references: []
+2025-11-28T09:40:25.178+0200 [DEBUG] ReferenceTransformer: "output.image_hw_firmware_type (expand)" references: [gcore_cloud_gpu_virtual_cluster_image.test]
+2025-11-28T09:40:25.178+0200 [DEBUG] ReferenceTransformer: "output.image_gpu_driver (expand)" references: [gcore_cloud_gpu_virtual_cluster_image.test]
+2025-11-28T09:40:25.178+0200 [DEBUG] ReferenceTransformer: "output.image_visibility (expand)" references: [gcore_cloud_gpu_virtual_cluster_image.test]
+2025-11-28T09:40:25.178+0200 [DEBUG] ReferenceTransformer: "output.image_min_disk (expand)" references: [gcore_cloud_gpu_virtual_cluster_image.test]
+2025-11-28T09:40:25.178+0200 [DEBUG] ReferenceTransformer: "provider[\"registry.terraform.io/gcore/gcore\"]" references: []
+2025-11-28T09:40:25.178+0200 [DEBUG] ReferenceTransformer: "output.image_cow_format (expand)" references: [gcore_cloud_gpu_virtual_cluster_image.test]
+2025-11-28T09:40:25.178+0200 [DEBUG] ReferenceTransformer: "output.image_ssh_key (expand)" references: [gcore_cloud_gpu_virtual_cluster_image.test]
+2025-11-28T09:40:25.178+0200 [DEBUG] ReferenceTransformer: "output.image_status (expand)" references: [gcore_cloud_gpu_virtual_cluster_image.test]
+2025-11-28T09:40:25.178+0200 [DEBUG] ReferenceTransformer: "output.image_os_distro (expand)" references: [gcore_cloud_gpu_virtual_cluster_image.test]
+2025-11-28T09:40:25.178+0200 [DEBUG] ReferenceTransformer: "output.image_name (expand)" references: [gcore_cloud_gpu_virtual_cluster_image.test]
+2025-11-28T09:40:25.179+0200 [DEBUG] Starting graph walk: walkValidate
+2025-11-28T09:40:25.179+0200 [DEBUG] created provider logger: level=debug
+2025-11-28T09:40:25.179+0200 [INFO]  provider: configuring client automatic mTLS
+2025-11-28T09:40:25.182+0200 [DEBUG] provider: starting plugin: path=/Users/user/repos/gcore-terraform/terraform-provider-gcore args=["/Users/user/repos/gcore-terraform/terraform-provider-gcore"]
+2025-11-28T09:40:25.185+0200 [DEBUG] provider: plugin started: path=/Users/user/repos/gcore-terraform/terraform-provider-gcore pid=75131
+2025-11-28T09:40:25.185+0200 [DEBUG] provider: waiting for RPC address: plugin=/Users/user/repos/gcore-terraform/terraform-provider-gcore
+2025-11-28T09:40:25.201+0200 [INFO]  provider.terraform-provider-gcore: configuring server automatic mTLS: timestamp="2025-11-28T09:40:25.200+0200"
+2025-11-28T09:40:25.212+0200 [DEBUG] provider: using plugin: version=6
+2025-11-28T09:40:25.212+0200 [DEBUG] provider.terraform-provider-gcore: plugin address: address=/var/folders/qj/cbb8n0j12tq6j2k955fxwpb80000gn/T/plugin12853944 network=unix timestamp="2025-11-28T09:40:25.212+0200"
+2025-11-28T09:40:25.222+0200 [DEBUG] provider.stdio: received EOF, stopping recv loop: err="rpc error: code = Unavailable desc = error reading from server: EOF"
+2025-11-28T09:40:25.223+0200 [INFO]  provider: plugin process exited: plugin=/Users/user/repos/gcore-terraform/terraform-provider-gcore id=75131
+2025-11-28T09:40:25.223+0200 [DEBUG] provider: plugin exited
+2025-11-28T09:40:25.223+0200 [INFO]  backend/local: plan calling Plan
+2025-11-28T09:40:25.224+0200 [DEBUG] Building and walking plan graph for NormalMode
+2025-11-28T09:40:25.224+0200 [DEBUG] ProviderTransformer: "gcore_cloud_gpu_virtual_cluster_image.test (expand)" (*terraform.nodeExpandPlannableResource) needs provider["registry.terraform.io/gcore/gcore"]
+2025-11-28T09:40:25.224+0200 [DEBUG] ReferenceTransformer: "output.image_hw_firmware_type (expand)" references: [gcore_cloud_gpu_virtual_cluster_image.test (expand)]
+2025-11-28T09:40:25.224+0200 [DEBUG] ReferenceTransformer: "output.image_size (expand)" references: [gcore_cloud_gpu_virtual_cluster_image.test (expand)]
+2025-11-28T09:40:25.224+0200 [DEBUG] ReferenceTransformer: "output.image_os_type (expand)" references: [gcore_cloud_gpu_virtual_cluster_image.test (expand)]
+2025-11-28T09:40:25.224+0200 [DEBUG] ReferenceTransformer: "output.image_os_distro (expand)" references: [gcore_cloud_gpu_virtual_cluster_image.test (expand)]
+2025-11-28T09:40:25.224+0200 [DEBUG] ReferenceTransformer: "var.test_tags" references: []
+2025-11-28T09:40:25.224+0200 [DEBUG] ReferenceTransformer: "output.image_visibility (expand)" references: [gcore_cloud_gpu_virtual_cluster_image.test (expand)]
+2025-11-28T09:40:25.224+0200 [DEBUG] ReferenceTransformer: "output.image_created_at (expand)" references: [gcore_cloud_gpu_virtual_cluster_image.test (expand)]
+2025-11-28T09:40:25.224+0200 [DEBUG] ReferenceTransformer: "output.image_cow_format (expand)" references: [gcore_cloud_gpu_virtual_cluster_image.test (expand)]
+2025-11-28T09:40:25.224+0200 [DEBUG] ReferenceTransformer: "output.image_min_ram (expand)" references: [gcore_cloud_gpu_virtual_cluster_image.test (expand)]
+2025-11-28T09:40:25.224+0200 [DEBUG] ReferenceTransformer: "output.image_id (expand)" references: [gcore_cloud_gpu_virtual_cluster_image.test (expand)]
+2025-11-28T09:40:25.224+0200 [DEBUG] ReferenceTransformer: "provider[\"registry.terraform.io/gcore/gcore\"]" references: []
+2025-11-28T09:40:25.224+0200 [DEBUG] ReferenceTransformer: "var.region_id" references: []
+2025-11-28T09:40:25.224+0200 [DEBUG] ReferenceTransformer: "var.image_name" references: []
+2025-11-28T09:40:25.224+0200 [DEBUG] ReferenceTransformer: "output.image_min_disk (expand)" references: [gcore_cloud_gpu_virtual_cluster_image.test (expand)]
+2025-11-28T09:40:25.225+0200 [DEBUG] ReferenceTransformer: "output.image_ssh_key (expand)" references: [gcore_cloud_gpu_virtual_cluster_image.test (expand)]
+2025-11-28T09:40:25.225+0200 [DEBUG] ReferenceTransformer: "output.image_status (expand)" references: [gcore_cloud_gpu_virtual_cluster_image.test (expand)]
+2025-11-28T09:40:25.225+0200 [DEBUG] ReferenceTransformer: "output.image_name (expand)" references: [gcore_cloud_gpu_virtual_cluster_image.test (expand)]
+2025-11-28T09:40:25.225+0200 [DEBUG] ReferenceTransformer: "output.image_updated_at (expand)" references: [gcore_cloud_gpu_virtual_cluster_image.test (expand)]
+2025-11-28T09:40:25.225+0200 [DEBUG] ReferenceTransformer: "gcore_cloud_gpu_virtual_cluster_image.test (expand)" references: [var.image_name var.test_tags var.project_id var.region_id]
+2025-11-28T09:40:25.225+0200 [DEBUG] ReferenceTransformer: "var.project_id" references: []
+2025-11-28T09:40:25.225+0200 [DEBUG] ReferenceTransformer: "output.image_os_version (expand)" references: [gcore_cloud_gpu_virtual_cluster_image.test (expand)]
+2025-11-28T09:40:25.225+0200 [DEBUG] ReferenceTransformer: "output.image_architecture (expand)" references: [gcore_cloud_gpu_virtual_cluster_image.test (expand)]
+2025-11-28T09:40:25.225+0200 [DEBUG] ReferenceTransformer: "output.image_gpu_driver (expand)" references: [gcore_cloud_gpu_virtual_cluster_image.test (expand)]
+2025-11-28T09:40:25.226+0200 [DEBUG] Starting graph walk: walkPlan
+2025-11-28T09:40:25.227+0200 [DEBUG] created provider logger: level=debug
+2025-11-28T09:40:25.227+0200 [INFO]  provider: configuring client automatic mTLS
+2025-11-28T09:40:25.230+0200 [DEBUG] provider: starting plugin: path=/Users/user/repos/gcore-terraform/terraform-provider-gcore args=["/Users/user/repos/gcore-terraform/terraform-provider-gcore"]
+2025-11-28T09:40:25.234+0200 [DEBUG] provider: plugin started: path=/Users/user/repos/gcore-terraform/terraform-provider-gcore pid=75132
+2025-11-28T09:40:25.234+0200 [DEBUG] provider: waiting for RPC address: plugin=/Users/user/repos/gcore-terraform/terraform-provider-gcore
+2025-11-28T09:40:25.247+0200 [INFO]  provider.terraform-provider-gcore: configuring server automatic mTLS: timestamp="2025-11-28T09:40:25.246+0200"
+2025-11-28T09:40:25.264+0200 [DEBUG] provider: using plugin: version=6
+2025-11-28T09:40:25.265+0200 [DEBUG] provider.terraform-provider-gcore: plugin address: address=/var/folders/qj/cbb8n0j12tq6j2k955fxwpb80000gn/T/plugin3112190308 network=unix timestamp="2025-11-28T09:40:25.263+0200"
+2025-11-28T09:40:25.319+0200 [DEBUG] ReferenceTransformer: "gcore_cloud_gpu_virtual_cluster_image.test" references: []
+2025-11-28T09:40:25.325+0200 [DEBUG] provider.terraform-provider-gcore: 
+GET /cloud/v3/gpu/virtual/379987/76/images/3a50d4ab-469d-4e51-80d9-727553da684e HTTP/1.1
+> x-stainless-arch: arm64
+> x-stainless-runtime-version: go1.24.5
+> x-stainless-retry-count: 0
+> user-agent: Gcore/Go 0.22.0
+> authorization: APIKey 21788$1e278ce67b6aa33f178122658b1dd0210d0edff453d348acb9b68bffea6a635b7791925ddda198d5678a4dc20269fe04a263ca92c7e5aa41ea79075f89b66bf6
+> accept: application/json
+> x-stainless-lang: go
+> x-stainless-package-version: 0.22.0
+> x-stainless-runtime: go
+> x-stainless-os: MacOS: @module=gcore tf_provider_addr=registry.terraform.io/stainless-sdks/gcore tf_resource_type=gcore_cloud_gpu_virtual_cluster_image tf_req_id=b5ef64cf-5a14-b1ab-509e-6e1443cc7869 tf_rpc=ReadResource @caller=/Users/user/repos/gcore-terraform/internal/logging/logging.go:60 timestamp="2025-11-28T09:40:25.325+0200"
+2025-11-28T09:40:25.946+0200 [DEBUG] provider.terraform-provider-gcore: 
+< HTTP/2.0 200 OK
+< access-control-allow-origin: *
+< strict-transport-security: max-age=15724800; includeSubDomains
+< x-robots-tag: noindex, nofollow, noarchive
+< accept-ranges: bytes
+< server: nginx
+< date: Fri, 28 Nov 2025 07:40:26 GMT
+< content-type: application/json; charset=UTF-8
+< x-id-fe: fr5-hw-edge-gc30
+< request_id: 5c9149028cbd9b9ec29d9ce74fd0caa1
+< cache-control: no-cache, no-store, must-revalidate
+< etag: "33b7a56bb7bf1cd1e554874720b5f028cf0af26e"
+< x-id: fr5-hw-edge-gc30
+< content-length: 695
+< traceparent: 00-5c9149028cbd9b9ec29d9ce74fd0caa1-2cac1bfd86a9bf88-01
+<
+
+{"id": "3a50d4ab-469d-4e51-80d9-727553da684e", "name": "test-comprehensive-gpu-image-GCLOUD2-21134", "status": "active", "min_disk": 1, "min_ram": 0, "metadata": {"jira-ticket": "GCLOUD2-21134", "test": "gpu-virtual-image"}, "tags": [{"key": "jira-ticket", "value": "GCLOUD2-21134", "read_only": false}, {"key": "test", "value": "gpu-virtual-image", "read_only": false}], "ssh_key": "allow", "size": 12716032, "visibility": "shared", "architecture": "x86_64", "os_distro": "cirros", "os_type": "linux", "os_version": "0.4.0", "created_at": "2025-11-28T07:40:07Z", "updated_at": "2025-11-28T07:40:11Z", "task_id": null, "gpu_driver": "nvidia", "gpu_driver_version": null, "gpu_driver_type": null}
+
+: @caller=/Users/user/repos/gcore-terraform/internal/logging/logging.go:88 tf_req_id=b5ef64cf-5a14-b1ab-509e-6e1443cc7869 tf_resource_type=gcore_cloud_gpu_virtual_cluster_image @module=gcore tf_provider_addr=registry.terraform.io/stainless-sdks/gcore tf_rpc=ReadResource timestamp="2025-11-28T09:40:25.945+0200"
+2025-11-28T09:40:25.946+0200 [DEBUG] provider.terraform-provider-gcore: Value switched to prior value due to semantic equality logic: tf_req_id=b5ef64cf-5a14-b1ab-509e-6e1443cc7869 tf_resource_type=gcore_cloud_gpu_virtual_cluster_image tf_rpc=ReadResource @caller=/Users/user/go/pkg/mod/github.com/hashicorp/terraform-plugin-framework@v1.15.0/internal/fwschemadata/value_semantic_equality.go:91 @module=sdk.framework tf_provider_addr=registry.terraform.io/stainless-sdks/gcore tf_attribute_path=name timestamp="2025-11-28T09:40:25.945+0200"
+2025-11-28T09:40:25.946+0200 [DEBUG] provider.terraform-provider-gcore: Value switched to prior value due to semantic equality logic: @module=sdk.framework tf_attribute_path=os_version tf_provider_addr=registry.terraform.io/stainless-sdks/gcore tf_req_id=b5ef64cf-5a14-b1ab-509e-6e1443cc7869 tf_resource_type=gcore_cloud_gpu_virtual_cluster_image tf_rpc=ReadResource @caller=/Users/user/go/pkg/mod/github.com/hashicorp/terraform-plugin-framework@v1.15.0/internal/fwschemadata/value_semantic_equality.go:91 timestamp="2025-11-28T09:40:25.945+0200"
+2025-11-28T09:40:25.946+0200 [DEBUG] provider.terraform-provider-gcore: Value switched to prior value due to semantic equality logic: @module=sdk.framework tf_provider_addr=registry.terraform.io/stainless-sdks/gcore tf_resource_type=gcore_cloud_gpu_virtual_cluster_image tf_attribute_path=url tf_req_id=b5ef64cf-5a14-b1ab-509e-6e1443cc7869 tf_rpc=ReadResource @caller=/Users/user/go/pkg/mod/github.com/hashicorp/terraform-plugin-framework@v1.15.0/internal/fwschemadata/value_semantic_equality.go:91 timestamp="2025-11-28T09:40:25.946+0200"
+2025-11-28T09:40:25.947+0200 [DEBUG] provider.terraform-provider-gcore: Value switched to prior value due to semantic equality logic: tf_attribute_path=region_id tf_rpc=ReadResource tf_req_id=b5ef64cf-5a14-b1ab-509e-6e1443cc7869 tf_resource_type=gcore_cloud_gpu_virtual_cluster_image @caller=/Users/user/go/pkg/mod/github.com/hashicorp/terraform-plugin-framework@v1.15.0/internal/fwschemadata/value_semantic_equality.go:91 @module=sdk.framework tf_provider_addr=registry.terraform.io/stainless-sdks/gcore timestamp="2025-11-28T09:40:25.946+0200"
+2025-11-28T09:40:25.947+0200 [DEBUG] provider.terraform-provider-gcore: Value switched to prior value due to semantic equality logic: tf_attribute_path="tags[\"test\"]" tf_provider_addr=registry.terraform.io/stainless-sdks/gcore tf_req_id=b5ef64cf-5a14-b1ab-509e-6e1443cc7869 tf_resource_type=gcore_cloud_gpu_virtual_cluster_image tf_rpc=ReadResource @module=sdk.framework @caller=/Users/user/go/pkg/mod/github.com/hashicorp/terraform-plugin-framework@v1.15.0/internal/fwschemadata/value_semantic_equality.go:91 timestamp="2025-11-28T09:40:25.946+0200"
+2025-11-28T09:40:25.947+0200 [DEBUG] provider.terraform-provider-gcore: Value switched to prior value due to semantic equality logic: @caller=/Users/user/go/pkg/mod/github.com/hashicorp/terraform-plugin-framework@v1.15.0/internal/fwschemadata/value_semantic_equality.go:91 @module=sdk.framework tf_attribute_path="tags[\"jira-ticket\"]" tf_provider_addr=registry.terraform.io/stainless-sdks/gcore tf_req_id=b5ef64cf-5a14-b1ab-509e-6e1443cc7869 tf_resource_type=gcore_cloud_gpu_virtual_cluster_image tf_rpc=ReadResource timestamp="2025-11-28T09:40:25.946+0200"
+2025-11-28T09:40:25.947+0200 [DEBUG] provider.terraform-provider-gcore: Value switched to prior value due to semantic equality logic: @module=sdk.framework tf_attribute_path=tags tf_provider_addr=registry.terraform.io/stainless-sdks/gcore tf_req_id=b5ef64cf-5a14-b1ab-509e-6e1443cc7869 tf_resource_type=gcore_cloud_gpu_virtual_cluster_image @caller=/Users/user/go/pkg/mod/github.com/hashicorp/terraform-plugin-framework@v1.15.0/internal/fwschemadata/value_semantic_equality.go:91 tf_rpc=ReadResource timestamp="2025-11-28T09:40:25.946+0200"
+2025-11-28T09:40:25.947+0200 [DEBUG] provider.terraform-provider-gcore: Value switched to prior value due to semantic equality logic: tf_resource_type=gcore_cloud_gpu_virtual_cluster_image tf_rpc=ReadResource @module=sdk.framework tf_attribute_path=size tf_provider_addr=registry.terraform.io/stainless-sdks/gcore tf_req_id=b5ef64cf-5a14-b1ab-509e-6e1443cc7869 @caller=/Users/user/go/pkg/mod/github.com/hashicorp/terraform-plugin-framework@v1.15.0/internal/fwschemadata/value_semantic_equality.go:91 timestamp="2025-11-28T09:40:25.946+0200"
+2025-11-28T09:40:25.947+0200 [DEBUG] provider.terraform-provider-gcore: Value switched to prior value due to semantic equality logic: @module=sdk.framework tf_attribute_path=id tf_rpc=ReadResource @caller=/Users/user/go/pkg/mod/github.com/hashicorp/terraform-plugin-framework@v1.15.0/internal/fwschemadata/value_semantic_equality.go:91 tf_provider_addr=registry.terraform.io/stainless-sdks/gcore tf_req_id=b5ef64cf-5a14-b1ab-509e-6e1443cc7869 tf_resource_type=gcore_cloud_gpu_virtual_cluster_image timestamp="2025-11-28T09:40:25.946+0200"
+2025-11-28T09:40:25.947+0200 [DEBUG] provider.terraform-provider-gcore: Value switched to prior value due to semantic equality logic: tf_attribute_path=project_id tf_req_id=b5ef64cf-5a14-b1ab-509e-6e1443cc7869 @caller=/Users/user/go/pkg/mod/github.com/hashicorp/terraform-plugin-framework@v1.15.0/internal/fwschemadata/value_semantic_equality.go:91 @module=sdk.framework tf_provider_addr=registry.terraform.io/stainless-sdks/gcore tf_resource_type=gcore_cloud_gpu_virtual_cluster_image tf_rpc=ReadResource timestamp="2025-11-28T09:40:25.946+0200"
+2025-11-28T09:40:25.947+0200 [DEBUG] provider.terraform-provider-gcore: Value switched to prior value due to semantic equality logic: @module=sdk.framework tf_resource_type=gcore_cloud_gpu_virtual_cluster_image tf_rpc=ReadResource @caller=/Users/user/go/pkg/mod/github.com/hashicorp/terraform-plugin-framework@v1.15.0/internal/fwschemadata/value_semantic_equality.go:91 tf_provider_addr=registry.terraform.io/stainless-sdks/gcore tf_req_id=b5ef64cf-5a14-b1ab-509e-6e1443cc7869 tf_attribute_path=hw_firmware_type timestamp="2025-11-28T09:40:25.946+0200"
+2025-11-28T09:40:25.947+0200 [DEBUG] provider.terraform-provider-gcore: Value switched to prior value due to semantic equality logic: tf_rpc=ReadResource @caller=/Users/user/go/pkg/mod/github.com/hashicorp/terraform-plugin-framework@v1.15.0/internal/fwschemadata/value_semantic_equality.go:91 @module=sdk.framework tf_provider_addr=registry.terraform.io/stainless-sdks/gcore tf_req_id=b5ef64cf-5a14-b1ab-509e-6e1443cc7869 tf_attribute_path=ssh_key tf_resource_type=gcore_cloud_gpu_virtual_cluster_image timestamp="2025-11-28T09:40:25.946+0200"
+2025-11-28T09:40:25.947+0200 [DEBUG] provider.terraform-provider-gcore: Value switched to prior value due to semantic equality logic: tf_provider_addr=registry.terraform.io/stainless-sdks/gcore tf_req_id=b5ef64cf-5a14-b1ab-509e-6e1443cc7869 @module=sdk.framework tf_attribute_path=min_disk tf_resource_type=gcore_cloud_gpu_virtual_cluster_image tf_rpc=ReadResource @caller=/Users/user/go/pkg/mod/github.com/hashicorp/terraform-plugin-framework@v1.15.0/internal/fwschemadata/value_semantic_equality.go:91 timestamp="2025-11-28T09:40:25.946+0200"
+2025-11-28T09:40:25.948+0200 [DEBUG] provider.terraform-provider-gcore: Value switched to prior value due to semantic equality logic: tf_provider_addr=registry.terraform.io/stainless-sdks/gcore tf_resource_type=gcore_cloud_gpu_virtual_cluster_image @module=sdk.framework tf_rpc=ReadResource @caller=/Users/user/go/pkg/mod/github.com/hashicorp/terraform-plugin-framework@v1.15.0/internal/fwschemadata/value_semantic_equality.go:91 tf_attribute_path=updated_at tf_req_id=b5ef64cf-5a14-b1ab-509e-6e1443cc7869 timestamp="2025-11-28T09:40:25.946+0200"
+2025-11-28T09:40:25.948+0200 [DEBUG] provider.terraform-provider-gcore: Value switched to prior value due to semantic equality logic: tf_attribute_path=gpu_driver tf_provider_addr=registry.terraform.io/stainless-sdks/gcore tf_resource_type=gcore_cloud_gpu_virtual_cluster_image @caller=/Users/user/go/pkg/mod/github.com/hashicorp/terraform-plugin-framework@v1.15.0/internal/fwschemadata/value_semantic_equality.go:91 @module=sdk.framework tf_req_id=b5ef64cf-5a14-b1ab-509e-6e1443cc7869 tf_rpc=ReadResource timestamp="2025-11-28T09:40:25.946+0200"
+2025-11-28T09:40:25.948+0200 [DEBUG] provider.terraform-provider-gcore: Value switched to prior value due to semantic equality logic: tf_resource_type=gcore_cloud_gpu_virtual_cluster_image @caller=/Users/user/go/pkg/mod/github.com/hashicorp/terraform-plugin-framework@v1.15.0/internal/fwschemadata/value_semantic_equality.go:91 tf_provider_addr=registry.terraform.io/stainless-sdks/gcore tf_attribute_path=cow_format tf_req_id=b5ef64cf-5a14-b1ab-509e-6e1443cc7869 tf_rpc=ReadResource @module=sdk.framework timestamp="2025-11-28T09:40:25.946+0200"
+2025-11-28T09:40:25.948+0200 [DEBUG] provider.terraform-provider-gcore: Value switched to prior value due to semantic equality logic: tf_rpc=ReadResource @caller=/Users/user/go/pkg/mod/github.com/hashicorp/terraform-plugin-framework@v1.15.0/internal/fwschemadata/value_semantic_equality.go:91 @module=sdk.framework tf_resource_type=gcore_cloud_gpu_virtual_cluster_image tf_attribute_path=min_ram tf_provider_addr=registry.terraform.io/stainless-sdks/gcore tf_req_id=b5ef64cf-5a14-b1ab-509e-6e1443cc7869 timestamp="2025-11-28T09:40:25.946+0200"
+2025-11-28T09:40:25.948+0200 [DEBUG] provider.terraform-provider-gcore: Value switched to prior value due to semantic equality logic: tf_attribute_path=os_distro tf_resource_type=gcore_cloud_gpu_virtual_cluster_image @module=sdk.framework tf_provider_addr=registry.terraform.io/stainless-sdks/gcore tf_req_id=b5ef64cf-5a14-b1ab-509e-6e1443cc7869 tf_rpc=ReadResource @caller=/Users/user/go/pkg/mod/github.com/hashicorp/terraform-plugin-framework@v1.15.0/internal/fwschemadata/value_semantic_equality.go:91 timestamp="2025-11-28T09:40:25.946+0200"
+2025-11-28T09:40:25.948+0200 [DEBUG] provider.terraform-provider-gcore: Value switched to prior value due to semantic equality logic: tf_attribute_path=visibility tf_req_id=b5ef64cf-5a14-b1ab-509e-6e1443cc7869 tf_resource_type=gcore_cloud_gpu_virtual_cluster_image @caller=/Users/user/go/pkg/mod/github.com/hashicorp/terraform-plugin-framework@v1.15.0/internal/fwschemadata/value_semantic_equality.go:91 @module=sdk.framework tf_provider_addr=registry.terraform.io/stainless-sdks/gcore tf_rpc=ReadResource timestamp="2025-11-28T09:40:25.946+0200"
+2025-11-28T09:40:25.948+0200 [DEBUG] provider.terraform-provider-gcore: Value switched to prior value due to semantic equality logic: @caller=/Users/user/go/pkg/mod/github.com/hashicorp/terraform-plugin-framework@v1.15.0/internal/fwschemadata/value_semantic_equality.go:91 @module=sdk.framework tf_req_id=b5ef64cf-5a14-b1ab-509e-6e1443cc7869 tf_attribute_path=os_type tf_provider_addr=registry.terraform.io/stainless-sdks/gcore tf_resource_type=gcore_cloud_gpu_virtual_cluster_image tf_rpc=ReadResource timestamp="2025-11-28T09:40:25.946+0200"
+2025-11-28T09:40:25.948+0200 [DEBUG] provider.terraform-provider-gcore: Value switched to prior value due to semantic equality logic: tf_resource_type=gcore_cloud_gpu_virtual_cluster_image @caller=/Users/user/go/pkg/mod/github.com/hashicorp/terraform-plugin-framework@v1.15.0/internal/fwschemadata/value_semantic_equality.go:91 tf_provider_addr=registry.terraform.io/stainless-sdks/gcore tf_rpc=ReadResource @module=sdk.framework tf_attribute_path=created_at tf_req_id=b5ef64cf-5a14-b1ab-509e-6e1443cc7869 timestamp="2025-11-28T09:40:25.947+0200"
+2025-11-28T09:40:25.948+0200 [DEBUG] provider.terraform-provider-gcore: Value switched to prior value due to semantic equality logic: @caller=/Users/user/go/pkg/mod/github.com/hashicorp/terraform-plugin-framework@v1.15.0/internal/fwschemadata/value_semantic_equality.go:91 @module=sdk.framework tf_provider_addr=registry.terraform.io/stainless-sdks/gcore tf_resource_type=gcore_cloud_gpu_virtual_cluster_image tf_rpc=ReadResource tf_attribute_path=architecture tf_req_id=b5ef64cf-5a14-b1ab-509e-6e1443cc7869 timestamp="2025-11-28T09:40:25.947+0200"
+2025-11-28T09:40:25.948+0200 [DEBUG] provider.terraform-provider-gcore: Value switched to prior value due to semantic equality logic: @caller=/Users/user/go/pkg/mod/github.com/hashicorp/terraform-plugin-framework@v1.15.0/internal/fwschemadata/value_semantic_equality.go:91 tf_provider_addr=registry.terraform.io/stainless-sdks/gcore tf_req_id=b5ef64cf-5a14-b1ab-509e-6e1443cc7869 @module=sdk.framework tf_attribute_path=status tf_resource_type=gcore_cloud_gpu_virtual_cluster_image tf_rpc=ReadResource timestamp="2025-11-28T09:40:25.947+0200"
+2025-11-28T09:40:25.959+0200 [DEBUG] provider.stdio: received EOF, stopping recv loop: err="rpc error: code = Unavailable desc = error reading from server: EOF"
+2025-11-28T09:40:25.960+0200 [INFO]  provider: plugin process exited: plugin=/Users/user/repos/gcore-terraform/terraform-provider-gcore id=75132
+2025-11-28T09:40:25.960+0200 [DEBUG] provider: plugin exited
+2025-11-28T09:40:25.960+0200 [DEBUG] no planned changes, skipping apply graph check
+2025-11-28T09:40:25.960+0200 [INFO]  backend/local: plan operation completed
+2025-11-28T09:40:26.006+0200 [INFO]  Terraform version: 1.10.5
+2025-11-28T09:40:26.006+0200 [DEBUG] using github.com/hashicorp/go-tfe v1.70.0
+2025-11-28T09:40:26.006+0200 [DEBUG] using github.com/hashicorp/hcl/v2 v2.23.0
+2025-11-28T09:40:26.006+0200 [DEBUG] using github.com/hashicorp/terraform-svchost v0.1.1
+2025-11-28T09:40:26.006+0200 [DEBUG] using github.com/zclconf/go-cty v1.16.2
+2025-11-28T09:40:26.006+0200 [INFO]  Go runtime version: go1.23.3
+2025-11-28T09:40:26.006+0200 [INFO]  CLI args: []string{"terraform", "output", "-json"}
+2025-11-28T09:40:26.006+0200 [DEBUG] Attempting to open CLI config file: /Users/user/repos/gcore-terraform/.terraformrc
+2025-11-28T09:40:26.007+0200 [INFO]  Loading CLI configuration from /Users/user/repos/gcore-terraform/.terraformrc
+2025-11-28T09:40:26.007+0200 [DEBUG] Not reading CLI config directory because config location is overridden by environment variable
+2025-11-28T09:40:26.007+0200 [DEBUG] checking for credentials in "/Users/user/.terraform.d/plugins"
+2025-11-28T09:40:26.007+0200 [DEBUG] Explicit provider installation configuration is set
+2025-11-28T09:40:26.007+0200 [INFO]  CLI command args: []string{"output", "-json"}
+2025-11-28T09:40:26.008+0200 [DEBUG] Provider registry.terraform.io/gcore/gcore is overridden by dev_overrides
+2025-11-28T09:40:26.008+0200 [DEBUG] Provider registry.terraform.io/gcore/gcore is overridden to load from /Users/user/repos/gcore-terraform
+2025-11-28T09:40:26.008+0200 [DEBUG] checking for provisioner in "."
+2025-11-28T09:40:26.015+0200 [DEBUG] checking for provisioner in "/opt/homebrew/bin"
+2025-11-28T09:40:26.015+0200 [DEBUG] checking for provisioner in "/Users/user/.terraform.d/plugins"
+2025-11-28T09:40:26.097+0200 [INFO]  Terraform version: 1.10.5
+2025-11-28T09:40:26.097+0200 [DEBUG] using github.com/hashicorp/go-tfe v1.70.0
+2025-11-28T09:40:26.097+0200 [DEBUG] using github.com/hashicorp/hcl/v2 v2.23.0
+2025-11-28T09:40:26.097+0200 [DEBUG] using github.com/hashicorp/terraform-svchost v0.1.1
+2025-11-28T09:40:26.097+0200 [DEBUG] using github.com/zclconf/go-cty v1.16.2
+2025-11-28T09:40:26.097+0200 [INFO]  Go runtime version: go1.23.3
+2025-11-28T09:40:26.097+0200 [INFO]  CLI args: []string{"terraform", "show"}
+2025-11-28T09:40:26.097+0200 [DEBUG] Attempting to open CLI config file: /Users/user/repos/gcore-terraform/.terraformrc
+2025-11-28T09:40:26.097+0200 [INFO]  Loading CLI configuration from /Users/user/repos/gcore-terraform/.terraformrc
+2025-11-28T09:40:26.097+0200 [DEBUG] Not reading CLI config directory because config location is overridden by environment variable
+2025-11-28T09:40:26.097+0200 [DEBUG] checking for credentials in "/Users/user/.terraform.d/plugins"
+2025-11-28T09:40:26.097+0200 [DEBUG] Explicit provider installation configuration is set
+2025-11-28T09:40:26.097+0200 [INFO]  CLI command args: []string{"show"}
+2025-11-28T09:40:26.098+0200 [DEBUG] Provider registry.terraform.io/gcore/gcore is overridden by dev_overrides
+2025-11-28T09:40:26.098+0200 [DEBUG] Provider registry.terraform.io/gcore/gcore is overridden to load from /Users/user/repos/gcore-terraform
+2025-11-28T09:40:26.098+0200 [DEBUG] checking for provisioner in "."
+2025-11-28T09:40:26.102+0200 [DEBUG] checking for provisioner in "/opt/homebrew/bin"
+2025-11-28T09:40:26.102+0200 [DEBUG] checking for provisioner in "/Users/user/.terraform.d/plugins"
+2025-11-28T09:40:26.104+0200 [DEBUG] Provider registry.terraform.io/gcore/gcore is overridden by dev_overrides
+2025-11-28T09:40:26.104+0200 [DEBUG] Provider registry.terraform.io/gcore/gcore is overridden to load from /Users/user/repos/gcore-terraform
+2025-11-28T09:40:26.104+0200 [DEBUG] checking for provisioner in "."
+2025-11-28T09:40:26.108+0200 [DEBUG] checking for provisioner in "/opt/homebrew/bin"
+2025-11-28T09:40:26.108+0200 [DEBUG] checking for provisioner in "/Users/user/.terraform.d/plugins"
+2025-11-28T09:40:26.108+0200 [DEBUG] created provider logger: level=debug
+2025-11-28T09:40:26.108+0200 [INFO]  provider: configuring client automatic mTLS
+2025-11-28T09:40:26.114+0200 [DEBUG] provider: starting plugin: path=/Users/user/repos/gcore-terraform/terraform-provider-gcore args=["/Users/user/repos/gcore-terraform/terraform-provider-gcore"]
+2025-11-28T09:40:26.117+0200 [DEBUG] provider: plugin started: path=/Users/user/repos/gcore-terraform/terraform-provider-gcore pid=75212
+2025-11-28T09:40:26.117+0200 [DEBUG] provider: waiting for RPC address: plugin=/Users/user/repos/gcore-terraform/terraform-provider-gcore
+2025-11-28T09:40:26.127+0200 [INFO]  provider.terraform-provider-gcore: configuring server automatic mTLS: timestamp="2025-11-28T09:40:26.127+0200"
+2025-11-28T09:40:26.134+0200 [DEBUG] provider: using plugin: version=6
+2025-11-28T09:40:26.134+0200 [DEBUG] provider.terraform-provider-gcore: plugin address: network=unix address=/var/folders/qj/cbb8n0j12tq6j2k955fxwpb80000gn/T/plugin2217608777 timestamp="2025-11-28T09:40:26.134+0200"
+2025-11-28T09:40:26.150+0200 [DEBUG] No provider meta schema returned
+2025-11-28T09:40:26.155+0200 [DEBUG] provider.stdio: received EOF, stopping recv loop: err="rpc error: code = Unavailable desc = error reading from server: EOF"
+2025-11-28T09:40:26.156+0200 [INFO]  provider: plugin process exited: plugin=/Users/user/repos/gcore-terraform/terraform-provider-gcore id=75212
+2025-11-28T09:40:26.156+0200 [DEBUG] provider: plugin exited
+2025-11-28T09:40:26.187+0200 [INFO]  Terraform version: 1.10.5
+2025-11-28T09:40:26.187+0200 [DEBUG] using github.com/hashicorp/go-tfe v1.70.0
+2025-11-28T09:40:26.187+0200 [DEBUG] using github.com/hashicorp/hcl/v2 v2.23.0
+2025-11-28T09:40:26.187+0200 [DEBUG] using github.com/hashicorp/terraform-svchost v0.1.1
+2025-11-28T09:40:26.187+0200 [DEBUG] using github.com/zclconf/go-cty v1.16.2
+2025-11-28T09:40:26.187+0200 [INFO]  Go runtime version: go1.23.3
+2025-11-28T09:40:26.187+0200 [INFO]  CLI args: []string{"terraform", "destroy", "-auto-approve"}
+2025-11-28T09:40:26.187+0200 [DEBUG] Attempting to open CLI config file: /Users/user/repos/gcore-terraform/.terraformrc
+2025-11-28T09:40:26.187+0200 [INFO]  Loading CLI configuration from /Users/user/repos/gcore-terraform/.terraformrc
+2025-11-28T09:40:26.187+0200 [DEBUG] Not reading CLI config directory because config location is overridden by environment variable
+2025-11-28T09:40:26.187+0200 [DEBUG] checking for credentials in "/Users/user/.terraform.d/plugins"
+2025-11-28T09:40:26.187+0200 [DEBUG] Explicit provider installation configuration is set
+2025-11-28T09:40:26.187+0200 [INFO]  CLI command args: []string{"destroy", "-auto-approve"}
+2025-11-28T09:40:26.188+0200 [DEBUG] Provider registry.terraform.io/gcore/gcore is overridden by dev_overrides
+2025-11-28T09:40:26.188+0200 [DEBUG] Provider registry.terraform.io/gcore/gcore is overridden to load from /Users/user/repos/gcore-terraform
+2025-11-28T09:40:26.188+0200 [DEBUG] checking for provisioner in "."
+2025-11-28T09:40:26.192+0200 [DEBUG] checking for provisioner in "/opt/homebrew/bin"
+2025-11-28T09:40:26.192+0200 [DEBUG] checking for provisioner in "/Users/user/.terraform.d/plugins"
+2025-11-28T09:40:26.193+0200 [DEBUG] Provider registry.terraform.io/gcore/gcore is overridden by dev_overrides
+2025-11-28T09:40:26.193+0200 [INFO]  backend/local: starting Apply operation
+2025-11-28T09:40:26.196+0200 [DEBUG] Config.VerifyDependencySelections: skipping registry.terraform.io/gcore/gcore because it's overridden by a special configuration setting
+2025-11-28T09:40:26.196+0200 [DEBUG] created provider logger: level=debug
+2025-11-28T09:40:26.196+0200 [INFO]  provider: configuring client automatic mTLS
+2025-11-28T09:40:26.203+0200 [DEBUG] provider: starting plugin: path=/Users/user/repos/gcore-terraform/terraform-provider-gcore args=["/Users/user/repos/gcore-terraform/terraform-provider-gcore"]
+2025-11-28T09:40:26.206+0200 [DEBUG] provider: plugin started: path=/Users/user/repos/gcore-terraform/terraform-provider-gcore pid=75214
+2025-11-28T09:40:26.206+0200 [DEBUG] provider: waiting for RPC address: plugin=/Users/user/repos/gcore-terraform/terraform-provider-gcore
+2025-11-28T09:40:26.216+0200 [INFO]  provider.terraform-provider-gcore: configuring server automatic mTLS: timestamp="2025-11-28T09:40:26.216+0200"
+2025-11-28T09:40:26.222+0200 [DEBUG] provider: using plugin: version=6
+2025-11-28T09:40:26.222+0200 [DEBUG] provider.terraform-provider-gcore: plugin address: address=/var/folders/qj/cbb8n0j12tq6j2k955fxwpb80000gn/T/plugin2540091960 network=unix timestamp="2025-11-28T09:40:26.222+0200"
+2025-11-28T09:40:26.238+0200 [DEBUG] No provider meta schema returned
+2025-11-28T09:40:26.242+0200 [DEBUG] provider.stdio: received EOF, stopping recv loop: err="rpc error: code = Unavailable desc = error reading from server: EOF"
+2025-11-28T09:40:26.243+0200 [INFO]  provider: plugin process exited: plugin=/Users/user/repos/gcore-terraform/terraform-provider-gcore id=75214
+2025-11-28T09:40:26.243+0200 [DEBUG] provider: plugin exited
+2025-11-28T09:40:26.243+0200 [DEBUG] Building and walking validate graph
+2025-11-28T09:40:26.243+0200 [DEBUG] ProviderTransformer: "gcore_cloud_gpu_virtual_cluster_image.test" (*terraform.NodeValidatableResource) needs provider["registry.terraform.io/gcore/gcore"]
+2025-11-28T09:40:26.243+0200 [DEBUG] ReferenceTransformer: "output.image_os_type (expand)" references: [gcore_cloud_gpu_virtual_cluster_image.test]
+2025-11-28T09:40:26.243+0200 [DEBUG] ReferenceTransformer: "output.image_os_distro (expand)" references: [gcore_cloud_gpu_virtual_cluster_image.test]
+2025-11-28T09:40:26.243+0200 [DEBUG] ReferenceTransformer: "output.image_cow_format (expand)" references: [gcore_cloud_gpu_virtual_cluster_image.test]
+2025-11-28T09:40:26.243+0200 [DEBUG] ReferenceTransformer: "output.image_min_disk (expand)" references: [gcore_cloud_gpu_virtual_cluster_image.test]
+2025-11-28T09:40:26.243+0200 [DEBUG] ReferenceTransformer: "output.image_min_ram (expand)" references: [gcore_cloud_gpu_virtual_cluster_image.test]
+2025-11-28T09:40:26.243+0200 [DEBUG] ReferenceTransformer: "output.image_status (expand)" references: [gcore_cloud_gpu_virtual_cluster_image.test]
+2025-11-28T09:40:26.243+0200 [DEBUG] ReferenceTransformer: "var.image_name" references: []
+2025-11-28T09:40:26.243+0200 [DEBUG] ReferenceTransformer: "output.image_architecture (expand)" references: [gcore_cloud_gpu_virtual_cluster_image.test]
+2025-11-28T09:40:26.243+0200 [DEBUG] ReferenceTransformer: "output.image_os_version (expand)" references: [gcore_cloud_gpu_virtual_cluster_image.test]
+2025-11-28T09:40:26.243+0200 [DEBUG] ReferenceTransformer: "output.image_id (expand)" references: [gcore_cloud_gpu_virtual_cluster_image.test]
+2025-11-28T09:40:26.243+0200 [DEBUG] ReferenceTransformer: "output.image_size (expand)" references: [gcore_cloud_gpu_virtual_cluster_image.test]
+2025-11-28T09:40:26.243+0200 [DEBUG] ReferenceTransformer: "output.image_updated_at (expand)" references: [gcore_cloud_gpu_virtual_cluster_image.test]
+2025-11-28T09:40:26.243+0200 [DEBUG] ReferenceTransformer: "output.image_name (expand)" references: [gcore_cloud_gpu_virtual_cluster_image.test]
+2025-11-28T09:40:26.243+0200 [DEBUG] ReferenceTransformer: "var.region_id" references: []
+2025-11-28T09:40:26.244+0200 [DEBUG] ReferenceTransformer: "var.test_tags" references: []
+2025-11-28T09:40:26.244+0200 [DEBUG] ReferenceTransformer: "output.image_gpu_driver (expand)" references: [gcore_cloud_gpu_virtual_cluster_image.test]
+2025-11-28T09:40:26.244+0200 [DEBUG] ReferenceTransformer: "output.image_created_at (expand)" references: [gcore_cloud_gpu_virtual_cluster_image.test]
+2025-11-28T09:40:26.244+0200 [DEBUG] ReferenceTransformer: "output.image_ssh_key (expand)" references: [gcore_cloud_gpu_virtual_cluster_image.test]
+2025-11-28T09:40:26.244+0200 [DEBUG] ReferenceTransformer: "provider[\"registry.terraform.io/gcore/gcore\"]" references: []
+2025-11-28T09:40:26.244+0200 [DEBUG] ReferenceTransformer: "gcore_cloud_gpu_virtual_cluster_image.test" references: [var.image_name var.project_id var.test_tags var.region_id]
+2025-11-28T09:40:26.244+0200 [DEBUG] ReferenceTransformer: "var.project_id" references: []
+2025-11-28T09:40:26.244+0200 [DEBUG] ReferenceTransformer: "output.image_hw_firmware_type (expand)" references: [gcore_cloud_gpu_virtual_cluster_image.test]
+2025-11-28T09:40:26.244+0200 [DEBUG] ReferenceTransformer: "output.image_visibility (expand)" references: [gcore_cloud_gpu_virtual_cluster_image.test]
+2025-11-28T09:40:26.244+0200 [DEBUG] Starting graph walk: walkValidate
+2025-11-28T09:40:26.244+0200 [DEBUG] created provider logger: level=debug
+2025-11-28T09:40:26.245+0200 [INFO]  provider: configuring client automatic mTLS
+2025-11-28T09:40:26.250+0200 [DEBUG] provider: starting plugin: path=/Users/user/repos/gcore-terraform/terraform-provider-gcore args=["/Users/user/repos/gcore-terraform/terraform-provider-gcore"]
+2025-11-28T09:40:26.254+0200 [DEBUG] provider: plugin started: path=/Users/user/repos/gcore-terraform/terraform-provider-gcore pid=75215
+2025-11-28T09:40:26.254+0200 [DEBUG] provider: waiting for RPC address: plugin=/Users/user/repos/gcore-terraform/terraform-provider-gcore
+2025-11-28T09:40:26.288+0200 [INFO]  provider.terraform-provider-gcore: configuring server automatic mTLS: timestamp="2025-11-28T09:40:26.288+0200"
+2025-11-28T09:40:26.295+0200 [DEBUG] provider.terraform-provider-gcore: plugin address: address=/var/folders/qj/cbb8n0j12tq6j2k955fxwpb80000gn/T/plugin1020107604 network=unix timestamp="2025-11-28T09:40:26.295+0200"
+2025-11-28T09:40:26.295+0200 [DEBUG] provider: using plugin: version=6
+2025-11-28T09:40:26.305+0200 [DEBUG] provider.stdio: received EOF, stopping recv loop: err="rpc error: code = Unavailable desc = error reading from server: EOF"
+2025-11-28T09:40:26.305+0200 [INFO]  provider: plugin process exited: plugin=/Users/user/repos/gcore-terraform/terraform-provider-gcore id=75215
+2025-11-28T09:40:26.305+0200 [DEBUG] provider: plugin exited
+2025-11-28T09:40:26.306+0200 [INFO]  backend/local: apply calling Plan
+2025-11-28T09:40:26.306+0200 [DEBUG] Building and walking plan graph for NormalMode
+2025-11-28T09:40:26.307+0200 [DEBUG] ProviderTransformer: "gcore_cloud_gpu_virtual_cluster_image.test (expand)" (*terraform.nodeExpandPlannableResource) needs provider["registry.terraform.io/gcore/gcore"]
+2025-11-28T09:40:26.307+0200 [DEBUG] ReferenceTransformer: "output.image_ssh_key (expand)" references: [gcore_cloud_gpu_virtual_cluster_image.test (expand)]
+2025-11-28T09:40:26.307+0200 [DEBUG] ReferenceTransformer: "output.image_gpu_driver (expand)" references: [gcore_cloud_gpu_virtual_cluster_image.test (expand)]
+2025-11-28T09:40:26.307+0200 [DEBUG] ReferenceTransformer: "output.image_cow_format (expand)" references: [gcore_cloud_gpu_virtual_cluster_image.test (expand)]
+2025-11-28T09:40:26.307+0200 [DEBUG] ReferenceTransformer: "output.image_id (expand)" references: [gcore_cloud_gpu_virtual_cluster_image.test (expand)]
+2025-11-28T09:40:26.307+0200 [DEBUG] ReferenceTransformer: "output.image_os_version (expand)" references: [gcore_cloud_gpu_virtual_cluster_image.test (expand)]
+2025-11-28T09:40:26.307+0200 [DEBUG] ReferenceTransformer: "var.test_tags" references: []
+2025-11-28T09:40:26.307+0200 [DEBUG] ReferenceTransformer: "var.project_id" references: []
+2025-11-28T09:40:26.307+0200 [DEBUG] ReferenceTransformer: "output.image_min_disk (expand)" references: [gcore_cloud_gpu_virtual_cluster_image.test (expand)]
+2025-11-28T09:40:26.307+0200 [DEBUG] ReferenceTransformer: "output.image_size (expand)" references: [gcore_cloud_gpu_virtual_cluster_image.test (expand)]
+2025-11-28T09:40:26.307+0200 [DEBUG] ReferenceTransformer: "var.region_id" references: []
+2025-11-28T09:40:26.307+0200 [DEBUG] ReferenceTransformer: "output.image_name (expand)" references: [gcore_cloud_gpu_virtual_cluster_image.test (expand)]
+2025-11-28T09:40:26.307+0200 [DEBUG] ReferenceTransformer: "output.image_architecture (expand)" references: [gcore_cloud_gpu_virtual_cluster_image.test (expand)]
+2025-11-28T09:40:26.307+0200 [DEBUG] ReferenceTransformer: "output.image_created_at (expand)" references: [gcore_cloud_gpu_virtual_cluster_image.test (expand)]
+2025-11-28T09:40:26.307+0200 [DEBUG] ReferenceTransformer: "output.image_os_type (expand)" references: [gcore_cloud_gpu_virtual_cluster_image.test (expand)]
+2025-11-28T09:40:26.307+0200 [DEBUG] ReferenceTransformer: "provider[\"registry.terraform.io/gcore/gcore\"]" references: []
+2025-11-28T09:40:26.307+0200 [DEBUG] ReferenceTransformer: "gcore_cloud_gpu_virtual_cluster_image.test (expand)" references: [var.project_id var.region_id var.test_tags var.image_name]
+2025-11-28T09:40:26.307+0200 [DEBUG] ReferenceTransformer: "var.image_name" references: []
+2025-11-28T09:40:26.307+0200 [DEBUG] ReferenceTransformer: "output.image_status (expand)" references: [gcore_cloud_gpu_virtual_cluster_image.test (expand)]
+2025-11-28T09:40:26.307+0200 [DEBUG] ReferenceTransformer: "output.image_os_distro (expand)" references: [gcore_cloud_gpu_virtual_cluster_image.test (expand)]
+2025-11-28T09:40:26.307+0200 [DEBUG] ReferenceTransformer: "output.image_hw_firmware_type (expand)" references: [gcore_cloud_gpu_virtual_cluster_image.test (expand)]
+2025-11-28T09:40:26.307+0200 [DEBUG] ReferenceTransformer: "output.image_visibility (expand)" references: [gcore_cloud_gpu_virtual_cluster_image.test (expand)]
+2025-11-28T09:40:26.307+0200 [DEBUG] ReferenceTransformer: "output.image_updated_at (expand)" references: [gcore_cloud_gpu_virtual_cluster_image.test (expand)]
+2025-11-28T09:40:26.307+0200 [DEBUG] ReferenceTransformer: "output.image_min_ram (expand)" references: [gcore_cloud_gpu_virtual_cluster_image.test (expand)]
+2025-11-28T09:40:26.307+0200 [DEBUG] Starting graph walk: walkPlan
+2025-11-28T09:40:26.308+0200 [DEBUG] created provider logger: level=debug
+2025-11-28T09:40:26.308+0200 [INFO]  provider: configuring client automatic mTLS
+2025-11-28T09:40:26.311+0200 [DEBUG] provider: starting plugin: path=/Users/user/repos/gcore-terraform/terraform-provider-gcore args=["/Users/user/repos/gcore-terraform/terraform-provider-gcore"]
+2025-11-28T09:40:26.315+0200 [DEBUG] provider: plugin started: path=/Users/user/repos/gcore-terraform/terraform-provider-gcore pid=75216
+2025-11-28T09:40:26.315+0200 [DEBUG] provider: waiting for RPC address: plugin=/Users/user/repos/gcore-terraform/terraform-provider-gcore
+2025-11-28T09:40:26.327+0200 [INFO]  provider.terraform-provider-gcore: configuring server automatic mTLS: timestamp="2025-11-28T09:40:26.327+0200"
+2025-11-28T09:40:26.334+0200 [DEBUG] provider.terraform-provider-gcore: plugin address: address=/var/folders/qj/cbb8n0j12tq6j2k955fxwpb80000gn/T/plugin1938354151 network=unix timestamp="2025-11-28T09:40:26.334+0200"
+2025-11-28T09:40:26.334+0200 [DEBUG] provider: using plugin: version=6
+2025-11-28T09:40:26.342+0200 [DEBUG] ReferenceTransformer: "gcore_cloud_gpu_virtual_cluster_image.test" references: []
+2025-11-28T09:40:26.344+0200 [DEBUG] provider.terraform-provider-gcore: 
+GET /cloud/v3/gpu/virtual/379987/76/images/3a50d4ab-469d-4e51-80d9-727553da684e HTTP/1.1
+> x-stainless-os: MacOS
+> x-stainless-package-version: 0.22.0
+> x-stainless-arch: arm64
+> x-stainless-runtime-version: go1.24.5
+> authorization: APIKey 21788$1e278ce67b6aa33f178122658b1dd0210d0edff453d348acb9b68bffea6a635b7791925ddda198d5678a4dc20269fe04a263ca92c7e5aa41ea79075f89b66bf6
+> x-stainless-lang: go
+> x-stainless-retry-count: 0
+> user-agent: Gcore/Go 0.22.0
+> x-stainless-runtime: go
+> accept: application/json: tf_rpc=ReadResource @module=gcore tf_req_id=9277d31a-a314-afbf-087f-eca15a71c9b7 tf_resource_type=gcore_cloud_gpu_virtual_cluster_image @caller=/Users/user/repos/gcore-terraform/internal/logging/logging.go:60 tf_provider_addr=registry.terraform.io/stainless-sdks/gcore timestamp="2025-11-28T09:40:26.344+0200"
+2025-11-28T09:40:26.732+0200 [DEBUG] provider.terraform-provider-gcore: 
+< HTTP/2.0 200 OK
+< etag: "3499ffe801437a6f1c0f9838536d9d6991242a2c"
+< strict-transport-security: max-age=15724800; includeSubDomains
+< x-id: fr5-hw-edge-gc12
+< x-robots-tag: noindex, nofollow, noarchive
+< accept-ranges: bytes
+< date: Fri, 28 Nov 2025 07:40:26 GMT
+< content-length: 695
+< x-id-fe: fr5-hw-edge-gc12
+< traceparent: 00-0ee34cad77d64dd2cb4d75b3096a9f71-e06af18959ab2866-01
+< request_id: 0ee34cad77d64dd2cb4d75b3096a9f71
+< access-control-allow-origin: *
+< cache-control: no-cache, no-store, must-revalidate
+< server: nginx
+< content-type: application/json; charset=UTF-8
+<
+
+{"id": "3a50d4ab-469d-4e51-80d9-727553da684e", "name": "test-comprehensive-gpu-image-GCLOUD2-21134", "status": "active", "min_disk": 1, "min_ram": 0, "metadata": {"test": "gpu-virtual-image", "jira-ticket": "GCLOUD2-21134"}, "tags": [{"key": "jira-ticket", "value": "GCLOUD2-21134", "read_only": false}, {"key": "test", "value": "gpu-virtual-image", "read_only": false}], "ssh_key": "allow", "size": 12716032, "visibility": "shared", "architecture": "x86_64", "os_distro": "cirros", "os_type": "linux", "os_version": "0.4.0", "created_at": "2025-11-28T07:40:07Z", "updated_at": "2025-11-28T07:40:11Z", "task_id": null, "gpu_driver": "nvidia", "gpu_driver_version": null, "gpu_driver_type": null}
+
+: tf_req_id=9277d31a-a314-afbf-087f-eca15a71c9b7 tf_resource_type=gcore_cloud_gpu_virtual_cluster_image @caller=/Users/user/repos/gcore-terraform/internal/logging/logging.go:88 @module=gcore tf_provider_addr=registry.terraform.io/stainless-sdks/gcore tf_rpc=ReadResource timestamp="2025-11-28T09:40:26.732+0200"
+2025-11-28T09:40:26.732+0200 [DEBUG] provider.terraform-provider-gcore: Value switched to prior value due to semantic equality logic: tf_attribute_path=region_id @caller=/Users/user/go/pkg/mod/github.com/hashicorp/terraform-plugin-framework@v1.15.0/internal/fwschemadata/value_semantic_equality.go:91 tf_provider_addr=registry.terraform.io/stainless-sdks/gcore tf_req_id=9277d31a-a314-afbf-087f-eca15a71c9b7 tf_resource_type=gcore_cloud_gpu_virtual_cluster_image tf_rpc=ReadResource @module=sdk.framework timestamp="2025-11-28T09:40:26.732+0200"
+2025-11-28T09:40:26.732+0200 [DEBUG] provider.terraform-provider-gcore: Value switched to prior value due to semantic equality logic: tf_resource_type=gcore_cloud_gpu_virtual_cluster_image tf_rpc=ReadResource @caller=/Users/user/go/pkg/mod/github.com/hashicorp/terraform-plugin-framework@v1.15.0/internal/fwschemadata/value_semantic_equality.go:91 @module=sdk.framework tf_attribute_path=cow_format tf_provider_addr=registry.terraform.io/stainless-sdks/gcore tf_req_id=9277d31a-a314-afbf-087f-eca15a71c9b7 timestamp="2025-11-28T09:40:26.732+0200"
+2025-11-28T09:40:26.732+0200 [DEBUG] provider.terraform-provider-gcore: Value switched to prior value due to semantic equality logic: @module=sdk.framework tf_attribute_path=id tf_provider_addr=registry.terraform.io/stainless-sdks/gcore tf_rpc=ReadResource @caller=/Users/user/go/pkg/mod/github.com/hashicorp/terraform-plugin-framework@v1.15.0/internal/fwschemadata/value_semantic_equality.go:91 tf_req_id=9277d31a-a314-afbf-087f-eca15a71c9b7 tf_resource_type=gcore_cloud_gpu_virtual_cluster_image timestamp="2025-11-28T09:40:26.732+0200"
+2025-11-28T09:40:26.732+0200 [DEBUG] provider.terraform-provider-gcore: Value switched to prior value due to semantic equality logic: @caller=/Users/user/go/pkg/mod/github.com/hashicorp/terraform-plugin-framework@v1.15.0/internal/fwschemadata/value_semantic_equality.go:91 @module=sdk.framework tf_provider_addr=registry.terraform.io/stainless-sdks/gcore tf_rpc=ReadResource tf_attribute_path=url tf_req_id=9277d31a-a314-afbf-087f-eca15a71c9b7 tf_resource_type=gcore_cloud_gpu_virtual_cluster_image timestamp="2025-11-28T09:40:26.732+0200"
+2025-11-28T09:40:26.732+0200 [DEBUG] provider.terraform-provider-gcore: Value switched to prior value due to semantic equality logic: @module=sdk.framework tf_resource_type=gcore_cloud_gpu_virtual_cluster_image tf_rpc=ReadResource @caller=/Users/user/go/pkg/mod/github.com/hashicorp/terraform-plugin-framework@v1.15.0/internal/fwschemadata/value_semantic_equality.go:91 tf_attribute_path=architecture tf_provider_addr=registry.terraform.io/stainless-sdks/gcore tf_req_id=9277d31a-a314-afbf-087f-eca15a71c9b7 timestamp="2025-11-28T09:40:26.732+0200"
+2025-11-28T09:40:26.732+0200 [DEBUG] provider.terraform-provider-gcore: Value switched to prior value due to semantic equality logic: @module=sdk.framework tf_resource_type=gcore_cloud_gpu_virtual_cluster_image tf_rpc=ReadResource @caller=/Users/user/go/pkg/mod/github.com/hashicorp/terraform-plugin-framework@v1.15.0/internal/fwschemadata/value_semantic_equality.go:91 tf_attribute_path=ssh_key tf_provider_addr=registry.terraform.io/stainless-sdks/gcore tf_req_id=9277d31a-a314-afbf-087f-eca15a71c9b7 timestamp="2025-11-28T09:40:26.732+0200"
+2025-11-28T09:40:26.732+0200 [DEBUG] provider.terraform-provider-gcore: Value switched to prior value due to semantic equality logic: tf_attribute_path=project_id tf_provider_addr=registry.terraform.io/stainless-sdks/gcore tf_resource_type=gcore_cloud_gpu_virtual_cluster_image tf_req_id=9277d31a-a314-afbf-087f-eca15a71c9b7 tf_rpc=ReadResource @caller=/Users/user/go/pkg/mod/github.com/hashicorp/terraform-plugin-framework@v1.15.0/internal/fwschemadata/value_semantic_equality.go:91 @module=sdk.framework timestamp="2025-11-28T09:40:26.732+0200"
+2025-11-28T09:40:26.733+0200 [DEBUG] provider.terraform-provider-gcore: Value switched to prior value due to semantic equality logic: @module=sdk.framework tf_attribute_path=size tf_req_id=9277d31a-a314-afbf-087f-eca15a71c9b7 tf_resource_type=gcore_cloud_gpu_virtual_cluster_image tf_rpc=ReadResource @caller=/Users/user/go/pkg/mod/github.com/hashicorp/terraform-plugin-framework@v1.15.0/internal/fwschemadata/value_semantic_equality.go:91 tf_provider_addr=registry.terraform.io/stainless-sdks/gcore timestamp="2025-11-28T09:40:26.732+0200"
+2025-11-28T09:40:26.733+0200 [DEBUG] provider.terraform-provider-gcore: Value switched to prior value due to semantic equality logic: tf_provider_addr=registry.terraform.io/stainless-sdks/gcore tf_resource_type=gcore_cloud_gpu_virtual_cluster_image tf_rpc=ReadResource @module=sdk.framework tf_attribute_path=os_distro tf_req_id=9277d31a-a314-afbf-087f-eca15a71c9b7 @caller=/Users/user/go/pkg/mod/github.com/hashicorp/terraform-plugin-framework@v1.15.0/internal/fwschemadata/value_semantic_equality.go:91 timestamp="2025-11-28T09:40:26.732+0200"
+2025-11-28T09:40:26.733+0200 [DEBUG] provider.terraform-provider-gcore: Value switched to prior value due to semantic equality logic: tf_rpc=ReadResource @caller=/Users/user/go/pkg/mod/github.com/hashicorp/terraform-plugin-framework@v1.15.0/internal/fwschemadata/value_semantic_equality.go:91 tf_attribute_path=name tf_provider_addr=registry.terraform.io/stainless-sdks/gcore tf_resource_type=gcore_cloud_gpu_virtual_cluster_image @module=sdk.framework tf_req_id=9277d31a-a314-afbf-087f-eca15a71c9b7 timestamp="2025-11-28T09:40:26.732+0200"
+2025-11-28T09:40:26.733+0200 [DEBUG] provider.terraform-provider-gcore: Value switched to prior value due to semantic equality logic: @caller=/Users/user/go/pkg/mod/github.com/hashicorp/terraform-plugin-framework@v1.15.0/internal/fwschemadata/value_semantic_equality.go:91 tf_attribute_path=min_disk tf_req_id=9277d31a-a314-afbf-087f-eca15a71c9b7 tf_resource_type=gcore_cloud_gpu_virtual_cluster_image tf_rpc=ReadResource @module=sdk.framework tf_provider_addr=registry.terraform.io/stainless-sdks/gcore timestamp="2025-11-28T09:40:26.733+0200"
+2025-11-28T09:40:26.733+0200 [DEBUG] provider.terraform-provider-gcore: Value switched to prior value due to semantic equality logic: tf_rpc=ReadResource @caller=/Users/user/go/pkg/mod/github.com/hashicorp/terraform-plugin-framework@v1.15.0/internal/fwschemadata/value_semantic_equality.go:91 tf_attribute_path=min_ram tf_provider_addr=registry.terraform.io/stainless-sdks/gcore tf_req_id=9277d31a-a314-afbf-087f-eca15a71c9b7 tf_resource_type=gcore_cloud_gpu_virtual_cluster_image @module=sdk.framework timestamp="2025-11-28T09:40:26.733+0200"
+2025-11-28T09:40:26.733+0200 [DEBUG] provider.terraform-provider-gcore: Value switched to prior value due to semantic equality logic: @module=sdk.framework tf_attribute_path="tags[\"jira-ticket\"]" tf_provider_addr=registry.terraform.io/stainless-sdks/gcore tf_req_id=9277d31a-a314-afbf-087f-eca15a71c9b7 tf_resource_type=gcore_cloud_gpu_virtual_cluster_image @caller=/Users/user/go/pkg/mod/github.com/hashicorp/terraform-plugin-framework@v1.15.0/internal/fwschemadata/value_semantic_equality.go:91 tf_rpc=ReadResource timestamp="2025-11-28T09:40:26.733+0200"
+2025-11-28T09:40:26.733+0200 [DEBUG] provider.terraform-provider-gcore: Value switched to prior value due to semantic equality logic: @module=sdk.framework tf_attribute_path="tags[\"test\"]" tf_req_id=9277d31a-a314-afbf-087f-eca15a71c9b7 tf_resource_type=gcore_cloud_gpu_virtual_cluster_image tf_rpc=ReadResource @caller=/Users/user/go/pkg/mod/github.com/hashicorp/terraform-plugin-framework@v1.15.0/internal/fwschemadata/value_semantic_equality.go:91 tf_provider_addr=registry.terraform.io/stainless-sdks/gcore timestamp="2025-11-28T09:40:26.733+0200"
+2025-11-28T09:40:26.734+0200 [DEBUG] provider.terraform-provider-gcore: Value switched to prior value due to semantic equality logic: @module=sdk.framework tf_provider_addr=registry.terraform.io/stainless-sdks/gcore tf_resource_type=gcore_cloud_gpu_virtual_cluster_image tf_rpc=ReadResource @caller=/Users/user/go/pkg/mod/github.com/hashicorp/terraform-plugin-framework@v1.15.0/internal/fwschemadata/value_semantic_equality.go:91 tf_attribute_path=tags tf_req_id=9277d31a-a314-afbf-087f-eca15a71c9b7 timestamp="2025-11-28T09:40:26.733+0200"
+2025-11-28T09:40:26.734+0200 [DEBUG] provider.terraform-provider-gcore: Value switched to prior value due to semantic equality logic: tf_rpc=ReadResource @caller=/Users/user/go/pkg/mod/github.com/hashicorp/terraform-plugin-framework@v1.15.0/internal/fwschemadata/value_semantic_equality.go:91 @module=sdk.framework tf_provider_addr=registry.terraform.io/stainless-sdks/gcore tf_attribute_path=updated_at tf_req_id=9277d31a-a314-afbf-087f-eca15a71c9b7 tf_resource_type=gcore_cloud_gpu_virtual_cluster_image timestamp="2025-11-28T09:40:26.733+0200"
+2025-11-28T09:40:26.734+0200 [DEBUG] provider.terraform-provider-gcore: Value switched to prior value due to semantic equality logic: @module=sdk.framework tf_attribute_path=status tf_provider_addr=registry.terraform.io/stainless-sdks/gcore @caller=/Users/user/go/pkg/mod/github.com/hashicorp/terraform-plugin-framework@v1.15.0/internal/fwschemadata/value_semantic_equality.go:91 tf_req_id=9277d31a-a314-afbf-087f-eca15a71c9b7 tf_resource_type=gcore_cloud_gpu_virtual_cluster_image tf_rpc=ReadResource timestamp="2025-11-28T09:40:26.733+0200"
+2025-11-28T09:40:26.734+0200 [DEBUG] provider.terraform-provider-gcore: Value switched to prior value due to semantic equality logic: @module=sdk.framework tf_attribute_path=visibility tf_provider_addr=registry.terraform.io/stainless-sdks/gcore tf_resource_type=gcore_cloud_gpu_virtual_cluster_image tf_rpc=ReadResource tf_req_id=9277d31a-a314-afbf-087f-eca15a71c9b7 @caller=/Users/user/go/pkg/mod/github.com/hashicorp/terraform-plugin-framework@v1.15.0/internal/fwschemadata/value_semantic_equality.go:91 timestamp="2025-11-28T09:40:26.733+0200"
+2025-11-28T09:40:26.734+0200 [DEBUG] provider.terraform-provider-gcore: Value switched to prior value due to semantic equality logic: tf_req_id=9277d31a-a314-afbf-087f-eca15a71c9b7 @caller=/Users/user/go/pkg/mod/github.com/hashicorp/terraform-plugin-framework@v1.15.0/internal/fwschemadata/value_semantic_equality.go:91 @module=sdk.framework tf_attribute_path=os_version tf_provider_addr=registry.terraform.io/stainless-sdks/gcore tf_resource_type=gcore_cloud_gpu_virtual_cluster_image tf_rpc=ReadResource timestamp="2025-11-28T09:40:26.733+0200"
+2025-11-28T09:40:26.734+0200 [DEBUG] provider.terraform-provider-gcore: Value switched to prior value due to semantic equality logic: @caller=/Users/user/go/pkg/mod/github.com/hashicorp/terraform-plugin-framework@v1.15.0/internal/fwschemadata/value_semantic_equality.go:91 tf_provider_addr=registry.terraform.io/stainless-sdks/gcore tf_req_id=9277d31a-a314-afbf-087f-eca15a71c9b7 tf_resource_type=gcore_cloud_gpu_virtual_cluster_image tf_rpc=ReadResource @module=sdk.framework tf_attribute_path=created_at timestamp="2025-11-28T09:40:26.734+0200"
+2025-11-28T09:40:26.734+0200 [DEBUG] provider.terraform-provider-gcore: Value switched to prior value due to semantic equality logic: tf_req_id=9277d31a-a314-afbf-087f-eca15a71c9b7 tf_rpc=ReadResource @caller=/Users/user/go/pkg/mod/github.com/hashicorp/terraform-plugin-framework@v1.15.0/internal/fwschemadata/value_semantic_equality.go:91 @module=sdk.framework tf_attribute_path=hw_firmware_type tf_provider_addr=registry.terraform.io/stainless-sdks/gcore tf_resource_type=gcore_cloud_gpu_virtual_cluster_image timestamp="2025-11-28T09:40:26.734+0200"
+2025-11-28T09:40:26.734+0200 [DEBUG] provider.terraform-provider-gcore: Value switched to prior value due to semantic equality logic: tf_attribute_path=os_type tf_resource_type=gcore_cloud_gpu_virtual_cluster_image tf_rpc=ReadResource @caller=/Users/user/go/pkg/mod/github.com/hashicorp/terraform-plugin-framework@v1.15.0/internal/fwschemadata/value_semantic_equality.go:91 tf_req_id=9277d31a-a314-afbf-087f-eca15a71c9b7 @module=sdk.framework tf_provider_addr=registry.terraform.io/stainless-sdks/gcore timestamp="2025-11-28T09:40:26.734+0200"
+2025-11-28T09:40:26.734+0200 [DEBUG] provider.terraform-provider-gcore: Value switched to prior value due to semantic equality logic: @module=sdk.framework tf_attribute_path=gpu_driver tf_req_id=9277d31a-a314-afbf-087f-eca15a71c9b7 @caller=/Users/user/go/pkg/mod/github.com/hashicorp/terraform-plugin-framework@v1.15.0/internal/fwschemadata/value_semantic_equality.go:91 tf_resource_type=gcore_cloud_gpu_virtual_cluster_image tf_rpc=ReadResource tf_provider_addr=registry.terraform.io/stainless-sdks/gcore timestamp="2025-11-28T09:40:26.734+0200"
+2025-11-28T09:40:26.743+0200 [DEBUG] provider.stdio: received EOF, stopping recv loop: err="rpc error: code = Unavailable desc = error reading from server: EOF"
+2025-11-28T09:40:26.744+0200 [INFO]  provider: plugin process exited: plugin=/Users/user/repos/gcore-terraform/terraform-provider-gcore id=75216
+2025-11-28T09:40:26.744+0200 [DEBUG] provider: plugin exited
+2025-11-28T09:40:26.745+0200 [DEBUG] Building and walking plan graph for DestroyMode
+2025-11-28T09:40:26.746+0200 [DEBUG] ProviderTransformer: "gcore_cloud_gpu_virtual_cluster_image.test (destroy)" (*terraform.NodePlanDestroyableResourceInstance) needs provider["registry.terraform.io/gcore/gcore"]
+2025-11-28T09:40:26.746+0200 [DEBUG] ReferenceTransformer: "output.image_created_at (expand)" references: []
+2025-11-28T09:40:26.746+0200 [DEBUG] ReferenceTransformer: "output.image_cow_format (expand)" references: []
+2025-11-28T09:40:26.746+0200 [DEBUG] ReferenceTransformer: "output.image_name (expand)" references: []
+2025-11-28T09:40:26.746+0200 [DEBUG] ReferenceTransformer: "output.image_status (expand)" references: []
+2025-11-28T09:40:26.746+0200 [DEBUG] ReferenceTransformer: "var.region_id" references: []
+2025-11-28T09:40:26.746+0200 [DEBUG] ReferenceTransformer: "var.test_tags" references: []
+2025-11-28T09:40:26.746+0200 [DEBUG] ReferenceTransformer: "output.image_visibility (expand)" references: []
+2025-11-28T09:40:26.746+0200 [DEBUG] ReferenceTransformer: "output.image_ssh_key (expand)" references: []
+2025-11-28T09:40:26.746+0200 [DEBUG] ReferenceTransformer: "output.image_hw_firmware_type (expand)" references: []
+2025-11-28T09:40:26.746+0200 [DEBUG] ReferenceTransformer: "output.image_min_disk (expand)" references: []
+2025-11-28T09:40:26.746+0200 [DEBUG] ReferenceTransformer: "provider[\"registry.terraform.io/gcore/gcore\"]" references: []
+2025-11-28T09:40:26.746+0200 [DEBUG] ReferenceTransformer: "var.image_name" references: []
+2025-11-28T09:40:26.746+0200 [DEBUG] ReferenceTransformer: "output.image_id (expand)" references: []
+2025-11-28T09:40:26.746+0200 [DEBUG] ReferenceTransformer: "output.image_os_version (expand)" references: []
+2025-11-28T09:40:26.746+0200 [DEBUG] ReferenceTransformer: "output.image_architecture (expand)" references: []
+2025-11-28T09:40:26.746+0200 [DEBUG] ReferenceTransformer: "output.image_min_ram (expand)" references: []
+2025-11-28T09:40:26.746+0200 [DEBUG] ReferenceTransformer: "output.image_os_type (expand)" references: []
+2025-11-28T09:40:26.746+0200 [DEBUG] ReferenceTransformer: "output.image_os_distro (expand)" references: []
+2025-11-28T09:40:26.746+0200 [DEBUG] ReferenceTransformer: "var.project_id" references: []
+2025-11-28T09:40:26.746+0200 [DEBUG] ReferenceTransformer: "output.image_size (expand)" references: []
+2025-11-28T09:40:26.746+0200 [DEBUG] ReferenceTransformer: "output.image_updated_at (expand)" references: []
+2025-11-28T09:40:26.746+0200 [DEBUG] ReferenceTransformer: "output.image_gpu_driver (expand)" references: []
+2025-11-28T09:40:26.747+0200 [DEBUG] Starting graph walk: walkPlanDestroy
+2025-11-28T09:40:26.747+0200 [DEBUG] created provider logger: level=debug
+2025-11-28T09:40:26.747+0200 [INFO]  provider: configuring client automatic mTLS
+2025-11-28T09:40:26.751+0200 [DEBUG] provider: starting plugin: path=/Users/user/repos/gcore-terraform/terraform-provider-gcore args=["/Users/user/repos/gcore-terraform/terraform-provider-gcore"]
+2025-11-28T09:40:26.754+0200 [DEBUG] provider: plugin started: path=/Users/user/repos/gcore-terraform/terraform-provider-gcore pid=75217
+2025-11-28T09:40:26.754+0200 [DEBUG] provider: waiting for RPC address: plugin=/Users/user/repos/gcore-terraform/terraform-provider-gcore
+2025-11-28T09:40:26.767+0200 [INFO]  provider.terraform-provider-gcore: configuring server automatic mTLS: timestamp="2025-11-28T09:40:26.766+0200"
+2025-11-28T09:40:26.775+0200 [DEBUG] provider: using plugin: version=6
+2025-11-28T09:40:26.775+0200 [DEBUG] provider.terraform-provider-gcore: plugin address: address=/var/folders/qj/cbb8n0j12tq6j2k955fxwpb80000gn/T/plugin1823706292 network=unix timestamp="2025-11-28T09:40:26.775+0200"
+2025-11-28T09:40:26.785+0200 [DEBUG] provider.stdio: received EOF, stopping recv loop: err="rpc error: code = Unavailable desc = error reading from server: EOF"
+2025-11-28T09:40:26.786+0200 [INFO]  provider: plugin process exited: plugin=/Users/user/repos/gcore-terraform/terraform-provider-gcore id=75217
+2025-11-28T09:40:26.786+0200 [DEBUG] provider: plugin exited
+2025-11-28T09:40:26.786+0200 [DEBUG] building apply graph to check for errors
+2025-11-28T09:40:26.787+0200 [DEBUG] ProviderTransformer: "gcore_cloud_gpu_virtual_cluster_image.test (destroy)" (*terraform.NodeDestroyResourceInstance) needs provider["registry.terraform.io/gcore/gcore"]
+2025-11-28T09:40:26.787+0200 [DEBUG] ProviderTransformer: "gcore_cloud_gpu_virtual_cluster_image.test (expand)" (*terraform.nodeExpandApplyableResource) needs provider["registry.terraform.io/gcore/gcore"]
+2025-11-28T09:40:26.787+0200 [DEBUG] ReferenceTransformer: "var.test_tags" references: []
+2025-11-28T09:40:26.787+0200 [DEBUG] ReferenceTransformer: "output.image_name (expand)" references: []
+2025-11-28T09:40:26.787+0200 [DEBUG] ReferenceTransformer: "output.image_status (expand)" references: []
+2025-11-28T09:40:26.787+0200 [DEBUG] ReferenceTransformer: "output.image_cow_format (expand)" references: []
+2025-11-28T09:40:26.787+0200 [DEBUG] ReferenceTransformer: "output.image_hw_firmware_type (expand)" references: []
+2025-11-28T09:40:26.787+0200 [DEBUG] ReferenceTransformer: "output.image_visibility (expand)" references: []
+2025-11-28T09:40:26.787+0200 [DEBUG] ReferenceTransformer: "var.project_id" references: []
+2025-11-28T09:40:26.787+0200 [DEBUG] ReferenceTransformer: "var.image_name" references: []
+2025-11-28T09:40:26.787+0200 [DEBUG] ReferenceTransformer: "output.image_size (expand)" references: []
+2025-11-28T09:40:26.787+0200 [DEBUG] ReferenceTransformer: "output.image_architecture (expand)" references: []
+2025-11-28T09:40:26.787+0200 [DEBUG] ReferenceTransformer: "output.image_gpu_driver (expand)" references: []
+2025-11-28T09:40:26.787+0200 [DEBUG] ReferenceTransformer: "output.image_os_distro (expand)" references: []
+2025-11-28T09:40:26.787+0200 [DEBUG] ReferenceTransformer: "provider[\"registry.terraform.io/gcore/gcore\"]" references: []
+2025-11-28T09:40:26.787+0200 [DEBUG] ReferenceTransformer: "output.image_ssh_key (expand)" references: []
+2025-11-28T09:40:26.787+0200 [DEBUG] ReferenceTransformer: "output.image_created_at (expand)" references: []
+2025-11-28T09:40:26.787+0200 [DEBUG] ReferenceTransformer: "output.image_min_disk (expand)" references: []
+2025-11-28T09:40:26.787+0200 [DEBUG] ReferenceTransformer: "output.image_min_ram (expand)" references: []
+2025-11-28T09:40:26.787+0200 [DEBUG] ReferenceTransformer: "output.image_os_type (expand)" references: []
+2025-11-28T09:40:26.787+0200 [DEBUG] ReferenceTransformer: "output.image_id (expand)" references: []
+2025-11-28T09:40:26.787+0200 [DEBUG] ReferenceTransformer: "gcore_cloud_gpu_virtual_cluster_image.test (expand)" references: [var.project_id var.test_tags var.image_name var.region_id]
+2025-11-28T09:40:26.787+0200 [DEBUG] ReferenceTransformer: "var.region_id" references: []
+2025-11-28T09:40:26.787+0200 [DEBUG] ReferenceTransformer: "output.image_updated_at (expand)" references: []
+2025-11-28T09:40:26.787+0200 [DEBUG] ReferenceTransformer: "output.image_os_version (expand)" references: []
+2025-11-28T09:40:26.789+0200 [INFO]  backend/local: apply calling Apply
+2025-11-28T09:40:26.789+0200 [DEBUG] Building and walking apply graph for DestroyMode plan
+2025-11-28T09:40:26.789+0200 [DEBUG] ProviderTransformer: "gcore_cloud_gpu_virtual_cluster_image.test (expand)" (*terraform.nodeExpandApplyableResource) needs provider["registry.terraform.io/gcore/gcore"]
+2025-11-28T09:40:26.789+0200 [DEBUG] ProviderTransformer: "gcore_cloud_gpu_virtual_cluster_image.test (destroy)" (*terraform.NodeDestroyResourceInstance) needs provider["registry.terraform.io/gcore/gcore"]
+2025-11-28T09:40:26.789+0200 [DEBUG] ReferenceTransformer: "output.image_os_type (expand)" references: []
+2025-11-28T09:40:26.789+0200 [DEBUG] ReferenceTransformer: "output.image_os_distro (expand)" references: []
+2025-11-28T09:40:26.789+0200 [DEBUG] ReferenceTransformer: "output.image_hw_firmware_type (expand)" references: []
+2025-11-28T09:40:26.789+0200 [DEBUG] ReferenceTransformer: "output.image_cow_format (expand)" references: []
+2025-11-28T09:40:26.789+0200 [DEBUG] ReferenceTransformer: "var.project_id" references: []
+2025-11-28T09:40:26.789+0200 [DEBUG] ReferenceTransformer: "output.image_ssh_key (expand)" references: []
+2025-11-28T09:40:26.789+0200 [DEBUG] ReferenceTransformer: "output.image_status (expand)" references: []
+2025-11-28T09:40:26.789+0200 [DEBUG] ReferenceTransformer: "output.image_visibility (expand)" references: []
+2025-11-28T09:40:26.789+0200 [DEBUG] ReferenceTransformer: "output.image_architecture (expand)" references: []
+2025-11-28T09:40:26.789+0200 [DEBUG] ReferenceTransformer: "gcore_cloud_gpu_virtual_cluster_image.test (expand)" references: [var.image_name var.project_id var.region_id var.test_tags]
+2025-11-28T09:40:26.789+0200 [DEBUG] ReferenceTransformer: "var.test_tags" references: []
+2025-11-28T09:40:26.789+0200 [DEBUG] ReferenceTransformer: "output.image_id (expand)" references: []
+2025-11-28T09:40:26.789+0200 [DEBUG] ReferenceTransformer: "output.image_updated_at (expand)" references: []
+2025-11-28T09:40:26.789+0200 [DEBUG] ReferenceTransformer: "var.region_id" references: []
+2025-11-28T09:40:26.789+0200 [DEBUG] ReferenceTransformer: "output.image_os_version (expand)" references: []
+2025-11-28T09:40:26.789+0200 [DEBUG] ReferenceTransformer: "output.image_size (expand)" references: []
+2025-11-28T09:40:26.789+0200 [DEBUG] ReferenceTransformer: "output.image_min_ram (expand)" references: []
+2025-11-28T09:40:26.789+0200 [DEBUG] ReferenceTransformer: "output.image_name (expand)" references: []
+2025-11-28T09:40:26.789+0200 [DEBUG] ReferenceTransformer: "output.image_min_disk (expand)" references: []
+2025-11-28T09:40:26.789+0200 [DEBUG] ReferenceTransformer: "provider[\"registry.terraform.io/gcore/gcore\"]" references: []
+2025-11-28T09:40:26.789+0200 [DEBUG] ReferenceTransformer: "var.image_name" references: []
+2025-11-28T09:40:26.789+0200 [DEBUG] ReferenceTransformer: "output.image_gpu_driver (expand)" references: []
+2025-11-28T09:40:26.789+0200 [DEBUG] ReferenceTransformer: "output.image_created_at (expand)" references: []
+2025-11-28T09:40:26.789+0200 [DEBUG] Starting graph walk: walkDestroy
+2025-11-28T09:40:26.790+0200 [DEBUG] created provider logger: level=debug
+2025-11-28T09:40:26.790+0200 [INFO]  provider: configuring client automatic mTLS
+2025-11-28T09:40:26.793+0200 [DEBUG] provider: starting plugin: path=/Users/user/repos/gcore-terraform/terraform-provider-gcore args=["/Users/user/repos/gcore-terraform/terraform-provider-gcore"]
+2025-11-28T09:40:26.795+0200 [DEBUG] provider: plugin started: path=/Users/user/repos/gcore-terraform/terraform-provider-gcore pid=75218
+2025-11-28T09:40:26.795+0200 [DEBUG] provider: waiting for RPC address: plugin=/Users/user/repos/gcore-terraform/terraform-provider-gcore
+2025-11-28T09:40:26.807+0200 [INFO]  provider.terraform-provider-gcore: configuring server automatic mTLS: timestamp="2025-11-28T09:40:26.807+0200"
+2025-11-28T09:40:26.814+0200 [DEBUG] provider: using plugin: version=6
+2025-11-28T09:40:26.814+0200 [DEBUG] provider.terraform-provider-gcore: plugin address: address=/var/folders/qj/cbb8n0j12tq6j2k955fxwpb80000gn/T/plugin3309407039 network=unix timestamp="2025-11-28T09:40:26.814+0200"
+2025-11-28T09:40:26.821+0200 [INFO]  Starting apply for gcore_cloud_gpu_virtual_cluster_image.test
+2025-11-28T09:40:26.821+0200 [DEBUG] gcore_cloud_gpu_virtual_cluster_image.test: applying the planned Delete change
+2025-11-28T09:40:26.822+0200 [DEBUG] provider.terraform-provider-gcore: 
+DELETE /cloud/v3/gpu/virtual/379987/76/images/3a50d4ab-469d-4e51-80d9-727553da684e HTTP/1.1
+> accept: application/json
+> x-stainless-retry-count: 0
+> user-agent: Gcore/Go 0.22.0
+> x-stainless-runtime-version: go1.24.5
+> x-stainless-lang: go
+> authorization: APIKey 21788$1e278ce67b6aa33f178122658b1dd0210d0edff453d348acb9b68bffea6a635b7791925ddda198d5678a4dc20269fe04a263ca92c7e5aa41ea79075f89b66bf6
+> x-stainless-package-version: 0.22.0
+> x-stainless-runtime: go
+> x-stainless-os: MacOS
+> x-stainless-arch: arm64: @caller=/Users/user/repos/gcore-terraform/internal/logging/logging.go:60 @module=gcore tf_provider_addr=registry.terraform.io/stainless-sdks/gcore tf_req_id=b2b73eed-767e-6829-800f-2479b6d93837 tf_resource_type=gcore_cloud_gpu_virtual_cluster_image tf_rpc=ApplyResourceChange timestamp="2025-11-28T09:40:26.822+0200"
+2025-11-28T09:40:28.860+0200 [DEBUG] provider.terraform-provider-gcore: 
+< HTTP/2.0 200 OK
+< server: nginx
+< x-id-fe: fr5-hw-edge-gc32
+< strict-transport-security: max-age=15724800; includeSubDomains
+< x-robots-tag: noindex, nofollow, noarchive
+< accept-ranges: bytes
+< date: Fri, 28 Nov 2025 07:40:28 GMT
+< content-type: application/json; charset=UTF-8
+< content-length: 51
+< traceparent: 00-32f8acd84249034e571bbe3a4e6b933c-52e3a16d092bc1f3-01
+< request_id: 32f8acd84249034e571bbe3a4e6b933c
+< access-control-allow-origin: *
+< cache-control: no-cache, no-store, must-revalidate
+< x-id: fr5-hw-edge-gc32
+<
+
+{"tasks": ["1837e1ff-4e00-49d0-b4bb-f1b953b32b37"]}
+
+: tf_rpc=ApplyResourceChange @caller=/Users/user/repos/gcore-terraform/internal/logging/logging.go:88 @module=gcore tf_provider_addr=registry.terraform.io/stainless-sdks/gcore tf_req_id=b2b73eed-767e-6829-800f-2479b6d93837 tf_resource_type=gcore_cloud_gpu_virtual_cluster_image timestamp="2025-11-28T09:40:28.860+0200"
+2025-11-28T09:40:32.153+0200 [DEBUG] State storage *statemgr.Filesystem declined to persist a state snapshot
+2025-11-28T09:40:32.154+0200 [DEBUG] provider.stdio: received EOF, stopping recv loop: err="rpc error: code = Unavailable desc = error reading from server: EOF"
+2025-11-28T09:40:32.156+0200 [INFO]  provider: plugin process exited: plugin=/Users/user/repos/gcore-terraform/terraform-provider-gcore id=75218
+2025-11-28T09:40:32.156+0200 [DEBUG] provider: plugin exited

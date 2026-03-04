@@ -1,0 +1,455 @@
+[10:12:23.926] Loading script /Users/user/repos/gcore-terraform/test-dns-zone-dnssec-bug/mitm_body_logger.py
+[10:12:23.927] HTTP(S) proxy listening at *:9092.
+[10:12:37.545][127.0.0.1:64073] client connect
+[10:12:37.631][127.0.0.1:64073] server connect api.gcore.com:443 (92.223.97.97:443)
+
+>>> GET https://api.gcore.com/dns/v2/zones/test-tf-dnssec-bug-1770883208.com
+<<< 200
+RESPONSE: {
+  "name": "test-tf-dnssec-bug-1770883208.com",
+  "meta": {
+    "dnssec_status": "ACTIVE"
+  },
+  "enabled": true,
+  "nx_ttl": 300,
+  "retry": 3600,
+  "refresh": 5400,
+  "expiry": 1209600,
+  "contact": "support@gcore.com",
+  "serial": 1770883855,
+  "primary_server": "ns1.gcorelabs.net",
+  "records": [
+    {
+      "name": "test-tf-dnssec-bug-1770883208.com",
+      "type": "NS",
+      "ttl": 3600,
+      "short_answers": [
+        "ns1.gcorelabs.net",
+        "ns2.gcdn.services"
+      ]
+    }
+  ],
+  "rrsets_amount": {
+    "total": 1,
+    "static": 1,
+    "dynamic": {
+      "total": 0,
+      "healthcheck": 0
+    }
+  },
+  "status": "non-delegated",
+  "dnssec_enabled": true
+}
+127.0.0.1:64073: GET https://api.gcore.com/dns/v2/zones/test-tf-dnssec-bug-1… HTTP/2.0
+     << HTTP/2.0 200 OK 329b
+[10:12:37.892][127.0.0.1:64073] client disconnect
+[10:12:37.892][127.0.0.1:64073] server disconnect api.gcore.com:443 (92.223.97.97:443)
+[10:12:37.972][127.0.0.1:64077] client connect
+[10:12:38.008][127.0.0.1:64077] server connect api.gcore.com:443 (92.223.97.97:443)
+
+>>> DELETE https://api.gcore.com/dns/v2/zones/test-tf-dnssec-bug-1770883208.com
+<<< 200
+RESPONSE: {}
+127.0.0.1:64077: DELETE https://api.gcore.com/dns/v2/zones/test-tf-dnssec-bug-1… HTTP/2.0
+     << HTTP/2.0 200 OK 31b
+[10:12:38.952][127.0.0.1:64077] client disconnect
+[10:12:38.953][127.0.0.1:64077] server disconnect api.gcore.com:443 (92.223.97.97:443)
+[10:12:39.159][127.0.0.1:64081] client connect
+[10:12:39.195][127.0.0.1:64081] server connect api.gcore.com:443 (92.223.97.97:443)
+
+>>> POST https://api.gcore.com/dns/v2/zones
+BODY: {
+  "dnssec_enabled": false,
+  "enabled": true,
+  "name": "test-tf-dnssec-bug-1770883208.com"
+}
+<<< 200
+RESPONSE: {
+  "id": 1088791,
+  "warnings": [
+    "Your contract has been set to reseller default due to the absence of contact information."
+  ]
+}
+127.0.0.1:64081: POST https://api.gcore.com/dns/v2/zones HTTP/2.0
+     << HTTP/2.0 200 OK 127b
+[10:12:39.796][127.0.0.1:64081] client disconnect
+[10:12:39.796][127.0.0.1:64081] server disconnect api.gcore.com:443 (92.223.97.97:443)
+[10:12:39.949][127.0.0.1:64094] client connect
+[10:12:39.985][127.0.0.1:64094] server connect api.gcore.com:443 (92.223.97.97:443)
+
+>>> GET https://api.gcore.com/dns/v2/zones/test-tf-dnssec-bug-1770883208.com
+<<< 200
+RESPONSE: {
+  "name": "test-tf-dnssec-bug-1770883208.com",
+  "meta": null,
+  "enabled": true,
+  "nx_ttl": 300,
+  "retry": 3600,
+  "refresh": 5400,
+  "expiry": 1209600,
+  "contact": "support@gcore.com",
+  "serial": 1770883959,
+  "primary_server": "ns1.gcorelabs.net",
+  "records": [
+    {
+      "name": "test-tf-dnssec-bug-1770883208.com",
+      "type": "NS",
+      "ttl": 3600,
+      "short_answers": [
+        "ns1.gcorelabs.net",
+        "ns2.gcdn.services"
+      ]
+    }
+  ],
+  "rrsets_amount": {
+    "total": 1,
+    "static": 1,
+    "dynamic": {
+      "total": 0,
+      "healthcheck": 0
+    }
+  },
+  "status": "non-delegated",
+  "dnssec_enabled": false
+}
+127.0.0.1:64094: GET https://api.gcore.com/dns/v2/zones/test-tf-dnssec-bug-1… HTTP/2.0
+     << HTTP/2.0 200 OK 314b
+[10:12:40.130][127.0.0.1:64094] client disconnect
+[10:12:40.131][127.0.0.1:64094] server disconnect api.gcore.com:443 (92.223.97.97:443)
+[10:12:40.171][127.0.0.1:64096] client connect
+[10:12:40.205][127.0.0.1:64096] server connect api.gcore.com:443 (92.223.97.97:443)
+
+>>> PUT https://api.gcore.com/dns/v2/zones/test-tf-dnssec-bug-1770883208.com
+BODY: {
+  "contact": "support@gcore.com",
+  "enabled": true,
+  "expiry": 1209600,
+  "name": "test-tf-dnssec-bug-1770883208.com",
+  "nx_ttl": 300,
+  "primary_server": "ns1.gcorelabs.net",
+  "refresh": 5400,
+  "retry": 3600
+}
+<<< 200
+RESPONSE: {}
+127.0.0.1:64096: PUT https://api.gcore.com/dns/v2/zones/test-tf-dnssec-bug-1… HTTP/2.0
+     << HTTP/2.0 200 OK 31b
+
+>>> PATCH https://api.gcore.com/dns/v2/zones/test-tf-dnssec-bug-1770883208.com/dnssec
+BODY: {
+  "enabled": true
+}
+<<< 200
+RESPONSE: {
+  "algorithm": "13",
+  "digest": "DBD201694AEDBDC74EE58A73CF7DB1D872AF4648C7F24D99CBAEF06C533A60D6",
+  "digest_algorithm": "SHA256",
+  "digest_type": "2",
+  "ds": "test-tf-dnssec-bug-1770883208.com. 3600 IN DS 55478 13 2 DBD201694AEDBDC74EE58A73CF7DB1D872AF4648C7F24D99CBAEF06C533A60D6",
+  "flags": 257,
+  "key_tag": 55478,
+  "key_type": "ECDSAP256SHA256",
+  "public_key": "YK8wUlrlZZtJmy9s1mHHVWpPDDUeIPe+0Mo3kHegHdoyhtPXJbgYlS7DPaZ66jhyN934sEaZl8IoOAmbGqSCWw==",
+  "message": "Successfully enable DNSSEC"
+}
+127.0.0.1:64096: PATCH https://api.gcore.com/dns/v2/zones/test-tf-dnssec-bug-1… HTTP/2.0
+     << HTTP/2.0 200 OK 344b
+
+>>> GET https://api.gcore.com/dns/v2/zones/test-tf-dnssec-bug-1770883208.com
+<<< 200
+RESPONSE: {
+  "name": "test-tf-dnssec-bug-1770883208.com",
+  "meta": {
+    "dnssec_status": "ACTIVE"
+  },
+  "enabled": true,
+  "nx_ttl": 300,
+  "retry": 3600,
+  "refresh": 5400,
+  "expiry": 1209600,
+  "contact": "support@gcore.com",
+  "serial": 1770883960,
+  "primary_server": "ns1.gcorelabs.net",
+  "records": [
+    {
+      "name": "test-tf-dnssec-bug-1770883208.com",
+      "type": "NS",
+      "ttl": 3600,
+      "short_answers": [
+        "ns1.gcorelabs.net",
+        "ns2.gcdn.services"
+      ]
+    }
+  ],
+  "rrsets_amount": {
+    "total": 1,
+    "static": 1,
+    "dynamic": {
+      "total": 0,
+      "healthcheck": 0
+    }
+  },
+  "status": "non-delegated",
+  "dnssec_enabled": true
+}
+127.0.0.1:64096: GET https://api.gcore.com/dns/v2/zones/test-tf-dnssec-bug-1… HTTP/2.0
+     << HTTP/2.0 200 OK 329b
+[10:12:41.581][127.0.0.1:64096] client disconnect
+[10:12:41.582][127.0.0.1:64096] server disconnect api.gcore.com:443 (92.223.97.97:443)
+[10:12:59.008][127.0.0.1:64123] client connect
+[10:12:59.081][127.0.0.1:64123] server connect api.gcore.com:443 (92.223.97.97:443)
+
+>>> GET https://api.gcore.com/dns/v2/zones/test-tf-dnssec-bug-1770883208.com
+<<< 200
+RESPONSE: {
+  "name": "test-tf-dnssec-bug-1770883208.com",
+  "meta": {
+    "dnssec_status": "ACTIVE"
+  },
+  "enabled": true,
+  "nx_ttl": 300,
+  "retry": 3600,
+  "refresh": 5400,
+  "expiry": 1209600,
+  "contact": "support@gcore.com",
+  "serial": 1770883960,
+  "primary_server": "ns1.gcorelabs.net",
+  "records": [
+    {
+      "name": "test-tf-dnssec-bug-1770883208.com",
+      "type": "NS",
+      "ttl": 3600,
+      "short_answers": [
+        "ns1.gcorelabs.net",
+        "ns2.gcdn.services"
+      ]
+    }
+  ],
+  "rrsets_amount": {
+    "total": 1,
+    "static": 1,
+    "dynamic": {
+      "total": 0,
+      "healthcheck": 0
+    }
+  },
+  "status": "non-delegated",
+  "dnssec_enabled": true
+}
+127.0.0.1:64123: GET https://api.gcore.com/dns/v2/zones/test-tf-dnssec-bug-1… HTTP/2.0
+     << HTTP/2.0 200 OK 329b
+[10:12:59.200][127.0.0.1:64123] client disconnect
+[10:12:59.200][127.0.0.1:64123] server disconnect api.gcore.com:443 (92.223.97.97:443)
+[10:12:59.338][127.0.0.1:64125] client connect
+[10:12:59.373][127.0.0.1:64125] server connect api.gcore.com:443 (92.223.97.97:443)
+
+>>> GET https://api.gcore.com/dns/v2/zones/test-tf-dnssec-bug-1770883208.com
+<<< 200
+RESPONSE: {
+  "name": "test-tf-dnssec-bug-1770883208.com",
+  "meta": {
+    "dnssec_status": "ACTIVE"
+  },
+  "enabled": true,
+  "nx_ttl": 300,
+  "retry": 3600,
+  "refresh": 5400,
+  "expiry": 1209600,
+  "contact": "support@gcore.com",
+  "serial": 1770883960,
+  "primary_server": "ns1.gcorelabs.net",
+  "records": [
+    {
+      "name": "test-tf-dnssec-bug-1770883208.com",
+      "type": "NS",
+      "ttl": 3600,
+      "short_answers": [
+        "ns1.gcorelabs.net",
+        "ns2.gcdn.services"
+      ]
+    }
+  ],
+  "rrsets_amount": {
+    "total": 1,
+    "static": 1,
+    "dynamic": {
+      "total": 0,
+      "healthcheck": 0
+    }
+  },
+  "status": "non-delegated",
+  "dnssec_enabled": true
+}
+127.0.0.1:64125: GET https://api.gcore.com/dns/v2/zones/test-tf-dnssec-bug-1… HTTP/2.0
+     << HTTP/2.0 200 OK 329b
+[10:12:59.494][127.0.0.1:64125] client disconnect
+[10:12:59.494][127.0.0.1:64125] server disconnect api.gcore.com:443 (92.223.97.97:443)
+[10:12:59.534][127.0.0.1:64128] client connect
+[10:12:59.570][127.0.0.1:64128] server connect api.gcore.com:443 (92.223.97.97:443)
+
+>>> PUT https://api.gcore.com/dns/v2/zones/test-tf-dnssec-bug-1770883208.com
+BODY: {
+  "contact": "support@gcore.com",
+  "enabled": true,
+  "expiry": 1209600,
+  "name": "test-tf-dnssec-bug-1770883208.com",
+  "nx_ttl": 300,
+  "primary_server": "ns1.gcorelabs.net",
+  "refresh": 5400,
+  "retry": 3600
+}
+<<< 200
+RESPONSE: {}
+127.0.0.1:64128: PUT https://api.gcore.com/dns/v2/zones/test-tf-dnssec-bug-1… HTTP/2.0
+     << HTTP/2.0 200 OK 31b
+
+>>> PATCH https://api.gcore.com/dns/v2/zones/test-tf-dnssec-bug-1770883208.com/dnssec
+BODY: {
+  "enabled": false
+}
+<<< 200
+RESPONSE: {
+  "message": "Successfully disable DNSSEC"
+}
+127.0.0.1:64128: PATCH https://api.gcore.com/dns/v2/zones/test-tf-dnssec-bug-1… HTTP/2.0
+     << HTTP/2.0 200 OK 70b
+
+>>> GET https://api.gcore.com/dns/v2/zones/test-tf-dnssec-bug-1770883208.com
+<<< 200
+RESPONSE: {
+  "name": "test-tf-dnssec-bug-1770883208.com",
+  "meta": {
+    "dnssec_status": "DISABLED"
+  },
+  "enabled": true,
+  "nx_ttl": 300,
+  "retry": 3600,
+  "refresh": 5400,
+  "expiry": 1209600,
+  "contact": "support@gcore.com",
+  "serial": 1770883980,
+  "primary_server": "ns1.gcorelabs.net",
+  "records": [
+    {
+      "name": "test-tf-dnssec-bug-1770883208.com",
+      "type": "NS",
+      "ttl": 3600,
+      "short_answers": [
+        "ns1.gcorelabs.net",
+        "ns2.gcdn.services"
+      ]
+    }
+  ],
+  "rrsets_amount": {
+    "total": 1,
+    "static": 1,
+    "dynamic": {
+      "total": 0,
+      "healthcheck": 0
+    }
+  },
+  "status": "non-delegated",
+  "dnssec_enabled": false
+}
+127.0.0.1:64128: GET https://api.gcore.com/dns/v2/zones/test-tf-dnssec-bug-1… HTTP/2.0
+     << HTTP/2.0 200 OK 329b
+[10:13:00.654][127.0.0.1:64128] client disconnect
+[10:13:00.654][127.0.0.1:64128] server disconnect api.gcore.com:443 (92.223.97.97:443)
+[10:13:00.813][127.0.0.1:64133] client connect
+[10:13:00.847][127.0.0.1:64133] server connect api.gcore.com:443 (92.223.97.97:443)
+
+>>> GET https://api.gcore.com/dns/v2/zones/test-tf-dnssec-bug-1770883208.com
+<<< 200
+RESPONSE: {
+  "name": "test-tf-dnssec-bug-1770883208.com",
+  "meta": {
+    "dnssec_status": "DISABLED"
+  },
+  "enabled": true,
+  "nx_ttl": 300,
+  "retry": 3600,
+  "refresh": 5400,
+  "expiry": 1209600,
+  "contact": "support@gcore.com",
+  "serial": 1770883980,
+  "primary_server": "ns1.gcorelabs.net",
+  "records": [
+    {
+      "name": "test-tf-dnssec-bug-1770883208.com",
+      "type": "NS",
+      "ttl": 3600,
+      "short_answers": [
+        "ns1.gcorelabs.net",
+        "ns2.gcdn.services"
+      ]
+    }
+  ],
+  "rrsets_amount": {
+    "total": 1,
+    "static": 1,
+    "dynamic": {
+      "total": 0,
+      "healthcheck": 0
+    }
+  },
+  "status": "non-delegated",
+  "dnssec_enabled": false
+}
+127.0.0.1:64133: GET https://api.gcore.com/dns/v2/zones/test-tf-dnssec-bug-1… HTTP/2.0
+     << HTTP/2.0 200 OK 329b
+[10:13:00.952][127.0.0.1:64133] client disconnect
+[10:13:00.953][127.0.0.1:64133] server disconnect api.gcore.com:443 (92.223.97.97:443)
+[10:13:12.693][127.0.0.1:64167] client connect
+[10:13:12.728][127.0.0.1:64167] server connect api.gcore.com:443 (92.223.97.97:443)
+
+>>> GET https://api.gcore.com/dns/v2/zones/test-tf-dnssec-bug-1770883208.com
+<<< 200
+RESPONSE: {
+  "name": "test-tf-dnssec-bug-1770883208.com",
+  "meta": {
+    "dnssec_status": "DISABLED"
+  },
+  "enabled": true,
+  "nx_ttl": 300,
+  "retry": 3600,
+  "refresh": 5400,
+  "expiry": 1209600,
+  "contact": "support@gcore.com",
+  "serial": 1770883980,
+  "primary_server": "ns1.gcorelabs.net",
+  "records": [
+    {
+      "name": "test-tf-dnssec-bug-1770883208.com",
+      "type": "NS",
+      "ttl": 3600,
+      "short_answers": [
+        "ns1.gcorelabs.net",
+        "ns2.gcdn.services"
+      ]
+    }
+  ],
+  "rrsets_amount": {
+    "total": 1,
+    "static": 1,
+    "dynamic": {
+      "total": 0,
+      "healthcheck": 0
+    }
+  },
+  "status": "non-delegated",
+  "dnssec_enabled": false
+}
+127.0.0.1:64167: GET https://api.gcore.com/dns/v2/zones/test-tf-dnssec-bug-1… HTTP/2.0
+     << HTTP/2.0 200 OK 329b
+[10:13:12.841][127.0.0.1:64167] client disconnect
+[10:13:12.841][127.0.0.1:64167] server disconnect api.gcore.com:443 (92.223.97.97:443)
+[10:13:12.905][127.0.0.1:64169] client connect
+[10:13:12.939][127.0.0.1:64169] server connect api.gcore.com:443 (92.223.97.97:443)
+
+>>> DELETE https://api.gcore.com/dns/v2/zones/test-tf-dnssec-bug-1770883208.com
+<<< 200
+RESPONSE: {}
+127.0.0.1:64169: DELETE https://api.gcore.com/dns/v2/zones/test-tf-dnssec-bug-1… HTTP/2.0
+     << HTTP/2.0 200 OK 31b
+[10:13:13.095][127.0.0.1:64169] client disconnect
+[10:13:13.096][127.0.0.1:64169] server disconnect api.gcore.com:443 (92.223.97.97:443)

@@ -1,0 +1,10 @@
+[0m[1mgcore_dns_zone.explicit_soa: Importing from ID "tf-test-soa-1770706779.com"...[0m
+[0m[1m[32mgcore_dns_zone.explicit_soa: Import prepared![0m
+[0m[32m  Prepared gcore_dns_zone for import[0m
+[0m[1mgcore_dns_zone.explicit_soa: Refreshing state... [id=tf-test-soa-1770706779.com][0m
+[0m[32m
+Import successful!
+
+The resources that were imported are shown above. These resources are now in
+your Terraform state and will henceforth be managed by Terraform.
+[0m

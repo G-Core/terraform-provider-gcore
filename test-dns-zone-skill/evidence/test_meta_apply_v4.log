@@ -1,0 +1,37 @@
+
+Warning: Provider development overrides are in effect
+
+The following provider development overrides are set in the CLI
+configuration:
+ - gcore/gcore in /Users/user/repos/gcore-terraform
+
+The behavior may therefore not match any released version of the provider and
+applying changes may cause the state to become incompatible with published
+releases.
+gcore_dns_zone.minimal: Refreshing state... [id=test-zone-skill-20260205.com]
+gcore_dns_zone.with_meta[0]: Refreshing state... [id=test-zone-meta-20260205.com]
+
+Terraform used the selected providers to generate the following execution
+plan. Resource actions are indicated with the following symbols:
+  ~ update in-place
+
+Terraform will perform the following actions:
+
+  # gcore_dns_zone.with_meta[0] will be updated in-place
+  ~ resource "gcore_dns_zone" "with_meta" {
+        id             = "test-zone-meta-20260205.com"
+      ~ meta           = {
+          - "max_hosts"      = "10" -> null
+          - "targeting"      = "country continent @ regiongroup region ip asn" -> null
+            # (2 unchanged elements hidden)
+        }
+        name           = "test-zone-meta-20260205.com"
+      + warnings       = (known after apply)
+        # (12 unchanged attributes hidden)
+    }
+
+Plan: 0 to add, 1 to change, 0 to destroy.
+gcore_dns_zone.with_meta[0]: Modifying... [id=test-zone-meta-20260205.com]
+gcore_dns_zone.with_meta[0]: Modifications complete after 0s [id=test-zone-meta-20260205.com]
+
+Apply complete! Resources: 0 added, 1 changed, 0 destroyed.

@@ -1,0 +1,40 @@
+terraform {
+  required_providers {
+    gcore = {
+      source = "gcore/gcore"
+    }
+  }
+}
+
+provider "gcore" {}
+
+# Test 1: Basic create with own cert
+resource "gcore_cdn_certificate" "test" {
+  name            = "tf-test-cdn-cert-manual"
+  ssl_certificate = file("${path.module}/cert.pem")
+  ssl_private_key = file("${path.module}/key.pem")
+}
+
+output "cert_id" {
+  value = gcore_cdn_certificate.test.id
+}
+
+output "cert_ssl_id" {
+  value = gcore_cdn_certificate.test.ssl_id
+}
+
+output "cert_name" {
+  value = gcore_cdn_certificate.test.name
+}
+
+output "cert_subject_cn" {
+  value = gcore_cdn_certificate.test.cert_subject_cn
+}
+
+output "cert_validate_root_ca" {
+  value = gcore_cdn_certificate.test.validate_root_ca
+}
+
+output "cert_deleted" {
+  value = gcore_cdn_certificate.test.deleted
+}

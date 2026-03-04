@@ -1,0 +1,23 @@
+[33m╷[0m[0m
+[33m│[0m [0m[1m[33mWarning: [0m[0m[1mProvider development overrides are in effect[0m
+[33m│[0m [0m
+[33m│[0m [0m[0mThe following provider development overrides are set in the CLI
+[33m│[0m [0mconfiguration:
+[33m│[0m [0m - gcore/gcore in /Users/user/repos/gcore-terraform
+[33m│[0m [0m
+[33m│[0m [0mThe behavior may therefore not match any released version of the provider
+[33m│[0m [0mand applying changes may cause the state to become incompatible with
+[33m│[0m [0mpublished releases.
+[33m╵[0m[0m
+[0m[1mdata.gcore_cloud_projects.my_projects: Reading...[0m[0m
+[0m[1mdata.gcore_cloud_region.rg: Reading...[0m[0m
+[0m[1mdata.gcore_cloud_projects.my_projects: Read complete after 0s [name=default][0m
+[0m[1mdata.gcore_cloud_region.rg: Read complete after 1s[0m
+[0m[1mgcore_cloud_load_balancer.lb: Refreshing state... [id=7997fcc2-0764-47b5-80e4-3be726bed5f5][0m
+[0m[1mgcore_cloud_load_balancer_listener.ls: Refreshing state... [id=ea982ba8-a55d-401e-a6b9-e7a3fe828b9b][0m
+[0m[1mgcore_cloud_load_balancer_pool.lb_pool: Refreshing state... [id=be2a59ed-9717-4fa6-9230-294b16cbc580][0m
+
+[0m[1m[32mNo changes.[0m[1m Your infrastructure matches the configuration.[0m
+
+[0mTerraform has compared your real infrastructure against your configuration
+and found no differences, so no changes are needed.

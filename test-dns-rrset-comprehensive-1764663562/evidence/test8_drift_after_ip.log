@@ -1,0 +1,26 @@
+[33m╷[0m[0m
+[33m│[0m [0m[1m[33mWarning: [0m[0m[1mProvider development overrides are in effect[0m
+[33m│[0m [0m
+[33m│[0m [0m[0mThe following provider development overrides are set in the CLI
+[33m│[0m [0mconfiguration:
+[33m│[0m [0m - gcore/gcore in /Users/user/repos/gcore-terraform
+[33m│[0m [0m
+[33m│[0m [0mThe behavior may therefore not match any released version of the provider
+[33m│[0m [0mand applying changes may cause the state to become incompatible with
+[33m│[0m [0mpublished releases.
+[33m╵[0m[0m
+[0m[1mgcore_dns_zone_rrset.test_a: Refreshing state... [name=tf-comprehensive-a.maxima.lt][0m
+
+[0m[1m[31mPlanning failed.[0m[1m Terraform encountered an error while generating this plan.[0m
+
+[0m[31m╷[0m[0m
+[31m│[0m [0m[1m[31mError: [0m[0m[1mIncorrect attribute value type[0m
+[31m│[0m [0m
+[31m│[0m [0m[0m  on main.tf line 25, in resource "gcore_dns_zone_rrset" "test_a":
+[31m│[0m [0m  25:   resource_records = [4mvar.records_a[0m[0m
+[31m│[0m [0m    [90m├────────────────[0m
+[31m│[0m [0m[0m    [90m│[0m [1mvar.records_a[0m is "[{content=[\"\\\"192.168.1.100\\\"\"],enabled=true},{content=[\"\\\"192.168.1.101\\\"\"],enabled=true}]"
+[31m│[0m [0m[0m
+[31m│[0m [0mInappropriate value for attribute "resource_records": list of object
+[31m│[0m [0mrequired.
+[31m╵[0m[0m

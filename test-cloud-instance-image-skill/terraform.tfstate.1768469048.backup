@@ -1,0 +1,71 @@
+{
+  "version": 4,
+  "terraform_version": "1.14.3",
+  "serial": 4,
+  "lineage": "7efa4b92-eb34-a902-179f-e85fb7d43341",
+  "outputs": {
+    "image_id": {
+      "value": "fa21d4a1-738c-41c5-a3b0-01d3aa17e5be",
+      "type": "string"
+    },
+    "image_size": {
+      "value": 12716032,
+      "type": "number"
+    },
+    "image_status": {
+      "value": "active",
+      "type": "string"
+    }
+  },
+  "resources": [
+    {
+      "mode": "managed",
+      "type": "gcore_cloud_instance_image",
+      "name": "test_image",
+      "provider": "provider[\"registry.terraform.io/gcore/gcore\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "architecture": "x86_64",
+            "cow_format": false,
+            "created_at": "2026-01-15T09:18:43Z",
+            "creator_task_id": "ed127450-129f-4e25-9291-946a58e1d18a",
+            "description": null,
+            "disk_format": "qcow2",
+            "display_order": null,
+            "gpu_driver": null,
+            "gpu_driver_type": null,
+            "gpu_driver_version": null,
+            "hw_firmware_type": null,
+            "hw_machine_type": null,
+            "id": "fa21d4a1-738c-41c5-a3b0-01d3aa17e5be",
+            "is_baremetal": false,
+            "min_disk": 1,
+            "min_ram": 0,
+            "name": "test-image-skill-updated",
+            "os_distro": "cirros",
+            "os_type": "linux",
+            "os_version": "0.4.0",
+            "project_id": 379987,
+            "region": "Luxembourg-2",
+            "region_id": 76,
+            "size": 12716032,
+            "ssh_key": "allow",
+            "status": "active",
+            "tags": {
+              "test": "skill-test"
+            },
+            "task_id": null,
+            "updated_at": "2026-01-15T09:21:23Z",
+            "url": "http://mirror.noris.net/cirros/0.4.0/cirros-0.4.0-x86_64-disk.img",
+            "visibility": "shared"
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0
+        }
+      ]
+    }
+  ],
+  "check_results": null
+}

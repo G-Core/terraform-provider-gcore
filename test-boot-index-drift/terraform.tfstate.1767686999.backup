@@ -1,0 +1,215 @@
+{
+  "version": 4,
+  "terraform_version": "1.10.5",
+  "serial": 20,
+  "lineage": "300fbc2a-0b54-24b1-ade4-d164698c5b7d",
+  "outputs": {
+    "boot_volume_id": {
+      "value": "86bc910b-da7b-4542-803c-1a5beed72e37",
+      "type": "string"
+    },
+    "data_volume_id": {
+      "value": "077d940d-1c93-4e91-be6e-4dd0e5274ced",
+      "type": "string"
+    },
+    "instance_id": {
+      "value": "33bbe11f-1525-483c-9944-51c7480849ca",
+      "type": "string"
+    }
+  },
+  "resources": [
+    {
+      "mode": "managed",
+      "type": "gcore_cloud_instance",
+      "name": "test",
+      "provider": "provider[\"registry.terraform.io/gcore/gcore\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "addresses": {
+              "pub_net": [
+                {
+                  "addr": "109.61.125.197",
+                  "interface_name": null,
+                  "subnet_id": "b4c6e91a-9eb9-4c59-ad57-00124eceda00",
+                  "subnet_name": "pub_net11",
+                  "type": "fixed"
+                }
+              ]
+            },
+            "allow_app_ports": null,
+            "blackhole_ports": [],
+            "configuration": null,
+            "created_at": "2026-01-06T07:49:59Z",
+            "creator_task_id": "78f22af1-f781-4c55-b937-2d45e7fd28ad",
+            "ddos_profile": null,
+            "fixed_ip_assignments": null,
+            "flavor": "g1-standard-1-2",
+            "id": "33bbe11f-1525-483c-9944-51c7480849ca",
+            "instance_description": null,
+            "instance_isolation": null,
+            "interfaces": [
+              {
+                "floating_ip": null,
+                "interface_name": null,
+                "ip_address": "109.61.125.197",
+                "ip_family": null,
+                "network_id": null,
+                "port_id": "e7eb41a6-e9e2-488c-8d02-309478f1b166",
+                "security_groups": null,
+                "subnet_id": null,
+                "type": "external"
+              }
+            ],
+            "name": "boot-index-drift-test",
+            "name_template": null,
+            "password": null,
+            "project_id": 379987,
+            "region": "Luxembourg-2",
+            "region_id": 76,
+            "security_groups": null,
+            "servergroup_id": null,
+            "ssh_key_name": null,
+            "status": "ACTIVE",
+            "tags": null,
+            "task_id": null,
+            "task_state": null,
+            "tasks": null,
+            "user_data": null,
+            "username": null,
+            "vm_state": "active",
+            "volumes": [
+              {
+                "attachment_tag": null,
+                "boot_index": 0,
+                "volume_id": "86bc910b-da7b-4542-803c-1a5beed72e37"
+              },
+              {
+                "attachment_tag": null,
+                "boot_index": -1,
+                "volume_id": "077d940d-1c93-4e91-be6e-4dd0e5274ced"
+              }
+            ]
+          },
+          "sensitive_attributes": []
+        }
+      ]
+    },
+    {
+      "mode": "managed",
+      "type": "gcore_cloud_volume",
+      "name": "boot",
+      "provider": "provider[\"registry.terraform.io/gcore/gcore\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "attachment_tag": null,
+            "attachments": [],
+            "bootable": true,
+            "created_at": "2026-01-06T07:49:45Z",
+            "creator_task_id": "cbcfc072-6d6b-46b8-a80e-b69738c2b8a6",
+            "id": "86bc910b-da7b-4542-803c-1a5beed72e37",
+            "image_id": "8a59956d-ada3-42c6-aaf3-e2c38ba70f99",
+            "instance_id_to_attach_to": null,
+            "is_root_volume": false,
+            "lifecycle_policy_ids": null,
+            "limiter_stats": {
+              "iops_base_limit": 30,
+              "iops_burst_limit": 300,
+              "m_bps_base_limit": 10,
+              "m_bps_burst_limit": 100
+            },
+            "name": "boot-vol-drift-test",
+            "project_id": 379987,
+            "region": "Luxembourg-2",
+            "region_id": 76,
+            "size": 5,
+            "snapshot_id": null,
+            "snapshot_ids": [],
+            "source": "image",
+            "status": "available",
+            "tags": null,
+            "task_id": null,
+            "tasks": null,
+            "type_name": "standard",
+            "updated_at": "2026-01-06T07:49:45Z",
+            "volume_image_metadata": {
+              "architecture": "x86_64",
+              "checksum": "acd7e4fc3c200015eadf541d06ba448e",
+              "container_format": "bare",
+              "disk_format": "raw",
+              "display_order": "2404",
+              "hw_disk_bus": "scsi",
+              "hw_machine_type": "q35",
+              "hw_qemu_guest_agent": "True",
+              "hw_scsi_model": "virtio-scsi",
+              "image_id": "8a59956d-ada3-42c6-aaf3-e2c38ba70f99",
+              "image_name": "ubuntu-24.04-x64",
+              "min_disk": "5",
+              "min_ram": "0",
+              "os_distro": "ubuntu",
+              "os_glance_failed_import": "",
+              "os_glance_importing_to_stores": "",
+              "os_require_quiesce": "True",
+              "os_type": "linux",
+              "os_version": "24.04",
+              "size": "3758096384",
+              "ssh_key": "allow"
+            },
+            "volume_type": "standard"
+          },
+          "sensitive_attributes": []
+        }
+      ]
+    },
+    {
+      "mode": "managed",
+      "type": "gcore_cloud_volume",
+      "name": "data",
+      "provider": "provider[\"registry.terraform.io/gcore/gcore\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "attachment_tag": null,
+            "attachments": [],
+            "bootable": false,
+            "created_at": "2026-01-06T07:49:44Z",
+            "creator_task_id": "a70a717f-ddfd-4903-88d1-f1c1c93e786e",
+            "id": "077d940d-1c93-4e91-be6e-4dd0e5274ced",
+            "image_id": null,
+            "instance_id_to_attach_to": null,
+            "is_root_volume": false,
+            "lifecycle_policy_ids": null,
+            "limiter_stats": {
+              "iops_base_limit": 30,
+              "iops_burst_limit": 300,
+              "m_bps_base_limit": 10,
+              "m_bps_burst_limit": 100
+            },
+            "name": "data-vol-drift-test",
+            "project_id": 379987,
+            "region": "Luxembourg-2",
+            "region_id": 76,
+            "size": 5,
+            "snapshot_id": null,
+            "snapshot_ids": [],
+            "source": "new-volume",
+            "status": "available",
+            "tags": null,
+            "task_id": null,
+            "tasks": null,
+            "type_name": "standard",
+            "updated_at": "2026-01-06T07:49:44Z",
+            "volume_image_metadata": null,
+            "volume_type": "standard"
+          },
+          "sensitive_attributes": []
+        }
+      ]
+    }
+  ],
+  "check_results": null
+}

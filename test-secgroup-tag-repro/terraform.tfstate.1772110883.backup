@@ -1,0 +1,42 @@
+{
+  "version": 4,
+  "terraform_version": "1.14.3",
+  "serial": 1,
+  "lineage": "409282a3-646a-3eda-975d-b2d369ae6c3e",
+  "outputs": {},
+  "resources": [
+    {
+      "mode": "managed",
+      "type": "gcore_cloud_security_group",
+      "name": "sg",
+      "provider": "provider[\"registry.terraform.io/gcore/gcore\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "created_at": "2026-02-26T12:59:42Z",
+            "description": "",
+            "id": "a7e23b27-712a-46ec-8005-a9f1dcde9eaa",
+            "name": "tf-test-tag-repro",
+            "project_id": 379987,
+            "region": "Luxembourg-2",
+            "region_id": 76,
+            "revision_number": 3,
+            "tags": null,
+            "tags_v2": [
+              {
+                "key": "tg",
+                "read_only": false,
+                "value": "gg"
+              }
+            ],
+            "updated_at": "2026-02-26T12:59:43Z"
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0
+        }
+      ]
+    }
+  ],
+  "check_results": null
+}

@@ -1,0 +1,37 @@
+[33m╷[0m[0m
+[33m│[0m [0m[1m[33mWarning: [0m[0m[1mProvider development overrides are in effect[0m
+[33m│[0m [0m
+[33m│[0m [0m[0mThe following provider development overrides are set in the CLI
+[33m│[0m [0mconfiguration:
+[33m│[0m [0m - gcore/gcore in /Users/user/repos/gcore-terraform
+[33m│[0m [0m
+[33m│[0m [0mThe behavior may therefore not match any released version of the provider
+[33m│[0m [0mand applying changes may cause the state to become incompatible with
+[33m│[0m [0mpublished releases.
+[33m╵[0m[0m
+[31m╷[0m[0m
+[31m│[0m [0m[1m[31mError: [0m[0m[1mValue Conversion Error[0m
+[31m│[0m [0m
+[31m│[0m [0m[0m  with gcore_cloud_instance.test,
+[31m│[0m [0m  on main.tf line 115, in resource "gcore_cloud_instance" "test":
+[31m│[0m [0m 115:   tags = [4mvar.tags[0m[0m
+[31m│[0m [0m
+[31m│[0m [0mAn unexpected error was encountered trying to build a value. This is always
+[31m│[0m [0man error in the provider. Please report the following to the provider
+[31m│[0m [0mdeveloper:
+[31m│[0m [0m
+[31m│[0m [0mReceived unknown value, however the target type cannot handle unknown
+[31m│[0m [0mvalues. Use the corresponding `types` package type or a custom type that
+[31m│[0m [0mhandles unknown values.
+[31m│[0m [0m
+[31m│[0m [0mPath: tags
+[31m│[0m [0mTarget Type: *map[string]basetypes.StringValue
+[31m│[0m [0mSuggested Type: basetypes.MapValue
+[31m╵[0m[0m
+
+=== BUG FOUND ===
+Provider Issue: Tags model type *map[string]types.String can't handle unknown values.
+Error: "Received unknown value, however the target type cannot handle unknown values"
+Suggested fix: Change Tags field in model.go from *map[string]types.String to types.Map
+
+This is a code generation bug in the Stainless terraform generator.

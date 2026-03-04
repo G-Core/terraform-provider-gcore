@@ -1,0 +1,117 @@
+[10:03:47.866] Loading script /Users/user/repos/gcore-terraform/test-dns-zone-dnssec-bug/mitm_body_logger.py
+[10:03:47.868] HTTP(S) proxy listening at *:9092.
+[10:03:57.506][127.0.0.1:63182] client connect
+[10:03:57.557][127.0.0.1:63182] server connect api.gcore.com:443 (93.123.17.254:443)
+
+>>> GET https://api.gcore.com/dns/v2/zones/test-tf-dnssec-bug-1770883208.com
+<<< 200
+RESPONSE: {
+  "name": "test-tf-dnssec-bug-1770883208.com",
+  "meta": {
+    "dnssec_status": "ACTIVE"
+  },
+  "enabled": true,
+  "nx_ttl": 300,
+  "retry": 3600,
+  "refresh": 5400,
+  "expiry": 1209600,
+  "contact": "support@gcore.com",
+  "serial": 1770883377,
+  "primary_server": "ns1.gcorelabs.net",
+  "records": [
+    {
+      "name": "test-tf-dnssec-bug-1770883208.com",
+      "type": "NS",
+      "ttl": 3600,
+      "short_answers": [
+        "ns1.gcorelabs.net",
+        "ns2.gcdn.services"
+      ]
+    }
+  ],
+  "rrsets_amount": {
+    "total": 1,
+    "static": 1,
+    "dynamic": {
+      "total": 0,
+      "healthcheck": 0
+    }
+  },
+  "status": "pending",
+  "dnssec_enabled": true
+}
+127.0.0.1:63182: GET https://api.gcore.com/dns/v2/zones/test-tf-dnssec-bug-1… HTTP/2.0
+     << HTTP/2.0 200 OK 326b
+[10:03:57.807][127.0.0.1:63182] client disconnect
+[10:03:57.808][127.0.0.1:63182] server disconnect api.gcore.com:443 (93.123.17.254:443)
+[10:03:57.855][127.0.0.1:63184] client connect
+[10:03:57.897][127.0.0.1:63184] server connect api.gcore.com:443 (93.123.17.254:443)
+
+>>> PUT https://api.gcore.com/dns/v2/zones/test-tf-dnssec-bug-1770883208.com
+BODY: {
+  "contact": "support@gcore.com",
+  "dnssec_enabled": false,
+  "enabled": true,
+  "expiry": 1209600,
+  "meta": null,
+  "name": "test-tf-dnssec-bug-1770883208.com",
+  "nx_ttl": 300,
+  "primary_server": "ns1.gcorelabs.net",
+  "refresh": 5400,
+  "retry": 3600
+}
+<<< 200
+RESPONSE: {}
+127.0.0.1:63184: PUT https://api.gcore.com/dns/v2/zones/test-tf-dnssec-bug-1… HTTP/2.0
+     << HTTP/2.0 200 OK 31b
+
+>>> PATCH https://api.gcore.com/dns/v2/zones/test-tf-dnssec-bug-1770883208.com/dnssec
+BODY: {
+  "enabled": false
+}
+<<< 200
+RESPONSE: {
+  "message": "Successfully disable DNSSEC"
+}
+127.0.0.1:63184: PATCH https://api.gcore.com/dns/v2/zones/test-tf-dnssec-bug-1… HTTP/2.0
+     << HTTP/2.0 200 OK 70b
+
+>>> GET https://api.gcore.com/dns/v2/zones/test-tf-dnssec-bug-1770883208.com
+<<< 200
+RESPONSE: {
+  "name": "test-tf-dnssec-bug-1770883208.com",
+  "meta": {
+    "dnssec_status": "DISABLED"
+  },
+  "enabled": true,
+  "nx_ttl": 300,
+  "retry": 3600,
+  "refresh": 5400,
+  "expiry": 1209600,
+  "contact": "support@gcore.com",
+  "serial": 1770883438,
+  "primary_server": "ns1.gcorelabs.net",
+  "records": [
+    {
+      "name": "test-tf-dnssec-bug-1770883208.com",
+      "type": "NS",
+      "ttl": 3600,
+      "short_answers": [
+        "ns1.gcorelabs.net",
+        "ns2.gcdn.services"
+      ]
+    }
+  ],
+  "rrsets_amount": {
+    "total": 1,
+    "static": 1,
+    "dynamic": {
+      "total": 0,
+      "healthcheck": 0
+    }
+  },
+  "status": "pending",
+  "dnssec_enabled": false
+}
+127.0.0.1:63184: GET https://api.gcore.com/dns/v2/zones/test-tf-dnssec-bug-1… HTTP/2.0
+     << HTTP/2.0 200 OK 326b

@@ -1,0 +1,44 @@
+[33m╷[0m[0m
+[33m│[0m [0m[1m[33mWarning: [0m[0m[1mProvider development overrides are in effect[0m
+[33m│[0m [0m
+[33m│[0m [0m[0mThe following provider development overrides are set in the CLI
+[33m│[0m [0mconfiguration:
+[33m│[0m [0m - gcore/gcore in /Users/user/repos/gcore-terraform
+[33m│[0m [0m
+[33m│[0m [0mThe behavior may therefore not match any released version of the provider
+[33m│[0m [0mand applying changes may cause the state to become incompatible with
+[33m│[0m [0mpublished releases.
+[33m╵[0m[0m
+[0m[1mgcore_cdn_origin_group.public_origins: Refreshing state... [name=test-origins-1768552065][0m
+
+Terraform used the selected providers to generate the following execution
+plan. Resource actions are indicated with the following symbols:
+  [33m~[0m update in-place[0m
+
+Terraform will perform the following actions:
+
+[1m  # gcore_cdn_origin_group.public_origins[0m will be updated in-place
+[0m  [33m~[0m[0m resource "gcore_cdn_origin_group" "public_origins" {
+        id                    = 1349081
+      [33m~[0m[0m name                  = "test-origins-1768552065" [33m->[0m[0m "test-origins-updated"
+        [90m# (5 unchanged attributes hidden)[0m[0m
+    }
+
+[1mPlan:[0m [0m0 to add, 1 to change, 0 to destroy.
+
+Changes to Outputs:
+  [33m~[0m[0m public_origins_name                  = "test-origins-1768552065" [33m->[0m[0m "test-origins-updated"
+[0m[1mgcore_cdn_origin_group.public_origins: Modifying... [name=test-origins-1768552065][0m[0m
+[0m[1mgcore_cdn_origin_group.public_origins: Modifications complete after 1s [name=test-origins-updated][0m
+[0m[1m[32m
+Apply complete! Resources: 0 added, 1 changed, 0 destroyed.[0m
+[0m[1m[32m
+Outputs:
+
+[0mpublic_origins_has_related_resources = false
+public_origins_id = 1349081
+public_origins_name = "test-origins-updated"
+public_origins_proxy_next_upstream = tolist([
+  "error",
+  "timeout",
+])

@@ -1,0 +1,72 @@
+127.0.0.1:54803: POST https://api.gcore.com/dns/v2/zones HTTP/2.0
+     << HTTP/2.0 200 OK 128b
+127.0.0.1:54803: POST https://api.gcore.com/dns/v2/zones/test-tf-rrset-177080… HTTP/2.0
+     << HTTP/2.0 200 OK 207b
+127.0.0.1:54816: GET https://api.gcore.com/dns/v2/zones/test-tf-rrset-177080… HTTP/2.0
+     << HTTP/2.0 200 OK 333b
+127.0.0.1:54816: GET https://api.gcore.com/dns/v2/zones/test-tf-rrset-177080… HTTP/2.0
+     << HTTP/2.0 200 OK 207b
+127.0.0.1:54841: GET https://api.gcore.com/dns/v2/zones/test-tf-rrset-177080… HTTP/2.0
+     << HTTP/2.0 200 OK 334b
+127.0.0.1:54841: GET https://api.gcore.com/dns/v2/zones/test-tf-rrset-177080… HTTP/2.0
+     << HTTP/2.0 200 OK 207b
+127.0.0.1:54854: GET https://api.gcore.com/dns/v2/zones/test-tf-rrset-177080… HTTP/2.0
+     << HTTP/2.0 200 OK 333b
+127.0.0.1:54854: GET https://api.gcore.com/dns/v2/zones/test-tf-rrset-177080… HTTP/2.0
+     << HTTP/2.0 200 OK 207b
+127.0.0.1:54885: GET https://api.gcore.com/dns/v2/zones/test-tf-rrset-177080… HTTP/2.0
+     << HTTP/2.0 200 OK 334b
+127.0.0.1:54885: GET https://api.gcore.com/dns/v2/zones/test-tf-rrset-177080… HTTP/2.0
+     << HTTP/2.0 200 OK 207b
+127.0.0.1:54887: PUT https://api.gcore.com/dns/v2/zones/test-tf-rrset-177080… HTTP/2.0
+     << HTTP/2.0 200 OK 207b
+127.0.0.1:54906: GET https://api.gcore.com/dns/v2/zones/test-tf-rrset-177080… HTTP/2.0
+     << HTTP/2.0 200 OK 332b
+127.0.0.1:54906: GET https://api.gcore.com/dns/v2/zones/test-tf-rrset-177080… HTTP/2.0
+     << HTTP/2.0 200 OK 207b
+127.0.0.1:54924: GET https://api.gcore.com/dns/v2/zones/test-tf-rrset-177080… HTTP/2.0
+     << HTTP/2.0 200 OK 332b
+127.0.0.1:54924: GET https://api.gcore.com/dns/v2/zones/test-tf-rrset-177080… HTTP/2.0
+     << HTTP/2.0 200 OK 207b
+127.0.0.1:54927: POST https://api.gcore.com/dns/v2/zones/test-tf-rrset-177080… HTTP/2.0
+     << HTTP/2.0 200 OK 245b
+127.0.0.1:55094: GET https://api.gcore.com/dns/v2/zones/test-tf-rrset-177080… HTTP/2.0
+     << HTTP/2.0 200 OK 360b
+127.0.0.1:55094: GET https://api.gcore.com/dns/v2/zones/test-tf-rrset-177080… HTTP/2.0
+     << HTTP/2.0 200 OK 207b
+127.0.0.1:55094: GET https://api.gcore.com/dns/v2/zones/test-tf-rrset-177080… HTTP/2.0
+     << HTTP/2.0 200 OK 245b
+127.0.0.1:55110: GET https://api.gcore.com/dns/v2/zones/test-tf-rrset-177080… HTTP/2.0
+     << HTTP/2.0 200 OK 360b
+127.0.0.1:55110: GET https://api.gcore.com/dns/v2/zones/test-tf-rrset-177080… HTTP/2.0
+     << HTTP/2.0 200 OK 207b
+127.0.0.1:55110: GET https://api.gcore.com/dns/v2/zones/test-tf-rrset-177080… HTTP/2.0
+     << HTTP/2.0 200 OK 245b
+127.0.0.1:55113: POST https://api.gcore.com/dns/v2/zones/test-tf-rrset-177080… HTTP/2.0
+     << HTTP/2.0 200 OK 253b
+127.0.0.1:55128: GET https://api.gcore.com/dns/v2/zones/test-tf-rrset-177080… HTTP/2.0
+     << HTTP/2.0 200 OK 379b
+127.0.0.1:55128: GET https://api.gcore.com/dns/v2/zones/test-tf-rrset-177080… HTTP/2.0
+     << HTTP/2.0 200 OK 207b
+127.0.0.1:55128: GET https://api.gcore.com/dns/v2/zones/test-tf-rrset-177080… HTTP/2.0
+     << HTTP/2.0 200 OK 245b
+127.0.0.1:55128: GET https://api.gcore.com/dns/v2/zones/test-tf-rrset-177080… HTTP/2.0
+     << HTTP/2.0 200 OK 253b
+127.0.0.1:55145: GET https://api.gcore.com/dns/v2/zones/test-tf-rrset-177080… HTTP/2.0
+     << HTTP/2.0 200 OK 207b
+127.0.0.1:55155: GET https://api.gcore.com/dns/v2/zones/test-tf-rrset-177080… HTTP/2.0
+     << HTTP/2.0 200 OK 378b
+127.0.0.1:55155: GET https://api.gcore.com/dns/v2/zones/test-tf-rrset-177080… HTTP/2.0
+     << HTTP/2.0 200 OK 207b
+127.0.0.1:55155: GET https://api.gcore.com/dns/v2/zones/test-tf-rrset-177080… HTTP/2.0
+     << HTTP/2.0 200 OK 245b
+127.0.0.1:55155: GET https://api.gcore.com/dns/v2/zones/test-tf-rrset-177080… HTTP/2.0
+     << HTTP/2.0 200 OK 253b
+127.0.0.1:55168: GET https://api.gcore.com/dns/v2/zones/test-tf-rrset-177080… HTTP/2.0
+     << HTTP/2.0 200 OK 379b
+127.0.0.1:55168: GET https://api.gcore.com/dns/v2/zones/test-tf-rrset-177080… HTTP/2.0
+     << HTTP/2.0 200 OK 207b
+127.0.0.1:55168: GET https://api.gcore.com/dns/v2/zones/test-tf-rrset-177080… HTTP/2.0
+     << HTTP/2.0 200 OK 253b
+127.0.0.1:55168: GET https://api.gcore.com/dns/v2/zones/test-tf-rrset-177080… HTTP/2.0
+     << HTTP/2.0 200 OK 245b

@@ -1,0 +1,125 @@
+[33m╷[0m[0m
+[33m│[0m [0m[1m[33mWarning: [0m[0m[1mProvider development overrides are in effect[0m
+[33m│[0m [0m
+[33m│[0m [0m[0mThe following provider development overrides are set in the CLI
+[33m│[0m [0mconfiguration:
+[33m│[0m [0m - gcore/gcore in /Users/user/repos/gcore-terraform
+[33m│[0m [0m
+[33m│[0m [0mThe behavior may therefore not match any released version of the provider
+[33m│[0m [0mand applying changes may cause the state to become incompatible with
+[33m│[0m [0mpublished releases.
+[33m╵[0m[0m
+[0m[1mgcore_cloud_network.test: Refreshing state... [id=9592b3b9-0dc1-47b8-9d77-7d2c9a822799][0m
+[0m[1mgcore_cloud_network_subnet.test: Refreshing state... [id=18fd02e0-e1a6-451f-8789-51d56c016a62][0m
+[0m[1mgcore_cloud_load_balancer.test: Refreshing state... [id=5ac291a4-6db8-41be-914b-b76235e86407][0m
+[0m[1mgcore_cloud_load_balancer_listener.test: Refreshing state... [id=f97ab14a-4f8c-4bf5-a690-6d11e31f9e3b][0m
+[0m[1mgcore_cloud_load_balancer_pool.test: Refreshing state... [id=08a28bd7-588f-4244-ab76-39522fa76ca1][0m
+[0m[1mgcore_cloud_load_balancer_pool_member.test[0]: Refreshing state... [id=0604175c-de31-4f24-b674-5988405c9266][0m
+
+[1m[36mNote:[0m[1m Objects have changed outside of Terraform
+[0m
+Terraform detected the following changes made outside of Terraform since the
+last "terraform apply" which may have affected this plan:
+
+[1m  # gcore_cloud_load_balancer.test[0m has changed
+[0m  [33m~[0m[0m resource "gcore_cloud_load_balancer" "test" {
+        id                     = "5ac291a4-6db8-41be-914b-b76235e86407"
+        name                   = "test-lb-gcloud2-20778"
+      [33m~[0m[0m operating_status       = "ONLINE" [33m->[0m[0m "ERROR"
+        tags                   = {
+            "env"  = "testing"
+            "test" = "gcloud2-20778"
+        }
+        [90m# (18 unchanged attributes hidden)[0m[0m
+    }
+
+[1m  # gcore_cloud_load_balancer_pool.test[0m has changed
+[0m  [33m~[0m[0m resource "gcore_cloud_load_balancer_pool" "test" {
+        id                  = "08a28bd7-588f-4244-ab76-39522fa76ca1"
+        name                = "test-pool"
+      [33m~[0m[0m operating_status    = "ONLINE" [33m->[0m[0m "ERROR"
+        [90m# (9 unchanged attributes hidden)[0m[0m
+    }
+
+
+Unless you have made equivalent changes to your configuration, or ignored the
+relevant attributes using ignore_changes, the following plan may include
+actions to undo or respond to these changes.
+[90m
+─────────────────────────────────────────────────────────────────────────────[0m
+
+Terraform used the selected providers to generate the following execution
+plan. Resource actions are indicated with the following symbols:
+  [33m~[0m update in-place[0m
+
+Terraform will perform the following actions:
+
+[1m  # gcore_cloud_load_balancer.test[0m will be updated in-place
+[0m  [33m~[0m[0m resource "gcore_cloud_load_balancer" "test" {
+      [32m+[0m[0m ddos_profile           = (known after apply)
+        id                     = "5ac291a4-6db8-41be-914b-b76235e86407"
+      [33m~[0m[0m name                   = "test-lb-gcloud2-20778" [33m->[0m[0m "updated-lb-gcloud2-20778"
+      [32m+[0m[0m stats                  = (known after apply)
+        tags                   = {
+            "env"  = "testing"
+            "test" = "gcloud2-20778"
+        }
+      [33m~[0m[0m updated_at             = "2025-11-19T13:24:35Z" -> (known after apply)
+      [33m~[0m[0m vrrp_ips               = [
+          [31m-[0m[0m {
+              [31m-[0m[0m ip_address = "10.100.0.235" [90m-> null[0m[0m
+              [31m-[0m[0m role       = "BACKUP" [90m-> null[0m[0m
+              [31m-[0m[0m subnet_id  = "18fd02e0-e1a6-451f-8789-51d56c016a62" [90m-> null[0m[0m
+            },
+          [31m-[0m[0m {
+              [31m-[0m[0m ip_address = "10.100.0.147" [90m-> null[0m[0m
+              [31m-[0m[0m role       = "MASTER" [90m-> null[0m[0m
+              [31m-[0m[0m subnet_id  = "18fd02e0-e1a6-451f-8789-51d56c016a62" [90m-> null[0m[0m
+            },
+        ] -> (known after apply)
+        [90m# (17 unchanged attributes hidden)[0m[0m
+    }
+
+[1mPlan:[0m 0 to add, 1 to change, 0 to destroy.
+[0m
+Changes to Outputs:
+  [33m~[0m[0m lb_operating_status       = "ONLINE" [33m->[0m[0m "ERROR"
+  [33m~[0m[0m lb_vrrp_ips               = [
+      [31m-[0m[0m {
+          [31m-[0m[0m ip_address = "10.100.0.235"
+          [31m-[0m[0m role       = "BACKUP"
+          [31m-[0m[0m subnet_id  = "18fd02e0-e1a6-451f-8789-51d56c016a62"
+        },
+      [31m-[0m[0m {
+          [31m-[0m[0m ip_address = "10.100.0.147"
+          [31m-[0m[0m role       = "MASTER"
+          [31m-[0m[0m subnet_id  = "18fd02e0-e1a6-451f-8789-51d56c016a62"
+        },
+    ] -> (known after apply)
+  [33m~[0m[0m pool_operating_status     = "ONLINE" [33m->[0m[0m "ERROR"
+[0m[1mgcore_cloud_load_balancer.test: Modifying... [id=5ac291a4-6db8-41be-914b-b76235e86407][0m[0m
+[0m[1mgcore_cloud_load_balancer.test: Modifications complete after 2s [id=5ac291a4-6db8-41be-914b-b76235e86407][0m
+[0m[1m[32m
+Apply complete! Resources: 0 added, 1 changed, 0 destroyed.
+[0m[0m[1m[32m
+Outputs:
+
+[0mlb_id = "5ac291a4-6db8-41be-914b-b76235e86407"
+lb_operating_status = "ERROR"
+lb_vip_address = "10.100.0.10"
+lb_vrrp_ips = tolist([
+  {
+    "ip_address" = "10.100.0.235"
+    "role" = "BACKUP"
+    "subnet_id" = "18fd02e0-e1a6-451f-8789-51d56c016a62"
+  },
+  {
+    "ip_address" = "10.100.0.147"
+    "role" = "MASTER"
+    "subnet_id" = "18fd02e0-e1a6-451f-8789-51d56c016a62"
+  },
+])
+listener_connection_limit = 100000
+listener_id = "f97ab14a-4f8c-4bf5-a690-6d11e31f9e3b"
+pool_id = "08a28bd7-588f-4244-ab76-39522fa76ca1"
+pool_operating_status = "ERROR"

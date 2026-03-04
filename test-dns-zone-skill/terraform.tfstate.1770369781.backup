@@ -1,0 +1,67 @@
+{
+  "version": 4,
+  "terraform_version": "1.14.3",
+  "serial": 55,
+  "lineage": "008429f6-8ae0-6e49-738a-deecbca1b33c",
+  "outputs": {
+    "zone_name": {
+      "value": "test-dns-zone-skill-20260206.com",
+      "type": "string"
+    },
+    "zone_status": {
+      "value": "pending",
+      "type": "string"
+    }
+  },
+  "resources": [
+    {
+      "mode": "managed",
+      "type": "gcore_dns_zone",
+      "name": "test",
+      "provider": "provider[\"registry.terraform.io/gcore/gcore\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "contact": "support@gcore.com",
+            "dnssec_enabled": false,
+            "enabled": true,
+            "expiry": 1209600,
+            "id": "test-dns-zone-skill-20260206.com",
+            "meta": null,
+            "name": "test-dns-zone-skill-20260206.com",
+            "nx_ttl": 300,
+            "primary_server": "ns1.gcorelabs.net",
+            "records": [
+              {
+                "name": "test-dns-zone-skill-20260206.com",
+                "short_answers": [
+                  "ns1.gcorelabs.net",
+                  "ns2.gcdn.services"
+                ],
+                "ttl": 3600,
+                "type": "NS"
+              }
+            ],
+            "refresh": 5400,
+            "retry": 3600,
+            "rrsets_amount": {
+              "dynamic": {
+                "healthcheck": 0,
+                "total": 0
+              },
+              "static": 1,
+              "total": 1
+            },
+            "serial": 1770369759,
+            "status": "pending",
+            "warnings": null
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0
+        }
+      ]
+    }
+  ],
+  "check_results": null
+}

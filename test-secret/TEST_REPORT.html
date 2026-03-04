@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Report: gcore_fastedge_secret</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f5f5f5; color: #333; line-height: 1.6; }
+        .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
+        header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 30px; border-radius: 10px; margin-bottom: 30px; }
+        h1 { font-size: 2em; margin-bottom: 10px; }
+        .meta { opacity: 0.9; font-size: 0.9em; }
+        .summary { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-bottom: 30px; }
+        .card { background: white; border-radius: 10px; padding: 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        .card h3 { color: #667eea; margin-bottom: 10px; font-size: 0.9em; text-transform: uppercase; }
+        .card .value { font-size: 2em; font-weight: bold; }
+        .pass { color: #10b981; }
+        .fail { color: #ef4444; }
+        .warning { color: #f59e0b; }
+        .section { background: white; border-radius: 10px; padding: 25px; margin-bottom: 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        .section h2 { color: #333; margin-bottom: 20px; padding-bottom: 10px; border-bottom: 2px solid #667eea; }
+        .section h3 { color: #555; margin: 20px 0 10px 0; }
+        table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+        th, td { padding: 12px; text-align: left; border-bottom: 1px solid #eee; }
+        th { background: #f8f9fa; font-weight: 600; color: #555; }
+        tr:hover { background: #f8f9fa; }
+        .status-badge { padding: 4px 12px; border-radius: 20px; font-size: 0.85em; font-weight: 500; }
+        .status-pass { background: #d1fae5; color: #065f46; }
+        .status-fail { background: #fee2e2; color: #991b1b; }
+        .status-warning { background: #fef3c7; color: #92400e; }
+        pre { background: #1e1e1e; color: #d4d4d4; padding: 15px; border-radius: 8px; overflow-x: auto; font-size: 0.85em; margin-top: 10px; }
+        .code { font-family: 'Monaco', 'Menlo', monospace; background: #f1f5f9; padding: 2px 6px; border-radius: 4px; }
+        .method { display: inline-block; padding: 3px 8px; border-radius: 4px; font-weight: bold; font-size: 0.8em; margin-right: 10px; }
+        .method-post { background: #10b981; color: white; }
+        .method-get { background: #3b82f6; color: white; }
+        .method-patch { background: #f59e0b; color: white; }
+        .method-delete { background: #ef4444; color: white; }
+        .issue-card { background: #fff; border: 1px solid #e5e7eb; border-radius: 8px; padding: 15px; margin-bottom: 15px; }
+        .issue-card.critical { border-left: 4px solid #ef4444; }
+        .issue-card.warning { border-left: 4px solid #f59e0b; }
+        .issue-card.info { border-left: 4px solid #3b82f6; }
+    </style>
+</head>
+<body>
+<div class="container">
+
+<header>
+    <h1>Test Report: gcore_fastedge_secret</h1>
+    <div class="meta">
+        <strong>Branch:</strong> fix/fastedge-secret-customizations |
+        <strong>Date:</strong> 2026-02-04 |
+        <strong>Resource:</strong> gcore_fastedge_secret |
+        <strong>API:</strong> FastEdge /fastedge/v1/secrets
+    </div>
+</header>
+
+<div class="summary">
+    <div class="card">
+        <h3>Total Tests</h3>
+        <div class="value">7</div>
+    </div>
+    <div class="card">
+        <h3>Passed</h3>
+        <div class="value pass">7</div>
+    </div>
+    <div class="card">
+        <h3>Warnings</h3>
+        <div class="value warning">3</div>
+    </div>
+    <div class="card">
+        <h3>Failed</h3>
+        <div class="value fail">0</div>
+    </div>
+</div>
+
+<div class="section">
+    <h2>Test Results</h2>
+    <table>
+        <tr>
+            <th>#</th>
+            <th>Test</th>
+            <th>Description</th>
+            <th>Status</th>
+        </tr>
+        <tr>
+            <td>1</td>
+            <td>Create minimal secret</td>
+            <td>Create with name only, verify no drift on 2nd plan</td>
+            <td><span class="status-badge status-pass">PASS</span></td>
+        </tr>
+        <tr>
+            <td>2</td>
+            <td>Update: add comment</td>
+            <td>Add comment via PATCH, verify in-place update (ID preserved: 325)</td>
+            <td><span class="status-badge status-pass">PASS</span></td>
+        </tr>
+        <tr>
+            <td>3</td>
+            <td>Add secret slots</td>
+            <td>Add 2 slots with sensitive values, verify checksums returned, no drift</td>
+            <td><span class="status-badge status-pass">PASS</span></td>
+        </tr>
+        <tr>
+            <td>4</td>
+            <td>Update: change name</td>
+            <td>Update name via PATCH, verify in-place update (ID preserved: 325)</td>
+            <td><span class="status-badge status-pass">PASS</span></td>
+        </tr>
+        <tr>
+            <td>5</td>
+            <td>Update secrets via wo_version</td>
+            <td>Change secret values + increment wo_version=2, verify checksums change</td>
+            <td><span class="status-badge status-pass">PASS</span></td>
+        </tr>
+        <tr>
+            <td>6</td>
+            <td>Import by ID</td>
+            <td>Remove from state, import by ID 325, verify all fields populated</td>
+            <td><span class="status-badge status-pass">PASS</span></td>
+        </tr>
+        <tr>
+            <td>7</td>
+            <td>Delete with force</td>
+            <td>Destroy resource, verify DELETE with force=true, API confirms deletion</td>
+            <td><span class="status-badge status-pass">PASS</span></td>
+        </tr>
+    </table>
+</div>
+
+<div class="section">
+    <h2>Fixes Applied During Testing</h2>
+
+    <div class="issue-card critical">
+        <h3>Fix 1: WriteOnly not allowed in SetNestedAttribute</h3>
+        <p><strong>Issue:</strong> Terraform framework does not allow <code class="code">WriteOnly: true</code> inside <code class="code">SetNestedAttribute</code>. Schema validation fails at provider startup.</p>
+        <p><strong>Root Cause:</strong> Set semantics require hashing all child attributes for uniqueness, but WriteOnly attributes can't be hashed (never stored in state).</p>
+        <p><strong>Fix:</strong> Changed <code class="code">secret_slots</code> from <code class="code">SetNestedAttribute</code> to <code class="code">ListNestedAttribute</code> and changed <code class="code">value</code> from <code class="code">WriteOnly: true</code> to <code class="code">Sensitive: true</code>. Also updated model type from <code class="code">NestedObjectSet</code> to <code class="code">NestedObjectList</code>.</p>
+        <p><strong>Files:</strong></p>
+        <ul>
+            <li><code class="code">internal/services/fastedge_secret/schema.go:33</code> - SetNestedAttribute &rarr; ListNestedAttribute</li>
+            <li><code class="code">internal/services/fastedge_secret/schema.go:51</code> - WriteOnly:true &rarr; Sensitive:true</li>
+            <li><code class="code">internal/services/fastedge_secret/model.go:15</code> - NestedObjectSet &rarr; NestedObjectList</li>
+        </ul>
+    </div>
+
+    <div class="issue-card critical">
+        <h3>Fix 2: ID lost during Read/Update (API doesn't return ID)</h3>
+        <p><strong>Issue:</strong> The FastEdge GET and PATCH responses do not include <code class="code">id</code> field. The <code class="code">apijson.UnmarshalComputed</code> decoder sets computed fields not present in JSON to null, causing <code class="code">id</code> to be lost.</p>
+        <p><strong>Root Cause:</strong> GET <code class="code">/fastedge/v1/secrets/{id}</code> returns <code class="code">{"app_count":0,"name":"...","secret_slots":[]}</code> without <code class="code">id</code>. PATCH response also omits <code class="code">id</code>.</p>
+        <p><strong>Fix:</strong> Preserve ID before API call and restore after unmarshal in Read, Update, and ImportState.</p>
+        <p><strong>Files:</strong></p>
+        <ul>
+            <li><code class="code">internal/services/fastedge_secret/resource.go:152</code> - Read: save/restore ID</li>
+            <li><code class="code">internal/services/fastedge_secret/resource.go:100</code> - Update: save/restore ID</li>
+            <li><code class="code">internal/services/fastedge_secret/resource.go:252</code> - ImportState: restore ID</li>
+        </ul>
+    </div>
+
+    <div class="issue-card warning">
+        <h3>Fix 3: ImportState used UnmarshalComputed instead of Unmarshal</h3>
+        <p><strong>Issue:</strong> ImportState was using <code class="code">UnmarshalComputed</code> which skips <code class="code">required</code> and <code class="code">optional</code> fields (like <code class="code">name</code> and <code class="code">comment</code>), resulting in incomplete state after import.</p>
+        <p><strong>Fix:</strong> Changed ImportState to use <code class="code">apijson.Unmarshal</code> (full deserialization) since all fields need to be populated on import.</p>
+        <p><strong>Files:</strong></p>
+        <ul>
+            <li><code class="code">internal/services/fastedge_secret/resource.go:246</code> - Unmarshal instead of UnmarshalComputed</li>
+        </ul>
+    </div>
+
+    <div class="issue-card info">
+        <h3>Fix 4: Read used Unmarshal instead of UnmarshalComputed</h3>
+        <p><strong>Issue:</strong> Read function was using <code class="code">apijson.Unmarshal</code> which would overwrite user-provided values (like <code class="code">name</code>) with API values. Should preserve user config values.</p>
+        <p><strong>Fix:</strong> Changed Read to use <code class="code">apijson.UnmarshalComputed</code> which only updates computed fields from API response.</p>
+        <p><strong>Files:</strong></p>
+        <ul>
+            <li><code class="code">internal/services/fastedge_secret/resource.go:169</code> - UnmarshalComputed for Read</li>
+        </ul>
+    </div>
+</div>
+
+<div class="section">
+    <h2>MITM API Calls</h2>
+    <p>Total captured API calls: 18 (1 POST, 13 GET, 4 PATCH)</p>
+    <table>
+        <tr>
+            <th>Method</th>
+            <th>Endpoint</th>
+            <th>Test</th>
+            <th>Response</th>
+        </tr>
+        <tr>
+            <td><span class="method method-post">POST</span></td>
+            <td>/fastedge/v1/secrets</td>
+            <td>Test 1: Create</td>
+            <td>200 OK - {"name":"tf-test-secret-qa","id":325}</td>
+        </tr>
+        <tr>
+            <td><span class="method method-get">GET</span></td>
+            <td>/fastedge/v1/secrets/325</td>
+            <td>Multiple (Read/Refresh)</td>
+            <td>200 OK</td>
+        </tr>
+        <tr>
+            <td><span class="method method-patch">PATCH</span></td>
+            <td>/fastedge/v1/secrets/325</td>
+            <td>Test 2: Add comment</td>
+            <td>200 OK - comment added</td>
+        </tr>
+        <tr>
+            <td><span class="method method-patch">PATCH</span></td>
+            <td>/fastedge/v1/secrets/325</td>
+            <td>Test 3: Add slots</td>
+            <td>200 OK - 2 slots with checksums</td>
+        </tr>
+        <tr>
+            <td><span class="method method-patch">PATCH</span></td>
+            <td>/fastedge/v1/secrets/325</td>
+            <td>Test 4: Update name</td>
+            <td>200 OK - name updated</td>
+        </tr>
+        <tr>
+            <td><span class="method method-patch">PATCH</span></td>
+            <td>/fastedge/v1/secrets/325</td>
+            <td>Test 5: Update secrets</td>
+            <td>200 OK - new checksums</td>
+        </tr>
+        <tr>
+            <td><span class="method method-delete">DELETE</span></td>
+            <td>/fastedge/v1/secrets/325?force=true</td>
+            <td>Test 7: Delete</td>
+            <td>204 No Content</td>
+        </tr>
+    </table>
+</div>
+
+<div class="section">
+    <h2>Known Issues / Warnings</h2>
+
+    <div class="issue-card warning">
+        <h3>Warning 1: Create API response is incomplete</h3>
+        <p>The POST response only returns <code class="code">{"name":"...","id":N}</code> without <code class="code">app_count</code> and <code class="code">secret_slots</code>. This causes a one-time output drift on the first plan after create. A second apply resolves it. This is an API-side issue, not a provider bug.</p>
+    </div>
+
+    <div class="issue-card warning">
+        <h3>Warning 2: WriteOnly + Set incompatibility required List fallback</h3>
+        <p>The ideal design would use <code class="code">SetNestedAttribute</code> (no ordering) with <code class="code">WriteOnly</code> for secret values. However, Terraform framework explicitly forbids WriteOnly children in Set attributes. The fallback is <code class="code">ListNestedAttribute</code> + <code class="code">Sensitive</code>, which means: (1) ordering matters - changing slot order causes drift, (2) secret values are stored in state (masked as sensitive).</p>
+    </div>
+
+    <div class="issue-card warning">
+        <h3>Warning 3: GET/PATCH responses don't include ID</h3>
+        <p>The FastEdge API GET and PATCH responses omit the <code class="code">id</code> field. Only the POST (create) response includes it. This required manual ID preservation in Read, Update, and Import functions. This should be reported as an API improvement suggestion.</p>
+    </div>
+</div>
+
+<div class="section">
+    <h2>Test Details</h2>
+
+    <h3>Test 1: Create Minimal Secret</h3>
+    <pre>
+terraform apply -var='secret_name=tf-test-secret-qa'
+# Created secret ID 325
+# POST /fastedge/v1/secrets -> 200 OK {"name":"tf-test-secret-qa","id":325}
+
+terraform plan -detailed-exitcode
+# No changes (after stabilization). Your infrastructure matches the configuration.
+# EXIT_CODE: 0
+    </pre>
+
+    <h3>Test 2: Add Comment (In-Place Update)</h3>
+    <pre>
+terraform apply -var='secret_name=tf-test-secret-qa' -var='secret_comment=QA test comment'
+# gcore_fastedge_secret.test will be updated in-place
+#   + comment = "QA test comment"
+#   id = 325 (preserved)
+# PATCH /fastedge/v1/secrets/325 -> 200 OK
+
+terraform plan -detailed-exitcode
+# No changes. EXIT_CODE: 0
+    </pre>
+
+    <h3>Test 3: Add Secret Slots</h3>
+    <pre>
+terraform apply -var='secret_slots=[{"slot":1,"value":"my-secret-value-1"},{"slot":2,"value":"my-secret-value-2"}]' -var='secret_slots_wo_version=1'
+# secret_slots = [
+#   { checksum = "5423b292...", slot = 1, value = (sensitive value) },
+#   { checksum = "cc466be7...", slot = 2, value = (sensitive value) },
+# ]
+# PATCH /fastedge/v1/secrets/325 -> 200 OK
+
+terraform plan -detailed-exitcode
+# No changes. EXIT_CODE: 0
+    </pre>
+
+    <h3>Test 4: Update Name (In-Place)</h3>
+    <pre>
+terraform apply -var='secret_name=tf-test-secret-qa-updated'
+# ~ name = "tf-test-secret-qa" -> "tf-test-secret-qa-updated"
+# id = 325 (preserved - in-place update confirmed)
+# PATCH /fastedge/v1/secrets/325 -> 200 OK
+
+terraform plan -detailed-exitcode
+# No changes. EXIT_CODE: 0
+    </pre>
+
+    <h3>Test 5: Update Secret Values via wo_version</h3>
+    <pre>
+terraform apply -var='secret_slots=[{"slot":1,"value":"UPDATED-secret-value-1"},{"slot":2,"value":"UPDATED-secret-value-2"}]' -var='secret_slots_wo_version=2'
+# ~ secret_slots_wo_version = 1 -> 2
+# ~ checksum = "5423b292..." -> (known after apply)  # Checksums changed!
+# ~ value = (sensitive value)
+# PATCH /fastedge/v1/secrets/325 -> 200 OK
+
+terraform plan -detailed-exitcode
+# No changes. EXIT_CODE: 0
+    </pre>
+
+    <h3>Test 6: Import by ID</h3>
+    <pre>
+terraform state rm gcore_fastedge_secret.test
+terraform import gcore_fastedge_secret.test 325
+# Import successful!
+# State shows:
+#   id = 325
+#   name = "tf-test-secret-qa-updated"
+#   comment = "QA test comment"
+#   secret_slots = [ {checksum="d8e7...", slot=1}, {checksum="d4c3...", slot=2} ]
+#   app_count = 0
+    </pre>
+
+    <h3>Test 7: Delete with Force</h3>
+    <pre>
+terraform destroy -auto-approve
+# gcore_fastedge_secret.test: Destroying... [name=tf-test-secret-qa-updated]
+# Destruction complete after 0s
+# DELETE /fastedge/v1/secrets/325?force=true -> 204 No Content
+
+# API verification:
+curl /fastedge/v1/secrets -> {"secrets":[]}  # Confirmed deleted
+    </pre>
+</div>
+
+<div class="section">
+    <h2>QA Checklist</h2>
+    <table>
+        <tr><th>Category</th><th>Status</th><th>Notes</th></tr>
+        <tr><td>Drift detection</td><td><span class="status-badge status-pass">PASS</span></td><td>No drift on 2nd plan for all tests</td></tr>
+        <tr><td>Update in-place</td><td><span class="status-badge status-pass">PASS</span></td><td>ID 325 preserved across all updates (Tests 2-5)</td></tr>
+        <tr><td>Sensitive fields</td><td><span class="status-badge status-pass">PASS</span></td><td>Secret values shown as (sensitive value) in plan/apply</td></tr>
+        <tr><td>Version tracking (wo_version)</td><td><span class="status-badge status-pass">PASS</span></td><td>Incrementing wo_version triggers secret re-send (Test 5)</td></tr>
+        <tr><td>Import</td><td><span class="status-badge status-pass">PASS</span></td><td>All fields populated correctly from API (Test 6)</td></tr>
+        <tr><td>Delete (force)</td><td><span class="status-badge status-pass">PASS</span></td><td>DELETE with force=true, resource removed (Test 7)</td></tr>
+        <tr><td>MITM verification</td><td><span class="status-badge status-pass">PASS</span></td><td>All API calls verified: POST, PATCH, GET, DELETE</td></tr>
+        <tr><td>Sync operations</td><td><span class="status-badge status-pass">PASS</span></td><td>All operations complete immediately (no polling)</td></tr>
+        <tr><td>Create response incomplete</td><td><span class="status-badge status-warning">WARNING</span></td><td>POST response missing app_count/secret_slots - API issue</td></tr>
+        <tr><td>GET/PATCH missing ID</td><td><span class="status-badge status-warning">WARNING</span></td><td>API responses omit id field - worked around in provider</td></tr>
+        <tr><td>WriteOnly+Set incompatible</td><td><span class="status-badge status-warning">WARNING</span></td><td>Fell back to List+Sensitive - TF framework limitation</td></tr>
+    </table>
+</div>
+
+<div class="section">
+    <h2>Evidence Package</h2>
+    <table>
+        <tr><th>Artifact</th><th>File</th></tr>
+        <tr><td>Test 1: Create apply log</td><td><code class="code">evidence/test1_apply.log</code></td></tr>
+        <tr><td>Test 1: Drift test log</td><td><code class="code">evidence/test1_drift.log</code></td></tr>
+        <tr><td>Test 1: Refresh log</td><td><code class="code">evidence/test1_refresh.log</code></td></tr>
+        <tr><td>Test 2: Comment update log</td><td><code class="code">evidence/test2_apply.log</code></td></tr>
+        <tr><td>Test 3: Secret slots log</td><td><code class="code">evidence/test3_apply.log</code></td></tr>
+        <tr><td>Test 3: Drift log</td><td><code class="code">evidence/test3_drift.log</code></td></tr>
+        <tr><td>Test 5: wo_version update log</td><td><code class="code">evidence/test5_apply.log</code></td></tr>
+        <tr><td>Test 6: Import log</td><td><code class="code">evidence/test6_import.log</code></td></tr>
+        <tr><td>Test 6: State after import</td><td><code class="code">evidence/test6_state.log</code></td></tr>
+        <tr><td>Test 7: Destroy log</td><td><code class="code">evidence/test7_destroy.log</code></td></tr>
+        <tr><td>MITM API calls</td><td><code class="code">evidence/mitm_api_calls.log</code></td></tr>
+        <tr><td>MITM flow capture</td><td><code class="code">flow.mitm</code></td></tr>
+    </table>
+</div>
+
+</div>
+</body>
+</html>

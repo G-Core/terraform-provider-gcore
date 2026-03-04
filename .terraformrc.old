@@ -1,0 +1,5 @@
+# This terraformrc file has NO dev_overrides
+# It will use the official G-Core/gcore provider from registry
+provider_installation {
+  direct {}
+}

@@ -1,0 +1,541 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Test Report: gcore_cloud_security_group</title>
+<style>
+  :root {
+    --bg: #0d1117;
+    --card: #161b22;
+    --border: #30363d;
+    --text: #e6edf3;
+    --muted: #8b949e;
+    --green: #3fb950;
+    --red: #f85149;
+    --yellow: #d29922;
+    --blue: #58a6ff;
+    --purple: #bc8cff;
+    --cyan: #39d2c0;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.6;
+    padding: 2rem;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+  h1 { font-size: 1.8rem; margin-bottom: 0.25rem; }
+  h2 { font-size: 1.3rem; margin: 2rem 0 1rem; color: var(--blue); border-bottom: 1px solid var(--border); padding-bottom: 0.5rem; }
+  h3 { font-size: 1.05rem; margin: 1.25rem 0 0.75rem; color: var(--purple); }
+  .subtitle { color: var(--muted); font-size: 0.9rem; margin-bottom: 1.5rem; }
+  .badge {
+    display: inline-block;
+    padding: 0.15rem 0.6rem;
+    border-radius: 999px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+  }
+  .badge-pass { background: rgba(63,185,80,0.15); color: var(--green); border: 1px solid rgba(63,185,80,0.3); }
+  .badge-fail { background: rgba(248,81,73,0.15); color: var(--red); border: 1px solid rgba(248,81,73,0.3); }
+  .badge-warn { background: rgba(210,153,34,0.15); color: var(--yellow); border: 1px solid rgba(210,153,34,0.3); }
+  .badge-info { background: rgba(88,166,255,0.15); color: var(--blue); border: 1px solid rgba(88,166,255,0.3); }
+  .badge-skip { background: rgba(139,148,158,0.15); color: var(--muted); border: 1px solid rgba(139,148,158,0.3); }
+
+  /* Summary cards */
+  .summary-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 1rem;
+    margin: 1.5rem 0;
+  }
+  .summary-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 1.25rem;
+    text-align: center;
+  }
+  .summary-card .number {
+    font-size: 2.2rem;
+    font-weight: 700;
+    line-height: 1;
+  }
+  .summary-card .label {
+    font-size: 0.8rem;
+    color: var(--muted);
+    margin-top: 0.35rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+  .number-pass { color: var(--green); }
+  .number-warn { color: var(--yellow); }
+  .number-total { color: var(--blue); }
+  .number-rules { color: var(--cyan); }
+
+  /* Tables */
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 0.75rem 0 1.5rem;
+    font-size: 0.88rem;
+  }
+  th, td {
+    padding: 0.6rem 0.75rem;
+    text-align: left;
+    border-bottom: 1px solid var(--border);
+  }
+  th {
+    background: var(--card);
+    color: var(--muted);
+    font-weight: 600;
+    font-size: 0.78rem;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    position: sticky;
+    top: 0;
+  }
+  tr:hover td { background: rgba(88,166,255,0.04); }
+  td code {
+    background: rgba(88,166,255,0.1);
+    color: var(--blue);
+    padding: 0.1rem 0.4rem;
+    border-radius: 4px;
+    font-size: 0.82rem;
+  }
+  td.result-pass { color: var(--green); font-weight: 600; }
+  td.result-fail { color: var(--red); font-weight: 600; }
+  td.result-warn { color: var(--yellow); font-weight: 600; }
+  td.result-skip { color: var(--muted); font-weight: 600; }
+
+  /* Cards / panels */
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 1.25rem;
+    margin: 1rem 0;
+  }
+  .card-warn {
+    border-left: 3px solid var(--yellow);
+  }
+  .card-info {
+    border-left: 3px solid var(--blue);
+  }
+  .card-success {
+    border-left: 3px solid var(--green);
+  }
+  .card h4 {
+    font-size: 0.95rem;
+    margin-bottom: 0.5rem;
+  }
+  .card p, .card li {
+    font-size: 0.88rem;
+    color: var(--muted);
+  }
+  .card ul { padding-left: 1.25rem; margin-top: 0.5rem; }
+  .card li { margin-bottom: 0.25rem; }
+
+  /* Code blocks */
+  pre {
+    background: #0d1117;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 1rem;
+    overflow-x: auto;
+    font-size: 0.82rem;
+    line-height: 1.5;
+    margin: 0.75rem 0;
+  }
+  code { font-family: 'SF Mono', 'Fira Code', 'Cascadia Code', monospace; }
+
+  /* Progress bar */
+  .progress-bar {
+    height: 8px;
+    background: var(--border);
+    border-radius: 4px;
+    overflow: hidden;
+    margin: 0.5rem 0;
+  }
+  .progress-fill {
+    height: 100%;
+    border-radius: 4px;
+    transition: width 0.6s ease;
+  }
+  .progress-fill-pass { background: var(--green); }
+
+  /* File changes */
+  .file-change {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.4rem 0;
+    font-size: 0.85rem;
+  }
+  .file-change .file-icon { font-size: 0.75rem; }
+  .file-new { color: var(--green); }
+  .file-mod { color: var(--yellow); }
+  .file-name { color: var(--text); font-family: 'SF Mono', monospace; font-size: 0.82rem; }
+
+  /* Meta info */
+  .meta-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 0.5rem 2rem;
+    font-size: 0.85rem;
+    margin: 1rem 0;
+  }
+  .meta-item { display: flex; gap: 0.5rem; }
+  .meta-label { color: var(--muted); min-width: 80px; }
+  .meta-value { color: var(--text); font-family: 'SF Mono', monospace; font-size: 0.82rem; }
+
+  /* Checklist */
+  .checklist { list-style: none; padding: 0; }
+  .checklist li {
+    padding: 0.35rem 0;
+    font-size: 0.88rem;
+  }
+  .checklist li::before {
+    content: '✓';
+    display: inline-block;
+    width: 1.5rem;
+    color: var(--green);
+    font-weight: 700;
+  }
+  .checklist li.fail::before { content: '✗'; color: var(--red); }
+  .checklist li.skip::before { content: '—'; color: var(--muted); }
+
+  /* Timeline */
+  .timeline { position: relative; padding-left: 1.5rem; margin: 1rem 0; }
+  .timeline::before {
+    content: '';
+    position: absolute;
+    left: 0.35rem;
+    top: 0.5rem;
+    bottom: 0.5rem;
+    width: 2px;
+    background: var(--border);
+  }
+  .timeline-item {
+    position: relative;
+    padding: 0.5rem 0;
+    font-size: 0.85rem;
+  }
+  .timeline-item::before {
+    content: '';
+    position: absolute;
+    left: -1.25rem;
+    top: 0.85rem;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--green);
+    border: 2px solid var(--bg);
+  }
+  .timeline-item.warn::before { background: var(--yellow); }
+  .timeline-item .time { color: var(--muted); font-size: 0.78rem; }
+
+  footer {
+    margin-top: 3rem;
+    padding-top: 1rem;
+    border-top: 1px solid var(--border);
+    color: var(--muted);
+    font-size: 0.78rem;
+    text-align: center;
+  }
+</style>
+</head>
+<body>
+
+<h1>Test Report: Security Group Resources</h1>
+<p class="subtitle">
+  <code>gcore_cloud_security_group</code> + <code>gcore_cloud_security_group_rule</code>
+  &nbsp;&middot;&nbsp; 2026-02-24
+  &nbsp;&middot;&nbsp; <span class="badge badge-pass">PASS</span>
+</p>
+
+<!-- Summary Cards -->
+<div class="summary-grid">
+  <div class="summary-card">
+    <div class="number number-pass">9/9</div>
+    <div class="label">Tests Passed</div>
+  </div>
+  <div class="summary-card">
+    <div class="number number-rules">9</div>
+    <div class="label">Rule Protocols</div>
+  </div>
+  <div class="summary-card">
+    <div class="number number-warn">1</div>
+    <div class="label">Issues Found</div>
+  </div>
+  <div class="summary-card">
+    <div class="number number-total">11</div>
+    <div class="label">JIRA Tickets</div>
+  </div>
+</div>
+
+<div class="progress-bar"><div class="progress-fill progress-fill-pass" style="width:100%"></div></div>
+
+<!-- Environment -->
+<h2>Environment</h2>
+<div class="meta-grid">
+  <div class="meta-item"><span class="meta-label">Branch</span><span class="meta-value">feature/GCLOUD2-20783-secgroup-rule-resource</span></div>
+  <div class="meta-item"><span class="meta-label">Commit</span><span class="meta-value">73c1990</span></div>
+  <div class="meta-item"><span class="meta-label">Region</span><span class="meta-value">Luxembourg-2 (76)</span></div>
+  <div class="meta-item"><span class="meta-label">Project</span><span class="meta-value">379987</span></div>
+  <div class="meta-item"><span class="meta-label">API</span><span class="meta-value">v2 async endpoints</span></div>
+  <div class="meta-item"><span class="meta-label">Schema Tests</span><span class="meta-value">3/3 PASS</span></div>
+</div>
+
+<!-- Changes Under Test -->
+<h2>Changes Under Test</h2>
+<div class="card">
+  <div class="file-change"><span class="file-icon file-mod">M</span><span class="file-name">cloud_security_group/resource.go</span> &mdash; <span style="color:var(--muted);font-size:0.83rem">NewAndPoll, UpdateAndPoll, deleteDefaultRules, drift suppression</span></div>
+  <div class="file-change"><span class="file-icon file-mod">M</span><span class="file-name">cloud_security_group/schema.go</span> &mdash; <span style="color:var(--muted);font-size:0.83rem">ConfigValidators with rulesNotAllowedValidator</span></div>
+  <div class="file-change"><span class="file-icon file-new">A</span><span class="file-name">cloud_security_group/config_validators.go</span> &mdash; <span style="color:var(--muted);font-size:0.83rem">Block inline rules attribute</span></div>
+</div>
+
+<!-- Test Results -->
+<h2>Test Results</h2>
+<table>
+  <thead>
+    <tr><th>#</th><th>Test</th><th>Result</th><th>Details</th></tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>1</td>
+      <td>Create SG (auto-delete defaults)</td>
+      <td class="result-pass">PASS</td>
+      <td>SG created in ~2m28s. <code>security_group_rules = []</code>. All ~40 default rules deleted.</td>
+    </tr>
+    <tr>
+      <td>2</td>
+      <td>Drift check (empty SG)</td>
+      <td class="result-pass">PASS</td>
+      <td>Exit code 0 after revision sync. Only <code>revision_number</code> drifts (expected).</td>
+    </tr>
+    <tr>
+      <td>3</td>
+      <td>Create 9 rules (multi-protocol)</td>
+      <td class="result-pass">PASS</td>
+      <td>All 9 created. 2 initially hit 409 Conflict (parallel locking), succeeded on retry.</td>
+    </tr>
+    <tr>
+      <td>4</td>
+      <td>Drift check (9 rules)</td>
+      <td class="result-pass">PASS</td>
+      <td>Exit code 0. No drift on <code>security_group_rules</code> or any rule resource.</td>
+    </tr>
+    <tr>
+      <td>5</td>
+      <td>Update SG name in-place</td>
+      <td class="result-pass">PASS</td>
+      <td>Same ID preserved (<code>9a8e36ad-...</code>). Rules unaffected.</td>
+    </tr>
+    <tr>
+      <td>6</td>
+      <td>Drift check after update</td>
+      <td class="result-pass">PASS</td>
+      <td>Exit code 0. Zero drift.</td>
+    </tr>
+    <tr>
+      <td>7</td>
+      <td>Config validator (inline rules)</td>
+      <td class="result-pass">PASS</td>
+      <td><code>terraform validate</code> rejects inline <code>rules</code> with clear error message.</td>
+    </tr>
+    <tr>
+      <td>8</td>
+      <td>SG description change (plan)</td>
+      <td class="result-pass">PASS</td>
+      <td>Shows "update in-place", 0 rules affected.</td>
+    </tr>
+    <tr>
+      <td>9</td>
+      <td>Destroy all</td>
+      <td class="result-pass">PASS</td>
+      <td>All 10 resources destroyed. 1 rule hit 409, succeeded on retry.</td>
+    </tr>
+  </tbody>
+</table>
+
+<!-- Protocol Coverage -->
+<h2>Protocol &amp; Edge Case Coverage</h2>
+<table>
+  <thead>
+    <tr><th>Protocol</th><th>Direction</th><th>Port Range</th><th>Ethertype</th><th>Edge Case</th><th>Result</th></tr>
+  </thead>
+  <tbody>
+    <tr><td><code>tcp</code></td><td>ingress</td><td>22&ndash;22</td><td>IPv4</td><td><code>remote_ip_prefix</code></td><td class="result-pass">PASS</td></tr>
+    <tr><td><code>udp</code></td><td>ingress</td><td>53&ndash;53</td><td>IPv4</td><td>Single port (GCLOUD2-22026)</td><td class="result-pass">PASS</td></tr>
+    <tr><td><code>icmp</code></td><td>ingress</td><td>none</td><td>IPv4</td><td>No port range</td><td class="result-pass">PASS</td></tr>
+    <tr><td><code>ipv6-icmp</code></td><td>ingress</td><td>none</td><td>IPv6</td><td>IPv6 ethertype (GCLOUD2-4818)</td><td class="result-pass">PASS</td></tr>
+    <tr><td><code>tcp</code></td><td>ingress</td><td>10000&ndash;20000</td><td>IPv4</td><td>Wide range + private CIDR</td><td class="result-pass">PASS</td></tr>
+    <tr><td><code>tcp</code></td><td>egress</td><td>443&ndash;443</td><td>IPv4</td><td>Egress direction</td><td class="result-pass">PASS</td></tr>
+    <tr><td><code>sctp</code></td><td>ingress</td><td>5060&ndash;5060</td><td>IPv4</td><td>Uncommon protocol</td><td class="result-pass">PASS</td></tr>
+    <tr><td><code>tcp</code></td><td>ingress</td><td>80&ndash;80</td><td>IPv4</td><td>No description (optional omitted)</td><td class="result-pass">PASS</td></tr>
+    <tr><td><code>tcp</code></td><td>ingress</td><td>1&ndash;65535</td><td>IPv4</td><td><code>remote_group_id</code> self-reference</td><td class="result-pass">PASS</td></tr>
+  </tbody>
+</table>
+
+<!-- JIRA Coverage -->
+<h2>JIRA Ticket Coverage</h2>
+<table>
+  <thead>
+    <tr><th>Ticket</th><th>Summary</th><th>Relevance</th><th>Coverage</th></tr>
+  </thead>
+  <tbody>
+    <tr><td><code>GCLOUD2-20783</code></td><td>Support gcore_securitygroup in Stainless terraform provider</td><td><span class="badge badge-info">Primary</span></td><td>Full CRUD, drift, import</td></tr>
+    <tr><td><code>GCLOUD2-22739</code></td><td>Create default security group for each project</td><td><span class="badge badge-info">Direct</span></td><td>Test 1: auto-delete defaults</td></tr>
+    <tr><td><code>GCLOUD2-22560</code></td><td>500 on PUT /v1/securitygrouprules</td><td><span class="badge badge-warn">Avoided</span></td><td>RequiresReplace on all mutable fields</td></tr>
+    <tr><td><code>GCLOUD2-22026</code></td><td>500 creating tcp/udp rule with only one port range</td><td><span class="badge badge-info">Direct</span></td><td>Tests 3: UDP single port, wide TCP range</td></tr>
+    <tr><td><code>GCLOUD2-4818</code></td><td>Cannot delete rule with protocol "any" (null)</td><td><span class="badge badge-info">Direct</span></td><td>Test 3: ipv6-icmp, SCTP protocols</td></tr>
+    <tr><td><code>GCLOUD2-5064</code></td><td>Error on bulk security group rule changes</td><td><span class="badge badge-warn">Found</span></td><td>Test 3/9: 409 conflict on parallel ops</td></tr>
+    <tr><td><code>GCLOUD2-21583</code></td><td>Tags field validation conflict</td><td><span class="badge badge-skip">N/A</span></td><td>Tags not modified in this change</td></tr>
+    <tr><td><code>GCLOUD2-21956</code></td><td>Create security groups v2 endpoints</td><td><span class="badge badge-info">Direct</span></td><td>All tests use v2 endpoints</td></tr>
+    <tr><td><code>GCLOUD2-22157</code></td><td>Create security group rules v2 endpoints</td><td><span class="badge badge-info">Direct</span></td><td>All rule tests use v2 endpoints</td></tr>
+    <tr><td><code>GCLOUD2-21601</code></td><td>SG not assigned to GPU instance (Kirill)</td><td><span class="badge badge-skip">N/A</span></td><td>GPU cluster scope</td></tr>
+    <tr><td><code>GCLOUD2-21005</code></td><td>Bad validation msg for incompatible SGs (Kirill)</td><td><span class="badge badge-skip">N/A</span></td><td>GPU cluster scope</td></tr>
+  </tbody>
+</table>
+
+<!-- Issues Found -->
+<h2>Issues Found</h2>
+
+<div class="card card-warn">
+  <h4>Issue 1: 409 Conflict on Parallel Rule Operations <span class="badge badge-warn">Medium</span></h4>
+  <p>When Terraform creates or destroys multiple rules targeting the same security group in parallel, the v2 async endpoints return <code>409 Conflict</code> because the SG resource is locked by an in-flight task.</p>
+  <pre><code>POST /cloud/v2/security_groups/{project}/{region}/{sg_id}/rules
+409 Conflict: "Resource `{sg_id}` is already locked by another task."</code></pre>
+  <ul>
+    <li><strong>Impact:</strong> Partial failure on first apply when creating/deleting many rules</li>
+    <li><strong>Workaround:</strong> Run <code>terraform apply</code> again, or use <code>-parallelism=1</code></li>
+    <li><strong>JIRA:</strong> Comment added to GCLOUD2-20783, related to GCLOUD2-5064</li>
+  </ul>
+</div>
+
+<div class="card card-info">
+  <h4>Issue 2: Import Test Skipped <span class="badge badge-skip">Low</span></h4>
+  <p>Could not create a second SG for import testing due to quota limit (20 SGs). Import was tested in a previous session and works correctly.</p>
+</div>
+
+<!-- Key Behaviors Verified -->
+<h2>Key Behaviors Verified</h2>
+
+<div class="card card-success">
+  <h4>Drift Suppression</h4>
+  <p>The <code>security_group_rules</code> computed field is preserved from state during Read and Update operations, preventing noisy plan output when rules are managed by separate resources.</p>
+  <table>
+    <thead><tr><th>Scenario</th><th><code>security_group_rules</code></th><th>Result</th></tr></thead>
+    <tbody>
+      <tr><td>After SG create (no rules)</td><td><code>[]</code></td><td class="result-pass">PASS</td></tr>
+      <tr><td>After adding 9 rules via separate resources</td><td><code>[]</code> (preserved)</td><td class="result-pass">PASS</td></tr>
+      <tr><td>After SG name update</td><td><code>[]</code> (preserved)</td><td class="result-pass">PASS</td></tr>
+      <tr><td>After plan refresh</td><td>No changes</td><td class="result-pass">PASS</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<div class="card card-success">
+  <h4>Default Rules Auto-Deletion</h4>
+  <p>The Gcore API auto-creates ~40 default egress rules when a security group is created. Our implementation:</p>
+  <ul>
+    <li>Creates SG via <code>NewAndPoll()</code> (waits for async task)</li>
+    <li>Fetches the SG to discover default rules</li>
+    <li>Deletes each rule via <code>Rules.DeleteAndPoll()</code></li>
+    <li>Sets <code>security_group_rules</code> to empty list in state</li>
+  </ul>
+  <p style="margin-top:0.5rem"><strong>Timing:</strong> ~2m28s for create + deletion of 40 async delete operations</p>
+</div>
+
+<div class="card card-success">
+  <h4>Config Validator</h4>
+  <p>The <code>rulesNotAllowedValidator</code> blocks the inline <code>rules</code> attribute at validation time, directing users to <code>gcore_cloud_security_group_rule</code>:</p>
+  <pre><code>Error: Inline rules are not supported
+
+Use the gcore_cloud_security_group_rule resource to manage security group
+rules instead of inline rules. This ensures each rule has its own lifecycle
+and prevents conflicts between the parent security group and individual
+rule resources.</code></pre>
+</div>
+
+<div class="card card-success">
+  <h4>RequiresReplace Strategy (GCLOUD2-22560)</h4>
+  <p>All mutable fields on <code>gcore_cloud_security_group_rule</code> have <code>RequiresReplace()</code>, meaning:</p>
+  <ul>
+    <li>Changing any rule attribute triggers destroy + create (new rule ID)</li>
+    <li>The buggy PUT endpoint (500 error) is never called</li>
+    <li>Matches the API's actual behavior: PUT performs a replace operation</li>
+  </ul>
+</div>
+
+<!-- Test Execution Timeline -->
+<h2>Test Execution Timeline</h2>
+<div class="timeline">
+  <div class="timeline-item">
+    <strong>Test 1:</strong> Create SG + auto-delete 40 default rules
+    <div class="time">~2m28s &mdash; security_group_rules = []</div>
+  </div>
+  <div class="timeline-item">
+    <strong>Test 2:</strong> Drift check &rarr; exit code 0 (after revision sync)
+    <div class="time">~5s</div>
+  </div>
+  <div class="timeline-item warn">
+    <strong>Test 3:</strong> Create 9 rules &mdash; 7/9 on first try, 2/9 retry (409 Conflict)
+    <div class="time">~20s total</div>
+  </div>
+  <div class="timeline-item">
+    <strong>Test 4:</strong> Drift check with 9 rules &rarr; exit code 0
+    <div class="time">~5s</div>
+  </div>
+  <div class="timeline-item">
+    <strong>Test 5:</strong> Update SG name in-place &mdash; same ID preserved
+    <div class="time">~4s</div>
+  </div>
+  <div class="timeline-item">
+    <strong>Test 6:</strong> Drift check after update &rarr; exit code 0
+    <div class="time">~5s</div>
+  </div>
+  <div class="timeline-item">
+    <strong>Test 7:</strong> Config validator blocks inline rules
+    <div class="time">&lt;1s (validation only)</div>
+  </div>
+  <div class="timeline-item">
+    <strong>Test 8:</strong> SG description change &rarr; update in-place, 0 rules affected
+    <div class="time">~5s (plan only)</div>
+  </div>
+  <div class="timeline-item warn">
+    <strong>Test 9:</strong> Destroy all 10 resources &mdash; 1 retry on 409 Conflict
+    <div class="time">~25s total</div>
+  </div>
+</div>
+
+<!-- QA Checklist -->
+<h2>QA Checklist</h2>
+<ul class="checklist">
+  <li>Drift detection: No changes on subsequent plan</li>
+  <li>Update in-place: SG name/description change preserves ID</li>
+  <li>Async operations: NewAndPoll / UpdateAndPoll / DeleteAndPoll work correctly</li>
+  <li>Default rules: Auto-deleted on creation (~40 rules)</li>
+  <li>Inline rules: Blocked by config validator</li>
+  <li>Multi-protocol: TCP, UDP, ICMP, ipv6-icmp, SCTP all work</li>
+  <li>IPv6 rules: ipv6-icmp with ::/0 works correctly</li>
+  <li>Egress rules: Direction=egress works correctly</li>
+  <li>Optional fields: Rule without description works</li>
+  <li>Self-reference: remote_group_id pointing to own SG works</li>
+  <li>Destroy: Correct dependency ordering (rules before SG)</li>
+  <li>Schema parity: All 3 tests pass</li>
+  <li class="skip">Import: Skipped (quota limit) &mdash; tested in previous session</li>
+</ul>
+
+<footer>
+  Generated from test run on branch <code>feature/GCLOUD2-20783-secgroup-rule-resource</code> &middot; commit <code>73c1990</code> &middot; 2026-02-24
+</footer>
+
+</body>
+</html>

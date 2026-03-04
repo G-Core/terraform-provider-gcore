@@ -1,0 +1,58 @@
+#!/bin/bash
+# Clean up worktrees and remove unused ones
+# Usage: ./scripts/worktree-cleanup [--force]
+
+set -e
+
+REPO_ROOT="/Users/user/repos/gcore-terraform"
+TREE_DIR="$REPO_ROOT/.tree"
+FORCE=false
+
+if [ "$1" = "--force" ]; then
+    FORCE=true
+fi
+
+echo "Current worktrees:"
+git worktree list
+
+echo ""
+echo "Checking for worktrees to clean up..."
+
+# Get list of worktrees
+WORKTREES=$(git worktree list --porcelain | grep "^worktree" | cut -d' ' -f2)
+
+for worktree in $WORKTREES; do
+    if [ "$worktree" != "$REPO_ROOT" ]; then
+        # Check if worktree directory exists
+        if [ ! -d "$worktree" ]; then
+            echo "Removing stale worktree reference: $worktree"
+            git worktree remove --force "$worktree" 2>/dev/null || true
+        else
+            # Check if worktree has uncommitted changes
+            cd "$worktree"
+            if [ -n "$(git status --porcelain)" ]; then
+                echo "Worktree $worktree has uncommitted changes:"
+                git status --short
+                if [ "$FORCE" = true ]; then
+                    echo "Force removing worktree with uncommitted changes..."
+                    cd "$REPO_ROOT"
+                    git worktree remove --force "$worktree"
+                else
+                    echo "Use --force to remove worktrees with uncommitted changes"
+                fi
+            else
+                # Check if branch still exists
+                BRANCH_NAME=$(basename "$worktree")
+                if ! git show-ref --verify --quiet "refs/heads/$BRANCH_NAME"; then
+                    echo "Removing worktree for deleted branch: $worktree"
+                    cd "$REPO_ROOT"
+                    git worktree remove "$worktree"
+                fi
+            fi
+        fi
+    fi
+done
+
+echo ""
+echo "Updated worktree list:"
+git worktree list

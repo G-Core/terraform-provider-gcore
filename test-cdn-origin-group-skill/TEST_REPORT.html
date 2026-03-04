@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Report: gcore_cdn_origin_group (GCLOUD2-22597)</title>
+    <style>
+        :root {
+            --success: #22c55e;
+            --warning: #f59e0b;
+            --error: #ef4444;
+            --bg: #1a1a2e;
+            --card-bg: #16213e;
+            --text: #e2e8f0;
+            --border: #334155;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: 'SF Mono', 'Monaco', 'Consolas', monospace;
+            background: var(--bg);
+            color: var(--text);
+            padding: 20px;
+            line-height: 1.6;
+        }
+        .container { max-width: 1200px; margin: 0 auto; }
+        header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 30px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+        }
+        h1 { font-size: 28px; margin-bottom: 10px; }
+        .meta { font-size: 14px; opacity: 0.9; }
+        .meta span { margin-right: 20px; }
+        .summary-cards {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        .card {
+            background: var(--card-bg);
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            border: 1px solid var(--border);
+        }
+        .card-value { font-size: 36px; font-weight: bold; }
+        .card-label { font-size: 12px; text-transform: uppercase; opacity: 0.7; }
+        .card.success .card-value { color: var(--success); }
+        .card.warning .card-value { color: var(--warning); }
+        .card.error .card-value { color: var(--error); }
+        .section {
+            background: var(--card-bg);
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            border: 1px solid var(--border);
+        }
+        .section h2 {
+            font-size: 18px;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid var(--border);
+        }
+        table { width: 100%; border-collapse: collapse; }
+        th, td { padding: 12px; text-align: left; border-bottom: 1px solid var(--border); }
+        th { font-weight: 600; opacity: 0.8; }
+        .badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        .badge-success { background: var(--success); color: #000; }
+        .badge-warning { background: var(--warning); color: #000; }
+        .badge-error { background: var(--error); color: #fff; }
+        .badge-info { background: #3b82f6; color: #fff; }
+        pre {
+            background: #0d1117;
+            padding: 15px;
+            border-radius: 8px;
+            overflow-x: auto;
+            font-size: 12px;
+            margin: 10px 0;
+        }
+        .test-detail { margin-bottom: 20px; }
+        .test-detail h3 { font-size: 14px; margin-bottom: 10px; }
+        .api-method {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 600;
+            margin-right: 5px;
+        }
+        .api-post { background: #22c55e; color: #000; }
+        .api-get { background: #3b82f6; color: #fff; }
+        .api-put { background: #f59e0b; color: #000; }
+        .api-patch { background: #8b5cf6; color: #fff; }
+        .api-delete { background: #ef4444; color: #fff; }
+        .highlight { background: #fef3c7; color: #000; padding: 2px 6px; border-radius: 4px; }
+        .fix-ref { font-family: monospace; background: #334155; padding: 2px 6px; border-radius: 4px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Test Report: gcore_cdn_origin_group</h1>
+            <div class="meta">
+                <span>JIRA: GCLOUD2-22597</span>
+                <span>PR: #82</span>
+                <span>Branch: fix/cdn-origin-group-GCLOUD2-22597</span>
+                <span>Date: 2026-01-26</span>
+            </div>
+        </header>
+
+        <div class="summary-cards">
+            <div class="card success">
+                <div class="card-value">7</div>
+                <div class="card-label">Total Tests</div>
+            </div>
+            <div class="card success">
+                <div class="card-value">7</div>
+                <div class="card-label">Passed</div>
+            </div>
+            <div class="card warning">
+                <div class="card-value">0</div>
+                <div class="card-label">Warnings</div>
+            </div>
+            <div class="card error">
+                <div class="card-value">0</div>
+                <div class="card-label">Failed</div>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>Bug Fix Verification (GCLOUD2-22597)</h2>
+            <table>
+                <tr>
+                    <th>Bug</th>
+                    <th>Description</th>
+                    <th>Test</th>
+                    <th>Status</th>
+                </tr>
+                <tr>
+                    <td>Bug 1</td>
+                    <td>s3_credentials_version field was required but should be optional</td>
+                    <td>TC-2</td>
+                    <td><span class="badge badge-success">FIXED</span></td>
+                </tr>
+                <tr>
+                    <td>Bug 2</td>
+                    <td>s3_credentials_version not persisted in state (was null causing "Provider produced inconsistent result")</td>
+                    <td>TC-2, TC-3</td>
+                    <td><span class="badge badge-success">FIXED</span></td>
+                </tr>
+                <tr>
+                    <td>Bug 3</td>
+                    <td>Resource with auth block fails to create/add to state</td>
+                    <td>TC-2, TC-3</td>
+                    <td><span class="badge badge-success">FIXED</span></td>
+                </tr>
+            </table>
+        </div>
+
+        <div class="section">
+            <h2>Test Results</h2>
+            <table>
+                <tr>
+                    <th>Test</th>
+                    <th>Description</th>
+                    <th>Duration</th>
+                    <th>Status</th>
+                </tr>
+                <tr>
+                    <td>TC-1</td>
+                    <td>Basic origin group with sources (public origins)</td>
+                    <td>~2s</td>
+                    <td><span class="badge badge-success">PASSED</span></td>
+                </tr>
+                <tr>
+                    <td>TC-2</td>
+                    <td>S3 auth with s3_type=other (BUG FIX VERIFICATION)</td>
+                    <td>~2s</td>
+                    <td><span class="badge badge-success">PASSED</span></td>
+                </tr>
+                <tr>
+                    <td>TC-3</td>
+                    <td>S3 auth with s3_type=amazon</td>
+                    <td>~2s</td>
+                    <td><span class="badge badge-success">PASSED</span></td>
+                </tr>
+                <tr>
+                    <td>TC-4</td>
+                    <td>Update operations (name, sources, proxy_next_upstream)</td>
+                    <td>~3s</td>
+                    <td><span class="badge badge-success">PASSED</span></td>
+                </tr>
+                <tr>
+                    <td>TC-5</td>
+                    <td>Credential version bump (1 -> 2)</td>
+                    <td>~2s</td>
+                    <td><span class="badge badge-success">PASSED</span></td>
+                </tr>
+                <tr>
+                    <td>TC-6</td>
+                    <td>Import functionality</td>
+                    <td>~2s</td>
+                    <td><span class="badge badge-success">PASSED</span></td>
+                </tr>
+                <tr>
+                    <td>TC-7</td>
+                    <td>Drift detection (all tests)</td>
+                    <td>N/A</td>
+                    <td><span class="badge badge-success">PASSED</span></td>
+                </tr>
+            </table>
+        </div>
+
+        <div class="section">
+            <h2>Test Details</h2>
+
+            <div class="test-detail">
+                <h3>TC-1: Basic origin group with sources</h3>
+                <pre>
+gcore_cdn_origin_group.tc1_public[0]: Creating...
+gcore_cdn_origin_group.tc1_public[0]: Creation complete after 1s [name=test-cdn-og-tc1-public-skill]
+
+Apply complete! Resources: 1 added, 0 changed, 0 destroyed.
+
+Outputs:
+tc1_id = 1354288
+
+=== Drift check ===
+No changes. Your infrastructure matches the configuration.
+                </pre>
+            </div>
+
+            <div class="test-detail">
+                <h3>TC-2: S3 auth with s3_type=other (BUG FIX VERIFICATION)</h3>
+                <pre>
+gcore_cdn_origin_group.tc2_s3_other[0]: Creating...
+gcore_cdn_origin_group.tc2_s3_other[0]: Creation complete after 1s [name=test-cdn-og-tc2-s3other-skill]
+
+Apply complete! Resources: 1 added, 0 changed, 1 destroyed.
+
+Outputs:
+tc2_auth = &lt;sensitive&gt;
+tc2_id = 1354289
+
+=== Drift check ===
+No changes. Your infrastructure matches the configuration.
+
+=== Verify s3_credentials_version in state ===
+{
+  "s3_access_key_id": null,
+  "s3_bucket_name": "my-test-bucket",
+  <span class="highlight">"s3_credentials_version": 1</span>,  &lt;-- BUG FIXED! Was null before fix
+  "s3_region": null,
+  "s3_secret_access_key": null,
+  "s3_storage_hostname": "s3.example.com",
+  "s3_type": "other"
+}
+                </pre>
+            </div>
+
+            <div class="test-detail">
+                <h3>TC-3: S3 auth with s3_type=amazon</h3>
+                <pre>
+gcore_cdn_origin_group.tc3_s3_amazon[0]: Creating...
+gcore_cdn_origin_group.tc3_s3_amazon[0]: Creation complete after 1s [name=test-cdn-og-tc3-s3amazon-skill]
+
+=== Verify s3_credentials_version in state ===
+{
+  "s3_access_key_id": null,
+  "s3_bucket_name": "my-amazon-bucket",
+  <span class="highlight">"s3_credentials_version": 1</span>,
+  "s3_region": "us-east-1",
+  "s3_secret_access_key": null,
+  "s3_storage_hostname": null,
+  "s3_type": "amazon"
+}
+                </pre>
+            </div>
+
+            <div class="test-detail">
+                <h3>TC-4: Update operations</h3>
+                <pre>
+ID before update: 1354291
+
+gcore_cdn_origin_group.tc4_update[0] will be updated in-place
+  ~ name = "test-cdn-og-tc4-update-skill" -> "test-cdn-og-tc4-updated-skill"
+  ~ proxy_next_upstream = [..., + "http_500"]
+  ~ sources = [{ source = "93.184.216.40" -> "93.184.216.41" }]
+
+gcore_cdn_origin_group.tc4_update[0]: Modifications complete after 1s
+
+ID after update: 1354291
+PASS: Resource updated in-place (same ID)
+
+=== Drift check ===
+No changes. Your infrastructure matches the configuration.
+                </pre>
+            </div>
+
+            <div class="test-detail">
+                <h3>TC-5: Credential version bump</h3>
+                <pre>
+=== Before bump ===
+s3_credentials_version: 1
+
+gcore_cdn_origin_group.tc2_s3_other[0] will be updated in-place
+  ~ auth = {
+      ~ s3_credentials_version = 1 -> 2
+    }
+
+gcore_cdn_origin_group.tc2_s3_other[0]: Modifications complete after 1s
+
+=== After bump ===
+s3_credentials_version: 2
+                </pre>
+            </div>
+
+            <div class="test-detail">
+                <h3>TC-6: Import functionality</h3>
+                <pre>
+gcore_cdn_origin_group.tc1_public[0]: Importing from ID "1354297"...
+gcore_cdn_origin_group.tc1_public[0]: Import prepared!
+gcore_cdn_origin_group.tc1_public[0]: Refreshing state... [name=test-cdn-og-tc1-public-skill]
+
+Import successful!
+                </pre>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>MITM API Calls</h2>
+            <table>
+                <tr>
+                    <th>Method</th>
+                    <th>Endpoint</th>
+                    <th>Response</th>
+                </tr>
+                <tr>
+                    <td><span class="api-method api-post">POST</span></td>
+                    <td>/cdn/origin_groups</td>
+                    <td>201 Created</td>
+                </tr>
+                <tr>
+                    <td><span class="api-method api-get">GET</span></td>
+                    <td>/cdn/origin_groups/{id}</td>
+                    <td>200 OK</td>
+                </tr>
+                <tr>
+                    <td><span class="api-method api-put">PUT</span></td>
+                    <td>/cdn/origin_groups/{id}</td>
+                    <td>200 OK</td>
+                </tr>
+                <tr>
+                    <td><span class="api-method api-delete">DELETE</span></td>
+                    <td>/cdn/origin_groups/{id}</td>
+                    <td>204 No Content</td>
+                </tr>
+            </table>
+            <p style="margin-top: 10px; font-size: 12px; opacity: 0.7;">Full MITM logs available at: evidence/mitm_api_calls.log (502 lines)</p>
+        </div>
+
+        <div class="section">
+            <h2>Fixes Applied</h2>
+            <table>
+                <tr>
+                    <th>Issue</th>
+                    <th>Fix</th>
+                    <th>File:Line</th>
+                </tr>
+                <tr>
+                    <td>s3_credentials_version reset to null by UnmarshalComputed</td>
+                    <td>Removed <code>json:"-"</code> tag - field now has only <code>tfsdk</code> tag (matches pattern in cloud_inference_secret)</td>
+                    <td><span class="fix-ref">model.go:37</span></td>
+                </tr>
+                <tr>
+                    <td>Explicit preservation code was unnecessary</td>
+                    <td>Removed preserveS3CredentialsVersion function and all usages</td>
+                    <td><span class="fix-ref">resource.go:27-34 (deleted)</span></td>
+                </tr>
+            </table>
+        </div>
+
+        <div class="section">
+            <h2>Technical Details</h2>
+            <h3>Root Cause</h3>
+            <p>The <code>s3_credentials_version</code> field had a <code>json:"-"</code> tag which caused <code>apijson.UnmarshalComputed</code> to reset it to null. Other resources with similar version fields (e.g., <code>cloud_inference_secret.data_wo_version</code>) use only the <code>tfsdk</code> tag without any json tag.</p>
+
+            <h3>Solution</h3>
+            <p>Removed the <code>json:"-"</code> tag from the field definition:</p>
+            <pre>
+// Before (buggy):
+S3CredentialsVersion types.Int64 `tfsdk:"s3_credentials_version" json:"-"`
+
+// After (fixed):
+S3CredentialsVersion types.Int64 `tfsdk:"s3_credentials_version"`
+            </pre>
+            <p>This matches the pattern used in other resources with write-only fields and version triggers.</p>
+        </div>
+
+        <div class="section">
+            <h2>Evidence Package</h2>
+            <ul style="list-style: none;">
+                <li>evidence/tc1_apply.log</li>
+                <li>evidence/tc1_drift.log</li>
+                <li>evidence/tc2_apply.log</li>
+                <li>evidence/tc2_drift.log</li>
+                <li>evidence/tc3_apply.log</li>
+                <li>evidence/tc3_drift.log</li>
+                <li>evidence/tc4_create.log</li>
+                <li>evidence/tc4_update.log</li>
+                <li>evidence/tc5_bump.log</li>
+                <li>evidence/tc6_import.log</li>
+                <li>evidence/tc6_plan_after_import.log</li>
+                <li>evidence/destroy.log</li>
+                <li>evidence/mitm_api_calls.log (502 lines)</li>
+            </ul>
+        </div>
+
+        <div class="section">
+            <h2>QA Checklist</h2>
+            <table>
+                <tr>
+                    <th>Category</th>
+                    <th>Status</th>
+                </tr>
+                <tr>
+                    <td>Drift detection (no changes on 2nd plan)</td>
+                    <td><span class="badge badge-success">PASS</span></td>
+                </tr>
+                <tr>
+                    <td>Create with auth block</td>
+                    <td><span class="badge badge-success">PASS</span></td>
+                </tr>
+                <tr>
+                    <td>s3_credentials_version persistence</td>
+                    <td><span class="badge badge-success">PASS</span></td>
+                </tr>
+                <tr>
+                    <td>Update in-place (same ID)</td>
+                    <td><span class="badge badge-success">PASS</span></td>
+                </tr>
+                <tr>
+                    <td>Import functionality</td>
+                    <td><span class="badge badge-success">PASS</span></td>
+                </tr>
+                <tr>
+                    <td>Delete operations</td>
+                    <td><span class="badge badge-success">PASS</span></td>
+                </tr>
+                <tr>
+                    <td>MITM verification</td>
+                    <td><span class="badge badge-success">PASS</span></td>
+                </tr>
+                <tr>
+                    <td>Resource cleanup</td>
+                    <td><span class="badge badge-success">PASS</span></td>
+                </tr>
+            </table>
+        </div>
+
+        <footer style="text-align: center; padding: 20px; opacity: 0.6; font-size: 12px;">
+            Generated by Terraform Testing Skill | 2026-01-26
+        </footer>
+    </div>
+</body>
+</html>

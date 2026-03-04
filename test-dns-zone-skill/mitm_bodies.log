@@ -1,0 +1,602 @@
+
+
+================================================================================
+>>> GET https://api.gcore.com/dns/v2/zones/test-tf-dns-regr-1770885500.com
+<<< 200 GET https://api.gcore.com/dns/v2/zones/test-tf-dns-regr-1770885500.com
+RESPONSE: {
+  "name": "test-tf-dns-regr-1770885500.com",
+  "meta": {
+    "max_hosts": 10,
+    "targeting": "country continent @ regiongroup region ip asn",
+    "webhook": "https://example.com/hook",
+    "webhook_method": "POST"
+  },
+  "enabled": true,
+  "nx_ttl": 300,
+  "retry": 3600,
+  "refresh": 5400,
+  "expiry": 1209600,
+  "contact": "support@gcore.com",
+  "serial": 1770885467,
+  "primary_server": "ns1.gcorelabs.net",
+  "records": [
+    {
+      "name": "test-tf-dns-regr-1770885500.com",
+      "type": "NS",
+      "ttl": 3600,
+      "short_answers": [
+        "ns1.gcorelabs.net",
+        "ns2.gcdn.services"
+      ]
+    }
+  ],
+  "rrsets_amount": {
+    "total": 1,
+    "static": 1,
+    "dynamic": {
+      "total": 0,
+      "healthcheck": 0
+    }
+  },
+  "status": "pending",
+  "dnssec_enabled": false
+}
+
+================================================================================
+>>> PUT https://api.gcore.com/dns/v2/zones/test-tf-dns-regr-1770885500.com
+BODY: {
+  "contact": "support@gcore.com",
+  "enabled": true,
+  "expiry": 1209600,
+  "meta": {
+    "webhook": "https://example.com/hook",
+    "webhook_method": "POST"
+  },
+  "name": "test-tf-dns-regr-1770885500.com",
+  "nx_ttl": 300,
+  "primary_server": "ns1.gcorelabs.net",
+  "refresh": 5400,
+  "retry": 3600
+}
+<<< 200 PUT https://api.gcore.com/dns/v2/zones/test-tf-dns-regr-1770885500.com
+RESPONSE: {}
+
+================================================================================
+>>> PATCH https://api.gcore.com/dns/v2/zones/test-tf-dns-regr-1770885500.com/dnssec
+BODY: {
+  "enabled": true
+}
+<<< 200 PATCH https://api.gcore.com/dns/v2/zones/test-tf-dns-regr-1770885500.com/dnssec
+RESPONSE: {
+  "algorithm": "13",
+  "digest": "DC88F8B3CD9B2F60F0AB2FCB785E95621F5849F193DC6A24C371AFD9846EC04E",
+  "digest_algorithm": "SHA256",
+  "digest_type": "2",
+  "ds": "test-tf-dns-regr-1770885500.com. 3600 IN DS 50337 13 2 DC88F8B3CD9B2F60F0AB2FCB785E95621F5849F193DC6A24C371AFD9846EC04E",
+  "flags": 257,
+  "key_tag": 50337,
+  "key_type": "ECDSAP256SHA256",
+  "public_key": "QKumWApreUvCNEPcrZae/t6teXRKgJxaCPhB0yWTlsc6nu2ySHVS9DElpzxBU7g/BFTVtqSQPoZ+IMyEABQfhQ==",
+  "message": "Successfully enable DNSSEC"
+}
+
+================================================================================
+>>> GET https://api.gcore.com/dns/v2/zones/test-tf-dns-regr-1770885500.com
+<<< 200 GET https://api.gcore.com/dns/v2/zones/test-tf-dns-regr-1770885500.com
+RESPONSE: {
+  "name": "test-tf-dns-regr-1770885500.com",
+  "meta": {
+    "dnssec_status": "ACTIVE",
+    "max_hosts": 10,
+    "targeting": "country continent @ regiongroup region ip asn",
+    "webhook": "https://example.com/hook",
+    "webhook_method": "POST"
+  },
+  "enabled": true,
+  "nx_ttl": 300,
+  "retry": 3600,
+  "refresh": 5400,
+  "expiry": 1209600,
+  "contact": "support@gcore.com",
+  "serial": 1770885482,
+  "primary_server": "ns1.gcorelabs.net",
+  "records": [
+    {
+      "name": "test-tf-dns-regr-1770885500.com",
+      "type": "NS",
+      "ttl": 3600,
+      "short_answers": [
+        "ns1.gcorelabs.net",
+        "ns2.gcdn.services"
+      ]
+    }
+  ],
+  "rrsets_amount": {
+    "total": 1,
+    "static": 1,
+    "dynamic": {
+      "total": 0,
+      "healthcheck": 0
+    }
+  },
+  "status": "pending",
+  "dnssec_enabled": true
+}
+
+================================================================================
+>>> GET https://api.gcore.com/dns/v2/zones/test-tf-dns-regr-1770885500.com
+<<< 200 GET https://api.gcore.com/dns/v2/zones/test-tf-dns-regr-1770885500.com
+RESPONSE: {
+  "name": "test-tf-dns-regr-1770885500.com",
+  "meta": {
+    "dnssec_status": "ACTIVE",
+    "max_hosts": 10,
+    "targeting": "country continent @ regiongroup region ip asn",
+    "webhook": "https://example.com/hook",
+    "webhook_method": "POST"
+  },
+  "enabled": true,
+  "nx_ttl": 300,
+  "retry": 3600,
+  "refresh": 5400,
+  "expiry": 1209600,
+  "contact": "support@gcore.com",
+  "serial": 1770885482,
+  "primary_server": "ns1.gcorelabs.net",
+  "records": [
+    {
+      "name": "test-tf-dns-regr-1770885500.com",
+      "type": "NS",
+      "ttl": 3600,
+      "short_answers": [
+        "ns1.gcorelabs.net",
+        "ns2.gcdn.services"
+      ]
+    }
+  ],
+  "rrsets_amount": {
+    "total": 1,
+    "static": 1,
+    "dynamic": {
+      "total": 0,
+      "healthcheck": 0
+    }
+  },
+  "status": "pending",
+  "dnssec_enabled": true
+}
+
+================================================================================
+>>> GET https://api.gcore.com/dns/v2/zones/test-tf-dns-regr-1770885500.com
+<<< 200 GET https://api.gcore.com/dns/v2/zones/test-tf-dns-regr-1770885500.com
+RESPONSE: {
+  "name": "test-tf-dns-regr-1770885500.com",
+  "meta": {
+    "dnssec_status": "ACTIVE",
+    "max_hosts": 10,
+    "targeting": "country continent @ regiongroup region ip asn",
+    "webhook": "https://example.com/hook",
+    "webhook_method": "POST"
+  },
+  "enabled": true,
+  "nx_ttl": 300,
+  "retry": 3600,
+  "refresh": 5400,
+  "expiry": 1209600,
+  "contact": "support@gcore.com",
+  "serial": 1770885482,
+  "primary_server": "ns1.gcorelabs.net",
+  "records": [
+    {
+      "name": "test-tf-dns-regr-1770885500.com",
+      "type": "NS",
+      "ttl": 3600,
+      "short_answers": [
+        "ns1.gcorelabs.net",
+        "ns2.gcdn.services"
+      ]
+    }
+  ],
+  "rrsets_amount": {
+    "total": 1,
+    "static": 1,
+    "dynamic": {
+      "total": 0,
+      "healthcheck": 0
+    }
+  },
+  "status": "pending",
+  "dnssec_enabled": true
+}
+
+================================================================================
+>>> GET https://api.gcore.com/dns/v2/zones/test-tf-dns-regr-1770885500.com
+<<< 200 GET https://api.gcore.com/dns/v2/zones/test-tf-dns-regr-1770885500.com
+RESPONSE: {
+  "name": "test-tf-dns-regr-1770885500.com",
+  "meta": {
+    "dnssec_status": "ACTIVE",
+    "max_hosts": 10,
+    "targeting": "country continent @ regiongroup region ip asn",
+    "webhook": "https://example.com/hook",
+    "webhook_method": "POST"
+  },
+  "enabled": true,
+  "nx_ttl": 300,
+  "retry": 3600,
+  "refresh": 5400,
+  "expiry": 1209600,
+  "contact": "support@gcore.com",
+  "serial": 1770885482,
+  "primary_server": "ns1.gcorelabs.net",
+  "records": [
+    {
+      "name": "test-tf-dns-regr-1770885500.com",
+      "type": "NS",
+      "ttl": 3600,
+      "short_answers": [
+        "ns1.gcorelabs.net",
+        "ns2.gcdn.services"
+      ]
+    }
+  ],
+  "rrsets_amount": {
+    "total": 1,
+    "static": 1,
+    "dynamic": {
+      "total": 0,
+      "healthcheck": 0
+    }
+  },
+  "status": "pending",
+  "dnssec_enabled": true
+}
+
+================================================================================
+>>> GET https://api.gcore.com/dns/v2/zones/test-tf-dns-regr-1770885500.com
+<<< 200 GET https://api.gcore.com/dns/v2/zones/test-tf-dns-regr-1770885500.com
+RESPONSE: {
+  "name": "test-tf-dns-regr-1770885500.com",
+  "meta": {
+    "dnssec_status": "ACTIVE",
+    "max_hosts": 10,
+    "targeting": "country continent @ regiongroup region ip asn",
+    "webhook": "https://example.com/hook",
+    "webhook_method": "POST"
+  },
+  "enabled": true,
+  "nx_ttl": 300,
+  "retry": 3600,
+  "refresh": 5400,
+  "expiry": 1209600,
+  "contact": "support@gcore.com",
+  "serial": 1770885482,
+  "primary_server": "ns1.gcorelabs.net",
+  "records": [
+    {
+      "name": "test-tf-dns-regr-1770885500.com",
+      "type": "NS",
+      "ttl": 3600,
+      "short_answers": [
+        "ns1.gcorelabs.net",
+        "ns2.gcdn.services"
+      ]
+    }
+  ],
+  "rrsets_amount": {
+    "total": 1,
+    "static": 1,
+    "dynamic": {
+      "total": 0,
+      "healthcheck": 0
+    }
+  },
+  "status": "pending",
+  "dnssec_enabled": true
+}
+
+================================================================================
+>>> GET https://api.gcore.com/dns/v2/zones/test-tf-dns-regr-1770885500.com
+<<< 200 GET https://api.gcore.com/dns/v2/zones/test-tf-dns-regr-1770885500.com
+RESPONSE: {
+  "name": "test-tf-dns-regr-1770885500.com",
+  "meta": {
+    "dnssec_status": "ACTIVE",
+    "max_hosts": 10,
+    "targeting": "country continent @ regiongroup region ip asn",
+    "webhook": "https://example.com/hook",
+    "webhook_method": "POST"
+  },
+  "enabled": true,
+  "nx_ttl": 300,
+  "retry": 3600,
+  "refresh": 5400,
+  "expiry": 1209600,
+  "contact": "support@gcore.com",
+  "serial": 1770885482,
+  "primary_server": "ns1.gcorelabs.net",
+  "records": [
+    {
+      "name": "test-tf-dns-regr-1770885500.com",
+      "type": "NS",
+      "ttl": 3600,
+      "short_answers": [
+        "ns1.gcorelabs.net",
+        "ns2.gcdn.services"
+      ]
+    }
+  ],
+  "rrsets_amount": {
+    "total": 1,
+    "static": 1,
+    "dynamic": {
+      "total": 0,
+      "healthcheck": 0
+    }
+  },
+  "status": "pending",
+  "dnssec_enabled": true
+}
+
+================================================================================
+>>> GET https://api.gcore.com/dns/v2/zones/test-tf-dns-regr-1770885500.com
+<<< 200 GET https://api.gcore.com/dns/v2/zones/test-tf-dns-regr-1770885500.com
+RESPONSE: {
+  "name": "test-tf-dns-regr-1770885500.com",
+  "meta": {
+    "dnssec_status": "ACTIVE",
+    "max_hosts": 10,
+    "targeting": "country continent @ regiongroup region ip asn",
+    "webhook": "https://example.com/hook",
+    "webhook_method": "POST"
+  },
+  "enabled": true,
+  "nx_ttl": 300,
+  "retry": 3600,
+  "refresh": 5400,
+  "expiry": 1209600,
+  "contact": "support@gcore.com",
+  "serial": 1770885482,
+  "primary_server": "ns1.gcorelabs.net",
+  "records": [
+    {
+      "name": "test-tf-dns-regr-1770885500.com",
+      "type": "NS",
+      "ttl": 3600,
+      "short_answers": [
+        "ns1.gcorelabs.net",
+        "ns2.gcdn.services"
+      ]
+    }
+  ],
+  "rrsets_amount": {
+    "total": 1,
+    "static": 1,
+    "dynamic": {
+      "total": 0,
+      "healthcheck": 0
+    }
+  },
+  "status": "pending",
+  "dnssec_enabled": true
+}
+
+================================================================================
+>>> GET https://api.gcore.com/dns/v2/zones/test-tf-dns-regr-1770885500.com
+<<< 200 GET https://api.gcore.com/dns/v2/zones/test-tf-dns-regr-1770885500.com
+RESPONSE: {
+  "name": "test-tf-dns-regr-1770885500.com",
+  "meta": {
+    "dnssec_status": "ACTIVE",
+    "max_hosts": 10,
+    "targeting": "country continent @ regiongroup region ip asn",
+    "webhook": "https://example.com/hook",
+    "webhook_method": "POST"
+  },
+  "enabled": true,
+  "nx_ttl": 300,
+  "retry": 3600,
+  "refresh": 5400,
+  "expiry": 1209600,
+  "contact": "support@gcore.com",
+  "serial": 1770885482,
+  "primary_server": "ns1.gcorelabs.net",
+  "records": [
+    {
+      "name": "test-tf-dns-regr-1770885500.com",
+      "type": "NS",
+      "ttl": 3600,
+      "short_answers": [
+        "ns1.gcorelabs.net",
+        "ns2.gcdn.services"
+      ]
+    }
+  ],
+  "rrsets_amount": {
+    "total": 1,
+    "static": 1,
+    "dynamic": {
+      "total": 0,
+      "healthcheck": 0
+    }
+  },
+  "status": "pending",
+  "dnssec_enabled": true
+}
+
+================================================================================
+>>> GET https://api.gcore.com/dns/v2/zones/test-tf-dns-regr-1770885500.com
+<<< 200 GET https://api.gcore.com/dns/v2/zones/test-tf-dns-regr-1770885500.com
+RESPONSE: {
+  "name": "test-tf-dns-regr-1770885500.com",
+  "meta": {
+    "dnssec_status": "ACTIVE",
+    "max_hosts": 10,
+    "targeting": "country continent @ regiongroup region ip asn",
+    "webhook": "https://example.com/hook",
+    "webhook_method": "POST"
+  },
+  "enabled": true,
+  "nx_ttl": 300,
+  "retry": 3600,
+  "refresh": 5400,
+  "expiry": 1209600,
+  "contact": "support@gcore.com",
+  "serial": 1770885482,
+  "primary_server": "ns1.gcorelabs.net",
+  "records": [
+    {
+      "name": "test-tf-dns-regr-1770885500.com",
+      "type": "NS",
+      "ttl": 3600,
+      "short_answers": [
+        "ns1.gcorelabs.net",
+        "ns2.gcdn.services"
+      ]
+    }
+  ],
+  "rrsets_amount": {
+    "total": 1,
+    "static": 1,
+    "dynamic": {
+      "total": 0,
+      "healthcheck": 0
+    }
+  },
+  "status": "pending",
+  "dnssec_enabled": true
+}
+
+================================================================================
+>>> GET https://api.gcore.com/dns/v2/zones/test-tf-dns-regr-1770885500.com
+<<< 200 GET https://api.gcore.com/dns/v2/zones/test-tf-dns-regr-1770885500.com
+RESPONSE: {
+  "name": "test-tf-dns-regr-1770885500.com",
+  "meta": {
+    "dnssec_status": "ACTIVE",
+    "max_hosts": 10,
+    "targeting": "country continent @ regiongroup region ip asn",
+    "webhook": "https://example.com/hook",
+    "webhook_method": "POST"
+  },
+  "enabled": true,
+  "nx_ttl": 300,
+  "retry": 3600,
+  "refresh": 5400,
+  "expiry": 1209600,
+  "contact": "support@gcore.com",
+  "serial": 1770885482,
+  "primary_server": "ns1.gcorelabs.net",
+  "records": [
+    {
+      "name": "test-tf-dns-regr-1770885500.com",
+      "type": "NS",
+      "ttl": 3600,
+      "short_answers": [
+        "ns1.gcorelabs.net",
+        "ns2.gcdn.services"
+      ]
+    }
+  ],
+  "rrsets_amount": {
+    "total": 1,
+    "static": 1,
+    "dynamic": {
+      "total": 0,
+      "healthcheck": 0
+    }
+  },
+  "status": "pending",
+  "dnssec_enabled": true
+}
+
+================================================================================
+>>> GET https://api.gcore.com/dns/v2/zones/test-tf-dns-regr-1770885500.com
+<<< 200 GET https://api.gcore.com/dns/v2/zones/test-tf-dns-regr-1770885500.com
+RESPONSE: {
+  "name": "test-tf-dns-regr-1770885500.com",
+  "meta": {
+    "dnssec_status": "ACTIVE",
+    "max_hosts": 10,
+    "targeting": "country continent @ regiongroup region ip asn",
+    "webhook": "https://example.com/hook",
+    "webhook_method": "POST"
+  },
+  "enabled": true,
+  "nx_ttl": 300,
+  "retry": 3600,
+  "refresh": 5400,
+  "expiry": 1209600,
+  "contact": "support@gcore.com",
+  "serial": 1770885482,
+  "primary_server": "ns1.gcorelabs.net",
+  "records": [
+    {
+      "name": "test-tf-dns-regr-1770885500.com",
+      "type": "NS",
+      "ttl": 3600,
+      "short_answers": [
+        "ns1.gcorelabs.net",
+        "ns2.gcdn.services"
+      ]
+    }
+  ],
+  "rrsets_amount": {
+    "total": 1,
+    "static": 1,
+    "dynamic": {
+      "total": 0,
+      "healthcheck": 0
+    }
+  },
+  "status": "pending",
+  "dnssec_enabled": true
+}
+
+================================================================================
+>>> GET https://api.gcore.com/dns/v2/zones/test-tf-dns-regr-1770885500.com
+<<< 200 GET https://api.gcore.com/dns/v2/zones/test-tf-dns-regr-1770885500.com
+RESPONSE: {
+  "name": "test-tf-dns-regr-1770885500.com",
+  "meta": {
+    "dnssec_status": "ACTIVE",
+    "max_hosts": 10,
+    "targeting": "country continent @ regiongroup region ip asn",
+    "webhook": "https://example.com/hook",
+    "webhook_method": "POST"
+  },
+  "enabled": true,
+  "nx_ttl": 300,
+  "retry": 3600,
+  "refresh": 5400,
+  "expiry": 1209600,
+  "contact": "support@gcore.com",
+  "serial": 1770885482,
+  "primary_server": "ns1.gcorelabs.net",
+  "records": [
+    {
+      "name": "test-tf-dns-regr-1770885500.com",
+      "type": "NS",
+      "ttl": 3600,
+      "short_answers": [
+        "ns1.gcorelabs.net",
+        "ns2.gcdn.services"
+      ]
+    }
+  ],
+  "rrsets_amount": {
+    "total": 1,
+    "static": 1,
+    "dynamic": {
+      "total": 0,
+      "healthcheck": 0
+    }
+  },
+  "status": "pending",
+  "dnssec_enabled": true
+}
+
+================================================================================
+>>> DELETE https://api.gcore.com/dns/v2/zones/test-tf-dns-regr-1770885500.com
+<<< 200 DELETE https://api.gcore.com/dns/v2/zones/test-tf-dns-regr-1770885500.com
+RESPONSE: {}

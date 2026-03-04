@@ -1,0 +1,130 @@
+{
+  "boot_volume_id": {
+    "sensitive": false,
+    "type": "string",
+    "value": "604c1e08-9b17-4733-941a-15eb918c975a"
+  },
+  "instance_addresses": {
+    "sensitive": false,
+    "type": [
+      "map",
+      [
+        "list",
+        [
+          "object",
+          {
+            "addr": "string",
+            "interface_name": "string",
+            "subnet_id": "string",
+            "subnet_name": "string",
+            "type": "string"
+          }
+        ]
+      ]
+    ],
+    "value": {
+      "pub_net": [
+        {
+          "addr": "109.61.125.9",
+          "interface_name": null,
+          "subnet_id": "b4c6e91a-9eb9-4c59-ad57-00124eceda00",
+          "subnet_name": "pub_net11",
+          "type": "fixed"
+        }
+      ]
+    }
+  },
+  "instance_id": {
+    "sensitive": false,
+    "type": "string",
+    "value": "acbc7a3a-63ce-4e65-8e0a-055465c58152"
+  },
+  "instance_interfaces": {
+    "sensitive": false,
+    "type": [
+      "list",
+      [
+        "object",
+        {
+          "floating_ip": [
+            "object",
+            {
+              "existing_floating_id": "string",
+              "source": "string"
+            }
+          ],
+          "interface_name": "string",
+          "ip_address": "string",
+          "ip_family": "string",
+          "network_id": "string",
+          "port_id": "string",
+          "security_groups": [
+            "list",
+            [
+              "object",
+              {
+                "id": "string"
+              }
+            ]
+          ],
+          "subnet_id": "string",
+          "type": "string"
+        }
+      ]
+    ],
+    "value": [
+      {
+        "floating_ip": null,
+        "interface_name": null,
+        "ip_address": "109.61.125.9",
+        "ip_family": null,
+        "network_id": null,
+        "port_id": "48caa4f6-f86a-4e8a-8fdd-a6598f387338",
+        "security_groups": null,
+        "subnet_id": null,
+        "type": "external"
+      }
+    ]
+  },
+  "instance_status": {
+    "sensitive": false,
+    "type": "string",
+    "value": "ACTIVE"
+  },
+  "instance_volumes": {
+    "sensitive": false,
+    "type": [
+      "list",
+      [
+        "object",
+        {
+          "attachment_tag": "string",
+          "boot_index": "number",
+          "volume_id": "string"
+        }
+      ]
+    ],
+    "value": [
+      {
+        "attachment_tag": null,
+        "boot_index": 0,
+        "volume_id": "604c1e08-9b17-4733-941a-15eb918c975a"
+      }
+    ]
+  },
+  "placement_group_id": {
+    "sensitive": false,
+    "type": "string",
+    "value": "1874e0e7-2270-48ba-8035-1623670c3c24"
+  },
+  "router_id": {
+    "sensitive": false,
+    "type": "string",
+    "value": "6c7f8c81-73d3-44f5-a24f-0edc0a07557f"
+  },
+  "subnet_id": {
+    "sensitive": false,
+    "type": "string",
+    "value": "8e5d1013-2852-4e5f-a7ca-ee8357f38e79"
+  }
+}

@@ -1,0 +1,17 @@
+
+Warning: Provider development overrides are in effect
+
+The following provider development overrides are set in the CLI
+configuration:
+ - gcore/gcore in /Users/user/repos/gcore-terraform
+
+The behavior may therefore not match any released version of the provider and
+applying changes may cause the state to become incompatible with published
+releases.
+gcore_dns_zone.test: Refreshing state... [id=test-tf-rrset-1770802269.com]
+gcore_dns_zone_rrset.a_record: Refreshing state... [name=www.test-tf-rrset-1770802269.com]
+
+No changes. Your infrastructure matches the configuration.
+
+Terraform has compared your real infrastructure against your configuration
+and found no differences, so no changes are needed.

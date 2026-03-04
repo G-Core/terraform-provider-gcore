@@ -1,0 +1,10 @@
+gcore_cdn_trusted_ca_certificate.test: Importing from ID "279590"...
+gcore_cdn_trusted_ca_certificate.test: Import prepared!
+  Prepared gcore_cdn_trusted_ca_certificate for import
+gcore_cdn_trusted_ca_certificate.test: Refreshing state... [name=tf-test-cacert-import]
+
+Import successful!
+
+The resources that were imported are shown above. These resources are now in
+your Terraform state and will henceforth be managed by Terraform.
+

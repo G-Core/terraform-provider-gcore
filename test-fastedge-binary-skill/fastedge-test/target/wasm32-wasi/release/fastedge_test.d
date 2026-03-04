@@ -1,0 +1,1 @@
+/Users/user/repos/gcore-terraform/test-fastedge-binary-skill/fastedge-test/target/wasm32-wasi/release/fastedge_test.wasm: /Users/user/repos/gcore-terraform/test-fastedge-binary-skill/fastedge-test/src/lib.rs

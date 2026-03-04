@@ -1,0 +1,351 @@
+{
+  "version": 4,
+  "terraform_version": "1.10.5",
+  "serial": 74,
+  "lineage": "e68facc7-80ed-91dd-0268-c9caf1bcfcd9",
+  "outputs": {
+    "floating_ip_id": {
+      "value": "",
+      "type": "string"
+    },
+    "minimal_id": {
+      "value": "",
+      "type": "string"
+    },
+    "two_volumes_id": {
+      "value": "",
+      "type": "string"
+    },
+    "with_servergroup_id": {
+      "value": "ae156930-74d4-4e6e-8c66-496a57763690",
+      "type": "string"
+    },
+    "with_tags_id": {
+      "value": "6a09a206-8eee-4b27-af71-8a289e0985f4",
+      "type": "string"
+    }
+  },
+  "resources": [
+    {
+      "mode": "managed",
+      "type": "gcore_cloud_instance",
+      "name": "with_servergroup",
+      "provider": "provider[\"registry.terraform.io/gcore/gcore\"]",
+      "instances": [
+        {
+          "index_key": 0,
+          "schema_version": 0,
+          "attributes": {
+            "addresses": {
+              "pub_net": [
+                {
+                  "addr": "45.82.160.55",
+                  "interface_name": null,
+                  "subnet_id": "e47b6c72-f1d3-44de-bd7a-1bed593cbc29",
+                  "subnet_name": "pub_net5",
+                  "type": "fixed"
+                }
+              ]
+            },
+            "allow_app_ports": null,
+            "blackhole_ports": [],
+            "configuration": null,
+            "created_at": "2026-01-05T09:49:36Z",
+            "creator_task_id": "df8556bf-f65b-4bd5-acdc-4d1dccb4c44f",
+            "ddos_profile": null,
+            "fixed_ip_assignments": null,
+            "flavor": "g1-standard-1-2",
+            "id": "ae156930-74d4-4e6e-8c66-496a57763690",
+            "instance_description": null,
+            "instance_isolation": null,
+            "interfaces": [
+              {
+                "floating_ip": null,
+                "interface_name": null,
+                "ip_address": "45.82.160.55",
+                "ip_family": null,
+                "network_id": null,
+                "port_id": "07966aa8-274a-4a75-81a2-6ec21e4d3d92",
+                "security_groups": null,
+                "subnet_id": null,
+                "type": "external"
+              }
+            ],
+            "name": "import-test-servergroup",
+            "name_template": null,
+            "password": null,
+            "project_id": 379987,
+            "region": "Luxembourg-2",
+            "region_id": 76,
+            "security_groups": null,
+            "servergroup_id": "42df0b54-1c40-4719-9208-2ee191ebe2cb",
+            "ssh_key_name": null,
+            "status": "ACTIVE",
+            "tags": null,
+            "task_id": null,
+            "task_state": null,
+            "tasks": null,
+            "user_data": null,
+            "username": null,
+            "vm_state": "active",
+            "volumes": [
+              {
+                "attachment_tag": null,
+                "boot_index": 0,
+                "volume_id": "cc6cd445-6bed-4218-9346-d4a76e51e492"
+              }
+            ]
+          },
+          "sensitive_attributes": [],
+          "dependencies": [
+            "gcore_cloud_placement_group.test",
+            "gcore_cloud_volume.servergroup_boot"
+          ]
+        }
+      ]
+    },
+    {
+      "mode": "managed",
+      "type": "gcore_cloud_instance",
+      "name": "with_tags",
+      "provider": "provider[\"registry.terraform.io/gcore/gcore\"]",
+      "instances": [
+        {
+          "index_key": 0,
+          "schema_version": 0,
+          "attributes": {
+            "addresses": {
+              "pub_net": [
+                {
+                  "addr": "45.82.160.177",
+                  "interface_name": null,
+                  "subnet_id": "e47b6c72-f1d3-44de-bd7a-1bed593cbc29",
+                  "subnet_name": "pub_net5",
+                  "type": "fixed"
+                }
+              ]
+            },
+            "allow_app_ports": null,
+            "blackhole_ports": [],
+            "configuration": null,
+            "created_at": "2026-01-05T09:49:32Z",
+            "creator_task_id": "5fd4798e-99fe-4c38-8cc7-4b7d7f5802de",
+            "ddos_profile": null,
+            "fixed_ip_assignments": null,
+            "flavor": "g1-standard-1-2",
+            "id": "6a09a206-8eee-4b27-af71-8a289e0985f4",
+            "instance_description": null,
+            "instance_isolation": null,
+            "interfaces": [
+              {
+                "floating_ip": null,
+                "interface_name": null,
+                "ip_address": "45.82.160.177",
+                "ip_family": null,
+                "network_id": null,
+                "port_id": "a94177ec-660d-4173-8302-9d72237b1940",
+                "security_groups": null,
+                "subnet_id": null,
+                "type": "external"
+              }
+            ],
+            "name": "import-test-tags",
+            "name_template": null,
+            "password": null,
+            "project_id": 379987,
+            "region": "Luxembourg-2",
+            "region_id": 76,
+            "security_groups": null,
+            "servergroup_id": null,
+            "ssh_key_name": null,
+            "status": "ACTIVE",
+            "tags": {
+              "env": "test",
+              "owner": "claude",
+              "project": "import-testing"
+            },
+            "task_id": null,
+            "task_state": null,
+            "tasks": null,
+            "user_data": null,
+            "username": null,
+            "vm_state": "active",
+            "volumes": [
+              {
+                "attachment_tag": null,
+                "boot_index": 0,
+                "volume_id": "2b3555c5-9ecb-4275-a6bc-08e959d50116"
+              }
+            ]
+          },
+          "sensitive_attributes": [],
+          "dependencies": [
+            "gcore_cloud_volume.tags_boot"
+          ]
+        }
+      ]
+    },
+    {
+      "mode": "managed",
+      "type": "gcore_cloud_placement_group",
+      "name": "test",
+      "provider": "provider[\"registry.terraform.io/gcore/gcore\"]",
+      "instances": [
+        {
+          "index_key": 0,
+          "schema_version": 0,
+          "attributes": {
+            "id": "42df0b54-1c40-4719-9208-2ee191ebe2cb",
+            "instances": [],
+            "name": "import-test-servergroup",
+            "policy": "soft-anti-affinity",
+            "project_id": null,
+            "region": "Luxembourg-2",
+            "region_id": null,
+            "servergroup_id": "42df0b54-1c40-4719-9208-2ee191ebe2cb"
+          },
+          "sensitive_attributes": []
+        }
+      ]
+    },
+    {
+      "mode": "managed",
+      "type": "gcore_cloud_volume",
+      "name": "servergroup_boot",
+      "provider": "provider[\"registry.terraform.io/gcore/gcore\"]",
+      "instances": [
+        {
+          "index_key": 0,
+          "schema_version": 0,
+          "attributes": {
+            "attachment_tag": null,
+            "attachments": [],
+            "bootable": true,
+            "created_at": "2026-01-05T09:49:16Z",
+            "creator_task_id": "9e0880c8-9b64-47cc-9dde-1d226a034d99",
+            "id": "cc6cd445-6bed-4218-9346-d4a76e51e492",
+            "image_id": "6343932d-0257-4285-bf89-05060f24095a",
+            "instance_id_to_attach_to": null,
+            "is_root_volume": false,
+            "lifecycle_policy_ids": null,
+            "limiter_stats": {
+              "iops_base_limit": 600,
+              "iops_burst_limit": 6000,
+              "m_bps_base_limit": 25,
+              "m_bps_burst_limit": 250
+            },
+            "name": "import-test-servergroup-boot",
+            "project_id": null,
+            "region": "Luxembourg-2",
+            "region_id": null,
+            "size": 10,
+            "snapshot_id": null,
+            "snapshot_ids": [],
+            "source": "image",
+            "status": "available",
+            "tags": null,
+            "task_id": null,
+            "tasks": null,
+            "type_name": "ssd_hiiops",
+            "updated_at": "2026-01-05T09:49:17Z",
+            "volume_image_metadata": {
+              "architecture": "x86_64",
+              "checksum": "f8173c6829404b9429b817b14a4aa14b",
+              "container_format": "bare",
+              "disk_format": "raw",
+              "display_order": "2204",
+              "hw_disk_bus": "scsi",
+              "hw_machine_type": "q35",
+              "hw_qemu_guest_agent": "True",
+              "hw_scsi_model": "virtio-scsi",
+              "image_id": "6343932d-0257-4285-bf89-05060f24095a",
+              "image_name": "ubuntu-22.04-x64",
+              "min_disk": "5",
+              "min_ram": "0",
+              "os_distro": "ubuntu",
+              "os_glance_failed_import": "",
+              "os_glance_importing_to_stores": "",
+              "os_require_quiesce": "True",
+              "os_type": "linux",
+              "os_version": "22.04",
+              "size": "2361393152",
+              "ssh_key": "allow"
+            },
+            "volume_type": "ssd_hiiops"
+          },
+          "sensitive_attributes": []
+        }
+      ]
+    },
+    {
+      "mode": "managed",
+      "type": "gcore_cloud_volume",
+      "name": "tags_boot",
+      "provider": "provider[\"registry.terraform.io/gcore/gcore\"]",
+      "instances": [
+        {
+          "index_key": 0,
+          "schema_version": 0,
+          "attributes": {
+            "attachment_tag": null,
+            "attachments": [],
+            "bootable": true,
+            "created_at": "2026-01-05T09:49:16Z",
+            "creator_task_id": "7734f4e3-2f1f-45bc-b2f0-9409a3dd2efe",
+            "id": "2b3555c5-9ecb-4275-a6bc-08e959d50116",
+            "image_id": "6343932d-0257-4285-bf89-05060f24095a",
+            "instance_id_to_attach_to": null,
+            "is_root_volume": false,
+            "lifecycle_policy_ids": null,
+            "limiter_stats": {
+              "iops_base_limit": 600,
+              "iops_burst_limit": 6000,
+              "m_bps_base_limit": 25,
+              "m_bps_burst_limit": 250
+            },
+            "name": "import-test-tags-boot",
+            "project_id": null,
+            "region": "Luxembourg-2",
+            "region_id": null,
+            "size": 10,
+            "snapshot_id": null,
+            "snapshot_ids": [],
+            "source": "image",
+            "status": "available",
+            "tags": null,
+            "task_id": null,
+            "tasks": null,
+            "type_name": "ssd_hiiops",
+            "updated_at": "2026-01-05T09:49:17Z",
+            "volume_image_metadata": {
+              "architecture": "x86_64",
+              "checksum": "f8173c6829404b9429b817b14a4aa14b",
+              "container_format": "bare",
+              "disk_format": "raw",
+              "display_order": "2204",
+              "hw_disk_bus": "scsi",
+              "hw_machine_type": "q35",
+              "hw_qemu_guest_agent": "True",
+              "hw_scsi_model": "virtio-scsi",
+              "image_id": "6343932d-0257-4285-bf89-05060f24095a",
+              "image_name": "ubuntu-22.04-x64",
+              "min_disk": "5",
+              "min_ram": "0",
+              "os_distro": "ubuntu",
+              "os_glance_failed_import": "",
+              "os_glance_importing_to_stores": "",
+              "os_require_quiesce": "True",
+              "os_type": "linux",
+              "os_version": "22.04",
+              "size": "2361393152",
+              "ssh_key": "allow"
+            },
+            "volume_type": "ssd_hiiops"
+          },
+          "sensitive_attributes": []
+        }
+      ]
+    }
+  ],
+  "check_results": null
+}

@@ -1,0 +1,46 @@
+
+Warning: Provider development overrides are in effect
+
+The following provider development overrides are set in the CLI
+configuration:
+ - gcore/gcore in /Users/user/repos/gcore-terraform
+
+The behavior may therefore not match any released version of the provider and
+applying changes may cause the state to become incompatible with published
+releases.
+gcore_cdn_trusted_ca_certificate.test: Refreshing state... [name=tf-test-cacert-update-v1]
+
+Terraform used the selected providers to generate the following execution
+plan. Resource actions are indicated with the following symbols:
+  ~ update in-place
+
+Terraform will perform the following actions:
+
+  # gcore_cdn_trusted_ca_certificate.test will be updated in-place
+  ~ resource "gcore_cdn_trusted_ca_certificate" "test" {
+      ~ cert_issuer           = "tf-test-ca.example.com" -> (known after apply)
+      + cert_subject_alt      = (known after apply)
+      ~ cert_subject_cn       = "tf-test-ca.example.com" -> (known after apply)
+      ~ deleted               = false -> (known after apply)
+      ~ has_related_resources = false -> (known after apply)
+        id                    = 279587
+      ~ name                  = "tf-test-cacert-update-v1" -> "tf-test-cacert-update-v2"
+      + ssl_certificate_chain = (known after apply)
+      ~ validity_not_after    = "2036-02-17T09:53:40Z" -> (known after apply)
+      ~ validity_not_before   = "2026-02-19T09:53:40Z" -> (known after apply)
+        # (1 unchanged attribute hidden)
+    }
+
+Plan: 0 to add, 1 to change, 0 to destroy.
+
+Changes to Outputs:
+  ~ cert_name = "tf-test-cacert-update-v1" -> "tf-test-cacert-update-v2"
+gcore_cdn_trusted_ca_certificate.test: Modifying... [name=tf-test-cacert-update-v1]
+gcore_cdn_trusted_ca_certificate.test: Modifications complete after 0s [name=tf-test-cacert-update-v2]
+
+Apply complete! Resources: 0 added, 1 changed, 0 destroyed.
+
+Outputs:
+
+cert_id = 279587
+cert_name = "tf-test-cacert-update-v2"

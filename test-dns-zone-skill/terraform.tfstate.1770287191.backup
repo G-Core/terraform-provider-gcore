@@ -1,0 +1,78 @@
+{
+  "version": 4,
+  "terraform_version": "1.14.3",
+  "serial": 5,
+  "lineage": "008429f6-8ae0-6e49-738a-deecbca1b33c",
+  "outputs": {},
+  "resources": [
+    {
+      "mode": "managed",
+      "type": "gcore_dns_zone",
+      "name": "minimal",
+      "provider": "provider[\"registry.terraform.io/gcore/gcore\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "contact": null,
+            "dnssec_enabled": null,
+            "enabled": true,
+            "expiry": null,
+            "id": "test-zone-skill-20260205.com",
+            "meta": null,
+            "name": "test-zone-skill-20260205.com",
+            "nx_ttl": null,
+            "primary_server": null,
+            "records": null,
+            "refresh": null,
+            "retry": null,
+            "rrsets_amount": null,
+            "serial": null,
+            "status": null,
+            "warnings": null
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0
+        }
+      ]
+    },
+    {
+      "mode": "managed",
+      "type": "gcore_dns_zone",
+      "name": "with_meta",
+      "provider": "provider[\"registry.terraform.io/gcore/gcore\"]",
+      "instances": [
+        {
+          "index_key": 0,
+          "schema_version": 0,
+          "attributes": {
+            "contact": null,
+            "dnssec_enabled": null,
+            "enabled": true,
+            "expiry": null,
+            "id": "test-zone-meta-20260205.com",
+            "meta": {
+              "webhook": "https://example.com/dns-hook",
+              "webhook_method": "POST"
+            },
+            "name": "test-zone-meta-20260205.com",
+            "nx_ttl": null,
+            "primary_server": null,
+            "records": null,
+            "refresh": null,
+            "retry": null,
+            "rrsets_amount": null,
+            "serial": null,
+            "status": null,
+            "warnings": [
+              "Your contract has been set to reseller default due to the absence of contact information."
+            ]
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0
+        }
+      ]
+    }
+  ],
+  "check_results": null
+}

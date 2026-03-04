@@ -1,0 +1,116 @@
+2026-01-14T12:03:24.588+0200 [INFO]  Terraform version: 1.14.3
+2026-01-14T12:03:24.588+0200 [DEBUG] using github.com/hashicorp/go-tfe v1.94.0
+2026-01-14T12:03:24.588+0200 [DEBUG] using github.com/hashicorp/hcl/v2 v2.24.0
+2026-01-14T12:03:24.588+0200 [DEBUG] using github.com/hashicorp/terraform-svchost v0.1.1
+2026-01-14T12:03:24.588+0200 [DEBUG] using github.com/zclconf/go-cty v1.16.3
+2026-01-14T12:03:24.588+0200 [INFO]  Go runtime version: go1.25.5
+2026-01-14T12:03:24.588+0200 [INFO]  CLI args: []string{"terraform", "plan"}
+2026-01-14T12:03:24.588+0200 [TRACE] Stdout is not a terminal
+2026-01-14T12:03:24.588+0200 [TRACE] Stderr is not a terminal
+2026-01-14T12:03:24.588+0200 [TRACE] Stdin is not a terminal
+2026-01-14T12:03:24.588+0200 [DEBUG] Attempting to open CLI config file: /Users/user/repos/gcore-terraform/test-cloud-instance-image-skill/.terraformrc
+2026-01-14T12:03:24.588+0200 [DEBUG] File doesn't exist, but doesn't need to. Ignoring.
+2026-01-14T12:03:24.589+0200 [DEBUG] Not reading CLI config directory because config location is overridden by environment variable
+2026-01-14T12:03:24.593+0200 [DEBUG] checking for credentials in "/Users/user/.terraform.d/plugins"
+2026-01-14T12:03:24.593+0200 [DEBUG] ignoring non-existing provider search directory terraform.d/plugins
+2026-01-14T12:03:24.593+0200 [DEBUG] will search for provider plugins in /Users/user/.terraform.d/plugins
+2026-01-14T12:03:24.595+0200 [WARN]  local provider path "/Users/user/.terraform.d/plugins/gcore/gcore/9999.0.0" contains invalid type "9999.0.0"; ignoring
+2026-01-14T12:03:24.596+0200 [WARN]  local provider path "/Users/user/.terraform.d/plugins/gcore/gcore/9999.0.0/darwin_arm64" contains invalid type "9999.0.0"; ignoring
+2026-01-14T12:03:24.596+0200 [WARN]  local provider path "/Users/user/.terraform.d/plugins/gcore/gcore/9999.0.0/darwin_arm64/terraform-provider-gcore" contains invalid type "9999.0.0"; ignoring
+2026-01-14T12:03:24.597+0200 [TRACE] getproviders.SearchLocalDirectory: found local/gcore/gcore v99.0.0 for darwin_arm64 at /Users/user/.terraform.d/plugins/local/gcore/gcore/99.0.0/darwin_arm64
+2026-01-14T12:03:24.598+0200 [TRACE] getproviders.SearchLocalDirectory: found local/stainless-sdks/gcore v0.1.0 for darwin_arm64 at /Users/user/.terraform.d/plugins/local/stainless-sdks/gcore/0.1.0/darwin_arm64
+2026-01-14T12:03:24.599+0200 [TRACE] getproviders.SearchLocalDirectory: found local.gcore.com/repo/gcore v0.0.1 for darwin_arm64 at /Users/user/.terraform.d/plugins/local.gcore.com/repo/gcore/0.0.1/darwin_arm64
+2026-01-14T12:03:24.601+0200 [TRACE] getproviders.SearchLocalDirectory: found local.gcore.com/repo/gcore v0.12.1 for darwin_arm64 at /Users/user/.terraform.d/plugins/local.gcore.com/repo/gcore/0.12.1/darwin_arm64
+2026-01-14T12:03:24.602+0200 [TRACE] getproviders.SearchLocalDirectory: found local.gcore.com/repo/gcore v0.28.0-2-geecdee5 for darwin_arm64 at /Users/user/.terraform.d/plugins/local.gcore.com/repo/gcore/0.28.0-2-geecdee5/darwin_arm64
+2026-01-14T12:03:24.602+0200 [TRACE] getproviders.SearchLocalDirectory: found local.gcore.com/repo/gcore v0.9.13 for darwin_arm64 at /Users/user/.terraform.d/plugins/local.gcore.com/repo/gcore/0.9.13/darwin_arm64
+2026-01-14T12:03:24.604+0200 [TRACE] getproviders.SearchLocalDirectory: found local.gcore.com/repo/gcore v9999.0.0 for darwin_arm64 at /Users/user/.terraform.d/plugins/local.gcore.com/repo/gcore/9999.0.0/darwin_arm64
+2026-01-14T12:03:24.606+0200 [TRACE] getproviders.SearchLocalDirectory: found registry.terraform.io/gcore/gcore v1.0.0 for darwin_arm64 at /Users/user/.terraform.d/plugins/registry.terraform.io/gcore/gcore/1.0.0/darwin_arm64
+2026-01-14T12:03:24.607+0200 [TRACE] getproviders.SearchLocalDirectory: found registry.terraform.io/gcore/gcore v9999.0.0 for darwin_arm64 at /Users/user/.terraform.d/plugins/registry.terraform.io/gcore/gcore/9999.0.0/darwin_arm64
+2026-01-14T12:03:24.607+0200 [DEBUG] ignoring non-existing provider search directory /Users/user/Library/Application Support/io.terraform/plugins
+2026-01-14T12:03:24.607+0200 [DEBUG] ignoring non-existing provider search directory /Library/Application Support/io.terraform/plugins
+2026-01-14T12:03:24.607+0200 [INFO]  CLI command args: []string{"plan"}
+2026-01-14T12:03:24.608+0200 [TRACE] Meta.Backend: no config given or present on disk, so returning nil config
+2026-01-14T12:03:24.608+0200 [TRACE] Meta.Backend: backend has not previously been initialized in this working directory
+2026-01-14T12:03:24.608+0200 [TRACE] Meta.Backend: using default local state only (no backend configuration, and no existing initialized backend)
+2026-01-14T12:03:24.608+0200 [TRACE] Meta.Backend: instantiated backend of type <nil>
+2026-01-14T12:03:24.608+0200 [DEBUG] checking for provisioner in "."
+2026-01-14T12:03:24.612+0200 [DEBUG] checking for provisioner in "/opt/homebrew/bin"
+2026-01-14T12:03:24.612+0200 [DEBUG] checking for provisioner in "/Users/user/.terraform.d/plugins"
+2026-01-14T12:03:24.612+0200 [TRACE] Meta.Backend: backend <nil> does not support operations, so wrapping it in a local backend
+2026-01-14T12:03:24.613+0200 [INFO]  backend/local: starting Plan operation
+2026-01-14T12:03:24.613+0200 [TRACE] backend/local: requesting state manager for workspace "default"
+2026-01-14T12:03:24.613+0200 [TRACE] backend/local: state manager for workspace "default" will:
+ - read initial snapshot from terraform.tfstate
+ - write new snapshots to terraform.tfstate
+ - create any backup at terraform.tfstate.backup
+2026-01-14T12:03:24.613+0200 [TRACE] backend/local: requesting state lock for workspace "default"
+2026-01-14T12:03:24.613+0200 [TRACE] statemgr.Filesystem: preparing to manage state snapshots at terraform.tfstate
+2026-01-14T12:03:24.613+0200 [TRACE] statemgr.Filesystem: no previously-stored snapshot exists
+2026-01-14T12:03:24.613+0200 [TRACE] statemgr.Filesystem: locking terraform.tfstate using fcntl flock
+2026-01-14T12:03:24.613+0200 [TRACE] statemgr.Filesystem: writing lock metadata to .terraform.tfstate.lock.info
+2026-01-14T12:03:24.614+0200 [TRACE] backend/local: reading remote state for workspace "default"
+2026-01-14T12:03:24.614+0200 [TRACE] statemgr.Filesystem: reading latest snapshot from terraform.tfstate
+2026-01-14T12:03:24.614+0200 [TRACE] statemgr.Filesystem: snapshot file has nil snapshot, but that's okay
+2026-01-14T12:03:24.614+0200 [TRACE] statemgr.Filesystem: read nil snapshot
+2026-01-14T12:03:24.614+0200 [TRACE] backend/local: populating backendrun.LocalRun for current working directory
+2026-01-14T12:03:24.614+0200 [TRACE] Config.VerifyDependencySelections: provider registry.terraform.io/gcore/gcore has no lock file entry to satisfy ""
+2026-01-14T12:03:24.614+0200 [TRACE] statemgr.Filesystem: removing lock metadata file .terraform.tfstate.lock.info
+2026-01-14T12:03:24.614+0200 [TRACE] statemgr.Filesystem: unlocking terraform.tfstate using fcntl flock
+2026-01-14T12:03:29.747+0200 [INFO]  Terraform version: 1.14.3
+2026-01-14T12:03:29.747+0200 [DEBUG] using github.com/hashicorp/go-tfe v1.94.0
+2026-01-14T12:03:29.748+0200 [DEBUG] using github.com/hashicorp/hcl/v2 v2.24.0
+2026-01-14T12:03:29.748+0200 [DEBUG] using github.com/hashicorp/terraform-svchost v0.1.1
+2026-01-14T12:03:29.748+0200 [DEBUG] using github.com/zclconf/go-cty v1.16.3
+2026-01-14T12:03:29.748+0200 [INFO]  Go runtime version: go1.25.5
+2026-01-14T12:03:29.748+0200 [INFO]  CLI args: []string{"terraform", "plan"}
+2026-01-14T12:03:29.748+0200 [TRACE] Stdout is not a terminal
+2026-01-14T12:03:29.748+0200 [TRACE] Stderr is not a terminal
+2026-01-14T12:03:29.748+0200 [TRACE] Stdin is not a terminal
+2026-01-14T12:03:29.748+0200 [DEBUG] Attempting to open CLI config file: /Users/user/repos/gcore-terraform/test-cloud-instance-image-skill/.terraformrc
+2026-01-14T12:03:29.748+0200 [DEBUG] File doesn't exist, but doesn't need to. Ignoring.
+2026-01-14T12:03:29.748+0200 [DEBUG] Not reading CLI config directory because config location is overridden by environment variable
+2026-01-14T12:03:29.749+0200 [DEBUG] checking for credentials in "/Users/user/.terraform.d/plugins"
+2026-01-14T12:03:29.749+0200 [DEBUG] ignoring non-existing provider search directory terraform.d/plugins
+2026-01-14T12:03:29.749+0200 [DEBUG] will search for provider plugins in /Users/user/.terraform.d/plugins
+2026-01-14T12:03:29.750+0200 [WARN]  local provider path "/Users/user/.terraform.d/plugins/gcore/gcore/9999.0.0" contains invalid type "9999.0.0"; ignoring
+2026-01-14T12:03:29.750+0200 [WARN]  local provider path "/Users/user/.terraform.d/plugins/gcore/gcore/9999.0.0/darwin_arm64" contains invalid type "9999.0.0"; ignoring
+2026-01-14T12:03:29.750+0200 [WARN]  local provider path "/Users/user/.terraform.d/plugins/gcore/gcore/9999.0.0/darwin_arm64/terraform-provider-gcore" contains invalid type "9999.0.0"; ignoring
+2026-01-14T12:03:29.750+0200 [TRACE] getproviders.SearchLocalDirectory: found local/gcore/gcore v99.0.0 for darwin_arm64 at /Users/user/.terraform.d/plugins/local/gcore/gcore/99.0.0/darwin_arm64
+2026-01-14T12:03:29.751+0200 [TRACE] getproviders.SearchLocalDirectory: found local/stainless-sdks/gcore v0.1.0 for darwin_arm64 at /Users/user/.terraform.d/plugins/local/stainless-sdks/gcore/0.1.0/darwin_arm64
+2026-01-14T12:03:29.751+0200 [TRACE] getproviders.SearchLocalDirectory: found local.gcore.com/repo/gcore v0.0.1 for darwin_arm64 at /Users/user/.terraform.d/plugins/local.gcore.com/repo/gcore/0.0.1/darwin_arm64
+2026-01-14T12:03:29.751+0200 [TRACE] getproviders.SearchLocalDirectory: found local.gcore.com/repo/gcore v0.12.1 for darwin_arm64 at /Users/user/.terraform.d/plugins/local.gcore.com/repo/gcore/0.12.1/darwin_arm64
+2026-01-14T12:03:29.752+0200 [TRACE] getproviders.SearchLocalDirectory: found local.gcore.com/repo/gcore v0.28.0-2-geecdee5 for darwin_arm64 at /Users/user/.terraform.d/plugins/local.gcore.com/repo/gcore/0.28.0-2-geecdee5/darwin_arm64
+2026-01-14T12:03:29.752+0200 [TRACE] getproviders.SearchLocalDirectory: found local.gcore.com/repo/gcore v0.9.13 for darwin_arm64 at /Users/user/.terraform.d/plugins/local.gcore.com/repo/gcore/0.9.13/darwin_arm64
+2026-01-14T12:03:29.752+0200 [TRACE] getproviders.SearchLocalDirectory: found local.gcore.com/repo/gcore v9999.0.0 for darwin_arm64 at /Users/user/.terraform.d/plugins/local.gcore.com/repo/gcore/9999.0.0/darwin_arm64
+2026-01-14T12:03:29.752+0200 [TRACE] getproviders.SearchLocalDirectory: found registry.terraform.io/gcore/gcore v1.0.0 for darwin_arm64 at /Users/user/.terraform.d/plugins/registry.terraform.io/gcore/gcore/1.0.0/darwin_arm64
+2026-01-14T12:03:29.753+0200 [TRACE] getproviders.SearchLocalDirectory: found registry.terraform.io/gcore/gcore v9999.0.0 for darwin_arm64 at /Users/user/.terraform.d/plugins/registry.terraform.io/gcore/gcore/9999.0.0/darwin_arm64
+2026-01-14T12:03:29.753+0200 [DEBUG] ignoring non-existing provider search directory /Users/user/Library/Application Support/io.terraform/plugins
+2026-01-14T12:03:29.753+0200 [DEBUG] ignoring non-existing provider search directory /Library/Application Support/io.terraform/plugins
+2026-01-14T12:03:29.754+0200 [INFO]  CLI command args: []string{"plan"}
+2026-01-14T12:03:29.755+0200 [TRACE] Meta.Backend: no config given or present on disk, so returning nil config
+2026-01-14T12:03:29.755+0200 [TRACE] Meta.Backend: backend has not previously been initialized in this working directory
+2026-01-14T12:03:29.755+0200 [TRACE] Meta.Backend: using default local state only (no backend configuration, and no existing initialized backend)
+2026-01-14T12:03:29.755+0200 [TRACE] Meta.Backend: instantiated backend of type <nil>
+2026-01-14T12:03:29.755+0200 [DEBUG] checking for provisioner in "."
+2026-01-14T12:03:29.759+0200 [DEBUG] checking for provisioner in "/opt/homebrew/bin"
+2026-01-14T12:03:29.759+0200 [DEBUG] checking for provisioner in "/Users/user/.terraform.d/plugins"
+2026-01-14T12:03:29.759+0200 [TRACE] Meta.Backend: backend <nil> does not support operations, so wrapping it in a local backend
+2026-01-14T12:03:29.759+0200 [INFO]  backend/local: starting Plan operation
+2026-01-14T12:03:29.759+0200 [TRACE] backend/local: requesting state manager for workspace "default"
+2026-01-14T12:03:29.759+0200 [TRACE] backend/local: state manager for workspace "default" will:
+ - read initial snapshot from terraform.tfstate
+ - write new snapshots to terraform.tfstate
+ - create any backup at terraform.tfstate.backup
+2026-01-14T12:03:29.759+0200 [TRACE] backend/local: requesting state lock for workspace "default"
+2026-01-14T12:03:29.759+0200 [TRACE] statemgr.Filesystem: preparing to manage state snapshots at terraform.tfstate
+2026-01-14T12:03:29.760+0200 [TRACE] statemgr.Filesystem: no previously-stored snapshot exists
+2026-01-14T12:03:29.760+0200 [TRACE] statemgr.Filesystem: locking terraform.tfstate using fcntl flock
+2026-01-14T12:03:29.760+0200 [TRACE] statemgr.Filesystem: writing lock metadata to .terraform.tfstate.lock.info
+2026-01-14T12:03:29.760+0200 [TRACE] backend/local: reading remote state for workspace "default"
+2026-01-14T12:03:29.760+0200 [TRACE] statemgr.Filesystem: reading latest snapshot from terraform.tfstate
+2026-01-14T12:03:29.760+0200 [TRACE] statemgr.Filesystem: snapshot file has nil snapshot, but that's okay
+2026-01-14T12:03:29.760+0200 [TRACE] statemgr.Filesystem: read nil snapshot
+2026-01-14T12:03:29.760+0200 [TRACE] backend/local: populating backendrun.LocalRun for current working directory
+2026-01-14T12:03:29.760+0200 [TRACE] Config.VerifyDependencySelections: provider registry.terraform.io/gcore/gcore has no lock file entry to satisfy ""
+2026-01-14T12:03:29.760+0200 [TRACE] statemgr.Filesystem: removing lock metadata file .terraform.tfstate.lock.info
+2026-01-14T12:03:29.760+0200 [TRACE] statemgr.Filesystem: unlocking terraform.tfstate using fcntl flock

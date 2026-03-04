@@ -1,0 +1,11 @@
+# gcore_fastedge_secret.test_secret:
+resource "gcore_fastedge_secret" "test_secret" {
+    comment = "Test secret for GCLOUD2-23104 - old provider"
+    id      = "326"
+    name    = "terraform_jira_test_secret"
+
+    slot {
+      # At least one attribute in this block is (or was) sensitive,
+      # so its contents will not be displayed.
+    }
+}

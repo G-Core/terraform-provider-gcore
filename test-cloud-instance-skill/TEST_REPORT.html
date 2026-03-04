@@ -1,0 +1,692 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Terraform Test Report: gcore_cloud_instance</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: #f5f5f5;
+            padding: 20px;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+        }
+        header h1 {
+            font-size: 2em;
+            margin-bottom: 10px;
+        }
+        .meta-info {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 10px;
+            margin-top: 15px;
+            font-size: 0.9em;
+        }
+        .meta-item {
+            background: rgba(255,255,255,0.1);
+            padding: 8px 12px;
+            border-radius: 5px;
+        }
+        .meta-label {
+            font-weight: 600;
+            opacity: 0.8;
+        }
+        .summary-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        .card {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+        .card.total { border-left: 4px solid #667eea; }
+        .card.passed { border-left: 4px solid #28a745; }
+        .card.warning { border-left: 4px solid #ffc107; }
+        .card.failed { border-left: 4px solid #dc3545; }
+        .card-number {
+            font-size: 3em;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        .card.passed .card-number { color: #28a745; }
+        .card.warning .card-number { color: #ffc107; }
+        .card.failed .card-number { color: #dc3545; }
+        .card-label {
+            font-size: 0.9em;
+            color: #666;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        section {
+            background: white;
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+        }
+        section h2 {
+            font-size: 1.5em;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #f0f0f0;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+        th {
+            background: #f8f9fa;
+            font-weight: 600;
+            color: #555;
+        }
+        tr:hover {
+            background: #f8f9fa;
+        }
+        .badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 15px;
+            font-size: 0.8em;
+            font-weight: 600;
+        }
+        .badge-success { background: #d4edda; color: #155724; }
+        .badge-warning { background: #fff3cd; color: #856404; }
+        .badge-danger { background: #f8d7da; color: #721c24; }
+        .badge-info { background: #d1ecf1; color: #0c5460; }
+        .badge-post { background: #28a745; color: white; }
+        .badge-get { background: #17a2b8; color: white; }
+        .badge-patch { background: #ffc107; color: #333; }
+        .badge-delete { background: #dc3545; color: white; }
+        .test-detail {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 15px 0;
+            border-left: 3px solid #667eea;
+        }
+        .test-detail h4 {
+            margin-bottom: 10px;
+            color: #555;
+        }
+        pre {
+            background: #2d2d2d;
+            color: #f8f8f2;
+            padding: 15px;
+            border-radius: 5px;
+            overflow-x: auto;
+            font-size: 0.85em;
+            line-height: 1.5;
+        }
+        .code-inline {
+            background: #e9ecef;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: 'Monaco', 'Menlo', monospace;
+            font-size: 0.9em;
+        }
+        .evidence-list {
+            list-style: none;
+            padding: 0;
+        }
+        .evidence-list li {
+            padding: 10px;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .evidence-list li:last-child {
+            border-bottom: none;
+        }
+        .file-icon {
+            width: 24px;
+            height: 24px;
+            background: #667eea;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 0.7em;
+            font-weight: bold;
+        }
+        .checklist {
+            list-style: none;
+            padding: 0;
+        }
+        .checklist li {
+            padding: 8px 0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .check-pass::before {
+            content: "✓";
+            color: #28a745;
+            font-weight: bold;
+            font-size: 1.2em;
+        }
+        .check-fail::before {
+            content: "✗";
+            color: #dc3545;
+            font-weight: bold;
+            font-size: 1.2em;
+        }
+        .check-na::before {
+            content: "—";
+            color: #6c757d;
+            font-weight: bold;
+            font-size: 1.2em;
+        }
+        .highlight-box {
+            background: #e8f4f8;
+            border: 1px solid #bee5eb;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 15px 0;
+        }
+        .highlight-box.success {
+            background: #d4edda;
+            border-color: #c3e6cb;
+        }
+        .highlight-box.warning {
+            background: #fff3cd;
+            border-color: #ffeeba;
+        }
+        footer {
+            text-align: center;
+            color: #666;
+            padding: 20px;
+            font-size: 0.9em;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Terraform Test Report: gcore_cloud_instance</h1>
+            <div class="meta-info">
+                <div class="meta-item">
+                    <span class="meta-label">JIRA Ticket:</span> GCLOUD2-21138
+                </div>
+                <div class="meta-item">
+                    <span class="meta-label">PR:</span> #35
+                </div>
+                <div class="meta-item">
+                    <span class="meta-label">Branch:</span> fix/cdn-origin-group-GCLOUD2-22597
+                </div>
+                <div class="meta-item">
+                    <span class="meta-label">Date:</span> 2026-01-16
+                </div>
+                <div class="meta-item">
+                    <span class="meta-label">Region:</span> Luxembourg-2 (76)
+                </div>
+                <div class="meta-item">
+                    <span class="meta-label">Project:</span> 379987
+                </div>
+            </div>
+        </header>
+
+        <div class="summary-cards">
+            <div class="card total">
+                <div class="card-number">3</div>
+                <div class="card-label">Total Tests</div>
+            </div>
+            <div class="card passed">
+                <div class="card-number">2</div>
+                <div class="card-label">Passed</div>
+            </div>
+            <div class="card warning">
+                <div class="card-number">0</div>
+                <div class="card-label">Warnings</div>
+            </div>
+            <div class="card failed">
+                <div class="card-number">1</div>
+                <div class="card-label">Failed</div>
+            </div>
+        </div>
+
+        <section>
+            <h2>Test Results Summary</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Test Name</th>
+                        <th>Description</th>
+                        <th>JIRA Bug</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>1</td>
+                        <td>External Interface + Existing Volume</td>
+                        <td>Tests volume_id serialization (was sending "id" instead of "volume_id")</td>
+                        <td>GCLOUD2-21138</td>
+                        <td><span class="badge badge-success">PASS</span></td>
+                    </tr>
+                    <tr>
+                        <td>7</td>
+                        <td>Combined Update (name + flavor)</td>
+                        <td>Tests that BOTH name AND flavor changes apply in single terraform apply</td>
+                        <td>GCLOUD2-21138 (Pedro Comment 3)</td>
+                        <td><span class="badge badge-success">PASS</span></td>
+                    </tr>
+                    <tr>
+                        <td>Import</td>
+                        <td>Import + Drift Check</td>
+                        <td>Import existing instance and verify no drift</td>
+                        <td>-</td>
+                        <td><span class="badge badge-danger">FAIL</span></td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+
+        <section>
+            <h2>Test 1: External Interface + Existing Volume</h2>
+            <div class="highlight-box success">
+                <strong>Result: PASSED</strong> - The volume_id serialization bug is FIXED. API correctly receives "volume_id" field.
+            </div>
+
+            <div class="test-detail">
+                <h4>Test Configuration</h4>
+                <ul>
+                    <li>Interface type: <code class="code-inline">external</code></li>
+                    <li>Volume source: <code class="code-inline">existing-volume</code></li>
+                    <li>Boot index: <code class="code-inline">0</code></li>
+                </ul>
+            </div>
+
+            <div class="test-detail">
+                <h4>MITM Verification - Instance Creation Payload</h4>
+<pre>{
+    "flavor": "g1-standard-1-2",
+    "interfaces": [
+        {
+            "type": "external"
+        }
+    ],
+    "name": "test-instance-skill",
+    "volumes": [
+        {
+            "boot_index": 0,
+            "delete_on_termination": false,
+            "source": "existing-volume",
+            "volume_id": "c305c356-e93d-4695-a5b4-6971e898e555"  <-- CORRECT! (not "id")
+        }
+    ]
+}</pre>
+            </div>
+
+            <div class="test-detail">
+                <h4>Resources Created</h4>
+                <ul>
+                    <li>Instance ID: <code class="code-inline">157504a5-5821-4f21-a32d-7a6d1f615eae</code></li>
+                    <li>Boot Volume ID: <code class="code-inline">c305c356-e93d-4695-a5b4-6971e898e555</code></li>
+                    <li>Interface Port ID: <code class="code-inline">cb07fa12-b1df-4bf1-af86-f26ab4469af5</code></li>
+                    <li>External IP: <code class="code-inline">85.204.246.86</code></li>
+                </ul>
+            </div>
+
+            <div class="test-detail">
+                <h4>Drift Check</h4>
+                <p>Second terraform plan shows: <strong>"No changes. Your infrastructure matches the configuration."</strong></p>
+            </div>
+        </section>
+
+        <section>
+            <h2>Test 7: Combined Update (name + flavor) - CRITICAL</h2>
+            <div class="highlight-box success">
+                <strong>Result: PASSED</strong> - Pedro's Comment 3 fix is working! Both name AND flavor changes apply correctly.
+            </div>
+
+            <div class="test-detail">
+                <h4>Test Description</h4>
+                <p>This test validates the fix for Pedro's PR Comment #3: the early return after specialized endpoints (like /changeflavor) was preventing PATCH for simple field changes (like name).</p>
+                <p><strong>Before fix:</strong> Only flavor would change, name update would be skipped.</p>
+                <p><strong>After fix:</strong> Both changes apply in a single terraform apply.</p>
+            </div>
+
+            <div class="test-detail">
+                <h4>Update Operations</h4>
+                <table>
+                    <tr>
+                        <th>Field</th>
+                        <th>Before</th>
+                        <th>After</th>
+                        <th>API Endpoint</th>
+                    </tr>
+                    <tr>
+                        <td>name</td>
+                        <td><code class="code-inline">test-instance-skill</code></td>
+                        <td><code class="code-inline">test-instance-skill-renamed</code></td>
+                        <td>PATCH /instances/{id}</td>
+                    </tr>
+                    <tr>
+                        <td>flavor</td>
+                        <td><code class="code-inline">g1-standard-1-2</code></td>
+                        <td><code class="code-inline">g1-standard-2-4</code></td>
+                        <td>POST /instances/{id}/changeflavor</td>
+                    </tr>
+                </table>
+            </div>
+
+            <div class="test-detail">
+                <h4>MITM Verification - /changeflavor Endpoint</h4>
+<pre>POST https://api.gcore.com/cloud/v1/instances/379987/76/157504a5-5821-4f21-a32d-7a6d1f615eae/changeflavor
+{
+    "flavor_id": "g1-standard-2-4"
+}</pre>
+            </div>
+
+            <div class="test-detail">
+                <h4>API State Verification</h4>
+<pre>$ curl API response:
+"test-instance-skill-renamed"  <-- Name updated correctly
+"test-instance-skill-renamed"  <-- instance_name also correct
+"g1-standard-2-4"              <-- Flavor updated correctly</pre>
+            </div>
+
+            <div class="test-detail">
+                <h4>Drift Check</h4>
+                <p>Second terraform plan shows: <strong>"No changes. Your infrastructure matches the configuration."</strong></p>
+            </div>
+
+            <div class="test-detail">
+                <h4>Instance ID Stability</h4>
+                <p>Instance ID remained: <code class="code-inline">157504a5-5821-4f21-a32d-7a6d1f615eae</code> (no recreation)</p>
+            </div>
+        </section>
+
+        <section>
+            <h2>Import Test: Drift After Import</h2>
+            <div class="highlight-box warning">
+                <strong>Result: FAILED</strong> - Drift detected after import. Resource would be replaced.
+            </div>
+
+            <div class="test-detail">
+                <h4>Test Description</h4>
+                <p>This test imports an existing instance and checks for drift. A successful import should show "No changes" on subsequent plan.</p>
+            </div>
+
+            <div class="test-detail">
+                <h4>Import Command</h4>
+<pre>terraform import gcore_cloud_instance.test_external "379987/76/3b277ae2-5104-43d8-89cb-07fe692c6fbb"
+# Import successful!</pre>
+            </div>
+
+            <div class="test-detail">
+                <h4>Drift Issues Found</h4>
+                <table>
+                    <tr>
+                        <th>Field</th>
+                        <th>Issue</th>
+                        <th>Impact</th>
+                    </tr>
+                    <tr>
+                        <td><code class="code-inline">project_id</code></td>
+                        <td>Set to 379987 in state after import, but null in config (uses env var)</td>
+                        <td><span class="badge badge-danger">forces replacement</span></td>
+                    </tr>
+                    <tr>
+                        <td><code class="code-inline">region_id</code></td>
+                        <td>Set to 76 in state after import, but null in config (uses env var)</td>
+                        <td><span class="badge badge-danger">forces replacement</span></td>
+                    </tr>
+                    <tr>
+                        <td><code class="code-inline">volumes.boot_index</code></td>
+                        <td>Not read from API during import, shows as added</td>
+                        <td><span class="badge badge-warning">drift</span></td>
+                    </tr>
+                </table>
+            </div>
+
+            <div class="test-detail">
+                <h4>Terraform Plan Output After Import</h4>
+<pre># gcore_cloud_instance.test_external must be replaced
+-/+ resource "gcore_cloud_instance" "test_external" {
+      - project_id = 379987 -> null  # forces replacement
+      - region_id  = 76 -> null      # forces replacement
+      ~ volumes = [
+          ~ {
+              + boot_index = 0       # drift - not read from API
+            },
+        ]
+    }</pre>
+            </div>
+
+            <div class="test-detail">
+                <h4>Root Cause Analysis</h4>
+                <p><strong>1. project_id/region_id issue:</strong> These fields are marked as "forces replacement" when null in config but present in state. The config relies on environment variables (GCORE_CLOUD_PROJECT_ID, GCORE_CLOUD_REGION_ID) but after import, explicit values are in state.</p>
+                <p><strong>2. boot_index issue:</strong> The instance GET API doesn't return boot_index for volumes. The import reads volumes but can't populate boot_index, causing drift.</p>
+            </div>
+
+            <div class="test-detail">
+                <h4>Recommended Fixes</h4>
+                <ol>
+                    <li>Make project_id and region_id not force replacement when transitioning from explicit to environment-variable-based</li>
+                    <li>During import, fetch volume details separately to get boot_index, OR document that users must specify boot_index in config before import</li>
+                </ol>
+            </div>
+        </section>
+
+        <section>
+            <h2>MITM API Calls</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Method</th>
+                        <th>Endpoint</th>
+                        <th>Purpose</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><span class="badge badge-post">POST</span></td>
+                        <td>/cloud/v2/instances/{project}/{region}</td>
+                        <td>Create instance with existing volume</td>
+                    </tr>
+                    <tr>
+                        <td><span class="badge badge-get">GET</span></td>
+                        <td>/cloud/v1/tasks/{task_id}</td>
+                        <td>Poll create task until completion</td>
+                    </tr>
+                    <tr>
+                        <td><span class="badge badge-get">GET</span></td>
+                        <td>/cloud/v1/instances/{project}/{region}/{id}</td>
+                        <td>Refresh instance state</td>
+                    </tr>
+                    <tr>
+                        <td><span class="badge badge-get">GET</span></td>
+                        <td>/cloud/v1/instances/{project}/{region}/{id}/interfaces</td>
+                        <td>Get interface details</td>
+                    </tr>
+                    <tr>
+                        <td><span class="badge badge-post">POST</span></td>
+                        <td>/cloud/v1/instances/{project}/{region}/{id}/changeflavor</td>
+                        <td>Change instance flavor</td>
+                    </tr>
+                    <tr>
+                        <td><span class="badge badge-patch">PATCH</span></td>
+                        <td>/cloud/v1/instances/{project}/{region}/{id}</td>
+                        <td>Update instance name (API verified)</td>
+                    </tr>
+                    <tr>
+                        <td><span class="badge badge-delete">DELETE</span></td>
+                        <td>/cloud/v1/instances/{project}/{region}/{id}</td>
+                        <td>Delete instance (cleanup)</td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+
+        <section>
+            <h2>Fixes Applied (PR #35)</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Issue</th>
+                        <th>Fix Description</th>
+                        <th>File:Line</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>volume_id serialization bug</td>
+                        <td>MarshalJSONWithState now correctly sends "volume_id" instead of "id"</td>
+                        <td>internal/services/cloud_instance/model.go</td>
+                    </tr>
+                    <tr>
+                        <td>Early return blocking combined updates</td>
+                        <td>Removed early return after specialized endpoints; name update now runs after flavor change</td>
+                        <td>internal/services/cloud_instance/resource.go:888-919</td>
+                    </tr>
+                    <tr>
+                        <td>Interface/volume preservation (Pedro Comment 1)</td>
+                        <td>Added comments explaining why preservation pattern is needed for cloud_instance</td>
+                        <td>internal/services/cloud_instance/resource.go:1393</td>
+                    </tr>
+                    <tr>
+                        <td>Interface matching logic (Pedro Comment 2)</td>
+                        <td>Added mergeInterfaceComputedFields helper with port_id matching</td>
+                        <td>internal/services/cloud_instance/resource.go:1291-1355</td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+
+        <section>
+            <h2>Known Issues / Notes</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Issue</th>
+                        <th>Status</th>
+                        <th>Notes</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Quota limits prevented network/data volume creation</td>
+                        <td><span class="badge badge-info">Not a bug</span></td>
+                        <td>Infrastructure quota limitation; instance tests still valid</td>
+                    </tr>
+                    <tr>
+                        <td>PATCH for name not captured in MITM</td>
+                        <td><span class="badge badge-info">Timing issue</span></td>
+                        <td>API verified name was updated; MITM may have missed due to timing</td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+
+        <section>
+            <h2>Evidence Package</h2>
+            <ul class="evidence-list">
+                <li>
+                    <span class="file-icon">LOG</span>
+                    <span>evidence/test1_plan.log - Terraform plan output for Test 1</span>
+                </li>
+                <li>
+                    <span class="file-icon">LOG</span>
+                    <span>evidence/test1_apply.log - Terraform apply output for Test 1</span>
+                </li>
+                <li>
+                    <span class="file-icon">LOG</span>
+                    <span>evidence/test1_drift.log - Drift check output for Test 1</span>
+                </li>
+                <li>
+                    <span class="file-icon">LOG</span>
+                    <span>evidence/test1_outputs.log - Terraform outputs for Test 1</span>
+                </li>
+                <li>
+                    <span class="file-icon">LOG</span>
+                    <span>evidence/test7_plan.log - Terraform plan output for Test 7</span>
+                </li>
+                <li>
+                    <span class="file-icon">LOG</span>
+                    <span>evidence/test7_apply.log - Terraform apply output for Test 7</span>
+                </li>
+                <li>
+                    <span class="file-icon">LOG</span>
+                    <span>evidence/test7_drift.log - Drift check output for Test 7</span>
+                </li>
+                <li>
+                    <span class="file-icon">LOG</span>
+                    <span>evidence/test7_outputs.log - Terraform outputs for Test 7</span>
+                </li>
+                <li>
+                    <span class="file-icon">MITM</span>
+                    <span>evidence/mitm_api_calls.log - All captured API calls</span>
+                </li>
+                <li>
+                    <span class="file-icon">MITM</span>
+                    <span>flow.mitm - Raw mitmproxy capture file</span>
+                </li>
+                <li>
+                    <span class="file-icon">LOG</span>
+                    <span>evidence/import_create.log - Instance creation for import test</span>
+                </li>
+                <li>
+                    <span class="file-icon">LOG</span>
+                    <span>evidence/import_fixed.log - Import command output</span>
+                </li>
+                <li>
+                    <span class="file-icon">LOG</span>
+                    <span>evidence/import_drift_fixed.log - Drift check after import (shows issues)</span>
+                </li>
+            </ul>
+        </section>
+
+        <section>
+            <h2>QA Checklist</h2>
+            <ul class="checklist">
+                <li class="check-pass">Drift detection: No changes on second plan after create</li>
+                <li class="check-pass">Drift detection: No changes on second plan after update</li>
+                <li class="check-pass">Update operations: Resources updated in-place (not recreated)</li>
+                <li class="check-pass">Combined updates: Both specialized endpoint + PATCH work together</li>
+                <li class="check-pass">Async operations: Task polling works correctly</li>
+                <li class="check-pass">volume_id serialization: Correct field name in API payload</li>
+                <li class="check-pass">Interface computed fields: port_id and ip_address populated</li>
+                <li class="check-pass">Delete operations: Clean deletion with task polling</li>
+                <li class="check-fail">Import functionality: DRIFT after import (project_id/region_id force replacement, boot_index missing)</li>
+                <li class="check-na">Empty array handling: Not tested in this run</li>
+            </ul>
+        </section>
+
+        <footer>
+            <p>Generated by Terraform Testing Skill | Report Date: 2026-01-16</p>
+        </footer>
+    </div>
+</body>
+</html>

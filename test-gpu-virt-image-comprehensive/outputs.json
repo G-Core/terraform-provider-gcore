@@ -1,0 +1,87 @@
+{
+  "image_architecture": {
+    "sensitive": false,
+    "type": "string",
+    "value": "x86_64"
+  },
+  "image_cow_format": {
+    "sensitive": false,
+    "type": "bool",
+    "value": false
+  },
+  "image_created_at": {
+    "sensitive": false,
+    "type": "string",
+    "value": "2025-11-28T07:40:07Z"
+  },
+  "image_gpu_driver": {
+    "sensitive": false,
+    "type": "string",
+    "value": "nvidia"
+  },
+  "image_hw_firmware_type": {
+    "sensitive": false,
+    "type": "string",
+    "value": "bios"
+  },
+  "image_id": {
+    "sensitive": false,
+    "type": "string",
+    "value": "3a50d4ab-469d-4e51-80d9-727553da684e"
+  },
+  "image_min_disk": {
+    "sensitive": false,
+    "type": "number",
+    "value": 1
+  },
+  "image_min_ram": {
+    "sensitive": false,
+    "type": "number",
+    "value": 0
+  },
+  "image_name": {
+    "sensitive": false,
+    "type": "string",
+    "value": "test-comprehensive-gpu-image-GCLOUD2-21134"
+  },
+  "image_os_distro": {
+    "sensitive": false,
+    "type": "string",
+    "value": "cirros"
+  },
+  "image_os_type": {
+    "sensitive": false,
+    "type": "string",
+    "value": "linux"
+  },
+  "image_os_version": {
+    "sensitive": false,
+    "type": "string",
+    "value": "0.4.0"
+  },
+  "image_size": {
+    "sensitive": false,
+    "type": "number",
+    "value": 12716032
+  },
+  "image_ssh_key": {
+    "sensitive": false,
+    "type": "string",
+    "value": "allow"
+  },
+  "image_status": {
+    "sensitive": false,
+    "type": "string",
+    "value": "active"
+  },
+  "image_updated_at": {
+    "sensitive": false,
+    "type": "string",
+    "value": "2025-11-28T07:40:11Z"
+  },
+  "image_visibility": {
+    "sensitive": false,
+    "type": "string",
+    "value": "shared"
+  }
+}

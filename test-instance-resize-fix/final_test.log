@@ -1,0 +1,113 @@
+=== Instance Resize Operations Test ===
+
+Step 1: Loading credentials from .env...
+✅ Credentials loaded
+
+Step 2: Setting up environment...
+✅ Environment configured
+
+Step 3: Verifying Terraform setup...
+Provider is configured via dev_overrides in .terraformrc
+
+Step 4: Creating instance with initial configuration...
+  Flavor: g1-standard-1-2 (1 vCPU, 2GB RAM)
+  Volume: 10GB
+[33m╷[0m[0m
+[33m│[0m [0m[1m[33mWarning: [0m[0m[1mProvider development overrides are in effect[0m
+[33m│[0m [0m
+[33m│[0m [0m[0mThe following provider development overrides are set in the CLI
+[33m│[0m [0mconfiguration:
+[33m│[0m [0m - gcore/gcore in /Users/user/repos/gcore-terraform
+[33m│[0m [0m
+[33m│[0m [0mThe behavior may therefore not match any released version of the provider
+[33m│[0m [0mand applying changes may cause the state to become incompatible with
+[33m│[0m [0mpublished releases.
+[33m╵[0m[0m
+
+Terraform used the selected providers to generate the following execution
+plan. Resource actions are indicated with the following symbols:
+  [32m+[0m create[0m
+
+Terraform will perform the following actions:
+
+[1m  # gcore_cloud_instance.test[0m will be created
+[0m  [32m+[0m[0m resource "gcore_cloud_instance" "test" {
+      [32m+[0m[0m addresses            = (known after apply)
+      [32m+[0m[0m blackhole_ports      = (known after apply)
+      [32m+[0m[0m created_at           = (known after apply)
+      [32m+[0m[0m creator_task_id      = (known after apply)
+      [32m+[0m[0m ddos_profile         = (known after apply)
+      [32m+[0m[0m fixed_ip_assignments = (known after apply)
+      [32m+[0m[0m flavor               = "g1-standard-1-2"
+      [32m+[0m[0m id                   = (known after apply)
+      [32m+[0m[0m instance_description = (known after apply)
+      [32m+[0m[0m instance_isolation   = (known after apply)
+      [32m+[0m[0m interfaces           = [
+          [32m+[0m[0m {
+              [32m+[0m[0m type = "external"
+            },
+        ]
+      [32m+[0m[0m name                 = "test-resize-fix"
+      [32m+[0m[0m project_id           = 379987
+      [32m+[0m[0m region               = (known after apply)
+      [32m+[0m[0m region_id            = 76
+      [32m+[0m[0m status               = (known after apply)
+      [32m+[0m[0m task_id              = (known after apply)
+      [32m+[0m[0m task_state           = (known after apply)
+      [32m+[0m[0m tasks                = (known after apply)
+      [32m+[0m[0m vm_state             = (known after apply)
+      [32m+[0m[0m volumes              = [
+          [32m+[0m[0m {
+              [32m+[0m[0m boot_index            = 0
+              [32m+[0m[0m delete_on_termination = false
+              [32m+[0m[0m image_id              = "8a59956d-ada3-42c6-aaf3-e2c38ba70f99"
+              [32m+[0m[0m size                  = 10
+              [32m+[0m[0m source                = "image"
+              [32m+[0m[0m volume_id             = (known after apply)
+            },
+        ]
+    }
+
+[1mPlan:[0m 1 to add, 0 to change, 0 to destroy.
+[0m
+Changes to Outputs:
+  [32m+[0m[0m instance_id      = (known after apply)
+  [32m+[0m[0m instance_volumes = [
+      [32m+[0m[0m {
+          [32m+[0m[0m apptemplate_id        = [90mnull[0m[0m
+          [32m+[0m[0m attachment_tag        = [90mnull[0m[0m
+          [32m+[0m[0m boot_index            = 0
+          [32m+[0m[0m delete_on_termination = false
+          [32m+[0m[0m image_id              = "8a59956d-ada3-42c6-aaf3-e2c38ba70f99"
+          [32m+[0m[0m name                  = [90mnull[0m[0m
+          [32m+[0m[0m size                  = 10
+          [32m+[0m[0m snapshot_id           = [90mnull[0m[0m
+          [32m+[0m[0m source                = "image"
+          [32m+[0m[0m tags                  = [90mnull[0m[0m
+          [32m+[0m[0m type_name             = [90mnull[0m[0m
+          [32m+[0m[0m volume_id             = (known after apply)
+        },
+    ]
+[0m[1mgcore_cloud_instance.test: Creating...[0m[0m
+[31m╷[0m[0m
+[31m│[0m [0m[1m[31mError: [0m[0m[1mfailed to make http request[0m
+[31m│[0m [0m
+[31m│[0m [0m[0m  with gcore_cloud_instance.test,
+[31m│[0m [0m  on main.tf line 23, in resource "gcore_cloud_instance" "test":
+[31m│[0m [0m  23: resource "gcore_cloud_instance" "test" [4m{[0m[0m
+[31m│[0m [0m
+[31m│[0m [0mPOST "https://api.gcore.com/cloud/v2/instances/379987/76": 400 Bad Request
+[31m│[0m [0m{
+[31m│[0m [0m   "exception_class": "MultipleQuotaLimitExceeded",
+[31m│[0m [0m   "message": "Quota limit for volume_count exceeded by 1",
+[31m│[0m [0m   "request_id": "8188187e8e41d7c832148e11d6eec303",
+[31m│[0m [0m   "info": [
+[31m│[0m [0m      {
+[31m│[0m [0m         "attribute": "volume_count",
+[31m│[0m [0m         "current_usage": 16,
+[31m│[0m [0m         "requested_usage": 17,
+[31m│[0m [0m         "limit": 16
+[31m│[0m [0m      }
+[31m│[0m [0m   ]
+[31m│[0m [0m}
+[31m╵[0m[0m

@@ -1,0 +1,122 @@
+{
+  "version": 4,
+  "terraform_version": "1.10.5",
+  "serial": 11,
+  "lineage": "a6af9f28-b2fc-ca6d-fb86-09093f956eae",
+  "outputs": {
+    "gcore_s3_id": {
+      "value": "1346647",
+      "type": "string"
+    },
+    "public_origins_id": {
+      "value": "1346648",
+      "type": "string"
+    }
+  },
+  "resources": [
+    {
+      "mode": "managed",
+      "type": "gcore_cdn_origingroup",
+      "name": "gcore_s3",
+      "provider": "provider[\"local/gcore/gcore\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "auth": [
+              {
+                "s3_access_key_id": "8JFFS2NK771RDN7D5QB6",
+                "s3_bucket_name": "cdn-test-bucket",
+                "s3_region": "",
+                "s3_secret_access_key": "PVzuij5qBpmavBJInB4eCtwMtkBEvo1k37ubj7z1",
+                "s3_storage_hostname": "s-ed1.cloud.gcore.lu",
+                "s3_type": "other"
+              }
+            ],
+            "id": "1346647",
+            "name": "test-gcore-s3-old",
+            "origin": [],
+            "proxy_next_upstream": [
+              "error",
+              "timeout"
+            ],
+            "use_next": true
+          },
+          "sensitive_attributes": [
+            [
+              {
+                "type": "get_attr",
+                "value": "auth"
+              },
+              {
+                "type": "index",
+                "value": {
+                  "value": 0,
+                  "type": "number"
+                }
+              },
+              {
+                "type": "get_attr",
+                "value": "s3_secret_access_key"
+              }
+            ],
+            [
+              {
+                "type": "get_attr",
+                "value": "auth"
+              },
+              {
+                "type": "index",
+                "value": {
+                  "value": 0,
+                  "type": "number"
+                }
+              },
+              {
+                "type": "get_attr",
+                "value": "s3_access_key_id"
+              }
+            ]
+          ],
+          "private": "bnVsbA=="
+        }
+      ]
+    },
+    {
+      "mode": "managed",
+      "type": "gcore_cdn_origingroup",
+      "name": "public_origins",
+      "provider": "provider[\"local/gcore/gcore\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "auth": [],
+            "id": "1346648",
+            "name": "test-public-origins-old",
+            "origin": [
+              {
+                "backup": false,
+                "enabled": true,
+                "source": "google.com"
+              },
+              {
+                "backup": true,
+                "enabled": true,
+                "source": "cloudflare.com"
+              }
+            ],
+            "proxy_next_upstream": [
+              "error",
+              "timeout"
+            ],
+            "use_next": true
+          },
+          "sensitive_attributes": [],
+          "private": "bnVsbA=="
+        }
+      ]
+    }
+  ],
+  "check_results": null
+}

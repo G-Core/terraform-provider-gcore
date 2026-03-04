@@ -1,0 +1,19 @@
+
+Warning: Provider development overrides are in effect
+
+The following provider development overrides are set in the CLI
+configuration:
+ - gcore/gcore in /Users/user/repos/gcore-terraform
+
+The behavior may therefore not match any released version of the provider and
+applying changes may cause the state to become incompatible with published
+releases.
+
+Error: Field 'permanent_api_token' or 'username' and 'password' are required.
+
+  with provider["registry.terraform.io/g-core/gcore"],
+  on main.tf line 11, in provider "gcore":
+  11: provider "gcore" {
+
+To use provider your should fill field 'permanent_api_token' or 'username'
+and 'password'.

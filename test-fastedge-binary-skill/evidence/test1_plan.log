@@ -1,0 +1,42 @@
+
+Warning: Provider development overrides are in effect
+
+The following provider development overrides are set in the CLI
+configuration:
+ - gcore/gcore in /Users/user/repos/gcore-terraform
+
+The behavior may therefore not match any released version of the provider and
+applying changes may cause the state to become incompatible with published
+releases.
+
+Terraform used the selected providers to generate the following execution
+plan. Resource actions are indicated with the following symbols:
+  + create
+
+Terraform will perform the following actions:
+
+  # gcore_fastedge_binary.test will be created
+  + resource "gcore_fastedge_binary" "test" {
+      + api_type    = (known after apply)
+      + checksum    = "34524214b83ffe9ccf98bf5601003057"
+      + filename    = "./minimal.wasm"
+      + id          = (known after apply)
+      + source      = (known after apply)
+      + status      = (known after apply)
+      + unref_since = (known after apply)
+    }
+
+Plan: 1 to add, 0 to change, 0 to destroy.
+
+Changes to Outputs:
+  + binary_api_type     = (known after apply)
+  + binary_checksum     = "34524214b83ffe9ccf98bf5601003057"
+  + binary_id           = (known after apply)
+  + binary_source       = (known after apply)
+  + binary_status       = (known after apply)
+  + datasource_checksum = "N/A"
+
+─────────────────────────────────────────────────────────────────────────────
+
+Note: You didn't use the -out option to save this plan, so Terraform can't
+guarantee to take exactly these actions if you run "terraform apply" now.

@@ -1,0 +1,47 @@
+
+Warning: Provider development overrides are in effect
+
+The following provider development overrides are set in the CLI
+configuration:
+ - gcore/gcore in /Users/user/repos/gcore-terraform
+
+The behavior may therefore not match any released version of the provider and
+applying changes may cause the state to become incompatible with published
+releases.
+gcore_fastedge_secret.test: Refreshing state... [name=tf-test-secret-minimal]
+
+Note: Objects have changed outside of Terraform
+
+Terraform detected the following changes made outside of Terraform since the
+last "terraform apply" which may have affected this plan:
+
+  # gcore_fastedge_secret.test has changed
+  ~ resource "gcore_fastedge_secret" "test" {
+      + app_count    = 0
+        id           = 323
+        name         = "tf-test-secret-minimal"
+      + secret_slots = []
+    }
+
+
+Unless you have made equivalent changes to your configuration, or ignored the
+relevant attributes using ignore_changes, the following plan may include
+actions to undo or respond to these changes.
+
+─────────────────────────────────────────────────────────────────────────────
+
+Changes to Outputs:
+  + secret_app_count  = 0
+  + secret_slots_info = (sensitive value)
+
+You can apply this plan to save these new output values to the Terraform
+state, without changing any real infrastructure.
+
+Apply complete! Resources: 0 added, 0 changed, 0 destroyed.
+
+Outputs:
+
+secret_app_count = 0
+secret_id = 323
+secret_name = "tf-test-secret-minimal"
+secret_slots_info = <sensitive>

@@ -1,0 +1,74 @@
+[33m╷[0m[0m
+[33m│[0m [0m[1m[33mWarning: [0m[0m[1mProvider development overrides are in effect[0m
+[33m│[0m [0m
+[33m│[0m [0m[0mThe following provider development overrides are set in the CLI
+[33m│[0m [0mconfiguration:
+[33m│[0m [0m - gcore/gcore in /Users/user/repos/gcore-terraform
+[33m│[0m [0m
+[33m│[0m [0mThe behavior may therefore not match any released version of the provider
+[33m│[0m [0mand applying changes may cause the state to become incompatible with
+[33m│[0m [0mpublished releases.
+[33m╵[0m[0m
+[0m[1mdata.gcore_cloud_projects.my_projects: Reading...[0m[0m
+[0m[1mdata.gcore_cloud_region.rg: Reading...[0m[0m
+[0m[1mdata.gcore_cloud_projects.my_projects: Read complete after 1s [name=default][0m
+[0m[1mdata.gcore_cloud_region.rg: Read complete after 1s[0m
+[0m[1mgcore_cloud_load_balancer.lb: Refreshing state... [id=9ed93faa-70e4-45ee-97f6-5442c6d80c66][0m
+
+Terraform used the selected providers to generate the following execution
+plan. Resource actions are indicated with the following symbols:
+  [33m~[0m update in-place[0m
+
+Terraform will perform the following actions:
+
+[1m  # gcore_cloud_load_balancer.lb[0m will be updated in-place
+[0m  [33m~[0m[0m resource "gcore_cloud_load_balancer" "lb" {
+      [33m~[0m[0m additional_vips        = [] -> (known after apply)
+      [33m~[0m[0m created_at             = "2025-11-24T08:54:39Z" -> (known after apply)
+      [33m~[0m[0m creator_task_id        = "0c8e8735-44ae-4c0f-b777-46a686a59374" -> (known after apply)
+      [32m+[0m[0m ddos_profile           = (known after apply)
+      [33m~[0m[0m floating_ips           = [] -> (known after apply)
+        id                     = "9ed93faa-70e4-45ee-97f6-5442c6d80c66"
+      [33m~[0m[0m listeners              = [] -> (known after apply)
+      [33m~[0m[0m logging                = {
+          [32m+[0m[0m destination_region_id = (known after apply)
+          [33m~[0m[0m enabled               = false -> (known after apply)
+          [32m+[0m[0m retention_policy      = (known after apply)
+          [32m+[0m[0m topic_name            = (known after apply)
+        } -> (known after apply)
+        name                   = "qa-lb-tags-test"
+      [33m~[0m[0m operating_status       = "ONLINE" -> (known after apply)
+      [33m~[0m[0m provisioning_status    = "ACTIVE" -> (known after apply)
+      [33m~[0m[0m region                 = "Luxembourg-2" -> (known after apply)
+      [32m+[0m[0m stats                  = (known after apply)
+      [32m+[0m[0m tags                   = {
+          [32m+[0m[0m "qa" = "load-balancer"
+        }
+      [33m~[0m[0m tags_v2                = [] -> (known after apply)
+      [32m+[0m[0m task_id                = (known after apply)
+      [32m+[0m[0m tasks                  = (known after apply)
+      [33m~[0m[0m updated_at             = "2025-11-24T08:55:45Z" -> (known after apply)
+      [33m~[0m[0m vip_address            = "109.61.125.22" -> (known after apply)
+      [33m~[0m[0m vip_ip_family          = "ipv4" -> (known after apply)
+      [33m~[0m[0m vip_port_id            = "2c643757-7d04-4a7d-af2f-9ad31bc71a4d" -> (known after apply)
+      [33m~[0m[0m vrrp_ips               = [
+          [31m-[0m[0m {
+              [31m-[0m[0m ip_address = "109.61.125.21" [90m-> null[0m[0m
+              [31m-[0m[0m role       = "BACKUP" [90m-> null[0m[0m
+              [31m-[0m[0m subnet_id  = "b4c6e91a-9eb9-4c59-ad57-00124eceda00" [90m-> null[0m[0m
+            },
+          [31m-[0m[0m {
+              [31m-[0m[0m ip_address = "109.61.125.118" [90m-> null[0m[0m
+              [31m-[0m[0m role       = "MASTER" [90m-> null[0m[0m
+              [31m-[0m[0m subnet_id  = "b4c6e91a-9eb9-4c59-ad57-00124eceda00" [90m-> null[0m[0m
+            },
+        ] -> (known after apply)
+        [90m# (4 unchanged attributes hidden)[0m[0m
+    }
+
+[1mPlan:[0m 0 to add, 1 to change, 0 to destroy.
+[0m[0m[1mgcore_cloud_load_balancer.lb: Modifying... [id=9ed93faa-70e4-45ee-97f6-5442c6d80c66][0m[0m
+[0m[1mgcore_cloud_load_balancer.lb: Modifications complete after 1s [id=9ed93faa-70e4-45ee-97f6-5442c6d80c66][0m
+[0m[1m[32m
+Apply complete! Resources: 0 added, 1 changed, 0 destroyed.
+[0m

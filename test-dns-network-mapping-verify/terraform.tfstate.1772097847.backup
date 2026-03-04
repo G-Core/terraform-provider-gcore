@@ -1,0 +1,52 @@
+{
+  "version": 4,
+  "terraform_version": "1.14.3",
+  "serial": 4,
+  "lineage": "6dfd1911-3d84-8b2d-0e0d-dcf28d5d0468",
+  "outputs": {
+    "nm_id": {
+      "value": 60,
+      "type": "number"
+    },
+    "nm_name": {
+      "value": "tf-test-nm-verify",
+      "type": "string"
+    }
+  },
+  "resources": [
+    {
+      "mode": "managed",
+      "type": "gcore_dns_network_mapping",
+      "name": "test",
+      "provider": "provider[\"registry.terraform.io/gcore/gcore\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "id": null,
+            "mapping": [
+              {
+                "cidr4": [
+                  "10.0.0.0/24",
+                  "10.0.1.0/24"
+                ],
+                "cidr6": [
+                  "2001:db8:2::/48"
+                ],
+                "tags": [
+                  "dev",
+                  "dc1",
+                  "updated"
+                ]
+              }
+            ],
+            "name": "tf-test-nm-verify"
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0
+        }
+      ]
+    }
+  ],
+  "check_results": null
+}

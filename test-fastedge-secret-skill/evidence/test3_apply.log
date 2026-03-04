@@ -1,0 +1,40 @@
+
+Warning: Provider development overrides are in effect
+
+The following provider development overrides are set in the CLI
+configuration:
+ - gcore/gcore in /Users/user/repos/gcore-terraform
+
+The behavior may therefore not match any released version of the provider and
+applying changes may cause the state to become incompatible with published
+releases.
+gcore_fastedge_secret.test_single: Refreshing state... [name=tf-skill-test-single-slot]
+
+Terraform used the selected providers to generate the following execution
+plan. Resource actions are indicated with the following symbols:
+  ~ update in-place
+
+Terraform will perform the following actions:
+
+  # gcore_fastedge_secret.test_single will be updated in-place
+  ~ resource "gcore_fastedge_secret" "test_single" {
+        id                      = 332
+        name                    = "tf-skill-test-single-slot"
+      ~ secret_slots            = (sensitive value)
+      + secret_slots_wo_version = 2
+        # (2 unchanged attributes hidden)
+    }
+
+Plan: 0 to add, 1 to change, 0 to destroy.
+
+Changes to Outputs:
+  ~ single_slot_secret_slots = (sensitive value)
+gcore_fastedge_secret.test_single: Modifying... [name=tf-skill-test-single-slot]
+gcore_fastedge_secret.test_single: Modifications complete after 0s [name=tf-skill-test-single-slot]
+
+Apply complete! Resources: 0 added, 1 changed, 0 destroyed.
+
+Outputs:
+
+single_slot_id = 332
+single_slot_secret_slots = <sensitive>

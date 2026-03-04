@@ -1,0 +1,70 @@
+
+Warning: Provider development overrides are in effect
+
+The following provider development overrides are set in the CLI
+configuration:
+ - gcore/gcore in /Users/user/repos/gcore-terraform
+
+The behavior may therefore not match any released version of the provider and
+applying changes may cause the state to become incompatible with published
+releases.
+gcore_dns_zone.test: Refreshing state... [id=test-tf-dns-retest-1770885100.com]
+
+Terraform used the selected providers to generate the following execution
+plan. Resource actions are indicated with the following symbols:
+  ~ update in-place
+
+Terraform will perform the following actions:
+
+  # gcore_dns_zone.test will be updated in-place
+  ~ resource "gcore_dns_zone" "test" {
+      ~ contact        = "support@gcore.com" -> "admin@test.com"
+      ~ dnssec_enabled = false -> true
+      ~ expiry         = 1209600 -> 604800
+        id             = "test-tf-dns-retest-1770885100.com"
+        name           = "test-tf-dns-retest-1770885100.com"
+      ~ nx_ttl         = 300 -> 600
+      ~ refresh        = 5400 -> 7200
+      ~ retry          = 3600 -> 1800
+      ~ serial         = 1770885125 -> (known after apply)
+      + warnings       = (known after apply)
+        # (5 unchanged attributes hidden)
+    }
+
+Plan: 0 to add, 1 to change, 0 to destroy.
+
+Changes to Outputs:
+  ~ zone_contact       = "support@gcore.com" -> "admin@test.com"
+  ~ zone_dnssec        = false -> true
+  ~ zone_serial        = 1770885125 -> (known after apply)
+gcore_dns_zone.test: Modifying... [id=test-tf-dns-retest-1770885100.com]
+gcore_dns_zone.test: Modifications complete after 1s [id=test-tf-dns-retest-1770885100.com]
+
+Apply complete! Resources: 0 added, 1 changed, 0 destroyed.
+
+Outputs:
+
+zone_contact = "admin@test.com"
+zone_dnssec = true
+zone_id = "test-tf-dns-retest-1770885100.com"
+zone_records = tolist([
+  {
+    "name" = "test-tf-dns-retest-1770885100.com"
+    "short_answers" = tolist([
+      "ns1.gcorelabs.net",
+      "ns2.gcdn.services",
+    ])
+    "ttl" = 3600
+    "type" = "NS"
+  },
+])
+zone_rrsets_amount = {
+  "dynamic" = {
+    "healthcheck" = 0
+    "total" = 0
+  }
+  "static" = 1
+  "total" = 1
+}
+zone_serial = 1770885140
+zone_status = "pending"

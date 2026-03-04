@@ -1,0 +1,176 @@
+{
+  "version": 4,
+  "terraform_version": "1.10.5",
+  "serial": 6,
+  "lineage": "f878cf8c-7353-38cd-2391-21ca740cf6b4",
+  "outputs": {
+    "import_lb_cmd": {
+      "value": "terraform import gcore_cloud_load_balancer.test_lb 379987/76/75c19e87-54e8-49ea-bb3c-c37c02230e2c",
+      "type": "string"
+    },
+    "import_listener_cmd": {
+      "value": "terraform import gcore_cloud_load_balancer_listener.http_listener 379987/76/da70789d-490f-4f82-98a2-4c58cb966e80",
+      "type": "string"
+    },
+    "import_pool_cmd": {
+      "value": "terraform import gcore_cloud_load_balancer_pool.test_pool 379987/76/5ec9ac42-9b5c-4074-9064-6138c15d0098",
+      "type": "string"
+    },
+    "lb_id": {
+      "value": "75c19e87-54e8-49ea-bb3c-c37c02230e2c",
+      "type": "string"
+    },
+    "listener_id": {
+      "value": "da70789d-490f-4f82-98a2-4c58cb966e80",
+      "type": "string"
+    },
+    "pool_id": {
+      "value": "5ec9ac42-9b5c-4074-9064-6138c15d0098",
+      "type": "string"
+    }
+  },
+  "resources": [
+    {
+      "mode": "managed",
+      "type": "gcore_cloud_load_balancer",
+      "name": "test_lb",
+      "provider": "provider[\"registry.terraform.io/gcore/gcore\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "additional_vips": [],
+            "created_at": "2025-12-16T11:46:32Z",
+            "creator_task_id": "673791ff-0bf9-4932-ba38-2503cd6cfe8e",
+            "ddos_profile": null,
+            "flavor": "lb1-1-2",
+            "floating_ip": null,
+            "floating_ips": [],
+            "id": "75c19e87-54e8-49ea-bb3c-c37c02230e2c",
+            "listeners": [],
+            "logging": {
+              "destination_region_id": null,
+              "enabled": false,
+              "retention_policy": null,
+              "topic_name": null
+            },
+            "name": "comprehensive-test-lb",
+            "name_template": null,
+            "operating_status": "ONLINE",
+            "preferred_connectivity": "L2",
+            "project_id": 379987,
+            "provisioning_status": "ACTIVE",
+            "region": "Luxembourg-2",
+            "region_id": 76,
+            "stats": null,
+            "tags": null,
+            "tags_v2": [],
+            "updated_at": "2025-12-16T11:47:44Z",
+            "vip_address": "45.82.160.229",
+            "vip_ip_family": "ipv4",
+            "vip_network_id": null,
+            "vip_port_id": "198a3020-f3f5-4f2b-aebe-1a3cafd2de98",
+            "vip_subnet_id": null,
+            "vrrp_ips": [
+              {
+                "ip_address": "45.82.160.196",
+                "role": "BACKUP",
+                "subnet_id": "e47b6c72-f1d3-44de-bd7a-1bed593cbc29"
+              },
+              {
+                "ip_address": "45.82.160.200",
+                "role": "MASTER",
+                "subnet_id": "e47b6c72-f1d3-44de-bd7a-1bed593cbc29"
+              }
+            ]
+          },
+          "sensitive_attributes": []
+        }
+      ]
+    },
+    {
+      "mode": "managed",
+      "type": "gcore_cloud_load_balancer_listener",
+      "name": "http_listener",
+      "provider": "provider[\"registry.terraform.io/gcore/gcore\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "allowed_cidrs": null,
+            "connection_limit": 100000,
+            "creator_task_id": "84fa445c-5140-43ba-b8bd-5ac583f71501",
+            "id": "da70789d-490f-4f82-98a2-4c58cb966e80",
+            "insert_headers": "{}",
+            "insert_x_forwarded": null,
+            "load_balancer_id": "75c19e87-54e8-49ea-bb3c-c37c02230e2c",
+            "name": "http-listener",
+            "operating_status": "ONLINE",
+            "pool_count": 0,
+            "project_id": 379987,
+            "protocol": "HTTP",
+            "protocol_port": 80,
+            "provisioning_status": "ACTIVE",
+            "region_id": 76,
+            "secret_id": null,
+            "sni_secret_id": [],
+            "stats": null,
+            "timeout_client_data": 50000,
+            "timeout_member_connect": 5000,
+            "timeout_member_data": 50000,
+            "user_list": []
+          },
+          "sensitive_attributes": [],
+          "dependencies": [
+            "gcore_cloud_load_balancer.test_lb"
+          ]
+        }
+      ]
+    },
+    {
+      "mode": "managed",
+      "type": "gcore_cloud_load_balancer_pool",
+      "name": "test_pool",
+      "provider": "provider[\"registry.terraform.io/gcore/gcore\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "ca_secret_id": null,
+            "creator_task_id": "d3ed7e21-1696-4755-a815-29630298c1b0",
+            "crl_secret_id": null,
+            "healthmonitor": null,
+            "id": "5ec9ac42-9b5c-4074-9064-6138c15d0098",
+            "lb_algorithm": "ROUND_ROBIN",
+            "listener_id": "da70789d-490f-4f82-98a2-4c58cb966e80",
+            "listeners": [
+              {
+                "id": "da70789d-490f-4f82-98a2-4c58cb966e80"
+              }
+            ],
+            "load_balancer_id": null,
+            "loadbalancers": [
+              {
+                "id": "75c19e87-54e8-49ea-bb3c-c37c02230e2c"
+              }
+            ],
+            "members": [],
+            "name": "comprehensive-test-pool",
+            "operating_status": "ONLINE",
+            "project_id": 379987,
+            "protocol": "HTTP",
+            "provisioning_status": "ACTIVE",
+            "region_id": 76,
+            "secret_id": null,
+            "session_persistence": null,
+            "timeout_client_data": null,
+            "timeout_member_connect": null,
+            "timeout_member_data": null
+          },
+          "sensitive_attributes": []
+        }
+      ]
+    }
+  ],
+  "check_results": null
+}

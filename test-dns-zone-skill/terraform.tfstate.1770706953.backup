@@ -1,0 +1,89 @@
+{
+  "version": 4,
+  "terraform_version": "1.14.3",
+  "serial": 64,
+  "lineage": "008429f6-8ae0-6e49-738a-deecbca1b33c",
+  "outputs": {},
+  "resources": [
+    {
+      "mode": "managed",
+      "type": "gcore_dns_zone",
+      "name": "explicit_soa",
+      "provider": "provider[\"registry.terraform.io/gcore/gcore\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "contact": "admin@example.com",
+            "dnssec_enabled": null,
+            "enabled": true,
+            "expiry": 604800,
+            "id": "tf-test-soa-1770706779.com",
+            "meta": null,
+            "name": "tf-test-soa-1770706779.com",
+            "nx_ttl": 300,
+            "primary_server": null,
+            "records": null,
+            "refresh": 7200,
+            "retry": 3600,
+            "rrsets_amount": null,
+            "serial": null,
+            "status": null,
+            "warnings": null
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0
+        }
+      ]
+    },
+    {
+      "mode": "managed",
+      "type": "gcore_dns_zone",
+      "name": "minimal",
+      "provider": "provider[\"registry.terraform.io/gcore/gcore\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "contact": "support@gcore.com",
+            "dnssec_enabled": false,
+            "enabled": true,
+            "expiry": 1209600,
+            "id": "tf-test-min-1770706779.com",
+            "meta": null,
+            "name": "tf-test-min-1770706779.com",
+            "nx_ttl": 300,
+            "primary_server": "ns1.gcorelabs.net",
+            "records": [
+              {
+                "name": "tf-test-min-1770706779.com",
+                "short_answers": [
+                  "ns1.gcorelabs.net",
+                  "ns2.gcdn.services"
+                ],
+                "ttl": 3600,
+                "type": "NS"
+              }
+            ],
+            "refresh": 5400,
+            "retry": 3600,
+            "rrsets_amount": {
+              "dynamic": {
+                "healthcheck": 0,
+                "total": 0
+              },
+              "static": 1,
+              "total": 1
+            },
+            "serial": 1770706792,
+            "status": "pending",
+            "warnings": null
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0
+        }
+      ]
+    }
+  ],
+  "check_results": null
+}

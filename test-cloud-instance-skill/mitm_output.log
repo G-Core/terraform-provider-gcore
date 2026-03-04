@@ -1,0 +1,644 @@
+[12:06:48.755] HTTP(S) proxy listening at *:9092.
+[12:11:15.323][127.0.0.1:61547] client connect
+[12:11:15.323][127.0.0.1:61545] client connect
+[12:11:15.324][127.0.0.1:61546] client connect
+[12:11:18.534][127.0.0.1:61546] server connect api.gcore.com:443 (93.123.17.254:443)
+[12:11:18.536][127.0.0.1:61545] server connect api.gcore.com:443 (93.123.17.254:443)
+[12:11:18.537][127.0.0.1:61547] server connect api.gcore.com:443 (93.123.17.254:443)
+[12:11:18.661][127.0.0.1:61547] client disconnect
+[12:11:18.661][127.0.0.1:61545] client disconnect
+[12:11:18.662][127.0.0.1:61547] server disconnect api.gcore.com:443 (93.123.17.254:443)
+[12:11:18.662][127.0.0.1:61545] server disconnect api.gcore.com:443 (93.123.17.254:443)
+127.0.0.1:61546: POST https://api.gcore.com/cloud/v1/networks/379987/76 HTTP/2.0
+    x-stainless-retry-count: 0
+    x-stainless-runtime-version: go1.24.5
+    x-stainless-runtime: go
+    x-stainless-arch: arm64
+    content-type: application/json
+    accept: application/json
+    user-agent: Gcore/Go 0.28.0
+    x-stainless-lang: go
+    x-stainless-package-version: 0.28.0
+    x-stainless-os: MacOS
+    authorization: APIKey 21788$1e278ce67b6aa33f178122658b1dd0210d0edff453d348acb9b68bffea6a635b7791925ddda198d5678a4dc20269fe04a263ca92c7e5aa41ea79075f89b66bf6
+    content-length: 70
+    accept-encoding: gzip
+ << HTTP/2.0 400 Bad Request 228b
+    server: nginx
+    date: Fri, 16 Jan 2026 10:11:19 GMT
+    content-type: application/json
+    content-length: 228
+    x-id-fe: am3-hw-edge-gc117
+    traceparent: 00-41b3fcf0c422502bf0c8a5521c135922-e08ca0af2f0b68df-01
+    request_id: 41b3fcf0c422502bf0c8a5521c135922
+    access-control-allow-origin: *
+    cache-control: no-cache, no-store, must-revalidate
+    strict-transport-security: max-age=15724800; includeSubDomains
+    x-id: am3-hw-edge-gc117
+    x-robots-tag: noindex, nofollow, noarchive
+127.0.0.1:61546: POST https://api.gcore.com/cloud/v1/volumes/379987/76 HTTP/2.0
+    content-type: application/json
+    accept: application/json
+    x-stainless-retry-count: 0
+    user-agent: Gcore/Go 0.28.0
+    x-stainless-runtime: go
+    x-stainless-package-version: 0.28.0
+    x-stainless-runtime-version: go1.24.5
+    x-stainless-lang: go
+    x-stainless-os: MacOS
+    x-stainless-arch: arm64
+    authorization: APIKey 21788$1e278ce67b6aa33f178122658b1dd0210d0edff453d348acb9b68bffea6a635b7791925ddda198d5678a4dc20269fe04a263ca92c7e5aa41ea79075f89b66bf6
+    content-length: 89
+    accept-encoding: gzip
+ << HTTP/2.0 400 Bad Request 228b
+    server: nginx
+    date: Fri, 16 Jan 2026 10:11:19 GMT
+    content-type: application/json
+    content-length: 228
+    x-id-fe: am3-hw-edge-gc117
+    traceparent: 00-776d5a9818eda30d0648d9d2a65b9176-3a26551b47532eb9-01
+    request_id: 776d5a9818eda30d0648d9d2a65b9176
+    access-control-allow-origin: *
+    cache-control: no-cache, no-store, must-revalidate
+    strict-transport-security: max-age=15724800; includeSubDomains
+    x-id: am3-hw-edge-gc117
+    x-robots-tag: noindex, nofollow, noarchive
+127.0.0.1:61546: POST https://api.gcore.com/cloud/v1/volumes/379987/76 HTTP/2.0
+    x-stainless-os: MacOS
+    x-stainless-arch: arm64
+    x-stainless-runtime: go
+    x-stainless-runtime-version: go1.24.5
+    x-stainless-retry-count: 0
+    authorization: APIKey 21788$1e278ce67b6aa33f178122658b1dd0210d0edff453d348acb9b68bffea6a635b7791925ddda198d5678a4dc20269fe04a263ca92c7e5aa41ea79075f89b66bf6
+    content-type: application/json
+    accept: application/json
+    user-agent: Gcore/Go 0.28.0
+    x-stainless-lang: go
+    x-stainless-package-version: 0.28.0
+    content-length: 134
+    accept-encoding: gzip
+ << HTTP/2.0 200 OK 50b
+    server: nginx
+    date: Fri, 16 Jan 2026 10:11:20 GMT
+    content-type: application/json
+    content-length: 50
+    x-id-fe: am3-hw-edge-gc117
+    traceparent: 00-f5cad47a7e8865886651b61c938f86bd-809a57f15129d1e9-01
+    request_id: f5cad47a7e8865886651b61c938f86bd
+    access-control-allow-origin: *
+    cache-control: no-cache, no-store, must-revalidate
+    strict-transport-security: max-age=15724800; includeSubDomains
+    x-id: am3-hw-edge-gc117
+    x-robots-tag: noindex, nofollow, noarchive
+    accept-ranges: bytes
+127.0.0.1:61546: GET https://api.gcore.com/cloud/v1/tasks/aaf160c5-1243-4520-af59-dfcee051ac12 HTTP/2.0
+    x-stainless-runtime-version: go1.24.5
+    accept: application/json
+    user-agent: Gcore/Go 0.28.0
+    x-stainless-runtime: go
+    authorization: APIKey 21788$1e278ce67b6aa33f178122658b1dd0210d0edff453d348acb9b68bffea6a635b7791925ddda198d5678a4dc20269fe04a263ca92c7e5aa41ea79075f89b66bf6
+    x-stainless-retry-count: 0
+    x-stainless-lang: go
+    x-stainless-os: MacOS
+    x-stainless-package-version: 0.28.0
+    x-stainless-arch: arm64
+    accept-encoding: gzip
+ << HTTP/2.0 200 OK 900b
+    server: nginx
+    date: Fri, 16 Jan 2026 10:11:20 GMT
+    content-type: application/json
+    content-length: 900
+    x-id-fe: am3-hw-edge-gc117
+    traceparent: 00-08290a0ff8fd29bf0a31dd18ea025ada-b6edea7ecf6b8906-01
+    request_id: 08290a0ff8fd29bf0a31dd18ea025ada
+    access-control-allow-origin: *
+    cache-control: no-cache, no-store, must-revalidate
+    etag: "77d7f9fff551bd8ace34e5cf0144382e9cccaeb3"
+    strict-transport-security: max-age=15724800; includeSubDomains
+    x-id: am3-hw-edge-gc117
+    x-robots-tag: noindex, nofollow, noarchive
+    accept-ranges: bytes
+127.0.0.1:61546: GET https://api.gcore.com/cloud/v1/tasks/aaf160c5-1243-4520-af59-dfcee051ac12 HTTP/2.0
+    accept: application/json
+    user-agent: Gcore/Go 0.28.0
+    x-stainless-lang: go
+    x-stainless-package-version: 0.28.0
+    x-stainless-os: MacOS
+    x-stainless-retry-count: 0
+    x-stainless-runtime: go
+    x-stainless-arch: arm64
+    x-stainless-runtime-version: go1.24.5
+    authorization: APIKey 21788$1e278ce67b6aa33f178122658b1dd0210d0edff453d348acb9b68bffea6a635b7791925ddda198d5678a4dc20269fe04a263ca92c7e5aa41ea79075f89b66bf6
+    accept-encoding: gzip
+ << HTTP/2.0 200 OK 1.5k
+    server: nginx
+    date: Fri, 16 Jan 2026 10:11:23 GMT
+    content-type: application/json
+    content-length: 1521
+    x-id-fe: am3-hw-edge-gc117
+    traceparent: 00-23031b2013035ac087e55470153c0115-ad662ed50e8c9897-01
+    request_id: 23031b2013035ac087e55470153c0115
+    access-control-allow-origin: *
+    cache-control: no-cache, no-store, must-revalidate
+    etag: "2b4880ce05fe0a1479eef14b496bece50eb9046c"
+    strict-transport-security: max-age=15724800; includeSubDomains
+    x-id: am3-hw-edge-gc117
+    x-robots-tag: noindex, nofollow, noarchive
+    accept-ranges: bytes
+127.0.0.1:61546: GET https://api.gcore.com/cloud/v1/volumes/379987/76/c305c356-e93d-4695-a5b4-6971e898e555 HTTP/2.0
+    x-stainless-lang: go
+    x-stainless-runtime-version: go1.24.5
+    x-stainless-runtime: go
+    x-stainless-arch: arm64
+    authorization: APIKey 21788$1e278ce67b6aa33f178122658b1dd0210d0edff453d348acb9b68bffea6a635b7791925ddda198d5678a4dc20269fe04a263ca92c7e5aa41ea79075f89b66bf6
+    accept: application/json
+    user-agent: Gcore/Go 0.28.0
+    x-stainless-package-version: 0.28.0
+    x-stainless-os: MacOS
+    content-type: application/json
+    x-stainless-retry-count: 0
+    content-length: 134
+    accept-encoding: gzip
+ << HTTP/2.0 200 OK 1.3k
+    server: nginx
+    date: Fri, 16 Jan 2026 10:11:24 GMT
+    content-type: application/json
+    content-length: 1352
+    x-id-fe: am3-hw-edge-gc117
+    traceparent: 00-09084b4a3ed3e690679c64b7f396a42a-495e716ec3148f62-01
+    request_id: 09084b4a3ed3e690679c64b7f396a42a
+    access-control-allow-origin: *
+    cache-control: no-cache, no-store, must-revalidate
+    etag: "ba1a8ec4844239add25fc9b43d0d5f73a172aed4"
+    strict-transport-security: max-age=15724800; includeSubDomains
+    x-id: am3-hw-edge-gc117
+    x-robots-tag: noindex, nofollow, noarchive
+    accept-ranges: bytes
+127.0.0.1:61546: POST https://api.gcore.com/cloud/v2/instances/379987/76 HTTP/2.0
+    x-stainless-runtime-version: go1.24.5
+    x-stainless-retry-count: 0
+    user-agent: Gcore/Go 0.28.0
+    x-stainless-arch: arm64
+    accept: application/json
+    x-stainless-package-version: 0.28.0
+    authorization: APIKey 21788$1e278ce67b6aa33f178122658b1dd0210d0edff453d348acb9b68bffea6a635b7791925ddda198d5678a4dc20269fe04a263ca92c7e5aa41ea79075f89b66bf6
+    x-stainless-runtime: go
+    x-stainless-os: MacOS
+    x-stainless-lang: go
+    content-type: application/json
+    content-length: 229
+    accept-encoding: gzip
+ << HTTP/2.0 200 OK 50b
+    server: nginx
+    date: Fri, 16 Jan 2026 10:11:25 GMT
+    content-type: application/json
+    content-length: 50
+    x-id-fe: am3-hw-edge-gc117
+    traceparent: 00-c7dddfbe0e3457946061cd84d14a5900-ecd6c82d39b0b912-01
+    request_id: c7dddfbe0e3457946061cd84d14a5900
+    access-control-allow-origin: *
+    cache-control: no-cache, no-store, must-revalidate
+    strict-transport-security: max-age=15724800; includeSubDomains
+    x-id: am3-hw-edge-gc117
+    x-robots-tag: noindex, nofollow, noarchive
+    accept-ranges: bytes
+127.0.0.1:61546: GET https://api.gcore.com/cloud/v1/tasks/274e3380-67e3-4c22-89ed-ac3fec21185f HTTP/2.0
+    authorization: APIKey 21788$1e278ce67b6aa33f178122658b1dd0210d0edff453d348acb9b68bffea6a635b7791925ddda198d5678a4dc20269fe04a263ca92c7e5aa41ea79075f89b66bf6
+    x-stainless-runtime-version: go1.24.5
+    accept: application/json
+    user-agent: Gcore/Go 0.28.0
+    x-stainless-retry-count: 0
+    x-stainless-package-version: 0.28.0
+    x-stainless-arch: arm64
+    x-stainless-lang: go
+    x-stainless-runtime: go
+    x-stainless-os: MacOS
+    accept-encoding: gzip
+ << HTTP/2.0 200 OK 1.3k
+    server: nginx
+    date: Fri, 16 Jan 2026 10:11:25 GMT
+    content-type: application/json
+    content-length: 1293
+    x-id-fe: am3-hw-edge-gc117
+    traceparent: 00-a63c2f1704b87cf6a90c78330dc7838a-ea7c47e55ca62b28-01
+    request_id: a63c2f1704b87cf6a90c78330dc7838a
+    access-control-allow-origin: *
+    cache-control: no-cache, no-store, must-revalidate
+    etag: "4e2e869a11b57fffe6ce47605f2c8a1a51b5f502"
+    strict-transport-security: max-age=15724800; includeSubDomains
+    x-id: am3-hw-edge-gc117
+    x-robots-tag: noindex, nofollow, noarchive
+    accept-ranges: bytes
+127.0.0.1:61546: GET https://api.gcore.com/cloud/v1/tasks/274e3380-67e3-4c22-89ed-ac3fec21185f HTTP/2.0
+    x-stainless-runtime: go
+    x-stainless-arch: arm64
+    x-stainless-lang: go
+    accept: application/json
+    x-stainless-retry-count: 0
+    x-stainless-package-version: 0.28.0
+    x-stainless-os: MacOS
+    x-stainless-runtime-version: go1.24.5
+    authorization: APIKey 21788$1e278ce67b6aa33f178122658b1dd0210d0edff453d348acb9b68bffea6a635b7791925ddda198d5678a4dc20269fe04a263ca92c7e5aa41ea79075f89b66bf6
+    user-agent: Gcore/Go 0.28.0
+    accept-encoding: gzip
+ << HTTP/2.0 200 OK 1.3k
+    server: nginx
+    date: Fri, 16 Jan 2026 10:11:28 GMT
+    content-type: application/json
+    content-length: 1293
+    x-id-fe: am3-hw-edge-gc117
+    traceparent: 00-1db07d5a877571c44173a59414a35c03-bc21a0952dd675f5-01
+    request_id: 1db07d5a877571c44173a59414a35c03
+    access-control-allow-origin: *
+    cache-control: no-cache, no-store, must-revalidate
+    etag: "4e2e869a11b57fffe6ce47605f2c8a1a51b5f502"
+    strict-transport-security: max-age=15724800; includeSubDomains
+    x-id: am3-hw-edge-gc117
+    x-robots-tag: noindex, nofollow, noarchive
+    accept-ranges: bytes
+127.0.0.1:61546: GET https://api.gcore.com/cloud/v1/tasks/274e3380-67e3-4c22-89ed-ac3fec21185f HTTP/2.0
+    accept: application/json
+    user-agent: Gcore/Go 0.28.0
+    x-stainless-os: MacOS
+    x-stainless-lang: go
+    x-stainless-package-version: 0.28.0
+    x-stainless-arch: arm64
+    x-stainless-runtime-version: go1.24.5
+    x-stainless-runtime: go
+    x-stainless-retry-count: 0
+    authorization: APIKey 21788$1e278ce67b6aa33f178122658b1dd0210d0edff453d348acb9b68bffea6a635b7791925ddda198d5678a4dc20269fe04a263ca92c7e5aa41ea79075f89b66bf6
+    accept-encoding: gzip
+ << HTTP/2.0 200 OK 1.3k
+    server: nginx
+    date: Fri, 16 Jan 2026 10:11:31 GMT
+    content-type: application/json
+    content-length: 1293
+    x-id-fe: am3-hw-edge-gc117
+    traceparent: 00-bcf99d98ee6725d449b10a9e0aec1555-43201a1f115b16c2-01
+    request_id: bcf99d98ee6725d449b10a9e0aec1555
+    access-control-allow-origin: *
+    cache-control: no-cache, no-store, must-revalidate
+    etag: "4e2e869a11b57fffe6ce47605f2c8a1a51b5f502"
+    strict-transport-security: max-age=15724800; includeSubDomains
+    x-id: am3-hw-edge-gc117
+    x-robots-tag: noindex, nofollow, noarchive
+    accept-ranges: bytes
+127.0.0.1:61546: GET https://api.gcore.com/cloud/v1/tasks/274e3380-67e3-4c22-89ed-ac3fec21185f HTTP/2.0
+    user-agent: Gcore/Go 0.28.0
+    x-stainless-package-version: 0.28.0
+    x-stainless-arch: arm64
+    accept: application/json
+    x-stainless-lang: go
+    x-stainless-runtime: go
+    x-stainless-os: MacOS
+    x-stainless-runtime-version: go1.24.5
+    authorization: APIKey 21788$1e278ce67b6aa33f178122658b1dd0210d0edff453d348acb9b68bffea6a635b7791925ddda198d5678a4dc20269fe04a263ca92c7e5aa41ea79075f89b66bf6
+    x-stainless-retry-count: 0
+    accept-encoding: gzip
+ << HTTP/2.0 200 OK 1.3k
+    server: nginx
+    date: Fri, 16 Jan 2026 10:11:34 GMT
+    content-type: application/json
+    content-length: 1293
+    x-id-fe: am3-hw-edge-gc117
+    traceparent: 00-6bfa9dd0e822267697569aabd39bfe5f-52b6f4c00fab620a-01
+    request_id: 6bfa9dd0e822267697569aabd39bfe5f
+    access-control-allow-origin: *
+    cache-control: no-cache, no-store, must-revalidate
+    etag: "4e2e869a11b57fffe6ce47605f2c8a1a51b5f502"
+    strict-transport-security: max-age=15724800; includeSubDomains
+    x-id: am3-hw-edge-gc117
+    x-robots-tag: noindex, nofollow, noarchive
+    accept-ranges: bytes
+127.0.0.1:61546: GET https://api.gcore.com/cloud/v1/tasks/274e3380-67e3-4c22-89ed-ac3fec21185f HTTP/2.0
+    x-stainless-arch: arm64
+    authorization: APIKey 21788$1e278ce67b6aa33f178122658b1dd0210d0edff453d348acb9b68bffea6a635b7791925ddda198d5678a4dc20269fe04a263ca92c7e5aa41ea79075f89b66bf6
+    x-stainless-lang: go
+    x-stainless-runtime-version: go1.24.5
+    accept: application/json
+    x-stainless-retry-count: 0
+    x-stainless-os: MacOS
+    user-agent: Gcore/Go 0.28.0
+    x-stainless-package-version: 0.28.0
+    x-stainless-runtime: go
+    accept-encoding: gzip
+ << HTTP/2.0 200 OK 1.3k
+    server: nginx
+    date: Fri, 16 Jan 2026 10:11:38 GMT
+    content-type: application/json
+    content-length: 1293
+    x-id-fe: am3-hw-edge-gc117
+    traceparent: 00-355f773b630a587bed66614ddcffa283-7b00f6b63c96735c-01
+    request_id: 355f773b630a587bed66614ddcffa283
+    access-control-allow-origin: *
+    cache-control: no-cache, no-store, must-revalidate
+    etag: "4e2e869a11b57fffe6ce47605f2c8a1a51b5f502"
+    strict-transport-security: max-age=15724800; includeSubDomains
+    x-id: am3-hw-edge-gc117
+    x-robots-tag: noindex, nofollow, noarchive
+    accept-ranges: bytes
+127.0.0.1:61546: GET https://api.gcore.com/cloud/v1/tasks/274e3380-67e3-4c22-89ed-ac3fec21185f HTTP/2.0
+    x-stainless-arch: arm64
+    x-stainless-runtime-version: go1.24.5
+    accept: application/json
+    x-stainless-runtime: go
+    authorization: APIKey 21788$1e278ce67b6aa33f178122658b1dd0210d0edff453d348acb9b68bffea6a635b7791925ddda198d5678a4dc20269fe04a263ca92c7e5aa41ea79075f89b66bf6
+    x-stainless-lang: go
+    x-stainless-package-version: 0.28.0
+    x-stainless-retry-count: 0
+    user-agent: Gcore/Go 0.28.0
+    x-stainless-os: MacOS
+    accept-encoding: gzip
+ << HTTP/2.0 200 OK 1.3k
+    server: nginx
+    date: Fri, 16 Jan 2026 10:11:41 GMT
+    content-type: application/json
+    content-length: 1293
+    x-id-fe: am3-hw-edge-gc117
+    traceparent: 00-60ee2596bd6fa5c13c69c999aafa0dd1-d54712a9d80081e7-01
+    request_id: 60ee2596bd6fa5c13c69c999aafa0dd1
+    access-control-allow-origin: *
+    cache-control: no-cache, no-store, must-revalidate
+    etag: "4e2e869a11b57fffe6ce47605f2c8a1a51b5f502"
+    strict-transport-security: max-age=15724800; includeSubDomains
+    x-id: am3-hw-edge-gc117
+    x-robots-tag: noindex, nofollow, noarchive
+    accept-ranges: bytes
+127.0.0.1:61546: GET https://api.gcore.com/cloud/v1/tasks/274e3380-67e3-4c22-89ed-ac3fec21185f HTTP/2.0
+    x-stainless-arch: arm64
+    accept: application/json
+    x-stainless-lang: go
+    x-stainless-runtime: go
+    user-agent: Gcore/Go 0.28.0
+    x-stainless-package-version: 0.28.0
+    x-stainless-retry-count: 0
+    x-stainless-os: MacOS
+    authorization: APIKey 21788$1e278ce67b6aa33f178122658b1dd0210d0edff453d348acb9b68bffea6a635b7791925ddda198d5678a4dc20269fe04a263ca92c7e5aa41ea79075f89b66bf6
+    x-stainless-runtime-version: go1.24.5
+    accept-encoding: gzip
+ << HTTP/2.0 200 OK 1.3k
+    server: nginx
+    date: Fri, 16 Jan 2026 10:11:44 GMT
+    content-type: application/json
+    content-length: 1293
+    x-id-fe: am3-hw-edge-gc117
+    traceparent: 00-7e602909ea24be84542534aa8fbd3948-7754fabb8c88e346-01
+    request_id: 7e602909ea24be84542534aa8fbd3948
+    access-control-allow-origin: *
+    cache-control: no-cache, no-store, must-revalidate
+    etag: "4e2e869a11b57fffe6ce47605f2c8a1a51b5f502"
+    strict-transport-security: max-age=15724800; includeSubDomains
+    x-id: am3-hw-edge-gc117
+    x-robots-tag: noindex, nofollow, noarchive
+    accept-ranges: bytes
+127.0.0.1:61546: GET https://api.gcore.com/cloud/v1/tasks/274e3380-67e3-4c22-89ed-ac3fec21185f HTTP/2.0
+    x-stainless-package-version: 0.28.0
+    x-stainless-runtime: go
+    x-stainless-retry-count: 0
+    user-agent: Gcore/Go 0.28.0
+    x-stainless-lang: go
+    x-stainless-arch: arm64
+    authorization: APIKey 21788$1e278ce67b6aa33f178122658b1dd0210d0edff453d348acb9b68bffea6a635b7791925ddda198d5678a4dc20269fe04a263ca92c7e5aa41ea79075f89b66bf6
+    accept: application/json
+    x-stainless-runtime-version: go1.24.5
+    x-stainless-os: MacOS
+    accept-encoding: gzip
+ << HTTP/2.0 200 OK 1.9k
+    server: nginx
+    date: Fri, 16 Jan 2026 10:11:47 GMT
+    content-type: application/json
+    content-length: 1980
+    x-id-fe: am3-hw-edge-gc117
+    traceparent: 00-a35831eb89b591cb4201982d5cc5ee39-b5c5e4490cbe3214-01
+    request_id: a35831eb89b591cb4201982d5cc5ee39
+    access-control-allow-origin: *
+    cache-control: no-cache, no-store, must-revalidate
+    etag: "f0ec58bb43ea1102fdd76b7d9aa0b52c7c37c681"
+    strict-transport-security: max-age=15724800; includeSubDomains
+    x-id: am3-hw-edge-gc117
+    x-robots-tag: noindex, nofollow, noarchive
+    accept-ranges: bytes
+127.0.0.1:61546: GET https://api.gcore.com/cloud/v1/tasks/274e3380-67e3-4c22-89ed-ac3fec21185f HTTP/2.0
+    x-stainless-runtime-version: go1.24.5
+    authorization: APIKey 21788$1e278ce67b6aa33f178122658b1dd0210d0edff453d348acb9b68bffea6a635b7791925ddda198d5678a4dc20269fe04a263ca92c7e5aa41ea79075f89b66bf6
+    accept: application/json
+    x-stainless-retry-count: 0
+    x-stainless-os: MacOS
+    x-stainless-package-version: 0.28.0
+    x-stainless-runtime: go
+    x-stainless-lang: go
+    x-stainless-arch: arm64
+    user-agent: Gcore/Go 0.28.0
+    accept-encoding: gzip
+ << HTTP/2.0 200 OK 1.9k
+    server: nginx
+    date: Fri, 16 Jan 2026 10:11:50 GMT
+    content-type: application/json
+    content-length: 1980
+    x-id-fe: am3-hw-edge-gc117
+    traceparent: 00-d7da2bb1770cd75df3ad0fc4172d01ad-bfe8f9aded2c0244-01
+    request_id: d7da2bb1770cd75df3ad0fc4172d01ad
+    access-control-allow-origin: *
+    cache-control: no-cache, no-store, must-revalidate
+    etag: "f0ec58bb43ea1102fdd76b7d9aa0b52c7c37c681"
+    strict-transport-security: max-age=15724800; includeSubDomains
+    x-id: am3-hw-edge-gc117
+    x-robots-tag: noindex, nofollow, noarchive
+    accept-ranges: bytes
+127.0.0.1:61546: GET https://api.gcore.com/cloud/v1/tasks/274e3380-67e3-4c22-89ed-ac3fec21185f HTTP/2.0
+    x-stainless-os: MacOS
+    x-stainless-retry-count: 0
+    accept: application/json
+    user-agent: Gcore/Go 0.28.0
+    x-stainless-arch: arm64
+    x-stainless-runtime-version: go1.24.5
+    authorization: APIKey 21788$1e278ce67b6aa33f178122658b1dd0210d0edff453d348acb9b68bffea6a635b7791925ddda198d5678a4dc20269fe04a263ca92c7e5aa41ea79075f89b66bf6
+    x-stainless-lang: go
+    x-stainless-package-version: 0.28.0
+    x-stainless-runtime: go
+    accept-encoding: gzip
+ << HTTP/2.0 200 OK 1.9k
+    server: nginx
+    date: Fri, 16 Jan 2026 10:11:53 GMT
+    content-type: application/json
+    content-length: 1980
+    x-id-fe: am3-hw-edge-gc117
+    traceparent: 00-968bdc62cebdb35304378fcbb2501c43-9b097a8a06474f92-01
+    request_id: 968bdc62cebdb35304378fcbb2501c43
+    access-control-allow-origin: *
+    cache-control: no-cache, no-store, must-revalidate
+    etag: "f0ec58bb43ea1102fdd76b7d9aa0b52c7c37c681"
+    strict-transport-security: max-age=15724800; includeSubDomains
+    x-id: am3-hw-edge-gc117
+    x-robots-tag: noindex, nofollow, noarchive
+    accept-ranges: bytes
+127.0.0.1:61546: GET https://api.gcore.com/cloud/v1/tasks/274e3380-67e3-4c22-89ed-ac3fec21185f HTTP/2.0
+    accept: application/json
+    x-stainless-arch: arm64
+    x-stainless-package-version: 0.28.0
+    x-stainless-runtime: go
+    authorization: APIKey 21788$1e278ce67b6aa33f178122658b1dd0210d0edff453d348acb9b68bffea6a635b7791925ddda198d5678a4dc20269fe04a263ca92c7e5aa41ea79075f89b66bf6
+    x-stainless-retry-count: 0
+    x-stainless-os: MacOS
+    x-stainless-lang: go
+    user-agent: Gcore/Go 0.28.0
+    x-stainless-runtime-version: go1.24.5
+    accept-encoding: gzip
+ << HTTP/2.0 200 OK 2.0k
+    server: nginx
+    date: Fri, 16 Jan 2026 10:11:56 GMT
+    content-type: application/json
+    content-length: 1998
+    x-id-fe: am3-hw-edge-gc117
+    traceparent: 00-e952dae498dc34445511df1a65a1b512-65d9e1d75dccd7ee-01
+    request_id: e952dae498dc34445511df1a65a1b512
+    access-control-allow-origin: *
+    cache-control: no-cache, no-store, must-revalidate
+    etag: "de0d46289e9b8e7f681da18568b1b9cdb09f3e02"
+    strict-transport-security: max-age=15724800; includeSubDomains
+    x-id: am3-hw-edge-gc117
+    x-robots-tag: noindex, nofollow, noarchive
+    accept-ranges: bytes
+127.0.0.1:61546: GET https://api.gcore.com/cloud/v1/instances/379987/76/157504a5-5821-4f21-a32d-7a6d1f615eae HTTP/2.0
+    user-agent: Gcore/Go 0.28.0
+    x-stainless-package-version: 0.28.0
+    x-stainless-os: MacOS
+    authorization: APIKey 21788$1e278ce67b6aa33f178122658b1dd0210d0edff453d348acb9b68bffea6a635b7791925ddda198d5678a4dc20269fe04a263ca92c7e5aa41ea79075f89b66bf6
+    content-type: application/json
+    x-stainless-runtime: go
+    x-stainless-arch: arm64
+    accept: application/json
+    x-stainless-lang: go
+    x-stainless-runtime-version: go1.24.5
+    x-stainless-retry-count: 0
+    content-length: 229
+    accept-encoding: gzip
+ << HTTP/2.0 200 OK 2.0k
+    server: nginx
+    date: Fri, 16 Jan 2026 10:11:57 GMT
+    content-type: application/json
+    content-length: 2083
+    x-id-fe: am3-hw-edge-gc117
+    traceparent: 00-18a01f56f5f97242a2070febbccac8d3-1a38725d6ce590ab-01
+    request_id: 18a01f56f5f97242a2070febbccac8d3
+    access-control-allow-origin: *
+    cache-control: no-cache, no-store, must-revalidate
+    etag: "503e12dd1a7bd9d72423c4062eafbce34c39d952"
+    strict-transport-security: max-age=15724800; includeSubDomains
+    x-id: am3-hw-edge-gc117
+    x-robots-tag: noindex, nofollow, noarchive
+    accept-ranges: bytes
+127.0.0.1:61546: GET https://api.gcore.com/cloud/v1/instances/379987/76/157504a5-5821-4f21-a32d-7a6d1f615eae/interfaces HTTP/2.0
+    x-stainless-runtime: go
+    x-stainless-retry-count: 0
+    x-stainless-lang: go
+    x-stainless-arch: arm64
+    x-stainless-runtime-version: go1.24.5
+    x-stainless-package-version: 0.28.0
+    authorization: APIKey 21788$1e278ce67b6aa33f178122658b1dd0210d0edff453d348acb9b68bffea6a635b7791925ddda198d5678a4dc20269fe04a263ca92c7e5aa41ea79075f89b66bf6
+    accept: application/json
+    user-agent: Gcore/Go 0.28.0
+    x-stainless-os: MacOS
+    accept-encoding: gzip
+ << HTTP/2.0 200 OK 6.5k
+    server: nginx
+    date: Fri, 16 Jan 2026 10:11:57 GMT
+    content-type: application/json; charset=UTF-8
+    content-length: 6688
+    x-id-fe: am3-hw-edge-gc117
+    traceparent: 00-783fdd10892c545881bcf932d64123f7-5503eee44dc98a0c-01
+    request_id: 783fdd10892c545881bcf932d64123f7
+    access-control-allow-origin: *
+    cache-control: no-cache, no-store, must-revalidate
+    etag: "5a071362600efeaedd71fc5ec7bc90a886a221d2"
+    strict-transport-security: max-age=15724800; includeSubDomains
+    x-id: am3-hw-edge-gc117
+    x-robots-tag: noindex, nofollow, noarchive
+    accept-ranges: bytes
+[12:11:57.600][127.0.0.1:61546] client disconnect
+[12:11:57.600][127.0.0.1:61546] server disconnect api.gcore.com:443 (93.123.17.254:443)
+[12:11:57.751][127.0.0.1:61650] client connect
+[12:11:57.840][127.0.0.1:61650] server connect api.gcore.com:443 (93.123.17.254:443)
+127.0.0.1:61650: GET https://api.gcore.com/cloud/v1/volumes/379987/76/c305c356-e93d-4695-a5b4-6971e898e555 HTTP/2.0
+    x-stainless-runtime-version: go1.24.5
+    accept: application/json
+    x-stainless-retry-count: 0
+    authorization: APIKey 21788$1e278ce67b6aa33f178122658b1dd0210d0edff453d348acb9b68bffea6a635b7791925ddda198d5678a4dc20269fe04a263ca92c7e5aa41ea79075f89b66bf6
+    user-agent: Gcore/Go 0.28.0
+    x-stainless-os: MacOS
+    x-stainless-arch: arm64
+    x-stainless-package-version: 0.28.0
+    x-stainless-runtime: go
+    x-stainless-lang: go
+    accept-encoding: gzip
+ << HTTP/2.0 200 OK 1.6k
+    server: nginx
+    date: Fri, 16 Jan 2026 10:11:58 GMT
+    content-type: application/json
+    content-length: 1618
+    x-id-fe: am3-hw-edge-gc112
+    traceparent: 00-57765d2913ea96fbf0f4b1947f60ee8b-3ee715499b26f712-01
+    request_id: 57765d2913ea96fbf0f4b1947f60ee8b
+    access-control-allow-origin: *
+    cache-control: no-cache, no-store, must-revalidate
+    etag: "a94b6e6c97c9ed6adabe71c4b0d794f6804011a4"
+    strict-transport-security: max-age=15724800; includeSubDomains
+    x-id: am3-hw-edge-gc112
+    x-robots-tag: noindex, nofollow, noarchive
+    accept-ranges: bytes
+127.0.0.1:61650: GET https://api.gcore.com/cloud/v1/instances/379987/76/157504a5-5821-4f21-a32d-7a6d1f615eae HTTP/2.0
+    x-stainless-lang: go
+    x-stainless-runtime: go
+    accept: application/json
+    user-agent: Gcore/Go 0.28.0
+    x-stainless-runtime-version: go1.24.5
+    x-stainless-os: MacOS
+    x-stainless-arch: arm64
+    x-stainless-package-version: 0.28.0
+    authorization: APIKey 21788$1e278ce67b6aa33f178122658b1dd0210d0edff453d348acb9b68bffea6a635b7791925ddda198d5678a4dc20269fe04a263ca92c7e5aa41ea79075f89b66bf6
+    x-stainless-retry-count: 0
+    accept-encoding: gzip
+ << HTTP/2.0 200 OK 2.0k
+    server: nginx
+    date: Fri, 16 Jan 2026 10:11:59 GMT
+    content-type: application/json
+    content-length: 2083
+    x-id-fe: am3-hw-edge-gc112
+    traceparent: 00-4ac489d6b5eb371acb7ba664debfae52-4d1f38e82b9d0502-01
+    request_id: 4ac489d6b5eb371acb7ba664debfae52
+    access-control-allow-origin: *
+    cache-control: no-cache, no-store, must-revalidate
+    etag: "503e12dd1a7bd9d72423c4062eafbce34c39d952"
+    strict-transport-security: max-age=15724800; includeSubDomains
+    x-id: am3-hw-edge-gc112
+    x-robots-tag: noindex, nofollow, noarchive
+    accept-ranges: bytes
+127.0.0.1:61650: GET https://api.gcore.com/cloud/v1/instances/379987/76/157504a5-5821-4f21-a32d-7a6d1f615eae/interfaces HTTP/2.0
+    user-agent: Gcore/Go 0.28.0
+    x-stainless-package-version: 0.28.0
+    x-stainless-os: MacOS
+    x-stainless-arch: arm64
+    x-stainless-lang: go
+    x-stainless-runtime: go
+    authorization: APIKey 21788$1e278ce67b6aa33f178122658b1dd0210d0edff453d348acb9b68bffea6a635b7791925ddda198d5678a4dc20269fe04a263ca92c7e5aa41ea79075f89b66bf6
+    accept: application/json
+    x-stainless-runtime-version: go1.24.5
+    x-stainless-retry-count: 0
+    accept-encoding: gzip
+ << HTTP/2.0 200 OK 6.5k
+    server: nginx
+    date: Fri, 16 Jan 2026 10:11:59 GMT
+    content-type: application/json; charset=UTF-8
+    content-length: 6688
+    x-id-fe: am3-hw-edge-gc112
+    traceparent: 00-9c394a5e25be5924c9856ea60fa11c87-5bdec3e4e5b22a1d-01
+    request_id: 9c394a5e25be5924c9856ea60fa11c87
+    access-control-allow-origin: *
+    cache-control: no-cache, no-store, must-revalidate
+    etag: "1fc3a2aa1f08b8b6c3025fc0b7cda6507479d6f2"
+    strict-transport-security: max-age=15724800; includeSubDomains
+    x-id: am3-hw-edge-gc112
+    x-robots-tag: noindex, nofollow, noarchive
+    accept-ranges: bytes
+[12:11:59.844][127.0.0.1:61650] client disconnect
+[12:11:59.844][127.0.0.1:61650] server disconnect api.gcore.com:443 (93.123.17.254:443)

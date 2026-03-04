@@ -1,0 +1,110 @@
+
+Warning: Provider development overrides are in effect
+
+The following provider development overrides are set in the CLI
+configuration:
+ - gcore/gcore in /Users/user/repos/gcore-terraform
+
+The behavior may therefore not match any released version of the provider and
+applying changes may cause the state to become incompatible with published
+releases.
+gcore_dns_zone.test: Refreshing state... [id=test-tf-dns-skill-1770884578.com]
+
+Note: Objects have changed outside of Terraform
+
+Terraform detected the following changes made outside of Terraform since the
+last "terraform apply" which may have affected this plan:
+
+  # gcore_dns_zone.test has changed
+  ~ resource "gcore_dns_zone" "test" {
+      + contact        = "support@gcore.com"
+      + dnssec_enabled = false
+        id             = "test-tf-dns-skill-1770884578.com"
+        name           = "test-tf-dns-skill-1770884578.com"
+      + records        = [
+          + {
+              + name          = "test-tf-dns-skill-1770884578.com"
+              + short_answers = [
+                  + "ns1.gcorelabs.net",
+                  + "ns2.gcdn.services",
+                ]
+              + ttl           = 3600
+              + type          = "NS"
+            },
+        ]
+      + rrsets_amount  = {
+          + dynamic = {
+              + healthcheck = 0
+              + total       = 0
+            }
+          + static  = 1
+          + total   = 1
+        }
+      + serial         = 1770884650
+      + status         = "pending"
+        # (2 unchanged attributes hidden)
+    }
+
+
+Unless you have made equivalent changes to your configuration, or ignored the
+relevant attributes using ignore_changes, the following plan may include
+actions to undo or respond to these changes.
+
+─────────────────────────────────────────────────────────────────────────────
+
+Changes to Outputs:
+  + zone_contact       = "support@gcore.com"
+  + zone_dnssec        = false
+  + zone_records       = [
+      + {
+          + name          = "test-tf-dns-skill-1770884578.com"
+          + short_answers = [
+              + "ns1.gcorelabs.net",
+              + "ns2.gcdn.services",
+            ]
+          + ttl           = 3600
+          + type          = "NS"
+        },
+    ]
+  + zone_rrsets_amount = {
+      + dynamic = {
+          + healthcheck = 0
+          + total       = 0
+        }
+      + static  = 1
+      + total   = 1
+    }
+  + zone_serial        = 1770884650
+  + zone_status        = "pending"
+
+You can apply this plan to save these new output values to the Terraform
+state, without changing any real infrastructure.
+
+Apply complete! Resources: 0 added, 0 changed, 0 destroyed.
+
+Outputs:
+
+zone_contact = "support@gcore.com"
+zone_dnssec = false
+zone_id = "test-tf-dns-skill-1770884578.com"
+zone_records = tolist([
+  {
+    "name" = "test-tf-dns-skill-1770884578.com"
+    "short_answers" = tolist([
+      "ns1.gcorelabs.net",
+      "ns2.gcdn.services",
+    ])
+    "ttl" = 3600
+    "type" = "NS"
+  },
+])
+zone_rrsets_amount = {
+  "dynamic" = {
+    "healthcheck" = 0
+    "total" = 0
+  }
+  "static" = 1
+  "total" = 1
+}
+zone_serial = 1770884650
+zone_status = "pending"

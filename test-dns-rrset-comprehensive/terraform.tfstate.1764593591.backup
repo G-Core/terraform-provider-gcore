@@ -1,0 +1,84 @@
+{
+  "version": 4,
+  "terraform_version": "1.10.5",
+  "serial": 6,
+  "lineage": "2319483b-d016-544a-49dc-613a700429c4",
+  "outputs": {
+    "resource_record_ids": {
+      "value": [
+        143190345,
+        143190355
+      ],
+      "type": [
+        "tuple",
+        [
+          "number",
+          "number"
+        ]
+      ]
+    },
+    "rrset_name": {
+      "value": "tf-test-fixed.maxima.lt",
+      "type": "string"
+    },
+    "rrset_ttl": {
+      "value": 600,
+      "type": "number"
+    },
+    "rrset_type": {
+      "value": "A",
+      "type": "string"
+    },
+    "updated_at": {
+      "value": 1764593577892578000,
+      "type": "number"
+    }
+  },
+  "resources": [
+    {
+      "mode": "managed",
+      "type": "gcore_dns_zone_rrset",
+      "name": "test_a",
+      "provider": "provider[\"registry.terraform.io/gcore/gcore\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "filter_set_id": null,
+            "meta": null,
+            "name": "tf-test-fixed.maxima.lt",
+            "pickers": null,
+            "resource_records": [
+              {
+                "content": [
+                  "\"192.168.1.100\""
+                ],
+                "enabled": true,
+                "id": 143190345,
+                "meta": null
+              },
+              {
+                "content": [
+                  "\"192.168.1.101\""
+                ],
+                "enabled": true,
+                "id": 143190355,
+                "meta": null
+              }
+            ],
+            "rrset_name": "tf-test-fixed.maxima.lt",
+            "rrset_type": "A",
+            "ttl": 600,
+            "type": "A",
+            "updated_at": 1764593577892578000,
+            "warning": null,
+            "warnings": null,
+            "zone_name": "maxima.lt"
+          },
+          "sensitive_attributes": []
+        }
+      ]
+    }
+  ],
+  "check_results": null
+}

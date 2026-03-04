@@ -1,0 +1,95 @@
+--- a/internal/services/cloud_security_group/model.go
++++ b/internal/services/cloud_security_group/model.go
+@@ -15,7 +15,11 @@ type CloudSecurityGroupModel struct {
+ 	ProjectID          types.Int64                                                             `tfsdk:"project_id" path:"project_id,optional"`
+ 	RegionID           types.Int64                                                             `tfsdk:"region_id" path:"region_id,optional"`
+ 	SecurityGroup      *CloudSecurityGroupSecurityGroupModel                                   `tfsdk:"security_group" json:"security_group,required,no_refresh"`
++
++	// WORKAROUND: Flat syntax support (mutually exclusive with SecurityGroup)
++	NameFlat           types.String                                                            `tfsdk:"name_flat" json:"-"`
++	DescriptionFlat    types.String                                                            `tfsdk:"description_flat" json:"-"`
++
+ 	Instances          *[]types.String                                                         `tfsdk:"instances" json:"instances,optional,no_refresh"`
+-	Name               types.String                                                            `tfsdk:"name" json:"name,optional"`
+ 	Tags               *map[string]types.String                                                `tfsdk:"tags" json:"tags,optional,no_refresh"`
+ 	ChangedRules       *[]*CloudSecurityGroupChangedRulesModel                                 `tfsdk:"changed_rules" json:"changed_rules,optional,no_refresh"`
+@@ -29,6 +33,41 @@ type CloudSecurityGroupModel struct {
+ }
+
+ func (m CloudSecurityGroupModel) MarshalJSON() (data []byte, err error) {
++	// WORKAROUND: Support both nested and flat syntax
++	//
++	// Nested syntax (legacy):
++	//   security_group = { name = "...", description = "..." }
++	//
++	// Flat syntax (preferred):
++	//   name_flat = "..."
++	//   description_flat = "..."
++	//
++	// The API always expects nested structure, so we convert flat to nested here.
++
++	model := m
++
++	// If user provided flat fields, create nested SecurityGroup structure for API
++	if model.SecurityGroup == nil && !model.NameFlat.IsNull() {
++		model.SecurityGroup = &CloudSecurityGroupSecurityGroupModel{
++			Name:        model.NameFlat,
++			Description: model.DescriptionFlat,
++		}
++	}
++
+ 	return apijson.MarshalRoot(m)
+ }
+
+ func (m CloudSecurityGroupModel) MarshalJSONForUpdate(state CloudSecurityGroupModel) (data []byte, err error) {
++	// WORKAROUND: Same logic for updates
++	model := m
++
++	// Convert flat to nested if needed
++	if model.SecurityGroup == nil && !model.NameFlat.IsNull() {
++		model.SecurityGroup = &CloudSecurityGroupSecurityGroupModel{
++			Name:        model.NameFlat,
++			Description: model.DescriptionFlat,
++		}
++	}
++
+ 	return apijson.MarshalForPatch(m, state)
+ }
+
+--- a/internal/services/cloud_security_group/resource.go
++++ b/internal/services/cloud_security_group/resource.go
+@@ -284,6 +284,33 @@ func (r *CloudSecurityGroupResource) ImportState(ctx context.Context, req resou
+ }
+
+ func (r *CloudSecurityGroupResource) ModifyPlan(_ context.Context, _ resource.ModifyPlanRequest, _ *resource.ModifyPlanResponse) {
+-	// ModifyPlan intentionally left empty
+-	// project_id and region_id will use provider-level defaults automatically
++	var plan *CloudSecurityGroupModel
++	resp.Diagnostics.Append(req.Plan.Get(ctx, &plan)...)
++	if resp.Diagnostics.HasError() {
++		return
++	}
++
++	// WORKAROUND: Validate mutually exclusive syntax options
++	hasNested := plan.SecurityGroup != nil && !plan.SecurityGroup.Name.IsNull()
++	hasFlat := !plan.NameFlat.IsNull()
++
++	if hasNested && hasFlat {
++		resp.Diagnostics.AddError(
++			"Conflicting security group configuration",
++			"Cannot use both 'security_group' block and flat 'name_flat'/'description_flat' attributes.\n\n"+
++			"Choose one syntax:\n\n"+
++			"Option 1 (Nested - Legacy):\n"+
++			"  security_group = {\n"+
++			"    name        = \"my-sg\"\n"+
++			"    description = \"Description\"\n"+
++			"  }\n\n"+
++			"Option 2 (Flat - Recommended):\n"+
++			"  name_flat        = \"my-sg\"\n"+
++			"  description_flat = \"Description\"",
++		)
++		return
++	}
++
++	// project_id and region_id will use provider-level defaults automatically
+ }

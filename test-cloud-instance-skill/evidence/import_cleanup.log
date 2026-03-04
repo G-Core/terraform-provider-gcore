@@ -1,0 +1,132 @@
+[33m╷[0m[0m
+[33m│[0m [0m[1m[33mWarning: [0m[0m[1mProvider development overrides are in effect[0m
+[33m│[0m [0m
+[33m│[0m [0m[0mThe following provider development overrides are set in the CLI
+[33m│[0m [0mconfiguration:
+[33m│[0m [0m - gcore/gcore in /Users/user/repos/gcore-terraform
+[33m│[0m [0m
+[33m│[0m [0mThe behavior may therefore not match any released version of the provider
+[33m│[0m [0mand applying changes may cause the state to become incompatible with
+[33m│[0m [0mpublished releases.
+[33m╵[0m[0m
+[0m[1mgcore_cloud_volume.boot: Refreshing state... [id=c4b3f30d-dd77-4727-ad1f-4ad4b0da686b][0m
+[0m[1mgcore_cloud_instance.test_external: Refreshing state... [id=9b9e76a9-ecc4-4fde-a253-082008ad993b][0m
+
+Terraform used the selected providers to generate the following execution
+plan. Resource actions are indicated with the following symbols:
+  [31m-[0m destroy[0m
+
+Terraform will perform the following actions:
+
+[1m  # gcore_cloud_instance.test_external[0m will be [1m[31mdestroyed[0m
+[0m  [31m-[0m[0m resource "gcore_cloud_instance" "test_external" {
+      [31m-[0m[0m addresses       = {
+          [31m-[0m[0m "pub_net" = [
+              [31m-[0m[0m {
+                  [31m-[0m[0m addr        = "193.57.88.148"
+                  [31m-[0m[0m subnet_id   = "fedee72b-ae29-45de-936c-fea1866a6aed"
+                  [31m-[0m[0m subnet_name = "pub_net2"
+                  [31m-[0m[0m type        = "fixed"
+                },
+            ]
+        } [90m-> null[0m[0m
+      [31m-[0m[0m blackhole_ports = [] [90m-> null[0m[0m
+      [31m-[0m[0m created_at      = "2026-01-16T12:30:57Z" [90m-> null[0m[0m
+      [31m-[0m[0m creator_task_id = "db5ed485-f73b-4720-9842-9bf633ee61f0" [90m-> null[0m[0m
+      [31m-[0m[0m flavor          = "g1-standard-1-2" [90m-> null[0m[0m
+      [31m-[0m[0m id              = "9b9e76a9-ecc4-4fde-a253-082008ad993b" [90m-> null[0m[0m
+      [31m-[0m[0m interfaces      = [
+          [31m-[0m[0m {
+              [31m-[0m[0m ip_address = "193.57.88.148" [90m-> null[0m[0m
+              [31m-[0m[0m port_id    = "4f443ffc-3bf7-49b0-9868-cff34a77ec70" [90m-> null[0m[0m
+              [31m-[0m[0m type       = "external" [90m-> null[0m[0m
+            },
+        ] [90m-> null[0m[0m
+      [31m-[0m[0m name            = "test-instance-import" [90m-> null[0m[0m
+      [31m-[0m[0m project_id      = 379987 [90m-> null[0m[0m
+      [31m-[0m[0m region          = "Luxembourg-2" [90m-> null[0m[0m
+      [31m-[0m[0m region_id       = 76 [90m-> null[0m[0m
+      [31m-[0m[0m status          = "ACTIVE" [90m-> null[0m[0m
+      [31m-[0m[0m vm_state        = "active" [90m-> null[0m[0m
+      [31m-[0m[0m volumes         = [
+          [31m-[0m[0m {
+              [31m-[0m[0m volume_id = "c4b3f30d-dd77-4727-ad1f-4ad4b0da686b" [90m-> null[0m[0m
+            },
+        ] [90m-> null[0m[0m
+    }
+
+[1m  # gcore_cloud_volume.boot[0m will be [1m[31mdestroyed[0m
+[0m  [31m-[0m[0m resource "gcore_cloud_volume" "boot" {
+      [31m-[0m[0m attachments           = [
+          [31m-[0m[0m {
+              [31m-[0m[0m attached_at   = "2026-01-16T12:31:01Z" [90m-> null[0m[0m
+              [31m-[0m[0m attachment_id = "a9ca8452-7296-49bf-be4b-3a21011868f8" [90m-> null[0m[0m
+              [31m-[0m[0m device        = "/dev/sda" [90m-> null[0m[0m
+              [31m-[0m[0m flavor_id     = "g1-standard-1-2" [90m-> null[0m[0m
+              [31m-[0m[0m server_id     = "9b9e76a9-ecc4-4fde-a253-082008ad993b" [90m-> null[0m[0m
+              [31m-[0m[0m volume_id     = "c4b3f30d-dd77-4727-ad1f-4ad4b0da686b" [90m-> null[0m[0m
+            },
+        ] [90m-> null[0m[0m
+      [31m-[0m[0m bootable              = true [90m-> null[0m[0m
+      [31m-[0m[0m created_at            = "2026-01-16T12:30:43Z" [90m-> null[0m[0m
+      [31m-[0m[0m creator_task_id       = "3c88711f-8df9-4fab-9811-b54ba35fb0aa" [90m-> null[0m[0m
+      [31m-[0m[0m id                    = "c4b3f30d-dd77-4727-ad1f-4ad4b0da686b" [90m-> null[0m[0m
+      [31m-[0m[0m image_id              = "6343932d-0257-4285-bf89-05060f24095a" [90m-> null[0m[0m
+      [31m-[0m[0m is_root_volume        = true [90m-> null[0m[0m
+      [31m-[0m[0m limiter_stats         = {
+          [31m-[0m[0m iops_base_limit   = 30 [90m-> null[0m[0m
+          [31m-[0m[0m iops_burst_limit  = 300 [90m-> null[0m[0m
+          [31m-[0m[0m m_bps_base_limit  = 10 [90m-> null[0m[0m
+          [31m-[0m[0m m_bps_burst_limit = 100 [90m-> null[0m[0m
+        } [90m-> null[0m[0m
+      [31m-[0m[0m name                  = "test-instance-skill-boot" [90m-> null[0m[0m
+      [31m-[0m[0m region                = "Luxembourg-2" [90m-> null[0m[0m
+      [31m-[0m[0m size                  = 5 [90m-> null[0m[0m
+      [31m-[0m[0m snapshot_ids          = [] [90m-> null[0m[0m
+      [31m-[0m[0m source                = "image" [90m-> null[0m[0m
+      [31m-[0m[0m status                = "in-use" [90m-> null[0m[0m
+      [31m-[0m[0m type_name             = "standard" [90m-> null[0m[0m
+      [31m-[0m[0m updated_at            = "2026-01-16T12:31:01Z" [90m-> null[0m[0m
+      [31m-[0m[0m volume_image_metadata = {
+          [31m-[0m[0m "architecture"                  = "x86_64"
+          [31m-[0m[0m "checksum"                      = "f8173c6829404b9429b817b14a4aa14b"
+          [31m-[0m[0m "container_format"              = "bare"
+          [31m-[0m[0m "disk_format"                   = "raw"
+          [31m-[0m[0m "display_order"                 = "2204"
+          [31m-[0m[0m "hw_disk_bus"                   = "scsi"
+          [31m-[0m[0m "hw_machine_type"               = "q35"
+          [31m-[0m[0m "hw_qemu_guest_agent"           = "True"
+          [31m-[0m[0m "hw_scsi_model"                 = "virtio-scsi"
+          [31m-[0m[0m "image_id"                      = "6343932d-0257-4285-bf89-05060f24095a"
+          [31m-[0m[0m "image_name"                    = "ubuntu-22.04-x64"
+          [31m-[0m[0m "min_disk"                      = "5"
+          [31m-[0m[0m "min_ram"                       = "0"
+          [31m-[0m[0m "os_distro"                     = "ubuntu"
+          [31m-[0m[0m "os_glance_failed_import"       = ""
+          [31m-[0m[0m "os_glance_importing_to_stores" = ""
+          [31m-[0m[0m "os_require_quiesce"            = "True"
+          [31m-[0m[0m "os_type"                       = "linux"
+          [31m-[0m[0m "os_version"                    = "22.04"
+          [31m-[0m[0m "size"                          = "2361393152"
+          [31m-[0m[0m "ssh_key"                       = "allow"
+        } [90m-> null[0m[0m
+      [31m-[0m[0m volume_type           = "standard" [90m-> null[0m[0m
+    }
+
+[1mPlan:[0m [0m0 to add, 0 to change, 2 to destroy.
+
+Changes to Outputs:
+  [31m-[0m[0m boot_volume_id       = "c4b3f30d-dd77-4727-ad1f-4ad4b0da686b" [90m-> null[0m[0m
+  [31m-[0m[0m instance_flavor      = "g1-standard-1-2" [90m-> null[0m[0m
+  [31m-[0m[0m instance_id          = "9b9e76a9-ecc4-4fde-a253-082008ad993b" [90m-> null[0m[0m
+  [31m-[0m[0m instance_name        = "test-instance-import" [90m-> null[0m[0m
+  [31m-[0m[0m instance_status      = "ACTIVE" [90m-> null[0m[0m
+  [31m-[0m[0m interface_ip_address = "193.57.88.148" [90m-> null[0m[0m
+  [31m-[0m[0m interface_port_id    = "4f443ffc-3bf7-49b0-9868-cff34a77ec70" [90m-> null[0m[0m
+[0m[1mgcore_cloud_instance.test_external: Destroying... [id=9b9e76a9-ecc4-4fde-a253-082008ad993b][0m[0m
+[0m[1mgcore_cloud_instance.test_external: Still destroying... [id=9b9e76a9-ecc4-4fde-a253-082008ad993b, 00m10s elapsed][0m[0m
+[0m[1mgcore_cloud_instance.test_external: Destruction complete after 19s[0m
+[0m[1mgcore_cloud_volume.boot: Destroying... [id=c4b3f30d-dd77-4727-ad1f-4ad4b0da686b][0m[0m
+[0m[1mgcore_cloud_volume.boot: Destruction complete after 4s[0m
+[0m[1m[32m
+Destroy complete! Resources: 2 destroyed.[0m

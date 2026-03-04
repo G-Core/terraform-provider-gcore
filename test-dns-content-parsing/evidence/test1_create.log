@@ -1,0 +1,216 @@
+[33m╷[0m[0m
+[33m│[0m [0m[1m[33mWarning: [0m[0m[1mProvider development overrides are in effect[0m
+[33m│[0m [0m
+[33m│[0m [0m[0mThe following provider development overrides are set in the CLI
+[33m│[0m [0mconfiguration:
+[33m│[0m [0m - gcore/gcore in /Users/user/repos/gcore-terraform
+[33m│[0m [0m
+[33m│[0m [0mThe behavior may therefore not match any released version of the provider
+[33m│[0m [0mand applying changes may cause the state to become incompatible with
+[33m│[0m [0mpublished releases.
+[33m╵[0m[0m
+
+Terraform used the selected providers to generate the following execution
+plan. Resource actions are indicated with the following symbols:
+  [32m+[0m create[0m
+
+Terraform will perform the following actions:
+
+[1m  # gcore_dns_zone_rrset.test_a[0m will be created
+[0m  [32m+[0m[0m resource "gcore_dns_zone_rrset" "test_a" {
+      [32m+[0m[0m filter_set_id    = (known after apply)
+      [32m+[0m[0m name             = (known after apply)
+      [32m+[0m[0m resource_records = [
+          [32m+[0m[0m {
+              [32m+[0m[0m content = [
+                  [32m+[0m[0m "192.168.1.100",
+                ]
+              [32m+[0m[0m enabled = true
+              [32m+[0m[0m id      = (known after apply)
+            },
+        ]
+      [32m+[0m[0m rrset_name       = "tf-content-test-a.maxima.lt"
+      [32m+[0m[0m rrset_type       = "A"
+      [32m+[0m[0m ttl              = 300
+      [32m+[0m[0m type             = (known after apply)
+      [32m+[0m[0m warning          = (known after apply)
+      [32m+[0m[0m warnings         = (known after apply)
+      [32m+[0m[0m zone_name        = "maxima.lt"
+    }
+
+[1m  # gcore_dns_zone_rrset.test_aaaa[0m will be created
+[0m  [32m+[0m[0m resource "gcore_dns_zone_rrset" "test_aaaa" {
+      [32m+[0m[0m filter_set_id    = (known after apply)
+      [32m+[0m[0m name             = (known after apply)
+      [32m+[0m[0m resource_records = [
+          [32m+[0m[0m {
+              [32m+[0m[0m content = [
+                  [32m+[0m[0m "2001:db8::1",
+                ]
+              [32m+[0m[0m enabled = true
+              [32m+[0m[0m id      = (known after apply)
+            },
+        ]
+      [32m+[0m[0m rrset_name       = "tf-content-test-aaaa.maxima.lt"
+      [32m+[0m[0m rrset_type       = "AAAA"
+      [32m+[0m[0m ttl              = 300
+      [32m+[0m[0m type             = (known after apply)
+      [32m+[0m[0m warning          = (known after apply)
+      [32m+[0m[0m warnings         = (known after apply)
+      [32m+[0m[0m zone_name        = "maxima.lt"
+    }
+
+[1m  # gcore_dns_zone_rrset.test_cname[0m will be created
+[0m  [32m+[0m[0m resource "gcore_dns_zone_rrset" "test_cname" {
+      [32m+[0m[0m filter_set_id    = (known after apply)
+      [32m+[0m[0m name             = (known after apply)
+      [32m+[0m[0m resource_records = [
+          [32m+[0m[0m {
+              [32m+[0m[0m content = [
+                  [32m+[0m[0m "maxima.lt.",
+                ]
+              [32m+[0m[0m enabled = true
+              [32m+[0m[0m id      = (known after apply)
+            },
+        ]
+      [32m+[0m[0m rrset_name       = "tf-content-test-cname.maxima.lt"
+      [32m+[0m[0m rrset_type       = "CNAME"
+      [32m+[0m[0m ttl              = 300
+      [32m+[0m[0m type             = (known after apply)
+      [32m+[0m[0m warning          = (known after apply)
+      [32m+[0m[0m warnings         = (known after apply)
+      [32m+[0m[0m zone_name        = "maxima.lt"
+    }
+
+[1m  # gcore_dns_zone_rrset.test_mx[0m will be created
+[0m  [32m+[0m[0m resource "gcore_dns_zone_rrset" "test_mx" {
+      [32m+[0m[0m filter_set_id    = (known after apply)
+      [32m+[0m[0m name             = (known after apply)
+      [32m+[0m[0m resource_records = [
+          [32m+[0m[0m {
+              [32m+[0m[0m content = [
+                  [32m+[0m[0m "10",
+                  [32m+[0m[0m "mail.maxima.lt.",
+                ]
+              [32m+[0m[0m enabled = true
+              [32m+[0m[0m id      = (known after apply)
+            },
+        ]
+      [32m+[0m[0m rrset_name       = "tf-content-test-mx.maxima.lt"
+      [32m+[0m[0m rrset_type       = "MX"
+      [32m+[0m[0m ttl              = 300
+      [32m+[0m[0m type             = (known after apply)
+      [32m+[0m[0m warning          = (known after apply)
+      [32m+[0m[0m warnings         = (known after apply)
+      [32m+[0m[0m zone_name        = "maxima.lt"
+    }
+
+[1m  # gcore_dns_zone_rrset.test_txt[0m will be created
+[0m  [32m+[0m[0m resource "gcore_dns_zone_rrset" "test_txt" {
+      [32m+[0m[0m filter_set_id    = (known after apply)
+      [32m+[0m[0m name             = (known after apply)
+      [32m+[0m[0m resource_records = [
+          [32m+[0m[0m {
+              [32m+[0m[0m content = [
+                  [32m+[0m[0m "v=spf1 include:_spf.google.com ~all",
+                ]
+              [32m+[0m[0m enabled = true
+              [32m+[0m[0m id      = (known after apply)
+            },
+        ]
+      [32m+[0m[0m rrset_name       = "tf-content-test-txt.maxima.lt"
+      [32m+[0m[0m rrset_type       = "TXT"
+      [32m+[0m[0m ttl              = 300
+      [32m+[0m[0m type             = (known after apply)
+      [32m+[0m[0m warning          = (known after apply)
+      [32m+[0m[0m warnings         = (known after apply)
+      [32m+[0m[0m zone_name        = "maxima.lt"
+    }
+
+[1mPlan:[0m 5 to add, 0 to change, 0 to destroy.
+[0m
+Changes to Outputs:
+  [32m+[0m[0m a_record  = {
+      [32m+[0m[0m content = [
+          [32m+[0m[0m "192.168.1.100",
+        ]
+      [32m+[0m[0m name    = (known after apply)
+      [32m+[0m[0m ttl     = 300
+    }
+  [32m+[0m[0m mx_record = {
+      [32m+[0m[0m content = [
+          [32m+[0m[0m "10",
+          [32m+[0m[0m "mail.maxima.lt.",
+        ]
+      [32m+[0m[0m name    = (known after apply)
+    }
+[0m[1mgcore_dns_zone_rrset.test_mx: Creating...[0m[0m
+[0m[1mgcore_dns_zone_rrset.test_cname: Creating...[0m[0m
+[0m[1mgcore_dns_zone_rrset.test_txt: Creating...[0m[0m
+[0m[1mgcore_dns_zone_rrset.test_a: Creating...[0m[0m
+[0m[1mgcore_dns_zone_rrset.test_aaaa: Creating...[0m[0m
+[31m╷[0m[0m
+[31m│[0m [0m[1m[31mError: [0m[0m[1mInvalid JSON String Value[0m
+[31m│[0m [0m
+[31m│[0m [0m[0m  with gcore_dns_zone_rrset.test_a,
+[31m│[0m [0m  on main.tf line 12, in resource "gcore_dns_zone_rrset" "test_a":
+[31m│[0m [0m  12: resource "gcore_dns_zone_rrset" "test_a" [4m{[0m[0m
+[31m│[0m [0m
+[31m│[0m [0mA string value was provided that is not valid JSON string format (RFC
+[31m│[0m [0m7159).
+[31m│[0m [0m
+[31m│[0m [0mGiven Value: 192.168.1.100
+[31m│[0m [0m
+[31m╵[0m[0m
+[31m╷[0m[0m
+[31m│[0m [0m[1m[31mError: [0m[0m[1mInvalid JSON String Value[0m
+[31m│[0m [0m
+[31m│[0m [0m[0m  with gcore_dns_zone_rrset.test_aaaa,
+[31m│[0m [0m  on main.tf line 27, in resource "gcore_dns_zone_rrset" "test_aaaa":
+[31m│[0m [0m  27: resource "gcore_dns_zone_rrset" "test_aaaa" [4m{[0m[0m
+[31m│[0m [0m
+[31m│[0m [0mA string value was provided that is not valid JSON string format (RFC
+[31m│[0m [0m7159).
+[31m│[0m [0m
+[31m│[0m [0mGiven Value: 2001:db8::1
+[31m│[0m [0m
+[31m╵[0m[0m
+[31m╷[0m[0m
+[31m│[0m [0m[1m[31mError: [0m[0m[1mInvalid JSON String Value[0m
+[31m│[0m [0m
+[31m│[0m [0m[0m  with gcore_dns_zone_rrset.test_cname,
+[31m│[0m [0m  on main.tf line 42, in resource "gcore_dns_zone_rrset" "test_cname":
+[31m│[0m [0m  42: resource "gcore_dns_zone_rrset" "test_cname" [4m{[0m[0m
+[31m│[0m [0m
+[31m│[0m [0mA string value was provided that is not valid JSON string format (RFC
+[31m│[0m [0m7159).
+[31m│[0m [0m
+[31m│[0m [0mGiven Value: maxima.lt.
+[31m│[0m [0m
+[31m╵[0m[0m
+[31m╷[0m[0m
+[31m│[0m [0m[1m[31mError: [0m[0m[1mInvalid JSON String Value[0m
+[31m│[0m [0m
+[31m│[0m [0m[0m  with gcore_dns_zone_rrset.test_mx,
+[31m│[0m [0m  on main.tf line 57, in resource "gcore_dns_zone_rrset" "test_mx":
+[31m│[0m [0m  57: resource "gcore_dns_zone_rrset" "test_mx" [4m{[0m[0m
+[31m│[0m [0m
+[31m│[0m [0mA string value was provided that is not valid JSON string format (RFC
+[31m│[0m [0m7159).
+[31m│[0m [0m
+[31m│[0m [0mGiven Value: mail.maxima.lt.
+[31m│[0m [0m
+[31m╵[0m[0m
+[31m╷[0m[0m
+[31m│[0m [0m[1m[31mError: [0m[0m[1mInvalid JSON String Value[0m
+[31m│[0m [0m
+[31m│[0m [0m[0m  with gcore_dns_zone_rrset.test_txt,
+[31m│[0m [0m  on main.tf line 72, in resource "gcore_dns_zone_rrset" "test_txt":
+[31m│[0m [0m  72: resource "gcore_dns_zone_rrset" "test_txt" [4m{[0m[0m
+[31m│[0m [0m
+[31m│[0m [0mA string value was provided that is not valid JSON string format (RFC
+[31m│[0m [0m7159).
+[31m│[0m [0m
+[31m│[0m [0mGiven Value: v=spf1 include:_spf.google.com ~all
+[31m│[0m [0m
+[31m╵[0m[0m

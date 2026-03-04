@@ -1,0 +1,81 @@
+=== TEST 2: Update tags - add new tag ===
+Command: terraform apply -auto-approve -var='tags={env="test", project="bug2-verification", version="1.0"}'
+
+[33m╷[0m[0m
+[33m│[0m [0m[1m[33mWarning: [0m[0m[1mProvider development overrides are in effect[0m
+[33m│[0m [0m
+[33m│[0m [0m[0mThe following provider development overrides are set in the CLI
+[33m│[0m [0mconfiguration:
+[33m│[0m [0m - gcore/gcore in /Users/user/repos/gcore-terraform
+[33m│[0m [0m
+[33m│[0m [0mThe behavior may therefore not match any released version of the provider
+[33m│[0m [0mand applying changes may cause the state to become incompatible with
+[33m│[0m [0mpublished releases.
+[33m╵[0m[0m
+[0m[1mgcore_cloud_volume.boot: Refreshing state... [id=7451708e-cebd-4fe0-bb6e-ce50d0ae5a73][0m
+[0m[1mgcore_cloud_instance.test: Refreshing state... [id=1a385737-d66f-4d82-a38d-db1a2d0de73b][0m
+
+Terraform used the selected providers to generate the following execution
+plan. Resource actions are indicated with the following symbols:
+  [33m~[0m update in-place[0m
+
+Terraform will perform the following actions:
+
+[1m  # gcore_cloud_instance.test[0m will be updated in-place
+[0m  [33m~[0m[0m resource "gcore_cloud_instance" "test" {
+      [33m~[0m[0m addresses            = {
+          [31m-[0m[0m "test-router-net" = [
+              [31m-[0m[0m {
+                  [31m-[0m[0m addr        = "192.168.1.194"
+                  [31m-[0m[0m subnet_id   = "8dfa65b6-bdcc-4fa8-ae53-1720b0b88a63"
+                  [31m-[0m[0m subnet_name = "subnet1"
+                  [31m-[0m[0m type        = "fixed"
+                },
+            ]
+        } -> (known after apply)
+      [32m+[0m[0m ddos_profile         = (known after apply)
+      [32m+[0m[0m fixed_ip_assignments = (known after apply)
+        id                   = "1a385737-d66f-4d82-a38d-db1a2d0de73b"
+      [32m+[0m[0m instance_description = (known after apply)
+      [32m+[0m[0m instance_isolation   = (known after apply)
+      [33m~[0m[0m interfaces           = [
+          [33m~[0m[0m {
+              [33m~[0m[0m ip_address = "192.168.1.194" -> (known after apply)
+              [33m~[0m[0m port_id    = "b2e92cec-43fa-4fd7-aaea-8dbeb869cafe" -> (known after apply)
+                [90m# (3 unchanged attributes hidden)[0m[0m
+            },
+        ]
+        name                 = "test-bug2-tags"
+      [33m~[0m[0m status               = "ACTIVE" -> (known after apply)
+      [33m~[0m[0m tags                 = {
+            "env"     = "test"
+            "project" = "bug2-verification"
+          [32m+[0m[0m "version" = "1.0"
+        }
+      [32m+[0m[0m task_id              = (known after apply)
+      [32m+[0m[0m task_state           = (known after apply)
+      [32m+[0m[0m tasks                = (known after apply)
+      [33m~[0m[0m vm_state             = "active" -> (known after apply)
+        [90m# (8 unchanged attributes hidden)[0m[0m
+    }
+
+[1mPlan:[0m 0 to add, 1 to change, 0 to destroy.
+[0m
+Changes to Outputs:
+  [33m~[0m[0m tags        = {
+      [32m+[0m[0m version = "1.0"
+        [90m# (2 unchanged attributes hidden)[0m[0m
+    }
+[0m[1mgcore_cloud_instance.test: Modifying... [id=1a385737-d66f-4d82-a38d-db1a2d0de73b][0m[0m
+[0m[1mgcore_cloud_instance.test: Modifications complete after 1s [id=1a385737-d66f-4d82-a38d-db1a2d0de73b][0m
+[0m[1m[32m
+Apply complete! Resources: 0 added, 1 changed, 0 destroyed.
+[0m[0m[1m[32m
+Outputs:
+
+[0minstance_id = "1a385737-d66f-4d82-a38d-db1a2d0de73b"
+tags = tomap({
+  "env" = "test"
+  "project" = "bug2-verification"
+  "version" = "1.0"
+})

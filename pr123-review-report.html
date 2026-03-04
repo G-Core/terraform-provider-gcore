@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>PR #123 Review Report — deferred's Comments</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif; background: #0d1117; color: #c9d1d9; line-height: 1.6; padding: 24px; max-width: 1100px; margin: 0 auto; }
+  h1 { color: #58a6ff; margin-bottom: 8px; font-size: 24px; }
+  .pr-meta { color: #8b949e; margin-bottom: 32px; font-size: 14px; }
+  .pr-meta a { color: #58a6ff; text-decoration: none; }
+  .summary-box { background: #161b22; border: 1px solid #30363d; border-radius: 6px; padding: 16px 20px; margin-bottom: 32px; }
+  .summary-box h2 { color: #f0f6fc; font-size: 16px; margin-bottom: 8px; }
+  .summary-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-top: 12px; }
+  .stat { background: #0d1117; border: 1px solid #30363d; border-radius: 6px; padding: 12px; text-align: center; }
+  .stat .num { font-size: 28px; font-weight: 700; }
+  .stat .label { font-size: 12px; color: #8b949e; text-transform: uppercase; }
+  .stat.ok .num { color: #3fb950; }
+  .stat.warn .num { color: #d29922; }
+  .stat.fail .num { color: #f85149; }
+
+  .comment-card { background: #161b22; border: 1px solid #30363d; border-radius: 6px; margin-bottom: 24px; overflow: hidden; }
+  .comment-header { background: #21262d; padding: 12px 20px; border-bottom: 1px solid #30363d; display: flex; justify-content: space-between; align-items: center; }
+  .comment-header .id { font-weight: 700; color: #f0f6fc; }
+  .comment-header .file { font-size: 13px; color: #8b949e; font-family: monospace; }
+  .badge { display: inline-block; padding: 2px 8px; border-radius: 12px; font-size: 12px; font-weight: 600; }
+  .badge-resolved { background: #238636; color: #fff; }
+  .badge-mismatch { background: #da3633; color: #fff; }
+  .badge-na { background: #30363d; color: #8b949e; }
+
+  .comment-body { padding: 20px; }
+  .section { margin-bottom: 16px; }
+  .section-title { font-size: 11px; text-transform: uppercase; font-weight: 700; color: #8b949e; letter-spacing: 0.5px; margin-bottom: 6px; }
+
+  .reviewer-text, .understanding, .our-response { background: #0d1117; border: 1px solid #30363d; border-radius: 6px; padding: 12px 16px; font-size: 14px; }
+  .reviewer-text { border-left: 3px solid #d29922; }
+  .understanding { border-left: 3px solid #58a6ff; }
+  .our-response { border-left: 3px solid #a371f7; }
+
+  .diff-block { background: #0d1117; border: 1px solid #30363d; border-radius: 6px; overflow: hidden; font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace; font-size: 13px; }
+  .diff-block .diff-header { background: #161b22; padding: 8px 12px; color: #8b949e; border-bottom: 1px solid #30363d; font-size: 12px; }
+  .diff-block pre { padding: 12px; margin: 0; overflow-x: auto; white-space: pre; }
+  .diff-add { color: #3fb950; }
+  .diff-del { color: #f85149; }
+  .diff-ctx { color: #8b949e; }
+  .diff-hunk { color: #a371f7; }
+
+  .verdict { padding: 12px 20px; border-top: 1px solid #30363d; display: flex; align-items: center; gap: 8px; font-size: 14px; }
+  .verdict.ok { background: rgba(35,134,54,0.1); }
+  .verdict.fail { background: rgba(218,54,51,0.1); }
+  .icon { font-size: 18px; }
+</style>
+</head>
+<body>
+
+<h1>PR #123 — Review Comment Audit</h1>
+<p class="pr-meta">
+  <a href="https://github.com/stainless-sdks/gcore-terraform/pull/123">fix(cdn): deactivate cdn_resource_rule before deletion, mark deleted as no_refresh</a><br>
+  Reviewer: <strong>deferred</strong> &nbsp;|&nbsp; Branch: <code>fix/cdn-rule-custom-code</code> &nbsp;|&nbsp; Audit date: 2026-02-27
+</p>
+
+<div class="summary-box">
+  <h2>Summary</h2>
+  <p>3 unique review comments from <strong>deferred</strong>. All have been addressed in the current branch state.</p>
+  <div class="summary-grid">
+    <div class="stat ok"><div class="num">3</div><div class="label">Total Comments</div></div>
+    <div class="stat ok"><div class="num">3</div><div class="label">Resolved</div></div>
+    <div class="stat ok"><div class="num">0</div><div class="label">Mismatches</div></div>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- COMMENT 1 -->
+<!-- ============================================================ -->
+<div class="comment-card">
+  <div class="comment-header">
+    <span class="id">Comment #1 — WithRequestBody bypasses SDK serialization</span>
+    <span class="badge badge-resolved">RESOLVED</span>
+  </div>
+  <div class="comment-body">
+
+    <div class="section">
+      <div class="section-title">Original Comment (review body)</div>
+      <div class="reviewer-text">
+        <code>option.WithRequestBody("application/json", []byte(`{"active":false}`))</code><br><br>
+        This bypasses the SDK's own serialization. If the generated <code>CDNResourceRuleUpdateParams</code> or a dedicated body type ever gains the <code>active</code> field, this will silently become stale and send a redundant raw payload alongside typed params. A brief comment explaining <em>why</em> the raw body is used (i.e. the SDK struct does not carry <code>active</code>) would help future readers understand the intent. &#x1F916;
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-title">My Understanding</div>
+      <div class="understanding">
+        Deferred flagged that using <code>WithRequestBody</code> with a raw JSON literal is fragile and inconsistent with the rest of the provider. If the SDK later adds <code>Active</code> to the params struct, the raw body would conflict. He asked for at minimum a comment, or ideally switching to typed params.
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-title">File: internal/services/cdn_cdn_resource_rule/resource.go</div>
+    </div>
+
+    <div class="section">
+      <div class="section-title">Code Diff (current branch vs main)</div>
+      <div class="diff-block">
+        <div class="diff-header">internal/services/cdn_cdn_resource_rule/resource.go — Delete method deactivation block</div>
+<pre>
+<span class="diff-hunk">@@ -186,6 +187,24 @@</span>
+<span class="diff-ctx"> 	if resp.Diagnostics.HasError() {</span>
+<span class="diff-ctx"> 		return</span>
+<span class="diff-ctx"> 	}</span>
+<span class="diff-ctx"> </span>
+<span class="diff-add">+	// The CDN API requires rules to be deactivated before deletion.</span>
+<span class="diff-add">+	// PATCH active=false first, then delete.</span>
+<span class="diff-add">+	if data.Active.ValueBool() {</span>
+<span class="diff-add">+		_, err := r.client.CDN.CDNResources.Rules.Update(</span>
+<span class="diff-add">+			ctx,</span>
+<span class="diff-add">+			data.ID.ValueInt64(),</span>
+<span class="diff-add">+			cdn.CDNResourceRuleUpdateParams{</span>
+<span class="diff-add">+				ResourceID: data.ResourceID.ValueInt64(),</span>
+<span class="diff-add">+				Active:     param.NewOpt(false),</span>
+<span class="diff-add">+			},</span>
+<span class="diff-add">+			option.WithMiddleware(logging.Middleware(ctx)),</span>
+<span class="diff-add">+		)</span>
+<span class="diff-add">+		if err != nil {</span>
+<span class="diff-add">+			resp.Diagnostics.AddError("failed to deactivate rule before deletion", err.Error())</span>
+<span class="diff-add">+			return</span>
+<span class="diff-add">+		}</span>
+<span class="diff-add">+	}</span>
+</pre>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-title">Our Response</div>
+      <div class="our-response">
+        <strong>Inline reply (algis-dumbris):</strong> "done, switched to typed params with <code>param.NewOpt(false)</code> &#x1F44D;"<br><br>
+        <strong>Issue comment (algis-dumbris):</strong> "re: the raw body comment — no longer relevant since we switched to typed <code>param.NewOpt(false)</code> in the SDK params struct. no raw JSON left to explain :)"
+      </div>
+    </div>
+
+  </div>
+  <div class="verdict ok">
+    <span class="icon">&#x2705;</span>
+    <strong>Consistent.</strong>&nbsp; Raw <code>WithRequestBody</code> replaced with typed <code>param.NewOpt(false)</code>. Import added. No raw JSON remains. Response accurately describes the fix.
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- COMMENT 2 -->
+<!-- ============================================================ -->
+<div class="comment-card">
+  <div class="comment-header">
+    <span class="id">Comment #2 — Use typed SDK params instead of raw JSON</span>
+    <span class="badge badge-resolved">RESOLVED</span>
+  </div>
+  <div class="comment-body">
+
+    <div class="section">
+      <div class="section-title">Original Comment (inline, line 199-200)</div>
+      <div class="reviewer-text">
+        The SDK's <code>CDNResourceRuleUpdateParams</code> already has an <code>Active param.Opt[bool]</code> field (confirmed at <code>gcore-go@v0.33.0/cdn/cdnresourcerule.go:4632</code>). Using a raw JSON literal here bypasses SDK serialization and is the only instance of this pattern across all 57 <code>WithRequestBody</code> call sites in the codebase — every other one uses a serialized struct.<br><br>
+        This would be more robust as:<br>
+<pre style="background:#0d1117;padding:8px;border-radius:4px;margin-top:8px;">_, err := r.client.CDN.CDNResources.Rules.Update(
+    ctx,
+    data.ID.ValueInt64(),
+    cdn.CDNResourceRuleUpdateParams{
+        ResourceID: data.ResourceID.ValueInt64(),
+        Active:     param.NewOpt(false),
+    },
+    option.WithMiddleware(logging.Middleware(ctx)),
+)</pre>
+        Type-safe, consistent with the rest of the provider, and won't silently conflict if the params struct evolves. You'd need to add <code>"github.com/G-Core/gcore-go/packages/param"</code> to the imports. &#x1F916;
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-title">My Understanding</div>
+      <div class="understanding">
+        This is the concrete suggestion accompanying Comment #1. Deferred provided an exact code snippet to replace the raw JSON approach — use <code>Active: param.NewOpt(false)</code> in the typed params struct, and add the <code>param</code> import. This is more type-safe and consistent with the 57 other call sites.
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-title">Code Diff (current branch vs main)</div>
+      <div class="diff-block">
+        <div class="diff-header">internal/services/cdn_cdn_resource_rule/resource.go — imports</div>
+<pre>
+<span class="diff-ctx"> 	"github.com/G-Core/gcore-go"</span>
+<span class="diff-ctx"> 	"github.com/G-Core/gcore-go/cdn"</span>
+<span class="diff-ctx"> 	"github.com/G-Core/gcore-go/option"</span>
+<span class="diff-add">+	"github.com/G-Core/gcore-go/packages/param"</span>
+<span class="diff-ctx"> 	"github.com/hashicorp/terraform-plugin-framework/resource"</span>
+</pre>
+      </div>
+      <div class="diff-block" style="margin-top:8px;">
+        <div class="diff-header">internal/services/cdn_cdn_resource_rule/resource.go — Update call (current code, lines 192-206)</div>
+<pre>
+<span class="diff-add">+	if data.Active.ValueBool() {</span>
+<span class="diff-add">+		_, err := r.client.CDN.CDNResources.Rules.Update(</span>
+<span class="diff-add">+			ctx,</span>
+<span class="diff-add">+			data.ID.ValueInt64(),</span>
+<span class="diff-add">+			cdn.CDNResourceRuleUpdateParams{</span>
+<span class="diff-add">+				ResourceID: data.ResourceID.ValueInt64(),</span>
+<span class="diff-add">+				Active:     param.NewOpt(false),</span>
+<span class="diff-add">+			},</span>
+<span class="diff-add">+			option.WithMiddleware(logging.Middleware(ctx)),</span>
+<span class="diff-add">+		)</span>
+</pre>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-title">Our Response</div>
+      <div class="our-response">
+        <strong>Inline reply (algis-dumbris):</strong> "done, switched to typed params with <code>param.NewOpt(false)</code> &#x1F44D;"
+      </div>
+    </div>
+
+  </div>
+  <div class="verdict ok">
+    <span class="icon">&#x2705;</span>
+    <strong>Consistent.</strong>&nbsp; Code matches deferred's exact suggestion verbatim. <code>WithRequestBody</code> removed, <code>Active: param.NewOpt(false)</code> used, <code>param</code> import added. Response is accurate.
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- COMMENT 3 -->
+<!-- ============================================================ -->
+<div class="comment-card">
+  <div class="comment-header">
+    <span class="id">Comment #3 — Keep resp.State.Set in Delete method</span>
+    <span class="badge badge-resolved">RESOLVED</span>
+  </div>
+  <div class="comment-body">
+
+    <div class="section">
+      <div class="section-title">Original Comment (inline, line 202 LEFT side — deletion)</div>
+      <div class="reviewer-text">
+        <strong>First message:</strong> "I know that this call is unnecessary and can be safely deleted, but it is harmless and should we remove generated code? @pedrodeoliveira wdyt?"<br><br>
+        <strong>Follow-up:</strong> "Lets keep it and delete in 1 go everywhere if we decide to do it. Better for stainless not to generate in a first place."
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-title">My Understanding</div>
+      <div class="understanding">
+        Deferred acknowledged <code>resp.State.Set</code> in Delete is technically unnecessary (Terraform removes state automatically after Delete returns without error). However, he wants to keep it for consistency — it's generated code present in all resources, and removing it from just one resource creates an inconsistency. If it should be removed, it should be removed everywhere at once, or ideally Stainless should stop generating it.
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-title">Code Diff (current branch vs main)</div>
+      <div class="diff-block">
+        <div class="diff-header">internal/services/cdn_cdn_resource_rule/resource.go — end of Delete method (lines 216-222)</div>
+<pre>
+<span class="diff-ctx"> 	if err != nil {</span>
+<span class="diff-ctx"> 		resp.Diagnostics.AddError("failed to make http request", err.Error())</span>
+<span class="diff-ctx"> 		return</span>
+<span class="diff-ctx"> 	}</span>
+<span class="diff-ctx"> </span>
+<span class="diff-ctx"> 	resp.Diagnostics.Append(resp.State.Set(ctx, &amp;data)...)</span>
+<span class="diff-ctx"> }</span>
+</pre>
+      </div>
+      <p style="margin-top:8px;font-size:13px;color:#8b949e;">
+        The line <code>resp.Diagnostics.Append(resp.State.Set(ctx, &amp;data)...)</code> is present at line 221 — it was originally removed in the PR, but has been restored per deferred's request (commit <code>f33e164</code>).
+      </p>
+    </div>
+
+    <div class="section">
+      <div class="section-title">Our Response</div>
+      <div class="our-response">
+        <strong>Inline reply (algis-dumbris):</strong> "makes sense, keeping it as-is for now"
+      </div>
+    </div>
+
+  </div>
+  <div class="verdict ok">
+    <span class="icon">&#x2705;</span>
+    <strong>Consistent.</strong>&nbsp; The line <code>resp.State.Set</code> has been restored. Code matches the original generated pattern. Response says "keeping it as-is" and the code confirms it's kept.
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- FINAL VERDICT -->
+<!-- ============================================================ -->
+<div class="summary-box" style="margin-top:32px; border-color:#238636;">
+  <h2 style="color:#3fb950;">&#x2705; All Review Comments Addressed</h2>
+  <table style="width:100%; margin-top:12px; font-size:14px; border-collapse:collapse;">
+    <thead>
+      <tr style="border-bottom:1px solid #30363d; color:#8b949e; text-align:left;">
+        <th style="padding:8px 4px;">#</th>
+        <th style="padding:8px 4px;">Comment</th>
+        <th style="padding:8px 4px;">Request</th>
+        <th style="padding:8px 4px;">Code State</th>
+        <th style="padding:8px 4px;">Response Match</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr style="border-bottom:1px solid #21262d;">
+        <td style="padding:8px 4px;">1</td>
+        <td style="padding:8px 4px;">Raw JSON bypasses SDK</td>
+        <td style="padding:8px 4px;">Add comment or use typed params</td>
+        <td style="padding:8px 4px;color:#3fb950;">Switched to param.NewOpt(false)</td>
+        <td style="padding:8px 4px;color:#3fb950;">&#x2705; Yes</td>
+      </tr>
+      <tr style="border-bottom:1px solid #21262d;">
+        <td style="padding:8px 4px;">2</td>
+        <td style="padding:8px 4px;">Use typed SDK params</td>
+        <td style="padding:8px 4px;">Use Active: param.NewOpt(false)</td>
+        <td style="padding:8px 4px;color:#3fb950;">Exact match to suggestion</td>
+        <td style="padding:8px 4px;color:#3fb950;">&#x2705; Yes</td>
+      </tr>
+      <tr>
+        <td style="padding:8px 4px;">3</td>
+        <td style="padding:8px 4px;">Keep resp.State.Set in Delete</td>
+        <td style="padding:8px 4px;">Restore removed line</td>
+        <td style="padding:8px 4px;color:#3fb950;">Line restored at L221</td>
+        <td style="padding:8px 4px;color:#3fb950;">&#x2705; Yes</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<p style="margin-top:24px; color:#8b949e; font-size:12px; text-align:center;">
+  Generated from PR #123 review data &bull; Branch: fix/cdn-rule-custom-code @ f33e164
+</p>
+
+</body>
+</html>

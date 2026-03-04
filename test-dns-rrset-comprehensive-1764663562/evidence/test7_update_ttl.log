@@ -1,0 +1,72 @@
+[33m╷[0m[0m
+[33m│[0m [0m[1m[33mWarning: [0m[0m[1mProvider development overrides are in effect[0m
+[33m│[0m [0m
+[33m│[0m [0m[0mThe following provider development overrides are set in the CLI
+[33m│[0m [0mconfiguration:
+[33m│[0m [0m - gcore/gcore in /Users/user/repos/gcore-terraform
+[33m│[0m [0m
+[33m│[0m [0mThe behavior may therefore not match any released version of the provider
+[33m│[0m [0mand applying changes may cause the state to become incompatible with
+[33m│[0m [0mpublished releases.
+[33m╵[0m[0m
+[0m[1mgcore_dns_zone_rrset.test_a: Refreshing state... [name=tf-comprehensive-a.maxima.lt][0m
+
+Terraform used the selected providers to generate the following execution
+plan. Resource actions are indicated with the following symbols:
+  [33m~[0m update in-place[0m
+
+Terraform will perform the following actions:
+
+[1m  # gcore_dns_zone_rrset.test_a[0m will be updated in-place
+[0m  [33m~[0m[0m resource "gcore_dns_zone_rrset" "test_a" {
+      [32m+[0m[0m filter_set_id    = (known after apply)
+      [33m~[0m[0m name             = "tf-comprehensive-a.maxima.lt" -> (known after apply)
+      [33m~[0m[0m resource_records = [
+          [33m~[0m[0m {
+              [33m~[0m[0m id      = 143278056 -> (known after apply)
+                [90m# (2 unchanged attributes hidden)[0m[0m
+            },
+        ]
+      [33m~[0m[0m ttl              = 300 [33m->[0m[0m 600
+      [33m~[0m[0m type             = "A" -> (known after apply)
+      [32m+[0m[0m warning          = (known after apply)
+      [32m+[0m[0m warnings         = (known after apply)
+        [90m# (3 unchanged attributes hidden)[0m[0m
+    }
+
+[1mPlan:[0m 0 to add, 1 to change, 0 to destroy.
+[0m
+Changes to Outputs:
+  [33m~[0m[0m a_record = {
+      [33m~[0m[0m name             = "tf-comprehensive-a.maxima.lt" -> (known after apply)
+      [33m~[0m[0m resource_records = [
+          [33m~[0m[0m {
+              [33m~[0m[0m id      = 143278056 -> (known after apply)
+                [90m# (3 unchanged attributes hidden)[0m[0m
+            },
+        ]
+      [33m~[0m[0m ttl              = 300 [33m->[0m[0m 600
+      [33m~[0m[0m type             = "A" -> (known after apply)
+    }
+[0m[1mgcore_dns_zone_rrset.test_a: Modifying... [name=tf-comprehensive-a.maxima.lt][0m[0m
+[0m[1mgcore_dns_zone_rrset.test_a: Modifications complete after 0s [name=tf-comprehensive-a.maxima.lt][0m
+[0m[1m[32m
+Apply complete! Resources: 0 added, 1 changed, 0 destroyed.
+[0m[0m[1m[32m
+Outputs:
+
+[0ma_record = {
+  "name" = "tf-comprehensive-a.maxima.lt"
+  "resource_records" = tolist([
+    {
+      "content" = tolist([
+        "\"192.168.1.100\"",
+      ])
+      "enabled" = true
+      "id" = 143278056
+      "meta" = tomap(null) /* of string */
+    },
+  ])
+  "ttl" = 600
+  "type" = "A"
+}

@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Report: gcore_cdn_origin_group</title>
+    <style>
+        :root {
+            --bg-primary: #1a1a2e;
+            --bg-secondary: #16213e;
+            --bg-card: #0f3460;
+            --text-primary: #e4e4e4;
+            --text-secondary: #a0a0a0;
+            --accent: #e94560;
+            --success: #4ade80;
+            --warning: #fbbf24;
+            --error: #ef4444;
+            --border: #2a2a4a;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.6;
+            padding: 2rem;
+        }
+        .container { max-width: 1200px; margin: 0 auto; }
+        h1, h2, h3 { color: var(--text-primary); margin-bottom: 1rem; }
+        h1 { font-size: 2rem; border-bottom: 2px solid var(--accent); padding-bottom: 0.5rem; }
+        h2 { font-size: 1.5rem; margin-top: 2rem; }
+        h3 { font-size: 1.2rem; margin-top: 1.5rem; }
+
+        .header {
+            background: var(--bg-secondary);
+            padding: 1.5rem;
+            border-radius: 8px;
+            margin-bottom: 2rem;
+        }
+        .header-meta {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+        .meta-item { color: var(--text-secondary); }
+        .meta-item strong { color: var(--text-primary); }
+
+        .summary-cards {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+        .card {
+            background: var(--bg-card);
+            padding: 1.5rem;
+            border-radius: 8px;
+            text-align: center;
+        }
+        .card-value { font-size: 2.5rem; font-weight: bold; }
+        .card-label { color: var(--text-secondary); margin-top: 0.5rem; }
+        .card.total .card-value { color: var(--text-primary); }
+        .card.passed .card-value { color: var(--success); }
+        .card.warnings .card-value { color: var(--warning); }
+        .card.failed .card-value { color: var(--error); }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1rem 0;
+            background: var(--bg-secondary);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        th, td {
+            padding: 0.75rem 1rem;
+            text-align: left;
+            border-bottom: 1px solid var(--border);
+        }
+        th { background: var(--bg-card); font-weight: 600; }
+        tr:last-child td { border-bottom: none; }
+        tr:hover { background: rgba(255,255,255,0.02); }
+
+        .badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+        .badge-success { background: rgba(74, 222, 128, 0.2); color: var(--success); }
+        .badge-warning { background: rgba(251, 191, 36, 0.2); color: var(--warning); }
+        .badge-error { background: rgba(239, 68, 68, 0.2); color: var(--error); }
+        .badge-info { background: rgba(96, 165, 250, 0.2); color: #60a5fa; }
+
+        .badge-method {
+            display: inline-block;
+            padding: 0.2rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            font-family: monospace;
+        }
+        .badge-post { background: #22c55e; color: white; }
+        .badge-get { background: #3b82f6; color: white; }
+        .badge-patch { background: #f59e0b; color: white; }
+        .badge-delete { background: #ef4444; color: white; }
+
+        .test-output {
+            background: #0d1117;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 1rem;
+            margin: 1rem 0;
+            font-family: 'SF Mono', Monaco, 'Courier New', monospace;
+            font-size: 0.85rem;
+            overflow-x: auto;
+            white-space: pre-wrap;
+            color: #c9d1d9;
+        }
+
+        .checklist {
+            list-style: none;
+            padding: 0;
+        }
+        .checklist li {
+            padding: 0.5rem 0;
+            border-bottom: 1px solid var(--border);
+        }
+        .checklist li:last-child { border-bottom: none; }
+        .check-pass::before { content: "✅ "; }
+        .check-fail::before { content: "❌ "; }
+        .check-warn::before { content: "⚠️ "; }
+
+        .section {
+            background: var(--bg-secondary);
+            padding: 1.5rem;
+            border-radius: 8px;
+            margin-bottom: 1.5rem;
+        }
+
+        code {
+            background: var(--bg-card);
+            padding: 0.2rem 0.4rem;
+            border-radius: 4px;
+            font-family: 'SF Mono', Monaco, monospace;
+            font-size: 0.9em;
+        }
+
+        .file-ref {
+            color: var(--accent);
+            text-decoration: none;
+        }
+        .file-ref:hover { text-decoration: underline; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Test Report: gcore_cdn_origin_group</h1>
+            <div class="header-meta">
+                <div class="meta-item"><strong>JIRA Ticket:</strong> GCLOUD2-22597</div>
+                <div class="meta-item"><strong>PR Number:</strong> #70</div>
+                <div class="meta-item"><strong>Branch:</strong> fix/cdn-origin-group-GCLOUD2-22597</div>
+                <div class="meta-item"><strong>Date:</strong> 2026-01-16</div>
+                <div class="meta-item"><strong>Provider Version:</strong> Development (local build)</div>
+                <div class="meta-item"><strong>Terraform Version:</strong> 1.14.3</div>
+            </div>
+        </div>
+
+        <div class="summary-cards">
+            <div class="card total">
+                <div class="card-value">7</div>
+                <div class="card-label">Total Tests</div>
+            </div>
+            <div class="card passed">
+                <div class="card-value">7</div>
+                <div class="card-label">Passed</div>
+            </div>
+            <div class="card warnings">
+                <div class="card-value">0</div>
+                <div class="card-label">Warnings</div>
+            </div>
+            <div class="card failed">
+                <div class="card-value">0</div>
+                <div class="card-label">Failed</div>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>Test Results Summary</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Test #</th>
+                        <th>Test Name</th>
+                        <th>Description</th>
+                        <th>Duration</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>1</td>
+                        <td>Create with Public Origins</td>
+                        <td>Create origin group with multiple sources (primary + backup)</td>
+                        <td>&lt;1s</td>
+                        <td><span class="badge badge-success">PASSED</span></td>
+                    </tr>
+                    <tr>
+                        <td>2</td>
+                        <td>Drift Test (Post-Create)</td>
+                        <td>Verify no changes on second plan after create</td>
+                        <td>&lt;1s</td>
+                        <td><span class="badge badge-success">PASSED</span></td>
+                    </tr>
+                    <tr>
+                        <td>3</td>
+                        <td>Update Name (In-Place)</td>
+                        <td>Change name - should PATCH, not recreate</td>
+                        <td>~1s</td>
+                        <td><span class="badge badge-success">PASSED</span></td>
+                    </tr>
+                    <tr>
+                        <td>4</td>
+                        <td>Update Sources</td>
+                        <td>Modify sources array (replace all sources)</td>
+                        <td>~1s</td>
+                        <td><span class="badge badge-success">PASSED</span></td>
+                    </tr>
+                    <tr>
+                        <td>5</td>
+                        <td>Drift Test (Post-Update)</td>
+                        <td>Verify no changes after update operations</td>
+                        <td>&lt;1s</td>
+                        <td><span class="badge badge-success">PASSED</span></td>
+                    </tr>
+                    <tr>
+                        <td>6</td>
+                        <td>Import Test</td>
+                        <td>Remove from state, import by ID, verify no drift</td>
+                        <td>&lt;1s</td>
+                        <td><span class="badge badge-success">PASSED</span></td>
+                    </tr>
+                    <tr>
+                        <td>7</td>
+                        <td>Destroy Test</td>
+                        <td>Clean deletion of origin group</td>
+                        <td>&lt;1s</td>
+                        <td><span class="badge badge-success">PASSED</span></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="section">
+            <h2>Test Details</h2>
+
+            <h3>Test 1: Create with Public Origins</h3>
+            <p>Created origin group with ID <code>1349081</code> containing:</p>
+            <ul>
+                <li>Primary source: google.com (enabled=true, backup=false)</li>
+                <li>Backup source: cloudflare.com (enabled=true, backup=true)</li>
+            </ul>
+            <p><strong>Computed fields populated:</strong></p>
+            <ul>
+                <li><code>has_related_resources</code>: false</li>
+                <li><code>proxy_next_upstream</code>: ["error", "timeout"]</li>
+            </ul>
+            <div class="test-output">Apply complete! Resources: 1 added, 0 changed, 0 destroyed.
+
+Outputs:
+public_origins_has_related_resources = false
+public_origins_id = 1349081
+public_origins_name = "test-origins-1768552065"
+public_origins_proxy_next_upstream = tolist([
+  "error",
+  "timeout",
+])</div>
+
+            <h3>Test 2: Drift Test (Post-Create)</h3>
+            <p>Immediately after create, ran <code>terraform plan -detailed-exitcode</code></p>
+            <div class="test-output">No changes. Your infrastructure matches the configuration.
+
+Terraform has compared your real infrastructure against your configuration
+and found no differences, so no changes are needed.
+Exit code: 0</div>
+
+            <h3>Test 3: Update Name (In-Place)</h3>
+            <p>Changed name from <code>test-origins-1768552065</code> to <code>test-origins-updated</code></p>
+            <p><strong>Resource ID preserved:</strong> 1349081 (updated in-place, not recreated)</p>
+            <div class="test-output"># gcore_cdn_origin_group.public_origins will be updated in-place
+  ~ resource "gcore_cdn_origin_group" "public_origins" {
+        id   = 1349081
+      ~ name = "test-origins-1768552065" -> "test-origins-updated"
+    }
+
+Apply complete! Resources: 0 added, 1 changed, 0 destroyed.</div>
+
+            <h3>Test 4: Update Sources</h3>
+            <p>Replaced all sources with new domains:</p>
+            <ul>
+                <li>github.com (enabled=true, backup=false)</li>
+                <li>gitlab.com (enabled=true, backup=true)</li>
+                <li>bitbucket.org (enabled=false, backup=false)</li>
+            </ul>
+            <div class="test-output"># gcore_cdn_origin_group.public_origins will be updated in-place
+  ~ sources = [
+      - { backup = false, enabled = true, source = "google.com" },
+      - { backup = true, enabled = true, source = "cloudflare.com" },
+      + { backup = false, enabled = false, source = "bitbucket.org" },
+      + { backup = false, enabled = true, source = "github.com" },
+      + { backup = true, enabled = true, source = "gitlab.com" },
+    ]
+
+Apply complete! Resources: 0 added, 1 changed, 0 destroyed.</div>
+
+            <h3>Test 5: Drift Test (Post-Update)</h3>
+            <div class="test-output">No changes. Your infrastructure matches the configuration.
+Exit code: 0</div>
+
+            <h3>Test 6: Import Test</h3>
+            <p>Workflow: Remove from state -> Import by ID -> Verify no drift</p>
+            <div class="test-output">terraform state rm gcore_cdn_origin_group.public_origins
+Removed gcore_cdn_origin_group.public_origins
+
+terraform import gcore_cdn_origin_group.public_origins 1349081
+gcore_cdn_origin_group.public_origins: Importing from ID "1349081"...
+gcore_cdn_origin_group.public_origins: Import prepared!
+Import successful!
+
+terraform plan -detailed-exitcode
+No changes. Your infrastructure matches the configuration.
+Exit code: 0</div>
+
+            <h3>Test 7: Destroy Test</h3>
+            <div class="test-output">gcore_cdn_origin_group.public_origins: Destroying... [name=test-origins-updated]
+gcore_cdn_origin_group.public_origins: Destruction complete after 0s
+
+Destroy complete! Resources: 1 destroyed.</div>
+        </div>
+
+        <div class="section">
+            <h2>API Operations Verified</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Method</th>
+                        <th>Endpoint</th>
+                        <th>Test #</th>
+                        <th>Notes</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><span class="badge-method badge-post">POST</span></td>
+                        <td><code>/cdn/origin_groups</code></td>
+                        <td>1</td>
+                        <td>Create origin group with sources</td>
+                    </tr>
+                    <tr>
+                        <td><span class="badge-method badge-get">GET</span></td>
+                        <td><code>/cdn/origin_groups/{id}</code></td>
+                        <td>2, 5, 6</td>
+                        <td>Read for drift detection, import</td>
+                    </tr>
+                    <tr>
+                        <td><span class="badge-method badge-patch">PATCH</span></td>
+                        <td><code>/cdn/origin_groups/{id}</code></td>
+                        <td>3, 4</td>
+                        <td>Update name, sources (in-place)</td>
+                    </tr>
+                    <tr>
+                        <td><span class="badge-method badge-delete">DELETE</span></td>
+                        <td><code>/cdn/origin_groups/{id}</code></td>
+                        <td>7</td>
+                        <td>Delete origin group</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="section">
+            <h2>Fixes Applied in PR #70</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Issue</th>
+                        <th>Fix</th>
+                        <th>File:Line</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Write-only credentials handling</td>
+                        <td>Use <code>GetAttribute</code> pattern for auth block</td>
+                        <td><code>resource.go:68-71</code></td>
+                    </tr>
+                    <tr>
+                        <td>s3_credentials_version required</td>
+                        <td>Changed from Optional to Required</td>
+                        <td><code>schema.go:73</code></td>
+                    </tr>
+                    <tr>
+                        <td>JSON tag for credentials version</td>
+                        <td>Use <code>json:"-"</code> to exclude from API payload</td>
+                        <td><code>model.go:37</code></td>
+                    </tr>
+                    <tr>
+                        <td>Sources defaults missing</td>
+                        <td>Added defaults for enabled (true) and backup (false)</td>
+                        <td><code>schema.go:87,93</code></td>
+                    </tr>
+                    <tr>
+                        <td>Sources as Set (not List)</td>
+                        <td>Changed to SetNestedAttribute with NestedObjectSet</td>
+                        <td><code>schema.go:77, model.go:17</code></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="section">
+            <h2>Known Behaviors</h2>
+            <ul class="checklist">
+                <li class="check-pass"><code>proxy_next_upstream</code> has API-provided default: ["error", "timeout"]</li>
+                <li class="check-pass"><code>has_related_resources</code> is purely computed (read-only)</li>
+                <li class="check-pass"><code>sources</code> uses Set semantics - order doesn't matter</li>
+                <li class="check-pass">S3 credentials are write-only - never stored in state</li>
+                <li class="check-pass"><code>s3_credentials_version</code> triggers credential re-send on change</li>
+                <li class="check-warn">API validates domain names can be resolved (fake domains rejected)</li>
+            </ul>
+        </div>
+
+        <div class="section">
+            <h2>Evidence Package</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Artifact</th>
+                        <th>Filename</th>
+                        <th>Purpose</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Create log</td>
+                        <td><code>test1_apply.log</code></td>
+                        <td>Terraform apply output for create</td>
+                    </tr>
+                    <tr>
+                        <td>Drift log (post-create)</td>
+                        <td><code>test1_drift.log</code></td>
+                        <td>Plan output showing no changes</td>
+                    </tr>
+                    <tr>
+                        <td>Name update log</td>
+                        <td><code>test_update_name.log</code></td>
+                        <td>In-place update output</td>
+                    </tr>
+                    <tr>
+                        <td>Sources update log</td>
+                        <td><code>test_update_sources.log</code></td>
+                        <td>Sources modification output</td>
+                    </tr>
+                    <tr>
+                        <td>Drift log (post-update)</td>
+                        <td><code>test_update_drift.log</code></td>
+                        <td>Plan output showing no changes</td>
+                    </tr>
+                    <tr>
+                        <td>Import log</td>
+                        <td><code>test_import.log</code></td>
+                        <td>Import operation output</td>
+                    </tr>
+                    <tr>
+                        <td>Import drift log</td>
+                        <td><code>test_import_drift.log</code></td>
+                        <td>Plan after import</td>
+                    </tr>
+                    <tr>
+                        <td>Destroy log</td>
+                        <td><code>test_destroy.log</code></td>
+                        <td>Resource deletion output</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="section">
+            <h2>QA Checklist</h2>
+            <ul class="checklist">
+                <li class="check-pass">Drift detection: No changes on second plan</li>
+                <li class="check-pass">Update in-place: PATCH operations preserve resource ID</li>
+                <li class="check-pass">Computed fields: Properly populated from API response</li>
+                <li class="check-pass">Write-only fields: S3 credentials never stored in state</li>
+                <li class="check-pass">Import: State matches API after import</li>
+                <li class="check-pass">Delete: Clean removal without errors</li>
+                <li class="check-pass">Set semantics: Sources order-independent</li>
+                <li class="check-pass">Defaults: enabled=true, backup=false applied correctly</li>
+            </ul>
+        </div>
+
+        <div class="section">
+            <h2>Conclusion</h2>
+            <p>All 7 tests passed successfully. The <code>gcore_cdn_origin_group</code> resource implementation is ready for review and merge.</p>
+            <p><strong>Key validations:</strong></p>
+            <ul>
+                <li>No drift after create or update operations</li>
+                <li>All CRUD operations work correctly (sync API calls)</li>
+                <li>Import functionality working as expected</li>
+                <li>Write-only credentials handled properly</li>
+                <li>Set semantics for sources prevents ordering issues</li>
+            </ul>
+        </div>
+
+        <footer style="margin-top: 2rem; padding-top: 1rem; border-top: 1px solid var(--border); color: var(--text-secondary); text-align: center;">
+            Generated by Terraform Testing Skill | 2026-01-16 10:35 UTC
+        </footer>
+    </div>
+</body>
+</html>

@@ -1,0 +1,68 @@
+[33m╷[0m[0m
+[33m│[0m [0m[1m[33mWarning: [0m[0m[1mProvider development overrides are in effect[0m
+[33m│[0m [0m
+[33m│[0m [0m[0mThe following provider development overrides are set in the CLI
+[33m│[0m [0mconfiguration:
+[33m│[0m [0m - gcore/gcore in /Users/user/repos/gcore-terraform
+[33m│[0m [0m
+[33m│[0m [0mThe behavior may therefore not match any released version of the provider
+[33m│[0m [0mand applying changes may cause the state to become incompatible with
+[33m│[0m [0mpublished releases.
+[33m╵[0m[0m
+[0m[1mgcore_cloud_volume.boot: Refreshing state... [id=c305c356-e93d-4695-a5b4-6971e898e555][0m
+[0m[1mgcore_cloud_instance.test_external: Refreshing state... [id=157504a5-5821-4f21-a32d-7a6d1f615eae][0m
+
+Terraform used the selected providers to generate the following execution
+plan. Resource actions are indicated with the following symbols:
+  [33m~[0m update in-place[0m
+
+Terraform will perform the following actions:
+
+[1m  # gcore_cloud_instance.test_external[0m will be updated in-place
+[0m  [33m~[0m[0m resource "gcore_cloud_instance" "test_external" {
+      [33m~[0m[0m addresses            = {
+          [31m-[0m[0m "pub_net" = [
+              [31m-[0m[0m {
+                  [31m-[0m[0m addr        = "85.204.246.86"
+                  [31m-[0m[0m subnet_id   = "896f3e39-51cb-4f70-b905-a749b642c152"
+                  [31m-[0m[0m subnet_name = "pub_net9"
+                  [31m-[0m[0m type        = "fixed"
+                },
+            ]
+        } -> (known after apply)
+      [32m+[0m[0m ddos_profile         = (known after apply)
+      [32m+[0m[0m fixed_ip_assignments = (known after apply)
+      [33m~[0m[0m flavor               = "g1-standard-1-2" [33m->[0m[0m "g1-standard-2-4"
+        id                   = "157504a5-5821-4f21-a32d-7a6d1f615eae"
+      [32m+[0m[0m instance_description = (known after apply)
+      [32m+[0m[0m instance_isolation   = (known after apply)
+      [33m~[0m[0m interfaces           = [
+          [33m~[0m[0m {
+              [33m~[0m[0m ip_address = "85.204.246.86" -> (known after apply)
+              [33m~[0m[0m port_id    = "cb07fa12-b1df-4bf1-af86-f26ab4469af5" -> (known after apply)
+                [90m# (1 unchanged attribute hidden)[0m[0m
+            },
+        ]
+      [33m~[0m[0m name                 = "test-instance-skill" [33m->[0m[0m "test-instance-skill-renamed"
+      [33m~[0m[0m status               = "ACTIVE" -> (known after apply)
+      [32m+[0m[0m task_id              = (known after apply)
+      [32m+[0m[0m task_state           = (known after apply)
+      [33m~[0m[0m vm_state             = "active" -> (known after apply)
+        [90m# (5 unchanged attributes hidden)[0m[0m
+    }
+
+[1mPlan:[0m [0m0 to add, 1 to change, 0 to destroy.
+
+Changes to Outputs:
+  [33m~[0m[0m instance_flavor      = "g1-standard-1-2" [33m->[0m[0m "g1-standard-2-4"
+  [33m~[0m[0m instance_name        = "test-instance-skill" [33m->[0m[0m "test-instance-skill-renamed"
+  [33m~[0m[0m instance_status      = "ACTIVE" -> (known after apply)
+  [33m~[0m[0m interface_ip_address = "85.204.246.86" -> (known after apply)
+  [33m~[0m[0m interface_port_id    = "cb07fa12-b1df-4bf1-af86-f26ab4469af5" -> (known after apply)
+[90m
+─────────────────────────────────────────────────────────────────────────────[0m
+
+Saved the plan to: tfplan
+
+To perform exactly these actions, run the following command to apply:
+    terraform apply "tfplan"

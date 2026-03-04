@@ -1,0 +1,63 @@
+[33m╷[0m[0m
+[33m│[0m [0m[1m[33mWarning: [0m[0m[1mProvider development overrides are in effect[0m
+[33m│[0m [0m
+[33m│[0m [0m[0mThe following provider development overrides are set in the CLI
+[33m│[0m [0mconfiguration:
+[33m│[0m [0m - gcore/gcore in /Users/user/repos/gcore-terraform
+[33m│[0m [0m
+[33m│[0m [0mThe behavior may therefore not match any released version of the provider
+[33m│[0m [0mand applying changes may cause the state to become incompatible with
+[33m│[0m [0mpublished releases.
+[33m╵[0m[0m
+[0m[1mgcore_cloud_load_balancer.test: Refreshing state... [id=bca08535-9766-4375-8dca-266330adffc4][0m
+[0m[1mgcore_cloud_load_balancer_listener.test: Refreshing state... [id=d8c6ed80-9411-436f-8c7f-9c1c748ce070][0m
+[0m[1mgcore_cloud_load_balancer_pool.test: Refreshing state... [id=569f150f-344c-406a-8284-bccfe97c0d5b][0m
+[0m[1mgcore_cloud_load_balancer_pool_member.test: Refreshing state... [id=087b0322-74f7-4fc8-8a4e-6441e42faf19][0m
+
+Terraform used the selected providers to generate the following execution
+plan. Resource actions are indicated with the following symbols:
+  [33m~[0m update in-place[0m
+
+Terraform will perform the following actions:
+
+[1m  # gcore_cloud_load_balancer_pool.test[0m will be updated in-place
+[0m  [33m~[0m[0m resource "gcore_cloud_load_balancer_pool" "test" {
+      [33m~[0m[0m healthmonitor       = {
+          [33m~[0m[0m delay            = 10 [33m->[0m[0m 15
+            [90m# (7 unchanged attributes hidden)[0m[0m
+        }
+        id                  = "569f150f-344c-406a-8284-bccfe97c0d5b"
+        name                = "tf-test-pool-20778"
+      [33m~[0m[0m operating_status    = "ERROR" -> (known after apply)
+      [33m~[0m[0m provisioning_status = "ACTIVE" -> (known after apply)
+        [90m# (10 unchanged attributes hidden)[0m[0m
+    }
+
+[1m  # gcore_cloud_load_balancer_pool_member.test[0m will be updated in-place
+[0m  [33m~[0m[0m resource "gcore_cloud_load_balancer_pool_member" "test" {
+        id             = "087b0322-74f7-4fc8-8a4e-6441e42faf19"
+      [33m~[0m[0m weight         = 1 [33m->[0m[0m 2
+        [90m# (7 unchanged attributes hidden)[0m[0m
+    }
+
+[1mPlan:[0m 0 to add, 2 to change, 0 to destroy.
+[0m
+Changes to Outputs:
+  [33m~[0m[0m pool_operating_status    = "ERROR" -> (known after apply)
+  [33m~[0m[0m pool_provisioning_status = "ACTIVE" -> (known after apply)
+[0m[1mgcore_cloud_load_balancer_pool.test: Modifying... [id=569f150f-344c-406a-8284-bccfe97c0d5b][0m[0m
+[31m╷[0m[0m
+[31m│[0m [0m[1m[31mError: [0m[0m[1mfailed to make http request[0m
+[31m│[0m [0m
+[31m│[0m [0m[0m  with gcore_cloud_load_balancer_pool.test,
+[31m│[0m [0m  on main.tf line 48, in resource "gcore_cloud_load_balancer_pool" "test":
+[31m│[0m [0m  48: resource "gcore_cloud_load_balancer_pool" "test" [4m{[0m[0m
+[31m│[0m [0m
+[31m│[0m [0mPATCH
+[31m│[0m [0m"https://api.gcore.com/cloud/v2/lbpools/379987/76/569f150f-344c-406a-8284-bccfe97c0d5b":
+[31m│[0m [0m400 Bad Request {"exception_class":"ValidationError","message":"Validation
+[31m│[0m [0mError: {'healthmonitor': {'max_retries': ['Input should be greater than or
+[31m│[0m [0mequal to
+[31m│[0m [0m1']}}","request_id":"ae6738dc71f3d3de8857d161d8bfe65b","invalid_fields":{"healthmonitor":{"max_retries":["Input
+[31m│[0m [0mshould be greater than or equal to 1"]}}}
+[31m╵[0m[0m

@@ -1,0 +1,42 @@
+
+Warning: Provider development overrides are in effect
+
+The following provider development overrides are set in the CLI
+configuration:
+ - gcore/gcore in /Users/user/repos/gcore-terraform
+
+The behavior may therefore not match any released version of the provider and
+applying changes may cause the state to become incompatible with published
+releases.
+gcore_fastedge_secret.test: Refreshing state... [name=tf-skill-test-secret]
+
+Note: Objects have changed outside of Terraform
+
+Terraform detected the following changes made outside of Terraform since the
+last "terraform apply" which may have affected this plan:
+
+  # gcore_fastedge_secret.test has changed
+  ~ resource "gcore_fastedge_secret" "test" {
+      + app_count    = 0
+        id           = 351
+        name         = "tf-skill-test-secret"
+        # (2 unchanged attributes hidden)
+    }
+
+
+Unless you have made equivalent changes to your configuration, or ignored the
+relevant attributes using ignore_changes, the following plan may include
+actions to undo or respond to these changes.
+
+─────────────────────────────────────────────────────────────────────────────
+
+Changes to Outputs:
+  + app_count   = 0
+
+You can apply this plan to save these new output values to the Terraform
+state, without changing any real infrastructure.
+
+─────────────────────────────────────────────────────────────────────────────
+
+Note: You didn't use the -out option to save this plan, so Terraform can't
+guarantee to take exactly these actions if you run "terraform apply" now.

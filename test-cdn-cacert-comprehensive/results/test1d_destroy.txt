@@ -1,0 +1,67 @@
+
+Warning: Provider development overrides are in effect
+
+The following provider development overrides are set in the CLI
+configuration:
+ - gcore/gcore in /Users/user/repos/gcore-terraform
+
+The behavior may therefore not match any released version of the provider and
+applying changes may cause the state to become incompatible with published
+releases.
+gcore_cdn_trusted_ca_certificate.test: Refreshing state... [name=tf-test-cacert-basic]
+
+Terraform used the selected providers to generate the following execution
+plan. Resource actions are indicated with the following symbols:
+  - destroy
+
+Terraform will perform the following actions:
+
+  # gcore_cdn_trusted_ca_certificate.test will be destroyed
+  - resource "gcore_cdn_trusted_ca_certificate" "test" {
+      - cert_issuer           = "tf-test-ca.example.com" -> null
+      - cert_subject_cn       = "tf-test-ca.example.com" -> null
+      - deleted               = false -> null
+      - has_related_resources = false -> null
+      - id                    = 279586 -> null
+      - name                  = "tf-test-cacert-basic" -> null
+      - ssl_certificate       = <<-EOT
+            -----BEGIN CERTIFICATE-----
+            MIIDTTCCAjWgAwIBAgIUSxFCl2F6hwTdsUxcSyXfA8UNBd4wDQYJKoZIhvcNAQEL
+            BQAwNjEfMB0GA1UEAwwWdGYtdGVzdC1jYS5leGFtcGxlLmNvbTETMBEGA1UECgwK
+            VEYgVGVzdCBDQTAeFw0yNjAyMTkwOTUzNDBaFw0zNjAyMTcwOTUzNDBaMDYxHzAd
+            BgNVBAMMFnRmLXRlc3QtY2EuZXhhbXBsZS5jb20xEzARBgNVBAoMClRGIFRlc3Qg
+            Q0EwggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEKAoIBAQDjQdPc0vEL19sGV3AI
+            yEe5GODxQRjRxFnfkWX2KvMYQipA5JZN0WgHFe3EMHNRs+9yULyz5VfX/LDMEaQh
+            gt0lQ0ZDatLSSKvGLwA9Ben74+MIFIqSycXyo11k5zESz2vYd0z78esVYxo+SBO7
+            OmkZdpuoKoYnBxsNCk5eN/T58+BxfsDce2dDG64zjW1eWnFAcJ/WQuxybJQTBWQr
+            9PNqGKilPJLvLe9eUhLCbjDojvNxcfyqEv5w+Ln5Fse//sypljheJRlLyHwGWLZn
+            3nYMml+S6Z7hpE6kS3YwZfdjm8+2unHMoUmNNxtYHJVFkUX/h8vuU7lZJScIWSgx
+            4zZbAgMBAAGjUzBRMB0GA1UdDgQWBBR+1ZMyCKYP3vMkVtEmHMSsQIWI4jAfBgNV
+            HSMEGDAWgBR+1ZMyCKYP3vMkVtEmHMSsQIWI4jAPBgNVHRMBAf8EBTADAQH/MA0G
+            CSqGSIb3DQEBCwUAA4IBAQBzkOmUVy/8YOHJNLcvluTbhH+0q3DgZfmCmVG+iKk4
+            dXyzgwmfXtS6Y8LUzT+hub2l+Rlt78qczLoON6V/tM0BnTEuUATSc3DmMx2DRsIZ
+            FnFM6mwk2WmUs9j3E9EsM9JoFrKl5RQz9H76/q0si5Z+g5lqvKswcLtjGiBZQLt0
+            fIiMi8TO1oPhIjq7LsK8u1eUQcVetuGOQVRiQ1FK1t/WXCnTNRjWYXydalR2GU2b
+            iPRh/ZWXfWJLjYbe021r8uuNeYfja+Vlqdan3drTkpeC+57HILU7EpITGbZ8WXVS
+            OK79sVMVjRGHAEhkkCz2uULKjDpjfb12QW45cKEo/Hce
+            -----END CERTIFICATE-----
+        EOT -> null
+      - validity_not_after    = "2036-02-17T09:53:40Z" -> null
+      - validity_not_before   = "2026-02-19T09:53:40Z" -> null
+        # (1 unchanged attribute hidden)
+    }
+
+Plan: 0 to add, 0 to change, 1 to destroy.
+
+Changes to Outputs:
+  - cert_id               = 279586 -> null
+  - cert_issuer           = "tf-test-ca.example.com" -> null
+  - cert_name             = "tf-test-cacert-basic" -> null
+  - cert_subject_cn       = "tf-test-ca.example.com" -> null
+  - has_related_resources = false -> null
+  - validity_not_after    = "2036-02-17T09:53:40Z" -> null
+  - validity_not_before   = "2026-02-19T09:53:40Z" -> null
+gcore_cdn_trusted_ca_certificate.test: Destroying... [name=tf-test-cacert-basic]
+gcore_cdn_trusted_ca_certificate.test: Destruction complete after 1s
+
+Destroy complete! Resources: 1 destroyed.

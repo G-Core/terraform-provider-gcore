@@ -1,0 +1,104 @@
+Subject: x-stainless-terraform-configurability: computed_optional not being applied to generated Terraform code
+
+Hi Stainless team,
+
+We've added x-stainless-terraform-configurability: computed_optional attributes to the OpenAPI spec for Load Balancer Listener fields, but the generated Terraform provider code hasn't been updated with Computed: true and computed_optional JSON tags.
+
+## OpenAPI Spec Changes
+
+Repository: https://github.com/G-Core/api-schemas
+
+The x-stainless-terraform-configurability: computed_optional attribute was added to 5 fields in PatchLbListenerSerializer:
+
+openapi.yaml lines with x-stainless-terraform-configurability: computed_optional:
+
+1. Line 85561: sni_secret_id
+   https://github.com/G-Core/api-schemas/blob/main/openapi.yaml#L85560-L85561
+
+2. Line 85572: timeout_client_data
+   https://github.com/G-Core/api-schemas/blob/main/openapi.yaml#L85571-L85572
+
+3. Line 85583: timeout_member_connect
+   https://github.com/G-Core/api-schemas/blob/main/openapi.yaml#L85582-L85583
+
+4. Line 85594: timeout_member_data
+   https://github.com/G-Core/api-schemas/blob/main/openapi.yaml#L85593-L85594
+
+5. Line 85606: user_list
+   https://github.com/G-Core/api-schemas/blob/main/openapi.yaml#L85605-L85606
+
+All are within PatchLbListenerSerializer (starts at line 85512):
+https://github.com/G-Core/api-schemas/blob/main/openapi.yaml#L85512
+
+## Configuration Commits
+
+Config added: https://github.com/G-Core/api-schemas/commit/4d9dbaa
+OpenAPI regenerated: https://github.com/G-Core/api-schemas/commit/e45f332
+
+## Expected Generated Code (Not Happening)
+
+Repository: https://github.com/stainless-sdks/gcore-terraform
+
+We expected Stainless to generate:
+
+1. Schema with Computed: true, Optional: true
+2. Model with json:"field_name,computed_optional" tags
+3. Proper types for list fields (types.List instead of *[]types.String)
+
+## Actual Generated Code (Current State)
+
+Schema file still has Optional: true only (missing Computed: true):
+https://github.com/stainless-sdks/gcore-terraform/blob/main/internal/services/cloud_load_balancer_listener/schema.go#L83-L103
+
+Example - timeout_client_data (line 83-89):
+```go
+"timeout_client_data": schema.Int64Attribute{
+    Description: "Frontend client inactivity timeout in milliseconds",
+    Optional:    true,  // ← Missing: Computed: true
+    Validators: []validator.Int64{
+        int64validator.Between(0, 86400000),
+    },
+},
+```
+
+Model file still has "optional" JSON tags (should be "computed_optional"):
+https://github.com/stainless-sdks/gcore-terraform/blob/main/internal/services/cloud_load_balancer_listener/model.go#L22-L27
+
+Example - TimeoutClientData (line 22):
+```go
+TimeoutClientData types.Int64 `tfsdk:"timeout_client_data" json:"timeout_client_data,optional"`
+// Should be: json:"timeout_client_data,computed_optional"
+```
+
+## Comparison with Working Field
+
+The connection_limit field (line 28 in model.go) was configured earlier and shows correct generation:
+```go
+ConnectionLimit types.Int64 `tfsdk:"connection_limit" json:"connection_limit,computed_optional"`
+```
+
+This proves that computed_optional configuration works - it's just not being applied to our 5 new fields.
+
+## Question
+
+Why hasn't Stainless regenerated the Terraform code after the x-stainless-terraform-configurability attributes were added to the OpenAPI spec?
+
+Possible issues we've considered:
+1. Does Stainless need a manual trigger after OpenAPI changes?
+2. Is there a cache that needs to be cleared?
+3. Are the warnings about "undefined type" fields blocking generation?
+4. Is there a specific format/location requirement we're missing?
+
+We've verified:
+✓ x-stainless attributes are in the OpenAPI spec (all 5 fields)
+✓ Attributes are in the INPUT schema (PatchLbListenerSerializer) not OUTPUT schema
+✓ Config.yaml has the proper configuration
+✓ OpenAPI spec was regenerated after config changes
+
+Any guidance would be appreciated!
+
+## Additional Context
+
+The same computed_optional pattern worked correctly for other resources (CreateSubnetSerializer, CreateLoadbalancerSerializer, CreateRouterSerializer) which are configured in the same config.yaml file and have properly generated code with Computed: true.
+
+Config file: https://github.com/G-Core/api-schemas/blob/main/scripts/config.yaml#L52-L58

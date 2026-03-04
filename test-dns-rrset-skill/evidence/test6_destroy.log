@@ -1,0 +1,220 @@
+[33m╷[0m[0m
+[33m│[0m [0m[1m[33mWarning: [0m[0m[1mProvider development overrides are in effect[0m
+[33m│[0m [0m
+[33m│[0m [0m[0mThe following provider development overrides are set in the CLI
+[33m│[0m [0mconfiguration:
+[33m│[0m [0m - gcore/gcore in /Users/user/repos/gcore-terraform
+[33m│[0m [0m
+[33m│[0m [0mThe behavior may therefore not match any released version of the provider
+[33m│[0m [0mand applying changes may cause the state to become incompatible with
+[33m│[0m [0mpublished releases.
+[33m╵[0m[0m
+[0m[1mgcore_dns_zone.test: Refreshing state... [id=test-rrset-skill-20260206.com][0m
+[0m[1mgcore_dns_zone_rrset.a_record: Refreshing state... [name=www.test-rrset-skill-20260206.com][0m
+[0m[1mgcore_dns_zone_rrset.with_pickers[0]: Refreshing state... [name=geo.test-rrset-skill-20260206.com][0m
+[0m[1mgcore_dns_zone_rrset.mx_record[0]: Refreshing state... [name=test-rrset-skill-20260206.com][0m
+
+Terraform used the selected providers to generate the following execution
+plan. Resource actions are indicated with the following symbols:
+  [31m-[0m destroy[0m
+
+Terraform will perform the following actions:
+
+[1m  # gcore_dns_zone.test[0m will be [1m[31mdestroyed[0m
+[0m  [31m-[0m[0m resource "gcore_dns_zone" "test" {
+      [31m-[0m[0m contact        = "support@gcore.com" [90m-> null[0m[0m
+      [31m-[0m[0m dnssec_enabled = false [90m-> null[0m[0m
+      [31m-[0m[0m enabled        = true [90m-> null[0m[0m
+      [31m-[0m[0m expiry         = 1209600 [90m-> null[0m[0m
+      [31m-[0m[0m id             = "test-rrset-skill-20260206.com" [90m-> null[0m[0m
+      [31m-[0m[0m name           = "test-rrset-skill-20260206.com" [90m-> null[0m[0m
+      [31m-[0m[0m nx_ttl         = 300 [90m-> null[0m[0m
+      [31m-[0m[0m primary_server = "ns1.gcorelabs.net" [90m-> null[0m[0m
+      [31m-[0m[0m records        = [
+          [31m-[0m[0m {
+              [31m-[0m[0m name          = "geo.test-rrset-skill-20260206.com" [90m-> null[0m[0m
+              [31m-[0m[0m short_answers = [
+                  [31m-[0m[0m "10.0.0.1",
+                  [31m-[0m[0m "10.0.0.2",
+                ] [90m-> null[0m[0m
+              [31m-[0m[0m ttl           = 300 [90m-> null[0m[0m
+              [31m-[0m[0m type          = "A" [90m-> null[0m[0m
+            },
+          [31m-[0m[0m {
+              [31m-[0m[0m name          = "www.test-rrset-skill-20260206.com" [90m-> null[0m[0m
+              [31m-[0m[0m short_answers = [
+                  [31m-[0m[0m "192.168.1.1",
+                  [31m-[0m[0m "192.168.1.2",
+                ] [90m-> null[0m[0m
+              [31m-[0m[0m ttl           = 300 [90m-> null[0m[0m
+              [31m-[0m[0m type          = "A" [90m-> null[0m[0m
+            },
+          [31m-[0m[0m {
+              [31m-[0m[0m name          = "test-rrset-skill-20260206.com" [90m-> null[0m[0m
+              [31m-[0m[0m short_answers = [
+                  [31m-[0m[0m "mail1.test-rrset-skill-20260206.com",
+                  [31m-[0m[0m "mail2.test-rrset-skill-20260206.com",
+                  [31m-[0m[0m "mail4.test-rrset-skill-20260206.com",
+                ] [90m-> null[0m[0m
+              [31m-[0m[0m ttl           = 3600 [90m-> null[0m[0m
+              [31m-[0m[0m type          = "MX" [90m-> null[0m[0m
+            },
+          [31m-[0m[0m {
+              [31m-[0m[0m name          = "test-rrset-skill-20260206.com" [90m-> null[0m[0m
+              [31m-[0m[0m short_answers = [
+                  [31m-[0m[0m "ns1.gcorelabs.net",
+                  [31m-[0m[0m "ns2.gcdn.services",
+                ] [90m-> null[0m[0m
+              [31m-[0m[0m ttl           = 3600 [90m-> null[0m[0m
+              [31m-[0m[0m type          = "NS" [90m-> null[0m[0m
+            },
+        ] [90m-> null[0m[0m
+      [31m-[0m[0m refresh        = 5400 [90m-> null[0m[0m
+      [31m-[0m[0m retry          = 3600 [90m-> null[0m[0m
+      [31m-[0m[0m rrsets_amount  = {
+          [31m-[0m[0m dynamic = {
+              [31m-[0m[0m healthcheck = 0 [90m-> null[0m[0m
+              [31m-[0m[0m total       = 1 [90m-> null[0m[0m
+            } [90m-> null[0m[0m
+          [31m-[0m[0m static  = 3 [90m-> null[0m[0m
+          [31m-[0m[0m total   = 4 [90m-> null[0m[0m
+        } [90m-> null[0m[0m
+      [31m-[0m[0m serial         = 1770369038 [90m-> null[0m[0m
+      [31m-[0m[0m status         = "non-delegated" [90m-> null[0m[0m
+    }
+
+[1m  # gcore_dns_zone_rrset.a_record[0m will be [1m[31mdestroyed[0m
+[0m  [31m-[0m[0m resource "gcore_dns_zone_rrset" "a_record" {
+      [31m-[0m[0m name             = "www.test-rrset-skill-20260206.com" [90m-> null[0m[0m
+      [31m-[0m[0m resource_records = [
+          [31m-[0m[0m {
+              [31m-[0m[0m content = [
+                  [31m-[0m[0m "\"192.168.1.1\"",
+                ] [90m-> null[0m[0m
+              [31m-[0m[0m enabled = true [90m-> null[0m[0m
+              [31m-[0m[0m id      = 213693002 [90m-> null[0m[0m
+            },
+          [31m-[0m[0m {
+              [31m-[0m[0m content = [
+                  [31m-[0m[0m "\"192.168.1.2\"",
+                ] [90m-> null[0m[0m
+              [31m-[0m[0m enabled = true [90m-> null[0m[0m
+              [31m-[0m[0m id      = 213693003 [90m-> null[0m[0m
+            },
+        ] [90m-> null[0m[0m
+      [31m-[0m[0m rrset_name       = "www.test-rrset-skill-20260206.com" [90m-> null[0m[0m
+      [31m-[0m[0m rrset_type       = "A" [90m-> null[0m[0m
+      [31m-[0m[0m ttl              = 300 [90m-> null[0m[0m
+      [31m-[0m[0m type             = "A" [90m-> null[0m[0m
+      [31m-[0m[0m zone_name        = "test-rrset-skill-20260206.com" [90m-> null[0m[0m
+    }
+
+[1m  # gcore_dns_zone_rrset.mx_record[0][0m will be [1m[31mdestroyed[0m
+[0m  [31m-[0m[0m resource "gcore_dns_zone_rrset" "mx_record" {
+      [31m-[0m[0m meta             = {
+          [31m-[0m[0m "geodns_link" = "test-rrset-skill-20260206.com"
+        } [90m-> null[0m[0m
+      [31m-[0m[0m name             = "test-rrset-skill-20260206.com" [90m-> null[0m[0m
+      [31m-[0m[0m resource_records = [
+          [31m-[0m[0m {
+              [31m-[0m[0m content = [
+                  [31m-[0m[0m "10",
+                  [31m-[0m[0m "\"mail1.test-rrset-skill-20260206.com\"",
+                ] [90m-> null[0m[0m
+              [31m-[0m[0m enabled = true [90m-> null[0m[0m
+              [31m-[0m[0m id      = 213694437 [90m-> null[0m[0m
+              [31m-[0m[0m meta    = {
+                  [31m-[0m[0m "countries" = jsonencode(
+                        [
+                          [31m-[0m[0m "us",
+                          [31m-[0m[0m "ca",
+                        ]
+                    )
+                } [90m-> null[0m[0m
+            },
+          [31m-[0m[0m {
+              [31m-[0m[0m content = [
+                  [31m-[0m[0m "20",
+                  [31m-[0m[0m "\"mail2.test-rrset-skill-20260206.com\"",
+                ] [90m-> null[0m[0m
+              [31m-[0m[0m enabled = true [90m-> null[0m[0m
+              [31m-[0m[0m id      = 213694438 [90m-> null[0m[0m
+            },
+          [31m-[0m[0m {
+              [31m-[0m[0m content = [
+                  [31m-[0m[0m "30",
+                  [31m-[0m[0m "\"mail4.test-rrset-skill-20260206.com\"",
+                ] [90m-> null[0m[0m
+              [31m-[0m[0m enabled = true [90m-> null[0m[0m
+              [31m-[0m[0m id      = 213694439 [90m-> null[0m[0m
+            },
+        ] [90m-> null[0m[0m
+      [31m-[0m[0m rrset_name       = "test-rrset-skill-20260206.com" [90m-> null[0m[0m
+      [31m-[0m[0m rrset_type       = "MX" [90m-> null[0m[0m
+      [31m-[0m[0m ttl              = 3600 [90m-> null[0m[0m
+      [31m-[0m[0m type             = "MX" [90m-> null[0m[0m
+      [31m-[0m[0m zone_name        = "test-rrset-skill-20260206.com" [90m-> null[0m[0m
+    }
+
+[1m  # gcore_dns_zone_rrset.with_pickers[0][0m will be [1m[31mdestroyed[0m
+[0m  [31m-[0m[0m resource "gcore_dns_zone_rrset" "with_pickers" {
+      [31m-[0m[0m filter_set_id    = 4084164 [90m-> null[0m[0m
+      [31m-[0m[0m name             = "geo.test-rrset-skill-20260206.com" [90m-> null[0m[0m
+      [31m-[0m[0m pickers          = [
+          [31m-[0m[0m {
+              [31m-[0m[0m strict = false [90m-> null[0m[0m
+              [31m-[0m[0m type   = "country" [90m-> null[0m[0m
+            },
+        ] [90m-> null[0m[0m
+      [31m-[0m[0m resource_records = [
+          [31m-[0m[0m {
+              [31m-[0m[0m content = [
+                  [31m-[0m[0m "\"10.0.0.1\"",
+                ] [90m-> null[0m[0m
+              [31m-[0m[0m enabled = true [90m-> null[0m[0m
+              [31m-[0m[0m id      = 213693267 [90m-> null[0m[0m
+              [31m-[0m[0m meta    = {
+                  [31m-[0m[0m "countries" = jsonencode(
+                        [
+                          [31m-[0m[0m "us",
+                        ]
+                    )
+                } [90m-> null[0m[0m
+            },
+          [31m-[0m[0m {
+              [31m-[0m[0m content = [
+                  [31m-[0m[0m "\"10.0.0.2\"",
+                ] [90m-> null[0m[0m
+              [31m-[0m[0m enabled = true [90m-> null[0m[0m
+              [31m-[0m[0m id      = 213693268 [90m-> null[0m[0m
+              [31m-[0m[0m meta    = {
+                  [31m-[0m[0m "countries" = jsonencode(
+                        [
+                          [31m-[0m[0m "de",
+                        ]
+                    )
+                } [90m-> null[0m[0m
+            },
+        ] [90m-> null[0m[0m
+      [31m-[0m[0m rrset_name       = "geo.test-rrset-skill-20260206.com" [90m-> null[0m[0m
+      [31m-[0m[0m rrset_type       = "A" [90m-> null[0m[0m
+      [31m-[0m[0m ttl              = 300 [90m-> null[0m[0m
+      [31m-[0m[0m type             = "A" [90m-> null[0m[0m
+      [31m-[0m[0m zone_name        = "test-rrset-skill-20260206.com" [90m-> null[0m[0m
+    }
+
+[1mPlan:[0m [0m0 to add, 0 to change, 4 to destroy.
+
+Changes to Outputs:
+  [31m-[0m[0m a_record_name = "www.test-rrset-skill-20260206.com" [90m-> null[0m[0m
+  [31m-[0m[0m a_record_type = "A" [90m-> null[0m[0m
+[0m[1mgcore_dns_zone_rrset.a_record: Destroying... [name=www.test-rrset-skill-20260206.com][0m[0m
+[0m[1mgcore_dns_zone_rrset.mx_record[0]: Destroying... [name=test-rrset-skill-20260206.com][0m[0m
+[0m[1mgcore_dns_zone_rrset.with_pickers[0]: Destroying... [name=geo.test-rrset-skill-20260206.com][0m[0m
+[0m[1mgcore_dns_zone_rrset.with_pickers[0]: Destruction complete after 0s[0m
+[0m[1mgcore_dns_zone_rrset.a_record: Destruction complete after 0s[0m
+[0m[1mgcore_dns_zone_rrset.mx_record[0]: Destruction complete after 0s[0m
+[0m[1mgcore_dns_zone.test: Destroying... [id=test-rrset-skill-20260206.com][0m[0m
+[0m[1mgcore_dns_zone.test: Destruction complete after 0s[0m
+[0m[1m[32m
+Destroy complete! Resources: 4 destroyed.[0m

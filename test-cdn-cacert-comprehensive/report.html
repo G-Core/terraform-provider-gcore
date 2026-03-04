@@ -1,0 +1,501 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>gcore_cdn_trusted_ca_certificate - Comprehensive Test Report</title>
+<style>
+  :root { --pass: #22c55e; --fail: #ef4444; --warn: #f59e0b; --bg: #0f172a; --card: #1e293b; --text: #e2e8f0; --muted: #94a3b8; --border: #334155; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, monospace; background: var(--bg); color: var(--text); line-height: 1.6; padding: 2rem; }
+  h1 { font-size: 1.8rem; margin-bottom: 0.5rem; }
+  h2 { font-size: 1.3rem; margin: 1.5rem 0 0.5rem; color: var(--text); }
+  h3 { font-size: 1.1rem; margin: 1rem 0 0.3rem; }
+  .header { text-align: center; margin-bottom: 2rem; padding-bottom: 1rem; border-bottom: 1px solid var(--border); }
+  .header .subtitle { color: var(--muted); font-size: 0.9rem; }
+  .summary { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 2rem; }
+  .summary-card { background: var(--card); border-radius: 8px; padding: 1.2rem; text-align: center; border: 1px solid var(--border); }
+  .summary-card .number { font-size: 2rem; font-weight: bold; }
+  .summary-card .label { color: var(--muted); font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.05em; }
+  .pass { color: var(--pass); }
+  .fail { color: var(--fail); }
+  .warn { color: var(--warn); }
+  .badge { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 0.75rem; font-weight: 600; text-transform: uppercase; }
+  .badge-pass { background: rgba(34,197,94,0.15); color: var(--pass); border: 1px solid rgba(34,197,94,0.3); }
+  .badge-fail { background: rgba(239,68,68,0.15); color: var(--fail); border: 1px solid rgba(239,68,68,0.3); }
+  .badge-warn { background: rgba(245,158,11,0.15); color: var(--warn); border: 1px solid rgba(245,158,11,0.3); }
+  .test-section { background: var(--card); border-radius: 8px; margin-bottom: 1.5rem; border: 1px solid var(--border); overflow: hidden; }
+  .test-header { padding: 1rem 1.2rem; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border); }
+  .test-header h2 { margin: 0; font-size: 1.1rem; }
+  .test-body { padding: 1.2rem; }
+  details { margin-bottom: 0.8rem; }
+  summary { cursor: pointer; padding: 0.6rem 0.8rem; background: rgba(255,255,255,0.03); border-radius: 6px; font-weight: 500; font-size: 0.9rem; user-select: none; display: flex; align-items: center; gap: 0.5rem; }
+  summary:hover { background: rgba(255,255,255,0.06); }
+  summary::marker { content: ''; }
+  summary::before { content: '\25B6'; font-size: 0.7rem; transition: transform 0.2s; display: inline-block; }
+  details[open] summary::before { transform: rotate(90deg); }
+  .step-badge { margin-left: auto; }
+  pre { background: #0c1222; padding: 1rem; border-radius: 6px; overflow-x: auto; font-size: 0.8rem; line-height: 1.5; margin-top: 0.5rem; border: 1px solid rgba(255,255,255,0.05); white-space: pre-wrap; word-wrap: break-word; }
+  code { font-family: 'JetBrains Mono', 'Fira Code', 'Consolas', monospace; }
+  .tf-config { margin-top: 0.5rem; }
+  .tf-config pre { border-left: 3px solid #6366f1; }
+  .finding { padding: 0.8rem 1rem; margin: 0.5rem 0; border-radius: 6px; font-size: 0.9rem; }
+  .finding-pass { background: rgba(34,197,94,0.08); border: 1px solid rgba(34,197,94,0.2); }
+  .finding-warn { background: rgba(245,158,11,0.08); border: 1px solid rgba(245,158,11,0.2); }
+  .finding-fail { background: rgba(239,68,68,0.08); border: 1px solid rgba(239,68,68,0.2); }
+  table { width: 100%; border-collapse: collapse; margin: 0.5rem 0; font-size: 0.85rem; }
+  th, td { padding: 0.5rem 0.8rem; text-align: left; border-bottom: 1px solid var(--border); }
+  th { color: var(--muted); font-weight: 600; text-transform: uppercase; font-size: 0.75rem; letter-spacing: 0.05em; }
+  .attr-table td:first-child { font-family: monospace; color: #a78bfa; }
+  .note { color: var(--muted); font-size: 0.85rem; font-style: italic; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>gcore_cdn_trusted_ca_certificate</h1>
+  <div class="subtitle">Comprehensive Infrastructure Test Report &middot; GCLOUD2-22617 &middot; 2026-02-19</div>
+  <div class="subtitle">Branch: feat/cdn-trusted-ca-certificate-GCLOUD2-22617 &middot; PR #121</div>
+</div>
+
+<div class="summary">
+  <div class="summary-card">
+    <div class="number pass">3</div>
+    <div class="label">Tests Passed</div>
+  </div>
+  <div class="summary-card">
+    <div class="number warn">1</div>
+    <div class="label">Expected Behavior</div>
+  </div>
+  <div class="summary-card">
+    <div class="number fail">0</div>
+    <div class="label">Tests Failed</div>
+  </div>
+  <div class="summary-card">
+    <div class="number" style="color:#60a5fa">4</div>
+    <div class="label">Total Scenarios</div>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- TEST 1: BASIC CREATE -->
+<!-- ============================================================ -->
+<div class="test-section">
+  <div class="test-header">
+    <h2>Test 1: Basic Create + Drift Check</h2>
+    <span class="badge badge-pass">PASS</span>
+  </div>
+  <div class="test-body">
+    <p>Creates a CA certificate, verifies all computed attributes are populated, runs apply twice to confirm no drift, then destroys.</p>
+
+    <details>
+      <summary>Terraform Configuration <span class="step-badge badge badge-pass">HCL</span></summary>
+      <div class="tf-config"><pre><code>resource "gcore_cdn_trusted_ca_certificate" "test" {
+  name            = "tf-test-cacert-basic"
+  ssl_certificate = &lt;&lt;-EOT
+    -----BEGIN CERTIFICATE-----
+    MIIDTTCCAjWgAwIBAgIU...  (self-signed CA, CN=tf-test-ca.example.com)
+    -----END CERTIFICATE-----
+  EOT
+}
+
+output "cert_id"               { value = gcore_cdn_trusted_ca_certificate.test.id }
+output "cert_name"             { value = gcore_cdn_trusted_ca_certificate.test.name }
+output "cert_issuer"           { value = gcore_cdn_trusted_ca_certificate.test.cert_issuer }
+output "cert_subject_cn"       { value = gcore_cdn_trusted_ca_certificate.test.cert_subject_cn }
+output "has_related_resources"  { value = gcore_cdn_trusted_ca_certificate.test.has_related_resources }
+output "validity_not_after"    { value = gcore_cdn_trusted_ca_certificate.test.validity_not_after }
+output "validity_not_before"   { value = gcore_cdn_trusted_ca_certificate.test.validity_not_before }</code></pre></div>
+    </details>
+
+    <details>
+      <summary>Step 1a: terraform apply (Create) <span class="step-badge badge badge-pass">exit 0</span></summary>
+      <pre><code>Plan: 1 to add, 0 to change, 0 to destroy.
+
+gcore_cdn_trusted_ca_certificate.test: Creating...
+gcore_cdn_trusted_ca_certificate.test: Creation complete after 1s [name=tf-test-cacert-basic]
+
+Apply complete! Resources: 1 added, 0 changed, 0 destroyed.
+
+Outputs:
+
+cert_id = 279586
+cert_issuer = "tf-test-ca.example.com"
+cert_name = "tf-test-cacert-basic"
+cert_subject_cn = "tf-test-ca.example.com"
+has_related_resources = false
+validity_not_after = "2036-02-17T09:53:40Z"
+validity_not_before = "2026-02-19T09:53:40Z"</code></pre>
+    </details>
+
+    <h3>Computed Attributes Populated</h3>
+    <table class="attr-table">
+      <tr><th>Attribute</th><th>Value</th><th>Status</th></tr>
+      <tr><td>id</td><td>279586</td><td class="pass">Set</td></tr>
+      <tr><td>cert_issuer</td><td>tf-test-ca.example.com</td><td class="pass">Set</td></tr>
+      <tr><td>cert_subject_cn</td><td>tf-test-ca.example.com</td><td class="pass">Set</td></tr>
+      <tr><td>has_related_resources</td><td>false</td><td class="pass">Set</td></tr>
+      <tr><td>validity_not_after</td><td>2036-02-17T09:53:40Z</td><td class="pass">Set</td></tr>
+      <tr><td>validity_not_before</td><td>2026-02-19T09:53:40Z</td><td class="pass">Set</td></tr>
+    </table>
+
+    <details>
+      <summary>Step 1b: terraform apply (Drift Check - 2nd apply) <span class="step-badge badge badge-pass">No changes</span></summary>
+      <pre><code>gcore_cdn_trusted_ca_certificate.test: Refreshing state... [name=tf-test-cacert-basic]
+
+No changes. Your infrastructure matches the configuration.
+
+Apply complete! Resources: 0 added, 0 changed, 0 destroyed.</code></pre>
+    </details>
+
+    <details>
+      <summary>Step 1c: terraform plan -detailed-exitcode <span class="step-badge badge badge-pass">exit 0</span></summary>
+      <pre><code>gcore_cdn_trusted_ca_certificate.test: Refreshing state... [name=tf-test-cacert-basic]
+
+No changes. Your infrastructure matches the configuration.</code></pre>
+    </details>
+
+    <details>
+      <summary>Step 1d: terraform destroy <span class="step-badge badge badge-pass">exit 0</span></summary>
+      <pre><code>Plan: 0 to add, 0 to change, 1 to destroy.
+
+gcore_cdn_trusted_ca_certificate.test: Destroying... [name=tf-test-cacert-basic]
+gcore_cdn_trusted_ca_certificate.test: Destruction complete after 1s
+
+Destroy complete! Resources: 1 destroyed.</code></pre>
+    </details>
+
+    <div class="finding finding-pass">Create populates all computed fields. Double-apply confirms zero drift. Destroy cleans up.</div>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- TEST 2: NAME UPDATE -->
+<!-- ============================================================ -->
+<div class="test-section">
+  <div class="test-header">
+    <h2>Test 2: Name Update (In-Place)</h2>
+    <span class="badge badge-pass">PASS</span>
+  </div>
+  <div class="test-body">
+    <p>Creates a certificate, updates the name in-place (no recreation), verifies the ID stays the same, then drift-checks.</p>
+
+    <details>
+      <summary>Terraform Configuration <span class="step-badge badge badge-pass">HCL</span></summary>
+      <div class="tf-config"><pre><code>variable "cert_name" {
+  type    = string
+  default = "tf-test-cacert-update-v1"
+}
+
+resource "gcore_cdn_trusted_ca_certificate" "test" {
+  name            = var.cert_name
+  ssl_certificate = &lt;&lt;-EOT
+    -----BEGIN CERTIFICATE----- ... -----END CERTIFICATE-----
+  EOT
+}
+
+output "cert_id"   { value = gcore_cdn_trusted_ca_certificate.test.id }
+output "cert_name" { value = gcore_cdn_trusted_ca_certificate.test.name }</code></pre></div>
+    </details>
+
+    <details>
+      <summary>Step 2a: terraform apply -var='cert_name=tf-test-cacert-update-v1' <span class="step-badge badge badge-pass">Created</span></summary>
+      <pre><code>Plan: 1 to add, 0 to change, 0 to destroy.
+
+gcore_cdn_trusted_ca_certificate.test: Creating...
+gcore_cdn_trusted_ca_certificate.test: Creation complete after 0s [name=tf-test-cacert-update-v1]
+
+Apply complete! Resources: 1 added, 0 changed, 0 destroyed.
+
+Outputs:
+cert_id = 279587
+cert_name = "tf-test-cacert-update-v1"</code></pre>
+    </details>
+
+    <details open>
+      <summary>Step 2b: terraform apply -var='cert_name=tf-test-cacert-update-v2' (Name Update) <span class="step-badge badge badge-pass">In-place</span></summary>
+      <pre><code>  # gcore_cdn_trusted_ca_certificate.test will be updated in-place
+  ~ resource "gcore_cdn_trusted_ca_certificate" "test" {
+        id   = 279587
+      ~ name = "tf-test-cacert-update-v1" -> "tf-test-cacert-update-v2"
+        # (1 unchanged attribute hidden)
+    }
+
+Plan: 0 to add, 1 to change, 0 to destroy.
+
+gcore_cdn_trusted_ca_certificate.test: Modifying... [name=tf-test-cacert-update-v1]
+gcore_cdn_trusted_ca_certificate.test: Modifications complete after 0s [name=tf-test-cacert-update-v2]
+
+Apply complete! Resources: 0 added, 1 changed, 0 destroyed.
+
+Outputs:
+cert_id = 279587    &lt;-- SAME ID, no recreation
+cert_name = "tf-test-cacert-update-v2"</code></pre>
+    </details>
+
+    <div class="finding finding-pass">Name updated in-place via PUT /cdn/sslCertificates/{id}. ID preserved (279587). No recreation.</div>
+
+    <details>
+      <summary>Step 2c: terraform apply (Drift Check after update) <span class="step-badge badge badge-pass">No changes</span></summary>
+      <pre><code>gcore_cdn_trusted_ca_certificate.test: Refreshing state... [name=tf-test-cacert-update-v2]
+
+No changes. Your infrastructure matches the configuration.
+
+Apply complete! Resources: 0 added, 0 changed, 0 destroyed.</code></pre>
+    </details>
+
+    <details>
+      <summary>Step 2d: terraform plan -detailed-exitcode <span class="step-badge badge badge-pass">exit 0</span></summary>
+      <pre><code>gcore_cdn_trusted_ca_certificate.test: Refreshing state... [name=tf-test-cacert-update-v2]
+
+No changes. Your infrastructure matches the configuration.</code></pre>
+    </details>
+
+    <details>
+      <summary>Step 2e: terraform destroy <span class="step-badge badge badge-pass">exit 0</span></summary>
+      <pre><code>gcore_cdn_trusted_ca_certificate.test: Destroying... [name=tf-test-cacert-update-v2]
+gcore_cdn_trusted_ca_certificate.test: Destruction complete after 1s
+
+Destroy complete! Resources: 1 destroyed.</code></pre>
+    </details>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- TEST 3: IMPORT -->
+<!-- ============================================================ -->
+<div class="test-section">
+  <div class="test-header">
+    <h2>Test 3: Import + Drift Check</h2>
+    <span class="badge badge-warn">EXPECTED BEHAVIOR</span>
+  </div>
+  <div class="test-body">
+    <p>Creates a certificate, removes it from state, imports by ID, and checks for drift after import.</p>
+
+    <details>
+      <summary>Terraform Configuration <span class="step-badge badge badge-pass">HCL</span></summary>
+      <div class="tf-config"><pre><code>resource "gcore_cdn_trusted_ca_certificate" "test" {
+  name            = "tf-test-cacert-import"
+  ssl_certificate = &lt;&lt;-EOT
+    -----BEGIN CERTIFICATE----- ... -----END CERTIFICATE-----
+  EOT
+}
+
+output "cert_id" { value = gcore_cdn_trusted_ca_certificate.test.id }</code></pre></div>
+    </details>
+
+    <details>
+      <summary>Step 3a: terraform apply (Create) <span class="step-badge badge badge-pass">ID: 279590</span></summary>
+      <pre><code>Plan: 1 to add, 0 to change, 0 to destroy.
+
+gcore_cdn_trusted_ca_certificate.test: Creating...
+gcore_cdn_trusted_ca_certificate.test: Creation complete after 0s [name=tf-test-cacert-import]
+
+Apply complete! Resources: 1 added, 0 changed, 0 destroyed.
+
+Outputs:
+cert_id = 279590</code></pre>
+    </details>
+
+    <details>
+      <summary>Step 3b: terraform state rm <span class="step-badge badge badge-pass">Removed</span></summary>
+      <pre><code>Removed gcore_cdn_trusted_ca_certificate.test
+Successfully removed 1 resource instance(s).</code></pre>
+    </details>
+
+    <details>
+      <summary>Step 3c: terraform import 279590 <span class="step-badge badge badge-pass">Imported</span></summary>
+      <pre><code>gcore_cdn_trusted_ca_certificate.test: Importing from ID "279590"...
+gcore_cdn_trusted_ca_certificate.test: Import prepared!
+  Prepared gcore_cdn_trusted_ca_certificate for import
+gcore_cdn_trusted_ca_certificate.test: Refreshing state... [name=tf-test-cacert-import]
+
+Import successful!</code></pre>
+    </details>
+
+    <details open>
+      <summary>Step 3d: terraform plan after import (Drift Check) <span class="step-badge badge badge-warn">ssl_certificate drift</span></summary>
+      <pre><code>  # gcore_cdn_trusted_ca_certificate.test must be replaced
+-/+ resource "gcore_cdn_trusted_ca_certificate" "test" {
+        name                  = "tf-test-cacert-import"
+      + ssl_certificate       = &lt;&lt;-EOT # forces replacement
+            -----BEGIN CERTIFICATE-----
+            ...
+            -----END CERTIFICATE-----
+        EOT
+      ~ id = 279590 -> (known after apply)
+        ...
+    }
+
+Plan: 1 to add, 0 to change, 1 to destroy.</code></pre>
+    </details>
+
+    <div class="finding finding-warn">
+      <strong>Expected behavior:</strong> After import, <code>ssl_certificate</code> is not in state (API does not return it on GET due to <code>no_refresh</code> tag). Terraform sees config value vs empty state and plans a replacement. This is by design &mdash; the certificate PEM is write-only. The same behavior exists in the old provider (<code>gcore_cdn_cacert</code>).
+    </div>
+
+    <details>
+      <summary>Step 3e: terraform apply (re-create after import) <span class="step-badge badge badge-pass">exit 0</span></summary>
+      <pre><code>gcore_cdn_trusted_ca_certificate.test: Destroying... [name=tf-test-cacert-import]
+gcore_cdn_trusted_ca_certificate.test: Destruction complete after 1s
+gcore_cdn_trusted_ca_certificate.test: Creating...
+gcore_cdn_trusted_ca_certificate.test: Creation complete after 0s [name=tf-test-cacert-import]
+
+Apply complete! Resources: 1 added, 0 changed, 1 destroyed.
+
+Outputs:
+cert_id = 279591</code></pre>
+    </details>
+
+    <details>
+      <summary>Step 3f: terraform plan (Final drift check) <span class="step-badge badge badge-pass">No changes</span></summary>
+      <pre><code>gcore_cdn_trusted_ca_certificate.test: Refreshing state... [name=tf-test-cacert-import]
+
+No changes. Your infrastructure matches the configuration.</code></pre>
+    </details>
+
+    <details>
+      <summary>Step 3g: terraform destroy <span class="step-badge badge badge-pass">exit 0</span></summary>
+      <pre><code>gcore_cdn_trusted_ca_certificate.test: Destroying... [name=tf-test-cacert-import]
+gcore_cdn_trusted_ca_certificate.test: Destruction complete after 1s
+
+Destroy complete! Resources: 1 destroyed.</code></pre>
+    </details>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- TEST 4: DATA SOURCE -->
+<!-- ============================================================ -->
+<div class="test-section">
+  <div class="test-header">
+    <h2>Test 4: Data Source</h2>
+    <span class="badge badge-pass">PASS</span>
+  </div>
+  <div class="test-body">
+    <p>Creates a resource, reads it via data source, verifies attributes match, and drift-checks.</p>
+
+    <details>
+      <summary>Terraform Configuration <span class="step-badge badge badge-pass">HCL</span></summary>
+      <div class="tf-config"><pre><code>resource "gcore_cdn_trusted_ca_certificate" "test" {
+  name            = "tf-test-cacert-datasource"
+  ssl_certificate = &lt;&lt;-EOT
+    -----BEGIN CERTIFICATE----- ... -----END CERTIFICATE-----
+  EOT
+}
+
+data "gcore_cdn_trusted_ca_certificate" "lookup" {
+  id = gcore_cdn_trusted_ca_certificate.test.id
+}
+
+output "resource_name"                 { value = gcore_cdn_trusted_ca_certificate.test.name }
+output "datasource_name"               { value = data.gcore_cdn_trusted_ca_certificate.lookup.name }
+output "datasource_cert_issuer"        { value = data.gcore_cdn_trusted_ca_certificate.lookup.cert_issuer }
+output "datasource_cert_subject_cn"    { value = data.gcore_cdn_trusted_ca_certificate.lookup.cert_subject_cn }
+output "datasource_validity_not_after" { value = data.gcore_cdn_trusted_ca_certificate.lookup.validity_not_after }
+output "names_match"                   { value = ... == ... }</code></pre></div>
+    </details>
+
+    <details open>
+      <summary>Step 4a: terraform apply <span class="step-badge badge badge-pass">exit 0</span></summary>
+      <pre><code>gcore_cdn_trusted_ca_certificate.test: Creating...
+gcore_cdn_trusted_ca_certificate.test: Creation complete after 1s [name=tf-test-cacert-datasource]
+data.gcore_cdn_trusted_ca_certificate.lookup: Reading...
+data.gcore_cdn_trusted_ca_certificate.lookup: Read complete after 0s [name=tf-test-cacert-datasource]
+
+Apply complete! Resources: 1 added, 0 changed, 0 destroyed.
+
+Outputs:
+datasource_cert_issuer        = "tf-test-ca.example.com"
+datasource_cert_subject_cn    = "tf-test-ca.example.com"
+datasource_name               = "tf-test-cacert-datasource"
+datasource_validity_not_after = "2036-02-17T09:53:40Z"
+names_match                   = true
+resource_name                 = "tf-test-cacert-datasource"</code></pre>
+    </details>
+
+    <div class="finding finding-pass">Data source retrieves all computed fields. <code>names_match = true</code> confirms resource and data source return consistent data.</div>
+
+    <details>
+      <summary>Step 4b: terraform plan -detailed-exitcode <span class="step-badge badge badge-pass">No changes</span></summary>
+      <pre><code>gcore_cdn_trusted_ca_certificate.test: Refreshing state... [name=tf-test-cacert-datasource]
+data.gcore_cdn_trusted_ca_certificate.lookup: Reading...
+data.gcore_cdn_trusted_ca_certificate.lookup: Read complete after 0s [name=tf-test-cacert-datasource]
+
+No changes. Your infrastructure matches the configuration.</code></pre>
+    </details>
+
+    <details>
+      <summary>Step 4c: terraform destroy <span class="step-badge badge badge-pass">exit 0</span></summary>
+      <pre><code>gcore_cdn_trusted_ca_certificate.test: Destroying... [name=tf-test-cacert-datasource]
+gcore_cdn_trusted_ca_certificate.test: Destruction complete after 0s
+
+Destroy complete! Resources: 1 destroyed.</code></pre>
+    </details>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- SUMMARY TABLE -->
+<!-- ============================================================ -->
+<div class="test-section">
+  <div class="test-header">
+    <h2>Results Summary</h2>
+  </div>
+  <div class="test-body">
+    <table>
+      <tr><th>Scenario</th><th>Operation</th><th>Result</th><th>Notes</th></tr>
+      <tr><td>Test 1</td><td>Create</td><td><span class="badge badge-pass">PASS</span></td><td>All computed fields populated</td></tr>
+      <tr><td>Test 1</td><td>Drift (2nd apply)</td><td><span class="badge badge-pass">PASS</span></td><td>No changes detected</td></tr>
+      <tr><td>Test 1</td><td>Plan (detailed-exitcode)</td><td><span class="badge badge-pass">PASS</span></td><td>Exit code 0 (no changes)</td></tr>
+      <tr><td>Test 1</td><td>Destroy</td><td><span class="badge badge-pass">PASS</span></td><td>Clean deletion</td></tr>
+      <tr><td>Test 2</td><td>Create</td><td><span class="badge badge-pass">PASS</span></td><td>ID=279587</td></tr>
+      <tr><td>Test 2</td><td>Name Update (in-place)</td><td><span class="badge badge-pass">PASS</span></td><td>ID preserved (279587), no recreation</td></tr>
+      <tr><td>Test 2</td><td>Drift (after update)</td><td><span class="badge badge-pass">PASS</span></td><td>No changes detected</td></tr>
+      <tr><td>Test 2</td><td>Destroy</td><td><span class="badge badge-pass">PASS</span></td><td>Clean deletion</td></tr>
+      <tr><td>Test 3</td><td>Create</td><td><span class="badge badge-pass">PASS</span></td><td>ID=279590</td></tr>
+      <tr><td>Test 3</td><td>Import</td><td><span class="badge badge-pass">PASS</span></td><td>Imported by ID successfully</td></tr>
+      <tr><td>Test 3</td><td>Plan after import</td><td><span class="badge badge-warn">EXPECTED</span></td><td>ssl_certificate forces replacement (no_refresh field)</td></tr>
+      <tr><td>Test 3</td><td>Re-apply + drift check</td><td><span class="badge badge-pass">PASS</span></td><td>No drift after re-create</td></tr>
+      <tr><td>Test 3</td><td>Destroy</td><td><span class="badge badge-pass">PASS</span></td><td>Clean deletion</td></tr>
+      <tr><td>Test 4</td><td>Create + Data Source</td><td><span class="badge badge-pass">PASS</span></td><td>names_match = true</td></tr>
+      <tr><td>Test 4</td><td>Drift (data source)</td><td><span class="badge badge-pass">PASS</span></td><td>No changes detected</td></tr>
+      <tr><td>Test 4</td><td>Destroy</td><td><span class="badge badge-pass">PASS</span></td><td>Clean deletion</td></tr>
+    </table>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- ACCEPTANCE TESTS -->
+<!-- ============================================================ -->
+<div class="test-section">
+  <div class="test-header">
+    <h2>Automated Acceptance Tests (go test)</h2>
+    <span class="badge badge-pass">ALL PASS</span>
+  </div>
+  <div class="test-body">
+    <details open>
+      <summary>TF_ACC=1 go test ./internal/services/cdn_trusted_ca_certificate/... -v <span class="step-badge badge badge-pass">4/4</span></summary>
+      <pre><code>=== RUN   TestAccCDNTrustedCaCertificate_basic
+--- PASS: TestAccCDNTrustedCaCertificate_basic (2.72s)
+=== RUN   TestAccCDNTrustedCaCertificate_update
+--- PASS: TestAccCDNTrustedCaCertificate_update (4.11s)
+=== RUN   TestAccCDNTrustedCaCertificate_import
+--- PASS: TestAccCDNTrustedCaCertificate_import (3.39s)
+=== RUN   TestAccCDNTrustedCaCertificateDataSource_basic
+--- PASS: TestAccCDNTrustedCaCertificateDataSource_basic (3.42s)
+PASS
+ok  github.com/stainless-sdks/gcore-terraform/internal/services/cdn_trusted_ca_certificate  4.704s</code></pre>
+    </details>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- FOOTER -->
+<!-- ============================================================ -->
+<div style="text-align:center; margin-top:2rem; padding-top:1rem; border-top:1px solid var(--border); color:var(--muted); font-size:0.8rem;">
+  Provider: gcore/gcore (dev override) &middot; Terraform v1.x &middot; SDK: github.com/G-Core/gcore-go v0.33.0
+</div>
+
+</body>
+</html>

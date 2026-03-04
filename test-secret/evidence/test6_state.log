@@ -1,0 +1,22 @@
+# gcore_fastedge_secret.test:
+resource "gcore_fastedge_secret" "test" {
+    app_count    = 0
+    id           = 325
+    secret_slots = [
+        {
+            checksum = "d8e76ccd1aebc89c26d749fe5252299bc43684d04a090989585b97bb3937e25b"
+            slot     = 1
+        },
+        {
+            checksum = "d4c35021fd2b91b3d4f782afc67114b5ed86a062e8cbe0050fbea096faf46794"
+            slot     = 2
+        },
+    ]
+}
+
+
+Outputs:
+
+secret_app_count = 0
+secret_id = 325
+secret_slots_info = (sensitive value)

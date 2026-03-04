@@ -1,0 +1,247 @@
+# Manual Test: Clean Syntax with Terraform References
+# This demonstrates the RECOMMENDED approach to avoid repeating project_id/region_id
+
+terraform {
+  required_providers {
+    gcore = {
+      source = "gcore/gcore"
+    }
+  }
+}
+
+provider "gcore" {
+  # Uses environment variables:
+  # GCORE_API_KEY, GCORE_CLOUD_PROJECT_ID, GCORE_CLOUD_REGION_ID
+}
+
+# =============================================================================
+# SECURITY GROUP - Current Limitation
+# =============================================================================
+# LIMITATION 1: Nested block required (not ideal)
+#
+# Current syntax (REQUIRED):
+resource "gcore_cloud_security_group" "web" {
+  project_id = 379987
+  region_id  = 76
+
+  security_group = {  # ← Nested block required due to API request structure
+    name        = "test-manual-clean-syntax"
+    description = "Testing clean syntax with Terraform references"
+  }
+
+  # Why nested?
+  # - API expects: {"security_group": {"name": "...", "description": "..."}}
+  # - To fix: Need to change OpenAPI spec to use SingleCreateSecurityGroupSerializer
+  # - See: /Users/user/repos/gcore-config/openapi.yml
+}
+
+# What we WANT (doesn't work yet):
+# resource "gcore_cloud_security_group" "web" {
+#   project_id  = 379987
+#   region_id   = 76
+#   name        = "test-manual-clean-syntax"  # ← Flat attribute
+#   description = "Testing clean syntax"      # ← Flat attribute
+# }
+
+# =============================================================================
+# SECURITY GROUP RULES - Clean Syntax (WORKS TODAY)
+# =============================================================================
+# SOLUTION: Use Terraform references to avoid repetition
+#
+# Instead of repeating hardcoded values:
+#   project_id = 379987  # ← BAD: Repetition
+#   region_id  = 76      # ← BAD: Repetition
+#
+# Reference the parent resource:
+#   project_id = gcore_cloud_security_group.web.project_id  # ← GOOD: DRY
+#   region_id  = gcore_cloud_security_group.web.region_id   # ← GOOD: DRY
+
+resource "gcore_cloud_security_group_rule" "https" {
+  # Parent security group reference
+  group_id = gcore_cloud_security_group.test.id
+
+  # ✅ SOLUTION: Reference parent's project_id/region_id
+  # Terraform resolves these BEFORE calling the provider
+  # Provider receives concrete values: 379987, 76
+  project_id = gcore_cloud_security_group.test.project_id
+  region_id  = gcore_cloud_security_group.test.region_id
+
+  # Why can't the provider auto-inherit these?
+  # LIMITATION 2: Provider can't access other resources' state
+  #
+  # When provider's Create() method runs:
+  # - We only get: group_id = "1af49443-4fc8-4689-84db-b146946c2b58" (UUID)
+  # - We DON'T get access to: gcore_cloud_security_group.test.project_id
+  # - Terraform has already resolved references before calling provider
+  # - Provider has no API to query other resources in state file
+  #
+  # Attempted solution (failed):
+  # - Fetch parent security group via API to get project_id/region_id
+  # - Problem: API call requires project_id/region_id as parameters!
+  # - Chicken-and-egg: Need values to get values
+  #
+  # Why references ARE the solution:
+  # - Terraform resolves references during plan phase
+  # - Provider receives concrete values, not references
+  # - No runtime overhead, no API calls needed
+  # - Explicit and clear
+
+  direction        = "ingress"
+  ethertype        = "IPv4"
+  protocol         = "tcp"
+  port_range_min   = 443
+  port_range_max   = 443
+  remote_ip_prefix = "0.0.0.0/0"
+  description      = "Allow HTTPS"
+}
+
+resource "gcore_cloud_security_group_rule" "http" {
+  group_id   = gcore_cloud_security_group.test.id
+  project_id = gcore_cloud_security_group.test.project_id  # ✅ Reference parent
+  region_id  = gcore_cloud_security_group.test.region_id   # ✅ Reference parent
+
+  direction        = "ingress"
+  ethertype        = "IPv4"
+  protocol         = "tcp"
+  port_range_min   = 80
+  port_range_max   = 80
+  remote_ip_prefix = "0.0.0.0/0"
+  description      = "Allow HTTP"
+}
+
+resource "gcore_cloud_security_group_rule" "ssh" {
+  group_id   = gcore_cloud_security_group.test.id
+  project_id = gcore_cloud_security_group.test.project_id  # ✅ Reference parent
+  region_id  = gcore_cloud_security_group.test.region_id   # ✅ Reference parent
+
+  direction        = "ingress"
+  ethertype        = "IPv4"
+  protocol         = "tcp"
+  port_range_min   = 22
+  port_range_max   = 22
+  remote_ip_prefix = "10.0.0.0/8"
+  description      = "Allow SSH from internal network"
+}
+
+# =============================================================================
+# ALTERNATIVE: Environment Variables (Even Cleaner)
+# =============================================================================
+# If you set these environment variables:
+#   export GCORE_CLOUD_PROJECT_ID=379987
+#   export GCORE_CLOUD_REGION_ID=76
+#
+# Then you can omit project_id/region_id entirely:
+
+# resource "gcore_cloud_security_group_rule" "mysql" {
+#   group_id = gcore_cloud_security_group.test.id
+#   # ← project_id/region_id auto-populated from environment variables!
+#
+#   # How this works:
+#   # - Schema marks fields as Optional+Computed
+#   # - Provider reads GCORE_CLOUD_PROJECT_ID and GCORE_CLOUD_REGION_ID
+#   # - Values automatically applied if not specified in config
+#
+#   # Pros:
+#   # - Cleanest configuration (no repetition at all)
+#   # - Works for all resources in the project
+#
+#   # Cons:
+#   # - Less explicit (values not visible in config)
+#   # - Requires environment setup
+#
+#   direction        = "ingress"
+#   protocol         = "tcp"
+#   port_range_min   = 3306
+#   port_range_max   = 3306
+#   remote_ip_prefix = "10.0.0.0/8"
+#   description      = "Allow MySQL from internal network"
+# }
+
+# =============================================================================
+# OUTPUTS
+# =============================================================================
+output "security_group_id" {
+  value = gcore_cloud_security_group.test.id
+}
+
+output "rule_ids" {
+  value = {
+    https = gcore_cloud_security_group_rule.https.id
+    http  = gcore_cloud_security_group_rule.http.id
+    ssh   = gcore_cloud_security_group_rule.ssh.id
+  }
+}
+
+output "rule_details" {
+  description = "Verify project_id/region_id were correctly inherited"
+  value = {
+    https = {
+      id         = gcore_cloud_security_group_rule.https.id
+      project_id = gcore_cloud_security_group_rule.https.project_id  # Should be 379987
+      region_id  = gcore_cloud_security_group_rule.https.region_id   # Should be 76
+    }
+    http = {
+      id         = gcore_cloud_security_group_rule.http.id
+      project_id = gcore_cloud_security_group_rule.http.project_id   # Should be 379987
+      region_id  = gcore_cloud_security_group_rule.http.region_id    # Should be 76
+    }
+  }
+}
+
+# =============================================================================
+# MANUAL TEST COMMANDS
+# =============================================================================
+# 1. Set environment:
+#    export TF_CLI_CONFIG_FILE="/Users/user/repos/gcore-terraform/.terraformrc"
+#    set -o allexport
+#    source /Users/user/repos/gcore-terraform/.env
+#    set +o allexport
+#
+# 2. Plan:
+#    terraform plan
+#    # Should show all rules with project_id=379987, region_id=76
+#
+# 3. Apply:
+#    terraform apply -auto-approve
+#    # Should create 1 security group + 3 rules successfully
+#
+# 4. Verify outputs:
+#    terraform output rule_details
+#    # Should show project_id=379987 and region_id=76 for all rules
+#
+# 5. Test drift detection:
+#    terraform plan
+#    # Should show no changes on user-created rules
+#    # May show drift on backend-created default rules (expected AWS-like behavior)
+#
+# 6. Cleanup:
+#    terraform destroy -auto-approve
+#
+# =============================================================================
+# SUMMARY OF LIMITATIONS & SOLUTIONS
+# =============================================================================
+#
+# LIMITATION 1: Nested security_group block
+# ├─ Current:  security_group = { name = "...", description = "..." }
+# ├─ Want:     name = "...", description = "..."
+# └─ Fix:      Update OpenAPI spec to use SingleCreateSecurityGroupSerializer
+#
+# LIMITATION 2: Must specify project_id/region_id in rules
+# ├─ Why:      Provider can't access other resources' state
+# ├─ Solution: Use Terraform references (this file)
+# └─ Benefit:  Values defined once, no repetition, no runtime overhead
+#
+# WHAT DOESN'T WORK:
+# ❌ Auto-fetch from parent security group via API
+#    └─ Requires project_id/region_id to make API call (chicken-and-egg)
+#
+# ❌ Read from Terraform state file
+#    └─ Terraform Plugin Framework doesn't provide cross-resource state access
+#
+# ❌ Parse resource references
+#    └─ Provider receives resolved UUID, not reference object
+#
+# WHAT WORKS:
+# ✅ Terraform references (recommended, shown above)
+# ✅ Environment variables (alternative, commented out above)
+# ✅ Hardcoded values (not DRY, not recommended)

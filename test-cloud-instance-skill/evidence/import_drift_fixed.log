@@ -1,0 +1,76 @@
+[33m╷[0m[0m
+[33m│[0m [0m[1m[33mWarning: [0m[0m[1mProvider development overrides are in effect[0m
+[33m│[0m [0m
+[33m│[0m [0m[0mThe following provider development overrides are set in the CLI
+[33m│[0m [0mconfiguration:
+[33m│[0m [0m - gcore/gcore in /Users/user/repos/gcore-terraform
+[33m│[0m [0m
+[33m│[0m [0mThe behavior may therefore not match any released version of the provider
+[33m│[0m [0mand applying changes may cause the state to become incompatible with
+[33m│[0m [0mpublished releases.
+[33m╵[0m[0m
+[0m[1mgcore_cloud_volume.boot: Refreshing state... [id=0d23dedf-8b9c-4001-9d36-efc0646e8338][0m
+[0m[1mgcore_cloud_instance.test_external: Refreshing state... [id=3b277ae2-5104-43d8-89cb-07fe692c6fbb][0m
+
+Terraform used the selected providers to generate the following execution
+plan. Resource actions are indicated with the following symbols:
+[31m-[0m/[32m+[0m destroy and then create replacement[0m
+
+Terraform will perform the following actions:
+
+[1m  # gcore_cloud_instance.test_external[0m must be [1m[31mreplaced[0m
+[0m[31m-[0m/[32m+[0m[0m resource "gcore_cloud_instance" "test_external" {
+      [33m~[0m[0m addresses            = {
+          [31m-[0m[0m "pub_net" = [
+              [31m-[0m[0m {
+                  [31m-[0m[0m addr        = "193.57.88.74"
+                  [31m-[0m[0m subnet_id   = "fedee72b-ae29-45de-936c-fea1866a6aed"
+                  [31m-[0m[0m subnet_name = "pub_net2"
+                  [31m-[0m[0m type        = "fixed"
+                },
+            ]
+        } -> (known after apply)
+      [33m~[0m[0m blackhole_ports      = [] -> (known after apply)
+      [33m~[0m[0m created_at           = "2026-01-16T11:16:40Z" -> (known after apply)
+      [33m~[0m[0m creator_task_id      = "04f9699c-1274-4134-9043-a04a16a54d23" -> (known after apply)
+      [32m+[0m[0m ddos_profile         = (known after apply)
+      [32m+[0m[0m fixed_ip_assignments = (known after apply)
+      [33m~[0m[0m id                   = "3b277ae2-5104-43d8-89cb-07fe692c6fbb" -> (known after apply)
+      [32m+[0m[0m instance_description = (known after apply)
+      [32m+[0m[0m instance_isolation   = (known after apply)
+      [33m~[0m[0m interfaces           = [
+          [33m~[0m[0m {
+              [33m~[0m[0m ip_address = "193.57.88.74" -> (known after apply)
+              [33m~[0m[0m port_id    = "75e880c2-690f-4c8c-95c5-9ade79ae2f6f" -> (known after apply)
+                [90m# (1 unchanged attribute hidden)[0m[0m
+            },
+        ]
+        name                 = "test-instance-import"
+      [31m-[0m[0m project_id           = 379987 [90m-> null[0m[0m [31m# forces replacement[0m[0m
+      [33m~[0m[0m region               = "Luxembourg-2" -> (known after apply)
+      [31m-[0m[0m region_id            = 76 [90m-> null[0m[0m [31m# forces replacement[0m[0m
+      [33m~[0m[0m status               = "ACTIVE" -> (known after apply)
+      [32m+[0m[0m task_id              = (known after apply)
+      [32m+[0m[0m task_state           = (known after apply)
+      [33m~[0m[0m vm_state             = "active" -> (known after apply)
+      [33m~[0m[0m volumes              = [
+          [33m~[0m[0m {
+              [32m+[0m[0m boot_index = 0
+                [90m# (1 unchanged attribute hidden)[0m[0m
+            },
+        ]
+        [90m# (1 unchanged attribute hidden)[0m[0m
+    }
+
+[1mPlan:[0m [0m1 to add, 0 to change, 1 to destroy.
+
+Changes to Outputs:
+  [33m~[0m[0m instance_id          = "3b277ae2-5104-43d8-89cb-07fe692c6fbb" -> (known after apply)
+  [33m~[0m[0m instance_status      = "ACTIVE" -> (known after apply)
+  [33m~[0m[0m interface_ip_address = "193.57.88.74" -> (known after apply)
+  [33m~[0m[0m interface_port_id    = "75e880c2-690f-4c8c-95c5-9ade79ae2f6f" -> (known after apply)
+[90m
+─────────────────────────────────────────────────────────────────────────────[0m
+
+Note: You didn't use the -out option to save this plan, so Terraform can't
+guarantee to take exactly these actions if you run "terraform apply" now.

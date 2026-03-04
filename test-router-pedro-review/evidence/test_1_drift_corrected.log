@@ -1,0 +1,42 @@
+[33m╷[0m[0m
+[33m│[0m [0m[1m[33mWarning: [0m[0m[1mProvider development overrides are in effect[0m
+[33m│[0m [0m
+[33m│[0m [0m[0mThe following provider development overrides are set in the CLI
+[33m│[0m [0mconfiguration:
+[33m│[0m [0m - gcore/gcore in /Users/user/repos/gcore-terraform
+[33m│[0m [0m
+[33m│[0m [0mThe behavior may therefore not match any released version of the provider
+[33m│[0m [0mand applying changes may cause the state to become incompatible with
+[33m│[0m [0mpublished releases.
+[33m╵[0m[0m
+[0m[1mgcore_cloud_network_router.test: Refreshing state... [id=25204151-fa9f-4b8a-8967-e3e6a1c5f48b][0m
+[0m[1mgcore_cloud_network.test: Refreshing state... [id=61b29367-1877-4d81-ad2e-f98ed7459fd4][0m
+[0m[1mgcore_cloud_network_subnet.test: Refreshing state... [id=7bbd6b87-6f73-4f2b-a9df-a961b1c4067f][0m
+
+Terraform used the selected providers to generate the following execution
+plan. Resource actions are indicated with the following symbols:
+  [33m~[0m update in-place[0m
+
+Terraform will perform the following actions:
+
+[1m  # gcore_cloud_network_router.test[0m will be updated in-place
+[0m  [33m~[0m[0m resource "gcore_cloud_network_router" "test" {
+      [33m~[0m[0m external_gateway_info = {
+          [33m~[0m[0m enable_snat = false -> (known after apply)
+          [32m+[0m[0m network_id  = (known after apply)
+          [32m+[0m[0m type        = (known after apply)
+        } -> (known after apply)
+        id                    = "25204151-fa9f-4b8a-8967-e3e6a1c5f48b"
+        name                  = "pedro-test-minimal"
+      [32m+[0m[0m task_id               = (known after apply)
+      [32m+[0m[0m tasks                 = (known after apply)
+      [33m~[0m[0m updated_at            = "2025-11-20T09:06:20Z" -> (known after apply)
+        [90m# (9 unchanged attributes hidden)[0m[0m
+    }
+
+[1mPlan:[0m 0 to add, 1 to change, 0 to destroy.
+[0m[90m
+─────────────────────────────────────────────────────────────────────────────[0m
+
+Note: You didn't use the -out option to save this plan, so Terraform can't
+guarantee to take exactly these actions if you run "terraform apply" now.

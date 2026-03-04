@@ -1,0 +1,149 @@
+==========================================
+TC-UPDATE-001: Route Removal Test
+==========================================
+This tests the main bug fix: routes deleted when removed from config
+
+✓ Loaded credentials
+
+Step 1: Creating router WITH routes...
+----------------------------------------
+[31m╷[0m[0m
+[31m│[0m [0m[1m[31mError: [0m[0m[1mDuplicate required providers configuration[0m
+[31m│[0m [0m
+[31m│[0m [0m[0m  on TC-UPDATE-002-name-change.tf line 2, in terraform:
+[31m│[0m [0m   2:   [4mrequired_providers[0m {[0m
+[31m│[0m [0m
+[31m│[0m [0mA module may have only one required providers configuration. The required
+[31m│[0m [0mproviders were previously configured at
+[31m│[0m [0mTC-UPDATE-001-route-removal.tf:2,3-21.
+[31m╵[0m[0m
+[31m╷[0m[0m
+[31m│[0m [0m[1m[31mError: [0m[0m[1mDuplicate provider configuration[0m
+[31m│[0m [0m
+[31m│[0m [0m[0m  on TC-UPDATE-002-name-change.tf line 9:
+[31m│[0m [0m   9: [4mprovider "gcore"[0m {}[0m
+[31m│[0m [0m
+[31m│[0m [0mA default (non-aliased) provider configuration for "gcore" was already
+[31m│[0m [0mgiven at TC-UPDATE-001-route-removal.tf:9,1-17. If multiple configurations
+[31m│[0m [0mare required, set the "alias" argument for alternative configurations.
+[31m╵[0m[0m
+[31m╷[0m[0m
+[31m│[0m [0m[1m[31mError: [0m[0m[1mDuplicate resource "gcore_cloud_network" configuration[0m
+[31m│[0m [0m
+[31m│[0m [0m[0m  on TC-UPDATE-002-name-change.tf line 14:
+[31m│[0m [0m  14: [4mresource "gcore_cloud_network" "network"[0m {[0m
+[31m│[0m [0m
+[31m│[0m [0mA gcore_cloud_network resource named "network" was already declared at
+[31m│[0m [0mTC-UPDATE-001-route-removal.tf:14,1-41. Resource names must be unique per
+[31m│[0m [0mtype in each module.
+[31m╵[0m[0m
+[31m╷[0m[0m
+[31m│[0m [0m[1m[31mError: [0m[0m[1mDuplicate resource "gcore_cloud_network_subnet" configuration[0m
+[31m│[0m [0m
+[31m│[0m [0m[0m  on TC-UPDATE-002-name-change.tf line 21:
+[31m│[0m [0m  21: [4mresource "gcore_cloud_network_subnet" "subnet"[0m {[0m
+[31m│[0m [0m
+[31m│[0m [0mA gcore_cloud_network_subnet resource named "subnet" was already declared
+[31m│[0m [0mat TC-UPDATE-001-route-removal.tf:21,1-47. Resource names must be unique
+[31m│[0m [0mper type in each module.
+[31m╵[0m[0m
+[31m╷[0m[0m
+[31m│[0m [0m[1m[31mError: [0m[0m[1mDuplicate resource "gcore_cloud_network_router" configuration[0m
+[31m│[0m [0m
+[31m│[0m [0m[0m  on TC-UPDATE-002-name-change.tf line 34:
+[31m│[0m [0m  34: [4mresource "gcore_cloud_network_router" "router"[0m {[0m
+[31m│[0m [0m
+[31m│[0m [0mA gcore_cloud_network_router resource named "router" was already declared
+[31m│[0m [0mat TC-UPDATE-001-route-removal.tf:34,1-47. Resource names must be unique
+[31m│[0m [0mper type in each module.
+[31m╵[0m[0m
+[31m╷[0m[0m
+[31m│[0m [0m[1m[31mError: [0m[0m[1mDuplicate output definition[0m
+[31m│[0m [0m
+[31m│[0m [0m[0m  on TC-UPDATE-002-name-change.tf line 54:
+[31m│[0m [0m  54: [4moutput "router_id"[0m {[0m
+[31m│[0m [0m
+[31m│[0m [0mAn output named "router_id" was already defined at
+[31m│[0m [0mTC-UPDATE-001-route-removal.tf:57,1-19. Output names must be unique within
+[31m│[0m [0ma module.
+[31m╵[0m[0m
+[31m╷[0m[0m
+[31m│[0m [0m[1m[31mError: [0m[0m[1mDuplicate required providers configuration[0m
+[31m│[0m [0m
+[31m│[0m [0m[0m  on main.tf line 2, in terraform:
+[31m│[0m [0m   2:   [4mrequired_providers[0m {[0m
+[31m│[0m [0m
+[31m│[0m [0mA module may have only one required providers configuration. The required
+[31m│[0m [0mproviders were previously configured at
+[31m│[0m [0mTC-UPDATE-001-route-removal.tf:2,3-21.
+[31m╵[0m[0m
+[31m╷[0m[0m
+[31m│[0m [0m[1m[31mError: [0m[0m[1mDuplicate provider configuration[0m
+[31m│[0m [0m
+[31m│[0m [0m[0m  on main.tf line 9:
+[31m│[0m [0m   9: [4mprovider "gcore"[0m {}[0m
+[31m│[0m [0m
+[31m│[0m [0mA default (non-aliased) provider configuration for "gcore" was already
+[31m│[0m [0mgiven at TC-UPDATE-001-route-removal.tf:9,1-17. If multiple configurations
+[31m│[0m [0mare required, set the "alias" argument for alternative configurations.
+[31m╵[0m[0m
+[31m╷[0m[0m
+[31m│[0m [0m[1m[31mError: [0m[0m[1mDuplicate resource "gcore_cloud_network" configuration[0m
+[31m│[0m [0m
+[31m│[0m [0m[0m  on main.tf line 14:
+[31m│[0m [0m  14: [4mresource "gcore_cloud_network" "network"[0m {[0m
+[31m│[0m [0m
+[31m│[0m [0mA gcore_cloud_network resource named "network" was already declared at
+[31m│[0m [0mTC-UPDATE-001-route-removal.tf:14,1-41. Resource names must be unique per
+[31m│[0m [0mtype in each module.
+[31m╵[0m[0m
+[31m╷[0m[0m
+[31m│[0m [0m[1m[31mError: [0m[0m[1mDuplicate resource "gcore_cloud_network_subnet" configuration[0m
+[31m│[0m [0m
+[31m│[0m [0m[0m  on main.tf line 21:
+[31m│[0m [0m  21: [4mresource "gcore_cloud_network_subnet" "subnet"[0m {[0m
+[31m│[0m [0m
+[31m│[0m [0mA gcore_cloud_network_subnet resource named "subnet" was already declared
+[31m│[0m [0mat TC-UPDATE-001-route-removal.tf:21,1-47. Resource names must be unique
+[31m│[0m [0mper type in each module.
+[31m╵[0m[0m
+[31m╷[0m[0m
+[31m│[0m [0m[1m[31mError: [0m[0m[1mDuplicate variable declaration[0m
+[31m│[0m [0m
+[31m│[0m [0m[0m  on main.tf line 29:
+[31m│[0m [0m  29: [4mvariable "include_routes"[0m {[0m
+[31m│[0m [0m
+[31m│[0m [0mA variable named "include_routes" was already declared at
+[31m│[0m [0mTC-UPDATE-001-route-removal.tf:29,1-26. Variable names must be unique
+[31m│[0m [0mwithin a module.
+[31m╵[0m[0m
+[31m╷[0m[0m
+[31m│[0m [0m[1m[31mError: [0m[0m[1mDuplicate resource "gcore_cloud_network_router" configuration[0m
+[31m│[0m [0m
+[31m│[0m [0m[0m  on main.tf line 34:
+[31m│[0m [0m  34: [4mresource "gcore_cloud_network_router" "router"[0m {[0m
+[31m│[0m [0m
+[31m│[0m [0mA gcore_cloud_network_router resource named "router" was already declared
+[31m│[0m [0mat TC-UPDATE-001-route-removal.tf:34,1-47. Resource names must be unique
+[31m│[0m [0mper type in each module.
+[31m╵[0m[0m
+[31m╷[0m[0m
+[31m│[0m [0m[1m[31mError: [0m[0m[1mDuplicate output definition[0m
+[31m│[0m [0m
+[31m│[0m [0m[0m  on main.tf line 57:
+[31m│[0m [0m  57: [4moutput "router_id"[0m {[0m
+[31m│[0m [0m
+[31m│[0m [0mAn output named "router_id" was already defined at
+[31m│[0m [0mTC-UPDATE-002-name-change.tf:54,1-19. Output names must be unique within a
+[31m│[0m [0mmodule.
+[31m╵[0m[0m
+[31m╷[0m[0m
+[31m│[0m [0m[1m[31mError: [0m[0m[1mDuplicate output definition[0m
+[31m│[0m [0m
+[31m│[0m [0m[0m  on main.tf line 61:
+[31m│[0m [0m  61: [4moutput "router_routes"[0m {[0m
+[31m│[0m [0m
+[31m│[0m [0mAn output named "router_routes" was already defined at
+[31m│[0m [0mTC-UPDATE-001-route-removal.tf:61,1-23. Output names must be unique within
+[31m│[0m [0ma module.
+[31m╵[0m[0m

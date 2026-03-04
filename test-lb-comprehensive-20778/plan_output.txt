@@ -1,0 +1,55 @@
+[33m╷[0m[0m
+[33m│[0m [0m[1m[33mWarning: [0m[0m[1mProvider development overrides are in effect[0m
+[33m│[0m [0m
+[33m│[0m [0m[0mThe following provider development overrides are set in the CLI
+[33m│[0m [0mconfiguration:
+[33m│[0m [0m - gcore/gcore in /Users/user/repos/gcore-terraform
+[33m│[0m [0m
+[33m│[0m [0mThe behavior may therefore not match any released version of the provider
+[33m│[0m [0mand applying changes may cause the state to become incompatible with
+[33m│[0m [0mpublished releases.
+[33m╵[0m[0m
+[0m[1mgcore_cloud_load_balancer.test: Refreshing state... [id=bca08535-9766-4375-8dca-266330adffc4][0m
+[0m[1mgcore_cloud_load_balancer_listener.test: Refreshing state... [id=d8c6ed80-9411-436f-8c7f-9c1c748ce070][0m
+[0m[1mgcore_cloud_load_balancer_pool.test: Refreshing state... [id=569f150f-344c-406a-8284-bccfe97c0d5b][0m
+[0m[1mgcore_cloud_load_balancer_pool_member.test: Refreshing state... [id=087b0322-74f7-4fc8-8a4e-6441e42faf19][0m
+
+[1m[36mNote:[0m[1m Objects have changed outside of Terraform
+[0m
+Terraform detected the following changes made outside of Terraform since the
+last "terraform apply" which may have affected this plan:
+
+[1m  # gcore_cloud_load_balancer.test[0m has changed
+[0m  [33m~[0m[0m resource "gcore_cloud_load_balancer" "test" {
+        id                     = "bca08535-9766-4375-8dca-266330adffc4"
+        name                   = "tf-test-lb-20778"
+      [33m~[0m[0m operating_status       = "ONLINE" [33m->[0m[0m "ERROR"
+        [90m# (18 unchanged attributes hidden)[0m[0m
+    }
+
+[1m  # gcore_cloud_load_balancer_pool.test[0m has changed
+[0m  [33m~[0m[0m resource "gcore_cloud_load_balancer_pool" "test" {
+        id                  = "569f150f-344c-406a-8284-bccfe97c0d5b"
+        name                = "tf-test-pool-20778"
+      [33m~[0m[0m operating_status    = "ONLINE" [33m->[0m[0m "ERROR"
+        [90m# (12 unchanged attributes hidden)[0m[0m
+    }
+
+
+Unless you have made equivalent changes to your configuration, or ignored the
+relevant attributes using ignore_changes, the following plan may include
+actions to undo or respond to these changes.
+[90m
+─────────────────────────────────────────────────────────────────────────────[0m
+
+Changes to Outputs:
+  [33m~[0m[0m lb_operating_status      = "ONLINE" [33m->[0m[0m "ERROR"
+  [33m~[0m[0m pool_operating_status    = "ONLINE" [33m->[0m[0m "ERROR"
+
+You can apply this plan to save these new output values to the Terraform
+state, without changing any real infrastructure.
+[90m
+─────────────────────────────────────────────────────────────────────────────[0m
+
+Note: You didn't use the -out option to save this plan, so Terraform can't
+guarantee to take exactly these actions if you run "terraform apply" now.

@@ -1,0 +1,56 @@
+{
+  "version": 4,
+  "terraform_version": "1.14.3",
+  "serial": 14,
+  "lineage": "f4fb16e8-e2b3-86ca-fa91-87b892cf1650",
+  "outputs": {
+    "app_count": {
+      "value": 0,
+      "type": "number"
+    },
+    "secret_id": {
+      "value": 351,
+      "type": "number"
+    },
+    "secret_name": {
+      "value": "tf-skill-test-renamed",
+      "type": "string"
+    }
+  },
+  "resources": [
+    {
+      "mode": "managed",
+      "type": "gcore_fastedge_secret",
+      "name": "test",
+      "provider": "provider[\"registry.terraform.io/gcore/gcore\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "app_count": 0,
+            "comment": "Updated comment for testing",
+            "id": 351,
+            "name": "tf-skill-test-renamed",
+            "secret_slots": [
+              {
+                "checksum": "b071462d14093205b41de1402a08e4003cbc58ee5d63915aebcc28339be408ee",
+                "slot": 0,
+                "value": null
+              }
+            ]
+          },
+          "sensitive_attributes": [
+            [
+              {
+                "type": "get_attr",
+                "value": "secret_slots"
+              }
+            ]
+          ],
+          "identity_schema_version": 0
+        }
+      ]
+    }
+  ],
+  "check_results": null
+}

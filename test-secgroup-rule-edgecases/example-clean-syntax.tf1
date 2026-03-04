@@ -1,0 +1,86 @@
+# Example: Clean syntax using Terraform references
+# This demonstrates the RECOMMENDED approach to avoid repeating project_id/region_id
+
+terraform {
+  required_providers {
+    gcore = {
+      source = "gcore/gcore"
+    }
+  }
+}
+
+provider "gcore" {
+  # Uses environment variables
+}
+
+# Define security group with project_id/region_id ONCE
+resource "gcore_cloud_security_group" "web" {
+  project_id = 379987
+  region_id  = 76
+
+  security_group = {
+    name        = "web-servers"
+    description = "Web server security group"
+  }
+}
+
+# Rules reference the parent - DRY principle!
+resource "gcore_cloud_security_group_rule" "https" {
+  group_id   = gcore_cloud_security_group.web.id
+  project_id = gcore_cloud_security_group.web.project_id  # Reference parent
+  region_id  = gcore_cloud_security_group.web.region_id   # Reference parent
+
+  direction        = "ingress"
+  ethertype        = "IPv4"
+  protocol         = "tcp"
+  port_range_min   = 443
+  port_range_max   = 443
+  remote_ip_prefix = "0.0.0.0/0"
+  description      = "Allow HTTPS"
+}
+
+resource "gcore_cloud_security_group_rule" "http" {
+  group_id   = gcore_cloud_security_group.web.id
+  project_id = gcore_cloud_security_group.web.project_id  # Reference parent
+  region_id  = gcore_cloud_security_group.web.region_id   # Reference parent
+
+  direction        = "ingress"
+  ethertype        = "IPv4"
+  protocol         = "tcp"
+  port_range_min   = 80
+  port_range_max   = 80
+  remote_ip_prefix = "0.0.0.0/0"
+  description      = "Allow HTTP"
+}
+
+resource "gcore_cloud_security_group_rule" "ssh" {
+  group_id   = gcore_cloud_security_group.web.id
+  project_id = gcore_cloud_security_group.web.project_id  # Reference parent
+  region_id  = gcore_cloud_security_group.web.region_id   # Reference parent
+
+  direction        = "ingress"
+  ethertype        = "IPv4"
+  protocol         = "tcp"
+  port_range_min   = 22
+  port_range_max   = 22
+  remote_ip_prefix = "10.0.0.0/8"  # Internal network only
+  description      = "Allow SSH from internal network"
+}
+
+# Alternative: Using environment variables (even cleaner!)
+# Set these environment variables:
+#   export GCORE_CLOUD_PROJECT_ID=379987
+#   export GCORE_CLOUD_REGION_ID=76
+#
+# Then you can omit project_id/region_id entirely:
+#
+# resource "gcore_cloud_security_group_rule" "https_envvar" {
+#   group_id = gcore_cloud_security_group.web.id
+#   # project_id and region_id auto-populated from env vars!
+#
+#   direction        = "ingress"
+#   protocol         = "tcp"
+#   port_range_min   = 443
+#   port_range_max   = 443
+#   remote_ip_prefix = "0.0.0.0/0"
+# }

@@ -1,0 +1,10 @@
+[0m[1mgcore_cdn_origin_group.tc1_public[0]: Importing from ID "1354297"...[0m
+[0m[1m[32mgcore_cdn_origin_group.tc1_public[0]: Import prepared![0m
+[0m[32m  Prepared gcore_cdn_origin_group for import[0m
+[0m[1mgcore_cdn_origin_group.tc1_public[0]: Refreshing state... [name=test-cdn-og-tc1-public-skill][0m
+[0m[32m
+Import successful!
+
+The resources that were imported are shown above. These resources are now in
+your Terraform state and will henceforth be managed by Terraform.
+[0m

@@ -1,0 +1,64 @@
+
+Warning: Provider development overrides are in effect
+
+The following provider development overrides are set in the CLI
+configuration:
+ - gcore/gcore in /Users/user/repos/gcore-terraform
+
+The behavior may therefore not match any released version of the provider and
+applying changes may cause the state to become incompatible with published
+releases.
+gcore_dns_zone.test: Refreshing state... [id=test-tf-dns-skill-1770884578.com]
+
+Terraform used the selected providers to generate the following execution
+plan. Resource actions are indicated with the following symbols:
+  ~ update in-place
+
+Terraform will perform the following actions:
+
+  # gcore_dns_zone.test will be updated in-place
+  ~ resource "gcore_dns_zone" "test" {
+      ~ dnssec_enabled = false -> true
+        id             = "test-tf-dns-skill-1770884578.com"
+        name           = "test-tf-dns-skill-1770884578.com"
+      ~ serial         = 1770884733 -> (known after apply)
+      + warnings       = (known after apply)
+        # (10 unchanged attributes hidden)
+    }
+
+Plan: 0 to add, 1 to change, 0 to destroy.
+
+Changes to Outputs:
+  ~ zone_dnssec        = false -> true
+  ~ zone_serial        = 1770884733 -> (known after apply)
+gcore_dns_zone.test: Modifying... [id=test-tf-dns-skill-1770884578.com]
+gcore_dns_zone.test: Modifications complete after 2s [id=test-tf-dns-skill-1770884578.com]
+
+Apply complete! Resources: 0 added, 1 changed, 0 destroyed.
+
+Outputs:
+
+zone_contact = "admin@testzone.com"
+zone_dnssec = true
+zone_id = "test-tf-dns-skill-1770884578.com"
+zone_records = tolist([
+  {
+    "name" = "test-tf-dns-skill-1770884578.com"
+    "short_answers" = tolist([
+      "ns1.gcorelabs.net",
+      "ns2.gcdn.services",
+    ])
+    "ttl" = 3600
+    "type" = "NS"
+  },
+])
+zone_rrsets_amount = {
+  "dynamic" = {
+    "healthcheck" = 0
+    "total" = 0
+  }
+  "static" = 1
+  "total" = 1
+}
+zone_serial = 1770884750
+zone_status = "pending"

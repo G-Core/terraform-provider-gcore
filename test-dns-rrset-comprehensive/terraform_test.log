@@ -1,0 +1,21 @@
+2025-12-01T14:51:03.296+0200 [INFO]  Terraform version: 1.10.5
+2025-12-01T14:51:03.297+0200 [DEBUG] using github.com/hashicorp/go-tfe v1.70.0
+2025-12-01T14:51:03.297+0200 [DEBUG] using github.com/hashicorp/hcl/v2 v2.23.0
+2025-12-01T14:51:03.297+0200 [DEBUG] using github.com/hashicorp/terraform-svchost v0.1.1
+2025-12-01T14:51:03.297+0200 [DEBUG] using github.com/zclconf/go-cty v1.16.2
+2025-12-01T14:51:03.297+0200 [INFO]  Go runtime version: go1.23.3
+2025-12-01T14:51:03.297+0200 [INFO]  CLI args: []string{"terraform", "init", "-upgrade"}
+2025-12-01T14:51:03.297+0200 [DEBUG] Attempting to open CLI config file: /Users/user/repos/gcore-terraform/.terraformrc
+2025-12-01T14:51:03.298+0200 [INFO]  Loading CLI configuration from /Users/user/repos/gcore-terraform/.terraformrc
+2025-12-01T14:51:03.299+0200 [DEBUG] Not reading CLI config directory because config location is overridden by environment variable
+2025-12-01T14:51:03.300+0200 [DEBUG] checking for credentials in "/Users/user/.terraform.d/plugins"
+2025-12-01T14:51:03.300+0200 [DEBUG] Explicit provider installation configuration is set
+2025-12-01T14:51:03.301+0200 [INFO]  CLI command args: []string{"init", "-upgrade"}
+2025-12-01T14:51:03.313+0200 [DEBUG] Provider registry.terraform.io/gcore/gcore is overridden by dev_overrides
+2025-12-01T14:51:03.314+0200 [DEBUG] Provider registry.terraform.io/gcore/gcore is overridden to load from /Users/user/repos/gcore-terraform
+2025-12-01T14:51:03.314+0200 [DEBUG] checking for provisioner in "."
+2025-12-01T14:51:03.321+0200 [DEBUG] checking for provisioner in "/opt/homebrew/bin"
+2025-12-01T14:51:03.321+0200 [DEBUG] checking for provisioner in "/Users/user/.terraform.d/plugins"
+2025-12-01T14:51:03.322+0200 [DEBUG] Provider registry.terraform.io/gcore/gcore is overridden by dev_overrides
+2025-12-01T14:51:03.323+0200 [DEBUG] Service discovery for registry.terraform.io at https://registry.terraform.io/.well-known/terraform.json
+2025-12-01T14:51:03.499+0200 [DEBUG] GET https://registry.terraform.io/v1/providers/gcore/gcore/versions

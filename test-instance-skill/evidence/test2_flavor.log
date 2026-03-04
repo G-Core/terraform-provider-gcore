@@ -1,0 +1,103 @@
+[33m╷[0m[0m
+[33m│[0m [0m[1m[33mWarning: [0m[0m[1mProvider development overrides are in effect[0m
+[33m│[0m [0m
+[33m│[0m [0m[0mThe following provider development overrides are set in the CLI
+[33m│[0m [0mconfiguration:
+[33m│[0m [0m - gcore/gcore in /Users/user/repos/gcore-terraform
+[33m│[0m [0m
+[33m│[0m [0mThe behavior may therefore not match any released version of the provider
+[33m│[0m [0mand applying changes may cause the state to become incompatible with
+[33m│[0m [0mpublished releases.
+[33m╵[0m[0m
+[0m[1mgcore_cloud_volume.boot: Refreshing state... [id=0834f9fb-1fb3-4d11-b1d8-74622f0ca032][0m
+[0m[1mgcore_cloud_instance.test: Refreshing state... [id=86973cc4-a805-4ab4-a177-d68d0622a765][0m
+
+Terraform used the selected providers to generate the following execution
+plan. Resource actions are indicated with the following symbols:
+  [33m~[0m update in-place[0m
+
+Terraform will perform the following actions:
+
+[1m  # gcore_cloud_instance.test[0m will be updated in-place
+[0m  [33m~[0m[0m resource "gcore_cloud_instance" "test" {
+      [33m~[0m[0m addresses            = {
+          [31m-[0m[0m "pub_net" = [
+              [31m-[0m[0m {
+                  [31m-[0m[0m addr        = "109.61.125.241"
+                  [31m-[0m[0m subnet_id   = "b4c6e91a-9eb9-4c59-ad57-00124eceda00"
+                  [31m-[0m[0m subnet_name = "pub_net11"
+                  [31m-[0m[0m type        = "fixed"
+                },
+            ]
+        } -> (known after apply)
+      [32m+[0m[0m ddos_profile         = (known after apply)
+      [32m+[0m[0m fixed_ip_assignments = (known after apply)
+      [33m~[0m[0m flavor               = "g1-standard-1-2" [33m->[0m[0m "g1-standard-2-4"
+        id                   = "86973cc4-a805-4ab4-a177-d68d0622a765"
+      [32m+[0m[0m instance_description = (known after apply)
+      [32m+[0m[0m instance_isolation   = (known after apply)
+      [33m~[0m[0m interfaces           = [
+          [33m~[0m[0m {
+              [33m~[0m[0m ip_address = "109.61.125.241" -> (known after apply)
+              [33m~[0m[0m port_id    = "95113522-8fa2-4403-9564-4cb9674d8384" -> (known after apply)
+                [90m# (1 unchanged attribute hidden)[0m[0m
+            },
+        ]
+        name                 = "pr35-comprehensive-test"
+      [33m~[0m[0m status               = "ACTIVE" -> (known after apply)
+      [32m+[0m[0m task_id              = (known after apply)
+      [32m+[0m[0m task_state           = (known after apply)
+      [33m~[0m[0m vm_state             = "active" -> (known after apply)
+        [90m# (7 unchanged attributes hidden)[0m[0m
+    }
+
+[1mPlan:[0m 0 to add, 1 to change, 0 to destroy.
+[0m
+Changes to Outputs:
+  [33m~[0m[0m instance_addresses     = {
+      [31m-[0m[0m pub_net = [
+          [31m-[0m[0m {
+              [31m-[0m[0m addr           = "109.61.125.241"
+              [31m-[0m[0m interface_name = [90mnull[0m[0m
+              [31m-[0m[0m subnet_id      = "b4c6e91a-9eb9-4c59-ad57-00124eceda00"
+              [31m-[0m[0m subnet_name    = "pub_net11"
+              [31m-[0m[0m type           = "fixed"
+            },
+        ]
+    } -> (known after apply)
+  [33m~[0m[0m instance_flavor        = "g1-standard-1-2" [33m->[0m[0m "g1-standard-2-4"
+  [33m~[0m[0m instance_interfaces    = [
+      [33m~[0m[0m {
+          [33m~[0m[0m ip_address      = "109.61.125.241" -> (known after apply)
+          [33m~[0m[0m port_id         = "95113522-8fa2-4403-9564-4cb9674d8384" -> (known after apply)
+            [90m# (7 unchanged attributes hidden)[0m[0m
+        },
+    ]
+  [33m~[0m[0m instance_status        = "ACTIVE" -> (known after apply)
+  [33m~[0m[0m instance_vm_state      = "active" -> (known after apply)
+[0m[1mgcore_cloud_instance.test: Modifying... [id=86973cc4-a805-4ab4-a177-d68d0622a765][0m[0m
+[0m[1mgcore_cloud_instance.test: Still modifying... [id=86973cc4-a805-4ab4-a177-d68d0622a765, 10s elapsed][0m[0m
+[0m[1mgcore_cloud_instance.test: Still modifying... [id=86973cc4-a805-4ab4-a177-d68d0622a765, 20s elapsed][0m[0m
+[0m[1mgcore_cloud_instance.test: Still modifying... [id=86973cc4-a805-4ab4-a177-d68d0622a765, 30s elapsed][0m[0m
+[31m╷[0m[0m
+[31m│[0m [0m[1m[31mError: [0m[0m[1mProvider produced inconsistent result after apply[0m
+[31m│[0m [0m
+[31m│[0m [0m[0mWhen applying changes to gcore_cloud_instance.test, provider
+[31m│[0m [0m"provider[\"registry.terraform.io/gcore/gcore\"]" produced an unexpected
+[31m│[0m [0mnew value: .flavor: was cty.StringVal("g1-standard-2-4"), but now
+[31m│[0m [0mcty.StringVal("g1-standard-1-2").
+[31m│[0m [0m
+[31m│[0m [0mThis is a bug in the provider, which should be reported in the provider's
+[31m│[0m [0mown issue tracker.
+[31m╵[0m[0m
+
+=== BUG FOUND ===
+Provider Issue: Flavor change operation doesn't wait for task completion properly.
+Expected: Flavor should change to g1-standard-2-4
+Actual: Flavor remains g1-standard-1-2 (verified via direct API call)
+Error: "Provider produced inconsistent result after apply"
+
+Root Cause (suspected): The changeflavor endpoint returns before the operation completes,
+or the task polling doesn't wait for the resize to finish.
+
+Action: Need to investigate resource.go changeflavor implementation.

@@ -1,0 +1,12 @@
+{
+  "image_id": {
+    "sensitive": false,
+    "type": "string",
+    "value": "314fde33-4ecb-4d62-a729-cf0fe3b54ebb"
+  },
+  "image_status": {
+    "sensitive": false,
+    "type": "string",
+    "value": "queued"
+  }
+}

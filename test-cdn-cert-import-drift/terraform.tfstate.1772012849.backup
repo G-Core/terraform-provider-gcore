@@ -1,0 +1,40 @@
+{
+  "version": 4,
+  "terraform_version": "1.14.3",
+  "serial": 3,
+  "lineage": "91e02ef2-1432-34c3-d539-b93c6cbffd57",
+  "outputs": {},
+  "resources": [
+    {
+      "mode": "managed",
+      "type": "gcore_cdn_certificate",
+      "name": "test",
+      "provider": "provider[\"registry.terraform.io/gcore/gcore\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "automated": true,
+            "cert_issuer": null,
+            "cert_subject_alt": null,
+            "cert_subject_cn": null,
+            "deleted": false,
+            "has_related_resources": false,
+            "id": 280468,
+            "name": "tf-test-import-drift-check",
+            "ssl_certificate": null,
+            "ssl_certificate_chain": null,
+            "ssl_id": 280468,
+            "ssl_private_key": null,
+            "validate_root_ca": false,
+            "validity_not_after": null,
+            "validity_not_before": null
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0
+        }
+      ]
+    }
+  ],
+  "check_results": null
+}

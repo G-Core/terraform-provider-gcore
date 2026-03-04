@@ -1,0 +1,47 @@
+
+Warning: Provider development overrides are in effect
+
+The following provider development overrides are set in the CLI
+configuration:
+ - gcore/gcore in /Users/user/repos/gcore-terraform
+
+The behavior may therefore not match any released version of the provider and
+applying changes may cause the state to become incompatible with published
+releases.
+
+Terraform used the selected providers to generate the following execution
+plan. Resource actions are indicated with the following symbols:
+  + create
+
+Terraform will perform the following actions:
+
+  # gcore_cloud_network_router.test will be created
+  + resource "gcore_cloud_network_router" "test" {
+      + created_at            = (known after apply)
+      + creator_task_id       = (known after apply)
+      + distributed           = (known after apply)
+      + external_gateway_info = (known after apply)
+      + id                    = (known after apply)
+      + interfaces            = (known after apply)
+      + name                  = "test-router-basic"
+      + project_id            = 379987
+      + region                = (known after apply)
+      + region_id             = 76
+      + status                = (known after apply)
+      + task_id               = (known after apply)
+      + tasks                 = (known after apply)
+      + updated_at            = (known after apply)
+    }
+
+Plan: 1 to add, 0 to change, 0 to destroy.
+
+Changes to Outputs:
+  + router_id     = (known after apply)
+  + router_name   = "test-router-basic"
+  + router_region = (known after apply)
+  + router_status = (known after apply)
+
+─────────────────────────────────────────────────────────────────────────────
+
+Note: You didn't use the -out option to save this plan, so Terraform can't
+guarantee to take exactly these actions if you run "terraform apply" now.

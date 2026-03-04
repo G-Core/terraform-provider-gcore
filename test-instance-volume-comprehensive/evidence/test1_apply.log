@@ -1,0 +1,100 @@
+
+Warning: Provider development overrides are in effect
+
+The following provider development overrides are set in the CLI
+configuration:
+ - gcore/gcore in /Users/user/repos/gcore-terraform
+
+The behavior may therefore not match any released version of the provider and
+applying changes may cause the state to become incompatible with published
+releases.
+
+Terraform used the selected providers to generate the following execution
+plan. Resource actions are indicated with the following symbols:
+  + create
+
+Terraform will perform the following actions:
+
+  # gcore_cloud_instance.test will be created
+  + resource "gcore_cloud_instance" "test" {
+      + addresses            = (known after apply)
+      + blackhole_ports      = (known after apply)
+      + created_at           = (known after apply)
+      + creator_task_id      = (known after apply)
+      + ddos_profile         = (known after apply)
+      + fixed_ip_assignments = (known after apply)
+      + flavor               = "g1-standard-1-2"
+      + id                   = (known after apply)
+      + instance_description = (known after apply)
+      + instance_isolation   = (known after apply)
+      + interfaces           = [
+          + {
+              + ip_address = (known after apply)
+              + ip_family  = "dual"
+              + port_id    = (known after apply)
+              + type       = "external"
+            },
+        ]
+      + name                 = "tf-test-instance-volumes-comprehensive"
+      + project_id           = 379987
+      + region               = (known after apply)
+      + region_id            = 76
+      + status               = (known after apply)
+      + task_id              = (known after apply)
+      + task_state           = (known after apply)
+      + tasks                = (known after apply)
+      + vm_state             = (known after apply)
+      + volumes              = [
+          + {
+              + boot_index = 0
+              + volume_id  = (known after apply)
+            },
+        ]
+    }
+
+  # gcore_cloud_volume.boot will be created
+  + resource "gcore_cloud_volume" "boot" {
+      + attachments           = (known after apply)
+      + bootable              = (known after apply)
+      + created_at            = (known after apply)
+      + creator_task_id       = (known after apply)
+      + id                    = (known after apply)
+      + image_id              = "f84ddba3-7a5a-4199-931a-250e981d16fb"
+      + is_root_volume        = (known after apply)
+      + limiter_stats         = (known after apply)
+      + name                  = "tf-test-boot-volume-comprehensive"
+      + project_id            = 379987
+      + region                = (known after apply)
+      + region_id             = 76
+      + size                  = 10
+      + snapshot_ids          = (known after apply)
+      + source                = "image"
+      + status                = (known after apply)
+      + task_id               = (known after apply)
+      + tasks                 = (known after apply)
+      + type_name             = "standard"
+      + updated_at            = (known after apply)
+      + volume_image_metadata = (known after apply)
+      + volume_type           = (known after apply)
+    }
+
+Plan: 2 to add, 0 to change, 0 to destroy.
+
+Changes to Outputs:
+  + boot_volume_id = (known after apply)
+  + instance_id    = (known after apply)
+gcore_cloud_volume.boot: Creating...
+gcore_cloud_volume.boot: Creation complete after 5s [id=f95a61f3-a2f3-4106-a5bd-017de78bb0ff]
+gcore_cloud_instance.test: Creating...
+gcore_cloud_instance.test: Still creating... [10s elapsed]
+gcore_cloud_instance.test: Still creating... [20s elapsed]
+gcore_cloud_instance.test: Still creating... [30s elapsed]
+gcore_cloud_instance.test: Still creating... [40s elapsed]
+gcore_cloud_instance.test: Creation complete after 48s [id=d94fe0c6-015b-415d-a8e0-ccb5dca1e0a5]
+
+Apply complete! Resources: 2 added, 0 changed, 0 destroyed.
+
+Outputs:
+
+boot_volume_id = "f95a61f3-a2f3-4106-a5bd-017de78bb0ff"
+instance_id = "d94fe0c6-015b-415d-a8e0-ccb5dca1e0a5"

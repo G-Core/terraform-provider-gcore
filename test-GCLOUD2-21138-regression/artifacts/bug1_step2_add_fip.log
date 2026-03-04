@@ -1,0 +1,113 @@
+[33m╷[0m[0m
+[33m│[0m [0m[1m[33mWarning: [0m[0m[1mProvider development overrides are in effect[0m
+[33m│[0m [0m
+[33m│[0m [0m[0mThe following provider development overrides are set in the CLI
+[33m│[0m [0mconfiguration:
+[33m│[0m [0m - gcore/gcore in /Users/user/repos/gcore-terraform
+[33m│[0m [0m
+[33m│[0m [0mThe behavior may therefore not match any released version of the provider
+[33m│[0m [0mand applying changes may cause the state to become incompatible with
+[33m│[0m [0mpublished releases.
+[33m╵[0m[0m
+[0m[1mgcore_cloud_network.private: Refreshing state... [id=e1e546fd-f9db-48ec-b92e-17a4864b12ee][0m
+[0m[1mgcore_cloud_volume.boot: Refreshing state... [id=604c1e08-9b17-4733-941a-15eb918c975a][0m
+[0m[1mgcore_cloud_placement_group.test: Refreshing state... [id=1874e0e7-2270-48ba-8035-1623670c3c24][0m
+[0m[1mgcore_cloud_network_subnet.private: Refreshing state... [id=8e5d1013-2852-4e5f-a7ca-ee8357f38e79][0m
+[0m[1mgcore_cloud_network_router.main: Refreshing state... [id=6c7f8c81-73d3-44f5-a24f-0edc0a07557f][0m
+[0m[1mgcore_cloud_instance.test[0]: Refreshing state... [id=87be1230-0eff-4f81-a2be-7d5da3ea836a][0m
+
+Terraform used the selected providers to generate the following execution
+plan. Resource actions are indicated with the following symbols:
+  [33m~[0m update in-place[0m
+
+Terraform will perform the following actions:
+
+[1m  # gcore_cloud_instance.test[0][0m will be updated in-place
+[0m  [33m~[0m[0m resource "gcore_cloud_instance" "test" {
+      [33m~[0m[0m addresses            = {
+          [31m-[0m[0m "regression-test-network" = [
+              [31m-[0m[0m {
+                  [31m-[0m[0m addr        = "192.168.100.230"
+                  [31m-[0m[0m subnet_id   = "8e5d1013-2852-4e5f-a7ca-ee8357f38e79"
+                  [31m-[0m[0m subnet_name = "regression-test-subnet"
+                  [31m-[0m[0m type        = "fixed"
+                },
+            ]
+        } -> (known after apply)
+      [32m+[0m[0m ddos_profile         = (known after apply)
+      [32m+[0m[0m fixed_ip_assignments = (known after apply)
+        id                   = "87be1230-0eff-4f81-a2be-7d5da3ea836a"
+      [32m+[0m[0m instance_description = (known after apply)
+      [32m+[0m[0m instance_isolation   = (known after apply)
+      [33m~[0m[0m interfaces           = [
+          [33m~[0m[0m {
+              [32m+[0m[0m floating_ip = {
+                  [32m+[0m[0m source = "new"
+                }
+              [33m~[0m[0m ip_address  = "192.168.100.230" -> (known after apply)
+              [33m~[0m[0m port_id     = "f49aa7ae-63c0-492d-af4c-d0f4b22d2e7b" -> (known after apply)
+                [90m# (3 unchanged attributes hidden)[0m[0m
+            },
+        ]
+        name                 = "regression-test-instance"
+      [33m~[0m[0m status               = "ACTIVE" -> (known after apply)
+        tags                 = {
+            "env"     = "test"
+            "project" = "regression"
+        }
+      [32m+[0m[0m task_id              = (known after apply)
+      [32m+[0m[0m task_state           = (known after apply)
+      [32m+[0m[0m tasks                = (known after apply)
+      [33m~[0m[0m vm_state             = "active" -> (known after apply)
+        [90m# (8 unchanged attributes hidden)[0m[0m
+    }
+
+[1mPlan:[0m 0 to add, 1 to change, 0 to destroy.
+[0m
+Changes to Outputs:
+  [33m~[0m[0m instance_addresses  = {
+      [31m-[0m[0m regression-test-network = [
+          [31m-[0m[0m {
+              [31m-[0m[0m addr           = "192.168.100.230"
+              [31m-[0m[0m interface_name = [90mnull[0m[0m
+              [31m-[0m[0m subnet_id      = "8e5d1013-2852-4e5f-a7ca-ee8357f38e79"
+              [31m-[0m[0m subnet_name    = "regression-test-subnet"
+              [31m-[0m[0m type           = "fixed"
+            },
+        ]
+    } -> (known after apply)
+  [33m~[0m[0m instance_interfaces = [
+      [33m~[0m[0m {
+          [33m~[0m[0m floating_ip     = [90mnull[0m[0m [33m->[0m[0m {
+              [32m+[0m[0m existing_floating_id = [90mnull[0m[0m
+              [32m+[0m[0m source               = "new"
+            }
+          [33m~[0m[0m ip_address      = "192.168.100.230" -> (known after apply)
+          [33m~[0m[0m port_id         = "f49aa7ae-63c0-492d-af4c-d0f4b22d2e7b" -> (known after apply)
+            [90m# (6 unchanged attributes hidden)[0m[0m
+        },
+    ]
+  [33m~[0m[0m instance_status     = "ACTIVE" -> (known after apply)
+[0m[1mgcore_cloud_instance.test[0]: Modifying... [id=87be1230-0eff-4f81-a2be-7d5da3ea836a][0m[0m
+[31m╷[0m[0m
+[31m│[0m [0m[1m[31mError: [0m[0m[1mProvider produced inconsistent result after apply[0m
+[31m│[0m [0m
+[31m│[0m [0m[0mWhen applying changes to gcore_cloud_instance.test[0], provider
+[31m│[0m [0m"provider[\"registry.terraform.io/gcore/gcore\"]" produced an unexpected
+[31m│[0m [0mnew value: .interfaces[0].floating_ip.existing_floating_id: was null, but
+[31m│[0m [0mnow cty.StringVal("26369297-93b4-4095-8f04-eae0517d4f5b").
+[31m│[0m [0m
+[31m│[0m [0mThis is a bug in the provider, which should be reported in the provider's
+[31m│[0m [0mown issue tracker.
+[31m╵[0m[0m
+[31m╷[0m[0m
+[31m│[0m [0m[1m[31mError: [0m[0m[1mProvider produced inconsistent result after apply[0m
+[31m│[0m [0m
+[31m│[0m [0m[0mWhen applying changes to gcore_cloud_instance.test[0], provider
+[31m│[0m [0m"provider[\"registry.terraform.io/gcore/gcore\"]" produced an unexpected
+[31m│[0m [0mnew value: .interfaces[0].floating_ip.source: was cty.StringVal("new"), but
+[31m│[0m [0mnow cty.StringVal("existing").
+[31m│[0m [0m
+[31m│[0m [0mThis is a bug in the provider, which should be reported in the provider's
+[31m│[0m [0mown issue tracker.
+[31m╵[0m[0m

@@ -1,0 +1,44 @@
+
+Warning: Provider development overrides are in effect
+
+The following provider development overrides are set in the CLI
+configuration:
+ - gcore/gcore in /Users/user/repos/gcore-terraform
+
+The behavior may therefore not match any released version of the provider and
+applying changes may cause the state to become incompatible with published
+releases.
+gcore_fastedge_secret.test_multi: Refreshing state... [name=tf-skill-test-multi-slot]
+
+Note: Objects have changed outside of Terraform
+
+Terraform detected the following changes made outside of Terraform since the
+last "terraform apply" which may have affected this plan:
+
+  # gcore_fastedge_secret.test_multi has changed
+  ~ resource "gcore_fastedge_secret" "test_multi" {
+        id           = 333
+        name         = "tf-skill-test-multi-slot"
+      ~ secret_slots = (sensitive value)
+        # (1 unchanged attribute hidden)
+    }
+
+
+Unless you have made equivalent changes to your configuration, or ignored the
+relevant attributes using ignore_changes, the following plan may include
+actions to undo or respond to these changes.
+
+─────────────────────────────────────────────────────────────────────────────
+
+Changes to Outputs:
+  ~ multi_slot_secret_slots = (sensitive value)
+
+You can apply this plan to save these new output values to the Terraform
+state, without changing any real infrastructure.
+
+Apply complete! Resources: 0 added, 0 changed, 0 destroyed.
+
+Outputs:
+
+multi_slot_id = 333
+multi_slot_secret_slots = <sensitive>

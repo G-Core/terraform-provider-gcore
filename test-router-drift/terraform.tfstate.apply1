@@ -1,0 +1,217 @@
+{
+  "version": 4,
+  "terraform_version": "1.10.5",
+  "serial": 6,
+  "lineage": "8a1a06e9-da4c-b069-9e62-2459d52d8dde",
+  "outputs": {
+    "router_basic_external_gateway": {
+      "value": {
+        "enable_snat": true,
+        "network_id": "4b99f7d1-5d1e-4fdb-8ae1-a4bfb208556c",
+        "type": "default"
+      },
+      "type": [
+        "object",
+        {
+          "enable_snat": "bool",
+          "network_id": "string",
+          "type": "string"
+        }
+      ]
+    },
+    "router_basic_id": {
+      "value": "5d9a138a-174c-45dd-9649-431fc7b5e581",
+      "type": "string"
+    },
+    "router_routes_id": {
+      "value": "7502cb6b-acfc-4966-99ca-b662687bdbb6",
+      "type": "string"
+    },
+    "router_routes_list": {
+      "value": [
+        {
+          "destination": "10.0.0.0/24",
+          "nexthop": "192.168.100.10"
+        },
+        {
+          "destination": "10.1.0.0/24",
+          "nexthop": "192.168.100.20"
+        }
+      ],
+      "type": [
+        "list",
+        [
+          "object",
+          {
+            "destination": "string",
+            "nexthop": "string"
+          }
+        ]
+      ]
+    }
+  },
+  "resources": [
+    {
+      "mode": "managed",
+      "type": "gcore_cloud_network",
+      "name": "test_network",
+      "provider": "provider[\"registry.terraform.io/gcore/gcore\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "create_router": true,
+            "created_at": "2025-10-28T08:23:12Z",
+            "creator_task_id": "210c6c50-27c4-47b0-a27f-acbd15ba36e9",
+            "default": null,
+            "external": false,
+            "id": "69b3a353-1c2e-457f-8353-d3886309f3c6",
+            "mtu": 1500,
+            "name": "qa-router-drift-network",
+            "port_security_enabled": true,
+            "project_id": 379987,
+            "region": "Luxembourg-2",
+            "region_id": 76,
+            "segmentation_id": 400,
+            "shared": false,
+            "subnets": [],
+            "tags": null,
+            "task_id": null,
+            "tasks": null,
+            "type": "vxlan",
+            "updated_at": "2025-10-28T08:23:12Z"
+          },
+          "sensitive_attributes": []
+        }
+      ]
+    },
+    {
+      "mode": "managed",
+      "type": "gcore_cloud_network_router",
+      "name": "router_basic",
+      "provider": "provider[\"registry.terraform.io/gcore/gcore\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "created_at": "2025-10-28T08:23:12Z",
+            "creator_task_id": "92045e8f-5012-4e11-b42b-be30f717a093",
+            "distributed": false,
+            "external_gateway_info": {
+              "enable_snat": true,
+              "network_id": "4b99f7d1-5d1e-4fdb-8ae1-a4bfb208556c",
+              "type": "default"
+            },
+            "id": "5d9a138a-174c-45dd-9649-431fc7b5e581",
+            "interfaces": [],
+            "name": "qa-router-drift-basic",
+            "project_id": 379987,
+            "region": "Luxembourg-2",
+            "region_id": 76,
+            "routes": [],
+            "status": "ACTIVE",
+            "task_id": null,
+            "tasks": null,
+            "updated_at": "2025-10-28T08:23:15Z"
+          },
+          "sensitive_attributes": []
+        }
+      ]
+    },
+    {
+      "mode": "managed",
+      "type": "gcore_cloud_network_router",
+      "name": "router_routes",
+      "provider": "provider[\"registry.terraform.io/gcore/gcore\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "created_at": "2025-10-28T08:23:39Z",
+            "creator_task_id": "bfa6af39-ba57-4282-bbc8-f6f8ff4acb53",
+            "distributed": false,
+            "external_gateway_info": {
+              "enable_snat": true,
+              "network_id": "4b99f7d1-5d1e-4fdb-8ae1-a4bfb208556c",
+              "type": "default"
+            },
+            "id": "7502cb6b-acfc-4966-99ca-b662687bdbb6",
+            "interfaces": [
+              {
+                "subnet_id": "05cc4eaa-dca1-4b66-9616-5b9740c79ebc",
+                "type": "subnet"
+              }
+            ],
+            "name": "qa-router-drift-routes",
+            "project_id": 379987,
+            "region": "Luxembourg-2",
+            "region_id": 76,
+            "routes": [
+              {
+                "destination": "10.0.0.0/24",
+                "nexthop": "192.168.100.10"
+              },
+              {
+                "destination": "10.1.0.0/24",
+                "nexthop": "192.168.100.20"
+              }
+            ],
+            "status": "ACTIVE",
+            "task_id": null,
+            "tasks": null,
+            "updated_at": "2025-10-28T08:25:23Z"
+          },
+          "sensitive_attributes": [],
+          "dependencies": [
+            "gcore_cloud_network.test_network",
+            "gcore_cloud_network_subnet.subnet1"
+          ]
+        }
+      ]
+    },
+    {
+      "mode": "managed",
+      "type": "gcore_cloud_network_subnet",
+      "name": "subnet1",
+      "provider": "provider[\"registry.terraform.io/gcore/gcore\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "available_ips": 251,
+            "cidr": "192.168.100.0/24",
+            "connect_to_network_router": true,
+            "created_at": "2025-10-28T08:23:25Z",
+            "creator_task_id": "8866e3aa-1552-4da5-a0a1-e7fae0364cfe",
+            "dns_nameservers": [
+              "8.8.8.8",
+              "8.8.4.4"
+            ],
+            "enable_dhcp": true,
+            "gateway_ip": "192.168.100.1",
+            "has_router": false,
+            "host_routes": [],
+            "id": "05cc4eaa-dca1-4b66-9616-5b9740c79ebc",
+            "ip_version": 4,
+            "name": "qa-router-drift-subnet-1",
+            "network_id": "69b3a353-1c2e-457f-8353-d3886309f3c6",
+            "project_id": 379987,
+            "region": "Luxembourg-2",
+            "region_id": 76,
+            "router_id_to_connect": null,
+            "tags": null,
+            "task_id": null,
+            "tasks": null,
+            "total_ips": 253,
+            "updated_at": "2025-10-28T08:23:25Z"
+          },
+          "sensitive_attributes": [],
+          "dependencies": [
+            "gcore_cloud_network.test_network"
+          ]
+        }
+      ]
+    }
+  ],
+  "check_results": null
+}

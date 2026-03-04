@@ -1,0 +1,592 @@
+2025-11-19T10:33:16.286+0200 [INFO]  Terraform version: 1.10.5
+2025-11-19T10:33:16.286+0200 [DEBUG] using github.com/hashicorp/go-tfe v1.70.0
+2025-11-19T10:33:16.287+0200 [DEBUG] using github.com/hashicorp/hcl/v2 v2.23.0
+2025-11-19T10:33:16.287+0200 [DEBUG] using github.com/hashicorp/terraform-svchost v0.1.1
+2025-11-19T10:33:16.287+0200 [DEBUG] using github.com/zclconf/go-cty v1.16.2
+2025-11-19T10:33:16.287+0200 [INFO]  Go runtime version: go1.23.3
+2025-11-19T10:33:16.287+0200 [INFO]  CLI args: []string{"terraform", "apply", "-auto-approve"}
+2025-11-19T10:33:16.287+0200 [DEBUG] Attempting to open CLI config file: /Users/user/repos/gcore-terraform/.terraformrc
+2025-11-19T10:33:16.287+0200 [INFO]  Loading CLI configuration from /Users/user/repos/gcore-terraform/.terraformrc
+2025-11-19T10:33:16.287+0200 [DEBUG] Not reading CLI config directory because config location is overridden by environment variable
+2025-11-19T10:33:16.287+0200 [DEBUG] checking for credentials in "/Users/user/.terraform.d/plugins"
+2025-11-19T10:33:16.287+0200 [DEBUG] Explicit provider installation configuration is set
+2025-11-19T10:33:16.287+0200 [INFO]  CLI command args: []string{"apply", "-auto-approve"}
+2025-11-19T10:33:16.288+0200 [DEBUG] Provider registry.terraform.io/gcore/gcore is overridden by dev_overrides
+2025-11-19T10:33:16.288+0200 [DEBUG] Provider registry.terraform.io/gcore/gcore is overridden to load from /Users/user/repos/gcore-terraform
+2025-11-19T10:33:16.288+0200 [DEBUG] checking for provisioner in "."
+2025-11-19T10:33:16.291+0200 [DEBUG] checking for provisioner in "/opt/homebrew/bin"
+2025-11-19T10:33:16.292+0200 [DEBUG] checking for provisioner in "/Users/user/.terraform.d/plugins"
+2025-11-19T10:33:16.293+0200 [DEBUG] Provider registry.terraform.io/gcore/gcore is overridden by dev_overrides
+2025-11-19T10:33:16.295+0200 [INFO]  backend/local: starting Apply operation
+2025-11-19T10:33:16.302+0200 [DEBUG] Config.VerifyDependencySelections: skipping registry.terraform.io/gcore/gcore because it's overridden by a special configuration setting
+2025-11-19T10:33:16.303+0200 [DEBUG] created provider logger: level=debug
+2025-11-19T10:33:16.303+0200 [INFO]  provider: configuring client automatic mTLS
+2025-11-19T10:33:16.321+0200 [DEBUG] provider: starting plugin: path=/Users/user/repos/gcore-terraform/terraform-provider-gcore args=["/Users/user/repos/gcore-terraform/terraform-provider-gcore"]
+2025-11-19T10:33:16.324+0200 [DEBUG] provider: plugin started: path=/Users/user/repos/gcore-terraform/terraform-provider-gcore pid=39472
+2025-11-19T10:33:16.324+0200 [DEBUG] provider: waiting for RPC address: plugin=/Users/user/repos/gcore-terraform/terraform-provider-gcore
+2025-11-19T10:33:17.145+0200 [INFO]  provider.terraform-provider-gcore: configuring server automatic mTLS: timestamp="2025-11-19T10:33:17.144+0200"
+2025-11-19T10:33:17.159+0200 [DEBUG] provider.terraform-provider-gcore: plugin address: network=unix address=/var/folders/qj/cbb8n0j12tq6j2k955fxwpb80000gn/T/plugin4235435033 timestamp="2025-11-19T10:33:17.158+0200"
+2025-11-19T10:33:17.159+0200 [DEBUG] provider: using plugin: version=6
+2025-11-19T10:33:17.182+0200 [DEBUG] No provider meta schema returned
+2025-11-19T10:33:17.185+0200 [DEBUG] provider.stdio: received EOF, stopping recv loop: err="rpc error: code = Unavailable desc = error reading from server: EOF"
+2025-11-19T10:33:17.185+0200 [INFO]  provider: plugin process exited: plugin=/Users/user/repos/gcore-terraform/terraform-provider-gcore id=39472
+2025-11-19T10:33:17.185+0200 [DEBUG] provider: plugin exited
+2025-11-19T10:33:17.186+0200 [DEBUG] Building and walking validate graph
+2025-11-19T10:33:17.189+0200 [DEBUG] ProviderTransformer: "data.gcore_cloud_image.ubuntu" (*terraform.NodeValidatableResource) needs provider["registry.terraform.io/gcore/gcore"]
+2025-11-19T10:33:17.189+0200 [DEBUG] ProviderTransformer: "gcore_cloud_instance.test" (*terraform.NodeValidatableResource) needs provider["registry.terraform.io/gcore/gcore"]
+2025-11-19T10:33:17.189+0200 [ERROR] AttachSchemaTransformer: No resource schema available for data.gcore_cloud_image.ubuntu
+2025-11-19T10:33:17.189+0200 [WARN]  no schema is attached to data.gcore_cloud_image.ubuntu, so config references cannot be detected
+2025-11-19T10:33:17.189+0200 [DEBUG] ReferenceTransformer: "data.gcore_cloud_image.ubuntu" references: []
+2025-11-19T10:33:17.190+0200 [DEBUG] ReferenceTransformer: "provider[\"registry.terraform.io/gcore/gcore\"]" references: [var.api_key]
+2025-11-19T10:33:17.190+0200 [DEBUG] ReferenceTransformer: "output.volume_size (expand)" references: [gcore_cloud_instance.test]
+2025-11-19T10:33:17.192+0200 [DEBUG] ReferenceTransformer: "gcore_cloud_instance.test" references: [var.instance_name var.project_id var.region_id var.vm_state data.gcore_cloud_image.ubuntu var.volume_size var.flavor]
+2025-11-19T10:33:17.192+0200 [DEBUG] ReferenceTransformer: "var.instance_name" references: []
+2025-11-19T10:33:17.192+0200 [DEBUG] ReferenceTransformer: "output.instance_id (expand)" references: [gcore_cloud_instance.test]
+2025-11-19T10:33:17.192+0200 [DEBUG] ReferenceTransformer: "output.instance_vm_state (expand)" references: [gcore_cloud_instance.test]
+2025-11-19T10:33:17.192+0200 [DEBUG] ReferenceTransformer: "output.volume_id (expand)" references: [gcore_cloud_instance.test]
+2025-11-19T10:33:17.192+0200 [DEBUG] ReferenceTransformer: "var.api_key" references: []
+2025-11-19T10:33:17.192+0200 [DEBUG] ReferenceTransformer: "var.project_id" references: []
+2025-11-19T10:33:17.192+0200 [DEBUG] ReferenceTransformer: "var.flavor" references: []
+2025-11-19T10:33:17.192+0200 [DEBUG] ReferenceTransformer: "output.instance_status (expand)" references: [gcore_cloud_instance.test]
+2025-11-19T10:33:17.192+0200 [DEBUG] ReferenceTransformer: "output.instance_flavor (expand)" references: [gcore_cloud_instance.test]
+2025-11-19T10:33:17.192+0200 [DEBUG] ReferenceTransformer: "output.instance_addresses (expand)" references: [gcore_cloud_instance.test]
+2025-11-19T10:33:17.193+0200 [DEBUG] ReferenceTransformer: "var.volume_size" references: []
+2025-11-19T10:33:17.193+0200 [DEBUG] ReferenceTransformer: "var.vm_state" references: []
+2025-11-19T10:33:17.193+0200 [DEBUG] ReferenceTransformer: "var.region_id" references: []
+2025-11-19T10:33:17.193+0200 [WARN]  no schema is attached to data.gcore_cloud_image.ubuntu, so config references cannot be detected
+2025-11-19T10:33:17.193+0200 [DEBUG] Starting graph walk: walkValidate
+2025-11-19T10:33:17.197+0200 [DEBUG] created provider logger: level=debug
+2025-11-19T10:33:17.197+0200 [INFO]  provider: configuring client automatic mTLS
+2025-11-19T10:33:17.201+0200 [DEBUG] provider: starting plugin: path=/Users/user/repos/gcore-terraform/terraform-provider-gcore args=["/Users/user/repos/gcore-terraform/terraform-provider-gcore"]
+2025-11-19T10:33:17.203+0200 [DEBUG] provider: plugin started: path=/Users/user/repos/gcore-terraform/terraform-provider-gcore pid=39476
+2025-11-19T10:33:17.203+0200 [DEBUG] provider: waiting for RPC address: plugin=/Users/user/repos/gcore-terraform/terraform-provider-gcore
+2025-11-19T10:33:17.211+0200 [INFO]  provider.terraform-provider-gcore: configuring server automatic mTLS: timestamp="2025-11-19T10:33:17.211+0200"
+2025-11-19T10:33:17.217+0200 [DEBUG] provider: using plugin: version=6
+2025-11-19T10:33:17.218+0200 [DEBUG] provider.terraform-provider-gcore: plugin address: address=/var/folders/qj/cbb8n0j12tq6j2k955fxwpb80000gn/T/plugin1554538625 network=unix timestamp="2025-11-19T10:33:17.217+0200"
+2025-11-19T10:33:17.227+0200 [ERROR] vertex "data.gcore_cloud_image.ubuntu" error: Invalid data source
+2025-11-19T10:33:17.230+0200 [DEBUG] provider.stdio: received EOF, stopping recv loop: err="rpc error: code = Unavailable desc = error reading from server: EOF"
+2025-11-19T10:33:17.231+0200 [INFO]  provider: plugin process exited: plugin=/Users/user/repos/gcore-terraform/terraform-provider-gcore id=39476
+2025-11-19T10:33:17.231+0200 [DEBUG] provider: plugin exited
+2025-11-19T10:35:09.623+0200 [INFO]  Terraform version: 1.10.5
+2025-11-19T10:35:09.623+0200 [DEBUG] using github.com/hashicorp/go-tfe v1.70.0
+2025-11-19T10:35:09.623+0200 [DEBUG] using github.com/hashicorp/hcl/v2 v2.23.0
+2025-11-19T10:35:09.623+0200 [DEBUG] using github.com/hashicorp/terraform-svchost v0.1.1
+2025-11-19T10:35:09.623+0200 [DEBUG] using github.com/zclconf/go-cty v1.16.2
+2025-11-19T10:35:09.623+0200 [INFO]  Go runtime version: go1.23.3
+2025-11-19T10:35:09.623+0200 [INFO]  CLI args: []string{"terraform", "apply", "-auto-approve"}
+2025-11-19T10:35:09.623+0200 [DEBUG] Attempting to open CLI config file: /Users/user/repos/gcore-terraform/.terraformrc
+2025-11-19T10:35:09.623+0200 [INFO]  Loading CLI configuration from /Users/user/repos/gcore-terraform/.terraformrc
+2025-11-19T10:35:09.624+0200 [DEBUG] Not reading CLI config directory because config location is overridden by environment variable
+2025-11-19T10:35:09.624+0200 [DEBUG] checking for credentials in "/Users/user/.terraform.d/plugins"
+2025-11-19T10:35:09.624+0200 [DEBUG] Explicit provider installation configuration is set
+2025-11-19T10:35:09.626+0200 [INFO]  CLI command args: []string{"apply", "-auto-approve"}
+2025-11-19T10:35:09.631+0200 [DEBUG] Provider registry.terraform.io/gcore/gcore is overridden by dev_overrides
+2025-11-19T10:35:09.631+0200 [DEBUG] Provider registry.terraform.io/gcore/gcore is overridden to load from /Users/user/repos/gcore-terraform
+2025-11-19T10:35:09.632+0200 [DEBUG] checking for provisioner in "."
+2025-11-19T10:35:09.639+0200 [DEBUG] checking for provisioner in "/opt/homebrew/bin"
+2025-11-19T10:35:09.639+0200 [DEBUG] checking for provisioner in "/Users/user/.terraform.d/plugins"
+2025-11-19T10:35:09.640+0200 [DEBUG] Provider registry.terraform.io/gcore/gcore is overridden by dev_overrides
+2025-11-19T10:35:09.643+0200 [INFO]  backend/local: starting Apply operation
+2025-11-19T10:35:09.648+0200 [DEBUG] Config.VerifyDependencySelections: skipping registry.terraform.io/gcore/gcore because it's overridden by a special configuration setting
+2025-11-19T10:35:09.649+0200 [DEBUG] created provider logger: level=debug
+2025-11-19T10:35:09.649+0200 [INFO]  provider: configuring client automatic mTLS
+2025-11-19T10:35:09.659+0200 [DEBUG] provider: starting plugin: path=/Users/user/repos/gcore-terraform/terraform-provider-gcore args=["/Users/user/repos/gcore-terraform/terraform-provider-gcore"]
+2025-11-19T10:35:09.661+0200 [DEBUG] provider: plugin started: path=/Users/user/repos/gcore-terraform/terraform-provider-gcore pid=41292
+2025-11-19T10:35:09.661+0200 [DEBUG] provider: waiting for RPC address: plugin=/Users/user/repos/gcore-terraform/terraform-provider-gcore
+2025-11-19T10:35:09.749+0200 [INFO]  provider.terraform-provider-gcore: configuring server automatic mTLS: timestamp="2025-11-19T10:35:09.748+0200"
+2025-11-19T10:35:09.761+0200 [DEBUG] provider.terraform-provider-gcore: plugin address: address=/var/folders/qj/cbb8n0j12tq6j2k955fxwpb80000gn/T/plugin2759846760 network=unix timestamp="2025-11-19T10:35:09.761+0200"
+2025-11-19T10:35:09.761+0200 [DEBUG] provider: using plugin: version=6
+2025-11-19T10:35:09.799+0200 [DEBUG] No provider meta schema returned
+2025-11-19T10:35:09.803+0200 [DEBUG] provider.stdio: received EOF, stopping recv loop: err="rpc error: code = Unavailable desc = error reading from server: EOF"
+2025-11-19T10:35:09.803+0200 [INFO]  provider: plugin process exited: plugin=/Users/user/repos/gcore-terraform/terraform-provider-gcore id=41292
+2025-11-19T10:35:09.803+0200 [DEBUG] provider: plugin exited
+2025-11-19T10:35:09.804+0200 [DEBUG] Building and walking validate graph
+2025-11-19T10:35:09.805+0200 [DEBUG] ProviderTransformer: "gcore_cloud_instance.test" (*terraform.NodeValidatableResource) needs provider["registry.terraform.io/gcore/gcore"]
+2025-11-19T10:35:09.806+0200 [DEBUG] ReferenceTransformer: "output.instance_status (expand)" references: [gcore_cloud_instance.test]
+2025-11-19T10:35:09.806+0200 [DEBUG] ReferenceTransformer: "output.instance_vm_state (expand)" references: [gcore_cloud_instance.test]
+2025-11-19T10:35:09.806+0200 [DEBUG] ReferenceTransformer: "gcore_cloud_instance.test" references: [var.instance_name var.vm_state var.image_id var.volume_size var.region_id var.project_id var.flavor]
+2025-11-19T10:35:09.806+0200 [DEBUG] ReferenceTransformer: "var.flavor" references: []
+2025-11-19T10:35:09.806+0200 [DEBUG] ReferenceTransformer: "var.vm_state" references: []
+2025-11-19T10:35:09.806+0200 [DEBUG] ReferenceTransformer: "var.region_id" references: []
+2025-11-19T10:35:09.806+0200 [DEBUG] ReferenceTransformer: "output.volume_size (expand)" references: [gcore_cloud_instance.test]
+2025-11-19T10:35:09.806+0200 [DEBUG] ReferenceTransformer: "var.project_id" references: []
+2025-11-19T10:35:09.806+0200 [DEBUG] ReferenceTransformer: "var.instance_name" references: []
+2025-11-19T10:35:09.806+0200 [DEBUG] ReferenceTransformer: "var.volume_size" references: []
+2025-11-19T10:35:09.806+0200 [DEBUG] ReferenceTransformer: "output.instance_addresses (expand)" references: [gcore_cloud_instance.test]
+2025-11-19T10:35:09.806+0200 [DEBUG] ReferenceTransformer: "output.volume_id (expand)" references: [gcore_cloud_instance.test]
+2025-11-19T10:35:09.806+0200 [DEBUG] ReferenceTransformer: "output.instance_id (expand)" references: [gcore_cloud_instance.test]
+2025-11-19T10:35:09.806+0200 [DEBUG] ReferenceTransformer: "var.image_id" references: []
+2025-11-19T10:35:09.806+0200 [DEBUG] ReferenceTransformer: "var.api_key" references: []
+2025-11-19T10:35:09.806+0200 [DEBUG] ReferenceTransformer: "output.instance_flavor (expand)" references: [gcore_cloud_instance.test]
+2025-11-19T10:35:09.806+0200 [DEBUG] ReferenceTransformer: "provider[\"registry.terraform.io/gcore/gcore\"]" references: [var.api_key]
+2025-11-19T10:35:09.806+0200 [DEBUG] Starting graph walk: walkValidate
+2025-11-19T10:35:09.809+0200 [DEBUG] created provider logger: level=debug
+2025-11-19T10:35:09.809+0200 [INFO]  provider: configuring client automatic mTLS
+2025-11-19T10:35:09.813+0200 [DEBUG] provider: starting plugin: path=/Users/user/repos/gcore-terraform/terraform-provider-gcore args=["/Users/user/repos/gcore-terraform/terraform-provider-gcore"]
+2025-11-19T10:35:09.814+0200 [DEBUG] provider: plugin started: path=/Users/user/repos/gcore-terraform/terraform-provider-gcore pid=41293
+2025-11-19T10:35:09.814+0200 [DEBUG] provider: waiting for RPC address: plugin=/Users/user/repos/gcore-terraform/terraform-provider-gcore
+2025-11-19T10:35:09.822+0200 [INFO]  provider.terraform-provider-gcore: configuring server automatic mTLS: timestamp="2025-11-19T10:35:09.822+0200"
+2025-11-19T10:35:09.828+0200 [DEBUG] provider: using plugin: version=6
+2025-11-19T10:35:09.828+0200 [DEBUG] provider.terraform-provider-gcore: plugin address: address=/var/folders/qj/cbb8n0j12tq6j2k955fxwpb80000gn/T/plugin3748394169 network=unix timestamp="2025-11-19T10:35:09.828+0200"
+2025-11-19T10:35:09.837+0200 [DEBUG] skipping FixUpBlockAttrs
+2025-11-19T10:35:09.839+0200 [DEBUG] provider.stdio: received EOF, stopping recv loop: err="rpc error: code = Unavailable desc = error reading from server: EOF"
+2025-11-19T10:35:09.840+0200 [INFO]  provider: plugin process exited: plugin=/Users/user/repos/gcore-terraform/terraform-provider-gcore id=41293
+2025-11-19T10:35:09.840+0200 [DEBUG] provider: plugin exited
+2025-11-19T10:35:09.840+0200 [INFO]  backend/local: apply calling Plan
+2025-11-19T10:35:09.840+0200 [DEBUG] Building and walking plan graph for NormalMode
+2025-11-19T10:35:09.841+0200 [DEBUG] ProviderTransformer: "gcore_cloud_instance.test (expand)" (*terraform.nodeExpandPlannableResource) needs provider["registry.terraform.io/gcore/gcore"]
+2025-11-19T10:35:09.841+0200 [DEBUG] ReferenceTransformer: "var.api_key" references: []
+2025-11-19T10:35:09.841+0200 [DEBUG] ReferenceTransformer: "output.instance_vm_state (expand)" references: [gcore_cloud_instance.test (expand)]
+2025-11-19T10:35:09.841+0200 [DEBUG] ReferenceTransformer: "output.instance_addresses (expand)" references: [gcore_cloud_instance.test (expand)]
+2025-11-19T10:35:09.841+0200 [DEBUG] ReferenceTransformer: "gcore_cloud_instance.test (expand)" references: [var.project_id var.flavor var.instance_name var.vm_state var.image_id var.volume_size var.region_id]
+2025-11-19T10:35:09.841+0200 [DEBUG] ReferenceTransformer: "var.volume_size" references: []
+2025-11-19T10:35:09.841+0200 [DEBUG] ReferenceTransformer: "var.vm_state" references: []
+2025-11-19T10:35:09.841+0200 [DEBUG] ReferenceTransformer: "output.instance_flavor (expand)" references: [gcore_cloud_instance.test (expand)]
+2025-11-19T10:35:09.841+0200 [DEBUG] ReferenceTransformer: "var.instance_name" references: []
+2025-11-19T10:35:09.841+0200 [DEBUG] ReferenceTransformer: "output.volume_id (expand)" references: [gcore_cloud_instance.test (expand)]
+2025-11-19T10:35:09.841+0200 [DEBUG] ReferenceTransformer: "output.instance_status (expand)" references: [gcore_cloud_instance.test (expand)]
+2025-11-19T10:35:09.841+0200 [DEBUG] ReferenceTransformer: "var.region_id" references: []
+2025-11-19T10:35:09.841+0200 [DEBUG] ReferenceTransformer: "provider[\"registry.terraform.io/gcore/gcore\"]" references: [var.api_key]
+2025-11-19T10:35:09.841+0200 [DEBUG] ReferenceTransformer: "output.volume_size (expand)" references: [gcore_cloud_instance.test (expand)]
+2025-11-19T10:35:09.841+0200 [DEBUG] ReferenceTransformer: "output.instance_id (expand)" references: [gcore_cloud_instance.test (expand)]
+2025-11-19T10:35:09.841+0200 [DEBUG] ReferenceTransformer: "var.flavor" references: []
+2025-11-19T10:35:09.841+0200 [DEBUG] ReferenceTransformer: "var.image_id" references: []
+2025-11-19T10:35:09.841+0200 [DEBUG] ReferenceTransformer: "var.project_id" references: []
+2025-11-19T10:35:09.842+0200 [DEBUG] Starting graph walk: walkPlan
+2025-11-19T10:35:09.842+0200 [DEBUG] created provider logger: level=debug
+2025-11-19T10:35:09.842+0200 [INFO]  provider: configuring client automatic mTLS
+2025-11-19T10:35:09.845+0200 [DEBUG] provider: starting plugin: path=/Users/user/repos/gcore-terraform/terraform-provider-gcore args=["/Users/user/repos/gcore-terraform/terraform-provider-gcore"]
+2025-11-19T10:35:09.846+0200 [DEBUG] provider: plugin started: path=/Users/user/repos/gcore-terraform/terraform-provider-gcore pid=41294
+2025-11-19T10:35:09.847+0200 [DEBUG] provider: waiting for RPC address: plugin=/Users/user/repos/gcore-terraform/terraform-provider-gcore
+2025-11-19T10:35:09.855+0200 [INFO]  provider.terraform-provider-gcore: configuring server automatic mTLS: timestamp="2025-11-19T10:35:09.854+0200"
+2025-11-19T10:35:09.861+0200 [DEBUG] provider: using plugin: version=6
+2025-11-19T10:35:09.861+0200 [DEBUG] provider.terraform-provider-gcore: plugin address: address=/var/folders/qj/cbb8n0j12tq6j2k955fxwpb80000gn/T/plugin3594869467 network=unix timestamp="2025-11-19T10:35:09.861+0200"
+2025-11-19T10:35:09.869+0200 [DEBUG] Resource instance state not found for node "gcore_cloud_instance.test", instance gcore_cloud_instance.test
+2025-11-19T10:35:09.869+0200 [DEBUG] ReferenceTransformer: "gcore_cloud_instance.test" references: []
+2025-11-19T10:35:09.870+0200 [DEBUG] refresh: gcore_cloud_instance.test: no state, so not refreshing
+2025-11-19T10:35:09.870+0200 [DEBUG] skipping FixUpBlockAttrs
+2025-11-19T10:35:09.875+0200 [DEBUG] provider.terraform-provider-gcore: Marking Computed attributes with null configuration values as unknown (known after apply) in the plan to prevent potential Terraform errors: @module=sdk.framework tf_provider_addr=registry.terraform.io/stainless-sdks/gcore tf_req_id=211807f7-3644-8277-b558-146283222fb2 tf_resource_type=gcore_cloud_instance @caller=/Users/user/go/pkg/mod/github.com/hashicorp/terraform-plugin-framework@v1.15.0/internal/fwserver/server_planresourcechange.go:250 tf_rpc=PlanResourceChange timestamp="2025-11-19T10:35:09.875+0200"
+2025-11-19T10:35:09.875+0200 [DEBUG] provider.terraform-provider-gcore: marking computed attribute that is null in the config as unknown: tf_resource_type=gcore_cloud_instance tf_rpc=PlanResourceChange tf_req_id=211807f7-3644-8277-b558-146283222fb2 @caller=/Users/user/go/pkg/mod/github.com/hashicorp/terraform-plugin-framework@v1.15.0/internal/fwserver/server_planresourcechange.go:538 @module=sdk.framework tf_attribute_path="AttributeName(\"blackhole_ports\")" tf_provider_addr=registry.terraform.io/stainless-sdks/gcore timestamp="2025-11-19T10:35:09.875+0200"
+2025-11-19T10:35:09.875+0200 [DEBUG] provider.terraform-provider-gcore: marking computed attribute that is null in the config as unknown: @module=sdk.framework tf_provider_addr=registry.terraform.io/stainless-sdks/gcore tf_req_id=211807f7-3644-8277-b558-146283222fb2 tf_rpc=PlanResourceChange @caller=/Users/user/go/pkg/mod/github.com/hashicorp/terraform-plugin-framework@v1.15.0/internal/fwserver/server_planresourcechange.go:538 tf_attribute_path="AttributeName(\"created_at\")" tf_resource_type=gcore_cloud_instance timestamp="2025-11-19T10:35:09.875+0200"
+2025-11-19T10:35:09.875+0200 [DEBUG] provider.terraform-provider-gcore: marking computed attribute that is null in the config as unknown: @module=sdk.framework tf_provider_addr=registry.terraform.io/stainless-sdks/gcore @caller=/Users/user/go/pkg/mod/github.com/hashicorp/terraform-plugin-framework@v1.15.0/internal/fwserver/server_planresourcechange.go:538 tf_attribute_path="AttributeName(\"region\")" tf_req_id=211807f7-3644-8277-b558-146283222fb2 tf_resource_type=gcore_cloud_instance tf_rpc=PlanResourceChange timestamp="2025-11-19T10:35:09.875+0200"
+2025-11-19T10:35:09.875+0200 [DEBUG] provider.terraform-provider-gcore: marking computed attribute that is null in the config as unknown: tf_rpc=PlanResourceChange tf_req_id=211807f7-3644-8277-b558-146283222fb2 @module=sdk.framework tf_attribute_path="AttributeName(\"vm_state\")" tf_provider_addr=registry.terraform.io/stainless-sdks/gcore tf_resource_type=gcore_cloud_instance @caller=/Users/user/go/pkg/mod/github.com/hashicorp/terraform-plugin-framework@v1.15.0/internal/fwserver/server_planresourcechange.go:538 timestamp="2025-11-19T10:35:09.875+0200"
+2025-11-19T10:35:09.875+0200 [DEBUG] provider.terraform-provider-gcore: marking computed attribute that is null in the config as unknown: @caller=/Users/user/go/pkg/mod/github.com/hashicorp/terraform-plugin-framework@v1.15.0/internal/fwserver/server_planresourcechange.go:538 tf_attribute_path="AttributeName(\"ddos_profile\")" tf_req_id=211807f7-3644-8277-b558-146283222fb2 tf_resource_type=gcore_cloud_instance tf_rpc=PlanResourceChange @module=sdk.framework tf_provider_addr=registry.terraform.io/stainless-sdks/gcore timestamp="2025-11-19T10:35:09.875+0200"
+2025-11-19T10:35:09.875+0200 [DEBUG] provider.terraform-provider-gcore: marking computed attribute that is null in the config as unknown: @caller=/Users/user/go/pkg/mod/github.com/hashicorp/terraform-plugin-framework@v1.15.0/internal/fwserver/server_planresourcechange.go:538 tf_resource_type=gcore_cloud_instance tf_rpc=PlanResourceChange @module=sdk.framework tf_attribute_path="AttributeName(\"id\")" tf_provider_addr=registry.terraform.io/stainless-sdks/gcore tf_req_id=211807f7-3644-8277-b558-146283222fb2 timestamp="2025-11-19T10:35:09.875+0200"
+2025-11-19T10:35:09.875+0200 [DEBUG] provider.terraform-provider-gcore: marking computed attribute that is null in the config as unknown: @caller=/Users/user/go/pkg/mod/github.com/hashicorp/terraform-plugin-framework@v1.15.0/internal/fwserver/server_planresourcechange.go:538 @module=sdk.framework tf_attribute_path="AttributeName(\"task_id\")" tf_req_id=211807f7-3644-8277-b558-146283222fb2 tf_provider_addr=registry.terraform.io/stainless-sdks/gcore tf_resource_type=gcore_cloud_instance tf_rpc=PlanResourceChange timestamp="2025-11-19T10:35:09.875+0200"
+2025-11-19T10:35:09.875+0200 [DEBUG] provider.terraform-provider-gcore: marking computed attribute that is null in the config as unknown: tf_attribute_path="AttributeName(\"fixed_ip_assignments\")" tf_rpc=PlanResourceChange @caller=/Users/user/go/pkg/mod/github.com/hashicorp/terraform-plugin-framework@v1.15.0/internal/fwserver/server_planresourcechange.go:538 tf_req_id=211807f7-3644-8277-b558-146283222fb2 tf_resource_type=gcore_cloud_instance @module=sdk.framework tf_provider_addr=registry.terraform.io/stainless-sdks/gcore timestamp="2025-11-19T10:35:09.875+0200"
+2025-11-19T10:35:09.875+0200 [DEBUG] provider.terraform-provider-gcore: marking computed attribute that is null in the config as unknown: tf_req_id=211807f7-3644-8277-b558-146283222fb2 tf_resource_type=gcore_cloud_instance tf_attribute_path="AttributeName(\"instance_isolation\")" tf_provider_addr=registry.terraform.io/stainless-sdks/gcore tf_rpc=PlanResourceChange @caller=/Users/user/go/pkg/mod/github.com/hashicorp/terraform-plugin-framework@v1.15.0/internal/fwserver/server_planresourcechange.go:538 @module=sdk.framework timestamp="2025-11-19T10:35:09.875+0200"
+2025-11-19T10:35:09.875+0200 [DEBUG] provider.terraform-provider-gcore: marking computed attribute that is null in the config as unknown: tf_rpc=PlanResourceChange @caller=/Users/user/go/pkg/mod/github.com/hashicorp/terraform-plugin-framework@v1.15.0/internal/fwserver/server_planresourcechange.go:538 @module=sdk.framework tf_attribute_path="AttributeName(\"task_state\")" tf_provider_addr=registry.terraform.io/stainless-sdks/gcore tf_req_id=211807f7-3644-8277-b558-146283222fb2 tf_resource_type=gcore_cloud_instance timestamp="2025-11-19T10:35:09.875+0200"
+2025-11-19T10:35:09.875+0200 [DEBUG] provider.terraform-provider-gcore: marking computed attribute that is null in the config as unknown: @caller=/Users/user/go/pkg/mod/github.com/hashicorp/terraform-plugin-framework@v1.15.0/internal/fwserver/server_planresourcechange.go:538 tf_provider_addr=registry.terraform.io/stainless-sdks/gcore tf_rpc=PlanResourceChange @module=sdk.framework tf_attribute_path="AttributeName(\"instance_description\")" tf_req_id=211807f7-3644-8277-b558-146283222fb2 tf_resource_type=gcore_cloud_instance timestamp="2025-11-19T10:35:09.875+0200"
+2025-11-19T10:35:09.876+0200 [DEBUG] provider.terraform-provider-gcore: marking computed attribute that is null in the config as unknown: @module=sdk.framework tf_rpc=PlanResourceChange @caller=/Users/user/go/pkg/mod/github.com/hashicorp/terraform-plugin-framework@v1.15.0/internal/fwserver/server_planresourcechange.go:538 tf_attribute_path="AttributeName(\"addresses\")" tf_provider_addr=registry.terraform.io/stainless-sdks/gcore tf_req_id=211807f7-3644-8277-b558-146283222fb2 tf_resource_type=gcore_cloud_instance timestamp="2025-11-19T10:35:09.875+0200"
+2025-11-19T10:35:09.876+0200 [DEBUG] provider.terraform-provider-gcore: marking computed attribute that is null in the config as unknown: @module=sdk.framework tf_resource_type=gcore_cloud_instance @caller=/Users/user/go/pkg/mod/github.com/hashicorp/terraform-plugin-framework@v1.15.0/internal/fwserver/server_planresourcechange.go:538 tf_attribute_path="AttributeName(\"tasks\")" tf_provider_addr=registry.terraform.io/stainless-sdks/gcore tf_req_id=211807f7-3644-8277-b558-146283222fb2 tf_rpc=PlanResourceChange timestamp="2025-11-19T10:35:09.875+0200"
+2025-11-19T10:35:09.876+0200 [DEBUG] provider.terraform-provider-gcore: marking computed attribute that is null in the config as unknown: tf_resource_type=gcore_cloud_instance @caller=/Users/user/go/pkg/mod/github.com/hashicorp/terraform-plugin-framework@v1.15.0/internal/fwserver/server_planresourcechange.go:538 @module=sdk.framework tf_attribute_path="AttributeName(\"status\")" tf_provider_addr=registry.terraform.io/stainless-sdks/gcore tf_req_id=211807f7-3644-8277-b558-146283222fb2 tf_rpc=PlanResourceChange timestamp="2025-11-19T10:35:09.875+0200"
+2025-11-19T10:35:09.876+0200 [DEBUG] provider.terraform-provider-gcore: marking computed attribute that is null in the config as unknown: @module=sdk.framework tf_attribute_path="AttributeName(\"volumes\").ElementKeyInt(0).AttributeName(\"volume_id\")" tf_provider_addr=registry.terraform.io/stainless-sdks/gcore tf_resource_type=gcore_cloud_instance @caller=/Users/user/go/pkg/mod/github.com/hashicorp/terraform-plugin-framework@v1.15.0/internal/fwserver/server_planresourcechange.go:538 tf_rpc=PlanResourceChange tf_req_id=211807f7-3644-8277-b558-146283222fb2 timestamp="2025-11-19T10:35:09.875+0200"
+2025-11-19T10:35:09.876+0200 [DEBUG] provider.terraform-provider-gcore: marking computed attribute that is null in the config as unknown: tf_attribute_path="AttributeName(\"creator_task_id\")" tf_provider_addr=registry.terraform.io/stainless-sdks/gcore tf_req_id=211807f7-3644-8277-b558-146283222fb2 tf_resource_type=gcore_cloud_instance tf_rpc=PlanResourceChange @module=sdk.framework @caller=/Users/user/go/pkg/mod/github.com/hashicorp/terraform-plugin-framework@v1.15.0/internal/fwserver/server_planresourcechange.go:538 timestamp="2025-11-19T10:35:09.876+0200"
+2025-11-19T10:35:09.881+0200 [DEBUG] provider.stdio: received EOF, stopping recv loop: err="rpc error: code = Unavailable desc = error reading from server: EOF"
+2025-11-19T10:35:09.882+0200 [INFO]  provider: plugin process exited: plugin=/Users/user/repos/gcore-terraform/terraform-provider-gcore id=41294
+2025-11-19T10:35:09.882+0200 [DEBUG] provider: plugin exited
+2025-11-19T10:35:09.882+0200 [DEBUG] building apply graph to check for errors
+2025-11-19T10:35:09.882+0200 [DEBUG] Resource state not found for node "gcore_cloud_instance.test", instance gcore_cloud_instance.test
+2025-11-19T10:35:09.882+0200 [DEBUG] ProviderTransformer: "gcore_cloud_instance.test" (*terraform.NodeApplyableResourceInstance) needs provider["registry.terraform.io/gcore/gcore"]
+2025-11-19T10:35:09.882+0200 [DEBUG] ProviderTransformer: "gcore_cloud_instance.test (expand)" (*terraform.nodeExpandApplyableResource) needs provider["registry.terraform.io/gcore/gcore"]
+2025-11-19T10:35:09.883+0200 [DEBUG] ReferenceTransformer: "gcore_cloud_instance.test (expand)" references: [var.image_id var.volume_size var.region_id var.flavor var.project_id var.instance_name var.vm_state]
+2025-11-19T10:35:09.883+0200 [DEBUG] ReferenceTransformer: "var.image_id" references: []
+2025-11-19T10:35:09.883+0200 [DEBUG] ReferenceTransformer: "output.instance_status (expand)" references: [gcore_cloud_instance.test (expand) gcore_cloud_instance.test gcore_cloud_instance.test]
+2025-11-19T10:35:09.883+0200 [DEBUG] ReferenceTransformer: "output.volume_id (expand)" references: [gcore_cloud_instance.test (expand) gcore_cloud_instance.test gcore_cloud_instance.test]
+2025-11-19T10:35:09.883+0200 [DEBUG] ReferenceTransformer: "output.instance_vm_state (expand)" references: [gcore_cloud_instance.test (expand) gcore_cloud_instance.test gcore_cloud_instance.test]
+2025-11-19T10:35:09.883+0200 [DEBUG] ReferenceTransformer: "output.volume_size (expand)" references: [gcore_cloud_instance.test (expand) gcore_cloud_instance.test gcore_cloud_instance.test]
+2025-11-19T10:35:09.883+0200 [DEBUG] ReferenceTransformer: "provider[\"registry.terraform.io/gcore/gcore\"]" references: [var.api_key]
+2025-11-19T10:35:09.883+0200 [DEBUG] ReferenceTransformer: "var.volume_size" references: []
+2025-11-19T10:35:09.883+0200 [DEBUG] ReferenceTransformer: "var.vm_state" references: []
+2025-11-19T10:35:09.883+0200 [DEBUG] ReferenceTransformer: "var.region_id" references: []
+2025-11-19T10:35:09.883+0200 [DEBUG] ReferenceTransformer: "var.flavor" references: []
+2025-11-19T10:35:09.883+0200 [DEBUG] ReferenceTransformer: "var.api_key" references: []
+2025-11-19T10:35:09.883+0200 [DEBUG] ReferenceTransformer: "var.instance_name" references: []
+2025-11-19T10:35:09.883+0200 [DEBUG] ReferenceTransformer: "gcore_cloud_instance.test" references: [var.region_id var.project_id var.flavor var.instance_name var.vm_state var.image_id var.volume_size]
+2025-11-19T10:35:09.883+0200 [DEBUG] ReferenceTransformer: "var.project_id" references: []
+2025-11-19T10:35:09.883+0200 [DEBUG] ReferenceTransformer: "output.instance_id (expand)" references: [gcore_cloud_instance.test (expand) gcore_cloud_instance.test gcore_cloud_instance.test]
+2025-11-19T10:35:09.883+0200 [DEBUG] ReferenceTransformer: "output.instance_flavor (expand)" references: [gcore_cloud_instance.test (expand) gcore_cloud_instance.test gcore_cloud_instance.test]
+2025-11-19T10:35:09.883+0200 [DEBUG] ReferenceTransformer: "output.instance_addresses (expand)" references: [gcore_cloud_instance.test (expand) gcore_cloud_instance.test gcore_cloud_instance.test]
+2025-11-19T10:35:09.885+0200 [INFO]  backend/local: apply calling Apply
+2025-11-19T10:35:09.885+0200 [DEBUG] Building and walking apply graph for NormalMode plan
+2025-11-19T10:35:09.885+0200 [DEBUG] Resource state not found for node "gcore_cloud_instance.test", instance gcore_cloud_instance.test
+2025-11-19T10:35:09.886+0200 [DEBUG] ProviderTransformer: "gcore_cloud_instance.test" (*terraform.NodeApplyableResourceInstance) needs provider["registry.terraform.io/gcore/gcore"]
+2025-11-19T10:35:09.886+0200 [DEBUG] ProviderTransformer: "gcore_cloud_instance.test (expand)" (*terraform.nodeExpandApplyableResource) needs provider["registry.terraform.io/gcore/gcore"]
+2025-11-19T10:35:09.886+0200 [DEBUG] ReferenceTransformer: "provider[\"registry.terraform.io/gcore/gcore\"]" references: [var.api_key]
+2025-11-19T10:35:09.886+0200 [DEBUG] ReferenceTransformer: "var.image_id" references: []
+2025-11-19T10:35:09.886+0200 [DEBUG] ReferenceTransformer: "output.instance_status (expand)" references: [gcore_cloud_instance.test (expand) gcore_cloud_instance.test gcore_cloud_instance.test]
+2025-11-19T10:35:09.886+0200 [DEBUG] ReferenceTransformer: "output.instance_vm_state (expand)" references: [gcore_cloud_instance.test (expand) gcore_cloud_instance.test gcore_cloud_instance.test]
+2025-11-19T10:35:09.886+0200 [DEBUG] ReferenceTransformer: "output.instance_flavor (expand)" references: [gcore_cloud_instance.test (expand) gcore_cloud_instance.test gcore_cloud_instance.test]
+2025-11-19T10:35:09.886+0200 [DEBUG] ReferenceTransformer: "output.instance_addresses (expand)" references: [gcore_cloud_instance.test (expand) gcore_cloud_instance.test gcore_cloud_instance.test]
+2025-11-19T10:35:09.886+0200 [DEBUG] ReferenceTransformer: "gcore_cloud_instance.test (expand)" references: [var.image_id var.volume_size var.region_id var.project_id var.flavor var.instance_name var.vm_state]
+2025-11-19T10:35:09.886+0200 [DEBUG] ReferenceTransformer: "var.project_id" references: []
+2025-11-19T10:35:09.886+0200 [DEBUG] ReferenceTransformer: "var.instance_name" references: []
+2025-11-19T10:35:09.886+0200 [DEBUG] ReferenceTransformer: "var.vm_state" references: []
+2025-11-19T10:35:09.886+0200 [DEBUG] ReferenceTransformer: "output.volume_id (expand)" references: [gcore_cloud_instance.test (expand) gcore_cloud_instance.test gcore_cloud_instance.test]
+2025-11-19T10:35:09.886+0200 [DEBUG] ReferenceTransformer: "var.region_id" references: []
+2025-11-19T10:35:09.886+0200 [DEBUG] ReferenceTransformer: "var.flavor" references: []
+2025-11-19T10:35:09.886+0200 [DEBUG] ReferenceTransformer: "var.volume_size" references: []
+2025-11-19T10:35:09.886+0200 [DEBUG] ReferenceTransformer: "var.api_key" references: []
+2025-11-19T10:35:09.886+0200 [DEBUG] ReferenceTransformer: "output.instance_id (expand)" references: [gcore_cloud_instance.test (expand) gcore_cloud_instance.test gcore_cloud_instance.test]
+2025-11-19T10:35:09.886+0200 [DEBUG] ReferenceTransformer: "output.volume_size (expand)" references: [gcore_cloud_instance.test (expand) gcore_cloud_instance.test gcore_cloud_instance.test]
+2025-11-19T10:35:09.886+0200 [DEBUG] ReferenceTransformer: "gcore_cloud_instance.test" references: [var.flavor var.instance_name var.vm_state var.image_id var.volume_size var.region_id var.project_id]
+2025-11-19T10:35:09.886+0200 [DEBUG] Starting graph walk: walkApply
+2025-11-19T10:35:09.887+0200 [DEBUG] created provider logger: level=debug
+2025-11-19T10:35:09.887+0200 [INFO]  provider: configuring client automatic mTLS
+2025-11-19T10:35:09.890+0200 [DEBUG] provider: starting plugin: path=/Users/user/repos/gcore-terraform/terraform-provider-gcore args=["/Users/user/repos/gcore-terraform/terraform-provider-gcore"]
+2025-11-19T10:35:09.891+0200 [DEBUG] provider: plugin started: path=/Users/user/repos/gcore-terraform/terraform-provider-gcore pid=41295
+2025-11-19T10:35:09.891+0200 [DEBUG] provider: waiting for RPC address: plugin=/Users/user/repos/gcore-terraform/terraform-provider-gcore
+2025-11-19T10:35:09.899+0200 [INFO]  provider.terraform-provider-gcore: configuring server automatic mTLS: timestamp="2025-11-19T10:35:09.899+0200"
+2025-11-19T10:35:09.905+0200 [DEBUG] provider.terraform-provider-gcore: plugin address: address=/var/folders/qj/cbb8n0j12tq6j2k955fxwpb80000gn/T/plugin3621516851 network=unix timestamp="2025-11-19T10:35:09.905+0200"
+2025-11-19T10:35:09.905+0200 [DEBUG] provider: using plugin: version=6
+2025-11-19T10:35:09.912+0200 [DEBUG] skipping FixUpBlockAttrs
+2025-11-19T10:35:09.917+0200 [DEBUG] provider.terraform-provider-gcore: Marking Computed attributes with null configuration values as unknown (known after apply) in the plan to prevent potential Terraform errors: @caller=/Users/user/go/pkg/mod/github.com/hashicorp/terraform-plugin-framework@v1.15.0/internal/fwserver/server_planresourcechange.go:250 tf_rpc=PlanResourceChange @module=sdk.framework tf_provider_addr=registry.terraform.io/stainless-sdks/gcore tf_req_id=bb340243-a920-8ff3-25f4-ab692203c5b6 tf_resource_type=gcore_cloud_instance timestamp="2025-11-19T10:35:09.917+0200"
+2025-11-19T10:35:09.917+0200 [DEBUG] provider.terraform-provider-gcore: marking computed attribute that is null in the config as unknown: tf_req_id=bb340243-a920-8ff3-25f4-ab692203c5b6 tf_resource_type=gcore_cloud_instance tf_rpc=PlanResourceChange tf_attribute_path="AttributeName(\"tasks\")" tf_provider_addr=registry.terraform.io/stainless-sdks/gcore @caller=/Users/user/go/pkg/mod/github.com/hashicorp/terraform-plugin-framework@v1.15.0/internal/fwserver/server_planresourcechange.go:538 @module=sdk.framework timestamp="2025-11-19T10:35:09.917+0200"
+2025-11-19T10:35:09.917+0200 [DEBUG] provider.terraform-provider-gcore: marking computed attribute that is null in the config as unknown: @module=sdk.framework tf_attribute_path="AttributeName(\"task_id\")" tf_provider_addr=registry.terraform.io/stainless-sdks/gcore tf_req_id=bb340243-a920-8ff3-25f4-ab692203c5b6 @caller=/Users/user/go/pkg/mod/github.com/hashicorp/terraform-plugin-framework@v1.15.0/internal/fwserver/server_planresourcechange.go:538 tf_resource_type=gcore_cloud_instance tf_rpc=PlanResourceChange timestamp="2025-11-19T10:35:09.917+0200"
+2025-11-19T10:35:09.917+0200 [DEBUG] provider.terraform-provider-gcore: marking computed attribute that is null in the config as unknown: @caller=/Users/user/go/pkg/mod/github.com/hashicorp/terraform-plugin-framework@v1.15.0/internal/fwserver/server_planresourcechange.go:538 @module=sdk.framework tf_provider_addr=registry.terraform.io/stainless-sdks/gcore tf_rpc=PlanResourceChange tf_attribute_path="AttributeName(\"status\")" tf_req_id=bb340243-a920-8ff3-25f4-ab692203c5b6 tf_resource_type=gcore_cloud_instance timestamp="2025-11-19T10:35:09.917+0200"
+2025-11-19T10:35:09.917+0200 [DEBUG] provider.terraform-provider-gcore: marking computed attribute that is null in the config as unknown: @module=sdk.framework tf_attribute_path="AttributeName(\"instance_description\")" tf_provider_addr=registry.terraform.io/stainless-sdks/gcore tf_req_id=bb340243-a920-8ff3-25f4-ab692203c5b6 tf_resource_type=gcore_cloud_instance @caller=/Users/user/go/pkg/mod/github.com/hashicorp/terraform-plugin-framework@v1.15.0/internal/fwserver/server_planresourcechange.go:538 tf_rpc=PlanResourceChange timestamp="2025-11-19T10:35:09.917+0200"
+2025-11-19T10:35:09.917+0200 [DEBUG] provider.terraform-provider-gcore: marking computed attribute that is null in the config as unknown: tf_attribute_path="AttributeName(\"fixed_ip_assignments\")" tf_provider_addr=registry.terraform.io/stainless-sdks/gcore tf_resource_type=gcore_cloud_instance @module=sdk.framework tf_req_id=bb340243-a920-8ff3-25f4-ab692203c5b6 tf_rpc=PlanResourceChange @caller=/Users/user/go/pkg/mod/github.com/hashicorp/terraform-plugin-framework@v1.15.0/internal/fwserver/server_planresourcechange.go:538 timestamp="2025-11-19T10:35:09.917+0200"
+2025-11-19T10:35:09.917+0200 [DEBUG] provider.terraform-provider-gcore: marking computed attribute that is null in the config as unknown: @caller=/Users/user/go/pkg/mod/github.com/hashicorp/terraform-plugin-framework@v1.15.0/internal/fwserver/server_planresourcechange.go:538 @module=sdk.framework tf_resource_type=gcore_cloud_instance tf_req_id=bb340243-a920-8ff3-25f4-ab692203c5b6 tf_rpc=PlanResourceChange tf_attribute_path="AttributeName(\"ddos_profile\")" tf_provider_addr=registry.terraform.io/stainless-sdks/gcore timestamp="2025-11-19T10:35:09.917+0200"
+2025-11-19T10:35:09.917+0200 [DEBUG] provider.terraform-provider-gcore: marking computed attribute that is null in the config as unknown: @module=sdk.framework tf_attribute_path="AttributeName(\"volumes\").ElementKeyInt(0).AttributeName(\"volume_id\")" tf_provider_addr=registry.terraform.io/stainless-sdks/gcore tf_req_id=bb340243-a920-8ff3-25f4-ab692203c5b6 @caller=/Users/user/go/pkg/mod/github.com/hashicorp/terraform-plugin-framework@v1.15.0/internal/fwserver/server_planresourcechange.go:538 tf_resource_type=gcore_cloud_instance tf_rpc=PlanResourceChange timestamp="2025-11-19T10:35:09.917+0200"
+2025-11-19T10:35:09.917+0200 [DEBUG] provider.terraform-provider-gcore: marking computed attribute that is null in the config as unknown: @caller=/Users/user/go/pkg/mod/github.com/hashicorp/terraform-plugin-framework@v1.15.0/internal/fwserver/server_planresourcechange.go:538 tf_provider_addr=registry.terraform.io/stainless-sdks/gcore tf_resource_type=gcore_cloud_instance tf_rpc=PlanResourceChange tf_attribute_path="AttributeName(\"task_state\")" tf_req_id=bb340243-a920-8ff3-25f4-ab692203c5b6 @module=sdk.framework timestamp="2025-11-19T10:35:09.917+0200"
+2025-11-19T10:35:09.917+0200 [DEBUG] provider.terraform-provider-gcore: marking computed attribute that is null in the config as unknown: tf_rpc=PlanResourceChange @caller=/Users/user/go/pkg/mod/github.com/hashicorp/terraform-plugin-framework@v1.15.0/internal/fwserver/server_planresourcechange.go:538 @module=sdk.framework tf_resource_type=gcore_cloud_instance tf_attribute_path="AttributeName(\"instance_isolation\")" tf_provider_addr=registry.terraform.io/stainless-sdks/gcore tf_req_id=bb340243-a920-8ff3-25f4-ab692203c5b6 timestamp="2025-11-19T10:35:09.917+0200"
+2025-11-19T10:35:09.917+0200 [DEBUG] provider.terraform-provider-gcore: marking computed attribute that is null in the config as unknown: tf_req_id=bb340243-a920-8ff3-25f4-ab692203c5b6 tf_resource_type=gcore_cloud_instance tf_rpc=PlanResourceChange @caller=/Users/user/go/pkg/mod/github.com/hashicorp/terraform-plugin-framework@v1.15.0/internal/fwserver/server_planresourcechange.go:538 @module=sdk.framework tf_attribute_path="AttributeName(\"creator_task_id\")" tf_provider_addr=registry.terraform.io/stainless-sdks/gcore timestamp="2025-11-19T10:35:09.917+0200"
+2025-11-19T10:35:09.917+0200 [DEBUG] provider.terraform-provider-gcore: marking computed attribute that is null in the config as unknown: tf_provider_addr=registry.terraform.io/stainless-sdks/gcore tf_resource_type=gcore_cloud_instance tf_rpc=PlanResourceChange tf_attribute_path="AttributeName(\"addresses\")" tf_req_id=bb340243-a920-8ff3-25f4-ab692203c5b6 @caller=/Users/user/go/pkg/mod/github.com/hashicorp/terraform-plugin-framework@v1.15.0/internal/fwserver/server_planresourcechange.go:538 @module=sdk.framework timestamp="2025-11-19T10:35:09.917+0200"
+2025-11-19T10:35:09.917+0200 [DEBUG] provider.terraform-provider-gcore: marking computed attribute that is null in the config as unknown: @module=sdk.framework tf_req_id=bb340243-a920-8ff3-25f4-ab692203c5b6 tf_rpc=PlanResourceChange @caller=/Users/user/go/pkg/mod/github.com/hashicorp/terraform-plugin-framework@v1.15.0/internal/fwserver/server_planresourcechange.go:538 tf_attribute_path="AttributeName(\"id\")" tf_provider_addr=registry.terraform.io/stainless-sdks/gcore tf_resource_type=gcore_cloud_instance timestamp="2025-11-19T10:35:09.917+0200"
+2025-11-19T10:35:09.917+0200 [DEBUG] provider.terraform-provider-gcore: marking computed attribute that is null in the config as unknown: tf_req_id=bb340243-a920-8ff3-25f4-ab692203c5b6 tf_resource_type=gcore_cloud_instance tf_rpc=PlanResourceChange tf_provider_addr=registry.terraform.io/stainless-sdks/gcore @caller=/Users/user/go/pkg/mod/github.com/hashicorp/terraform-plugin-framework@v1.15.0/internal/fwserver/server_planresourcechange.go:538 @module=sdk.framework tf_attribute_path="AttributeName(\"blackhole_ports\")" timestamp="2025-11-19T10:35:09.917+0200"
+2025-11-19T10:35:09.917+0200 [DEBUG] provider.terraform-provider-gcore: marking computed attribute that is null in the config as unknown: tf_req_id=bb340243-a920-8ff3-25f4-ab692203c5b6 tf_resource_type=gcore_cloud_instance tf_attribute_path="AttributeName(\"region\")" tf_provider_addr=registry.terraform.io/stainless-sdks/gcore @caller=/Users/user/go/pkg/mod/github.com/hashicorp/terraform-plugin-framework@v1.15.0/internal/fwserver/server_planresourcechange.go:538 @module=sdk.framework tf_rpc=PlanResourceChange timestamp="2025-11-19T10:35:09.917+0200"
+2025-11-19T10:35:09.917+0200 [DEBUG] provider.terraform-provider-gcore: marking computed attribute that is null in the config as unknown: @module=sdk.framework tf_provider_addr=registry.terraform.io/stainless-sdks/gcore tf_rpc=PlanResourceChange @caller=/Users/user/go/pkg/mod/github.com/hashicorp/terraform-plugin-framework@v1.15.0/internal/fwserver/server_planresourcechange.go:538 tf_attribute_path="AttributeName(\"vm_state\")" tf_req_id=bb340243-a920-8ff3-25f4-ab692203c5b6 tf_resource_type=gcore_cloud_instance timestamp="2025-11-19T10:35:09.917+0200"
+2025-11-19T10:35:09.917+0200 [DEBUG] provider.terraform-provider-gcore: marking computed attribute that is null in the config as unknown: tf_resource_type=gcore_cloud_instance tf_rpc=PlanResourceChange tf_attribute_path="AttributeName(\"created_at\")" tf_req_id=bb340243-a920-8ff3-25f4-ab692203c5b6 @caller=/Users/user/go/pkg/mod/github.com/hashicorp/terraform-plugin-framework@v1.15.0/internal/fwserver/server_planresourcechange.go:538 @module=sdk.framework tf_provider_addr=registry.terraform.io/stainless-sdks/gcore timestamp="2025-11-19T10:35:09.917+0200"
+2025-11-19T10:35:09.922+0200 [INFO]  Starting apply for gcore_cloud_instance.test
+2025-11-19T10:35:09.922+0200 [DEBUG] skipping FixUpBlockAttrs
+2025-11-19T10:35:09.922+0200 [DEBUG] gcore_cloud_instance.test: applying the planned Create change
+2025-11-19T10:35:09.926+0200 [DEBUG] provider.terraform-provider-gcore: 
+POST /cloud/v2/instances/379987/76 HTTP/1.1
+> x-stainless-package-version: 0.18.0
+> x-stainless-arch: arm64
+> x-stainless-lang: go
+> x-stainless-os: MacOS
+> user-agent: Gcore/Go 0.18.0
+> content-type: application/json
+> x-stainless-retry-count: 0
+> x-stainless-runtime: go
+> x-stainless-runtime-version: go1.24.5
+> authorization: APIKey 21788
+> accept: application/json
+>
+
+{"flavor":"g1-standard-1-2","interfaces":[{"type":"external"}],"name":"test-instance-skill","volumes":[{"boot_index":0,"delete_on_termination":true,"image_id":"6343932d-0257-4285-bf89-05060f24095a","size":5,"source":"image"}]}
+
+: @module=gcore tf_provider_addr=registry.terraform.io/stainless-sdks/gcore tf_req_id=8d4d5bce-26db-fc2f-239a-89a9f139fb72 tf_resource_type=gcore_cloud_instance tf_rpc=ApplyResourceChange @caller=/Users/user/repos/gcore-terraform/internal/logging/logging.go:56 timestamp="2025-11-19T10:35:09.925+0200"
+2025-11-19T10:35:10.179+0200 [DEBUG] provider.terraform-provider-gcore: 
+< HTTP/2.0 401 Unauthorized
+< x-id-fe: fr5-hw-edge-gc52
+< traceparent: 00-c30fc1f060b1ac5ac8ea768f8321dfca-e2f26446e93fb37a-01
+< request_id: c30fc1f060b1ac5ac8ea768f8321dfca
+< access-control-allow-origin: *
+< cache-control: no-cache, no-store, must-revalidate
+< www-authenticate: Bearer error="invalid_request"
+< strict-transport-security: max-age=15724800; includeSubDomains
+< x-id: fr5-hw-edge-gc52
+< server: nginx
+< date: Wed, 19 Nov 2025 08:35:10 GMT
+< content-type: Application/json; charset=utf-8
+< content-length: 106
+< x-robots-tag: noindex, nofollow, noarchive
+<
+
+{"exception_class":"UnauthorizedError","message":"Invalid <APIKey> authentication token: 21788*****21788"}
+
+: tf_rpc=ApplyResourceChange tf_resource_type=gcore_cloud_instance @caller=/Users/user/repos/gcore-terraform/internal/logging/logging.go:84 @module=gcore tf_provider_addr=registry.terraform.io/stainless-sdks/gcore tf_req_id=8d4d5bce-26db-fc2f-239a-89a9f139fb72 timestamp="2025-11-19T10:35:10.178+0200"
+2025-11-19T10:35:10.179+0200 [ERROR] provider.terraform-provider-gcore: Response contains error diagnostic: tf_proto_version=6.9 tf_resource_type=gcore_cloud_instance tf_rpc=ApplyResourceChange @module=sdk.proto diagnostic_detail="POST \"https://api.gcore.com/cloud/v2/instances/379987/76\": 401 Unauthorized {\"exception_class\":\"UnauthorizedError\",\"message\":\"Invalid <APIKey> authentication token: 21788*****21788\"}" diagnostic_severity=ERROR diagnostic_summary="failed to make http request" tf_provider_addr=registry.terraform.io/stainless-sdks/gcore tf_req_id=8d4d5bce-26db-fc2f-239a-89a9f139fb72 @caller=/Users/user/go/pkg/mod/github.com/hashicorp/terraform-plugin-go@v0.28.0/tfprotov6/internal/diag/diagnostics.go:58 timestamp="2025-11-19T10:35:10.179+0200"
+2025-11-19T10:35:10.187+0200 [DEBUG] State storage *statemgr.Filesystem declined to persist a state snapshot
+2025-11-19T10:35:10.187+0200 [ERROR] vertex "gcore_cloud_instance.test" error: failed to make http request
+2025-11-19T10:35:10.194+0200 [DEBUG] provider.stdio: received EOF, stopping recv loop: err="rpc error: code = Unavailable desc = error reading from server: EOF"
+2025-11-19T10:35:10.196+0200 [INFO]  provider: plugin process exited: plugin=/Users/user/repos/gcore-terraform/terraform-provider-gcore id=41295
+2025-11-19T10:35:10.196+0200 [DEBUG] provider: plugin exited
+2025-11-19T10:36:15.399+0200 [INFO]  Terraform version: 1.10.5
+2025-11-19T10:36:15.399+0200 [DEBUG] using github.com/hashicorp/go-tfe v1.70.0
+2025-11-19T10:36:15.400+0200 [DEBUG] using github.com/hashicorp/hcl/v2 v2.23.0
+2025-11-19T10:36:15.400+0200 [DEBUG] using github.com/hashicorp/terraform-svchost v0.1.1
+2025-11-19T10:36:15.400+0200 [DEBUG] using github.com/zclconf/go-cty v1.16.2
+2025-11-19T10:36:15.400+0200 [INFO]  Go runtime version: go1.23.3
+2025-11-19T10:36:15.400+0200 [INFO]  CLI args: []string{"terraform", "apply", "-auto-approve"}
+2025-11-19T10:36:15.400+0200 [DEBUG] Attempting to open CLI config file: /Users/user/repos/gcore-terraform/.terraformrc
+2025-11-19T10:36:15.400+0200 [INFO]  Loading CLI configuration from /Users/user/repos/gcore-terraform/.terraformrc
+2025-11-19T10:36:15.400+0200 [DEBUG] Not reading CLI config directory because config location is overridden by environment variable
+2025-11-19T10:36:15.401+0200 [DEBUG] checking for credentials in "/Users/user/.terraform.d/plugins"
+2025-11-19T10:36:15.401+0200 [DEBUG] Explicit provider installation configuration is set
+2025-11-19T10:36:15.402+0200 [INFO]  CLI command args: []string{"apply", "-auto-approve"}
+2025-11-19T10:36:15.408+0200 [DEBUG] Provider registry.terraform.io/gcore/gcore is overridden by dev_overrides
+2025-11-19T10:36:15.408+0200 [DEBUG] Provider registry.terraform.io/gcore/gcore is overridden to load from /Users/user/repos/gcore-terraform
+2025-11-19T10:36:15.408+0200 [DEBUG] checking for provisioner in "."
+2025-11-19T10:36:15.412+0200 [DEBUG] checking for provisioner in "/opt/homebrew/bin"
+2025-11-19T10:36:15.412+0200 [DEBUG] checking for provisioner in "/Users/user/.terraform.d/plugins"
+2025-11-19T10:36:15.414+0200 [DEBUG] Provider registry.terraform.io/gcore/gcore is overridden by dev_overrides
+2025-11-19T10:36:15.417+0200 [INFO]  backend/local: starting Apply operation
+2025-11-19T10:36:15.421+0200 [DEBUG] Config.VerifyDependencySelections: skipping registry.terraform.io/gcore/gcore because it's overridden by a special configuration setting
+2025-11-19T10:36:15.422+0200 [DEBUG] created provider logger: level=debug
+2025-11-19T10:36:15.422+0200 [INFO]  provider: configuring client automatic mTLS
+2025-11-19T10:36:15.433+0200 [DEBUG] provider: starting plugin: path=/Users/user/repos/gcore-terraform/terraform-provider-gcore args=["/Users/user/repos/gcore-terraform/terraform-provider-gcore"]
+2025-11-19T10:36:15.435+0200 [DEBUG] provider: plugin started: path=/Users/user/repos/gcore-terraform/terraform-provider-gcore pid=41918
+2025-11-19T10:36:15.435+0200 [DEBUG] provider: waiting for RPC address: plugin=/Users/user/repos/gcore-terraform/terraform-provider-gcore
+2025-11-19T10:36:15.529+0200 [INFO]  provider.terraform-provider-gcore: configuring server automatic mTLS: timestamp="2025-11-19T10:36:15.529+0200"
+2025-11-19T10:36:15.536+0200 [DEBUG] provider.terraform-provider-gcore: plugin address: address=/var/folders/qj/cbb8n0j12tq6j2k955fxwpb80000gn/T/plugin4023111057 network=unix timestamp="2025-11-19T10:36:15.536+0200"
+2025-11-19T10:36:15.536+0200 [DEBUG] provider: using plugin: version=6
+2025-11-19T10:36:15.581+0200 [DEBUG] No provider meta schema returned
+2025-11-19T10:36:15.584+0200 [DEBUG] provider.stdio: received EOF, stopping recv loop: err="rpc error: code = Unavailable desc = error reading from server: EOF"
+2025-11-19T10:36:15.584+0200 [INFO]  provider: plugin process exited: plugin=/Users/user/repos/gcore-terraform/terraform-provider-gcore id=41918
+2025-11-19T10:36:15.584+0200 [DEBUG] provider: plugin exited
+2025-11-19T10:36:15.585+0200 [DEBUG] Building and walking validate graph
+2025-11-19T10:36:15.587+0200 [DEBUG] ProviderTransformer: "gcore_cloud_instance.test" (*terraform.NodeValidatableResource) needs provider["registry.terraform.io/gcore/gcore"]
+2025-11-19T10:36:15.588+0200 [DEBUG] ReferenceTransformer: "gcore_cloud_instance.test" references: [var.vm_state var.image_id var.volume_size var.project_id var.region_id var.instance_name var.flavor]
+2025-11-19T10:36:15.588+0200 [DEBUG] ReferenceTransformer: "var.image_id" references: []
+2025-11-19T10:36:15.588+0200 [DEBUG] ReferenceTransformer: "var.volume_size" references: []
+2025-11-19T10:36:15.588+0200 [DEBUG] ReferenceTransformer: "output.instance_vm_state (expand)" references: [gcore_cloud_instance.test]
+2025-11-19T10:36:15.588+0200 [DEBUG] ReferenceTransformer: "output.volume_id (expand)" references: [gcore_cloud_instance.test]
+2025-11-19T10:36:15.588+0200 [DEBUG] ReferenceTransformer: "var.project_id" references: []
+2025-11-19T10:36:15.588+0200 [DEBUG] ReferenceTransformer: "var.flavor" references: []
+2025-11-19T10:36:15.588+0200 [DEBUG] ReferenceTransformer: "output.instance_status (expand)" references: [gcore_cloud_instance.test]
+2025-11-19T10:36:15.588+0200 [DEBUG] ReferenceTransformer: "output.instance_flavor (expand)" references: [gcore_cloud_instance.test]
+2025-11-19T10:36:15.588+0200 [DEBUG] ReferenceTransformer: "output.volume_size (expand)" references: [gcore_cloud_instance.test]
+2025-11-19T10:36:15.588+0200 [DEBUG] ReferenceTransformer: "output.instance_id (expand)" references: [gcore_cloud_instance.test]
+2025-11-19T10:36:15.588+0200 [DEBUG] ReferenceTransformer: "var.api_key" references: []
+2025-11-19T10:36:15.588+0200 [DEBUG] ReferenceTransformer: "var.region_id" references: []
+2025-11-19T10:36:15.588+0200 [DEBUG] ReferenceTransformer: "var.instance_name" references: []
+2025-11-19T10:36:15.588+0200 [DEBUG] ReferenceTransformer: "var.vm_state" references: []
+2025-11-19T10:36:15.588+0200 [DEBUG] ReferenceTransformer: "output.instance_addresses (expand)" references: [gcore_cloud_instance.test]
+2025-11-19T10:36:15.588+0200 [DEBUG] ReferenceTransformer: "provider[\"registry.terraform.io/gcore/gcore\"]" references: [var.api_key]
+2025-11-19T10:36:15.588+0200 [DEBUG] Starting graph walk: walkValidate
+2025-11-19T10:36:15.593+0200 [DEBUG] created provider logger: level=debug
+2025-11-19T10:36:15.593+0200 [INFO]  provider: configuring client automatic mTLS
+2025-11-19T10:36:15.596+0200 [DEBUG] provider: starting plugin: path=/Users/user/repos/gcore-terraform/terraform-provider-gcore args=["/Users/user/repos/gcore-terraform/terraform-provider-gcore"]
+2025-11-19T10:36:15.597+0200 [DEBUG] provider: plugin started: path=/Users/user/repos/gcore-terraform/terraform-provider-gcore pid=41919
+2025-11-19T10:36:15.597+0200 [DEBUG] provider: waiting for RPC address: plugin=/Users/user/repos/gcore-terraform/terraform-provider-gcore
+2025-11-19T10:36:15.605+0200 [INFO]  provider.terraform-provider-gcore: configuring server automatic mTLS: timestamp="2025-11-19T10:36:15.605+0200"
+2025-11-19T10:36:15.611+0200 [DEBUG] provider.terraform-provider-gcore: plugin address: address=/var/folders/qj/cbb8n0j12tq6j2k955fxwpb80000gn/T/plugin1925424206 network=unix timestamp="2025-11-19T10:36:15.611+0200"
+2025-11-19T10:36:15.612+0200 [DEBUG] provider: using plugin: version=6
+2025-11-19T10:36:15.623+0200 [DEBUG] skipping FixUpBlockAttrs
+2025-11-19T10:36:15.627+0200 [DEBUG] provider.stdio: received EOF, stopping recv loop: err="rpc error: code = Unavailable desc = error reading from server: EOF"
+2025-11-19T10:36:15.628+0200 [INFO]  provider: plugin process exited: plugin=/Users/user/repos/gcore-terraform/terraform-provider-gcore id=41919
+2025-11-19T10:36:15.628+0200 [DEBUG] provider: plugin exited
+2025-11-19T10:36:15.628+0200 [INFO]  backend/local: apply calling Plan
+2025-11-19T10:36:15.629+0200 [DEBUG] Building and walking plan graph for NormalMode
+2025-11-19T10:36:15.630+0200 [DEBUG] ProviderTransformer: "gcore_cloud_instance.test (expand)" (*terraform.nodeExpandPlannableResource) needs provider["registry.terraform.io/gcore/gcore"]
+2025-11-19T10:36:15.630+0200 [DEBUG] ReferenceTransformer: "var.volume_size" references: []
+2025-11-19T10:36:15.630+0200 [DEBUG] ReferenceTransformer: "var.vm_state" references: []
+2025-11-19T10:36:15.630+0200 [DEBUG] ReferenceTransformer: "output.instance_addresses (expand)" references: [gcore_cloud_instance.test (expand)]
+2025-11-19T10:36:15.630+0200 [DEBUG] ReferenceTransformer: "output.volume_size (expand)" references: [gcore_cloud_instance.test (expand)]
+2025-11-19T10:36:15.630+0200 [DEBUG] ReferenceTransformer: "output.instance_id (expand)" references: [gcore_cloud_instance.test (expand)]
+2025-11-19T10:36:15.630+0200 [DEBUG] ReferenceTransformer: "var.region_id" references: []
+2025-11-19T10:36:15.630+0200 [DEBUG] ReferenceTransformer: "var.flavor" references: []
+2025-11-19T10:36:15.630+0200 [DEBUG] ReferenceTransformer: "var.api_key" references: []
+2025-11-19T10:36:15.630+0200 [DEBUG] ReferenceTransformer: "output.instance_flavor (expand)" references: [gcore_cloud_instance.test (expand)]
+2025-11-19T10:36:15.630+0200 [DEBUG] ReferenceTransformer: "provider[\"registry.terraform.io/gcore/gcore\"]" references: [var.api_key]
+2025-11-19T10:36:15.630+0200 [DEBUG] ReferenceTransformer: "gcore_cloud_instance.test (expand)" references: [var.region_id var.instance_name var.flavor var.image_id var.volume_size var.vm_state var.project_id]
+2025-11-19T10:36:15.630+0200 [DEBUG] ReferenceTransformer: "var.instance_name" references: []
+2025-11-19T10:36:15.630+0200 [DEBUG] ReferenceTransformer: "var.image_id" references: []
+2025-11-19T10:36:15.630+0200 [DEBUG] ReferenceTransformer: "var.project_id" references: []
+2025-11-19T10:36:15.630+0200 [DEBUG] ReferenceTransformer: "output.instance_vm_state (expand)" references: [gcore_cloud_instance.test (expand)]
+2025-11-19T10:36:15.630+0200 [DEBUG] ReferenceTransformer: "output.volume_id (expand)" references: [gcore_cloud_instance.test (expand)]
+2025-11-19T10:36:15.630+0200 [DEBUG] ReferenceTransformer: "output.instance_status (expand)" references: [gcore_cloud_instance.test (expand)]
+2025-11-19T10:36:15.631+0200 [DEBUG] Starting graph walk: walkPlan
+2025-11-19T10:36:15.631+0200 [DEBUG] created provider logger: level=debug
+2025-11-19T10:36:15.631+0200 [INFO]  provider: configuring client automatic mTLS
+2025-11-19T10:36:15.634+0200 [DEBUG] provider: starting plugin: path=/Users/user/repos/gcore-terraform/terraform-provider-gcore args=["/Users/user/repos/gcore-terraform/terraform-provider-gcore"]
+2025-11-19T10:36:15.636+0200 [DEBUG] provider: plugin started: path=/Users/user/repos/gcore-terraform/terraform-provider-gcore pid=41920
+2025-11-19T10:36:15.636+0200 [DEBUG] provider: waiting for RPC address: plugin=/Users/user/repos/gcore-terraform/terraform-provider-gcore
+2025-11-19T10:36:15.643+0200 [INFO]  provider.terraform-provider-gcore: configuring server automatic mTLS: timestamp="2025-11-19T10:36:15.643+0200"
+2025-11-19T10:36:15.650+0200 [DEBUG] provider.terraform-provider-gcore: plugin address: address=/var/folders/qj/cbb8n0j12tq6j2k955fxwpb80000gn/T/plugin2977000455 network=unix timestamp="2025-11-19T10:36:15.650+0200"
+2025-11-19T10:36:15.650+0200 [DEBUG] provider: using plugin: version=6
+2025-11-19T10:36:15.659+0200 [DEBUG] Resource instance state not found for node "gcore_cloud_instance.test", instance gcore_cloud_instance.test
+2025-11-19T10:36:15.659+0200 [DEBUG] ReferenceTransformer: "gcore_cloud_instance.test" references: []
+2025-11-19T10:36:15.660+0200 [DEBUG] refresh: gcore_cloud_instance.test: no state, so not refreshing
+2025-11-19T10:36:15.661+0200 [DEBUG] skipping FixUpBlockAttrs
+2025-11-19T10:36:15.666+0200 [DEBUG] provider.terraform-provider-gcore: Marking Computed attributes with null configuration values as unknown (known after apply) in the plan to prevent potential Terraform errors: tf_req_id=417e8f98-ba54-3164-7375-5bfd01cef148 @caller=/Users/user/go/pkg/mod/github.com/hashicorp/terraform-plugin-framework@v1.15.0/internal/fwserver/server_planresourcechange.go:250 @module=sdk.framework tf_provider_addr=registry.terraform.io/stainless-sdks/gcore tf_resource_type=gcore_cloud_instance tf_rpc=PlanResourceChange timestamp="2025-11-19T10:36:15.666+0200"
+2025-11-19T10:36:15.666+0200 [DEBUG] provider.terraform-provider-gcore: marking computed attribute that is null in the config as unknown: tf_provider_addr=registry.terraform.io/stainless-sdks/gcore tf_rpc=PlanResourceChange @module=sdk.framework tf_attribute_path="AttributeName(\"region\")" tf_req_id=417e8f98-ba54-3164-7375-5bfd01cef148 tf_resource_type=gcore_cloud_instance @caller=/Users/user/go/pkg/mod/github.com/hashicorp/terraform-plugin-framework@v1.15.0/internal/fwserver/server_planresourcechange.go:538 timestamp="2025-11-19T10:36:15.666+0200"
+2025-11-19T10:36:15.666+0200 [DEBUG] provider.terraform-provider-gcore: marking computed attribute that is null in the config as unknown: tf_attribute_path="AttributeName(\"blackhole_ports\")" tf_provider_addr=registry.terraform.io/stainless-sdks/gcore @module=sdk.framework tf_req_id=417e8f98-ba54-3164-7375-5bfd01cef148 tf_resource_type=gcore_cloud_instance tf_rpc=PlanResourceChange @caller=/Users/user/go/pkg/mod/github.com/hashicorp/terraform-plugin-framework@v1.15.0/internal/fwserver/server_planresourcechange.go:538 timestamp="2025-11-19T10:36:15.666+0200"
+2025-11-19T10:36:15.667+0200 [DEBUG] provider.terraform-provider-gcore: marking computed attribute that is null in the config as unknown: @module=sdk.framework tf_resource_type=gcore_cloud_instance @caller=/Users/user/go/pkg/mod/github.com/hashicorp/terraform-plugin-framework@v1.15.0/internal/fwserver/server_planresourcechange.go:538 tf_attribute_path="AttributeName(\"status\")" tf_provider_addr=registry.terraform.io/stainless-sdks/gcore tf_req_id=417e8f98-ba54-3164-7375-5bfd01cef148 tf_rpc=PlanResourceChange timestamp="2025-11-19T10:36:15.666+0200"
+2025-11-19T10:36:15.667+0200 [DEBUG] provider.terraform-provider-gcore: marking computed attribute that is null in the config as unknown: tf_rpc=PlanResourceChange @module=sdk.framework tf_attribute_path="AttributeName(\"task_id\")" tf_provider_addr=registry.terraform.io/stainless-sdks/gcore tf_req_id=417e8f98-ba54-3164-7375-5bfd01cef148 tf_resource_type=gcore_cloud_instance @caller=/Users/user/go/pkg/mod/github.com/hashicorp/terraform-plugin-framework@v1.15.0/internal/fwserver/server_planresourcechange.go:538 timestamp="2025-11-19T10:36:15.666+0200"
+2025-11-19T10:36:15.667+0200 [DEBUG] provider.terraform-provider-gcore: marking computed attribute that is null in the config as unknown: @caller=/Users/user/go/pkg/mod/github.com/hashicorp/terraform-plugin-framework@v1.15.0/internal/fwserver/server_planresourcechange.go:538 tf_provider_addr=registry.terraform.io/stainless-sdks/gcore tf_req_id=417e8f98-ba54-3164-7375-5bfd01cef148 @module=sdk.framework tf_attribute_path="AttributeName(\"fixed_ip_assignments\")" tf_resource_type=gcore_cloud_instance tf_rpc=PlanResourceChange timestamp="2025-11-19T10:36:15.666+0200"
+2025-11-19T10:36:15.667+0200 [DEBUG] provider.terraform-provider-gcore: marking computed attribute that is null in the config as unknown: tf_provider_addr=registry.terraform.io/stainless-sdks/gcore tf_req_id=417e8f98-ba54-3164-7375-5bfd01cef148 tf_resource_type=gcore_cloud_instance @caller=/Users/user/go/pkg/mod/github.com/hashicorp/terraform-plugin-framework@v1.15.0/internal/fwserver/server_planresourcechange.go:538 @module=sdk.framework tf_attribute_path="AttributeName(\"instance_isolation\")" tf_rpc=PlanResourceChange timestamp="2025-11-19T10:36:15.666+0200"
+2025-11-19T10:36:15.667+0200 [DEBUG] provider.terraform-provider-gcore: marking computed attribute that is null in the config as unknown: @module=sdk.framework tf_attribute_path="AttributeName(\"vm_state\")" tf_provider_addr=registry.terraform.io/stainless-sdks/gcore tf_resource_type=gcore_cloud_instance tf_rpc=PlanResourceChange @caller=/Users/user/go/pkg/mod/github.com/hashicorp/terraform-plugin-framework@v1.15.0/internal/fwserver/server_planresourcechange.go:538 tf_req_id=417e8f98-ba54-3164-7375-5bfd01cef148 timestamp="2025-11-19T10:36:15.666+0200"
+2025-11-19T10:36:15.667+0200 [DEBUG] provider.terraform-provider-gcore: marking computed attribute that is null in the config as unknown: tf_req_id=417e8f98-ba54-3164-7375-5bfd01cef148 tf_resource_type=gcore_cloud_instance @module=sdk.framework tf_attribute_path="AttributeName(\"volumes\").ElementKeyInt(0).AttributeName(\"volume_id\")" tf_provider_addr=registry.terraform.io/stainless-sdks/gcore tf_rpc=PlanResourceChange @caller=/Users/user/go/pkg/mod/github.com/hashicorp/terraform-plugin-framework@v1.15.0/internal/fwserver/server_planresourcechange.go:538 timestamp="2025-11-19T10:36:15.666+0200"
+2025-11-19T10:36:15.667+0200 [DEBUG] provider.terraform-provider-gcore: marking computed attribute that is null in the config as unknown: @caller=/Users/user/go/pkg/mod/github.com/hashicorp/terraform-plugin-framework@v1.15.0/internal/fwserver/server_planresourcechange.go:538 @module=sdk.framework tf_attribute_path="AttributeName(\"ddos_profile\")" tf_provider_addr=registry.terraform.io/stainless-sdks/gcore tf_req_id=417e8f98-ba54-3164-7375-5bfd01cef148 tf_resource_type=gcore_cloud_instance tf_rpc=PlanResourceChange timestamp="2025-11-19T10:36:15.667+0200"
+2025-11-19T10:36:15.667+0200 [DEBUG] provider.terraform-provider-gcore: marking computed attribute that is null in the config as unknown: @module=sdk.framework tf_attribute_path="AttributeName(\"addresses\")" tf_req_id=417e8f98-ba54-3164-7375-5bfd01cef148 tf_rpc=PlanResourceChange @caller=/Users/user/go/pkg/mod/github.com/hashicorp/terraform-plugin-framework@v1.15.0/internal/fwserver/server_planresourcechange.go:538 tf_provider_addr=registry.terraform.io/stainless-sdks/gcore tf_resource_type=gcore_cloud_instance timestamp="2025-11-19T10:36:15.667+0200"
+2025-11-19T10:36:15.667+0200 [DEBUG] provider.terraform-provider-gcore: marking computed attribute that is null in the config as unknown: @module=sdk.framework tf_attribute_path="AttributeName(\"instance_description\")" tf_provider_addr=registry.terraform.io/stainless-sdks/gcore tf_req_id=417e8f98-ba54-3164-7375-5bfd01cef148 tf_resource_type=gcore_cloud_instance tf_rpc=PlanResourceChange @caller=/Users/user/go/pkg/mod/github.com/hashicorp/terraform-plugin-framework@v1.15.0/internal/fwserver/server_planresourcechange.go:538 timestamp="2025-11-19T10:36:15.667+0200"
+2025-11-19T10:36:15.667+0200 [DEBUG] provider.terraform-provider-gcore: marking computed attribute that is null in the config as unknown: @caller=/Users/user/go/pkg/mod/github.com/hashicorp/terraform-plugin-framework@v1.15.0/internal/fwserver/server_planresourcechange.go:538 tf_req_id=417e8f98-ba54-3164-7375-5bfd01cef148 tf_resource_type=gcore_cloud_instance tf_rpc=PlanResourceChange tf_attribute_path="AttributeName(\"task_state\")" tf_provider_addr=registry.terraform.io/stainless-sdks/gcore @module=sdk.framework timestamp="2025-11-19T10:36:15.667+0200"
+2025-11-19T10:36:15.667+0200 [DEBUG] provider.terraform-provider-gcore: marking computed attribute that is null in the config as unknown: tf_attribute_path="AttributeName(\"created_at\")" tf_rpc=PlanResourceChange @caller=/Users/user/go/pkg/mod/github.com/hashicorp/terraform-plugin-framework@v1.15.0/internal/fwserver/server_planresourcechange.go:538 @module=sdk.framework tf_provider_addr=registry.terraform.io/stainless-sdks/gcore tf_req_id=417e8f98-ba54-3164-7375-5bfd01cef148 tf_resource_type=gcore_cloud_instance timestamp="2025-11-19T10:36:15.667+0200"
+2025-11-19T10:36:15.667+0200 [DEBUG] provider.terraform-provider-gcore: marking computed attribute that is null in the config as unknown: @module=sdk.framework tf_attribute_path="AttributeName(\"id\")" tf_req_id=417e8f98-ba54-3164-7375-5bfd01cef148 tf_resource_type=gcore_cloud_instance tf_rpc=PlanResourceChange @caller=/Users/user/go/pkg/mod/github.com/hashicorp/terraform-plugin-framework@v1.15.0/internal/fwserver/server_planresourcechange.go:538 tf_provider_addr=registry.terraform.io/stainless-sdks/gcore timestamp="2025-11-19T10:36:15.667+0200"
+2025-11-19T10:36:15.667+0200 [DEBUG] provider.terraform-provider-gcore: marking computed attribute that is null in the config as unknown: tf_rpc=PlanResourceChange tf_attribute_path="AttributeName(\"creator_task_id\")" tf_provider_addr=registry.terraform.io/stainless-sdks/gcore tf_req_id=417e8f98-ba54-3164-7375-5bfd01cef148 tf_resource_type=gcore_cloud_instance @caller=/Users/user/go/pkg/mod/github.com/hashicorp/terraform-plugin-framework@v1.15.0/internal/fwserver/server_planresourcechange.go:538 @module=sdk.framework timestamp="2025-11-19T10:36:15.667+0200"
+2025-11-19T10:36:15.667+0200 [DEBUG] provider.terraform-provider-gcore: marking computed attribute that is null in the config as unknown: tf_provider_addr=registry.terraform.io/stainless-sdks/gcore tf_req_id=417e8f98-ba54-3164-7375-5bfd01cef148 tf_resource_type=gcore_cloud_instance @caller=/Users/user/go/pkg/mod/github.com/hashicorp/terraform-plugin-framework@v1.15.0/internal/fwserver/server_planresourcechange.go:538 @module=sdk.framework tf_attribute_path="AttributeName(\"tasks\")" tf_rpc=PlanResourceChange timestamp="2025-11-19T10:36:15.667+0200"
+2025-11-19T10:36:15.673+0200 [DEBUG] provider.stdio: received EOF, stopping recv loop: err="rpc error: code = Unavailable desc = error reading from server: EOF"
+2025-11-19T10:36:15.673+0200 [INFO]  provider: plugin process exited: plugin=/Users/user/repos/gcore-terraform/terraform-provider-gcore id=41920
+2025-11-19T10:36:15.674+0200 [DEBUG] provider: plugin exited
+2025-11-19T10:36:15.675+0200 [DEBUG] building apply graph to check for errors
+2025-11-19T10:36:15.675+0200 [DEBUG] Resource state not found for node "gcore_cloud_instance.test", instance gcore_cloud_instance.test
+2025-11-19T10:36:15.675+0200 [DEBUG] ProviderTransformer: "gcore_cloud_instance.test" (*terraform.NodeApplyableResourceInstance) needs provider["registry.terraform.io/gcore/gcore"]
+2025-11-19T10:36:15.675+0200 [DEBUG] ProviderTransformer: "gcore_cloud_instance.test (expand)" (*terraform.nodeExpandApplyableResource) needs provider["registry.terraform.io/gcore/gcore"]
+2025-11-19T10:36:15.675+0200 [DEBUG] ReferenceTransformer: "output.instance_vm_state (expand)" references: [gcore_cloud_instance.test gcore_cloud_instance.test gcore_cloud_instance.test (expand)]
+2025-11-19T10:36:15.675+0200 [DEBUG] ReferenceTransformer: "output.instance_flavor (expand)" references: [gcore_cloud_instance.test gcore_cloud_instance.test gcore_cloud_instance.test (expand)]
+2025-11-19T10:36:15.675+0200 [DEBUG] ReferenceTransformer: "output.volume_id (expand)" references: [gcore_cloud_instance.test gcore_cloud_instance.test gcore_cloud_instance.test (expand)]
+2025-11-19T10:36:15.675+0200 [DEBUG] ReferenceTransformer: "var.volume_size" references: []
+2025-11-19T10:36:15.675+0200 [DEBUG] ReferenceTransformer: "var.project_id" references: []
+2025-11-19T10:36:15.675+0200 [DEBUG] ReferenceTransformer: "gcore_cloud_instance.test" references: [var.flavor var.vm_state var.image_id var.volume_size var.project_id var.region_id var.instance_name]
+2025-11-19T10:36:15.675+0200 [DEBUG] ReferenceTransformer: "var.vm_state" references: []
+2025-11-19T10:36:15.675+0200 [DEBUG] ReferenceTransformer: "var.region_id" references: []
+2025-11-19T10:36:15.675+0200 [DEBUG] ReferenceTransformer: "output.instance_addresses (expand)" references: [gcore_cloud_instance.test gcore_cloud_instance.test gcore_cloud_instance.test (expand)]
+2025-11-19T10:36:15.675+0200 [DEBUG] ReferenceTransformer: "output.volume_size (expand)" references: [gcore_cloud_instance.test gcore_cloud_instance.test gcore_cloud_instance.test (expand)]
+2025-11-19T10:36:15.675+0200 [DEBUG] ReferenceTransformer: "provider[\"registry.terraform.io/gcore/gcore\"]" references: [var.api_key]
+2025-11-19T10:36:15.675+0200 [DEBUG] ReferenceTransformer: "var.flavor" references: []
+2025-11-19T10:36:15.675+0200 [DEBUG] ReferenceTransformer: "var.image_id" references: []
+2025-11-19T10:36:15.675+0200 [DEBUG] ReferenceTransformer: "var.api_key" references: []
+2025-11-19T10:36:15.675+0200 [DEBUG] ReferenceTransformer: "output.instance_status (expand)" references: [gcore_cloud_instance.test gcore_cloud_instance.test gcore_cloud_instance.test (expand)]
+2025-11-19T10:36:15.675+0200 [DEBUG] ReferenceTransformer: "output.instance_id (expand)" references: [gcore_cloud_instance.test gcore_cloud_instance.test gcore_cloud_instance.test (expand)]
+2025-11-19T10:36:15.676+0200 [DEBUG] ReferenceTransformer: "gcore_cloud_instance.test (expand)" references: [var.instance_name var.flavor var.image_id var.volume_size var.vm_state var.project_id var.region_id]
+2025-11-19T10:36:15.676+0200 [DEBUG] ReferenceTransformer: "var.instance_name" references: []
+2025-11-19T10:36:15.678+0200 [INFO]  backend/local: apply calling Apply
+2025-11-19T10:36:15.678+0200 [DEBUG] Building and walking apply graph for NormalMode plan
+2025-11-19T10:36:15.678+0200 [DEBUG] Resource state not found for node "gcore_cloud_instance.test", instance gcore_cloud_instance.test
+2025-11-19T10:36:15.679+0200 [DEBUG] ProviderTransformer: "gcore_cloud_instance.test" (*terraform.NodeApplyableResourceInstance) needs provider["registry.terraform.io/gcore/gcore"]
+2025-11-19T10:36:15.679+0200 [DEBUG] ProviderTransformer: "gcore_cloud_instance.test (expand)" (*terraform.nodeExpandApplyableResource) needs provider["registry.terraform.io/gcore/gcore"]
+2025-11-19T10:36:15.679+0200 [DEBUG] ReferenceTransformer: "var.instance_name" references: []
+2025-11-19T10:36:15.679+0200 [DEBUG] ReferenceTransformer: "output.instance_vm_state (expand)" references: [gcore_cloud_instance.test (expand) gcore_cloud_instance.test gcore_cloud_instance.test]
+2025-11-19T10:36:15.679+0200 [DEBUG] ReferenceTransformer: "output.instance_flavor (expand)" references: [gcore_cloud_instance.test (expand) gcore_cloud_instance.test gcore_cloud_instance.test]
+2025-11-19T10:36:15.679+0200 [DEBUG] ReferenceTransformer: "output.instance_addresses (expand)" references: [gcore_cloud_instance.test (expand) gcore_cloud_instance.test gcore_cloud_instance.test]
+2025-11-19T10:36:15.679+0200 [DEBUG] ReferenceTransformer: "var.volume_size" references: []
+2025-11-19T10:36:15.679+0200 [DEBUG] ReferenceTransformer: "var.vm_state" references: []
+2025-11-19T10:36:15.679+0200 [DEBUG] ReferenceTransformer: "var.image_id" references: []
+2025-11-19T10:36:15.679+0200 [DEBUG] ReferenceTransformer: "var.project_id" references: []
+2025-11-19T10:36:15.679+0200 [DEBUG] ReferenceTransformer: "output.volume_size (expand)" references: [gcore_cloud_instance.test (expand) gcore_cloud_instance.test gcore_cloud_instance.test]
+2025-11-19T10:36:15.679+0200 [DEBUG] ReferenceTransformer: "output.instance_id (expand)" references: [gcore_cloud_instance.test (expand) gcore_cloud_instance.test gcore_cloud_instance.test]
+2025-11-19T10:36:15.679+0200 [DEBUG] ReferenceTransformer: "gcore_cloud_instance.test (expand)" references: [var.vm_state var.image_id var.volume_size var.project_id var.region_id var.instance_name var.flavor]
+2025-11-19T10:36:15.679+0200 [DEBUG] ReferenceTransformer: "gcore_cloud_instance.test" references: [var.instance_name var.flavor var.image_id var.volume_size var.vm_state var.project_id var.region_id]
+2025-11-19T10:36:15.679+0200 [DEBUG] ReferenceTransformer: "var.region_id" references: []
+2025-11-19T10:36:15.679+0200 [DEBUG] ReferenceTransformer: "output.volume_id (expand)" references: [gcore_cloud_instance.test (expand) gcore_cloud_instance.test gcore_cloud_instance.test]
+2025-11-19T10:36:15.679+0200 [DEBUG] ReferenceTransformer: "provider[\"registry.terraform.io/gcore/gcore\"]" references: [var.api_key]
+2025-11-19T10:36:15.679+0200 [DEBUG] ReferenceTransformer: "var.api_key" references: []
+2025-11-19T10:36:15.679+0200 [DEBUG] ReferenceTransformer: "var.flavor" references: []
+2025-11-19T10:36:15.679+0200 [DEBUG] ReferenceTransformer: "output.instance_status (expand)" references: [gcore_cloud_instance.test (expand) gcore_cloud_instance.test gcore_cloud_instance.test]
+2025-11-19T10:36:15.679+0200 [DEBUG] Starting graph walk: walkApply
+2025-11-19T10:36:15.680+0200 [DEBUG] created provider logger: level=debug
+2025-11-19T10:36:15.680+0200 [INFO]  provider: configuring client automatic mTLS
+2025-11-19T10:36:15.683+0200 [DEBUG] provider: starting plugin: path=/Users/user/repos/gcore-terraform/terraform-provider-gcore args=["/Users/user/repos/gcore-terraform/terraform-provider-gcore"]
+2025-11-19T10:36:15.684+0200 [DEBUG] provider: plugin started: path=/Users/user/repos/gcore-terraform/terraform-provider-gcore pid=41921
+2025-11-19T10:36:15.684+0200 [DEBUG] provider: waiting for RPC address: plugin=/Users/user/repos/gcore-terraform/terraform-provider-gcore
+2025-11-19T10:36:15.692+0200 [INFO]  provider.terraform-provider-gcore: configuring server automatic mTLS: timestamp="2025-11-19T10:36:15.692+0200"
+2025-11-19T10:36:15.698+0200 [DEBUG] provider: using plugin: version=6
+2025-11-19T10:36:15.698+0200 [DEBUG] provider.terraform-provider-gcore: plugin address: address=/var/folders/qj/cbb8n0j12tq6j2k955fxwpb80000gn/T/plugin3554172760 network=unix timestamp="2025-11-19T10:36:15.698+0200"
+2025-11-19T10:36:15.705+0200 [DEBUG] skipping FixUpBlockAttrs
+2025-11-19T10:36:15.709+0200 [DEBUG] provider.terraform-provider-gcore: Marking Computed attributes with null configuration values as unknown (known after apply) in the plan to prevent potential Terraform errors: @module=sdk.framework tf_rpc=PlanResourceChange @caller=/Users/user/go/pkg/mod/github.com/hashicorp/terraform-plugin-framework@v1.15.0/internal/fwserver/server_planresourcechange.go:250 tf_provider_addr=registry.terraform.io/stainless-sdks/gcore tf_req_id=6b143b86-907e-adee-4222-6187d9c5ddf1 tf_resource_type=gcore_cloud_instance timestamp="2025-11-19T10:36:15.709+0200"
+2025-11-19T10:36:15.709+0200 [DEBUG] provider.terraform-provider-gcore: marking computed attribute that is null in the config as unknown: tf_attribute_path="AttributeName(\"created_at\")" tf_provider_addr=registry.terraform.io/stainless-sdks/gcore tf_resource_type=gcore_cloud_instance @caller=/Users/user/go/pkg/mod/github.com/hashicorp/terraform-plugin-framework@v1.15.0/internal/fwserver/server_planresourcechange.go:538 @module=sdk.framework tf_req_id=6b143b86-907e-adee-4222-6187d9c5ddf1 tf_rpc=PlanResourceChange timestamp="2025-11-19T10:36:15.709+0200"
+2025-11-19T10:36:15.709+0200 [DEBUG] provider.terraform-provider-gcore: marking computed attribute that is null in the config as unknown: tf_provider_addr=registry.terraform.io/stainless-sdks/gcore tf_resource_type=gcore_cloud_instance @caller=/Users/user/go/pkg/mod/github.com/hashicorp/terraform-plugin-framework@v1.15.0/internal/fwserver/server_planresourcechange.go:538 @module=sdk.framework tf_attribute_path="AttributeName(\"creator_task_id\")" tf_req_id=6b143b86-907e-adee-4222-6187d9c5ddf1 tf_rpc=PlanResourceChange timestamp="2025-11-19T10:36:15.709+0200"
+2025-11-19T10:36:15.709+0200 [DEBUG] provider.terraform-provider-gcore: marking computed attribute that is null in the config as unknown: tf_attribute_path="AttributeName(\"fixed_ip_assignments\")" tf_provider_addr=registry.terraform.io/stainless-sdks/gcore tf_resource_type=gcore_cloud_instance tf_rpc=PlanResourceChange @module=sdk.framework tf_req_id=6b143b86-907e-adee-4222-6187d9c5ddf1 @caller=/Users/user/go/pkg/mod/github.com/hashicorp/terraform-plugin-framework@v1.15.0/internal/fwserver/server_planresourcechange.go:538 timestamp="2025-11-19T10:36:15.709+0200"
+2025-11-19T10:36:15.709+0200 [DEBUG] provider.terraform-provider-gcore: marking computed attribute that is null in the config as unknown: tf_attribute_path="AttributeName(\"id\")" tf_provider_addr=registry.terraform.io/stainless-sdks/gcore tf_req_id=6b143b86-907e-adee-4222-6187d9c5ddf1 @caller=/Users/user/go/pkg/mod/github.com/hashicorp/terraform-plugin-framework@v1.15.0/internal/fwserver/server_planresourcechange.go:538 @module=sdk.framework tf_resource_type=gcore_cloud_instance tf_rpc=PlanResourceChange timestamp="2025-11-19T10:36:15.709+0200"
+2025-11-19T10:36:15.709+0200 [DEBUG] provider.terraform-provider-gcore: marking computed attribute that is null in the config as unknown: tf_resource_type=gcore_cloud_instance @caller=/Users/user/go/pkg/mod/github.com/hashicorp/terraform-plugin-framework@v1.15.0/internal/fwserver/server_planresourcechange.go:538 @module=sdk.framework tf_attribute_path="AttributeName(\"status\")" tf_provider_addr=registry.terraform.io/stainless-sdks/gcore tf_req_id=6b143b86-907e-adee-4222-6187d9c5ddf1 tf_rpc=PlanResourceChange timestamp="2025-11-19T10:36:15.709+0200"
+2025-11-19T10:36:15.709+0200 [DEBUG] provider.terraform-provider-gcore: marking computed attribute that is null in the config as unknown: @caller=/Users/user/go/pkg/mod/github.com/hashicorp/terraform-plugin-framework@v1.15.0/internal/fwserver/server_planresourcechange.go:538 @module=sdk.framework tf_req_id=6b143b86-907e-adee-4222-6187d9c5ddf1 tf_resource_type=gcore_cloud_instance tf_attribute_path="AttributeName(\"region\")" tf_provider_addr=registry.terraform.io/stainless-sdks/gcore tf_rpc=PlanResourceChange timestamp="2025-11-19T10:36:15.709+0200"
+2025-11-19T10:36:15.709+0200 [DEBUG] provider.terraform-provider-gcore: marking computed attribute that is null in the config as unknown: @module=sdk.framework tf_resource_type=gcore_cloud_instance tf_rpc=PlanResourceChange tf_provider_addr=registry.terraform.io/stainless-sdks/gcore tf_req_id=6b143b86-907e-adee-4222-6187d9c5ddf1 @caller=/Users/user/go/pkg/mod/github.com/hashicorp/terraform-plugin-framework@v1.15.0/internal/fwserver/server_planresourcechange.go:538 tf_attribute_path="AttributeName(\"task_id\")" timestamp="2025-11-19T10:36:15.709+0200"
+2025-11-19T10:36:15.709+0200 [DEBUG] provider.terraform-provider-gcore: marking computed attribute that is null in the config as unknown: @caller=/Users/user/go/pkg/mod/github.com/hashicorp/terraform-plugin-framework@v1.15.0/internal/fwserver/server_planresourcechange.go:538 @module=sdk.framework tf_req_id=6b143b86-907e-adee-4222-6187d9c5ddf1 tf_attribute_path="AttributeName(\"blackhole_ports\")" tf_provider_addr=registry.terraform.io/stainless-sdks/gcore tf_resource_type=gcore_cloud_instance tf_rpc=PlanResourceChange timestamp="2025-11-19T10:36:15.709+0200"
+2025-11-19T10:36:15.709+0200 [DEBUG] provider.terraform-provider-gcore: marking computed attribute that is null in the config as unknown: @caller=/Users/user/go/pkg/mod/github.com/hashicorp/terraform-plugin-framework@v1.15.0/internal/fwserver/server_planresourcechange.go:538 @module=sdk.framework tf_req_id=6b143b86-907e-adee-4222-6187d9c5ddf1 tf_rpc=PlanResourceChange tf_attribute_path="AttributeName(\"volumes\").ElementKeyInt(0).AttributeName(\"volume_id\")" tf_provider_addr=registry.terraform.io/stainless-sdks/gcore tf_resource_type=gcore_cloud_instance timestamp="2025-11-19T10:36:15.709+0200"
+2025-11-19T10:36:15.709+0200 [DEBUG] provider.terraform-provider-gcore: marking computed attribute that is null in the config as unknown: @caller=/Users/user/go/pkg/mod/github.com/hashicorp/terraform-plugin-framework@v1.15.0/internal/fwserver/server_planresourcechange.go:538 tf_req_id=6b143b86-907e-adee-4222-6187d9c5ddf1 tf_resource_type=gcore_cloud_instance tf_rpc=PlanResourceChange tf_attribute_path="AttributeName(\"tasks\")" tf_provider_addr=registry.terraform.io/stainless-sdks/gcore @module=sdk.framework timestamp="2025-11-19T10:36:15.709+0200"
+2025-11-19T10:36:15.709+0200 [DEBUG] provider.terraform-provider-gcore: marking computed attribute that is null in the config as unknown: tf_provider_addr=registry.terraform.io/stainless-sdks/gcore tf_req_id=6b143b86-907e-adee-4222-6187d9c5ddf1 tf_attribute_path="AttributeName(\"instance_isolation\")" @module=sdk.framework tf_resource_type=gcore_cloud_instance tf_rpc=PlanResourceChange @caller=/Users/user/go/pkg/mod/github.com/hashicorp/terraform-plugin-framework@v1.15.0/internal/fwserver/server_planresourcechange.go:538 timestamp="2025-11-19T10:36:15.709+0200"
+2025-11-19T10:36:15.709+0200 [DEBUG] provider.terraform-provider-gcore: marking computed attribute that is null in the config as unknown: tf_provider_addr=registry.terraform.io/stainless-sdks/gcore tf_req_id=6b143b86-907e-adee-4222-6187d9c5ddf1 tf_resource_type=gcore_cloud_instance @module=sdk.framework tf_attribute_path="AttributeName(\"vm_state\")" tf_rpc=PlanResourceChange @caller=/Users/user/go/pkg/mod/github.com/hashicorp/terraform-plugin-framework@v1.15.0/internal/fwserver/server_planresourcechange.go:538 timestamp="2025-11-19T10:36:15.709+0200"
+2025-11-19T10:36:15.709+0200 [DEBUG] provider.terraform-provider-gcore: marking computed attribute that is null in the config as unknown: @caller=/Users/user/go/pkg/mod/github.com/hashicorp/terraform-plugin-framework@v1.15.0/internal/fwserver/server_planresourcechange.go:538 tf_attribute_path="AttributeName(\"ddos_profile\")" tf_provider_addr=registry.terraform.io/stainless-sdks/gcore tf_resource_type=gcore_cloud_instance @module=sdk.framework tf_req_id=6b143b86-907e-adee-4222-6187d9c5ddf1 tf_rpc=PlanResourceChange timestamp="2025-11-19T10:36:15.709+0200"
+2025-11-19T10:36:15.709+0200 [DEBUG] provider.terraform-provider-gcore: marking computed attribute that is null in the config as unknown: tf_provider_addr=registry.terraform.io/stainless-sdks/gcore tf_req_id=6b143b86-907e-adee-4222-6187d9c5ddf1 tf_resource_type=gcore_cloud_instance tf_rpc=PlanResourceChange @caller=/Users/user/go/pkg/mod/github.com/hashicorp/terraform-plugin-framework@v1.15.0/internal/fwserver/server_planresourcechange.go:538 @module=sdk.framework tf_attribute_path="AttributeName(\"instance_description\")" timestamp="2025-11-19T10:36:15.709+0200"
+2025-11-19T10:36:15.709+0200 [DEBUG] provider.terraform-provider-gcore: marking computed attribute that is null in the config as unknown: tf_attribute_path="AttributeName(\"addresses\")" tf_provider_addr=registry.terraform.io/stainless-sdks/gcore tf_req_id=6b143b86-907e-adee-4222-6187d9c5ddf1 @caller=/Users/user/go/pkg/mod/github.com/hashicorp/terraform-plugin-framework@v1.15.0/internal/fwserver/server_planresourcechange.go:538 tf_resource_type=gcore_cloud_instance tf_rpc=PlanResourceChange @module=sdk.framework timestamp="2025-11-19T10:36:15.709+0200"
+2025-11-19T10:36:15.709+0200 [DEBUG] provider.terraform-provider-gcore: marking computed attribute that is null in the config as unknown: tf_rpc=PlanResourceChange @caller=/Users/user/go/pkg/mod/github.com/hashicorp/terraform-plugin-framework@v1.15.0/internal/fwserver/server_planresourcechange.go:538 tf_req_id=6b143b86-907e-adee-4222-6187d9c5ddf1 tf_resource_type=gcore_cloud_instance tf_provider_addr=registry.terraform.io/stainless-sdks/gcore @module=sdk.framework tf_attribute_path="AttributeName(\"task_state\")" timestamp="2025-11-19T10:36:15.709+0200"
+2025-11-19T10:36:15.714+0200 [INFO]  Starting apply for gcore_cloud_instance.test
+2025-11-19T10:36:15.714+0200 [DEBUG] skipping FixUpBlockAttrs
+2025-11-19T10:36:15.714+0200 [DEBUG] gcore_cloud_instance.test: applying the planned Create change
+2025-11-19T10:36:15.719+0200 [DEBUG] provider.terraform-provider-gcore: 
+POST /cloud/v2/instances/379987/76 HTTP/1.1
+> user-agent: Gcore/Go 0.18.0
+> x-stainless-lang: go
+> x-stainless-package-version: 0.18.0
+> x-stainless-arch: arm64
+> authorization: APIKey 21788$1e278ce67b6aa33f178122658b1dd0210d0edff453d348acb9b68bffea6a635b7791925ddda198d5678a4dc20269fe04a263ca92c7e5aa41ea79075f89b66bf6
+> x-stainless-runtime: go
+> x-stainless-os: MacOS
+> content-type: application/json
+> accept: application/json
+> x-stainless-runtime-version: go1.24.5
+> x-stainless-retry-count: 0
+>
+
+{"flavor":"g1-standard-1-2","interfaces":[{"type":"external"}],"name":"test-instance-skill","volumes":[{"boot_index":0,"delete_on_termination":true,"image_id":"6343932d-0257-4285-bf89-05060f24095a","size":5,"source":"image"}]}
+
+: @caller=/Users/user/repos/gcore-terraform/internal/logging/logging.go:56 tf_provider_addr=registry.terraform.io/stainless-sdks/gcore tf_req_id=ccc79ec0-ee9b-764e-eff9-afafd252ecb9 tf_resource_type=gcore_cloud_instance tf_rpc=ApplyResourceChange @module=gcore timestamp="2025-11-19T10:36:15.718+0200"
+2025-11-19T10:36:20.619+0200 [DEBUG] provider.terraform-provider-gcore: 
+< HTTP/2.0 200 OK
+< access-control-allow-origin: *
+< cache-control: no-cache, no-store, must-revalidate
+< strict-transport-security: max-age=15724800; includeSubDomains
+< x-id: fr5-hw-edge-gc16
+< x-robots-tag: noindex, nofollow, noarchive
+< content-length: 51
+< x-id-fe: fr5-hw-edge-gc16
+< traceparent: 00-61167b015165adabdc4659ae26c82051-6ed275113c150eda-01
+< request_id: 61167b015165adabdc4659ae26c82051
+< accept-ranges: bytes
+< server: nginx
+< date: Wed, 19 Nov 2025 08:36:20 GMT
+< content-type: application/json; charset=UTF-8
+<
+
+{"tasks": ["6e9f47ac-35fd-48ab-8510-4e2bb7dc4313"]}
+
+: tf_provider_addr=registry.terraform.io/stainless-sdks/gcore tf_resource_type=gcore_cloud_instance @caller=/Users/user/repos/gcore-terraform/internal/logging/logging.go:84 @module=gcore tf_req_id=ccc79ec0-ee9b-764e-eff9-afafd252ecb9 tf_rpc=ApplyResourceChange timestamp="2025-11-19T10:36:20.619+0200"
+2025-11-19T10:36:50.332+0200 [DEBUG] provider.terraform-provider-gcore: 
+GET /cloud/v1/instances/379987/76/a3c9095d-c5d1-497e-998a-7d9f8619b2f3 HTTP/1.1
+> x-stainless-package-version: 0.18.0
+> accept: application/json
+> x-stainless-os: MacOS
+> authorization: APIKey 21788$1e278ce67b6aa33f178122658b1dd0210d0edff453d348acb9b68bffea6a635b7791925ddda198d5678a4dc20269fe04a263ca92c7e5aa41ea79075f89b66bf6
+> x-stainless-retry-count: 0
+> user-agent: Gcore/Go 0.18.0
+> x-stainless-arch: arm64
+> x-stainless-runtime: go
+> content-type: application/json
+> x-stainless-runtime-version: go1.24.5
+> x-stainless-lang: go
+>
+
+{"flavor":"g1-standard-1-2","interfaces":[{"type":"external"}],"name":"test-instance-skill","volumes":[{"boot_index":0,"delete_on_termination":true,"image_id":"6343932d-0257-4285-bf89-05060f24095a","size":5,"source":"image"}]}
+
+: @caller=/Users/user/repos/gcore-terraform/internal/logging/logging.go:56 tf_rpc=ApplyResourceChange tf_req_id=ccc79ec0-ee9b-764e-eff9-afafd252ecb9 tf_resource_type=gcore_cloud_instance @module=gcore tf_provider_addr=registry.terraform.io/stainless-sdks/gcore timestamp="2025-11-19T10:36:50.331+0200"
+2025-11-19T10:36:51.865+0200 [DEBUG] provider.terraform-provider-gcore: 
+< HTTP/2.0 200 OK
+< strict-transport-security: max-age=15724800; includeSubDomains
+< x-id: fr5-hw-edge-gc16
+< server: nginx
+< date: Wed, 19 Nov 2025 08:36:51 GMT
+< content-type: application/json; charset=UTF-8
+< x-id-fe: fr5-hw-edge-gc16
+< traceparent: 00-f26eb15e42145aceaec46c1abd708f20-aa5e78c5fea61e36-01
+< access-control-allow-origin: *
+< x-robots-tag: noindex, nofollow, noarchive
+< accept-ranges: bytes
+< content-length: 2348
+< request_id: f26eb15e42145aceaec46c1abd708f20
+< cache-control: no-cache, no-store, must-revalidate
+< etag: "5317f573ac9f6baa5d2b2e468a7085e0dc5f0ae2"
+<
+
+{"id": "a3c9095d-c5d1-497e-998a-7d9f8619b2f3", "instance_id": "a3c9095d-c5d1-497e-998a-7d9f8619b2f3", "name": "test-instance-skill", "instance_name": "test-instance-skill", "created_at": "2025-11-19T08:36:29Z", "instance_created": "2025-11-19T08:36:29Z", "status": "ACTIVE", "vm_state": "active", "volumes": [{"id": "5d1f6fc8-11ac-48fa-95d0-8446dc5aad11", "delete_on_termination": true}], "flavor": {"flavor_id": "g1-standard-1-2", "flavor_name": "g1-standard-1-2", "vcpus": 1, "ram": 2048, "hardware_description": {"vcpus": "1", "ram": "2048"}, "os_type": "linux", "architecture": "x86_64"}, "metadata": {"task_id": "6e9f47ac-35fd-48ab-8510-4e2bb7dc4313", "os_distro": "ubuntu", "os_type": "linux", "os_version": "22.04", "image_name": "ubuntu-22.04-x64", "image_id": "6343932d-0257-4285-bf89-05060f24095a"}, "metadata_detailed": [{"key": "image_id", "value": "6343932d-0257-4285-bf89-05060f24095a", "read_only": true}, {"key": "image_name", "value": "ubuntu-22.04-x64", "read_only": true}, {"key": "os_distro", "value": "ubuntu", "read_only": true}, {"key": "os_type", "value": "linux", "read_only": true}, {"key": "os_version", "value": "22.04", "read_only": true}, {"key": "task_id", "value": "6e9f47ac-35fd-48ab-8510-4e2bb7dc4313", "read_only": true}], "tags": [{"key": "image_id", "value": "6343932d-0257-4285-bf89-05060f24095a", "read_only": true}, {"key": "image_name", "value": "ubuntu-22.04-x64", "read_only": true}, {"key": "os_distro", "value": "ubuntu", "read_only": true}, {"key": "os_type", "value": "linux", "read_only": true}, {"key": "os_version", "value": "22.04", "read_only": true}, {"key": "task_id", "value": "6e9f47ac-35fd-48ab-8510-4e2bb7dc4313", "read_only": true}], "instance_description": null, "addresses": {"pub_net": [{"addr": "85.204.246.82", "type": "fixed", "interface_name": null, "subnet_name": "pub_net9", "subnet_id": "896f3e39-51cb-4f70-b905-a749b642c152"}]}, "security_groups": [{"name": "default"}], "keypair_name": null, "ssh_key_name": null, "creator_task_id": "6e9f47ac-35fd-48ab-8510-4e2bb7dc4313", "task_state": null, "task_id": null, "blackhole_ports": [], "ddos_profile": null, "fixed_ip_assignments": [{"subnet_id": "896f3e39-51cb-4f70-b905-a749b642c152", "ip_address": "85.204.246.82", "external": true}], "instance_isolation": null, "region": "Luxembourg-2", "region_id": 76, "project_id": 379987}
+
+: tf_resource_type=gcore_cloud_instance tf_rpc=ApplyResourceChange @caller=/Users/user/repos/gcore-terraform/internal/logging/logging.go:84 @module=gcore tf_provider_addr=registry.terraform.io/stainless-sdks/gcore tf_req_id=ccc79ec0-ee9b-764e-eff9-afafd252ecb9 timestamp="2025-11-19T10:36:51.864+0200"
+2025-11-19T10:36:51.868+0200 [DEBUG] provider.terraform-provider-gcore: Value switched to prior value due to semantic equality logic: @caller=/Users/user/go/pkg/mod/github.com/hashicorp/terraform-plugin-framework@v1.15.0/internal/fwschemadata/value_semantic_equality.go:91 tf_attribute_path=volumes[0].delete_on_termination tf_req_id=ccc79ec0-ee9b-764e-eff9-afafd252ecb9 tf_resource_type=gcore_cloud_instance tf_rpc=ApplyResourceChange @module=sdk.framework tf_provider_addr=registry.terraform.io/stainless-sdks/gcore timestamp="2025-11-19T10:36:51.868+0200"
+2025-11-19T10:36:51.868+0200 [DEBUG] provider.terraform-provider-gcore: Value switched to prior value due to semantic equality logic: @caller=/Users/user/go/pkg/mod/github.com/hashicorp/terraform-plugin-framework@v1.15.0/internal/fwschemadata/value_semantic_equality.go:91 @module=sdk.framework tf_provider_addr=registry.terraform.io/stainless-sdks/gcore tf_rpc=ApplyResourceChange tf_attribute_path=volumes[0].image_id tf_req_id=ccc79ec0-ee9b-764e-eff9-afafd252ecb9 tf_resource_type=gcore_cloud_instance timestamp="2025-11-19T10:36:51.868+0200"
+2025-11-19T10:36:51.868+0200 [DEBUG] provider.terraform-provider-gcore: Value switched to prior value due to semantic equality logic: @module=sdk.framework tf_rpc=ApplyResourceChange tf_resource_type=gcore_cloud_instance @caller=/Users/user/go/pkg/mod/github.com/hashicorp/terraform-plugin-framework@v1.15.0/internal/fwschemadata/value_semantic_equality.go:91 tf_attribute_path=volumes[0].source tf_provider_addr=registry.terraform.io/stainless-sdks/gcore tf_req_id=ccc79ec0-ee9b-764e-eff9-afafd252ecb9 timestamp="2025-11-19T10:36:51.868+0200"
+2025-11-19T10:36:51.868+0200 [DEBUG] provider.terraform-provider-gcore: Value switched to prior value due to semantic equality logic: @caller=/Users/user/go/pkg/mod/github.com/hashicorp/terraform-plugin-framework@v1.15.0/internal/fwschemadata/value_semantic_equality.go:91 tf_attribute_path=volumes[0].size tf_provider_addr=registry.terraform.io/stainless-sdks/gcore tf_req_id=ccc79ec0-ee9b-764e-eff9-afafd252ecb9 tf_rpc=ApplyResourceChange @module=sdk.framework tf_resource_type=gcore_cloud_instance timestamp="2025-11-19T10:36:51.868+0200"
+2025-11-19T10:36:51.868+0200 [DEBUG] provider.terraform-provider-gcore: Value switched to prior value due to semantic equality logic: @module=sdk.framework tf_attribute_path=volumes[0].boot_index tf_req_id=ccc79ec0-ee9b-764e-eff9-afafd252ecb9 @caller=/Users/user/go/pkg/mod/github.com/hashicorp/terraform-plugin-framework@v1.15.0/internal/fwschemadata/value_semantic_equality.go:91 tf_provider_addr=registry.terraform.io/stainless-sdks/gcore tf_resource_type=gcore_cloud_instance tf_rpc=ApplyResourceChange timestamp="2025-11-19T10:36:51.868+0200"
+2025-11-19T10:36:51.868+0200 [DEBUG] provider.terraform-provider-gcore: Value switched to prior value due to semantic equality logic: @module=sdk.framework tf_attribute_path=name tf_provider_addr=registry.terraform.io/stainless-sdks/gcore tf_resource_type=gcore_cloud_instance @caller=/Users/user/go/pkg/mod/github.com/hashicorp/terraform-plugin-framework@v1.15.0/internal/fwschemadata/value_semantic_equality.go:91 tf_req_id=ccc79ec0-ee9b-764e-eff9-afafd252ecb9 tf_rpc=ApplyResourceChange timestamp="2025-11-19T10:36:51.868+0200"
+2025-11-19T10:36:51.869+0200 [DEBUG] provider.terraform-provider-gcore: Value switched to prior value due to semantic equality logic: @module=sdk.framework tf_attribute_path=project_id tf_provider_addr=registry.terraform.io/stainless-sdks/gcore tf_req_id=ccc79ec0-ee9b-764e-eff9-afafd252ecb9 tf_resource_type=gcore_cloud_instance tf_rpc=ApplyResourceChange @caller=/Users/user/go/pkg/mod/github.com/hashicorp/terraform-plugin-framework@v1.15.0/internal/fwschemadata/value_semantic_equality.go:91 timestamp="2025-11-19T10:36:51.869+0200"
+2025-11-19T10:36:51.869+0200 [DEBUG] provider.terraform-provider-gcore: Value switched to prior value due to semantic equality logic: tf_rpc=ApplyResourceChange @caller=/Users/user/go/pkg/mod/github.com/hashicorp/terraform-plugin-framework@v1.15.0/internal/fwschemadata/value_semantic_equality.go:91 tf_req_id=ccc79ec0-ee9b-764e-eff9-afafd252ecb9 tf_resource_type=gcore_cloud_instance tf_provider_addr=registry.terraform.io/stainless-sdks/gcore @module=sdk.framework tf_attribute_path=region_id timestamp="2025-11-19T10:36:51.869+0200"
+2025-11-19T10:36:51.870+0200 [DEBUG] provider.terraform-provider-gcore: Value switched to prior value due to semantic equality logic: @caller=/Users/user/go/pkg/mod/github.com/hashicorp/terraform-plugin-framework@v1.15.0/internal/fwschemadata/value_semantic_equality.go:91 @module=sdk.framework tf_attribute_path=flavor tf_req_id=ccc79ec0-ee9b-764e-eff9-afafd252ecb9 tf_provider_addr=registry.terraform.io/stainless-sdks/gcore tf_resource_type=gcore_cloud_instance tf_rpc=ApplyResourceChange timestamp="2025-11-19T10:36:51.869+0200"
+2025-11-19T10:36:51.870+0200 [DEBUG] provider.terraform-provider-gcore: Value switched to prior value due to semantic equality logic: tf_attribute_path=interfaces[0].type tf_rpc=ApplyResourceChange @caller=/Users/user/go/pkg/mod/github.com/hashicorp/terraform-plugin-framework@v1.15.0/internal/fwschemadata/value_semantic_equality.go:91 @module=sdk.framework tf_provider_addr=registry.terraform.io/stainless-sdks/gcore tf_req_id=ccc79ec0-ee9b-764e-eff9-afafd252ecb9 tf_resource_type=gcore_cloud_instance timestamp="2025-11-19T10:36:51.870+0200"
+2025-11-19T10:36:51.870+0200 [DEBUG] provider.terraform-provider-gcore: Value switched to prior value due to semantic equality logic: @module=sdk.framework tf_req_id=ccc79ec0-ee9b-764e-eff9-afafd252ecb9 tf_resource_type=gcore_cloud_instance @caller=/Users/user/go/pkg/mod/github.com/hashicorp/terraform-plugin-framework@v1.15.0/internal/fwschemadata/value_semantic_equality.go:91 tf_attribute_path=interfaces[0] tf_provider_addr=registry.terraform.io/stainless-sdks/gcore tf_rpc=ApplyResourceChange timestamp="2025-11-19T10:36:51.870+0200"
+2025-11-19T10:36:51.870+0200 [DEBUG] provider.terraform-provider-gcore: Value switched to prior value due to semantic equality logic: tf_attribute_path=interfaces tf_provider_addr=registry.terraform.io/stainless-sdks/gcore tf_req_id=ccc79ec0-ee9b-764e-eff9-afafd252ecb9 tf_rpc=ApplyResourceChange @caller=/Users/user/go/pkg/mod/github.com/hashicorp/terraform-plugin-framework@v1.15.0/internal/fwschemadata/value_semantic_equality.go:91 @module=sdk.framework tf_resource_type=gcore_cloud_instance timestamp="2025-11-19T10:36:51.870+0200"
+2025-11-19T10:36:51.880+0200 [DEBUG] State storage *statemgr.Filesystem declined to persist a state snapshot
+2025-11-19T10:36:51.881+0200 [DEBUG] provider.stdio: received EOF, stopping recv loop: err="rpc error: code = Unavailable desc = error reading from server: EOF"
+2025-11-19T10:36:51.882+0200 [INFO]  provider: plugin process exited: plugin=/Users/user/repos/gcore-terraform/terraform-provider-gcore id=41921
+2025-11-19T10:36:51.882+0200 [DEBUG] provider: plugin exited

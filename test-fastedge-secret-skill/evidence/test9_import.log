@@ -1,0 +1,10 @@
+gcore_fastedge_secret.test: Importing from ID "351"...
+gcore_fastedge_secret.test: Import prepared!
+  Prepared gcore_fastedge_secret for import
+gcore_fastedge_secret.test: Refreshing state... [name=tf-skill-test-renamed]
+
+Import successful!
+
+The resources that were imported are shown above. These resources are now in
+your Terraform state and will henceforth be managed by Terraform.
+
