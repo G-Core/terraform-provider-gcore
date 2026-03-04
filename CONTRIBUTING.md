@@ -26,7 +26,7 @@ Then edit (or create) your `~/.terraformrc` to look something like this:
 ```hcl
   provider_installation {
     dev_overrides {
-      "stainless-sdks/gcore" = "/local/path/to/this/repo"
+      "G-Core/gcore" = "/local/path/to/this/repo"
     }
     direct {}
   }

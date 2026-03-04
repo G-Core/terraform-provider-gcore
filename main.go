@@ -7,8 +7,8 @@ import (
 	"flag"
 	"log"
 
+	"github.com/G-Core/terraform-provider-gcore/internal"
 	"github.com/hashicorp/terraform-plugin-framework/providerserver"
-	"github.com/stainless-sdks/gcore-terraform/internal"
 )
 
 var (
@@ -22,7 +22,7 @@ func main() {
 	flag.Parse()
 
 	opts := providerserver.ServeOpts{
-		Address: "registry.terraform.io/stainless-sdks/gcore",
+		Address: "registry.terraform.io/G-Core/gcore",
 		Debug:   debug,
 	}
 

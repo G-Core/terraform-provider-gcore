@@ -18,7 +18,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/types/basetypes"
 
-	"github.com/stainless-sdks/gcore-terraform/internal/customfield"
+	"github.com/G-Core/terraform-provider-gcore/internal/customfield"
 )
 
 var _ codingerror = (*mismatch)(nil)
