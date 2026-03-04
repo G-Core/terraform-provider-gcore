@@ -3,12 +3,12 @@
 page_title: "gcore_fastedge_secret Data Source - gcore"
 subcategory: ""
 description: |-
-  
+  Secret values that can be used in apps
 ---
 
 # gcore_fastedge_secret (Data Source)
 
-
+Secret values that can be used in apps
 
 ## Example Usage
 

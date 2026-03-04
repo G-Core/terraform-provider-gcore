@@ -23,7 +23,7 @@ resource "gcore_fastedge_binary" "example" {
 
 ### Required
 
-- `filename` (String) Path to the WebAssembly binary file to upload. Changes to file content will trigger resource replacement.
+- `filename` (String) Path to the WebAssembly binary file to upload. Changes to file content (detected via checksum) will trigger resource replacement.
 
 ### Read-Only
 

@@ -78,7 +78,7 @@ resource "gcore_cloud_gpu_virtual_cluster" "example_cloud_gpu_virtual_cluster" {
 - `id` (String) The ID of this resource.
 - `servers_ids` (List of String) List of cluster nodes
 - `status` (String) Cluster status
-Available values: "active", "deleting", "error", "new", "resizing".
+Available values: "active", "creating", "degraded", "deleting", "error", "new", "rebooting", "rebuilding", "resizing", "shutoff".
 - `updated_at` (String) Cluster update date time
 
 <a id="nestedatt--servers_settings"></a>
@@ -145,7 +145,8 @@ Optional:
 
 Optional:
 
-- `password` (String) Used to set the password for the specified 'username' on Linux instances. If 'username' is not provided, the password is applied to the default user of the image. Mutually exclusive with '`user_data`' - only one can be specified.
+- `password_wo` (String) Used to set the password for the specified 'username' on Linux instances. If 'username' is not provided, the password is applied to the default user of the image. Mutually exclusive with '`user_data`' - only one can be specified.
+- `password_wo_version` (Number) Version of the password write-only field. Increment this value to trigger an update when changing the password.
 - `ssh_key_name` (String) Specifies the name of the SSH keypair, created via the
 [/v1/`ssh_keys` endpoint](/docs/api-reference/cloud/ssh-keys/add-or-generate-ssh-key).
 - `username` (String) The 'username' and 'password' fields create a new user on the system

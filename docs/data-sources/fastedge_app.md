@@ -3,12 +3,12 @@
 page_title: "gcore_fastedge_app Data Source - gcore"
 subcategory: ""
 description: |-
-  
+  Apps are descriptions of edge apps, that reference the binary and may contain app-specific settings, such as environment variables.
 ---
 
 # gcore_fastedge_app (Data Source)
 
-
+Apps are descriptions of edge apps, that reference the binary and may contain app-specific settings, such as environment variables.
 
 ## Example Usage
 

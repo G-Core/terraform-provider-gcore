@@ -67,5 +67,5 @@ Available values: "AMERICAS", "APAC", "EMEA", "RUSSIA_AND_CIS".
 
 Read-Only:
 
-- `latitude` (Dynamic)
-- `longitude` (Dynamic)
+- `latitude` (String)
+- `longitude` (String)

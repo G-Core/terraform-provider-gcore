@@ -85,7 +85,7 @@ Available values: "dual", "ipv4", "ipv6".
 - `type` (String) Available values: "external", "subnet", "any_subnet".
 
 <a id="nestedatt--items--servers_settings--interfaces--floating_ip"></a>
-### Nested Schema for `items.servers_settings.interfaces.floating_ip`
+### Nested Schema for `items.servers_settings.interfaces.type`
 
 Read-Only:
 
@@ -117,13 +117,13 @@ Read-Only:
 Available values: "cold", "ssd_hiiops", "ssd_local", "ssd_lowlatency", "standard", "ultra".
 
 <a id="nestedatt--items--servers_settings--volumes--tags"></a>
-### Nested Schema for `items.servers_settings.volumes.tags`
+### Nested Schema for `items.servers_settings.volumes.type`
 
 Read-Only:
 
-- `key` (String) Tag key. The maximum size for a key is 255 characters.
+- `key` (String) Tag key. Maximum 255 characters. Cannot contain spaces, tabs, newlines, empty string or '=' character.
 - `read_only` (Boolean) If true, the tag is read-only and cannot be modified by the user
-- `value` (String) Tag value. The maximum size for a value is 255 characters.
+- `value` (String) Tag value. Maximum 255 characters. Cannot contain spaces, tabs, newlines, empty string or '=' character.
 
 
 
@@ -133,6 +133,6 @@ Read-Only:
 
 Read-Only:
 
-- `key` (String) Tag key. The maximum size for a key is 255 characters.
+- `key` (String) Tag key. Maximum 255 characters. Cannot contain spaces, tabs, newlines, empty string or '=' character.
 - `read_only` (Boolean) If true, the tag is read-only and cannot be modified by the user
-- `value` (String) Tag value. The maximum size for a value is 255 characters.
+- `value` (String) Tag value. Maximum 255 characters. Cannot contain spaces, tabs, newlines, empty string or '=' character.

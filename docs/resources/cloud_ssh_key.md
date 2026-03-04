@@ -27,9 +27,7 @@ resource "gcore_cloud_ssh_key" "example_cloud_ssh_key" {
 ### Required
 
 - `name` (String) SSH key name
-- `public_key` (String) The public part of an SSH key is the shareable portion of an SSH key pair. It can be safely sent to servers or services to grant access. It does not contain sensitive information.
-- If you’re uploading your own key, provide the public part here (usually found in a file like `id_ed25519.pub`).
-- If you want the platform to generate an Ed25519 key pair for you, leave this field empty — the system will return the private key in the response **once only**.
+- `public_key` (String) The public part of an SSH key is the shareable portion of an SSH key pair. It can be safely sent to servers or services to grant access. It does not contain sensitive information. You must provide your own public key (usually found in a file like `id_ed25519.pub` or `id_rsa.pub`). Generate your SSH keypair locally using `ssh-keygen` before providing it here.
 
 ### Optional
 
@@ -41,11 +39,6 @@ resource "gcore_cloud_ssh_key" "example_cloud_ssh_key" {
 - `created_at` (String) SSH key creation time
 - `fingerprint` (String) Fingerprint
 - `id` (String) SSH key ID
-- `private_key` (String) The private part of an SSH key is the confidential portion of the key pair. It should never be shared or exposed. This key is used to prove your identity when connecting to a server. 
-
-If you omit the `public_key`, the platform will generate a key for you. The `private_key` will be returned **once** in the API response. Be sure to save it securely, as it cannot be retrieved again later. 
-
-Best practice: Save the private key to a secure location on your machine (e.g., `~/.ssh/id_ed25519`) and set the file permissions to be readable only by you.
 - `state` (String) SSH key state
 Available values: "ACTIVE", "DELETING".
 

@@ -39,6 +39,7 @@ resource "gcore_cloud_load_balancer" "example_cloud_load_balancer" {
         max_retries = 3
         timeout = 5
         type = "HTTP"
+        admin_state_up = true
         expected_codes = "200,301,302"
         http_method = "GET"
         max_retries_down = 3
@@ -76,7 +77,7 @@ resource "gcore_cloud_load_balancer" "example_cloud_load_balancer" {
       timeout_member_connect = 50000
       timeout_member_data = 0
     }]
-    secret_id = "f2e734d0-fa2b-42c2-ad33-4c6db5101e00"
+    secret_id = ""
     sni_secret_id = ["f2e734d0-fa2b-42c2-ad33-4c6db5101e00", "eb121225-7ded-4ff3-ae1f-599e145dd7cb"]
     timeout_client_data = 50000
     timeout_member_connect = 50000
@@ -132,6 +133,7 @@ Available values: "dual", "ipv4", "ipv6".
 ### Read-Only
 
 - `additional_vips` (Attributes List) List of additional IP addresses (see [below for nested schema](#nestedatt--additional_vips))
+- `admin_state_up` (Boolean) Administrative state of the resource. When set to true, the resource is enabled and operational. When set to false, the resource is disabled and will not process traffic. Defaults to true.
 - `created_at` (String) Datetime when the load balancer was created
 - `creator_task_id` (String) Task that created this entity
 - `ddos_profile` (Attributes) Loadbalancer advanced DDoS protection profile. (see [below for nested schema](#nestedatt--ddos_profile))
@@ -146,6 +148,7 @@ Available values: "ACTIVE", "DELETED", "ERROR", "PENDING_CREATE", "PENDING_DELET
 - `tags_v2` (Attributes List) List of key-value tags associated with the resource. A tag is a key-value pair that can be associated with a resource, enabling efficient filtering and grouping for better organization and management. Some tags are read-only and cannot be modified by the user. Tags are also integrated with cost reports, allowing cost data to be filtered based on tag keys or values. (see [below for nested schema](#nestedatt--tags_v2))
 - `updated_at` (String) Datetime when the load balancer was last updated
 - `vip_address` (String) Load balancer IP address
+- `vip_fqdn` (String) Fully qualified domain name for the load balancer VIP
 - `vrrp_ips` (Attributes List) List of VRRP IP addresses (see [below for nested schema](#nestedatt--vrrp_ips))
 
 <a id="nestedatt--floating_ip"></a>
@@ -178,6 +181,7 @@ Optional:
 - `insert_x_forwarded` (Boolean) Add headers X-Forwarded-For, X-Forwarded-Port, X-Forwarded-Proto to requests. Only used with HTTP or `TERMINATED_HTTPS` protocols.
 - `pools` (Attributes List) Member pools (see [below for nested schema](#nestedatt--listeners--pools))
 - `secret_id` (String) ID of the secret where PKCS12 file is stored for `TERMINATED_HTTPS` or PROMETHEUS listener
+Available values: "".
 - `sni_secret_id` (List of String) List of secrets IDs containing PKCS12 format certificate/key bundles for `TERMINATED_HTTPS` or PROMETHEUS listeners
 - `timeout_client_data` (Number) Frontend client inactivity timeout in milliseconds
 - `timeout_member_connect` (Number, Deprecated) Backend member connection timeout in milliseconds. We are recommending to use `pool.timeout_member_connect` instead.
@@ -220,6 +224,7 @@ Available values: "HTTP", "HTTPS", "K8S", "PING", "TCP", "TLS-HELLO", "UDP-CONNE
 
 Optional:
 
+- `admin_state_up` (Boolean) Administrative state of the resource. When set to true, the resource is enabled and operational. When set to false, the resource is disabled and will not process traffic. Defaults to true.
 - `expected_codes` (String) Expected HTTP response codes. Can be a single code or a range of codes. Can only be used together with `HTTP` or `HTTPS` health monitor type. For example, 200,202,300-302,401,403,404,500-504. If not specified, the default is 200.
 - `http_method` (String) HTTP method. Can only be used together with `HTTP` or `HTTPS` health monitor type.
 Available values: "CONNECT", "DELETE", "GET", "HEAD", "OPTIONS", "PATCH", "POST", "PUT", "TRACE".
@@ -237,16 +242,16 @@ Required:
 
 Optional:
 
-- `admin_state_up` (Boolean) Administrative state of the resource. When set to true, the resource is enabled and operational. When set to false, the resource is disabled and will not process traffic. When null is passed, the value is skipped and defaults to true.
+- `admin_state_up` (Boolean) Administrative state of the resource. When set to true, the resource is enabled and operational. When set to false, the resource is disabled and will not process traffic. Defaults to true.
 - `backup` (Boolean) Set to true if the member is a backup member, to which traffic will be sent exclusively when all non-backup members will be unreachable. It allows to realize ACTIVE-BACKUP load balancing without thinking about VRRP and VIP configuration. Default is false.
 - `instance_id` (String) Either `subnet_id` or `instance_id` should be provided
 - `monitor_address` (String) An alternate IP address used for health monitoring of a backend member. Default is null which monitors the member address.
 - `monitor_port` (Number) An alternate protocol port used for health monitoring of a backend member. Default is null which monitors the member `protocol_port`.
 - `subnet_id` (String) `subnet_id` in which `address` is present. Either `subnet_id` or `instance_id` should be provided
 - `weight` (Number) Member weight. Valid values are 0 < `weight` <= 256, defaults to 1. Controls traffic distribution based on the pool's load balancing algorithm:
-* `ROUND_ROBIN`: Distributes connections to each member in turn according to weights. Higher weight = more turns in the cycle. Example: weights 3 vs 1 = ~75% vs ~25% of requests.
-* `LEAST_CONNECTIONS`: Sends new connections to the member with fewest active connections, performing round-robin within groups of the same normalized load. Higher weight = allowed to hold more simultaneous connections before being considered 'more loaded'. Example: weights 2 vs 1 means 20 vs 10 active connections is treated as balanced.
-* `SOURCE_IP`: Routes clients consistently to the same member by hashing client source IP; hash result is modulo total weight of running members. Higher weight = more hash buckets, so more client IPs map to that member. Example: weights 2 vs 1 = roughly two-thirds of distinct client IPs map to the higher-weight member.
+- `ROUND_ROBIN`: Distributes connections to each member in turn according to weights. Higher weight = more turns in the cycle. Example: weights 3 vs 1 = ~75% vs ~25% of requests.
+- `LEAST_CONNECTIONS`: Sends new connections to the member with fewest active connections, performing round-robin within groups of the same normalized load. Higher weight = allowed to hold more simultaneous connections before being considered 'more loaded'. Example: weights 2 vs 1 means 20 vs 10 active connections is treated as balanced.
+- `SOURCE_IP`: Routes clients consistently to the same member by hashing client source IP; hash result is modulo total weight of running members. Higher weight = more hash buckets, so more client IPs map to that member. Example: weights 2 vs 1 = roughly two-thirds of distinct client IPs map to the higher-weight member.
 
 
 <a id="nestedatt--listeners--pools--session_persistence"></a>
@@ -413,9 +418,9 @@ Available values: "ACTIVE", "DOWN", "ERROR".
 
 Read-Only:
 
-- `key` (String) Tag key. The maximum size for a key is 255 characters.
+- `key` (String) Tag key. Maximum 255 characters. Cannot contain spaces, tabs, newlines, empty string or '=' character.
 - `read_only` (Boolean) If true, the tag is read-only and cannot be modified by the user
-- `value` (String) Tag value. The maximum size for a value is 255 characters.
+- `value` (String) Tag value. Maximum 255 characters. Cannot contain spaces, tabs, newlines, empty string or '=' character.
 
 
 
@@ -436,9 +441,9 @@ Read-Only:
 
 Read-Only:
 
-- `key` (String) Tag key. The maximum size for a key is 255 characters.
+- `key` (String) Tag key. Maximum 255 characters. Cannot contain spaces, tabs, newlines, empty string or '=' character.
 - `read_only` (Boolean) If true, the tag is read-only and cannot be modified by the user
-- `value` (String) Tag value. The maximum size for a value is 255 characters.
+- `value` (String) Tag value. Maximum 255 characters. Cannot contain spaces, tabs, newlines, empty string or '=' character.
 
 
 <a id="nestedatt--vrrp_ips"></a>

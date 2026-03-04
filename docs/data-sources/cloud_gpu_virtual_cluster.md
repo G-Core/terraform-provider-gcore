@@ -118,9 +118,9 @@ Available values: "cold", "ssd_hiiops", "ssd_local", "ssd_lowlatency", "standard
 
 Read-Only:
 
-- `key` (String) Tag key. The maximum size for a key is 255 characters.
+- `key` (String) Tag key. Maximum 255 characters. Cannot contain spaces, tabs, newlines, empty string or '=' character.
 - `read_only` (Boolean) If true, the tag is read-only and cannot be modified by the user
-- `value` (String) Tag value. The maximum size for a value is 255 characters.
+- `value` (String) Tag value. Maximum 255 characters. Cannot contain spaces, tabs, newlines, empty string or '=' character.
 
 
 
@@ -130,6 +130,6 @@ Read-Only:
 
 Read-Only:
 
-- `key` (String) Tag key. The maximum size for a key is 255 characters.
+- `key` (String) Tag key. Maximum 255 characters. Cannot contain spaces, tabs, newlines, empty string or '=' character.
 - `read_only` (Boolean) If true, the tag is read-only and cannot be modified by the user
-- `value` (String) Tag value. The maximum size for a value is 255 characters.
+- `value` (String) Tag value. Maximum 255 characters. Cannot contain spaces, tabs, newlines, empty string or '=' character.

@@ -14,8 +14,8 @@ description: |-
 
 ```terraform
 resource "gcore_cloud_k8s_cluster" "example_cloud_k8s_cluster" {
-  project_id = 0
-  region_id = 0
+  project_id = 1
+  region_id = 7
   keypair = "some_keypair"
   name = "string"
   pools = [{
@@ -163,8 +163,8 @@ Supported parameters (in alphabetical order):
 - `logging` (Attributes) Logging configuration (see [below for nested schema](#nestedatt--logging))
 - `pods_ip_pool` (String) The IP pool for the pods
 - `pods_ipv6_pool` (String) The IPv6 pool for the pods
-- `project_id` (Number)
-- `region_id` (Number)
+- `project_id` (Number) Project ID
+- `region_id` (Number) Region ID
 - `services_ip_pool` (String) The IP pool for the services
 - `services_ipv6_pool` (String) The IPv6 pool for the services
 
@@ -176,10 +176,6 @@ Supported parameters (in alphabetical order):
 - `is_public` (Boolean) Cluster is public
 - `status` (String) Status
 Available values: "Deleting", "Provisioned", "Provisioning".
-- `task_id` (String) The UUID of the active task that currently holds a lock on the resource. This lock prevents concurrent modifications to ensure consistency. If `null`, the resource is not locked.
-- `tasks` (List of String) List of task IDs representing asynchronous operations. Use these IDs to monitor operation progress:
-* `GET /v1/tasks/{task_id}` - Check individual task status and details
-Poll task status until completion (`FINISHED`/`ERROR`) before proceeding with dependent operations.
 
 <a id="nestedatt--pools"></a>
 ### Nested Schema for `pools`
@@ -230,6 +226,8 @@ The file share must have `root_squash` disabled, while `path_length` and `allowe
 - `worker_count` (Number) Size of the worker pool, i.e. the number of Slurm worker nodes.
 
 Each Slurm worker node will be backed by a Pod scheduled on one of cluster's GPU nodes.
+
+Note: Downscaling (reducing worker count) is not supported.
 
 
 

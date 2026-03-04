@@ -3,12 +3,12 @@
 page_title: "gcore_fastedge_binary Data Source - gcore"
 subcategory: ""
 description: |-
-  
+  Binaries are WebAssembly executables that are actually executed when app is ran.
 ---
 
 # gcore_fastedge_binary (Data Source)
 
-
+Binaries are WebAssembly executables that are actually executed when app is ran.
 
 ## Example Usage
 

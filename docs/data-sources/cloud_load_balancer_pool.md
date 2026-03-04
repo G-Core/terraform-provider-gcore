@@ -34,6 +34,7 @@ data "gcore_cloud_load_balancer_pool" "example_cloud_load_balancer_pool" {
 
 ### Read-Only
 
+- `admin_state_up` (Boolean) Administrative state of the resource. When set to true, the resource is enabled and operational. When set to false, the resource is disabled and will not process traffic. Defaults to true.
 - `ca_secret_id` (String) Secret ID of CA certificate bundle
 - `creator_task_id` (String) Task that created this entity
 - `crl_secret_id` (String) Secret ID of CA revocation list file
@@ -63,7 +64,7 @@ Available values: "ACTIVE", "DELETED", "ERROR", "PENDING_CREATE", "PENDING_DELET
 
 Read-Only:
 
-- `admin_state_up` (Boolean) Administrative state of the resource. When set to true, the resource is enabled and operational. When set to false, the resource is disabled and will not process traffic. When null is passed, the value is skipped and defaults to true.
+- `admin_state_up` (Boolean) Administrative state of the resource. When set to true, the resource is enabled and operational. When set to false, the resource is disabled and will not process traffic. Defaults to true.
 - `delay` (Number) The time, in seconds, between sending probes to members
 - `expected_codes` (String) Expected HTTP response codes. Can be a single code or a range of codes. Can only be used together with `HTTP` or `HTTPS` health monitor type. For example, 200,202,300-302,401,403,404,500-504. If not specified, the default is 200.
 - `http_method` (String) HTTP method
@@ -103,7 +104,7 @@ Read-Only:
 Read-Only:
 
 - `address` (String) Member IP address
-- `admin_state_up` (Boolean) Administrative state of the resource. When set to true, the resource is enabled and operational. When set to false, the resource is disabled and will not process traffic. When null is passed, the value is skipped and defaults to true.
+- `admin_state_up` (Boolean) Administrative state of the resource. When set to true, the resource is enabled and operational. When set to false, the resource is disabled and will not process traffic. Defaults to true.
 - `backup` (Boolean) Set to true if the member is a backup member, to which traffic will be sent exclusively when all non-backup members will be unreachable. It allows to realize ACTIVE-BACKUP load balancing without thinking about VRRP and VIP configuration. Default is false
 - `id` (String) Member ID must be provided if an existing member is being updated
 - `monitor_address` (String) An alternate IP address used for health monitoring of a backend member. Default is null which monitors the member address.
@@ -115,9 +116,9 @@ Available values: "DEGRADED", "DRAINING", "ERROR", "NO_MONITOR", "OFFLINE", "ONL
 Available values: "ACTIVE", "DELETED", "ERROR", "PENDING_CREATE", "PENDING_DELETE", "PENDING_UPDATE".
 - `subnet_id` (String) `subnet_id` in which `address` is present.
 - `weight` (Number) Member weight. Valid values are 0 < `weight` <= 256, defaults to 1. Controls traffic distribution based on the pool's load balancing algorithm:
-* `ROUND_ROBIN`: Distributes connections to each member in turn according to weights. Higher weight = more turns in the cycle. Example: weights 3 vs 1 = ~75% vs ~25% of requests.
-* `LEAST_CONNECTIONS`: Sends new connections to the member with fewest active connections, performing round-robin within groups of the same normalized load. Higher weight = allowed to hold more simultaneous connections before being considered 'more loaded'. Example: weights 2 vs 1 means 20 vs 10 active connections is treated as balanced.
-* `SOURCE_IP`: Routes clients consistently to the same member by hashing client source IP; hash result is modulo total weight of running members. Higher weight = more hash buckets, so more client IPs map to that member. Example: weights 2 vs 1 = roughly two-thirds of distinct client IPs map to the higher-weight member.
+- `ROUND_ROBIN`: Distributes connections to each member in turn according to weights. Higher weight = more turns in the cycle. Example: weights 3 vs 1 = ~75% vs ~25% of requests.
+- `LEAST_CONNECTIONS`: Sends new connections to the member with fewest active connections, performing round-robin within groups of the same normalized load. Higher weight = allowed to hold more simultaneous connections before being considered 'more loaded'. Example: weights 2 vs 1 means 20 vs 10 active connections is treated as balanced.
+- `SOURCE_IP`: Routes clients consistently to the same member by hashing client source IP; hash result is modulo total weight of running members. Higher weight = more hash buckets, so more client IPs map to that member. Example: weights 2 vs 1 = roughly two-thirds of distinct client IPs map to the higher-weight member.
 
 
 <a id="nestedatt--session_persistence"></a>

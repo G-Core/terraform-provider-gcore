@@ -112,9 +112,9 @@ Read-Only:
 
 Read-Only:
 
-- `key` (String) Tag key. The maximum size for a key is 255 characters.
+- `key` (String) Tag key. Maximum 255 characters. Cannot contain spaces, tabs, newlines, empty string or '=' character.
 - `read_only` (Boolean) If true, the tag is read-only and cannot be modified by the user
-- `value` (String) Tag value. The maximum size for a value is 255 characters.
+- `value` (String) Tag value. Maximum 255 characters. Cannot contain spaces, tabs, newlines, empty string or '=' character.
 
 
 <a id="nestedatt--items--instance--volumes"></a>
@@ -133,6 +133,7 @@ Read-Only:
 Read-Only:
 
 - `additional_vips` (Attributes List) List of additional IP addresses (see [below for nested schema](#nestedatt--items--loadbalancer--additional_vips))
+- `admin_state_up` (Boolean) Administrative state of the resource. When set to true, the resource is enabled and operational. When set to false, the resource is disabled and will not process traffic. Defaults to true.
 - `created_at` (String) Datetime when the load balancer was created
 - `creator_task_id` (String) Task that created this entity
 - `ddos_profile` (Attributes) Loadbalancer advanced DDoS protection profile. (see [below for nested schema](#nestedatt--items--loadbalancer--ddos_profile))
@@ -156,6 +157,7 @@ Available values: "ACTIVE", "DELETED", "ERROR", "PENDING_CREATE", "PENDING_DELET
 - `task_id` (String) The UUID of the active task that currently holds a lock on the resource. This lock prevents concurrent modifications to ensure consistency. If `null`, the resource is not locked.
 - `updated_at` (String) Datetime when the load balancer was last updated
 - `vip_address` (String) Load balancer IP address
+- `vip_fqdn` (String) Fully qualified domain name for the load balancer VIP
 - `vip_ip_family` (String) Load balancer IP family
 Available values: "dual", "ipv4", "ipv6".
 - `vip_port_id` (String) The ID of the Virtual IP (VIP) port.
@@ -185,7 +187,7 @@ Read-Only:
 - `status` (Attributes) Current operational status and any error information for the profile (see [below for nested schema](#nestedatt--items--loadbalancer--ddos_profile--status))
 
 <a id="nestedatt--items--loadbalancer--ddos_profile--fields"></a>
-### Nested Schema for `items.loadbalancer.ddos_profile.fields`
+### Nested Schema for `items.loadbalancer.ddos_profile.status`
 
 Read-Only:
 
@@ -203,7 +205,7 @@ Read-Only:
 
 
 <a id="nestedatt--items--loadbalancer--ddos_profile--options"></a>
-### Nested Schema for `items.loadbalancer.ddos_profile.options`
+### Nested Schema for `items.loadbalancer.ddos_profile.status`
 
 Read-Only:
 
@@ -212,17 +214,17 @@ Read-Only:
 
 
 <a id="nestedatt--items--loadbalancer--ddos_profile--profile_template"></a>
-### Nested Schema for `items.loadbalancer.ddos_profile.profile_template`
+### Nested Schema for `items.loadbalancer.ddos_profile.status`
 
 Read-Only:
 
 - `description` (String) Detailed description explaining the template's purpose and use cases
-- `fields` (Attributes List) List of configurable fields that define the template's protection parameters (see [below for nested schema](#nestedatt--items--loadbalancer--ddos_profile--profile_template--fields))
+- `fields` (Attributes List) List of configurable fields that define the template's protection parameters (see [below for nested schema](#nestedatt--items--loadbalancer--ddos_profile--status--fields))
 - `id` (Number) Unique identifier for the DDoS protection template
 - `name` (String) Human-readable name of the protection template
 
-<a id="nestedatt--items--loadbalancer--ddos_profile--profile_template--fields"></a>
-### Nested Schema for `items.loadbalancer.ddos_profile.profile_template.fields`
+<a id="nestedatt--items--loadbalancer--ddos_profile--status--fields"></a>
+### Nested Schema for `items.loadbalancer.ddos_profile.status.fields`
 
 Read-Only:
 
@@ -237,7 +239,7 @@ Read-Only:
 
 
 <a id="nestedatt--items--loadbalancer--ddos_profile--protocols"></a>
-### Nested Schema for `items.loadbalancer.ddos_profile.protocols`
+### Nested Schema for `items.loadbalancer.ddos_profile.status`
 
 Read-Only:
 
@@ -288,13 +290,13 @@ Available values: "ACTIVE", "DOWN", "ERROR".
 - `updated_at` (String) Datetime when the floating IP was last updated
 
 <a id="nestedatt--items--loadbalancer--floating_ips--tags"></a>
-### Nested Schema for `items.loadbalancer.floating_ips.tags`
+### Nested Schema for `items.loadbalancer.floating_ips.updated_at`
 
 Read-Only:
 
-- `key` (String) Tag key. The maximum size for a key is 255 characters.
+- `key` (String) Tag key. Maximum 255 characters. Cannot contain spaces, tabs, newlines, empty string or '=' character.
 - `read_only` (Boolean) If true, the tag is read-only and cannot be modified by the user
-- `value` (String) Tag value. The maximum size for a value is 255 characters.
+- `value` (String) Tag value. Maximum 255 characters. Cannot contain spaces, tabs, newlines, empty string or '=' character.
 
 
 
@@ -317,7 +319,7 @@ Read-Only:
 - `topic_name` (String) The topic name to stream logs to
 
 <a id="nestedatt--items--loadbalancer--logging--retention_policy"></a>
-### Nested Schema for `items.loadbalancer.logging.retention_policy`
+### Nested Schema for `items.loadbalancer.logging.topic_name`
 
 Read-Only:
 
@@ -342,9 +344,9 @@ Read-Only:
 
 Read-Only:
 
-- `key` (String) Tag key. The maximum size for a key is 255 characters.
+- `key` (String) Tag key. Maximum 255 characters. Cannot contain spaces, tabs, newlines, empty string or '=' character.
 - `read_only` (Boolean) If true, the tag is read-only and cannot be modified by the user
-- `value` (String) Tag value. The maximum size for a value is 255 characters.
+- `value` (String) Tag value. Maximum 255 characters. Cannot contain spaces, tabs, newlines, empty string or '=' character.
 
 
 <a id="nestedatt--items--loadbalancer--vrrp_ips"></a>
@@ -364,6 +366,6 @@ Available values: "BACKUP", "MASTER", "STANDALONE".
 
 Read-Only:
 
-- `key` (String) Tag key. The maximum size for a key is 255 characters.
+- `key` (String) Tag key. Maximum 255 characters. Cannot contain spaces, tabs, newlines, empty string or '=' character.
 - `read_only` (Boolean) If true, the tag is read-only and cannot be modified by the user
-- `value` (String) Tag value. The maximum size for a value is 255 characters.
+- `value` (String) Tag value. Maximum 255 characters. Cannot contain spaces, tabs, newlines, empty string or '=' character.

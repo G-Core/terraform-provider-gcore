@@ -54,9 +54,14 @@ data "gcore_cloud_network" "example_cloud_network" {
 
 Optional:
 
+- `external` (Boolean) Filter by external network status
 - `name` (String) Filter networks by name
-- `order_by` (String) Ordering networks list result by `name`, `created_at` fields of the network and directions (`created_at.desc`).
-Available values: "created_at.asc", "created_at.desc", "name.asc", "name.desc".
+- `network_type` (String) Filter by network type (vlan or vxlan)
+Available values: "vlan", "vxlan".
+- `order_by` (String) Ordering networks list result by `name`, `created_at` or `priority` fields and directions (e.g. `created_at.desc`). Default is `created_at.desc`. Use `priority.desc` to sort by shared network priority (relevant when `owned_by=any`).
+Available values: "created_at.asc", "created_at.desc", "name.asc", "name.desc", "priority.desc".
+- `owned_by` (String) Controls which networks are returned. 'project' (default) returns only networks owned by the project. 'any' returns all networks that the project can use, including shared networks from other projects.
+Available values: "any", "project".
 - `tag_key` (List of String) Optional. Filter by tag keys. ?`tag_key`=key1&`tag_key`=key2
 - `tag_key_value` (String) Optional. Filter by tag key-value pairs.
 
@@ -66,6 +71,6 @@ Available values: "created_at.asc", "created_at.desc", "name.asc", "name.desc".
 
 Read-Only:
 
-- `key` (String) Tag key. The maximum size for a key is 255 characters.
+- `key` (String) Tag key. Maximum 255 characters. Cannot contain spaces, tabs, newlines, empty string or '=' character.
 - `read_only` (Boolean) If true, the tag is read-only and cannot be modified by the user
-- `value` (String) Tag value. The maximum size for a value is 255 characters.
+- `value` (String) Tag value. Maximum 255 characters. Cannot contain spaces, tabs, newlines, empty string or '=' character.
