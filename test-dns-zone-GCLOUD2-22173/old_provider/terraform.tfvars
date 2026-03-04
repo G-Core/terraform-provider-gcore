@@ -1,2 +1,0 @@
-gcore_api_key = "21788$1e278ce67b6aa33f178122658b1dd0210d0edff453d348acb9b68bffea6a635b7791925ddda198d5678a4dc20269fe04a263ca92c7e5aa41ea79075f89b66bf6"
-zone_name     = "tf-test-22173-gcloud.com"

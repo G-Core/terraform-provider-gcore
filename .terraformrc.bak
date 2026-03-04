@@ -1,7 +1,0 @@
-provider_installation {
-  dev_overrides {
-    "gcore/gcore" = "/Users/user/repos/gcore-terraform"
-  }
-  direct {}
-}
-

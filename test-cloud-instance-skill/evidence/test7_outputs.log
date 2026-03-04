@@ -1,7 +1,0 @@
-boot_volume_id = "c305c356-e93d-4695-a5b4-6971e898e555"
-instance_flavor = "g1-standard-2-4"
-instance_id = "157504a5-5821-4f21-a32d-7a6d1f615eae"
-instance_name = "test-instance-skill-renamed"
-instance_status = "ACTIVE"
-interface_ip_address = "85.204.246.86"
-interface_port_id = "cb07fa12-b1df-4bf1-af86-f26ab4469af5"

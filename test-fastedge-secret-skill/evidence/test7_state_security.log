@@ -1,4 +1,0 @@
-=== State Security Check ===
-  slot=0, checksum=4a7923f2c53d470667659868be294430da761078f016c5ad0c62e9b5b0f25b74, value=None
-  slot=1, checksum=e1a8173e7b9e9b1205fa9356a9b961bb1cb65e01579b483f9bb6b7ce8dff7593, value=None
-PASS: No secret values in state file

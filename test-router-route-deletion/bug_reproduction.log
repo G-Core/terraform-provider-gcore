@@ -1,8 +1,0 @@
-==========================================
-Router Route Deletion Bug Reproduction
-==========================================
-
-
-Step 1: Creating router with interface (no routes)...
-----------------------------------------------
-Initializing Terraform...

@@ -16,9 +16,8 @@ import (
 
 func init() {
 	resource.AddTestSweepers("gcore_dns_zone", &resource.Sweeper{
-		Name:         "gcore_dns_zone",
-		F:            sweepDNSZones,
-		Dependencies: []string{"gcore_dns_zone_rrset"},
+		Name: "gcore_dns_zone",
+		F:    sweepDNSZones,
 	})
 }
 

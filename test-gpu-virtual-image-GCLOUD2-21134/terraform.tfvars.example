@@ -1,6 +1,0 @@
-# Copy this file to terraform.tfvars and fill in values
-# Or set TF_VAR_* environment variables
-
-gcore_api_token = "your-api-token-here"
-project_id      = 379987
-region_id       = 76

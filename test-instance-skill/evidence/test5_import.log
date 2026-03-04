@@ -1,8 +1,0 @@
-[0m[1mgcore_cloud_instance.test: Importing from ID "86973cc4-a805-4ab4-a177-d68d0622a765"...[0m
-[31m[31m╷[0m[0m
-[31m│[0m [0m[1m[31mError: [0m[0m[1minvalid ID[0m
-[31m│[0m [0m
-[31m│[0m [0m[0mexpected urlencoded segments "<project_id>/<region_id>/<instance_id>", got
-[31m│[0m [0m"86973cc4-a805-4ab4-a177-d68d0622a765"
-[31m╵[0m[0m
-[0m[0m
