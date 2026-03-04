@@ -7,10 +7,10 @@ import (
 	"fmt"
 
 	"github.com/G-Core/gcore-go"
+	"github.com/G-Core/terraform-provider-gcore/internal/apijson"
+	"github.com/G-Core/terraform-provider-gcore/internal/customfield"
 	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
-	"github.com/stainless-sdks/gcore-terraform/internal/apijson"
-	"github.com/stainless-sdks/gcore-terraform/internal/customfield"
 )
 
 type CloudLoadBalancersDataSource struct {

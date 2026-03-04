@@ -5,11 +5,11 @@ package cloud_inference_secret
 import (
 	"context"
 
+	"github.com/G-Core/terraform-provider-gcore/internal/customfield"
 	"github.com/hashicorp/terraform-plugin-framework-validators/int64validator"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/datasource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
-	"github.com/stainless-sdks/gcore-terraform/internal/customfield"
 )
 
 var _ datasource.DataSourceWithConfigValidators = (*CloudInferenceSecretsDataSource)(nil)

@@ -3,8 +3,8 @@
 package dns_network_mapping
 
 import (
+	"github.com/G-Core/terraform-provider-gcore/internal/customfield"
 	"github.com/hashicorp/terraform-plugin-framework/types"
-	"github.com/stainless-sdks/gcore-terraform/internal/customfield"
 )
 
 type DNSNetworkMappingDataSourceModel struct {

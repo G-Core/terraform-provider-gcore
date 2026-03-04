@@ -6,8 +6,8 @@ import (
 	"context"
 	"testing"
 
-	"github.com/stainless-sdks/gcore-terraform/internal/services/dns_network_mapping"
-	"github.com/stainless-sdks/gcore-terraform/internal/test_helpers"
+	"github.com/G-Core/terraform-provider-gcore/internal/services/dns_network_mapping"
+	"github.com/G-Core/terraform-provider-gcore/internal/test_helpers"
 )
 
 func TestDNSNetworkMappingModelSchemaParity(t *testing.T) {

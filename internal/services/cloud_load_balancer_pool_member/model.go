@@ -3,8 +3,9 @@
 package cloud_load_balancer_pool_member
 
 import (
+	"github.com/G-Core/terraform-provider-gcore/internal/apijson"
+	"github.com/G-Core/terraform-provider-gcore/internal/customfield"
 	"github.com/hashicorp/terraform-plugin-framework/types"
-	"github.com/stainless-sdks/gcore-terraform/internal/apijson"
 )
 
 type CloudLoadBalancerPoolMemberModel struct {

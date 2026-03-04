@@ -2,7 +2,7 @@ package customvalidator_test
 
 import (
 	"context"
-	"github.com/stainless-sdks/gcore-terraform/internal/customvalidator"
+	"github.com/G-Core/terraform-provider-gcore/internal/customvalidator"
 	"math/big"
 	"testing"
 

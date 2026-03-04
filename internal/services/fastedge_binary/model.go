@@ -3,6 +3,7 @@
 package fastedge_binary
 
 import (
+	"github.com/G-Core/terraform-provider-gcore/internal/apijson"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 )
 

@@ -3,9 +3,9 @@
 package dns_zone
 
 import (
+	"github.com/G-Core/terraform-provider-gcore/internal/customfield"
 	"github.com/hashicorp/terraform-plugin-framework-jsontypes/jsontypes"
 	"github.com/hashicorp/terraform-plugin-framework/types"
-	"github.com/stainless-sdks/gcore-terraform/internal/customfield"
 )
 
 type DNSZoneDataSourceModel struct {

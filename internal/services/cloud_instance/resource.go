@@ -19,9 +19,9 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-log/tflog"
-	"github.com/stainless-sdks/gcore-terraform/internal/apijson"
-	"github.com/stainless-sdks/gcore-terraform/internal/importpath"
-	"github.com/stainless-sdks/gcore-terraform/internal/logging"
+	"github.com/G-Core/terraform-provider-gcore/internal/apijson"
+	"github.com/G-Core/terraform-provider-gcore/internal/importpath"
+	"github.com/G-Core/terraform-provider-gcore/internal/logging"
 )
 
 // Ensure provider defined types fully satisfy framework interfaces.
