@@ -7,14 +7,10 @@ import (
 
 	"github.com/G-Core/terraform-provider-gcore/internal/customfield"
 	"github.com/hashicorp/terraform-plugin-framework-jsontypes/jsontypes"
-	"github.com/hashicorp/terraform-plugin-framework-timetypes/timetypes"
 	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/booldefault"
-	"github.com/hashicorp/terraform-plugin-framework/resource/schema/int64planmodifier"
-	"github.com/hashicorp/terraform-plugin-framework/resource/schema/listplanmodifier"
-	"github.com/hashicorp/terraform-plugin-framework/resource/schema/mapplanmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringplanmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
@@ -43,8 +39,12 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 				Required:    true,
 				NestedObject: schema.NestedAttributeObject{
 					Attributes: map[string]schema.Attribute{
+						"id": schema.Int64Attribute{
+							Description: "ID of the resource record",
+							Computed:    true,
+						},
 						"content": schema.ListAttribute{
-							Description: "Content of resource record\nThe exact length of the array depends on the type of rrset,\neach individual record parameter must be a separate element of the array. For example\n- SRV-record: `[100, 1, 5061, \"example.com\"]`\n- CNAME-record: `[ \"the.target.domain\" ]`\n- A-record: `[ \"1.2.3.4\", \"5.6.7.8\" ]`\n- AAAA-record: `[ \"2001:db8::1\", \"2001:db8::2\" ]`\n- MX-record: `[ \"mail1.example.com\", \"mail2.example.com\" ]`\n- SVCB/HTTPS-record: `[ 1, \".\", [\"alpn\", \"h3\", \"h2\"], [ \"port\", 1443 ], [ \"ipv4hint\", \"10.0.0.1\" ], [ \"ech\", \"AEn+DQBFKwAgACABWIHUGj4u+PIggYXcR5JF0gYk3dCRioBW8uJq9H4mKAAIAAEAAQABAANAEnB1YmxpYy50bHMtZWNoLmRldgAA\" ] ]`",
+							Description: "Content of resource record.\nValues must be valid JSON (strings need inner quotes).\nExamples:\n+ A-record: `[\"\\\"192.168.1.1\\\"\"]`\n+ MX-record: `[10, \"\\\"mail.example.com.\\\"\"]`",
 							Required:    true,
 							ElementType: jsontypes.NormalizedType{},
 						},
@@ -56,21 +56,18 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 						"meta": schema.MapAttribute{
 							Description: "This meta will be used to decide which resource record should pass\nthrough filters from the filter set",
 							Optional:    true,
-							ElementType: jsontypes.NormalizedType{},
+							ElementType: customfield.MetaStringType{},
 						},
 					},
 				},
-				PlanModifiers: []planmodifier.List{listplanmodifier.RequiresReplace()},
 			},
 			"ttl": schema.Int64Attribute{
-				Optional:      true,
-				PlanModifiers: []planmodifier.Int64{int64planmodifier.RequiresReplace()},
+				Optional: true,
 			},
 			"meta": schema.MapAttribute{
-				Description:   "Meta information for rrset",
-				Optional:      true,
-				ElementType:   jsontypes.NormalizedType{},
-				PlanModifiers: []planmodifier.Map{mapplanmodifier.RequiresReplace()},
+				Description: "Meta information for rrset",
+				Optional:    true,
+				ElementType: customfield.MetaStringType{},
 			},
 			"pickers": schema.ListNestedAttribute{
 				Description: "Set of pickers",
@@ -97,25 +94,28 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 						},
 						"limit": schema.Int64Attribute{
 							Description: "Limits the number of records returned by the filter\nCan be a positive value for a specific limit. Use zero or leave it blank to indicate no limits.",
+							Computed:    true,
 							Optional:    true,
 						},
 						"strict": schema.BoolAttribute{
 							Description: "if strict=false, then the filter will return all records if no records match the filter",
+							Computed:    true,
 							Optional:    true,
 						},
 					},
 				},
-				PlanModifiers: []planmodifier.List{listplanmodifier.RequiresReplace()},
 			},
 			"filter_set_id": schema.Int64Attribute{
 				Computed: true,
 			},
 			"name": schema.StringAttribute{
-				Computed: true,
+				Computed:      true,
+				PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
 			},
 			"type": schema.StringAttribute{
-				Description: "RRSet type\nAvailable values: \"A\", \"AAAA\", \"NS\", \"CNAME\", \"MX\", \"TXT\", \"SRV\", \"SOA\".",
-				Computed:    true,
+				Description:   "RRSet type\nAvailable values: \"A\", \"AAAA\", \"NS\", \"CNAME\", \"MX\", \"TXT\", \"SRV\", \"SOA\".",
+				Computed:      true,
+				PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
 				Validators: []validator.String{
 					stringvalidator.OneOfCaseInsensitive(
 						"A",
@@ -128,11 +128,6 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 						"SOA",
 					),
 				},
-			},
-			"updated_at": schema.StringAttribute{
-				Description: "Timestamp marshals/unmarshals date and time as timestamp in json",
-				Computed:    true,
-				CustomType:  timetypes.RFC3339Type{},
 			},
 			"warning": schema.StringAttribute{
 				Description: "Warning about some possible side effects without strictly disallowing operations on rrset\nreadonly\nDeprecated: use Warnings instead",
