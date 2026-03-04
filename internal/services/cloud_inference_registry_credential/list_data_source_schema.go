@@ -16,6 +16,7 @@ var _ datasource.DataSourceWithConfigValidators = (*CloudInferenceRegistryCreden
 
 func ListDataSourceSchema(ctx context.Context) schema.Schema {
 	return schema.Schema{
+		Description: "Registry credentials store authentication details for private container registries used by inference deployments.",
 		Attributes: map[string]schema.Attribute{
 			"project_id": schema.Int64Attribute{
 				Description: "Project ID",

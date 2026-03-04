@@ -19,7 +19,7 @@ var _ resource.ResourceWithConfigValidators = (*CloudPlacementGroupResource)(nil
 
 func ResourceSchema(ctx context.Context) schema.Schema {
 	return schema.Schema{
-		Description: "Placement Groups allow you to specific a policy that determines whether Virtual Machines will be hosted on the same physical server or on different ones.",
+		Description: "Placement groups enforce affinity or anti-affinity policies that control whether virtual machines are hosted on the same or different physical servers.",
 		Attributes: map[string]schema.Attribute{
 			"group_id": schema.StringAttribute{
 				Optional:      true,

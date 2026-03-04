@@ -19,6 +19,7 @@ var _ datasource.DataSourceWithConfigValidators = (*CloudVolumesDataSource)(nil)
 
 func ListDataSourceSchema(ctx context.Context) schema.Schema {
 	return schema.Schema{
+		Description: "Volumes are block storage devices that can be attached to instances as boot or data disks, with support for resizing and type changes.",
 		Attributes: map[string]schema.Attribute{
 			"project_id": schema.Int64Attribute{
 				Description: "Project ID",

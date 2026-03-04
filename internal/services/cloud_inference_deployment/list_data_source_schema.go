@@ -18,6 +18,7 @@ var _ datasource.DataSourceWithConfigValidators = (*CloudInferenceDeploymentsDat
 
 func ListDataSourceSchema(ctx context.Context) schema.Schema {
 	return schema.Schema{
+		Description: "Inference deployments run containerized ML models with configurable scaling, health probes, and GPU flavors.",
 		Attributes: map[string]schema.Attribute{
 			"project_id": schema.Int64Attribute{
 				Description: "Project ID",

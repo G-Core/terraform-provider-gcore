@@ -23,6 +23,7 @@ var _ resource.ResourceWithConfigValidators = (*CloudNetworkSubnetResource)(nil)
 
 func ResourceSchema(ctx context.Context) schema.Schema {
 	return schema.Schema{
+		Description: "Subnets define IP address ranges within a network for instance connectivity, with support for DHCP and DNS configuration.",
 		Attributes: map[string]schema.Attribute{
 			"id": schema.StringAttribute{
 				Computed:      true,

@@ -21,6 +21,7 @@ var _ resource.ResourceWithConfigValidators = (*CloudSecurityGroupRuleResource)(
 
 func ResourceSchema(ctx context.Context) schema.Schema {
 	return schema.Schema{
+		Description: "Security group rules define individual traffic permissions specifying protocol, port range, direction, and allowed sources.",
 		Attributes: map[string]schema.Attribute{
 			"id": schema.StringAttribute{
 				Computed:      true,

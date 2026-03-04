@@ -26,6 +26,7 @@ var _ resource.ResourceWithConfigValidators = (*CloudGPUBaremetalClusterImageRes
 
 func ResourceSchema(ctx context.Context) schema.Schema {
 	return schema.Schema{
+		Description: "GPU bare metal images are custom boot images for bare metal GPU servers.",
 		Attributes: map[string]schema.Attribute{
 			"id": schema.StringAttribute{
 				Computed:      true,

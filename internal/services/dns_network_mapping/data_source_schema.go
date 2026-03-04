@@ -15,6 +15,7 @@ var _ datasource.DataSourceWithConfigValidators = (*DNSNetworkMappingDataSource)
 
 func DataSourceSchema(ctx context.Context) schema.Schema {
 	return schema.Schema{
+		Description: "DNS network mappings associate CIDR ranges with network tags for private DNS resolution and traffic-based routing.",
 		Attributes: map[string]schema.Attribute{
 			"id": schema.Int64Attribute{
 				Required: true,

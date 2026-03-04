@@ -16,6 +16,7 @@ var _ resource.ResourceWithConfigValidators = (*CDNTrustedCaCertificateResource)
 
 func ResourceSchema(ctx context.Context) schema.Schema {
 	return schema.Schema{
+		Description: "Trusted CA certificates verify the authenticity of CDN origin servers during HTTPS connections.",
 		Attributes: map[string]schema.Attribute{
 			"id": schema.Int64Attribute{
 				Description:   "CA certificate ID.",

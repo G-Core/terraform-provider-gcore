@@ -21,6 +21,7 @@ var _ datasource.DataSourceWithConfigValidators = (*CloudSecurityGroupDataSource
 
 func DataSourceSchema(ctx context.Context) schema.Schema {
 	return schema.Schema{
+		Description: "Security groups act as virtual firewalls controlling inbound and outbound traffic for instances and other resources.",
 		Attributes: map[string]schema.Attribute{
 			"id": schema.StringAttribute{
 				Description: "Group ID",

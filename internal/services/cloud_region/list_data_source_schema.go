@@ -20,6 +20,7 @@ var _ datasource.DataSourceWithConfigValidators = (*CloudRegionsDataSource)(nil)
 
 func ListDataSourceSchema(ctx context.Context) schema.Schema {
 	return schema.Schema{
+		Description: "Regions represent available Gcore cloud data centers with information about supported services and volume types.",
 		Attributes: map[string]schema.Attribute{
 			"display_name": schema.StringAttribute{
 				Description: "Filter regions by display name. Case-insensitive exact match.",

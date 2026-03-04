@@ -22,6 +22,7 @@ var _ resource.ResourceWithConfigValidators = (*CloudSecurityGroupResource)(nil)
 
 func ResourceSchema(ctx context.Context) schema.Schema {
 	return schema.Schema{
+		Description: "Security groups act as virtual firewalls controlling inbound and outbound traffic for instances and other resources.",
 		Attributes: map[string]schema.Attribute{
 			"id": schema.StringAttribute{
 				Computed:      true,

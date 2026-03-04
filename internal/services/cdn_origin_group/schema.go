@@ -17,6 +17,7 @@ var _ resource.ResourceWithConfigValidators = (*CDNOriginGroupResource)(nil)
 
 func ResourceSchema(ctx context.Context) schema.Schema {
 	return schema.Schema{
+		Description: "CDN origin groups aggregate one or more origin servers with failover and load balancing for content delivery.",
 		Attributes: map[string]schema.Attribute{
 			"id": schema.Int64Attribute{
 				Description:   "Origin group ID.",
