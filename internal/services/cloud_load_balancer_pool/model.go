@@ -21,7 +21,6 @@ type CloudLoadBalancerPoolModel struct {
 	CaSecretID           types.String                                                          `tfsdk:"ca_secret_id" json:"ca_secret_id,optional"`
 	CrlSecretID          types.String                                                          `tfsdk:"crl_secret_id" json:"crl_secret_id,optional"`
 	SecretID             types.String                                                          `tfsdk:"secret_id" json:"secret_id,optional"`
-	TimeoutClientData    types.Int64                                                           `tfsdk:"timeout_client_data" json:"timeout_client_data,optional"`
 	TimeoutMemberConnect types.Int64                                                           `tfsdk:"timeout_member_connect" json:"timeout_member_connect,optional"`
 	TimeoutMemberData    types.Int64                                                           `tfsdk:"timeout_member_data" json:"timeout_member_data,optional"`
 	Healthmonitor        *CloudLoadBalancerPoolHealthmonitorModel                              `tfsdk:"healthmonitor" json:"healthmonitor,optional"`

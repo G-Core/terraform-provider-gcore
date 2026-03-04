@@ -120,30 +120,6 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 					int64planmodifier.UseStateForUnknown(),
 				},
 			},
-			"timeout_member_connect": schema.Int64Attribute{
-				Description:        "Backend member connection timeout in milliseconds. We are recommending to use `pool.timeout_member_connect` instead.",
-				Computed:           true,
-				Optional:           true,
-				DeprecationMessage: "This attribute is deprecated.",
-				Validators: []validator.Int64{
-					int64validator.Between(0, 86400000),
-				},
-				PlanModifiers: []planmodifier.Int64{
-					int64planmodifier.UseStateForUnknown(),
-				},
-			},
-			"timeout_member_data": schema.Int64Attribute{
-				Description:        "Backend member inactivity timeout in milliseconds. We are recommending to use `pool.timeout_member_data` instead.",
-				Computed:           true,
-				Optional:           true,
-				DeprecationMessage: "This attribute is deprecated.",
-				Validators: []validator.Int64{
-					int64validator.Between(0, 86400000),
-				},
-				PlanModifiers: []planmodifier.Int64{
-					int64planmodifier.UseStateForUnknown(),
-				},
-			},
 			"sni_secret_id": schema.ListAttribute{
 				Description: "List of secrets IDs containing PKCS12 format certificate/key bundles for `TERMINATED_HTTPS` or PROMETHEUS listeners",
 				Computed:    true,
