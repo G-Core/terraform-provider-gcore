@@ -29,10 +29,15 @@ terraform {
 
 # Initialize the provider
 provider "gcore" {
+  # API key for authenticating requests. Can also be set via the GCORE_API_KEY environment variable.
   api_key = "My API Key" # or set GCORE_API_KEY env variable
+  # Cloud project ID to operate on. Can also be set via the GCORE_CLOUD_PROJECT_ID environment variable.
   cloud_project_id = 0 # or set GCORE_CLOUD_PROJECT_ID env variable
+  # Cloud region ID to operate on. Can also be set via the GCORE_CLOUD_REGION_ID environment variable.
   cloud_region_id = 0 # or set GCORE_CLOUD_REGION_ID env variable
+  # Interval in seconds between polling attempts for long-running operations. Used by polling methods in the Cloud service.
   cloud_polling_interval_seconds = 0
+  # Maximum time in seconds to wait for long-running operations to complete before timing out. Used by polling methods in the Cloud service.
   cloud_polling_timeout_seconds = 0
 }
 
