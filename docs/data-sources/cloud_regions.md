@@ -3,17 +3,18 @@
 page_title: "gcore_cloud_regions Data Source - gcore"
 subcategory: ""
 description: |-
-  
+  Regions represent available Gcore cloud data centers with information about supported services and volume types.
 ---
 
 # gcore_cloud_regions (Data Source)
 
-
+Regions represent available Gcore cloud data centers with information about supported services and volume types.
 
 ## Example Usage
 
 ```terraform
 data "gcore_cloud_regions" "example_cloud_regions" {
+  display_name = "Luxembourg"
   product = "inference"
 }
 ```
@@ -23,6 +24,7 @@ data "gcore_cloud_regions" "example_cloud_regions" {
 
 ### Optional
 
+- `display_name` (String) Filter regions by display name. Case-insensitive exact match.
 - `max_items` (Number) Max items to fetch, default: 1000
 - `order_by` (String) Order by field and direction.
 Available values: "created_at.asc", "created_at.desc", "display_name.asc", "display_name.desc".
@@ -77,5 +79,5 @@ Available values: "AMERICAS", "APAC", "EMEA", "RUSSIA_AND_CIS".
 
 Read-Only:
 
-- `latitude` (Dynamic)
-- `longitude` (Dynamic)
+- `latitude` (String)
+- `longitude` (String)

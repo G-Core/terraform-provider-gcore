@@ -3,12 +3,12 @@
 page_title: "gcore_cloud_instance Resource - gcore"
 subcategory: ""
 description: |-
-  
+  Instances are cloud virtual machines with configurable CPU, memory, storage, and networking, supporting various operating systems and workloads.
 ---
 
 # gcore_cloud_instance (Resource)
 
-
+Instances are cloud virtual machines with configurable CPU, memory, storage, and networking, supporting various operating systems and workloads.
 
 ## Example Usage
 
@@ -104,7 +104,7 @@ Available values: "ACTIVE", "BUILD", "DELETED", "ERROR", "HARD_REBOOT", "MIGRATI
 - `task_id` (String) The UUID of the active task that currently holds a lock on the resource. This lock prevents concurrent modifications to ensure consistency. If `null`, the resource is not locked.
 - `task_state` (String) Task state
 - `tasks` (List of String) List of task IDs representing asynchronous operations. Use these IDs to monitor operation progress:
-* `GET /v1/tasks/{task_id}` - Check individual task status and details
+- `GET /v1/tasks/{task_id}` - Check individual task status and details
 Poll task status until completion (`FINISHED`/`ERROR`) before proceeding with dependent operations.
 - `vm_state` (String) Virtual machine state (active)
 Available values: "active", "building", "deleted", "error", "paused", "rescued", "resized", "shelved", "shelved_offloaded", "soft-deleted", "stopped", "suspended".

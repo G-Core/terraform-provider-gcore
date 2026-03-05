@@ -3,12 +3,12 @@
 page_title: "gcore_cloud_gpu_virtual_cluster_image Resource - gcore"
 subcategory: ""
 description: |-
-  
+  GPU virtual images are custom boot images for virtual GPU cluster instances.
 ---
 
 # gcore_cloud_gpu_virtual_cluster_image (Resource)
 
-
+GPU virtual images are custom boot images for virtual GPU cluster instances.
 
 ## Example Usage
 
@@ -69,7 +69,7 @@ Available values: "allow", "deny", "required".
 - `status` (String) Image status
 - `task_id` (String) The UUID of the active task that currently holds a lock on the resource. This lock prevents concurrent modifications to ensure consistency. If `null`, the resource is not locked.
 - `tasks` (List of String) List of task IDs representing asynchronous operations. Use these IDs to monitor operation progress:
-* `GET /v1/tasks/{task_id}` - Check individual task status and details
+- `GET /v1/tasks/{task_id}` - Check individual task status and details
 Poll task status until completion (`FINISHED`/`ERROR`) before proceeding with dependent operations.
 - `updated_at` (String) Datetime when the image was updated
 - `visibility` (String) Image visibility. Globally visible images are public

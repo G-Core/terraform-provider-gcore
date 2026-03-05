@@ -3,12 +3,12 @@
 page_title: "gcore_cloud_file_share Resource - gcore"
 subcategory: ""
 description: |-
-  
+  File shares provide NFS-based shared storage that can be mounted by virtual machines and Kubernetes clusters for persistent data.
 ---
 
 # gcore_cloud_file_share (Resource)
 
-
+File shares provide NFS-based shared storage that can be mounted by virtual machines and Kubernetes clusters for persistent data.
 
 ## Example Usage
 
@@ -74,7 +74,7 @@ Available values: "available", "awaiting_transfer", "backup_creating", "backup_r
 - `subnet_name` (String) Subnet name.
 - `task_id` (String) The UUID of the active task that currently holds a lock on the resource. This lock prevents concurrent modifications to ensure consistency. If `null`, the resource is not locked.
 - `tasks` (List of String) List of task IDs representing asynchronous operations. Use these IDs to monitor operation progress:
-* `GET /v1/tasks/{task_id}` - Check individual task status and details
+- `GET /v1/tasks/{task_id}` - Check individual task status and details
 Poll task status until completion (`FINISHED`/`ERROR`) before proceeding with dependent operations.
 
 <a id="nestedatt--access"></a>

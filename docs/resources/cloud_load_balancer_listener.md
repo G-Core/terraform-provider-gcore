@@ -3,12 +3,12 @@
 page_title: "gcore_cloud_load_balancer_listener Resource - gcore"
 subcategory: ""
 description: |-
-  
+  Load balancer listeners handle incoming traffic on specified protocols and ports, forwarding requests to backend pools.
 ---
 
 # gcore_cloud_load_balancer_listener (Resource)
 
-
+Load balancer listeners handle incoming traffic on specified protocols and ports, forwarding requests to backend pools.
 
 ## Example Usage
 
@@ -24,7 +24,7 @@ resource "gcore_cloud_load_balancer_listener" "example_cloud_load_balancer_liste
   connection_limit = 100000
   default_pool_id = "00000000-0000-4000-8000-000000000000"
   insert_x_forwarded = false
-  secret_id = "f2e734d0-fa2b-42c2-ad33-4c6db5101e00"
+  secret_id = ""
   sni_secret_id = ["f2e734d0-fa2b-42c2-ad33-4c6db5101e00", "eb121225-7ded-4ff3-ae1f-599e145dd7cb"]
   timeout_client_data = 50000
   timeout_member_connect = 50000
@@ -49,6 +49,7 @@ Available values: "HTTP", "HTTPS", "PROMETHEUS", "TCP", "TERMINATED_HTTPS", "UDP
 
 ### Optional
 
+- `admin_state_up` (Boolean) Administrative state of the resource. When set to true, the resource is enabled and operational. When set to false, the resource is disabled and will not process traffic. Defaults to true.
 - `allowed_cidrs` (List of String) Network CIDRs from which service will be accessible
 - `connection_limit` (Number) Limit of the simultaneous connections. If -1 is provided, it is translated to the default value 100000.
 - `default_pool_id` (String) ID of already existent Load Balancer Pool to attach listener to.
@@ -56,6 +57,7 @@ Available values: "HTTP", "HTTPS", "PROMETHEUS", "TCP", "TERMINATED_HTTPS", "UDP
 - `project_id` (Number) Project ID
 - `region_id` (Number) Region ID
 - `secret_id` (String) ID of the secret where PKCS12 file is stored for `TERMINATED_HTTPS` or PROMETHEUS listener
+Available values: "".
 - `sni_secret_id` (List of String) List of secrets IDs containing PKCS12 format certificate/key bundles for `TERMINATED_HTTPS` or PROMETHEUS listeners
 - `timeout_client_data` (Number) Frontend client inactivity timeout in milliseconds
 - `timeout_member_connect` (Number, Deprecated) Backend member connection timeout in milliseconds. We are recommending to use `pool.timeout_member_connect` instead.
@@ -75,7 +77,7 @@ Available values: "ACTIVE", "DELETED", "ERROR", "PENDING_CREATE", "PENDING_DELET
 - `stats` (Attributes) Statistics of the load balancer. It is available only in get functions by a flag. (see [below for nested schema](#nestedatt--stats))
 - `task_id` (String) The UUID of the active task that currently holds a lock on the resource. This lock prevents concurrent modifications to ensure consistency. If `null`, the resource is not locked.
 - `tasks` (List of String) List of task IDs representing asynchronous operations. Use these IDs to monitor operation progress:
-* `GET /v1/tasks/{task_id}` - Check individual task status and details
+- `GET /v1/tasks/{task_id}` - Check individual task status and details
 Poll task status until completion (`FINISHED`/`ERROR`) before proceeding with dependent operations.
 
 <a id="nestedatt--user_list"></a>

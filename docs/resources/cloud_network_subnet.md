@@ -3,12 +3,12 @@
 page_title: "gcore_cloud_network_subnet Resource - gcore"
 subcategory: ""
 description: |-
-  
+  Subnets define IP address ranges within a network for instance connectivity, with support for DHCP and DNS configuration.
 ---
 
 # gcore_cloud_network_subnet (Resource)
 
-
+Subnets define IP address ranges within a network for instance connectivity, with support for DHCP and DNS configuration.
 
 ## Example Usage
 
@@ -68,7 +68,7 @@ Available values: 4, 6.
 - `region` (String) Region name
 - `task_id` (String) The UUID of the active task that currently holds a lock on the resource. This lock prevents concurrent modifications to ensure consistency. If `null`, the resource is not locked.
 - `tasks` (List of String) List of task IDs representing asynchronous operations. Use these IDs to monitor operation progress:
-* `GET /v1/tasks/{task_id}` - Check individual task status and details
+- `GET /v1/tasks/{task_id}` - Check individual task status and details
 Poll task status until completion (`FINISHED`/`ERROR`) before proceeding with dependent operations.
 - `total_ips` (Number) Total number of ips in subnet
 - `updated_at` (String) Datetime when the subnet was last updated

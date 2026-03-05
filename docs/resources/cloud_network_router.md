@@ -3,12 +3,12 @@
 page_title: "gcore_cloud_network_router Resource - gcore"
 subcategory: ""
 description: |-
-  
+  Routers interconnect subnets and manage network routing, including external gateway connectivity and static routes.
 ---
 
 # gcore_cloud_network_router (Resource)
 
-
+Routers interconnect subnets and manage network routing, including external gateway connectivity and static routes.
 
 ## Example Usage
 
@@ -57,7 +57,7 @@ resource "gcore_cloud_network_router" "example_cloud_network_router" {
 - `status` (String) Status of the router.
 - `task_id` (String) The UUID of the active task that currently holds a lock on the resource. This lock prevents concurrent modifications to ensure consistency. If `null`, the resource is not locked.
 - `tasks` (List of String) List of task IDs representing asynchronous operations. Use these IDs to monitor operation progress:
-* `GET /v1/tasks/{task_id}` - Check individual task status and details
+- `GET /v1/tasks/{task_id}` - Check individual task status and details
 Poll task status until completion (`FINISHED`/`ERROR`) before proceeding with dependent operations.
 - `updated_at` (String) Datetime when the router was last updated
 

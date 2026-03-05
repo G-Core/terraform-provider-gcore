@@ -3,12 +3,12 @@
 page_title: "gcore_cloud_networks Data Source - gcore"
 subcategory: ""
 description: |-
-  
+  Networks provide software-defined networking infrastructure for connecting instances and other cloud resources within a region.
 ---
 
 # gcore_cloud_networks (Data Source)
 
-
+Networks provide software-defined networking infrastructure for connecting instances and other cloud resources within a region.
 
 ## Example Usage
 
@@ -16,7 +16,9 @@ description: |-
 data "gcore_cloud_networks" "example_cloud_networks" {
   project_id = 1
   region_id = 1
+  external = true
   name = "my-network"
+  network_type = "vlan"
   tag_key = ["key1", "key2"]
   tag_key_value = "tag_key_value"
 }
@@ -27,10 +29,15 @@ data "gcore_cloud_networks" "example_cloud_networks" {
 
 ### Optional
 
+- `external` (Boolean) Filter by external network status
 - `max_items` (Number) Max items to fetch, default: 1000
 - `name` (String) Filter networks by name
-- `order_by` (String) Ordering networks list result by `name`, `created_at` fields of the network and directions (`created_at.desc`).
-Available values: "created_at.asc", "created_at.desc", "name.asc", "name.desc".
+- `network_type` (String) Filter by network type (vlan or vxlan)
+Available values: "vlan", "vxlan".
+- `order_by` (String) Ordering networks list result by `name`, `created_at` or `priority` fields and directions (e.g. `created_at.desc`). Default is `created_at.desc`. Use `priority.desc` to sort by shared network priority (relevant when `owned_by=any`).
+Available values: "created_at.asc", "created_at.desc", "name.asc", "name.desc", "priority.desc".
+- `owned_by` (String) Controls which networks are returned. 'project' (default) returns only networks owned by the project. 'any' returns all networks that the project can use, including shared networks from other projects.
+Available values: "any", "project".
 - `project_id` (Number) Project ID
 - `region_id` (Number) Region ID
 - `tag_key` (List of String) Optional. Filter by tag keys. ?`tag_key`=key1&`tag_key`=key2
@@ -69,6 +76,6 @@ Read-Only:
 
 Read-Only:
 
-- `key` (String) Tag key. The maximum size for a key is 255 characters.
+- `key` (String) Tag key. Maximum 255 characters. Cannot contain spaces, tabs, newlines, empty string or '=' character.
 - `read_only` (Boolean) If true, the tag is read-only and cannot be modified by the user
-- `value` (String) Tag value. The maximum size for a value is 255 characters.
+- `value` (String) Tag value. Maximum 255 characters. Cannot contain spaces, tabs, newlines, empty string or '=' character.

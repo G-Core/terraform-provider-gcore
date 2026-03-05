@@ -3,12 +3,12 @@
 page_title: "gcore_cloud_gpu_baremetal_cluster_image Data Source - gcore"
 subcategory: ""
 description: |-
-  
+  GPU bare metal images are custom boot images for bare metal GPU servers.
 ---
 
 # gcore_cloud_gpu_baremetal_cluster_image (Data Source)
 
-
+GPU bare metal images are custom boot images for bare metal GPU servers.
 
 ## Example Usage
 
@@ -59,6 +59,6 @@ data "gcore_cloud_gpu_baremetal_cluster_image" "example_cloud_gpu_baremetal_clus
 
 Read-Only:
 
-- `key` (String) Tag key. The maximum size for a key is 255 characters.
+- `key` (String) Tag key. Maximum 255 characters. Cannot contain spaces, tabs, newlines, empty string or '=' character.
 - `read_only` (Boolean) If true, the tag is read-only and cannot be modified by the user
-- `value` (String) Tag value. The maximum size for a value is 255 characters.
+- `value` (String) Tag value. Maximum 255 characters. Cannot contain spaces, tabs, newlines, empty string or '=' character.

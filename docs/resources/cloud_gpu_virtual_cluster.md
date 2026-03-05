@@ -3,12 +3,12 @@
 page_title: "gcore_cloud_gpu_virtual_cluster Resource - gcore"
 subcategory: ""
 description: |-
-  
+  GPU virtual clusters provide managed virtual GPU servers with auto-scaling for parallel computation workloads.
 ---
 
 # gcore_cloud_gpu_virtual_cluster (Resource)
 
-
+GPU virtual clusters provide managed virtual GPU servers with auto-scaling for parallel computation workloads.
 
 ## Example Usage
 
@@ -78,9 +78,9 @@ resource "gcore_cloud_gpu_virtual_cluster" "example_cloud_gpu_virtual_cluster" {
 - `id` (String) The ID of this resource.
 - `servers_ids` (List of String) List of cluster nodes
 - `status` (String) Cluster status
-Available values: "active", "creating", "degraded", "deleting", "error", "new", "rebooting", "rebuilding", "resizing", "shutoff".
+Available values: "active", "creating", "degraded", "deleting", "error", "rebooting", "rebuilding", "resizing", "shutoff".
 - `tasks` (List of String) List of task IDs representing asynchronous operations. Use these IDs to monitor operation progress:
-* `GET /v1/tasks/{task_id}` - Check individual task status and details
+- `GET /v1/tasks/{task_id}` - Check individual task status and details
 Poll task status until completion (`FINISHED`/`ERROR`) before proceeding with dependent operations.
 - `updated_at` (String) Cluster update date time
 

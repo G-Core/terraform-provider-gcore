@@ -3,12 +3,12 @@
 page_title: "gcore_cloud_inference_registry_credential Resource - gcore"
 subcategory: ""
 description: |-
-  
+  Registry credentials store authentication details for private container registries used by inference deployments.
 ---
 
 # gcore_cloud_inference_registry_credential (Resource)
 
-
+Registry credentials store authentication details for private container registries used by inference deployments.
 
 ## Example Usage
 

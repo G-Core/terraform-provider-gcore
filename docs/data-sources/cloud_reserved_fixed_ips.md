@@ -3,12 +3,12 @@
 page_title: "gcore_cloud_reserved_fixed_ips Data Source - gcore"
 subcategory: ""
 description: |-
-  
+  Reserved fixed IPs are static IP addresses that persist independently of instances and can be used as virtual IPs (VIPs) for high availability.
 ---
 
 # gcore_cloud_reserved_fixed_ips (Data Source)
 
-
+Reserved fixed IPs are static IP addresses that persist independently of instances and can be used as virtual IPs (VIPs) for high availability.
 
 ## Example Usage
 
@@ -120,9 +120,9 @@ Read-Only:
 
 Read-Only:
 
-- `key` (String) Tag key. The maximum size for a key is 255 characters.
+- `key` (String) Tag key. Maximum 255 characters. Cannot contain spaces, tabs, newlines, empty string or '=' character.
 - `read_only` (Boolean) If true, the tag is read-only and cannot be modified by the user
-- `value` (String) Tag value. The maximum size for a value is 255 characters.
+- `value` (String) Tag value. Maximum 255 characters. Cannot contain spaces, tabs, newlines, empty string or '=' character.
 
 
 

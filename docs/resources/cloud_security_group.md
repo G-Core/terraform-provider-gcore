@@ -3,12 +3,12 @@
 page_title: "gcore_cloud_security_group Resource - gcore"
 subcategory: ""
 description: |-
-  
+  Security groups act as virtual firewalls controlling inbound and outbound traffic for instances and other resources.
 ---
 
 # gcore_cloud_security_group (Resource)
 
-
+Security groups act as virtual firewalls controlling inbound and outbound traffic for instances and other resources.
 
 ## Example Usage
 
@@ -58,7 +58,7 @@ resource "gcore_cloud_security_group" "example_cloud_security_group" {
 - `security_group_rules` (Attributes List) Security group rules (see [below for nested schema](#nestedatt--security_group_rules))
 - `tags_v2` (Attributes List) List of key-value tags associated with the resource. A tag is a key-value pair that can be associated with a resource, enabling efficient filtering and grouping for better organization and management. Some tags are read-only and cannot be modified by the user. Tags are also integrated with cost reports, allowing cost data to be filtered based on tag keys or values. (see [below for nested schema](#nestedatt--tags_v2))
 - `tasks` (List of String) List of task IDs representing asynchronous operations. Use these IDs to monitor operation progress:
-* `GET /v1/tasks/{task_id}` - Check individual task status and details
+- `GET /v1/tasks/{task_id}` - Check individual task status and details
 Poll task status until completion (`FINISHED`/`ERROR`) before proceeding with dependent operations.
 - `updated_at` (String) Datetime when the security group was last updated
 
@@ -111,9 +111,9 @@ Available values: "ah", "any", "dccp", "egp", "esp", "gre", "icmp", "igmp", "ipe
 
 Read-Only:
 
-- `key` (String) Tag key. The maximum size for a key is 255 characters.
+- `key` (String) Tag key. Maximum 255 characters. Cannot contain spaces, tabs, newlines, empty string or '=' character.
 - `read_only` (Boolean) If true, the tag is read-only and cannot be modified by the user
-- `value` (String) Tag value. The maximum size for a value is 255 characters.
+- `value` (String) Tag value. Maximum 255 characters. Cannot contain spaces, tabs, newlines, empty string or '=' character.
 
 ## Import
 

@@ -3,12 +3,12 @@
 page_title: "gcore_cloud_network_subnets Data Source - gcore"
 subcategory: ""
 description: |-
-  
+  Subnets define IP address ranges within a network for instance connectivity, with support for DHCP and DNS configuration.
 ---
 
 # gcore_cloud_network_subnets (Data Source)
 
-
+Subnets define IP address ranges within a network for instance connectivity, with support for DHCP and DNS configuration.
 
 ## Example Usage
 
@@ -31,6 +31,8 @@ data "gcore_cloud_network_subnets" "example_cloud_network_subnets" {
 - `network_id` (String) Only list subnets of this network
 - `order_by` (String) Ordering subnets list result by `name`, `created_at`, `updated_at`, `available_ips`, `total_ips`, and `cidr` (default) fields of the subnet and directions (`name.asc`).
 Available values: "available_ips.asc", "available_ips.desc", "cidr.asc", "cidr.desc", "created_at.asc", "created_at.desc", "name.asc", "name.desc", "total_ips.asc", "total_ips.desc", "updated_at.asc", "updated_at.desc".
+- `owned_by` (String) Controls which subnets are returned. 'project' (default) returns only subnets owned by the project. 'any' returns all subnets from networks available to the project, including subnets from shared networks.
+Available values: "any", "project".
 - `project_id` (Number) Project ID
 - `region_id` (Number) Region ID
 - `tag_key` (List of String) Optional. Filter by tag keys. ?`tag_key`=key1&`tag_key`=key2
@@ -81,6 +83,6 @@ Read-Only:
 
 Read-Only:
 
-- `key` (String) Tag key. The maximum size for a key is 255 characters.
+- `key` (String) Tag key. Maximum 255 characters. Cannot contain spaces, tabs, newlines, empty string or '=' character.
 - `read_only` (Boolean) If true, the tag is read-only and cannot be modified by the user
-- `value` (String) Tag value. The maximum size for a value is 255 characters.
+- `value` (String) Tag value. Maximum 255 characters. Cannot contain spaces, tabs, newlines, empty string or '=' character.

@@ -3,12 +3,12 @@
 page_title: "gcore_cloud_placement_group Data Source - gcore"
 subcategory: ""
 description: |-
-  Placement Groups allow you to specific a policy that determines whether Virtual Machines will be hosted on the same physical server or on different ones.
+  Placement groups enforce affinity or anti-affinity policies that control whether virtual machines are hosted on the same or different physical servers.
 ---
 
 # gcore_cloud_placement_group (Data Source)
 
-Placement Groups allow you to specific a policy that determines whether Virtual Machines will be hosted on the same physical server or on different ones.
+Placement groups enforce affinity or anti-affinity policies that control whether virtual machines are hosted on the same or different physical servers.
 
 ## Example Usage
 

@@ -3,12 +3,12 @@
 page_title: "gcore_cloud_region Data Source - gcore"
 subcategory: ""
 description: |-
-  
+  Regions represent available Gcore cloud data centers with information about supported services and volume types.
 ---
 
 # gcore_cloud_region (Data Source)
 
-
+Regions represent available Gcore cloud data centers with information about supported services and volume types.
 
 ## Example Usage
 
@@ -67,5 +67,5 @@ Available values: "AMERICAS", "APAC", "EMEA", "RUSSIA_AND_CIS".
 
 Read-Only:
 
-- `latitude` (Dynamic)
-- `longitude` (Dynamic)
+- `latitude` (String)
+- `longitude` (String)

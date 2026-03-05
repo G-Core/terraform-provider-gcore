@@ -3,12 +3,12 @@
 page_title: "gcore_dns_network_mapping Data Source - gcore"
 subcategory: ""
 description: |-
-  
+  DNS network mappings associate CIDR ranges with network tags for private DNS resolution and traffic-based routing.
 ---
 
 # gcore_dns_network_mapping (Data Source)
 
-
+DNS network mappings associate CIDR ranges with network tags for private DNS resolution and traffic-based routing.
 
 ## Example Usage
 

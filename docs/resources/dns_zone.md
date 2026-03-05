@@ -3,12 +3,12 @@
 page_title: "gcore_dns_zone Resource - gcore"
 subcategory: ""
 description: |-
-  
+  DNS zones are authoritative containers for domain name records, with support for DNSSEC and SOA configuration.
 ---
 
 # gcore_dns_zone (Resource)
 
-
+DNS zones are authoritative containers for domain name records, with support for DNSSEC and SOA configuration.
 
 ## Example Usage
 
@@ -27,7 +27,6 @@ resource "gcore_dns_zone" "example_dns_zone" {
   primary_server = "primary_server"
   refresh = 0
   retry = 0
-  serial = 0
 }
 ```
 
@@ -51,9 +50,6 @@ webhook will get a map with three arrays: for created, updated and deleted rrset
 - `primary_server` (String) primary master name server for zone
 - `refresh` (Number) number of seconds after which secondary name servers should query the master for the SOA record, to detect zone changes.
 - `retry` (Number) number of seconds after which secondary name servers should retry to request the serial number
-- `serial` (Number) Serial number for this zone or Timestamp of zone modification moment.
-If a secondary name server slaved to this one observes an increase in this number,
-the slave will assume that the zone has been updated and initiate a zone transfer.
 
 ### Read-Only
 
@@ -63,6 +59,9 @@ false means dnssec is disabled for the zone
 - `id` (String) name of DNS zone
 - `records` (Attributes List) (see [below for nested schema](#nestedatt--records))
 - `rrsets_amount` (Attributes) (see [below for nested schema](#nestedatt--rrsets_amount))
+- `serial` (Number) Serial number for this zone or Timestamp of zone modification moment.
+If a secondary name server slaved to this one observes an increase in this number,
+the slave will assume that the zone has been updated and initiate a zone transfer.
 - `status` (String)
 - `warnings` (List of String)
 

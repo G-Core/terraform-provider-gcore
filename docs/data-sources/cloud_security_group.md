@@ -3,12 +3,12 @@
 page_title: "gcore_cloud_security_group Data Source - gcore"
 subcategory: ""
 description: |-
-  
+  Security groups act as virtual firewalls controlling inbound and outbound traffic for instances and other resources.
 ---
 
 # gcore_cloud_security_group (Data Source)
 
-
+Security groups act as virtual firewalls controlling inbound and outbound traffic for instances and other resources.
 
 ## Example Usage
 
@@ -80,6 +80,6 @@ Available values: "ah", "any", "dccp", "egp", "esp", "gre", "icmp", "igmp", "ipe
 
 Read-Only:
 
-- `key` (String) Tag key. The maximum size for a key is 255 characters.
+- `key` (String) Tag key. Maximum 255 characters. Cannot contain spaces, tabs, newlines, empty string or '=' character.
 - `read_only` (Boolean) If true, the tag is read-only and cannot be modified by the user
-- `value` (String) Tag value. The maximum size for a value is 255 characters.
+- `value` (String) Tag value. Maximum 255 characters. Cannot contain spaces, tabs, newlines, empty string or '=' character.

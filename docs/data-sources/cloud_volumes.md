@@ -3,12 +3,12 @@
 page_title: "gcore_cloud_volumes Data Source - gcore"
 subcategory: ""
 description: |-
-  
+  Volumes are block storage devices that can be attached to instances as boot or data disks, with support for resizing and type changes.
 ---
 
 # gcore_cloud_volumes (Data Source)
 
-
+Volumes are block storage devices that can be attached to instances as boot or data disks, with support for resizing and type changes.
 
 ## Example Usage
 
@@ -104,6 +104,6 @@ Read-Only:
 
 Read-Only:
 
-- `key` (String) Tag key. The maximum size for a key is 255 characters.
+- `key` (String) Tag key. Maximum 255 characters. Cannot contain spaces, tabs, newlines, empty string or '=' character.
 - `read_only` (Boolean) If true, the tag is read-only and cannot be modified by the user
-- `value` (String) Tag value. The maximum size for a value is 255 characters.
+- `value` (String) Tag value. Maximum 255 characters. Cannot contain spaces, tabs, newlines, empty string or '=' character.

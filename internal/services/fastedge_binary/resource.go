@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"strings"
 
 	"github.com/G-Core/gcore-go"
 	"github.com/G-Core/gcore-go/option"
@@ -63,16 +64,10 @@ func (r *FastedgeBinaryResource) Create(ctx context.Context, req resource.Create
 		return
 	}
 
-	dataBytes, err := data.MarshalJSON()
-	if err != nil {
-		resp.Diagnostics.AddError("failed to serialize http request", err.Error())
-		return
-	}
 	res := new(http.Response)
-	_, err = r.client.Fastedge.Binaries.New(
+	_, err := r.client.Fastedge.Binaries.New(
 		ctx,
-		data.Body.ValueString(),
-		option.WithRequestBody("application/json", dataBytes),
+		strings.NewReader(data.Body.ValueString()),
 		option.WithResponseBodyInto(&res),
 		option.WithMiddleware(logging.Middleware(ctx)),
 	)

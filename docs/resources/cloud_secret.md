@@ -3,12 +3,12 @@
 page_title: "gcore_cloud_secret Resource - gcore"
 subcategory: ""
 description: |-
-  
+  Secrets store sensitive data such as TLS certificates and private keys in encrypted form within a cloud region.
 ---
 
 # gcore_cloud_secret (Resource)
 
-
+Secrets store sensitive data such as TLS certificates and private keys in encrypted form within a cloud region.
 
 ## Example Usage
 
@@ -52,7 +52,7 @@ resource "gcore_cloud_secret" "example_cloud_secret" {
 Available values: "certificate", "opaque", "passphrase", "private", "public", "symmetric".
 - `status` (String) Status
 - `tasks` (List of String) List of task IDs representing asynchronous operations. Use these IDs to monitor operation progress:
-* `GET /v1/tasks/{task_id}` - Check individual task status and details
+- `GET /v1/tasks/{task_id}` - Check individual task status and details
 Poll task status until completion (`FINISHED`/`ERROR`) before proceeding with dependent operations.
 
 <a id="nestedatt--payload"></a>

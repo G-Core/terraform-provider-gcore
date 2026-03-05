@@ -3,12 +3,12 @@
 page_title: "gcore_cloud_reserved_fixed_ip Resource - gcore"
 subcategory: ""
 description: |-
-  
+  Reserved fixed IPs are static IP addresses that persist independently of instances and can be used as virtual IPs (VIPs) for high availability.
 ---
 
 # gcore_cloud_reserved_fixed_ip (Resource)
 
-
+Reserved fixed IPs are static IP addresses that persist independently of instances and can be used as virtual IPs (VIPs) for high availability.
 
 ## Example Usage
 
@@ -60,7 +60,7 @@ Available values: "dual", "ipv4", "ipv6".
 - `subnet_v6_id` (String) ID of the subnet that owns the IPv6 address
 - `task_id` (String) The UUID of the active task that currently holds a lock on the resource. This lock prevents concurrent modifications to ensure consistency. If `null`, the resource is not locked.
 - `tasks` (List of String) List of task IDs representing asynchronous operations. Use these IDs to monitor operation progress:
-* `GET /v1/tasks/{task_id}` - Check individual task status and details
+- `GET /v1/tasks/{task_id}` - Check individual task status and details
 Poll task status until completion (`FINISHED`/`ERROR`) before proceeding with dependent operations.
 - `updated_at` (String) Datetime when the reserved fixed IP was last updated
 
@@ -111,9 +111,9 @@ Read-Only:
 
 Read-Only:
 
-- `key` (String) Tag key. The maximum size for a key is 255 characters.
+- `key` (String) Tag key. Maximum 255 characters. Cannot contain spaces, tabs, newlines, empty string or '=' character.
 - `read_only` (Boolean) If true, the tag is read-only and cannot be modified by the user
-- `value` (String) Tag value. The maximum size for a value is 255 characters.
+- `value` (String) Tag value. Maximum 255 characters. Cannot contain spaces, tabs, newlines, empty string or '=' character.
 
 
 

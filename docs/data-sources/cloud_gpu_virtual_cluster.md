@@ -3,12 +3,12 @@
 page_title: "gcore_cloud_gpu_virtual_cluster Data Source - gcore"
 subcategory: ""
 description: |-
-  
+  GPU virtual clusters provide managed virtual GPU servers with auto-scaling for parallel computation workloads.
 ---
 
 # gcore_cloud_gpu_virtual_cluster (Data Source)
 
-
+GPU virtual clusters provide managed virtual GPU servers with auto-scaling for parallel computation workloads.
 
 ## Example Usage
 
@@ -42,7 +42,7 @@ data "gcore_cloud_gpu_virtual_cluster" "example_cloud_gpu_virtual_cluster" {
 - `servers_ids` (List of String) List of cluster nodes
 - `servers_settings` (Attributes) (see [below for nested schema](#nestedatt--servers_settings))
 - `status` (String) Cluster status
-Available values: "active", "creating", "degraded", "deleting", "error", "new", "rebooting", "rebuilding", "resizing", "shutoff".
+Available values: "active", "creating", "degraded", "deleting", "error", "rebooting", "rebuilding", "resizing", "shutoff".
 - `tags` (Attributes List) List of key-value tags associated with the resource. A tag is a key-value pair that can be associated with a resource, enabling efficient filtering and grouping for better organization and management. Some tags are read-only and cannot be modified by the user. Tags are also integrated with cost reports, allowing cost data to be filtered based on tag keys or values. (see [below for nested schema](#nestedatt--tags))
 - `updated_at` (String) Cluster update date time
 
@@ -118,9 +118,9 @@ Available values: "cold", "ssd_hiiops", "ssd_local", "ssd_lowlatency", "standard
 
 Read-Only:
 
-- `key` (String) Tag key. The maximum size for a key is 255 characters.
+- `key` (String) Tag key. Maximum 255 characters. Cannot contain spaces, tabs, newlines, empty string or '=' character.
 - `read_only` (Boolean) If true, the tag is read-only and cannot be modified by the user
-- `value` (String) Tag value. The maximum size for a value is 255 characters.
+- `value` (String) Tag value. Maximum 255 characters. Cannot contain spaces, tabs, newlines, empty string or '=' character.
 
 
 
@@ -130,6 +130,6 @@ Read-Only:
 
 Read-Only:
 
-- `key` (String) Tag key. The maximum size for a key is 255 characters.
+- `key` (String) Tag key. Maximum 255 characters. Cannot contain spaces, tabs, newlines, empty string or '=' character.
 - `read_only` (Boolean) If true, the tag is read-only and cannot be modified by the user
-- `value` (String) Tag value. The maximum size for a value is 255 characters.
+- `value` (String) Tag value. Maximum 255 characters. Cannot contain spaces, tabs, newlines, empty string or '=' character.

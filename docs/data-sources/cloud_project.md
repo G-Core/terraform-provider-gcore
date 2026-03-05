@@ -3,12 +3,12 @@
 page_title: "gcore_cloud_project Data Source - gcore"
 subcategory: ""
 description: |-
-  
+  Projects are organizational units that group cloud resources for access control and billing.
 ---
 
 # gcore_cloud_project (Data Source)
 
-
+Projects are organizational units that group cloud resources for access control and billing.
 
 ## Example Usage
 

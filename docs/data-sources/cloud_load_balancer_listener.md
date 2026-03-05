@@ -3,12 +3,12 @@
 page_title: "gcore_cloud_load_balancer_listener Data Source - gcore"
 subcategory: ""
 description: |-
-  
+  Load balancer listeners handle incoming traffic on specified protocols and ports, forwarding requests to backend pools.
 ---
 
 # gcore_cloud_load_balancer_listener (Data Source)
 
-
+Load balancer listeners handle incoming traffic on specified protocols and ports, forwarding requests to backend pools.
 
 ## Example Usage
 
@@ -36,6 +36,7 @@ data "gcore_cloud_load_balancer_listener" "example_cloud_load_balancer_listener"
 
 ### Read-Only
 
+- `admin_state_up` (Boolean) Administrative state of the resource. When set to true, the resource is enabled and operational. When set to false, the resource is disabled and will not process traffic. Defaults to true.
 - `allowed_cidrs` (List of String) Network CIDRs from which service will be accessible
 - `connection_limit` (Number) Limit of simultaneous connections
 - `creator_task_id` (String) Task that created this entity

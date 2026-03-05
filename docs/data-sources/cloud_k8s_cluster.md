@@ -3,20 +3,20 @@
 page_title: "gcore_cloud_k8s_cluster Data Source - gcore"
 subcategory: ""
 description: |-
-  
+  Managed Kubernetes clusters with configurable worker node pools, networking, and cluster add-ons.
 ---
 
 # gcore_cloud_k8s_cluster (Data Source)
 
-
+Managed Kubernetes clusters with configurable worker node pools, networking, and cluster add-ons.
 
 ## Example Usage
 
 ```terraform
 data "gcore_cloud_k8s_cluster" "example_cloud_k8s_cluster" {
-  project_id = 0
-  region_id = 0
-  cluster_name = "cluster_name"
+  project_id = 1
+  region_id = 7
+  cluster_name = "my-cluster"
 }
 ```
 
@@ -25,12 +25,12 @@ data "gcore_cloud_k8s_cluster" "example_cloud_k8s_cluster" {
 
 ### Required
 
-- `cluster_name` (String)
+- `cluster_name` (String) Cluster name
 
 ### Optional
 
-- `project_id` (Number)
-- `region_id` (Number)
+- `project_id` (Number) Project ID
+- `region_id` (Number) Region ID
 
 ### Read-Only
 
@@ -46,7 +46,7 @@ It contains overrides to the default cluster-autoscaler parameters provided by t
 - `ddos_profile` (Attributes) Advanced DDoS Protection profile (see [below for nested schema](#nestedatt--ddos_profile))
 - `fixed_network` (String) Fixed network id
 - `fixed_subnet` (String) Fixed subnet id
-- `id` (String) The ID of this resource.
+- `id` (String) Cluster name
 - `is_ipv6` (Boolean) Enable public v6 address
 - `is_public` (Boolean) Cluster is public
 - `keypair` (String) Keypair
@@ -84,6 +84,8 @@ The Slurm add-on creates separate Persistent Volume Claims for different purpose
 - `worker_count` (Number) Size of the worker pool, i.e. number of worker nodes.
 
 Each Slurm worker node is backed by a Pod scheduled on one of cluster's GPU nodes.
+
+Note: Downscaling (reducing worker count) is not supported.
 
 
 

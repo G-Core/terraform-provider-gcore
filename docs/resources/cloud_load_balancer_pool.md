@@ -3,12 +3,12 @@
 page_title: "gcore_cloud_load_balancer_pool Resource - gcore"
 subcategory: ""
 description: |-
-  
+  Load balancer pools group backend instances with a load balancing algorithm and health monitoring configuration.
 ---
 
 # gcore_cloud_load_balancer_pool (Resource)
 
-
+Load balancer pools group backend instances with a load balancing algorithm and health monitoring configuration.
 
 ## Example Usage
 
@@ -26,6 +26,7 @@ resource "gcore_cloud_load_balancer_pool" "example_cloud_load_balancer_pool" {
     max_retries = 3
     timeout = 5
     type = "HTTP"
+    admin_state_up = true
     expected_codes = "200,301,302"
     http_method = "GET"
     max_retries_down = 3
@@ -80,6 +81,7 @@ Available values: "HTTP", "HTTPS", "PROXY", "PROXYV2", "TCP", "UDP".
 
 ### Optional
 
+- `admin_state_up` (Boolean) Administrative state of the resource. When set to true, the resource is enabled and operational. When set to false, the resource is disabled and will not process traffic. Defaults to true.
 - `ca_secret_id` (String) Secret ID of CA certificate bundle
 - `crl_secret_id` (String) Secret ID of CA revocation list file
 - `healthmonitor` (Attributes) Health monitor details (see [below for nested schema](#nestedatt--healthmonitor))
@@ -106,7 +108,7 @@ Available values: "DEGRADED", "DRAINING", "ERROR", "NO_MONITOR", "OFFLINE", "ONL
 Available values: "ACTIVE", "DELETED", "ERROR", "PENDING_CREATE", "PENDING_DELETE", "PENDING_UPDATE".
 - `task_id` (String) The UUID of the active task that currently holds a lock on the resource. This lock prevents concurrent modifications to ensure consistency. If `null`, the resource is not locked.
 - `tasks` (List of String) List of task IDs representing asynchronous operations. Use these IDs to monitor operation progress:
-* `GET /v1/tasks/{task_id}` - Check individual task status and details
+- `GET /v1/tasks/{task_id}` - Check individual task status and details
 Poll task status until completion (`FINISHED`/`ERROR`) before proceeding with dependent operations.
 
 <a id="nestedatt--healthmonitor"></a>
@@ -122,6 +124,7 @@ Available values: "HTTP", "HTTPS", "K8S", "PING", "TCP", "TLS-HELLO", "UDP-CONNE
 
 Optional:
 
+- `admin_state_up` (Boolean) Administrative state of the resource. When set to true, the resource is enabled and operational. When set to false, the resource is disabled and will not process traffic. Defaults to true.
 - `expected_codes` (String) Expected HTTP response codes. Can be a single code or a range of codes. Can only be used together with `HTTP` or `HTTPS` health monitor type. For example, 200,202,300-302,401,403,404,500-504. If not specified, the default is 200.
 - `http_method` (String) HTTP method. Can only be used together with `HTTP` or `HTTPS` health monitor type.
 Available values: "CONNECT", "DELETE", "GET", "HEAD", "OPTIONS", "PATCH", "POST", "PUT", "TRACE".
@@ -139,16 +142,16 @@ Required:
 
 Optional:
 
-- `admin_state_up` (Boolean) Administrative state of the resource. When set to true, the resource is enabled and operational. When set to false, the resource is disabled and will not process traffic. When null is passed, the value is skipped and defaults to true.
+- `admin_state_up` (Boolean) Administrative state of the resource. When set to true, the resource is enabled and operational. When set to false, the resource is disabled and will not process traffic. Defaults to true.
 - `backup` (Boolean) Set to true if the member is a backup member, to which traffic will be sent exclusively when all non-backup members will be unreachable. It allows to realize ACTIVE-BACKUP load balancing without thinking about VRRP and VIP configuration. Default is false.
 - `instance_id` (String) Either `subnet_id` or `instance_id` should be provided
 - `monitor_address` (String) An alternate IP address used for health monitoring of a backend member. Default is null which monitors the member address.
 - `monitor_port` (Number) An alternate protocol port used for health monitoring of a backend member. Default is null which monitors the member `protocol_port`.
 - `subnet_id` (String) `subnet_id` in which `address` is present. Either `subnet_id` or `instance_id` should be provided
 - `weight` (Number) Member weight. Valid values are 0 < `weight` <= 256, defaults to 1. Controls traffic distribution based on the pool's load balancing algorithm:
-* `ROUND_ROBIN`: Distributes connections to each member in turn according to weights. Higher weight = more turns in the cycle. Example: weights 3 vs 1 = ~75% vs ~25% of requests.
-* `LEAST_CONNECTIONS`: Sends new connections to the member with fewest active connections, performing round-robin within groups of the same normalized load. Higher weight = allowed to hold more simultaneous connections before being considered 'more loaded'. Example: weights 2 vs 1 means 20 vs 10 active connections is treated as balanced.
-* `SOURCE_IP`: Routes clients consistently to the same member by hashing client source IP; hash result is modulo total weight of running members. Higher weight = more hash buckets, so more client IPs map to that member. Example: weights 2 vs 1 = roughly two-thirds of distinct client IPs map to the higher-weight member.
+- `ROUND_ROBIN`: Distributes connections to each member in turn according to weights. Higher weight = more turns in the cycle. Example: weights 3 vs 1 = ~75% vs ~25% of requests.
+- `LEAST_CONNECTIONS`: Sends new connections to the member with fewest active connections, performing round-robin within groups of the same normalized load. Higher weight = allowed to hold more simultaneous connections before being considered 'more loaded'. Example: weights 2 vs 1 means 20 vs 10 active connections is treated as balanced.
+- `SOURCE_IP`: Routes clients consistently to the same member by hashing client source IP; hash result is modulo total weight of running members. Higher weight = more hash buckets, so more client IPs map to that member. Example: weights 2 vs 1 = roughly two-thirds of distinct client IPs map to the higher-weight member.
 
 
 <a id="nestedatt--session_persistence"></a>
