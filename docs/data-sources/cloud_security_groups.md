@@ -3,12 +3,12 @@
 page_title: "gcore_cloud_security_groups Data Source - gcore"
 subcategory: ""
 description: |-
-  
+  Security groups act as virtual firewalls controlling inbound and outbound traffic for instances and other resources.
 ---
 
 # gcore_cloud_security_groups (Data Source)
 
-
+Security groups act as virtual firewalls controlling inbound and outbound traffic for instances and other resources.
 
 ## Example Usage
 

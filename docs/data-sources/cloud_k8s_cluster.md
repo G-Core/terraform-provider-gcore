@@ -3,12 +3,12 @@
 page_title: "gcore_cloud_k8s_cluster Data Source - gcore"
 subcategory: ""
 description: |-
-  
+  Managed Kubernetes clusters with configurable worker node pools, networking, and cluster add-ons.
 ---
 
 # gcore_cloud_k8s_cluster (Data Source)
 
-
+Managed Kubernetes clusters with configurable worker node pools, networking, and cluster add-ons.
 
 ## Example Usage
 

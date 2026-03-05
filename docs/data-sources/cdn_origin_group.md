@@ -3,12 +3,12 @@
 page_title: "gcore_cdn_origin_group Data Source - gcore"
 subcategory: ""
 description: |-
-  
+  CDN origin groups aggregate one or more origin servers with failover and load balancing for content delivery.
 ---
 
 # gcore_cdn_origin_group (Data Source)
 
-
+CDN origin groups aggregate one or more origin servers with failover and load balancing for content delivery.
 
 ## Example Usage
 

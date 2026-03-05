@@ -3,12 +3,12 @@
 page_title: "gcore_cloud_secret Resource - gcore"
 subcategory: ""
 description: |-
-  
+  Secrets store sensitive data such as TLS certificates and private keys in encrypted form within a cloud region.
 ---
 
 # gcore_cloud_secret (Resource)
 
-
+Secrets store sensitive data such as TLS certificates and private keys in encrypted form within a cloud region.
 
 ## Example Usage
 

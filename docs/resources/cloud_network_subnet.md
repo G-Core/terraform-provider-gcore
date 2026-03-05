@@ -3,12 +3,12 @@
 page_title: "gcore_cloud_network_subnet Resource - gcore"
 subcategory: ""
 description: |-
-  
+  Subnets define IP address ranges within a network for instance connectivity, with support for DHCP and DNS configuration.
 ---
 
 # gcore_cloud_network_subnet (Resource)
 
-
+Subnets define IP address ranges within a network for instance connectivity, with support for DHCP and DNS configuration.
 
 ## Example Usage
 

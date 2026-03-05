@@ -3,12 +3,12 @@
 page_title: "gcore_cloud_instance Data Source - gcore"
 subcategory: ""
 description: |-
-  
+  Instances are cloud virtual machines with configurable CPU, memory, storage, and networking, supporting various operating systems and workloads.
 ---
 
 # gcore_cloud_instance (Data Source)
 
-
+Instances are cloud virtual machines with configurable CPU, memory, storage, and networking, supporting various operating systems and workloads.
 
 ## Example Usage
 

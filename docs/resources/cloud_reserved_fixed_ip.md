@@ -3,12 +3,12 @@
 page_title: "gcore_cloud_reserved_fixed_ip Resource - gcore"
 subcategory: ""
 description: |-
-  
+  Reserved fixed IPs are static IP addresses that persist independently of instances and can be used as virtual IPs (VIPs) for high availability.
 ---
 
 # gcore_cloud_reserved_fixed_ip (Resource)
 
-
+Reserved fixed IPs are static IP addresses that persist independently of instances and can be used as virtual IPs (VIPs) for high availability.
 
 ## Example Usage
 

@@ -3,12 +3,12 @@
 page_title: "gcore_cloud_gpu_virtual_cluster_image Resource - gcore"
 subcategory: ""
 description: |-
-  
+  GPU virtual images are custom boot images for virtual GPU cluster instances.
 ---
 
 # gcore_cloud_gpu_virtual_cluster_image (Resource)
 
-
+GPU virtual images are custom boot images for virtual GPU cluster instances.
 
 ## Example Usage
 

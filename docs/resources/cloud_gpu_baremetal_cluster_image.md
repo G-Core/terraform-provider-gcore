@@ -3,12 +3,12 @@
 page_title: "gcore_cloud_gpu_baremetal_cluster_image Resource - gcore"
 subcategory: ""
 description: |-
-  
+  GPU bare metal images are custom boot images for bare metal GPU servers.
 ---
 
 # gcore_cloud_gpu_baremetal_cluster_image (Resource)
 
-
+GPU bare metal images are custom boot images for bare metal GPU servers.
 
 ## Example Usage
 

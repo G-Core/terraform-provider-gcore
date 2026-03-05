@@ -3,12 +3,12 @@
 page_title: "gcore_cloud_load_balancer Resource - gcore"
 subcategory: ""
 description: |-
-  
+  Load balancers distribute incoming traffic across multiple instances with support for listeners, pools, and health monitoring.
 ---
 
 # gcore_cloud_load_balancer (Resource)
 
-
+Load balancers distribute incoming traffic across multiple instances with support for listeners, pools, and health monitoring.
 
 ## Example Usage
 

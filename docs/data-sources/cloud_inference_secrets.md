@@ -3,12 +3,12 @@
 page_title: "gcore_cloud_inference_secrets Data Source - gcore"
 subcategory: ""
 description: |-
-  
+  Inference secrets store sensitive values such as AWS credentials used for SQS-based autoscaling triggers in deployments.
 ---
 
 # gcore_cloud_inference_secrets (Data Source)
 
-
+Inference secrets store sensitive values such as AWS credentials used for SQS-based autoscaling triggers in deployments.
 
 ## Example Usage
 

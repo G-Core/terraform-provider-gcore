@@ -3,12 +3,12 @@
 page_title: "gcore_cloud_file_share_access_rule Resource - gcore"
 subcategory: ""
 description: |-
-  
+  File share access rules control which IP addresses can mount a file share and their permissions (read-only or read-write).
 ---
 
 # gcore_cloud_file_share_access_rule (Resource)
 
-
+File share access rules control which IP addresses can mount a file share and their permissions (read-only or read-write).
 
 ## Example Usage
 
