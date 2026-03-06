@@ -15,7 +15,7 @@ import (
 
 func TestAccCloudInstanceDataSource_basic(t *testing.T) {
 	rName := acctest.RandomName()
-	imageID := acctest.LatestUbuntuImageID(t)
+	imageID := latestUbuntuImageID(t)
 
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:                 func() { acctest.PreCheck(t) },

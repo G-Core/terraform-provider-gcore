@@ -57,7 +57,7 @@ func testAccCheckCloudInstanceDestroy(s *terraform.State) error {
 
 func TestAccCloudInstance_basic(t *testing.T) {
 	rName := acctest.RandomName()
-	imageID := acctest.LatestUbuntuImageID(t)
+	imageID := latestUbuntuImageID(t)
 
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:                 func() { acctest.PreCheck(t) },
@@ -95,7 +95,7 @@ func TestAccCloudInstance_basic(t *testing.T) {
 func TestAccCloudInstance_update(t *testing.T) {
 	rName := acctest.RandomName()
 	rNameUpdated := acctest.RandomName()
-	imageID := acctest.LatestUbuntuImageID(t)
+	imageID := latestUbuntuImageID(t)
 
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:                 func() { acctest.PreCheck(t) },

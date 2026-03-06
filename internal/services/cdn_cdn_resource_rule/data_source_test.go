@@ -15,7 +15,7 @@ import (
 
 func TestAccCDNCDNResourceRuleDataSource_basic(t *testing.T) {
 	rName := acctest.RandomName()
-	fixture := acctest.SetupCDNResource(t)
+	fixture := setupCDNResource(t)
 
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:                 func() { acctest.PreCheck(t) },

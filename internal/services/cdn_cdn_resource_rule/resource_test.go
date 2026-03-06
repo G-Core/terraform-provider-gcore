@@ -55,7 +55,7 @@ func testAccCheckCDNCDNResourceRuleDestroy(s *terraform.State) error {
 
 func TestAccCDNCDNResourceRule_basic(t *testing.T) {
 	rName := acctest.RandomName()
-	fixture := acctest.SetupCDNResource(t)
+	fixture := setupCDNResource(t)
 
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:                 func() { acctest.PreCheck(t) },
@@ -87,7 +87,7 @@ func TestAccCDNCDNResourceRule_basic(t *testing.T) {
 func TestAccCDNCDNResourceRule_update(t *testing.T) {
 	rName := acctest.RandomName()
 	rNameUpdated := acctest.RandomName()
-	fixture := acctest.SetupCDNResource(t)
+	fixture := setupCDNResource(t)
 
 	idCheck := statecheck.CompareValue(compare.ValuesSame())
 
