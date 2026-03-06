@@ -10,7 +10,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-testing/statecheck"
 	"github.com/hashicorp/terraform-plugin-testing/tfjsonpath"
 
-	"github.com/stainless-sdks/gcore-terraform/internal/acctest"
+	"github.com/G-Core/terraform-provider-gcore/internal/acctest"
 )
 
 func TestAccCloudInstanceDataSource_basic(t *testing.T) {

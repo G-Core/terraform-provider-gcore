@@ -12,7 +12,7 @@ import (
 	"github.com/G-Core/gcore-go/option"
 	"github.com/hashicorp/terraform-plugin-testing/helper/resource"
 
-	"github.com/stainless-sdks/gcore-terraform/internal/sweep"
+	"github.com/G-Core/terraform-provider-gcore/internal/sweep"
 )
 
 func init() {

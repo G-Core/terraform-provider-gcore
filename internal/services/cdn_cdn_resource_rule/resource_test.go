@@ -15,7 +15,7 @@ import (
 
 	"github.com/G-Core/gcore-go/cdn"
 
-	"github.com/stainless-sdks/gcore-terraform/internal/acctest"
+	"github.com/G-Core/terraform-provider-gcore/internal/acctest"
 )
 
 func testAccCheckCDNCDNResourceRuleDestroy(s *terraform.State) error {
