@@ -3,12 +3,12 @@
 page_title: "gcore_cloud_network Data Source - gcore"
 subcategory: ""
 description: |-
-  
+  Networks provide software-defined networking infrastructure for connecting instances and other cloud resources within a region.
 ---
 
 # gcore_cloud_network (Data Source)
 
-
+Networks provide software-defined networking infrastructure for connecting instances and other cloud resources within a region.
 
 ## Example Usage
 

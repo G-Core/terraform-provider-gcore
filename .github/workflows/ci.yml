@@ -12,6 +12,9 @@ on:
       - 'stl-preview-head/**'
       - 'stl-preview-base/**'
 
+env:
+  GOPRIVATE: github.com/stainless-sdks/gcore-go
+
 jobs:
   lint:
     runs-on: ${{ github.repository == 'stainless-sdks/gcore-terraform' && 'depot-ubuntu-24.04' || 'ubuntu-latest' }}
@@ -19,17 +22,9 @@ jobs:
     steps:
       - uses: actions/checkout@v6
 
-      - name: Setup go
-        uses: actions/setup-go@v5
+      - uses: ./.github/actions/setup-go
         with:
-          go-version-file: ./go.mod
-
-      - name: Configure Git for private modules
-        run: |
-          git config --global url."https://x-access-token:${{ secrets.GH_PRIVATE_TOKEN }}@github.com/".insteadOf "https://github.com/"
-
-      - name: Bootstrap
-        run: ./scripts/bootstrap
+          stainless-api-key: ${{ secrets.STAINLESS_API_KEY }}
 
       - name: Run lints
         run: ./scripts/lint
@@ -40,17 +35,9 @@ jobs:
     steps:
       - uses: actions/checkout@v6
 
-      - name: Setup go
-        uses: actions/setup-go@v5
+      - uses: ./.github/actions/setup-go
         with:
-          go-version-file: ./go.mod
-
-      - name: Configure Git for private modules
-        run: |
-          git config --global url."https://x-access-token:${{ secrets.GH_PRIVATE_TOKEN }}@github.com/".insteadOf "https://github.com/"
-
-      - name: Bootstrap
-        run: ./scripts/bootstrap
+          stainless-api-key: ${{ secrets.STAINLESS_API_KEY }}
 
       - name: Run tests
         run: ./scripts/test

@@ -3,12 +3,12 @@
 page_title: "gcore_fastedge_apps Data Source - gcore"
 subcategory: ""
 description: |-
-  Apps are descriptions of edge apps, that reference the binary and may contain app-specific settings, such as environment variables.
+  FastEdge applications combine a WebAssembly binary with configuration, environment variables, and secrets for deployment at the CDN edge.
 ---
 
 # gcore_fastedge_apps (Data Source)
 
-Apps are descriptions of edge apps, that reference the binary and may contain app-specific settings, such as environment variables.
+FastEdge applications combine a WebAssembly binary with configuration, environment variables, and secrets for deployment at the CDN edge.
 
 ## Example Usage
 

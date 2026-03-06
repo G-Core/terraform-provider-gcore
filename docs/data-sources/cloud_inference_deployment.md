@@ -3,12 +3,12 @@
 page_title: "gcore_cloud_inference_deployment Data Source - gcore"
 subcategory: ""
 description: |-
-  
+  Inference deployments run containerized ML models with configurable scaling, health probes, and GPU flavors.
 ---
 
 # gcore_cloud_inference_deployment (Data Source)
 
-
+Inference deployments run containerized ML models with configurable scaling, health probes, and GPU flavors.
 
 ## Example Usage
 

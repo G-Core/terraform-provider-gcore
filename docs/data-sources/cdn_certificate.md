@@ -3,12 +3,12 @@
 page_title: "gcore_cdn_certificate Data Source - gcore"
 subcategory: ""
 description: |-
-  
+  CDN SSL certificates enable HTTPS content delivery, supporting both uploaded certificates and automated Let's Encrypt provisioning.
 ---
 
 # gcore_cdn_certificate (Data Source)
 
-
+CDN SSL certificates enable HTTPS content delivery, supporting both uploaded certificates and automated Let's Encrypt provisioning.
 
 ## Example Usage
 

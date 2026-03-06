@@ -18,6 +18,7 @@ var _ resource.ResourceWithConfigValidators = (*CloudFileShareAccessRuleResource
 
 func ResourceSchema(ctx context.Context) schema.Schema {
 	return schema.Schema{
+		Description: "File share access rules control which IP addresses can mount a file share and their permissions (read-only or read-write).",
 		Attributes: map[string]schema.Attribute{
 			"id": schema.StringAttribute{
 				Description:   "Access Rule ID",

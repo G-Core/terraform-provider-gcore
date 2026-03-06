@@ -1,4 +1,4 @@
-module github.com/stainless-sdks/gcore-terraform
+module github.com/G-Core/terraform-provider-gcore
 
 go 1.24.0
 

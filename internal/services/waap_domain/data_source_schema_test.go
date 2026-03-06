@@ -6,8 +6,8 @@ import (
 	"context"
 	"testing"
 
-	"github.com/stainless-sdks/gcore-terraform/internal/services/waap_domain"
-	"github.com/stainless-sdks/gcore-terraform/internal/test_helpers"
+	"github.com/G-Core/terraform-provider-gcore/internal/services/waap_domain"
+	"github.com/G-Core/terraform-provider-gcore/internal/test_helpers"
 )
 
 func TestWaapDomainDataSourceModelSchemaParity(t *testing.T) {

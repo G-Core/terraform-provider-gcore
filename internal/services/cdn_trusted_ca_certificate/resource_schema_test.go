@@ -6,8 +6,8 @@ import (
 	"context"
 	"testing"
 
-	"github.com/stainless-sdks/gcore-terraform/internal/services/cdn_trusted_ca_certificate"
-	"github.com/stainless-sdks/gcore-terraform/internal/test_helpers"
+	"github.com/G-Core/terraform-provider-gcore/internal/services/cdn_trusted_ca_certificate"
+	"github.com/G-Core/terraform-provider-gcore/internal/test_helpers"
 )
 
 func TestCDNTrustedCaCertificateModelSchemaParity(t *testing.T) {

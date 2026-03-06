@@ -3,12 +3,12 @@
 page_title: "gcore_cloud_security_group_rule Resource - gcore"
 subcategory: ""
 description: |-
-  
+  Security group rules define individual traffic permissions specifying protocol, port range, direction, and allowed sources.
 ---
 
 # gcore_cloud_security_group_rule (Resource)
 
-
+Security group rules define individual traffic permissions specifying protocol, port range, direction, and allowed sources.
 
 ## Example Usage
 
@@ -54,3 +54,6 @@ Available values: "ah", "any", "dccp", "egp", "esp", "gre", "icmp", "igmp", "ipe
 ### Read-Only
 
 - `id` (String) The ID of this resource.
+- `tasks` (List of String) List of task IDs representing asynchronous operations. Use these IDs to monitor operation progress:
+- `GET /v1/tasks/{task_id}` - Check individual task status and details
+Poll task status until completion (`FINISHED`/`ERROR`) before proceeding with dependent operations.

@@ -3,12 +3,12 @@
 page_title: "gcore_dns_zone Data Source - gcore"
 subcategory: ""
 description: |-
-  
+  DNS zones are authoritative containers for domain name records, with support for DNSSEC and SOA configuration.
 ---
 
 # gcore_dns_zone (Data Source)
 
-
+DNS zones are authoritative containers for domain name records, with support for DNSSEC and SOA configuration.
 
 ## Example Usage
 

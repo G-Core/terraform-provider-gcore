@@ -3,12 +3,12 @@
 page_title: "gcore_fastedge_secret Resource - gcore"
 subcategory: ""
 description: |-
-  Secret values that can be used in apps
+  FastEdge secrets store sensitive values such as API keys and tokens that can be referenced by FastEdge applications.
 ---
 
 # gcore_fastedge_secret (Resource)
 
-Secret values that can be used in apps
+FastEdge secrets store sensitive values such as API keys and tokens that can be referenced by FastEdge applications.
 
 ## Example Usage
 
@@ -49,7 +49,7 @@ Required:
 
 Optional:
 
-- `value` (String, Sensitive) The value of the secret. Write-only: sent to the API but never stored in state. Changes are detected by comparing the local SHA-256 hash with the server checksum.
+- `value` (String) The value of the secret.
 
 Read-Only:
 

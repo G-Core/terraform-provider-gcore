@@ -4,11 +4,11 @@ import (
 	"context"
 	"testing"
 
+	"github.com/G-Core/terraform-provider-gcore/internal/planmodifiers"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/tfsdk"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-go/tftypes"
-	"github.com/stainless-sdks/gcore-terraform/internal/planmodifiers"
 )
 
 func TestUseStateForUnknownIncludingNullString_UnknownPlan_NullState(t *testing.T) {

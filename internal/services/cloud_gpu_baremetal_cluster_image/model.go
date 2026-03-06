@@ -3,9 +3,9 @@
 package cloud_gpu_baremetal_cluster_image
 
 import (
+	"github.com/G-Core/terraform-provider-gcore/internal/apijson"
 	"github.com/hashicorp/terraform-plugin-framework-timetypes/timetypes"
 	"github.com/hashicorp/terraform-plugin-framework/types"
-	"github.com/stainless-sdks/gcore-terraform/internal/apijson"
 )
 
 type CloudGPUBaremetalClusterImageModel struct {
@@ -17,7 +17,7 @@ type CloudGPUBaremetalClusterImageModel struct {
 	HwFirmwareType   types.String             `tfsdk:"hw_firmware_type" json:"hw_firmware_type,optional,no_refresh"`
 	OsDistro         types.String             `tfsdk:"os_distro" json:"os_distro,optional"`
 	OsVersion        types.String             `tfsdk:"os_version" json:"os_version,optional"`
-	Tags             *map[string]types.String       `tfsdk:"tags" json:"tags,optional,no_refresh"`
+	Tags             *map[string]types.String `tfsdk:"tags" json:"tags,optional,no_refresh"`
 	Architecture     types.String             `tfsdk:"architecture" json:"architecture,computed_optional"`
 	CowFormat        types.Bool               `tfsdk:"cow_format" json:"cow_format,computed_optional,no_refresh"`
 	OsType           types.String             `tfsdk:"os_type" json:"os_type,computed_optional"`

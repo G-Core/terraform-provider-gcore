@@ -41,6 +41,10 @@ Cover at minimum:
 | `UseEmptyListWhenConfigNull()` | List | Sets empty list when config null (for clearing lists) |
 | `UseStateForUnknownIncludingNullString()` | String | Preserves state (including null) when plan unknown |
 | `UseStateForUnknownIncludingNullObject()` | Object | Preserves state (including null) when plan unknown |
+| `{Bool,Int64,String,Set,Object}UseStateForUnknownInclNull()` | Various | Generic variants preserving state (including null) when plan unknown (in `use_state_for_unknown_incl_null.go`) |
+| `ObjectPreserveNullState()` | Object | Preserves null state when plan unknown; does not compute when neither config nor state specifies the object |
+| `StringRequiresReplaceIfConfiguredPreservingState()` | String | Import-safe replacement: requires replace only when both config and state have known values that differ. Skips replacement when state is null (e.g., after importing a resource with a write-only field like `origin` that the API doesn't return in GET responses) |
+| `SetSuppressServerAdditions()` | Set | Suppresses drift when the API enriches a user-provided set with server-managed elements. If every config element exists in state and state has more, uses state value |
 
 ## Resource-Specific Modifier Inventory
 

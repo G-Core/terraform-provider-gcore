@@ -3,12 +3,12 @@
 page_title: "gcore_cloud_instance_image Data Source - gcore"
 subcategory: ""
 description: |-
-  
+  Instance images are operating system images (public, private, or shared) used to boot cloud instances.
 ---
 
 # gcore_cloud_instance_image (Data Source)
 
-
+Instance images are operating system images (public, private, or shared) used to boot cloud instances.
 
 ## Example Usage
 

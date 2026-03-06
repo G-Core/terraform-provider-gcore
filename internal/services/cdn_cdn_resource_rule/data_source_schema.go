@@ -5,6 +5,7 @@ package cdn_cdn_resource_rule
 import (
 	"context"
 
+	"github.com/G-Core/terraform-provider-gcore/internal/customfield"
 	"github.com/hashicorp/terraform-plugin-framework-jsontypes/jsontypes"
 	"github.com/hashicorp/terraform-plugin-framework-validators/int64validator"
 	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
@@ -12,14 +13,13 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/datasource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
 	"github.com/hashicorp/terraform-plugin-framework/types"
-	"github.com/stainless-sdks/gcore-terraform/internal/customfield"
 )
 
 var _ datasource.DataSourceWithConfigValidators = (*CDNCDNResourceRuleDataSource)(nil)
 
 func DataSourceSchema(ctx context.Context) schema.Schema {
 	return schema.Schema{
-		Description: "Rules allow to set up custom settings for certain file types or paths.\nBy default, the rule inherits all options values from the related CDN resource.\n\nEach option in rule settings can be in one of the following states:\n- **Inherit** - Option is not added to the rule. Option inherits its value from the CDN resource settings. In this case, the option value is **null**.\n- **ON** - Option is added to the rule and enabled. Option values configured in the rule will override values from the CDN resource settings.\n- **OFF** - Option is added to the rule and disabled. Option will be turned off.",
+		Description: "CDN resource rules set custom caching, delivery, and security options for specific URL patterns or file types.",
 		Attributes: map[string]schema.Attribute{
 			"id": schema.Int64Attribute{
 				Computed: true,

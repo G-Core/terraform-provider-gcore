@@ -9,6 +9,46 @@ import (
 
 	"github.com/G-Core/gcore-go"
 	"github.com/G-Core/gcore-go/option"
+	"github.com/G-Core/terraform-provider-gcore/internal/services/cdn_cdn_resource_rule"
+	"github.com/G-Core/terraform-provider-gcore/internal/services/cdn_certificate"
+	"github.com/G-Core/terraform-provider-gcore/internal/services/cdn_origin_group"
+	"github.com/G-Core/terraform-provider-gcore/internal/services/cdn_resource"
+	"github.com/G-Core/terraform-provider-gcore/internal/services/cdn_trusted_ca_certificate"
+	"github.com/G-Core/terraform-provider-gcore/internal/services/cloud_file_share"
+	"github.com/G-Core/terraform-provider-gcore/internal/services/cloud_file_share_access_rule"
+	"github.com/G-Core/terraform-provider-gcore/internal/services/cloud_floating_ip"
+	"github.com/G-Core/terraform-provider-gcore/internal/services/cloud_gpu_baremetal_cluster_image"
+	"github.com/G-Core/terraform-provider-gcore/internal/services/cloud_gpu_virtual_cluster"
+	"github.com/G-Core/terraform-provider-gcore/internal/services/cloud_gpu_virtual_cluster_image"
+	"github.com/G-Core/terraform-provider-gcore/internal/services/cloud_inference_deployment"
+	"github.com/G-Core/terraform-provider-gcore/internal/services/cloud_inference_registry_credential"
+	"github.com/G-Core/terraform-provider-gcore/internal/services/cloud_inference_secret"
+	"github.com/G-Core/terraform-provider-gcore/internal/services/cloud_instance"
+	"github.com/G-Core/terraform-provider-gcore/internal/services/cloud_instance_image"
+	"github.com/G-Core/terraform-provider-gcore/internal/services/cloud_k8s_cluster"
+	"github.com/G-Core/terraform-provider-gcore/internal/services/cloud_load_balancer"
+	"github.com/G-Core/terraform-provider-gcore/internal/services/cloud_load_balancer_listener"
+	"github.com/G-Core/terraform-provider-gcore/internal/services/cloud_load_balancer_pool"
+	"github.com/G-Core/terraform-provider-gcore/internal/services/cloud_load_balancer_pool_member"
+	"github.com/G-Core/terraform-provider-gcore/internal/services/cloud_network"
+	"github.com/G-Core/terraform-provider-gcore/internal/services/cloud_network_router"
+	"github.com/G-Core/terraform-provider-gcore/internal/services/cloud_network_subnet"
+	"github.com/G-Core/terraform-provider-gcore/internal/services/cloud_placement_group"
+	"github.com/G-Core/terraform-provider-gcore/internal/services/cloud_project"
+	"github.com/G-Core/terraform-provider-gcore/internal/services/cloud_region"
+	"github.com/G-Core/terraform-provider-gcore/internal/services/cloud_reserved_fixed_ip"
+	"github.com/G-Core/terraform-provider-gcore/internal/services/cloud_secret"
+	"github.com/G-Core/terraform-provider-gcore/internal/services/cloud_security_group"
+	"github.com/G-Core/terraform-provider-gcore/internal/services/cloud_security_group_rule"
+	"github.com/G-Core/terraform-provider-gcore/internal/services/cloud_ssh_key"
+	"github.com/G-Core/terraform-provider-gcore/internal/services/cloud_volume"
+	"github.com/G-Core/terraform-provider-gcore/internal/services/dns_network_mapping"
+	"github.com/G-Core/terraform-provider-gcore/internal/services/dns_zone"
+	"github.com/G-Core/terraform-provider-gcore/internal/services/dns_zone_rrset"
+	"github.com/G-Core/terraform-provider-gcore/internal/services/fastedge_app"
+	"github.com/G-Core/terraform-provider-gcore/internal/services/fastedge_binary"
+	"github.com/G-Core/terraform-provider-gcore/internal/services/fastedge_secret"
+	"github.com/G-Core/terraform-provider-gcore/internal/services/waap_domain"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/path"
@@ -16,45 +56,6 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/provider/schema"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/types"
-	"github.com/stainless-sdks/gcore-terraform/internal/services/cdn_cdn_resource_rule"
-	"github.com/stainless-sdks/gcore-terraform/internal/services/cdn_certificate"
-	"github.com/stainless-sdks/gcore-terraform/internal/services/cdn_origin_group"
-	"github.com/stainless-sdks/gcore-terraform/internal/services/cdn_trusted_ca_certificate"
-	"github.com/stainless-sdks/gcore-terraform/internal/services/cloud_file_share"
-	"github.com/stainless-sdks/gcore-terraform/internal/services/cloud_file_share_access_rule"
-	"github.com/stainless-sdks/gcore-terraform/internal/services/cloud_floating_ip"
-	"github.com/stainless-sdks/gcore-terraform/internal/services/cloud_gpu_baremetal_cluster_image"
-	"github.com/stainless-sdks/gcore-terraform/internal/services/cloud_gpu_virtual_cluster"
-	"github.com/stainless-sdks/gcore-terraform/internal/services/cloud_gpu_virtual_cluster_image"
-	"github.com/stainless-sdks/gcore-terraform/internal/services/cloud_inference_deployment"
-	"github.com/stainless-sdks/gcore-terraform/internal/services/cloud_inference_registry_credential"
-	"github.com/stainless-sdks/gcore-terraform/internal/services/cloud_inference_secret"
-	"github.com/stainless-sdks/gcore-terraform/internal/services/cloud_instance"
-	"github.com/stainless-sdks/gcore-terraform/internal/services/cloud_instance_image"
-	"github.com/stainless-sdks/gcore-terraform/internal/services/cloud_k8s_cluster"
-	"github.com/stainless-sdks/gcore-terraform/internal/services/cloud_load_balancer"
-	"github.com/stainless-sdks/gcore-terraform/internal/services/cloud_load_balancer_listener"
-	"github.com/stainless-sdks/gcore-terraform/internal/services/cloud_load_balancer_pool"
-	"github.com/stainless-sdks/gcore-terraform/internal/services/cloud_load_balancer_pool_member"
-	"github.com/stainless-sdks/gcore-terraform/internal/services/cloud_network"
-	"github.com/stainless-sdks/gcore-terraform/internal/services/cloud_network_router"
-	"github.com/stainless-sdks/gcore-terraform/internal/services/cloud_network_subnet"
-	"github.com/stainless-sdks/gcore-terraform/internal/services/cloud_placement_group"
-	"github.com/stainless-sdks/gcore-terraform/internal/services/cloud_project"
-	"github.com/stainless-sdks/gcore-terraform/internal/services/cloud_region"
-	"github.com/stainless-sdks/gcore-terraform/internal/services/cloud_reserved_fixed_ip"
-	"github.com/stainless-sdks/gcore-terraform/internal/services/cloud_secret"
-	"github.com/stainless-sdks/gcore-terraform/internal/services/cloud_security_group"
-	"github.com/stainless-sdks/gcore-terraform/internal/services/cloud_security_group_rule"
-	"github.com/stainless-sdks/gcore-terraform/internal/services/cloud_ssh_key"
-	"github.com/stainless-sdks/gcore-terraform/internal/services/cloud_volume"
-	"github.com/stainless-sdks/gcore-terraform/internal/services/dns_network_mapping"
-	"github.com/stainless-sdks/gcore-terraform/internal/services/dns_zone"
-	"github.com/stainless-sdks/gcore-terraform/internal/services/dns_zone_rrset"
-	"github.com/stainless-sdks/gcore-terraform/internal/services/fastedge_app"
-	"github.com/stainless-sdks/gcore-terraform/internal/services/fastedge_binary"
-	"github.com/stainless-sdks/gcore-terraform/internal/services/fastedge_secret"
-	"github.com/stainless-sdks/gcore-terraform/internal/services/waap_domain"
 )
 
 var _ provider.ProviderWithConfigValidators = (*GcoreProvider)(nil)
@@ -228,6 +229,7 @@ func (p *GcoreProvider) Resources(ctx context.Context) []func() resource.Resourc
 		cdn_origin_group.NewResource,
 		cdn_certificate.NewResource,
 		cdn_trusted_ca_certificate.NewResource,
+		cdn_resource.NewResource,
 	}
 }
 
@@ -289,6 +291,7 @@ func (p *GcoreProvider) DataSources(ctx context.Context) []func() datasource.Dat
 		cdn_cdn_resource_rule.NewCDNCDNResourceRuleDataSource,
 		cdn_certificate.NewCDNCertificateDataSource,
 		cdn_trusted_ca_certificate.NewCDNTrustedCaCertificateDataSource,
+		cdn_resource.NewCDNResourceDataSource,
 	}
 }
 

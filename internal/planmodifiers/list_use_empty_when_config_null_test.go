@@ -4,10 +4,10 @@ import (
 	"context"
 	"testing"
 
+	"github.com/G-Core/terraform-provider-gcore/internal/planmodifiers"
 	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/types"
-	"github.com/stainless-sdks/gcore-terraform/internal/planmodifiers"
 )
 
 func TestUseEmptyListWhenConfigNull_NullConfig_WithState(t *testing.T) {

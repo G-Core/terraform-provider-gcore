@@ -4,9 +4,9 @@ import (
 	"context"
 	"testing"
 
+	"github.com/G-Core/terraform-provider-gcore/internal/planmodifiers"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/types"
-	"github.com/stainless-sdks/gcore-terraform/internal/planmodifiers"
 )
 
 func TestRequiresReplaceIfConfiguredPreservingState_NullConfig_WithState(t *testing.T) {
