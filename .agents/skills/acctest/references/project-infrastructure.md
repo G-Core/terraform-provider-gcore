@@ -5,7 +5,7 @@
 Protocol V6 provider factories and PreCheck:
 
 ```go
-import "github.com/stainless-sdks/gcore-terraform/internal/acctest"
+import "github.com/G-Core/terraform-provider-gcore/internal/acctest"
 
 // use in every TestCase
 acctest.ProtoV6ProviderFactories  // map[string]func() (tfprotov6.ProviderServer, error)

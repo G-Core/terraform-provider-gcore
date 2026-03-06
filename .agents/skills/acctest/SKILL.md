@@ -44,7 +44,7 @@ import (
     "github.com/hashicorp/terraform-plugin-testing/statecheck"
     "github.com/hashicorp/terraform-plugin-testing/tfjsonpath"
 
-    "github.com/stainless-sdks/gcore-terraform/internal/acctest"
+    "github.com/G-Core/terraform-provider-gcore/internal/acctest"
 )
 
 func TestAccCloudExample_basic(t *testing.T) {
@@ -107,8 +107,8 @@ import (
     "fmt"
 
     "github.com/hashicorp/terraform-plugin-testing/helper/resource"
-    "github.com/stainless-sdks/gcore-terraform/internal/acctest"
-    "github.com/stainless-sdks/gcore-terraform/internal/sweep"
+    "github.com/G-Core/terraform-provider-gcore/internal/acctest"
+    "github.com/G-Core/terraform-provider-gcore/internal/sweep"
 )
 
 func init() {
