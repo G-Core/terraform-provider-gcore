@@ -14,7 +14,7 @@ FastEdge binaries are immutable WebAssembly modules that implement edge applicat
 
 ```terraform
 resource "gcore_fastedge_binary" "example_fastedge_binary" {
-  body = null
+  body = "Example data"
 }
 ```
 
