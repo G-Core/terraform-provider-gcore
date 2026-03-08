@@ -6,13 +6,11 @@ import (
 	"fmt"
 	"log"
 	"strings"
-	"time"
 
 	gcorecloud "github.com/G-Core/gcorelabscloud-go"
 	ai "github.com/G-Core/gcorelabscloud-go/gcore/ai/v1/ais"
 	"github.com/G-Core/gcorelabscloud-go/gcore/instance/v1/instances"
 	"github.com/G-Core/gcorelabscloud-go/gcore/instance/v1/types"
-	"github.com/G-Core/gcorelabscloud-go/gcore/securitygroup/v1/securitygroups"
 	"github.com/G-Core/gcorelabscloud-go/gcore/task/v1/tasks"
 	"github.com/G-Core/gcorelabscloud-go/gcore/utils/metadata/v1/metadata"
 	"github.com/G-Core/gcorelabscloud-go/gcore/volume/v1/volumes"
@@ -20,7 +18,7 @@ import (
 	"github.com/hashicorp/go-cty/cty"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
-	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/retry"
+
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 )
 
@@ -39,10 +37,7 @@ const (
 	ActiveStatus    = "ACTIVE"
 )
 
-const (
-	SgStateAssigned   = "assigned"
-	SgStateUnassigned = "unassigned"
-)
+// Security group state constants removed; not used anymore
 
 const (
 	StatusErrorMessage = "cluster status is not '%s'"
@@ -283,6 +278,7 @@ func resourceAICluster() *schema.Resource {
 				Type:        schema.TypeSet,
 				Description: "Security groups attached to the cluster",
 				Optional:    true,
+				ForceNew:    true,
 				Set:         aiSgHashID,
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
@@ -773,23 +769,7 @@ func map2AttachInterfaceOpts(interfaces []interface{}) []ai.AttachInterfaceOpts 
 	return result
 }
 
-func AICluserSgRefreshedFunc(client *gcorecloud.ServiceClient, clusterID string, sgID string) retry.StateRefreshFunc {
-	return func() (interface{}, string, error) {
-		aiPorts, err := ai.ListPortsAll(client, clusterID)
-		if err != nil {
-			return aiPorts, "", err
-		}
-		portSgSet := make(map[string]bool)
-		for _, sgItem := range aiPorts[0].SecurityGroups {
-			portSgSet[sgItem.ID] = true
-		}
-		state := SgStateUnassigned
-		if _, found := portSgSet[sgID]; found {
-			state = SgStateAssigned
-		}
-		return aiPorts, state, nil
-	}
-}
+// Security group assign/unassign flow removed; API no longer supports it.
 
 func getDetachOptions(instanceInterfaces []instances.Interface, detachIface ai.AttachInterfaceOpts) (*ai.DetachInterfaceOpts, error) {
 	allDetachMap := make(map[string]ai.DetachInterfaceOpts, len(instanceInterfaces))
@@ -909,12 +889,6 @@ func resourceAIClusterUpdate(ctx context.Context, d *schema.ResourceData, m inte
 	// Make resize
 	if d.HasChanges("instances_count") {
 		IsResize = true
-		_, newSGs := d.GetChange("security_group")
-		securityGroupList := newSGs.(*schema.Set).List()
-		securityGroupIDs := make([]gcorecloud.ItemID, len(securityGroupList))
-		for sgIndex, sgID := range securityGroupList {
-			securityGroupIDs[sgIndex] = gcorecloud.ItemID{ID: sgID.(map[string]interface{})["id"].(string)}
-		}
 
 		instancesCount, ok := d.GetOk("instances_count")
 		if !ok || instancesCount.(int) == 0 {
@@ -1061,63 +1035,7 @@ func resourceAIClusterUpdate(ctx context.Context, d *schema.ResourceData, m inte
 		}
 	}
 
-	if d.HasChange("security_group") && !IsResize {
-		sgClient, err := CreateClient(provider, d, securityGroupPoint, versionPointV1)
-		if err != nil {
-			return diag.FromErr(err)
-		}
-		oldSecGroups, newSecGroups := d.GetChange("security_group")
-		newSecGroupSet := newSecGroups.(*schema.Set)
-		oldSecGroupSet := oldSecGroups.(*schema.Set)
-		for _, addSG := range newSecGroupSet.Difference(oldSecGroupSet).List() {
-			sgID := addSG.(map[string]interface{})["id"].(string)
-			result, err := securitygroups.Get(sgClient, sgID).Extract()
-			if err != nil {
-				return diag.FromErr(err)
-			}
-			opts := instances.SecurityGroupOpts{Name: result.Name}
-			log.Printf("[DEBUG] assing to ai cluster sg ID %v, name %v", sgID, result.Name)
-			err = ai.AssignSecurityGroup(clientV1, clusterID, opts).ExtractErr()
-			if err != nil {
-				return diag.FromErr(fmt.Errorf("assign security group ID %v: %w", sgID, err))
-			}
-			stopWaitConf := retry.StateChangeConf{
-				Target:     []string{SgStateAssigned},
-				Refresh:    AICluserSgRefreshedFunc(clientV1, clusterID, sgID),
-				Timeout:    3 * time.Minute,
-				Delay:      10 * time.Second,
-				MinTimeout: 5 * time.Second,
-			}
-			_, err = stopWaitConf.WaitForStateContext(ctx)
-			if err != nil {
-				return diag.Errorf("Error waiting for sg (%s) assigned): %s", sgID, err)
-			}
-		}
-		for _, delSG := range oldSecGroupSet.Difference(newSecGroupSet).List() {
-			sgID := delSG.(map[string]interface{})["id"].(string)
-			result, err := securitygroups.Get(sgClient, sgID).Extract()
-			if err != nil {
-				return diag.FromErr(err)
-			}
-			opts := instances.SecurityGroupOpts{Name: result.Name}
-			log.Printf("[DEBUG] unassing from ai cluster sg ID %v, name %v", sgID, result.Name)
-			err = ai.UnAssignSecurityGroup(clientV1, clusterID, opts).ExtractErr()
-			if err != nil {
-				return diag.FromErr(fmt.Errorf("unassign security group %v: %w", sgID, err))
-			}
-			stopWaitConf := retry.StateChangeConf{
-				Target:     []string{SgStateUnassigned},
-				Refresh:    AICluserSgRefreshedFunc(clientV1, clusterID, sgID),
-				Timeout:    3 * time.Minute,
-				Delay:      10 * time.Second,
-				MinTimeout: 5 * time.Second,
-			}
-			_, err = stopWaitConf.WaitForStateContext(ctx)
-			if err != nil {
-				return diag.Errorf("Error waiting for sg (%s) unassigned): %s", sgID, err)
-			}
-		}
-	}
+	// Security group updates via API are not supported; changes to security_group will ForceNew.
 
 	if d.HasChange("cluster_metadata") && !IsResize {
 		_, newMeta := d.GetChange("cluster_metadata")
