@@ -79,10 +79,6 @@ func DataSourceSchema(ctx context.Context) schema.Schema {
 				Description: "True when the network is shared with your project by external owner",
 				Computed:    true,
 			},
-			"task_id": schema.StringAttribute{
-				Description: "The UUID of the active task that currently holds a lock on the resource. This lock prevents concurrent modifications to ensure consistency. If `null`, the resource is not locked.",
-				Computed:    true,
-			},
 			"type": schema.StringAttribute{
 				Description: "Network type (vlan, vxlan)",
 				Computed:    true,

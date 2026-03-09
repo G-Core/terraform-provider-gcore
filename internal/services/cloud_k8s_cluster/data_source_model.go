@@ -31,7 +31,6 @@ type CloudK8SClusterDataSourceModel struct {
 	ServicesIPPool   types.String                                                           `tfsdk:"services_ip_pool" json:"services_ip_pool,computed"`
 	ServicesIpv6Pool types.String                                                           `tfsdk:"services_ipv6_pool" json:"services_ipv6_pool,computed"`
 	Status           types.String                                                           `tfsdk:"status" json:"status,computed"`
-	TaskID           types.String                                                           `tfsdk:"task_id" json:"task_id,computed"`
 	Version          types.String                                                           `tfsdk:"version" json:"version,computed"`
 	AutoscalerConfig customfield.Map[types.String]                                          `tfsdk:"autoscaler_config" json:"autoscaler_config,computed"`
 	AddOns           customfield.NestedObject[CloudK8SClusterAddOnsDataSourceModel]         `tfsdk:"add_ons" json:"add_ons,computed"`

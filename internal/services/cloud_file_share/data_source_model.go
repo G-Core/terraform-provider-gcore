@@ -30,7 +30,6 @@ type CloudFileShareDataSourceModel struct {
 	Status           types.String                                                         `tfsdk:"status" json:"status,computed"`
 	SubnetID         types.String                                                         `tfsdk:"subnet_id" json:"subnet_id,computed"`
 	SubnetName       types.String                                                         `tfsdk:"subnet_name" json:"subnet_name,computed"`
-	TaskID           types.String                                                         `tfsdk:"task_id" json:"task_id,computed"`
 	TypeName         types.String                                                         `tfsdk:"type_name" json:"type_name,computed"`
 	ShareSettings    customfield.NestedObject[CloudFileShareShareSettingsDataSourceModel] `tfsdk:"share_settings" json:"share_settings,computed"`
 	Tags             customfield.NestedObjectList[CloudFileShareTagsDataSourceModel]      `tfsdk:"tags" json:"tags,computed"`

@@ -106,10 +106,6 @@ func DataSourceSchema(ctx context.Context) schema.Schema {
 				Description: "Region name",
 				Computed:    true,
 			},
-			"task_id": schema.StringAttribute{
-				Description: "The UUID of the active task that currently holds a lock on the resource. This lock prevents concurrent modifications to ensure consistency. If `null`, the resource is not locked.",
-				Computed:    true,
-			},
 			"updated_at": schema.StringAttribute{
 				Description: "Datetime when the load balancer was last updated",
 				Computed:    true,
@@ -436,10 +432,6 @@ func DataSourceSchema(ctx context.Context) schema.Schema {
 									},
 								},
 							},
-						},
-						"task_id": schema.StringAttribute{
-							Description: "The UUID of the active task that currently holds a lock on the resource. This lock prevents concurrent modifications to ensure consistency. If `null`, the resource is not locked.",
-							Computed:    true,
 						},
 						"updated_at": schema.StringAttribute{
 							Description: "Datetime when the floating IP was last updated",

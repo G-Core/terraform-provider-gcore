@@ -22,9 +22,7 @@ type CloudNetworkRouterModel struct {
 	Distributed         types.Bool                                                           `tfsdk:"distributed" json:"distributed,computed"`
 	Region              types.String                                                         `tfsdk:"region" json:"region,computed"`
 	Status              types.String                                                         `tfsdk:"status" json:"status,computed"`
-	TaskID              types.String                                                         `tfsdk:"task_id" json:"task_id,computed"`
 	UpdatedAt           timetypes.RFC3339                                                    `tfsdk:"updated_at" json:"updated_at,computed" format:"date-time"`
-	Tasks               customfield.List[types.String]                                       `tfsdk:"tasks" json:"tasks,computed,no_refresh"`
 }
 
 func (m CloudNetworkRouterModel) MarshalJSON() (data []byte, err error) {

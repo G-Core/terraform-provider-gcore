@@ -67,7 +67,6 @@ Read-Only:
 - `shared` (Boolean) True when the network is shared with your project by external owner
 - `subnets` (List of String) List of subnetworks
 - `tags` (Attributes List) List of key-value tags associated with the resource. A tag is a key-value pair that can be associated with a resource, enabling efficient filtering and grouping for better organization and management. Some tags are read-only and cannot be modified by the user. Tags are also integrated with cost reports, allowing cost data to be filtered based on tag keys or values. (see [below for nested schema](#nestedatt--items--tags))
-- `task_id` (String) The UUID of the active task that currently holds a lock on the resource. This lock prevents concurrent modifications to ensure consistency. If `null`, the resource is not locked.
 - `type` (String) Network type (vlan, vxlan)
 - `updated_at` (String) Datetime when the network was last updated
 

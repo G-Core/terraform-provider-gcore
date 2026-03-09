@@ -5,7 +5,6 @@ package cloud_gpu_virtual_cluster_image
 import (
 	"context"
 
-	"github.com/G-Core/terraform-provider-gcore/internal/customfield"
 	"github.com/hashicorp/terraform-plugin-framework-timetypes/timetypes"
 	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
@@ -151,10 +150,6 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 				Description: "Image status",
 				Computed:    true,
 			},
-			"task_id": schema.StringAttribute{
-				Description: "The UUID of the active task that currently holds a lock on the resource. This lock prevents concurrent modifications to ensure consistency. If `null`, the resource is not locked.",
-				Computed:    true,
-			},
 			"updated_at": schema.StringAttribute{
 				Description: "Datetime when the image was updated",
 				Computed:    true,
@@ -163,12 +158,6 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 			"visibility": schema.StringAttribute{
 				Description: "Image visibility. Globally visible images are public",
 				Computed:    true,
-			},
-			"tasks": schema.ListAttribute{
-				Description: "List of task IDs representing asynchronous operations. Use these IDs to monitor operation progress:\n- `GET /v1/tasks/{task_id}` - Check individual task status and details\nPoll task status until completion (`FINISHED`/`ERROR`) before proceeding with dependent operations.",
-				Computed:    true,
-				CustomType:  customfield.NewListType[types.String](ctx),
-				ElementType: types.StringType,
 			},
 		},
 	}

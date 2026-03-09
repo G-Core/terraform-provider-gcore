@@ -30,7 +30,6 @@ type CloudLoadBalancerListenerDataSourceModel struct {
 	ProtocolPort         types.Int64                                                                    `tfsdk:"protocol_port" json:"protocol_port,computed"`
 	ProvisioningStatus   types.String                                                                   `tfsdk:"provisioning_status" json:"provisioning_status,computed"`
 	SecretID             types.String                                                                   `tfsdk:"secret_id" json:"secret_id,computed"`
-	TaskID               types.String                                                                   `tfsdk:"task_id" json:"task_id,computed"`
 	TimeoutClientData    types.Int64                                                                    `tfsdk:"timeout_client_data" json:"timeout_client_data,computed"`
 	TimeoutMemberConnect types.Int64                                                                    `tfsdk:"timeout_member_connect" json:"timeout_member_connect,computed"`
 	TimeoutMemberData    types.Int64                                                                    `tfsdk:"timeout_member_data" json:"timeout_member_data,computed"`

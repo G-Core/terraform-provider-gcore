@@ -237,10 +237,6 @@ func ListDataSourceSchema(ctx context.Context) schema.Schema {
 							CustomType:  customfield.NewListType[types.String](ctx),
 							ElementType: types.StringType,
 						},
-						"task_id": schema.StringAttribute{
-							Description: "The UUID of the active task that currently holds a lock on the resource. This lock prevents concurrent modifications to ensure consistency. If `null`, the resource is not locked.",
-							Computed:    true,
-						},
 						"updated_at": schema.StringAttribute{
 							Description: "The date and time when the volume was last updated.",
 							Computed:    true,

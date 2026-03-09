@@ -53,8 +53,6 @@ resource "gcore_cloud_secret" "example_cloud_secret" {
 - `secret_type` (String) Secret type, base64 encoded. symmetric - Used for storing byte arrays such as keys suitable for symmetric encryption; public - Used for storing the public key of an asymmetric keypair; private - Used for storing the private key of an asymmetric keypair; passphrase - Used for storing plain text passphrases; certificate - Used for storing cryptographic certificates such as X.509 certificates; opaque - Used for backwards compatibility with previous versions of the API
 Available values: "certificate", "opaque", "passphrase", "private", "public", "symmetric".
 - `status` (String) Status
-- `tasks` (List of String) List of task IDs representing asynchronous operations. Use these IDs to monitor operation progress:
-- `GET /v1/tasks/{task_id}` - Check individual task status and details
 Poll task status until completion (`FINISHED`/`ERROR`) before proceeding with dependent operations.
 
 <a id="nestedatt--payload"></a>

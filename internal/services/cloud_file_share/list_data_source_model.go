@@ -63,7 +63,6 @@ type CloudFileSharesItemsDataSourceModel struct {
 	SubnetID         types.String                                                          `tfsdk:"subnet_id" json:"subnet_id,computed"`
 	SubnetName       types.String                                                          `tfsdk:"subnet_name" json:"subnet_name,computed"`
 	Tags             customfield.NestedObjectList[CloudFileSharesTagsDataSourceModel]      `tfsdk:"tags" json:"tags,computed"`
-	TaskID           types.String                                                          `tfsdk:"task_id" json:"task_id,computed"`
 	TypeName         types.String                                                          `tfsdk:"type_name" json:"type_name,computed"`
 }
 

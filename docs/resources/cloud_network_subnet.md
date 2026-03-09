@@ -66,10 +66,6 @@ Available values: 4, 6.
 - `has_router` (Boolean, Deprecated) Deprecated. Always returns `false`.
 - `id` (String) The ID of this resource.
 - `region` (String) Region name
-- `task_id` (String) The UUID of the active task that currently holds a lock on the resource. This lock prevents concurrent modifications to ensure consistency. If `null`, the resource is not locked.
-- `tasks` (List of String) List of task IDs representing asynchronous operations. Use these IDs to monitor operation progress:
-- `GET /v1/tasks/{task_id}` - Check individual task status and details
-Poll task status until completion (`FINISHED`/`ERROR`) before proceeding with dependent operations.
 - `total_ips` (Number) Total number of ips in subnet
 - `updated_at` (String) Datetime when the subnet was last updated
 

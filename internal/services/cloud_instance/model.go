@@ -35,7 +35,6 @@ type CloudInstanceModel struct {
 	InstanceDescription types.String                                                               `tfsdk:"instance_description" json:"instance_description,computed"`
 	Region              types.String                                                               `tfsdk:"region" json:"region,computed"`
 	Status              types.String                                                               `tfsdk:"status" json:"status,computed"`
-	TaskID              types.String                                                               `tfsdk:"task_id" json:"task_id,computed"`
 	TaskState           types.String                                                               `tfsdk:"task_state" json:"task_state,computed"`
 	VmState             types.String                                                               `tfsdk:"vm_state" json:"vm_state,computed_optional"`
 	Addresses           customfield.Map[customfield.NestedObjectList[CloudInstanceAddressesModel]] `tfsdk:"addresses" json:"addresses,computed"`

@@ -103,10 +103,6 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 				Description: "True when the network is shared with your project by external owner",
 				Computed:    true,
 			},
-			"task_id": schema.StringAttribute{
-				Description: "The UUID of the active task that currently holds a lock on the resource. This lock prevents concurrent modifications to ensure consistency. If `null`, the resource is not locked.",
-				Computed:    true,
-			},
 			"updated_at": schema.StringAttribute{
 				Description: "Datetime when the network was last updated",
 				Computed:    true,
@@ -114,12 +110,6 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 			},
 			"subnets": schema.ListAttribute{
 				Description: "List of subnetworks",
-				Computed:    true,
-				CustomType:  customfield.NewListType[types.String](ctx),
-				ElementType: types.StringType,
-			},
-			"tasks": schema.ListAttribute{
-				Description: "List of task IDs representing asynchronous operations. Use these IDs to monitor operation progress:\n- `GET /v1/tasks/{task_id}` - Check individual task status and details\nPoll task status until completion (`FINISHED`/`ERROR`) before proceeding with dependent operations.",
 				Computed:    true,
 				CustomType:  customfield.NewListType[types.String](ctx),
 				ElementType: types.StringType,

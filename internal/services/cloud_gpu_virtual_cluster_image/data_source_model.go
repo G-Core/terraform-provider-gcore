@@ -32,7 +32,6 @@ type CloudGPUVirtualClusterImageDataSourceModel struct {
 	Size             types.Int64                                                                  `tfsdk:"size" json:"size,computed"`
 	SSHKey           types.String                                                                 `tfsdk:"ssh_key" json:"ssh_key,computed"`
 	Status           types.String                                                                 `tfsdk:"status" json:"status,computed"`
-	TaskID           types.String                                                                 `tfsdk:"task_id" json:"task_id,computed"`
 	UpdatedAt        timetypes.RFC3339                                                            `tfsdk:"updated_at" json:"updated_at,computed" format:"date-time"`
 	Visibility       types.String                                                                 `tfsdk:"visibility" json:"visibility,computed"`
 	Tags             customfield.NestedObjectList[CloudGPUVirtualClusterImageTagsDataSourceModel] `tfsdk:"tags" json:"tags,computed"`

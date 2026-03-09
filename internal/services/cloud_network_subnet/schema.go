@@ -138,10 +138,6 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 				Description: "Region name",
 				Computed:    true,
 			},
-			"task_id": schema.StringAttribute{
-				Description: "The UUID of the active task that currently holds a lock on the resource. This lock prevents concurrent modifications to ensure consistency. If `null`, the resource is not locked.",
-				Computed:    true,
-			},
 			"total_ips": schema.Int64Attribute{
 				Description: "Total number of ips in subnet",
 				Computed:    true,
@@ -150,12 +146,6 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 				Description: "Datetime when the subnet was last updated",
 				Computed:    true,
 				CustomType:  timetypes.RFC3339Type{},
-			},
-			"tasks": schema.ListAttribute{
-				Description: "List of task IDs representing asynchronous operations. Use these IDs to monitor operation progress:\n- `GET /v1/tasks/{task_id}` - Check individual task status and details\nPoll task status until completion (`FINISHED`/`ERROR`) before proceeding with dependent operations.",
-				Computed:    true,
-				CustomType:  customfield.NewListType[types.String](ctx),
-				ElementType: types.StringType,
 			},
 		},
 	}

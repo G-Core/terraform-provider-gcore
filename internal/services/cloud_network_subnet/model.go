@@ -29,10 +29,8 @@ type CloudNetworkSubnetModel struct {
 	CreatorTaskID          types.String                                                    `tfsdk:"creator_task_id" json:"creator_task_id,computed"`
 	HasRouter              types.Bool                                                      `tfsdk:"has_router" json:"has_router,computed"`
 	Region                 types.String                                                    `tfsdk:"region" json:"region,computed"`
-	TaskID                 types.String                                                    `tfsdk:"task_id" json:"task_id,computed"`
 	TotalIPs               types.Int64                                                     `tfsdk:"total_ips" json:"total_ips,computed"`
 	UpdatedAt              timetypes.RFC3339                                               `tfsdk:"updated_at" json:"updated_at,computed" format:"date-time"`
-	Tasks                  customfield.List[types.String]                                  `tfsdk:"tasks" json:"tasks,computed,no_refresh"`
 }
 
 func (m CloudNetworkSubnetModel) MarshalJSON() (data []byte, err error) {

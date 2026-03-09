@@ -26,7 +26,6 @@ type CloudFloatingIPDataSourceModel struct {
 	Region            types.String                                                     `tfsdk:"region" json:"region,computed"`
 	RouterID          types.String                                                     `tfsdk:"router_id" json:"router_id,computed"`
 	Status            types.String                                                     `tfsdk:"status" json:"status,computed"`
-	TaskID            types.String                                                     `tfsdk:"task_id" json:"task_id,computed"`
 	UpdatedAt         timetypes.RFC3339                                                `tfsdk:"updated_at" json:"updated_at,computed" format:"date-time"`
 	Tags              customfield.NestedObjectList[CloudFloatingIPTagsDataSourceModel] `tfsdk:"tags" json:"tags,computed"`
 	FindOneBy         *CloudFloatingIPFindOneByDataSourceModel                         `tfsdk:"find_one_by"`

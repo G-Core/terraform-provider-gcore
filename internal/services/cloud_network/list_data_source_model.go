@@ -87,7 +87,6 @@ type CloudNetworksItemsDataSourceModel struct {
 	Shared              types.Bool                                                     `tfsdk:"shared" json:"shared,computed"`
 	Subnets             customfield.List[types.String]                                 `tfsdk:"subnets" json:"subnets,computed"`
 	Tags                customfield.NestedObjectList[CloudNetworksTagsDataSourceModel] `tfsdk:"tags" json:"tags,computed"`
-	TaskID              types.String                                                   `tfsdk:"task_id" json:"task_id,computed"`
 	Type                types.String                                                   `tfsdk:"type" json:"type,computed"`
 	UpdatedAt           timetypes.RFC3339                                              `tfsdk:"updated_at" json:"updated_at,computed" format:"date-time"`
 }

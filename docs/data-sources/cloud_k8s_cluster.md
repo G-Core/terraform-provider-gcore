@@ -58,7 +58,6 @@ It contains overrides to the default cluster-autoscaler parameters provided by t
 - `services_ipv6_pool` (String) The IPv6 pool for the services
 - `status` (String) Status
 Available values: "Deleting", "Provisioned", "Provisioning".
-- `task_id` (String) The UUID of the active task that currently holds a lock on the resource. This lock prevents concurrent modifications to ensure consistency. If `null`, the resource is not locked.
 - `version` (String) K8s version
 
 <a id="nestedatt--add_ons"></a>

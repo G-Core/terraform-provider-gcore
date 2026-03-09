@@ -71,7 +71,6 @@ type CloudFloatingIPsItemsDataSourceModel struct {
 	RouterID          types.String                                                          `tfsdk:"router_id" json:"router_id,computed"`
 	Status            types.String                                                          `tfsdk:"status" json:"status,computed"`
 	Tags              customfield.NestedObjectList[CloudFloatingIPsTagsDataSourceModel]     `tfsdk:"tags" json:"tags,computed"`
-	TaskID            types.String                                                          `tfsdk:"task_id" json:"task_id,computed"`
 	UpdatedAt         timetypes.RFC3339                                                     `tfsdk:"updated_at" json:"updated_at,computed" format:"date-time"`
 }
 
@@ -90,7 +89,6 @@ type CloudFloatingIPsInstanceDataSourceModel struct {
 	SSHKeyName          types.String                                                                                    `tfsdk:"ssh_key_name" json:"ssh_key_name,computed"`
 	Status              types.String                                                                                    `tfsdk:"status" json:"status,computed"`
 	Tags                customfield.NestedObjectList[CloudFloatingIPsInstanceTagsDataSourceModel]                       `tfsdk:"tags" json:"tags,computed"`
-	TaskID              types.String                                                                                    `tfsdk:"task_id" json:"task_id,computed"`
 	TaskState           types.String                                                                                    `tfsdk:"task_state" json:"task_state,computed"`
 	VmState             types.String                                                                                    `tfsdk:"vm_state" json:"vm_state,computed"`
 	Volumes             customfield.NestedObjectList[CloudFloatingIPsInstanceVolumesDataSourceModel]                    `tfsdk:"volumes" json:"volumes,computed"`
@@ -146,7 +144,6 @@ type CloudFloatingIPsLoadbalancerDataSourceModel struct {
 	Logging               customfield.NestedObject[CloudFloatingIPsLoadbalancerLoggingDataSourceModel]            `tfsdk:"logging" json:"logging,computed"`
 	PreferredConnectivity types.String                                                                            `tfsdk:"preferred_connectivity" json:"preferred_connectivity,computed"`
 	Stats                 customfield.NestedObject[CloudFloatingIPsLoadbalancerStatsDataSourceModel]              `tfsdk:"stats" json:"stats,computed"`
-	TaskID                types.String                                                                            `tfsdk:"task_id" json:"task_id,computed"`
 	UpdatedAt             timetypes.RFC3339                                                                       `tfsdk:"updated_at" json:"updated_at,computed" format:"date-time"`
 	VipAddress            types.String                                                                            `tfsdk:"vip_address" json:"vip_address,computed"`
 	VipFqdn               types.String                                                                            `tfsdk:"vip_fqdn" json:"vip_fqdn,computed"`
@@ -243,7 +240,6 @@ type CloudFloatingIPsLoadbalancerFloatingIPsDataSourceModel struct {
 	RouterID          types.String                                                                             `tfsdk:"router_id" json:"router_id,computed"`
 	Status            types.String                                                                             `tfsdk:"status" json:"status,computed"`
 	Tags              customfield.NestedObjectList[CloudFloatingIPsLoadbalancerFloatingIPsTagsDataSourceModel] `tfsdk:"tags" json:"tags,computed"`
-	TaskID            types.String                                                                             `tfsdk:"task_id" json:"task_id,computed"`
 	UpdatedAt         timetypes.RFC3339                                                                        `tfsdk:"updated_at" json:"updated_at,computed" format:"date-time"`
 }
 

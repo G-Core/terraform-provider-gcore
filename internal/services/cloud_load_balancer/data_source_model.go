@@ -29,7 +29,6 @@ type CloudLoadBalancerDataSourceModel struct {
 	PreferredConnectivity types.String                                                                 `tfsdk:"preferred_connectivity" json:"preferred_connectivity,computed"`
 	ProvisioningStatus    types.String                                                                 `tfsdk:"provisioning_status" json:"provisioning_status,computed"`
 	Region                types.String                                                                 `tfsdk:"region" json:"region,computed"`
-	TaskID                types.String                                                                 `tfsdk:"task_id" json:"task_id,computed"`
 	UpdatedAt             timetypes.RFC3339                                                            `tfsdk:"updated_at" json:"updated_at,computed" format:"date-time"`
 	VipAddress            types.String                                                                 `tfsdk:"vip_address" json:"vip_address,computed"`
 	VipFqdn               types.String                                                                 `tfsdk:"vip_fqdn" json:"vip_fqdn,computed"`
@@ -191,7 +190,6 @@ type CloudLoadBalancerFloatingIPsDataSourceModel struct {
 	RouterID          types.String                                                                  `tfsdk:"router_id" json:"router_id,computed"`
 	Status            types.String                                                                  `tfsdk:"status" json:"status,computed"`
 	Tags              customfield.NestedObjectList[CloudLoadBalancerFloatingIPsTagsDataSourceModel] `tfsdk:"tags" json:"tags,computed"`
-	TaskID            types.String                                                                  `tfsdk:"task_id" json:"task_id,computed"`
 	UpdatedAt         timetypes.RFC3339                                                             `tfsdk:"updated_at" json:"updated_at,computed" format:"date-time"`
 }
 

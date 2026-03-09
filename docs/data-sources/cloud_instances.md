@@ -101,7 +101,6 @@ Read-Only:
 - `status` (String) Instance status
 Available values: "ACTIVE", "BUILD", "DELETED", "ERROR", "HARD_REBOOT", "MIGRATING", "PASSWORD", "PAUSED", "REBOOT", "REBUILD", "RESCUE", "RESIZE", "REVERT_RESIZE", "SHELVED", "SHELVED_OFFLOADED", "SHUTOFF", "SOFT_DELETED", "SUSPENDED", "UNKNOWN", "VERIFY_RESIZE".
 - `tags` (Attributes List) List of key-value tags associated with the resource. A tag is a key-value pair that can be associated with a resource, enabling efficient filtering and grouping for better organization and management. Some tags are read-only and cannot be modified by the user. Tags are also integrated with cost reports, allowing cost data to be filtered based on tag keys or values. (see [below for nested schema](#nestedatt--items--tags))
-- `task_id` (String) The UUID of the active task that currently holds a lock on the resource. This lock prevents concurrent modifications to ensure consistency. If `null`, the resource is not locked.
 - `task_state` (String) Task state
 - `vm_state` (String) Virtual machine state (active)
 Available values: "active", "building", "deleted", "error", "paused", "rescued", "resized", "shelved", "shelved_offloaded", "soft-deleted", "stopped", "suspended".

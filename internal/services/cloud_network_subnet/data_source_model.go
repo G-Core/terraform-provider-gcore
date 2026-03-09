@@ -29,7 +29,6 @@ type CloudNetworkSubnetDataSourceModel struct {
 	Name           types.String                                                              `tfsdk:"name" json:"name,computed"`
 	NetworkID      types.String                                                              `tfsdk:"network_id" json:"network_id,computed"`
 	Region         types.String                                                              `tfsdk:"region" json:"region,computed"`
-	TaskID         types.String                                                              `tfsdk:"task_id" json:"task_id,computed"`
 	TotalIPs       types.Int64                                                               `tfsdk:"total_ips" json:"total_ips,computed"`
 	UpdatedAt      timetypes.RFC3339                                                         `tfsdk:"updated_at" json:"updated_at,computed" format:"date-time"`
 	DNSNameservers customfield.List[types.String]                                            `tfsdk:"dns_nameservers" json:"dns_nameservers,computed"`

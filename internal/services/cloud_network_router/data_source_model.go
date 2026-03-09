@@ -24,7 +24,6 @@ type CloudNetworkRouterDataSourceModel struct {
 	Name                types.String                                                                   `tfsdk:"name" json:"name,computed"`
 	Region              types.String                                                                   `tfsdk:"region" json:"region,computed"`
 	Status              types.String                                                                   `tfsdk:"status" json:"status,computed"`
-	TaskID              types.String                                                                   `tfsdk:"task_id" json:"task_id,computed"`
 	UpdatedAt           timetypes.RFC3339                                                              `tfsdk:"updated_at" json:"updated_at,computed" format:"date-time"`
 	ExternalGatewayInfo customfield.NestedObject[CloudNetworkRouterExternalGatewayInfoDataSourceModel] `tfsdk:"external_gateway_info" json:"external_gateway_info,computed"`
 	Interfaces          customfield.NestedObjectList[CloudNetworkRouterInterfacesDataSourceModel]      `tfsdk:"interfaces" json:"interfaces,computed"`

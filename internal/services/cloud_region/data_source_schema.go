@@ -143,11 +143,6 @@ func DataSourceSchema(ctx context.Context) schema.Schema {
 					),
 				},
 			},
-			"task_id": schema.StringAttribute{
-				Description:        "This field is deprecated and can be ignored",
-				Computed:           true,
-				DeprecationMessage: "This attribute is deprecated.",
-			},
 			"vlan_physical_network": schema.StringAttribute{
 				Description: "Physical network name to create vlan networks",
 				Computed:    true,

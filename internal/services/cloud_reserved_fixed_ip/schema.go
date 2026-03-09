@@ -123,20 +123,10 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 				Description: "ID of the subnet that owns the IPv6 address",
 				Computed:    true,
 			},
-			"task_id": schema.StringAttribute{
-				Description: "The UUID of the active task that currently holds a lock on the resource. This lock prevents concurrent modifications to ensure consistency. If `null`, the resource is not locked.",
-				Computed:    true,
-			},
 			"updated_at": schema.StringAttribute{
 				Description: "Datetime when the reserved fixed IP was last updated",
 				Computed:    true,
 				CustomType:  timetypes.RFC3339Type{},
-			},
-			"tasks": schema.ListAttribute{
-				Description: "List of task IDs representing asynchronous operations. Use these IDs to monitor operation progress:\n- `GET /v1/tasks/{task_id}` - Check individual task status and details\nPoll task status until completion (`FINISHED`/`ERROR`) before proceeding with dependent operations.",
-				Computed:    true,
-				CustomType:  customfield.NewListType[types.String](ctx),
-				ElementType: types.StringType,
 			},
 			"allowed_address_pairs": schema.ListNestedAttribute{
 				Description: "Group of subnet masks and/or IP addresses that share the current IP as VIP",
@@ -256,10 +246,6 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 								},
 							},
 						},
-					},
-					"task_id": schema.StringAttribute{
-						Description: "The UUID of the active task that currently holds a lock on the resource. This lock prevents concurrent modifications to ensure consistency. If `null`, the resource is not locked.",
-						Computed:    true,
 					},
 					"type": schema.StringAttribute{
 						Description: "Network type (vlan, vxlan)",

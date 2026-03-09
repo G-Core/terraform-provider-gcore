@@ -82,7 +82,6 @@ type CloudNetworkSubnetsItemsDataSourceModel struct {
 	GatewayIP      types.String                                                               `tfsdk:"gateway_ip" json:"gateway_ip,computed"`
 	HasRouter      types.Bool                                                                 `tfsdk:"has_router" json:"has_router,computed"`
 	HostRoutes     customfield.NestedObjectList[CloudNetworkSubnetsHostRoutesDataSourceModel] `tfsdk:"host_routes" json:"host_routes,computed"`
-	TaskID         types.String                                                               `tfsdk:"task_id" json:"task_id,computed"`
 	TotalIPs       types.Int64                                                                `tfsdk:"total_ips" json:"total_ips,computed"`
 }
 

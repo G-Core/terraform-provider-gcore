@@ -54,5 +54,4 @@ type CloudProjectsItemsDataSourceModel struct {
 	IsDefault   types.Bool        `tfsdk:"is_default" json:"is_default,computed"`
 	Name        types.String      `tfsdk:"name" json:"name,computed"`
 	State       types.String      `tfsdk:"state" json:"state,computed"`
-	TaskID      types.String      `tfsdk:"task_id" json:"task_id,computed"`
 }

@@ -26,10 +26,8 @@ type CloudNetworkModel struct {
 	Region              types.String                   `tfsdk:"region" json:"region,computed"`
 	SegmentationID      types.Int64                    `tfsdk:"segmentation_id" json:"segmentation_id,computed"`
 	Shared              types.Bool                     `tfsdk:"shared" json:"shared,computed"`
-	TaskID              types.String                   `tfsdk:"task_id" json:"task_id,computed"`
 	UpdatedAt           timetypes.RFC3339              `tfsdk:"updated_at" json:"updated_at,computed" format:"date-time"`
 	Subnets             customfield.List[types.String] `tfsdk:"subnets" json:"subnets,computed"`
-	Tasks               customfield.List[types.String] `tfsdk:"tasks" json:"tasks,computed,no_refresh"`
 }
 
 func (m CloudNetworkModel) MarshalJSON() (data []byte, err error) {

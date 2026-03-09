@@ -59,7 +59,6 @@ Read-Only:
 - `status` (String) Floating IP status. DOWN - unassigned (available). ACTIVE - attached to a port (in use). ERROR - error state.
 Available values: "ACTIVE", "DOWN", "ERROR".
 - `tags` (Attributes List) List of key-value tags associated with the resource. A tag is a key-value pair that can be associated with a resource, enabling efficient filtering and grouping for better organization and management. Some tags are read-only and cannot be modified by the user. Tags are also integrated with cost reports, allowing cost data to be filtered based on tag keys or values. (see [below for nested schema](#nestedatt--items--tags))
-- `task_id` (String) The UUID of the active task that currently holds a lock on the resource. This lock prevents concurrent modifications to ensure consistency. If `null`, the resource is not locked.
 - `updated_at` (String) Datetime when the floating IP was last updated
 
 <a id="nestedatt--items--instance"></a>
@@ -82,7 +81,6 @@ Read-Only:
 - `status` (String) Instance status
 Available values: "ACTIVE", "BUILD", "DELETED", "ERROR", "HARD_REBOOT", "MIGRATING", "PASSWORD", "PAUSED", "REBOOT", "REBUILD", "RESCUE", "RESIZE", "REVERT_RESIZE", "SHELVED", "SHELVED_OFFLOADED", "SHUTOFF", "SOFT_DELETED", "SUSPENDED", "UNKNOWN", "VERIFY_RESIZE".
 - `tags` (Attributes List) List of key-value tags associated with the resource. A tag is a key-value pair that can be associated with a resource, enabling efficient filtering and grouping for better organization and management. Some tags are read-only and cannot be modified by the user. Tags are also integrated with cost reports, allowing cost data to be filtered based on tag keys or values. (see [below for nested schema](#nestedatt--items--instance--tags))
-- `task_id` (String) The UUID of the active task that currently holds a lock on the resource. This lock prevents concurrent modifications to ensure consistency. If `null`, the resource is not locked.
 - `task_state` (String) Task state
 - `vm_state` (String) Virtual machine state (active)
 Available values: "active", "building", "deleted", "error", "paused", "rescued", "resized", "shelved", "shelved_offloaded", "soft-deleted", "stopped", "suspended".
@@ -154,7 +152,6 @@ Available values: "ACTIVE", "DELETED", "ERROR", "PENDING_CREATE", "PENDING_DELET
 - `region_id` (Number) Region ID
 - `stats` (Attributes) Statistics of load balancer. (see [below for nested schema](#nestedatt--items--loadbalancer--stats))
 - `tags_v2` (Attributes List) List of key-value tags associated with the resource. A tag is a key-value pair that can be associated with a resource, enabling efficient filtering and grouping for better organization and management. Some tags are read-only and cannot be modified by the user. Tags are also integrated with cost reports, allowing cost data to be filtered based on tag keys or values. (see [below for nested schema](#nestedatt--items--loadbalancer--tags_v2))
-- `task_id` (String) The UUID of the active task that currently holds a lock on the resource. This lock prevents concurrent modifications to ensure consistency. If `null`, the resource is not locked.
 - `updated_at` (String) Datetime when the load balancer was last updated
 - `vip_address` (String) Load balancer IP address
 - `vip_fqdn` (String) Fully qualified domain name for the load balancer VIP
@@ -286,7 +283,6 @@ Read-Only:
 - `status` (String) Floating IP status. DOWN - unassigned (available). ACTIVE - attached to a port (in use). ERROR - error state.
 Available values: "ACTIVE", "DOWN", "ERROR".
 - `tags` (Attributes List) List of key-value tags associated with the resource. A tag is a key-value pair that can be associated with a resource, enabling efficient filtering and grouping for better organization and management. Some tags are read-only and cannot be modified by the user. Tags are also integrated with cost reports, allowing cost data to be filtered based on tag keys or values. (see [below for nested schema](#nestedatt--items--loadbalancer--floating_ips--tags))
-- `task_id` (String) The UUID of the active task that currently holds a lock on the resource. This lock prevents concurrent modifications to ensure consistency. If `null`, the resource is not locked.
 - `updated_at` (String) Datetime when the floating IP was last updated
 
 <a id="nestedatt--items--loadbalancer--floating_ips--tags"></a>

@@ -44,7 +44,6 @@ data "gcore_cloud_network_router" "example_cloud_network_router" {
 - `region` (String) Region name
 - `routes` (Attributes List) List of custom routes. (see [below for nested schema](#nestedatt--routes))
 - `status` (String) Status of the router.
-- `task_id` (String) The UUID of the active task that currently holds a lock on the resource. This lock prevents concurrent modifications to ensure consistency. If `null`, the resource is not locked.
 - `updated_at` (String) Datetime when the router was last updated
 
 <a id="nestedatt--external_gateway_info"></a>

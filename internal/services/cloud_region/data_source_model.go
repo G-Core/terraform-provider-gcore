@@ -38,7 +38,6 @@ type CloudRegionDataSourceModel struct {
 	KeystoneName         types.String                                                    `tfsdk:"keystone_name" json:"keystone_name,computed"`
 	MetricsDatabaseID    types.Int64                                                     `tfsdk:"metrics_database_id" json:"metrics_database_id,computed"`
 	State                types.String                                                    `tfsdk:"state" json:"state,computed"`
-	TaskID               types.String                                                    `tfsdk:"task_id" json:"task_id,computed"`
 	VlanPhysicalNetwork  types.String                                                    `tfsdk:"vlan_physical_network" json:"vlan_physical_network,computed"`
 	Zone                 types.String                                                    `tfsdk:"zone" json:"zone,computed"`
 	AvailableVolumeTypes customfield.List[types.String]                                  `tfsdk:"available_volume_types" json:"available_volume_types,computed"`

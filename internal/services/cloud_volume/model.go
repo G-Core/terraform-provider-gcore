@@ -29,11 +29,9 @@ type CloudVolumeModel struct {
 	IsRootVolume         types.Bool                                                `tfsdk:"is_root_volume" json:"is_root_volume,computed"`
 	Region               types.String                                              `tfsdk:"region" json:"region,computed"`
 	Status               types.String                                              `tfsdk:"status" json:"status,computed"`
-	TaskID               types.String                                              `tfsdk:"task_id" json:"task_id,computed"`
 	UpdatedAt            timetypes.RFC3339                                         `tfsdk:"updated_at" json:"updated_at,computed" format:"date-time"`
 	VolumeType           types.String                                              `tfsdk:"volume_type" json:"volume_type,computed"`
 	SnapshotIDs          customfield.List[types.String]                            `tfsdk:"snapshot_ids" json:"snapshot_ids,computed"`
-	Tasks                customfield.List[types.String]                            `tfsdk:"tasks" json:"tasks,computed,no_refresh"`
 	VolumeImageMetadata  customfield.Map[types.String]                             `tfsdk:"volume_image_metadata" json:"volume_image_metadata,computed"`
 	Attachments          customfield.NestedObjectList[CloudVolumeAttachmentsModel] `tfsdk:"attachments" json:"attachments,computed"`
 	LimiterStats         customfield.NestedObject[CloudVolumeLimiterStatsModel]    `tfsdk:"limiter_stats" json:"limiter_stats,computed"`

@@ -92,7 +92,6 @@ type CloudVolumesItemsDataSourceModel struct {
 	CreatorTaskID       types.String                                                         `tfsdk:"creator_task_id" json:"creator_task_id,computed"`
 	LimiterStats        customfield.NestedObject[CloudVolumesLimiterStatsDataSourceModel]    `tfsdk:"limiter_stats" json:"limiter_stats,computed"`
 	SnapshotIDs         customfield.List[types.String]                                       `tfsdk:"snapshot_ids" json:"snapshot_ids,computed"`
-	TaskID              types.String                                                         `tfsdk:"task_id" json:"task_id,computed"`
 	UpdatedAt           timetypes.RFC3339                                                    `tfsdk:"updated_at" json:"updated_at,computed" format:"date-time"`
 	VolumeImageMetadata customfield.Map[types.String]                                        `tfsdk:"volume_image_metadata" json:"volume_image_metadata,computed"`
 }

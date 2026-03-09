@@ -10,21 +10,20 @@ import (
 )
 
 type CloudSecretModel struct {
-	ID               types.String                   `tfsdk:"id" json:"id,computed"`
-	ProjectID        types.Int64                    `tfsdk:"project_id" path:"project_id,optional"`
-	RegionID         types.Int64                    `tfsdk:"region_id" path:"region_id,optional"`
-	Name             types.String                   `tfsdk:"name" json:"name,required"`
-	Payload          *CloudSecretPayloadModel       `tfsdk:"payload" json:"payload,required,no_refresh"`
-	PayloadWoVersion types.Int64                    `tfsdk:"payload_wo_version"`
-	Expiration       timetypes.RFC3339              `tfsdk:"expiration" json:"expiration,optional" format:"date-time"`
-	Algorithm        types.String                   `tfsdk:"algorithm" json:"algorithm,computed"`
-	BitLength        types.Int64                    `tfsdk:"bit_length" json:"bit_length,computed"`
-	Created          timetypes.RFC3339              `tfsdk:"created" json:"created,computed" format:"date-time"`
-	Mode             types.String                   `tfsdk:"mode" json:"mode,computed"`
-	SecretType       types.String                   `tfsdk:"secret_type" json:"secret_type,computed"`
-	Status           types.String                   `tfsdk:"status" json:"status,computed"`
-	ContentTypes     customfield.Map[types.String]  `tfsdk:"content_types" json:"content_types,computed"`
-	Tasks            customfield.List[types.String] `tfsdk:"tasks" json:"tasks,computed,no_refresh"`
+	ID               types.String                  `tfsdk:"id" json:"id,computed"`
+	ProjectID        types.Int64                   `tfsdk:"project_id" path:"project_id,optional"`
+	RegionID         types.Int64                   `tfsdk:"region_id" path:"region_id,optional"`
+	Name             types.String                  `tfsdk:"name" json:"name,required"`
+	Payload          *CloudSecretPayloadModel      `tfsdk:"payload" json:"payload,required,no_refresh"`
+	PayloadWoVersion types.Int64                   `tfsdk:"payload_wo_version"`
+	Expiration       timetypes.RFC3339             `tfsdk:"expiration" json:"expiration,optional" format:"date-time"`
+	Algorithm        types.String                  `tfsdk:"algorithm" json:"algorithm,computed"`
+	BitLength        types.Int64                   `tfsdk:"bit_length" json:"bit_length,computed"`
+	Created          timetypes.RFC3339             `tfsdk:"created" json:"created,computed" format:"date-time"`
+	Mode             types.String                  `tfsdk:"mode" json:"mode,computed"`
+	SecretType       types.String                  `tfsdk:"secret_type" json:"secret_type,computed"`
+	Status           types.String                  `tfsdk:"status" json:"status,computed"`
+	ContentTypes     customfield.Map[types.String] `tfsdk:"content_types" json:"content_types,computed"`
 }
 
 func (m CloudSecretModel) MarshalJSON() (data []byte, err error) {
