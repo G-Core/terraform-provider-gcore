@@ -1,5 +1,5 @@
 ---
-page_title: "gcore_fastedge_app Resource - gcore"
+page_title: "gcore_fastedge_app Resource - Gcore"
 subcategory: ""
 description: |-
   FastEdge applications combine a WebAssembly binary with configuration, environment variables, and secrets for deployment at the CDN edge.
@@ -119,6 +119,8 @@ Read-Only:
 ## Import
 
 Import is supported using the following syntax:
+
+The [`terraform import` command](https://developer.hashicorp.com/terraform/cli/commands/import) can be used, for example:
 
 ```shell
 $ terraform import gcore_fastedge_app.example '<id>'

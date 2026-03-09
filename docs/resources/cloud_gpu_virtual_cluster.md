@@ -1,5 +1,5 @@
 ---
-page_title: "gcore_cloud_gpu_virtual_cluster Resource - gcore"
+page_title: "gcore_cloud_gpu_virtual_cluster Resource - Gcore"
 subcategory: ""
 description: |-
   GPU virtual clusters provide managed virtual GPU servers with auto-scaling for parallel computation workloads.
@@ -165,6 +165,8 @@ Required:
 ## Import
 
 Import is supported using the following syntax:
+
+The [`terraform import` command](https://developer.hashicorp.com/terraform/cli/commands/import) can be used, for example:
 
 ```shell
 $ terraform import gcore_cloud_gpu_virtual_cluster.example '<project_id>/<region_id>/<cluster_id>'

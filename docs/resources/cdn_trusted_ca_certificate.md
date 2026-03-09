@@ -1,5 +1,5 @@
 ---
-page_title: "gcore_cdn_trusted_ca_certificate Resource - gcore"
+page_title: "gcore_cdn_trusted_ca_certificate Resource - Gcore"
 subcategory: ""
 description: |-
   Trusted CA certificates verify the authenticity of CDN origin servers during HTTPS connections.
@@ -59,6 +59,8 @@ Possible values:
 ## Import
 
 Import is supported using the following syntax:
+
+The [`terraform import` command](https://developer.hashicorp.com/terraform/cli/commands/import) can be used, for example:
 
 ```shell
 $ terraform import gcore_cdn_trusted_ca_certificate.example '<id>'

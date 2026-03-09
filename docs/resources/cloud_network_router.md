@@ -1,5 +1,5 @@
 ---
-page_title: "gcore_cloud_network_router Resource - gcore"
+page_title: "gcore_cloud_network_router Resource - Gcore"
 subcategory: ""
 description: |-
   Routers interconnect subnets and manage network routing, including external gateway connectivity and static routes.
@@ -95,6 +95,8 @@ Required:
 ## Import
 
 Import is supported using the following syntax:
+
+The [`terraform import` command](https://developer.hashicorp.com/terraform/cli/commands/import) can be used, for example:
 
 ```shell
 $ terraform import gcore_cloud_network_router.example '<project_id>/<region_id>/<router_id>'

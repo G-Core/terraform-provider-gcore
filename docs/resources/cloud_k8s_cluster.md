@@ -1,5 +1,5 @@
 ---
-page_title: "gcore_cloud_k8s_cluster Resource - gcore"
+page_title: "gcore_cloud_k8s_cluster Resource - Gcore"
 subcategory: ""
 description: |-
   Managed Kubernetes clusters with configurable worker node pools, networking, and cluster add-ons.
@@ -324,6 +324,8 @@ Required:
 ## Import
 
 Import is supported using the following syntax:
+
+The [`terraform import` command](https://developer.hashicorp.com/terraform/cli/commands/import) can be used, for example:
 
 ```shell
 $ terraform import gcore_cloud_k8s_cluster.example '<project_id>/<region_id>/<cluster_name>'

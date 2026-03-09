@@ -1,5 +1,5 @@
 ---
-page_title: "gcore_cloud_security_group_rule Resource - gcore"
+page_title: "gcore_cloud_security_group_rule Resource - Gcore"
 subcategory: ""
 description: |-
   Security group rules define individual traffic permissions specifying protocol, port range, direction, and allowed sources.

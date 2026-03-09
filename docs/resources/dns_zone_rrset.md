@@ -1,5 +1,5 @@
 ---
-page_title: "gcore_dns_zone_rrset Resource - gcore"
+page_title: "gcore_dns_zone_rrset Resource - Gcore"
 subcategory: ""
 description: |-
   DNS resource record sets (RRsets) define individual DNS records such as A, AAAA, CNAME, MX, and TXT with TTL and geo-balancing settings.

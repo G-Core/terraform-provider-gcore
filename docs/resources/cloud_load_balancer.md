@@ -1,5 +1,5 @@
 ---
-page_title: "gcore_cloud_load_balancer Resource - gcore"
+page_title: "gcore_cloud_load_balancer Resource - Gcore"
 subcategory: ""
 description: |-
   Load balancers distribute incoming traffic across multiple instances with support for listeners, pools, and health monitoring.
@@ -396,6 +396,8 @@ Available values: "BACKUP", "MASTER", "STANDALONE".
 ## Import
 
 Import is supported using the following syntax:
+
+The [`terraform import` command](https://developer.hashicorp.com/terraform/cli/commands/import) can be used, for example:
 
 ```shell
 $ terraform import gcore_cloud_load_balancer.example '<project_id>/<region_id>/<load_balancer_id>'

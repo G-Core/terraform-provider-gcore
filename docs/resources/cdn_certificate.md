@@ -1,5 +1,5 @@
 ---
-page_title: "gcore_cdn_certificate Resource - gcore"
+page_title: "gcore_cdn_certificate Resource - Gcore"
 subcategory: ""
 description: |-
   CDN SSL certificates enable HTTPS content delivery, supporting both uploaded certificates and automated Let's Encrypt provisioning.
