@@ -7,7 +7,6 @@ import (
 	"fmt"
 	"github.com/G-Core/terraform-provider-gcore/internal/apijson"
 	"github.com/G-Core/terraform-provider-gcore/internal/customfield"
-	"github.com/hashicorp/terraform-plugin-framework-jsontypes/jsontypes"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/tidwall/sjson"
 	"strings"
@@ -33,7 +32,6 @@ type CloudK8SClusterModel struct {
 	AddOns           customfield.NestedObject[CloudK8SClusterAddOnsModel]         `tfsdk:"add_ons" json:"add_ons,computed_optional"`
 	Authentication   customfield.NestedObject[CloudK8SClusterAuthenticationModel] `tfsdk:"authentication" json:"authentication,computed_optional"`
 	Cni              customfield.NestedObject[CloudK8SClusterCniModel]            `tfsdk:"cni" json:"cni,computed_optional"`
-	DDOSProfile      customfield.NestedObject[CloudK8SClusterDDOSProfileModel]    `tfsdk:"ddos_profile" json:"ddos_profile,computed_optional"`
 	Logging          customfield.NestedObject[CloudK8SClusterLoggingModel]        `tfsdk:"logging" json:"logging,computed_optional"`
 	CreatedAt        types.String                                                 `tfsdk:"created_at" json:"created_at,computed"`
 	CreatorTaskID    types.String                                                 `tfsdk:"creator_task_id" json:"creator_task_id,computed"`
@@ -129,19 +127,6 @@ type CloudK8SClusterCniCiliumModel struct {
 	MaskSizeV6     types.Int64  `tfsdk:"mask_size_v6" json:"mask_size_v6,computed_optional"`
 	RoutingMode    types.String `tfsdk:"routing_mode" json:"routing_mode,computed_optional"`
 	Tunnel         types.String `tfsdk:"tunnel" json:"tunnel,computed_optional"`
-}
-
-type CloudK8SClusterDDOSProfileModel struct {
-	Enabled             types.Bool                                                          `tfsdk:"enabled" json:"enabled,required"`
-	Fields              customfield.NestedObjectList[CloudK8SClusterDDOSProfileFieldsModel] `tfsdk:"fields" json:"fields,computed_optional"`
-	ProfileTemplate     types.Int64                                                         `tfsdk:"profile_template" json:"profile_template,optional"`
-	ProfileTemplateName types.String                                                        `tfsdk:"profile_template_name" json:"profile_template_name,optional"`
-}
-
-type CloudK8SClusterDDOSProfileFieldsModel struct {
-	BaseField  types.Int64          `tfsdk:"base_field" json:"base_field,required"`
-	FieldValue jsontypes.Normalized `tfsdk:"field_value" json:"field_value,optional"`
-	Value      types.String         `tfsdk:"value" json:"value,optional"`
 }
 
 type CloudK8SClusterLoggingModel struct {

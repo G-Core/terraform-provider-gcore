@@ -8,7 +8,6 @@ import (
 	"github.com/G-Core/gcore-go/cloud"
 	"github.com/G-Core/gcore-go/packages/param"
 	"github.com/G-Core/terraform-provider-gcore/internal/customfield"
-	"github.com/hashicorp/terraform-plugin-framework-jsontypes/jsontypes"
 	"github.com/hashicorp/terraform-plugin-framework-timetypes/timetypes"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/types"
@@ -39,7 +38,6 @@ type CloudK8SClusterDataSourceModel struct {
 	Authentication   customfield.NestedObject[CloudK8SClusterAuthenticationDataSourceModel] `tfsdk:"authentication" json:"authentication,computed"`
 	Cni              customfield.NestedObject[CloudK8SClusterCniDataSourceModel]            `tfsdk:"cni" json:"cni,computed"`
 	Csi              customfield.NestedObject[CloudK8SClusterCsiDataSourceModel]            `tfsdk:"csi" json:"csi,computed"`
-	DDOSProfile      customfield.NestedObject[CloudK8SClusterDDOSProfileDataSourceModel]    `tfsdk:"ddos_profile" json:"ddos_profile,computed"`
 	Logging          customfield.NestedObject[CloudK8SClusterLoggingDataSourceModel]        `tfsdk:"logging" json:"logging,computed"`
 	Pools            customfield.NestedObjectList[CloudK8SClusterPoolsDataSourceModel]      `tfsdk:"pools" json:"pools,computed"`
 }
@@ -108,19 +106,6 @@ type CloudK8SClusterCsiDataSourceModel struct {
 
 type CloudK8SClusterCsiNfsDataSourceModel struct {
 	VastEnabled types.Bool `tfsdk:"vast_enabled" json:"vast_enabled,computed"`
-}
-
-type CloudK8SClusterDDOSProfileDataSourceModel struct {
-	Enabled             types.Bool                                                                    `tfsdk:"enabled" json:"enabled,computed"`
-	Fields              customfield.NestedObjectList[CloudK8SClusterDDOSProfileFieldsDataSourceModel] `tfsdk:"fields" json:"fields,computed"`
-	ProfileTemplate     types.Int64                                                                   `tfsdk:"profile_template" json:"profile_template,computed"`
-	ProfileTemplateName types.String                                                                  `tfsdk:"profile_template_name" json:"profile_template_name,computed"`
-}
-
-type CloudK8SClusterDDOSProfileFieldsDataSourceModel struct {
-	BaseField  types.Int64          `tfsdk:"base_field" json:"base_field,computed"`
-	FieldValue jsontypes.Normalized `tfsdk:"field_value" json:"field_value,computed"`
-	Value      types.String         `tfsdk:"value" json:"value,computed"`
 }
 
 type CloudK8SClusterLoggingDataSourceModel struct {

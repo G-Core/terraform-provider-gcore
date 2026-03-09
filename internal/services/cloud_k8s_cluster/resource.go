@@ -163,14 +163,9 @@ func (r *CloudK8SClusterResource) Update(ctx context.Context, req resource.Updat
 
 	// 2. Check for changes in cluster updatable fields.
 	// Check for changes in attributes or blocks that can be updated in-place. Pools are handled in a separate block below.
-	// TODO: deal with changes to ddos_profile and logging
 	if !data.Authentication.Equal(state.Authentication) ||
 		!data.AutoscalerConfig.Equal(state.AutoscalerConfig) ||
 		!data.Cni.Equal(state.Cni) ||
-		// Check if value changed from null to set, or between set values
-		//(!data.DDOSProfile.IsNull() && state.DDOSProfile.IsNull()) ||
-		//(!data.DDOSProfile.IsNull() && !state.DDOSProfile.IsNull() && !data.DDOSProfile.Equal(state.DDOSProfile)) ||
-		//!data.Logging.Equal(state.Logging) ||
 		!data.AddOns.Equal(state.AddOns) {
 		params := cloud.K8SClusterUpdateParams{}
 

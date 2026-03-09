@@ -86,16 +86,6 @@ resource "gcore_cloud_k8s_cluster" "example_cloud_k8s_cluster" {
       vast_enabled = true
     }
   }
-  ddos_profile = {
-    enabled = true
-    fields = [{
-      base_field = 10
-      field_value = [45046, 45047]
-      value = null
-    }]
-    profile_template = 29
-    profile_template_name = "profile_template_name"
-  }
   fixed_network = "3fa85f64-5717-4562-b3fc-2c963f66afa6"
   fixed_subnet = "3fa85f64-5717-4562-b3fc-2c963f66afa6"
   is_ipv6 = true
@@ -156,7 +146,6 @@ Supported parameters (in alphabetical order):
 - skip-nodes-with-system-pods (boolean: true/false) - If true cluster autoscaler will never delete nodes with pods from kube-system (except for DaemonSet or mirror pods).
 - `cni` (Attributes) Cluster CNI settings (see [below for nested schema](#nestedatt--cni))
 - `csi` (Attributes) Container Storage Interface (CSI) driver settings (see [below for nested schema](#nestedatt--csi))
-- `ddos_profile` (Attributes) Advanced DDoS Protection profile (see [below for nested schema](#nestedatt--ddos_profile))
 - `fixed_network` (String) The network of the cluster
 - `fixed_subnet` (String) The subnet of the cluster
 - `is_ipv6` (Boolean) Enable public v6 address
@@ -296,33 +285,6 @@ Optional:
 Optional:
 
 - `vast_enabled` (Boolean) Enable or disable VAST NFS integration. The default value is `false`. When set to `true`, a dedicated StorageClass will be created in the cluster for each VAST NFS file share defined in the cloud. All file shares created prior to cluster creation will be available immediately, while those created afterward may take a few minutes for to appear.
-
-
-
-<a id="nestedatt--ddos_profile"></a>
-### Nested Schema for `ddos_profile`
-
-Required:
-
-- `enabled` (Boolean) Enable advanced DDoS protection
-
-Optional:
-
-- `fields` (Attributes List) DDoS profile parameters (see [below for nested schema](#nestedatt--ddos_profile--fields))
-- `profile_template` (Number) DDoS profile template ID
-- `profile_template_name` (String) DDoS profile template name
-
-<a id="nestedatt--ddos_profile--fields"></a>
-### Nested Schema for `ddos_profile.fields`
-
-Required:
-
-- `base_field` (Number)
-
-Optional:
-
-- `field_value` (String) Complex value. Only one of 'value' or 'field_value' must be specified
-- `value` (String) Basic value. Only one of 'value' or 'field_value' must be specified
 
 
 
