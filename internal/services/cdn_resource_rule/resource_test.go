@@ -25,7 +25,7 @@ func testAccCheckCDNCDNResourceRuleDestroy(s *terraform.State) error {
 	}
 	ctx := context.Background()
 	for _, rs := range s.RootModule().Resources {
-		if rs.Type != "gcore_cdn_cdn_resource_rule" {
+		if rs.Type != "gcore_cdn_resource_rule" {
 			continue
 		}
 		ruleIDStr := rs.Primary.ID
@@ -65,19 +65,19 @@ func TestAccCDNCDNResourceRule_basic(t *testing.T) {
 			{
 				Config: testAccCDNCDNResourceRuleConfig(fixture.ResourceID, rName),
 				ConfigStateChecks: []statecheck.StateCheck{
-					statecheck.ExpectKnownValue("gcore_cdn_cdn_resource_rule.test",
+					statecheck.ExpectKnownValue("gcore_cdn_resource_rule.test",
 						tfjsonpath.New("name"), knownvalue.StringExact(rName)),
-					statecheck.ExpectKnownValue("gcore_cdn_cdn_resource_rule.test",
+					statecheck.ExpectKnownValue("gcore_cdn_resource_rule.test",
 						tfjsonpath.New("id"), knownvalue.NotNull()),
-					statecheck.ExpectKnownValue("gcore_cdn_cdn_resource_rule.test",
+					statecheck.ExpectKnownValue("gcore_cdn_resource_rule.test",
 						tfjsonpath.New("rule"), knownvalue.StringExact("/images/*")),
 				},
 			},
 			{
-				ResourceName:            "gcore_cdn_cdn_resource_rule.test",
+				ResourceName:            "gcore_cdn_resource_rule.test",
 				ImportState:             true,
 				ImportStateVerify:       true,
-				ImportStateIdFunc:       acctest.BuildImportID("gcore_cdn_cdn_resource_rule.test", "resource_id", "id"),
+				ImportStateIdFunc:       acctest.BuildImportID("gcore_cdn_resource_rule.test", "resource_id", "id"),
 				ImportStateVerifyIgnore: []string{"deleted"},
 			},
 		},
@@ -99,17 +99,17 @@ func TestAccCDNCDNResourceRule_update(t *testing.T) {
 			{
 				Config: testAccCDNCDNResourceRuleConfig(fixture.ResourceID, rName),
 				ConfigStateChecks: []statecheck.StateCheck{
-					statecheck.ExpectKnownValue("gcore_cdn_cdn_resource_rule.test",
+					statecheck.ExpectKnownValue("gcore_cdn_resource_rule.test",
 						tfjsonpath.New("name"), knownvalue.StringExact(rName)),
-					idCheck.AddStateValue("gcore_cdn_cdn_resource_rule.test", tfjsonpath.New("id")),
+					idCheck.AddStateValue("gcore_cdn_resource_rule.test", tfjsonpath.New("id")),
 				},
 			},
 			{
 				Config: testAccCDNCDNResourceRuleConfig(fixture.ResourceID, rNameUpdated),
 				ConfigStateChecks: []statecheck.StateCheck{
-					statecheck.ExpectKnownValue("gcore_cdn_cdn_resource_rule.test",
+					statecheck.ExpectKnownValue("gcore_cdn_resource_rule.test",
 						tfjsonpath.New("name"), knownvalue.StringExact(rNameUpdated)),
-					idCheck.AddStateValue("gcore_cdn_cdn_resource_rule.test", tfjsonpath.New("id")),
+					idCheck.AddStateValue("gcore_cdn_resource_rule.test", tfjsonpath.New("id")),
 				},
 			},
 		},
@@ -118,7 +118,7 @@ func TestAccCDNCDNResourceRule_update(t *testing.T) {
 
 func testAccCDNCDNResourceRuleConfig(resourceID int64, name string) string {
 	return fmt.Sprintf(`
-resource "gcore_cdn_cdn_resource_rule" "test" {
+resource "gcore_cdn_resource_rule" "test" {
   resource_id = %d
   name        = %q
   rule        = "/images/*"

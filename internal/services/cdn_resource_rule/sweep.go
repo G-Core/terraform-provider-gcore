@@ -16,18 +16,18 @@ import (
 )
 
 func init() {
-	resource.AddTestSweepers("gcore_cdn_cdn_resource_rule", &resource.Sweeper{
-		Name: "gcore_cdn_cdn_resource_rule",
+	resource.AddTestSweepers("gcore_cdn_resource_rule", &resource.Sweeper{
+		Name: "gcore_cdn_resource_rule",
 		F:    sweepCDNResourceRules,
 		// Sweep rules before CDN resources and origin groups
 		Dependencies: []string{},
 	})
 
-	resource.AddTestSweepers("gcore_cdn_cdn_resource", &resource.Sweeper{
-		Name: "gcore_cdn_cdn_resource",
+	resource.AddTestSweepers("gcore_cdn_resource", &resource.Sweeper{
+		Name: "gcore_cdn_resource",
 		F:    sweepCDNResources,
 		// Sweep CDN resources after their rules, but before origin groups
-		Dependencies: []string{"gcore_cdn_cdn_resource_rule"},
+		Dependencies: []string{"gcore_cdn_resource_rule"},
 	})
 }
 
@@ -70,7 +70,7 @@ func sweepCDNResourceRules(_ string) error {
 		}
 
 		for _, rule := range *rules {
-			if !sweep.ShouldSweep("gcore_cdn_cdn_resource_rule", rule.Name) {
+			if !sweep.ShouldSweep("gcore_cdn_resource_rule", rule.Name) {
 				continue
 			}
 

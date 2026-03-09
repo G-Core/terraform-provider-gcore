@@ -17,7 +17,7 @@ Create a CDN resource rule that matches a URL pattern and overrides the origin p
 
 ```terraform
 # Create a CDN resource rule
-resource "gcore_cdn_cdn_resource_rule" "example" {
+resource "gcore_cdn_resource_rule" "example" {
   resource_id = 12345
   name        = "my-cdn-rule"
   rule        = "/assets/*.png"

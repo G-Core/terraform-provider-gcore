@@ -25,11 +25,11 @@ func TestAccCDNCDNResourceRuleDataSource_basic(t *testing.T) {
 			{
 				Config: testAccCDNCDNResourceRuleDataSourceConfig(fixture.ResourceID, rName),
 				ConfigStateChecks: []statecheck.StateCheck{
-					statecheck.ExpectKnownValue("data.gcore_cdn_cdn_resource_rule.test",
+					statecheck.ExpectKnownValue("data.gcore_cdn_resource_rule.test",
 						tfjsonpath.New("name"), knownvalue.StringExact(rName)),
 					statecheck.CompareValuePairs(
-						"gcore_cdn_cdn_resource_rule.test", tfjsonpath.New("id"),
-						"data.gcore_cdn_cdn_resource_rule.test", tfjsonpath.New("id"),
+						"gcore_cdn_resource_rule.test", tfjsonpath.New("id"),
+						"data.gcore_cdn_resource_rule.test", tfjsonpath.New("id"),
 						compare.ValuesSame(),
 					),
 				},
@@ -40,7 +40,7 @@ func TestAccCDNCDNResourceRuleDataSource_basic(t *testing.T) {
 
 func testAccCDNCDNResourceRuleDataSourceConfig(resourceID int64, name string) string {
 	return fmt.Sprintf(`
-resource "gcore_cdn_cdn_resource_rule" "test" {
+resource "gcore_cdn_resource_rule" "test" {
   resource_id = %d
   name        = %q
   rule        = "/images/*"
@@ -49,8 +49,8 @@ resource "gcore_cdn_cdn_resource_rule" "test" {
   weight      = 1
 }
 
-data "gcore_cdn_cdn_resource_rule" "test" {
-  rule_id     = gcore_cdn_cdn_resource_rule.test.id
-  resource_id = gcore_cdn_cdn_resource_rule.test.resource_id
+data "gcore_cdn_resource_rule" "test" {
+  rule_id     = gcore_cdn_resource_rule.test.id
+  resource_id = gcore_cdn_resource_rule.test.resource_id
 }`, resourceID, name)
 }

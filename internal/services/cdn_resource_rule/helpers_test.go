@@ -26,7 +26,7 @@ type cdnResourceFixture struct {
 // the test completes via t.Cleanup.
 //
 // This is intended to be called once per test function to provide a CDN
-// resource_id that cdn_cdn_resource_rule tests can reference.
+// resource_id that cdn_resource_rule tests can reference.
 //
 // It skips the test if TF_ACC is not set, preventing failures during
 // regular unit test runs.
