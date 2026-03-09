@@ -1,0 +1,34 @@
+---
+page_title: "{{ .Name }} {{ .Type }} - {{ .ProviderName }}"
+subcategory: ""
+description: |-
+  {{ .Description }}
+---
+
+# {{ .Name }} ({{ .Type }})
+
+{{ .Description }}
+
+## Example Usage
+
+### Managed Kubernetes cluster in a private network
+
+Creates a K8s cluster with a single node pool attached to an existing private network and subnet.
+
+{{tffile "examples/resources/gcore_cloud_k8s_cluster/basic.tf"}}
+
+### Managed Kubernetes cluster with VAST file share integration
+
+Creates a K8s cluster with Cilium CNI and VAST NFS CSI enabled for shared storage.
+
+{{tffile "examples/resources/gcore_cloud_k8s_cluster/with-vast.tf"}}
+
+{{ .SchemaMarkdown | trimspace }}
+
+{{ if .HasImport }}
+## Import
+
+Import is supported using the following syntax:
+
+{{ codefile "shell" .ImportFile }}
+{{ end }}

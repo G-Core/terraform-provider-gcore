@@ -1,0 +1,34 @@
+---
+page_title: "{{ .Name }} {{ .Type }} - {{ .ProviderName }}"
+subcategory: ""
+description: |-
+  {{ .Description }}
+---
+
+# {{ .Name }} ({{ .Type }})
+
+{{ .Description }}
+
+## Example Usage
+
+### Standard NFS file share
+
+Create a standard NFS file share attached to an existing network.
+
+{{tffile "examples/resources/gcore_cloud_file_share/standard.tf"}}
+
+### VAST NFS file share
+
+Create a VAST-backed NFS file share with custom share settings.
+
+{{tffile "examples/resources/gcore_cloud_file_share/vast.tf"}}
+
+{{ .SchemaMarkdown | trimspace }}
+
+{{ if .HasImport }}
+## Import
+
+Import is supported using the following syntax:
+
+{{ codefile "shell" .ImportFile }}
+{{ end }}

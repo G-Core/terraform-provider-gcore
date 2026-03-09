@@ -90,19 +90,25 @@ func ProviderSchema(ctx context.Context) schema.Schema {
 				Optional:    true,
 			},
 			"api_key": schema.StringAttribute{
-				Optional: true,
+				Description: "The API key for authenticating with the Gcore API. Can also be set via the `GCORE_API_KEY` environment variable.",
+				Optional:    true,
+				Sensitive:   true,
 			},
 			"cloud_project_id": schema.Int64Attribute{
-				Optional: true,
+				Description: "Default cloud project ID to use for cloud resources. Can also be set via the `GCORE_CLOUD_PROJECT_ID` environment variable.",
+				Optional:    true,
 			},
 			"cloud_region_id": schema.Int64Attribute{
-				Optional: true,
+				Description: "Default cloud region ID to use for cloud resources. Can also be set via the `GCORE_CLOUD_REGION_ID` environment variable.",
+				Optional:    true,
 			},
 			"cloud_polling_interval_seconds": schema.Int64Attribute{
-				Optional: true,
+				Description: "Interval in seconds between polling requests for long-running cloud operations. Defaults to `3`.",
+				Optional:    true,
 			},
 			"cloud_polling_timeout_seconds": schema.Int64Attribute{
-				Optional: true,
+				Description: "Timeout in seconds for polling long-running cloud operations. Defaults to `7200`.",
+				Optional:    true,
 			},
 		},
 	}

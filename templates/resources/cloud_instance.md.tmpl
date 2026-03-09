@@ -1,0 +1,70 @@
+---
+page_title: "{{ .Name }} {{ .Type }} - {{ .ProviderName }}"
+subcategory: ""
+description: |-
+  {{ .Description }}
+---
+
+# {{ .Name }} ({{ .Type }})
+
+{{ .Description }}
+
+## Example Usage
+
+### Instance with one public interface
+
+Create a basic instance with a single external IPv4 interface.
+
+{{tffile "examples/resources/gcore_cloud_instance/basic.tf"}}
+
+### Instance with two interfaces
+
+Create an instance with two network interfaces: one public and one private.
+
+{{tffile "examples/resources/gcore_cloud_instance/two-interface.tf"}}
+
+### Windows instance
+
+Create a Windows instance with a public interface.
+
+{{tffile "examples/resources/gcore_cloud_instance/windows.tf"}}
+
+### Dual-stack public interface
+
+Create an instance with both IPv4 and IPv6 addresses on a single interface.
+
+{{tffile "examples/resources/gcore_cloud_instance/dualstack.tf"}}
+
+### Instance with floating IP
+
+Create an instance and attach a floating IP address for external access.
+
+{{tffile "examples/resources/gcore_cloud_instance/fip.tf"}}
+
+### Instance with reserved public IP
+
+Create an instance using a pre-allocated reserved fixed IP address.
+
+{{tffile "examples/resources/gcore_cloud_instance/reserved-address.tf"}}
+
+### Instance with custom security group
+
+Create an instance with a custom security group allowing SSH, HTTP, and HTTPS inbound traffic.
+
+{{tffile "examples/resources/gcore_cloud_instance/custom-sg.tf"}}
+
+### Windows instance with two users
+
+Create a Windows instance and use userdata to add a second user during provisioning.
+
+{{tffile "examples/resources/gcore_cloud_instance/windows-userdata.tf"}}
+
+{{ .SchemaMarkdown | trimspace }}
+
+{{ if .HasImport }}
+## Import
+
+Import is supported using the following syntax:
+
+{{ codefile "shell" .ImportFile }}
+{{ end }}

@@ -1,0 +1,34 @@
+---
+page_title: "{{ .Name }} {{ .Type }} - {{ .ProviderName }}"
+subcategory: ""
+description: |-
+  {{ .Description }}
+---
+
+# {{ .Name }} ({{ .Type }})
+
+{{ .Description }}
+
+## Example Usage
+
+### IPv4 subnet with custom DNS and host routes
+
+Creates an IPv4 subnet with DHCP, custom DNS nameservers, and static host routes.
+
+{{tffile "examples/resources/gcore_cloud_network_subnet/ipv4.tf"}}
+
+### IPv6 subnet
+
+Creates a basic IPv6 subnet.
+
+{{tffile "examples/resources/gcore_cloud_network_subnet/ipv6.tf"}}
+
+{{ .SchemaMarkdown | trimspace }}
+
+{{ if .HasImport }}
+## Import
+
+Import is supported using the following syntax:
+
+{{ codefile "shell" .ImportFile }}
+{{ end }}

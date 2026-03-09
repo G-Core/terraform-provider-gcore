@@ -1,0 +1,32 @@
+---
+page_title: "{{ .Name }} {{ .Type }} - {{ .ProviderName }}"
+subcategory: ""
+description: |-
+  {{ .Description }}
+---
+
+# {{ .Name }} ({{ .Type }})
+
+{{ .Description }}
+
+## Example Usage
+
+### Instance member with private IP
+
+Adds a compute instance as a pool member using its reserved fixed IP address.
+
+{{tffile "examples/resources/gcore_cloud_load_balancer_pool_member/instance-member.tf"}}
+
+### Private member with subnet
+
+Adds a private IP address from a specific subnet as a pool member.
+
+{{tffile "examples/resources/gcore_cloud_load_balancer_pool_member/private-member.tf"}}
+
+### Public member
+
+Adds a public IP address as a pool member.
+
+{{tffile "examples/resources/gcore_cloud_load_balancer_pool_member/public-member.tf"}}
+
+{{ .SchemaMarkdown | trimspace }}

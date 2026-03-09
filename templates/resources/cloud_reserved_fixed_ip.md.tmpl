@@ -1,0 +1,52 @@
+---
+page_title: "{{ .Name }} {{ .Type }} - {{ .ProviderName }}"
+subcategory: ""
+description: |-
+  {{ .Description }}
+---
+
+# {{ .Name }} ({{ .Type }})
+
+{{ .Description }}
+
+## Example Usage
+
+### Reserve an external IP address
+
+Reserves a public (external) IP address.
+
+{{tffile "examples/resources/gcore_cloud_reserved_fixed_ip/external.tf"}}
+
+### Reserve a private IP in any subnet
+
+Reserves a private IP in any available subnet of a network.
+
+{{tffile "examples/resources/gcore_cloud_reserved_fixed_ip/any-subnet.tf"}}
+
+### Reserve a private IP in a specific subnet
+
+Reserves a private IP in a specific subnet of a network.
+
+{{tffile "examples/resources/gcore_cloud_reserved_fixed_ip/subnet.tf"}}
+
+### Reserve a specific IP address
+
+Reserves a specific IP address in a subnet.
+
+{{tffile "examples/resources/gcore_cloud_reserved_fixed_ip/ip-address.tf"}}
+
+### Reserve an existing port
+
+Reserves an existing port, such as a load balancer VIP port.
+
+{{tffile "examples/resources/gcore_cloud_reserved_fixed_ip/port.tf"}}
+
+{{ .SchemaMarkdown | trimspace }}
+
+{{ if .HasImport }}
+## Import
+
+Import is supported using the following syntax:
+
+{{ codefile "shell" .ImportFile }}
+{{ end }}
