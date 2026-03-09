@@ -1,6 +1,6 @@
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 
-package cdn_cdn_resource_rule
+package cdn_resource_rule
 
 import (
 	"context"
@@ -19,24 +19,24 @@ import (
 )
 
 // Ensure provider defined types fully satisfy framework interfaces.
-var _ resource.ResourceWithConfigure = (*CDNCDNResourceRuleResource)(nil)
-var _ resource.ResourceWithModifyPlan = (*CDNCDNResourceRuleResource)(nil)
-var _ resource.ResourceWithImportState = (*CDNCDNResourceRuleResource)(nil)
+var _ resource.ResourceWithConfigure = (*CDNResourceRuleResource)(nil)
+var _ resource.ResourceWithModifyPlan = (*CDNResourceRuleResource)(nil)
+var _ resource.ResourceWithImportState = (*CDNResourceRuleResource)(nil)
 
 func NewResource() resource.Resource {
-	return &CDNCDNResourceRuleResource{}
+	return &CDNResourceRuleResource{}
 }
 
-// CDNCDNResourceRuleResource defines the resource implementation.
-type CDNCDNResourceRuleResource struct {
+// CDNResourceRuleResource defines the resource implementation.
+type CDNResourceRuleResource struct {
 	client *gcore.Client
 }
 
-func (r *CDNCDNResourceRuleResource) Metadata(ctx context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
-	resp.TypeName = req.ProviderTypeName + "_cdn_cdn_resource_rule"
+func (r *CDNResourceRuleResource) Metadata(ctx context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
+	resp.TypeName = req.ProviderTypeName + "_cdn_resource_rule"
 }
 
-func (r *CDNCDNResourceRuleResource) Configure(ctx context.Context, req resource.ConfigureRequest, resp *resource.ConfigureResponse) {
+func (r *CDNResourceRuleResource) Configure(ctx context.Context, req resource.ConfigureRequest, resp *resource.ConfigureResponse) {
 	if req.ProviderData == nil {
 		return
 	}
@@ -55,8 +55,8 @@ func (r *CDNCDNResourceRuleResource) Configure(ctx context.Context, req resource
 	r.client = client
 }
 
-func (r *CDNCDNResourceRuleResource) Create(ctx context.Context, req resource.CreateRequest, resp *resource.CreateResponse) {
-	var data *CDNCDNResourceRuleModel
+func (r *CDNResourceRuleResource) Create(ctx context.Context, req resource.CreateRequest, resp *resource.CreateResponse) {
+	var data *CDNResourceRuleModel
 
 	resp.Diagnostics.Append(req.Plan.Get(ctx, &data)...)
 
@@ -92,8 +92,8 @@ func (r *CDNCDNResourceRuleResource) Create(ctx context.Context, req resource.Cr
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
 }
 
-func (r *CDNCDNResourceRuleResource) Update(ctx context.Context, req resource.UpdateRequest, resp *resource.UpdateResponse) {
-	var data *CDNCDNResourceRuleModel
+func (r *CDNResourceRuleResource) Update(ctx context.Context, req resource.UpdateRequest, resp *resource.UpdateResponse) {
+	var data *CDNResourceRuleModel
 
 	resp.Diagnostics.Append(req.Plan.Get(ctx, &data)...)
 
@@ -101,7 +101,7 @@ func (r *CDNCDNResourceRuleResource) Update(ctx context.Context, req resource.Up
 		return
 	}
 
-	var state *CDNCDNResourceRuleModel
+	var state *CDNResourceRuleModel
 
 	resp.Diagnostics.Append(req.State.Get(ctx, &state)...)
 
@@ -139,8 +139,8 @@ func (r *CDNCDNResourceRuleResource) Update(ctx context.Context, req resource.Up
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
 }
 
-func (r *CDNCDNResourceRuleResource) Read(ctx context.Context, req resource.ReadRequest, resp *resource.ReadResponse) {
-	var data *CDNCDNResourceRuleModel
+func (r *CDNResourceRuleResource) Read(ctx context.Context, req resource.ReadRequest, resp *resource.ReadResponse) {
+	var data *CDNResourceRuleModel
 
 	resp.Diagnostics.Append(req.State.Get(ctx, &data)...)
 
@@ -177,8 +177,8 @@ func (r *CDNCDNResourceRuleResource) Read(ctx context.Context, req resource.Read
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
 }
 
-func (r *CDNCDNResourceRuleResource) Delete(ctx context.Context, req resource.DeleteRequest, resp *resource.DeleteResponse) {
-	var data *CDNCDNResourceRuleModel
+func (r *CDNResourceRuleResource) Delete(ctx context.Context, req resource.DeleteRequest, resp *resource.DeleteResponse) {
+	var data *CDNResourceRuleModel
 
 	resp.Diagnostics.Append(req.State.Get(ctx, &data)...)
 
@@ -202,8 +202,8 @@ func (r *CDNCDNResourceRuleResource) Delete(ctx context.Context, req resource.De
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
 }
 
-func (r *CDNCDNResourceRuleResource) ImportState(ctx context.Context, req resource.ImportStateRequest, resp *resource.ImportStateResponse) {
-	var data = new(CDNCDNResourceRuleModel)
+func (r *CDNResourceRuleResource) ImportState(ctx context.Context, req resource.ImportStateRequest, resp *resource.ImportStateResponse) {
+	var data = new(CDNResourceRuleModel)
 
 	path_resource_id := int64(0)
 	path_rule_id := int64(0)
@@ -245,6 +245,6 @@ func (r *CDNCDNResourceRuleResource) ImportState(ctx context.Context, req resour
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
 }
 
-func (r *CDNCDNResourceRuleResource) ModifyPlan(_ context.Context, _ resource.ModifyPlanRequest, _ *resource.ModifyPlanResponse) {
+func (r *CDNResourceRuleResource) ModifyPlan(_ context.Context, _ resource.ModifyPlanRequest, _ *resource.ModifyPlanResponse) {
 
 }

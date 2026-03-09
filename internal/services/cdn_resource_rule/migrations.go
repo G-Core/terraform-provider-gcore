@@ -1,6 +1,6 @@
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 
-package cdn_cdn_resource_rule
+package cdn_resource_rule
 
 import (
 	"context"
@@ -8,8 +8,8 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 )
 
-var _ resource.ResourceWithUpgradeState = (*CDNCDNResourceRuleResource)(nil)
+var _ resource.ResourceWithUpgradeState = (*CDNResourceRuleResource)(nil)
 
-func (r *CDNCDNResourceRuleResource) UpgradeState(ctx context.Context) map[int64]resource.StateUpgrader {
+func (r *CDNResourceRuleResource) UpgradeState(ctx context.Context) map[int64]resource.StateUpgrader {
 	return map[int64]resource.StateUpgrader{}
 }

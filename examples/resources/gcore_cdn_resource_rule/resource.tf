@@ -1,4 +1,4 @@
-resource "gcore_cdn_cdn_resource_rule" "example_cdn_cdn_resource_rule" {
+resource "gcore_cdn_resource_rule" "example_cdn_resource_rule" {
   resource_id = 0
   name = "My first rule"
   rule = "/folder/images/*.png"
