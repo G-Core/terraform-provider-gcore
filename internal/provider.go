@@ -19,7 +19,6 @@ import (
 	"github.com/G-Core/terraform-provider-gcore/internal/services/cloud_gpu_baremetal_cluster_image"
 	"github.com/G-Core/terraform-provider-gcore/internal/services/cloud_gpu_virtual_cluster"
 	"github.com/G-Core/terraform-provider-gcore/internal/services/cloud_gpu_virtual_cluster_image"
-	"github.com/G-Core/terraform-provider-gcore/internal/services/cloud_inference_deployment"
 	"github.com/G-Core/terraform-provider-gcore/internal/services/cloud_inference_registry_credential"
 	"github.com/G-Core/terraform-provider-gcore/internal/services/cloud_inference_secret"
 	"github.com/G-Core/terraform-provider-gcore/internal/services/cloud_instance"
@@ -201,7 +200,6 @@ func (p *GcoreProvider) Resources(ctx context.Context) []func() resource.Resourc
 		cloud_floating_ip.NewResource,
 		cloud_security_group.NewResource,
 		cloud_security_group_rule.NewResource,
-		cloud_inference_deployment.NewResource,
 		cloud_inference_registry_credential.NewResource,
 		cloud_inference_secret.NewResource,
 		cloud_placement_group.NewResource,
@@ -255,8 +253,6 @@ func (p *GcoreProvider) DataSources(ctx context.Context) []func() datasource.Dat
 		cloud_floating_ip.NewCloudFloatingIPsDataSource,
 		cloud_security_group.NewCloudSecurityGroupDataSource,
 		cloud_security_group.NewCloudSecurityGroupsDataSource,
-		cloud_inference_deployment.NewCloudInferenceDeploymentDataSource,
-		cloud_inference_deployment.NewCloudInferenceDeploymentsDataSource,
 		cloud_inference_registry_credential.NewCloudInferenceRegistryCredentialDataSource,
 		cloud_inference_registry_credential.NewCloudInferenceRegistryCredentialsDataSource,
 		cloud_inference_secret.NewCloudInferenceSecretDataSource,

@@ -3,7 +3,7 @@ module github.com/G-Core/terraform-provider-gcore
 go 1.24.0
 
 require (
-	github.com/G-Core/gcore-go v0.36.0
+	github.com/G-Core/gcore-go v0.37.0
 	github.com/davecgh/go-spew v1.1.1
 	github.com/hashicorp/terraform-plugin-docs v0.16.0
 	github.com/hashicorp/terraform-plugin-framework v1.15.0
