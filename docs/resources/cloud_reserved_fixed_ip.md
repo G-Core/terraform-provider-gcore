@@ -1,5 +1,5 @@
 ---
-page_title: "gcore_cloud_reserved_fixed_ip Resource - gcore"
+page_title: "gcore_cloud_reserved_fixed_ip Resource - Gcore"
 subcategory: ""
 description: |-
   Reserved fixed IPs are static IP addresses that persist independently of instances and can be used as virtual IPs (VIPs) for high availability.
@@ -205,6 +205,8 @@ Read-Only:
 ## Import
 
 Import is supported using the following syntax:
+
+The [`terraform import` command](https://developer.hashicorp.com/terraform/cli/commands/import) can be used, for example:
 
 ```shell
 $ terraform import gcore_cloud_reserved_fixed_ip.example '<project_id>/<region_id>/<port_id>'

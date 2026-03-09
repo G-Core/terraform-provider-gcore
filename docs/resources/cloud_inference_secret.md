@@ -1,5 +1,5 @@
 ---
-page_title: "gcore_cloud_inference_secret Resource - gcore"
+page_title: "gcore_cloud_inference_secret Resource - Gcore"
 subcategory: ""
 description: |-
   Inference secrets store sensitive values such as AWS credentials used for SQS-based autoscaling triggers in deployments.
@@ -59,6 +59,8 @@ Required:
 ## Import
 
 Import is supported using the following syntax:
+
+The [`terraform import` command](https://developer.hashicorp.com/terraform/cli/commands/import) can be used, for example:
 
 ```shell
 $ terraform import gcore_cloud_inference_secret.example '<project_id>/<secret_name>'

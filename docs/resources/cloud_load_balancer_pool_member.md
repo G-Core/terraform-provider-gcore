@@ -1,5 +1,5 @@
 ---
-page_title: "gcore_cloud_load_balancer_pool_member Resource - gcore"
+page_title: "gcore_cloud_load_balancer_pool_member Resource - Gcore"
 subcategory: ""
 description: |-
   Pool members represent backend instances that receive load-balanced traffic from a pool.

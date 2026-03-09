@@ -1,5 +1,5 @@
 ---
-page_title: "gcore_cloud_instance Resource - gcore"
+page_title: "gcore_cloud_instance Resource - Gcore"
 subcategory: ""
 description: |-
   Instances are cloud virtual machines with configurable CPU, memory, storage, and networking, supporting various operating systems and workloads.
@@ -562,6 +562,8 @@ Read-Only:
 ## Import
 
 Import is supported using the following syntax:
+
+The [`terraform import` command](https://developer.hashicorp.com/terraform/cli/commands/import) can be used, for example:
 
 ```shell
 $ terraform import gcore_cloud_instance.example '<project_id>/<region_id>/<instance_id>'

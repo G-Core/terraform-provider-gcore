@@ -1,5 +1,5 @@
 ---
-page_title: "gcore_dns_network_mapping Resource - gcore"
+page_title: "gcore_dns_network_mapping Resource - Gcore"
 subcategory: ""
 description: |-
   DNS network mappings associate CIDR ranges with network tags for private DNS resolution and traffic-based routing.
@@ -52,6 +52,8 @@ Optional:
 ## Import
 
 Import is supported using the following syntax:
+
+The [`terraform import` command](https://developer.hashicorp.com/terraform/cli/commands/import) can be used, for example:
 
 ```shell
 $ terraform import gcore_dns_network_mapping.example '<id>'

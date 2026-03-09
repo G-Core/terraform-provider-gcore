@@ -1,5 +1,5 @@
 ---
-page_title: "gcore_cdn_origin_group Resource - gcore"
+page_title: "gcore_cdn_origin_group Resource - Gcore"
 subcategory: ""
 description: |-
   CDN origin groups aggregate one or more origin servers with failover and load balancing for content delivery.
@@ -176,6 +176,8 @@ Default value is true.
 ## Import
 
 Import is supported using the following syntax:
+
+The [`terraform import` command](https://developer.hashicorp.com/terraform/cli/commands/import) can be used, for example:
 
 ```shell
 $ terraform import gcore_cdn_origin_group.example '<origin_group_id>'

@@ -1,5 +1,5 @@
 ---
-page_title: "gcore_cloud_instance_image Resource - gcore"
+page_title: "gcore_cloud_instance_image Resource - Gcore"
 subcategory: ""
 description: |-
   Instance images are operating system images (public, private, or shared) used to boot cloud instances.
@@ -80,6 +80,8 @@ Available values: "allow", "deny", "required".
 ## Import
 
 Import is supported using the following syntax:
+
+The [`terraform import` command](https://developer.hashicorp.com/terraform/cli/commands/import) can be used, for example:
 
 ```shell
 $ terraform import gcore_cloud_instance_image.example '<project_id>/<region_id>/<image_id>'

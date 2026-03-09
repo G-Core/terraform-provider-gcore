@@ -1,5 +1,5 @@
 ---
-page_title: "gcore_cloud_load_balancer_pool Resource - gcore"
+page_title: "gcore_cloud_load_balancer_pool Resource - Gcore"
 subcategory: ""
 description: |-
   Load balancer pools group backend instances with a load balancing algorithm and health monitoring configuration.
@@ -196,6 +196,8 @@ Read-Only:
 ## Import
 
 Import is supported using the following syntax:
+
+The [`terraform import` command](https://developer.hashicorp.com/terraform/cli/commands/import) can be used, for example:
 
 ```shell
 $ terraform import gcore_cloud_load_balancer_pool.example '<project_id>/<region_id>/<pool_id>'

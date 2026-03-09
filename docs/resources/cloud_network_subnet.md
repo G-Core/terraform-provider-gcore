@@ -1,5 +1,5 @@
 ---
-page_title: "gcore_cloud_network_subnet Resource - gcore"
+page_title: "gcore_cloud_network_subnet Resource - Gcore"
 subcategory: ""
 description: |-
   Subnets define IP address ranges within a network for instance connectivity, with support for DHCP and DNS configuration.
@@ -109,6 +109,8 @@ Required:
 ## Import
 
 Import is supported using the following syntax:
+
+The [`terraform import` command](https://developer.hashicorp.com/terraform/cli/commands/import) can be used, for example:
 
 ```shell
 $ terraform import gcore_cloud_network_subnet.example '<project_id>/<region_id>/<subnet_id>'

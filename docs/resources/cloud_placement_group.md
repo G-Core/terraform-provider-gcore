@@ -1,5 +1,5 @@
 ---
-page_title: "gcore_cloud_placement_group Resource - gcore"
+page_title: "gcore_cloud_placement_group Resource - Gcore"
 subcategory: ""
 description: |-
   Placement groups enforce affinity or anti-affinity policies that control whether virtual machines are hosted on the same or different physical servers.

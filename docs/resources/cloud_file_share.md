@@ -1,5 +1,5 @@
 ---
-page_title: "gcore_cloud_file_share Resource - gcore"
+page_title: "gcore_cloud_file_share Resource - Gcore"
 subcategory: ""
 description: |-
   File shares provide NFS-based shared storage that can be mounted by virtual machines and Kubernetes clusters for persistent data.
@@ -122,6 +122,8 @@ Available values: "LCD", "NPL".
 ## Import
 
 Import is supported using the following syntax:
+
+The [`terraform import` command](https://developer.hashicorp.com/terraform/cli/commands/import) can be used, for example:
 
 ```shell
 $ terraform import gcore_cloud_file_share.example '<project_id>/<region_id>/<file_share_id>'

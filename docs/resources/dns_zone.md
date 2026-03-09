@@ -1,5 +1,5 @@
 ---
-page_title: "gcore_dns_zone Resource - gcore"
+page_title: "gcore_dns_zone Resource - Gcore"
 subcategory: ""
 description: |-
   DNS zones are authoritative containers for domain name records, with support for DNSSEC and SOA configuration.
@@ -105,6 +105,8 @@ Read-Only:
 ## Import
 
 Import is supported using the following syntax:
+
+The [`terraform import` command](https://developer.hashicorp.com/terraform/cli/commands/import) can be used, for example:
 
 ```shell
 $ terraform import gcore_dns_zone.example '<name>'

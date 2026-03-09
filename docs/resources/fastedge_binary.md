@@ -1,5 +1,5 @@
 ---
-page_title: "gcore_fastedge_binary Resource - gcore"
+page_title: "gcore_fastedge_binary Resource - Gcore"
 subcategory: ""
 description: |-
   Manages a FastEdge WebAssembly binary. Binaries are immutable - any change to the file content will trigger resource replacement.
@@ -50,6 +50,8 @@ resource "gcore_fastedge_binary" "example" {
 ## Import
 
 Import is supported using the following syntax:
+
+The [`terraform import` command](https://developer.hashicorp.com/terraform/cli/commands/import) can be used, for example:
 
 ```shell
 $ terraform import gcore_fastedge_binary.example '<id>'

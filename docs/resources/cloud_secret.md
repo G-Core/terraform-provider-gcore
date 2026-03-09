@@ -1,5 +1,5 @@
 ---
-page_title: "gcore_cloud_secret Resource - gcore"
+page_title: "gcore_cloud_secret Resource - Gcore"
 subcategory: ""
 description: |-
   Secrets store sensitive data such as TLS certificates and private keys in encrypted form within a cloud region.
@@ -72,6 +72,8 @@ Required:
 ## Import
 
 Import is supported using the following syntax:
+
+The [`terraform import` command](https://developer.hashicorp.com/terraform/cli/commands/import) can be used, for example:
 
 ```shell
 $ terraform import gcore_cloud_secret.example '<project_id>/<region_id>/<secret_id>'

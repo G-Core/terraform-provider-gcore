@@ -1,5 +1,5 @@
 ---
-page_title: "gcore_fastedge_secret Resource - gcore"
+page_title: "gcore_fastedge_secret Resource - Gcore"
 subcategory: ""
 description: |-
   FastEdge secrets store sensitive values such as API keys and tokens that can be referenced by FastEdge applications.
@@ -70,6 +70,8 @@ Read-Only:
 ## Import
 
 Import is supported using the following syntax:
+
+The [`terraform import` command](https://developer.hashicorp.com/terraform/cli/commands/import) can be used, for example:
 
 ```shell
 $ terraform import gcore_fastedge_secret.example '<id>'
