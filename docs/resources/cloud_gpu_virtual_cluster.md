@@ -145,7 +145,7 @@ Optional:
 
 Optional:
 
-- `password_wo` (String) Used to set the password for the specified 'username' on Linux instances. If 'username' is not provided, the password is applied to the default user of the image. Mutually exclusive with '`user_data`' - only one can be specified.
+- `password_wo` (String, [Write-only](https://developer.hashicorp.com/terraform/language/resources/ephemeral#write-only-arguments)) Used to set the password for the specified 'username' on Linux instances. If 'username' is not provided, the password is applied to the default user of the image. Mutually exclusive with '`user_data`' - only one can be specified.
 - `password_wo_version` (Number) Version of the password write-only field. Increment this value to trigger an update when changing the password.
 - `ssh_key_name` (String) Specifies the name of the SSH keypair, created via the
 [/v1/`ssh_keys` endpoint](/docs/api-reference/cloud/ssh-keys/add-or-generate-ssh-key).

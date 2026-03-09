@@ -62,9 +62,9 @@ Poll task status until completion (`FINISHED`/`ERROR`) before proceeding with de
 
 Required:
 
-- `certificate_chain_wo` (String) SSL certificate chain of intermediates and root certificates in PEM format. This is a write-only field — it will be sent to the API but never stored in state.
-- `certificate_wo` (String) SSL certificate in PEM format. This is a write-only field — it will be sent to the API but never stored in state.
-- `private_key_wo` (String) SSL private key in PEM format. This is a write-only field — it will be sent to the API but never stored in state.
+- `certificate_chain_wo` (String, [Write-only](https://developer.hashicorp.com/terraform/language/resources/ephemeral#write-only-arguments)) SSL certificate chain of intermediates and root certificates in PEM format. This is a write-only field — it will be sent to the API but never stored in state.
+- `certificate_wo` (String, [Write-only](https://developer.hashicorp.com/terraform/language/resources/ephemeral#write-only-arguments)) SSL certificate in PEM format. This is a write-only field — it will be sent to the API but never stored in state.
+- `private_key_wo` (String, [Write-only](https://developer.hashicorp.com/terraform/language/resources/ephemeral#write-only-arguments)) SSL private key in PEM format. This is a write-only field — it will be sent to the API but never stored in state.
 
 ## Import
 

@@ -80,7 +80,7 @@ Possible values:
 
 Required:
 
-- `s3_access_key_id` (String) Access key ID for the S3 account. This is a write-only field - it will be sent to the API but never stored in state. 
+- `s3_access_key_id` (String, [Write-only](https://developer.hashicorp.com/terraform/language/resources/ephemeral#write-only-arguments)) Access key ID for the S3 account. This is a write-only field - it will be sent to the API but never stored in state. 
 
 Restrictions:
 - Latin letters (A-Z, a-z), numbers (0-9), colon, dash, and underscore.
@@ -90,7 +90,7 @@ Restrictions:
 Restrictions:
 - Maximum 128 characters.
 - `s3_credentials_version` (Number) Version number for S3 credentials. Increment this value to force Terraform to re-send the S3 credentials to the API. Since credentials are write-only and not stored in state, changing this value is the way to update credentials.
-- `s3_secret_access_key` (String) Secret access key for the S3 account. This is a write-only field - it will be sent to the API but never stored in state. 
+- `s3_secret_access_key` (String, [Write-only](https://developer.hashicorp.com/terraform/language/resources/ephemeral#write-only-arguments)) Secret access key for the S3 account. This is a write-only field - it will be sent to the API but never stored in state. 
 
 Restrictions:
 - Latin letters (A-Z, a-z), numbers (0-9), pluses, slashes, dashes, colons and underscores.

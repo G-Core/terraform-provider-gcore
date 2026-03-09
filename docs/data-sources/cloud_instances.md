@@ -173,7 +173,7 @@ Read-Only:
 - `name` (String) Human-readable name of the protection template
 
 <a id="nestedatt--items--ddos_profile--profile_template--fields"></a>
-### Nested Schema for `items.ddos_profile.profile_template.name`
+### Nested Schema for `items.ddos_profile.profile_template.fields`
 
 Read-Only:
 

@@ -45,12 +45,14 @@ It must be unique.
 
 ### Optional
 
+> **NOTE**: [Write-only arguments](https://developer.hashicorp.com/terraform/language/resources/ephemeral#write-only-arguments) are supported in Terraform 1.11 and later.
+
 - `automated` (Boolean) Must be **true** to issue certificate automatically.
-- `ssl_certificate_wo` (String) Public part of the SSL certificate.
+- `ssl_certificate_wo` (String, [Write-only](https://developer.hashicorp.com/terraform/language/resources/ephemeral#write-only-arguments)) Public part of the SSL certificate.
 
 All chain of the SSL certificate should be added. This is a write-only field — it will be sent to the API but never stored in state.
 - `ssl_certificate_wo_version` (Number) SSL certificate write-only version. Increment this value to force Terraform to re-send the SSL certificate and private key to the API.
-- `ssl_private_key_wo` (String) Private key of the SSL certificate. This is a write-only field — it will be sent to the API but never stored in state.
+- `ssl_private_key_wo` (String, [Write-only](https://developer.hashicorp.com/terraform/language/resources/ephemeral#write-only-arguments)) Private key of the SSL certificate. This is a write-only field — it will be sent to the API but never stored in state.
 - `validate_root_ca` (Boolean) Defines whether to check the SSL certificate for a signature from a trusted certificate authority.
 
 Possible values:

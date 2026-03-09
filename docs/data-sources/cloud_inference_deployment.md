@@ -106,7 +106,7 @@ Read-Only:
 - `sqs` (Attributes) SQS trigger configuration (see [below for nested schema](#nestedatt--containers--scale--triggers--sqs))
 
 <a id="nestedatt--containers--scale--triggers--cpu"></a>
-### Nested Schema for `containers.scale.triggers.sqs`
+### Nested Schema for `containers.scale.triggers.cpu`
 
 Read-Only:
 
@@ -114,7 +114,7 @@ Read-Only:
 
 
 <a id="nestedatt--containers--scale--triggers--gpu_memory"></a>
-### Nested Schema for `containers.scale.triggers.sqs`
+### Nested Schema for `containers.scale.triggers.gpu_memory`
 
 Read-Only:
 
@@ -122,7 +122,7 @@ Read-Only:
 
 
 <a id="nestedatt--containers--scale--triggers--gpu_utilization"></a>
-### Nested Schema for `containers.scale.triggers.sqs`
+### Nested Schema for `containers.scale.triggers.gpu_utilization`
 
 Read-Only:
 
@@ -130,7 +130,7 @@ Read-Only:
 
 
 <a id="nestedatt--containers--scale--triggers--http"></a>
-### Nested Schema for `containers.scale.triggers.sqs`
+### Nested Schema for `containers.scale.triggers.http`
 
 Read-Only:
 
@@ -139,7 +139,7 @@ Read-Only:
 
 
 <a id="nestedatt--containers--scale--triggers--memory"></a>
-### Nested Schema for `containers.scale.triggers.sqs`
+### Nested Schema for `containers.scale.triggers.memory`
 
 Read-Only:
 
@@ -233,7 +233,7 @@ Read-Only:
 - `timeout_seconds` (Number) The timeout for each probe.
 
 <a id="nestedatt--probes--liveness_probe--probe--exec"></a>
-### Nested Schema for `probes.liveness_probe.probe.timeout_seconds`
+### Nested Schema for `probes.liveness_probe.probe.exec`
 
 Read-Only:
 
@@ -241,7 +241,7 @@ Read-Only:
 
 
 <a id="nestedatt--probes--liveness_probe--probe--http_get"></a>
-### Nested Schema for `probes.liveness_probe.probe.timeout_seconds`
+### Nested Schema for `probes.liveness_probe.probe.http_get`
 
 Read-Only:
 
@@ -253,7 +253,7 @@ Read-Only:
 
 
 <a id="nestedatt--probes--liveness_probe--probe--tcp_socket"></a>
-### Nested Schema for `probes.liveness_probe.probe.timeout_seconds`
+### Nested Schema for `probes.liveness_probe.probe.tcp_socket`
 
 Read-Only:
 
@@ -285,7 +285,7 @@ Read-Only:
 - `timeout_seconds` (Number) The timeout for each probe.
 
 <a id="nestedatt--probes--readiness_probe--probe--exec"></a>
-### Nested Schema for `probes.readiness_probe.probe.timeout_seconds`
+### Nested Schema for `probes.readiness_probe.probe.exec`
 
 Read-Only:
 
@@ -293,7 +293,7 @@ Read-Only:
 
 
 <a id="nestedatt--probes--readiness_probe--probe--http_get"></a>
-### Nested Schema for `probes.readiness_probe.probe.timeout_seconds`
+### Nested Schema for `probes.readiness_probe.probe.http_get`
 
 Read-Only:
 
@@ -305,7 +305,7 @@ Read-Only:
 
 
 <a id="nestedatt--probes--readiness_probe--probe--tcp_socket"></a>
-### Nested Schema for `probes.readiness_probe.probe.timeout_seconds`
+### Nested Schema for `probes.readiness_probe.probe.tcp_socket`
 
 Read-Only:
 
@@ -337,7 +337,7 @@ Read-Only:
 - `timeout_seconds` (Number) The timeout for each probe.
 
 <a id="nestedatt--probes--startup_probe--probe--exec"></a>
-### Nested Schema for `probes.startup_probe.probe.timeout_seconds`
+### Nested Schema for `probes.startup_probe.probe.exec`
 
 Read-Only:
 
@@ -345,7 +345,7 @@ Read-Only:
 
 
 <a id="nestedatt--probes--startup_probe--probe--http_get"></a>
-### Nested Schema for `probes.startup_probe.probe.timeout_seconds`
+### Nested Schema for `probes.startup_probe.probe.http_get`
 
 Read-Only:
 
@@ -357,7 +357,7 @@ Read-Only:
 
 
 <a id="nestedatt--probes--startup_probe--probe--tcp_socket"></a>
-### Nested Schema for `probes.startup_probe.probe.timeout_seconds`
+### Nested Schema for `probes.startup_probe.probe.tcp_socket`
 
 Read-Only:
 

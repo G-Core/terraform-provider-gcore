@@ -72,11 +72,13 @@ resource "gcore_cloud_instance" "example_cloud_instance" {
 
 ### Optional
 
+> **NOTE**: [Write-only arguments](https://developer.hashicorp.com/terraform/language/resources/ephemeral#write-only-arguments) are supported in Terraform 1.11 and later.
+
 - `allow_app_ports` (Boolean) Set to `true` if creating the instance from an `apptemplate`. This allows application ports in the security group for instances created from a marketplace application template.
 - `configuration` (Map of String) Parameters for the application template if creating the instance from an `apptemplate`.
 - `name` (String) Instance name.
 - `name_template` (String) If you want the instance name to be automatically generated based on IP addresses, you can provide a name template instead of specifying the name manually. The template should include a placeholder that will be replaced during provisioning. Supported placeholders are: `{ip_octets}` (last 3 octets of the IP), `{two_ip_octets}`, and `{one_ip_octet}`.
-- `password_wo` (String) For Linux instances, 'username' and 'password' are used to create a new user. When only 'password' is provided, it is set as the password for the default user of the image. For Windows instances, 'username' cannot be specified. Use the 'password' field to set the password for the 'Admin' user on Windows. Use the 'user_data' field to provide a script to create new users on Windows. The password of the Admin user cannot be updated via 'user_data'.
+- `password_wo` (String, [Write-only](https://developer.hashicorp.com/terraform/language/resources/ephemeral#write-only-arguments)) For Linux instances, 'username' and 'password' are used to create a new user. When only 'password' is provided, it is set as the password for the default user of the image. For Windows instances, 'username' cannot be specified. Use the 'password' field to set the password for the 'Admin' user on Windows. Use the 'user_data' field to provide a script to create new users on Windows. The password of the Admin user cannot be updated via 'user_data'.
 - `password_wo_version` (Number) Instance password write-only version. Used to trigger updates of the write-only password field.
 - `project_id` (Number) Project ID. If not specified, uses GCORE_CLOUD_PROJECT_ID environment variable.
 - `region_id` (Number) Region ID. If not specified, uses GCORE_CLOUD_REGION_ID environment variable.

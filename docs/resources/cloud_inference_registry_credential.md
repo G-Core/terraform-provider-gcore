@@ -27,8 +27,10 @@ resource "gcore_cloud_inference_registry_credential" "example_cloud_inference_re
 
 ### Required
 
+> **NOTE**: [Write-only arguments](https://developer.hashicorp.com/terraform/language/resources/ephemeral#write-only-arguments) are supported in Terraform 1.11 and later.
+
 - `name` (String) Registry credential name.
-- `password_wo` (String) Registry password.
+- `password_wo` (String, [Write-only](https://developer.hashicorp.com/terraform/language/resources/ephemeral#write-only-arguments)) Registry password.
 - `password_wo_version` (Number) Registry credential password write-only version. Used to trigger updates of the write-only password field.
 - `registry_url` (String) Registry URL.
 - `username` (String) Registry username.
