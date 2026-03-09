@@ -49,7 +49,7 @@ Required:
 
 Optional:
 
-- `value` (String) The value of the secret.
+- `value` (String, Sensitive) The value of the secret. Write-only: sent to the API but never stored in state. Changes are detected by comparing the local SHA-256 hash with the server checksum.
 
 Read-Only:
 

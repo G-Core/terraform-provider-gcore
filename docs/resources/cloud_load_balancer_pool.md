@@ -92,7 +92,6 @@ Available values: "HTTP", "HTTPS", "PROXY", "PROXYV2", "TCP", "UDP".
 - `region_id` (Number) Region ID
 - `secret_id` (String) Secret ID for TLS client authentication to the member servers
 - `session_persistence` (Attributes) Session persistence details (see [below for nested schema](#nestedatt--session_persistence))
-- `timeout_client_data` (Number, Deprecated) Frontend client inactivity timeout in milliseconds. We are recommending to use `listener.timeout_client_data` instead.
 - `timeout_member_connect` (Number) Backend member connection timeout in milliseconds
 - `timeout_member_data` (Number) Backend member inactivity timeout in milliseconds
 

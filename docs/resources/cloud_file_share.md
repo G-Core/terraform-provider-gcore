@@ -23,15 +23,10 @@ resource "gcore_cloud_file_share" "example_cloud_file_share" {
   }
   protocol = "NFS"
   size = 5
-  access = [{
-    access_mode = "ro"
-    ip_address = "10.0.0.1"
-  }]
   tags = {
     my-tag = "my-tag-value"
   }
   type_name = "standard"
-  volume_type = "default_share_type"
 }
 ```
 
@@ -47,7 +42,6 @@ Available values: "NFS".
 
 ### Optional
 
-- `access` (Attributes List) Access Rules (see [below for nested schema](#nestedatt--access))
 - `network` (Attributes) File share network configuration (see [below for nested schema](#nestedatt--network))
 - `project_id` (Number) Project ID
 - `region_id` (Number) Region ID
@@ -55,11 +49,10 @@ Available values: "NFS".
 - `tags` (Map of String) Key-value tags to associate with the resource. A tag is a key-value pair that can be associated with a resource, enabling efficient filtering and grouping for better organization and management. Both tag keys and values have a maximum length of 255 characters. Some tags are read-only and cannot be modified by the user. Tags are also integrated with cost reports, allowing cost data to be filtered based on tag keys or values.
 - `type_name` (String) Standard file share type
 Available values: "standard", "vast".
-- `volume_type` (String, Deprecated) Deprecated. Use `type_name` instead.
-Available values: "default_share_type", "vast_share_type".
 
 ### Read-Only
 
+- `access_rule_ids` (List of String) List of access rules IDs associated with the file share
 - `connection_point` (String) Connection point. Can be null during File share creation
 - `created_at` (String) Datetime when the file share was created
 - `creator_task_id` (String) Task that created this entity
@@ -72,20 +65,6 @@ Available values: "default_share_type", "vast_share_type".
 Available values: "available", "awaiting_transfer", "backup_creating", "backup_restoring", "backup_restoring_error", "creating", "creating_from_snapshot", "deleted", "deleting", "ensuring", "error", "error_deleting", "extending", "extending_error", "inactive", "manage_error", "manage_starting", "migrating", "migrating_to", "replication_change", "reverting", "reverting_error", "shrinking", "shrinking_error", "shrinking_possible_data_loss_error", "unmanage_error", "unmanage_starting", "unmanaged".
 - `subnet_id` (String) Subnet ID.
 - `subnet_name` (String) Subnet name.
-- `task_id` (String) The UUID of the active task that currently holds a lock on the resource. This lock prevents concurrent modifications to ensure consistency. If `null`, the resource is not locked.
-- `tasks` (List of String) List of task IDs representing asynchronous operations. Use these IDs to monitor operation progress:
-- `GET /v1/tasks/{task_id}` - Check individual task status and details
-Poll task status until completion (`FINISHED`/`ERROR`) before proceeding with dependent operations.
-
-<a id="nestedatt--access"></a>
-### Nested Schema for `access`
-
-Required:
-
-- `access_mode` (String) Access mode
-Available values: "ro", "rw".
-- `ip_address` (String) Source IP or network
-
 
 <a id="nestedatt--network"></a>
 ### Nested Schema for `network`

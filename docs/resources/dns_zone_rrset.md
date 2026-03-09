@@ -62,7 +62,6 @@ resource "gcore_dns_zone_rrset" "example_dns_zone_rrset" {
 - `name` (String)
 - `type` (String) RRSet type
 Available values: "A", "AAAA", "NS", "CNAME", "MX", "TXT", "SRV", "SOA".
-- `updated_at` (String) Timestamp marshals/unmarshals date and time as timestamp in json
 - `warning` (String) Warning about some possible side effects without strictly disallowing operations on rrset
 readonly
 Deprecated: use Warnings instead
@@ -74,21 +73,21 @@ readonly (see [below for nested schema](#nestedatt--warnings))
 
 Required:
 
-- `content` (List of String) Content of resource record
-The exact length of the array depends on the type of rrset,
-each individual record parameter must be a separate element of the array. For example
-- SRV-record: `[100, 1, 5061, "example.com"]`
-- CNAME-record: `[ "the.target.domain" ]`
-- A-record: `[ "1.2.3.4", "5.6.7.8" ]`
-- AAAA-record: `[ "2001:db8::1", "2001:db8::2" ]`
-- MX-record: `[ "mail1.example.com", "mail2.example.com" ]`
-- SVCB/HTTPS-record: `[ 1, ".", ["alpn", "h3", "h2"], [ "port", 1443 ], [ "ipv4hint", "10.0.0.1" ], [ "ech", "AEn+DQBFKwAgACABWIHUGj4u+PIggYXcR5JF0gYk3dCRioBW8uJq9H4mKAAIAAEAAQABAANAEnB1YmxpYy50bHMtZWNoLmRldgAA" ] ]`
+- `content` (List of String) Content of resource record.
+Values must be valid JSON (strings need inner quotes).
+Examples:
++ A-record: `["\"192.168.1.1\""]`
++ MX-record: `[10, "\"mail.example.com.\""]`
 
 Optional:
 
 - `enabled` (Boolean)
 - `meta` (Map of String) This meta will be used to decide which resource record should pass
 through filters from the filter set
+
+Read-Only:
+
+- `id` (Number) ID of the resource record
 
 
 <a id="nestedatt--pickers"></a>

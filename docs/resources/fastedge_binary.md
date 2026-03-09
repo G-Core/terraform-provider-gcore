@@ -3,18 +3,18 @@
 page_title: "gcore_fastedge_binary Resource - gcore"
 subcategory: ""
 description: |-
-  FastEdge binaries are immutable WebAssembly modules that implement edge application logic.
+  Manages a FastEdge WebAssembly binary. Binaries are immutable - any change to the file content will trigger resource replacement.
 ---
 
 # gcore_fastedge_binary (Resource)
 
-FastEdge binaries are immutable WebAssembly modules that implement edge application logic.
+Manages a FastEdge WebAssembly binary. Binaries are immutable - any change to the file content will trigger resource replacement.
 
 ## Example Usage
 
 ```terraform
-resource "gcore_fastedge_binary" "example_fastedge_binary" {
-  body = null
+resource "gcore_fastedge_binary" "example" {
+  filename = "path/to/your/wasm/binary.wasm"
 }
 ```
 
@@ -23,12 +23,12 @@ resource "gcore_fastedge_binary" "example_fastedge_binary" {
 
 ### Required
 
-- `body` (String)
+- `filename` (String) Path to the WebAssembly binary file to upload. Changes to file content (detected via checksum) will trigger resource replacement.
 
 ### Read-Only
 
 - `api_type` (String) Wasm API type
-- `checksum` (String) MD5 hash of the binary
+- `checksum` (String) MD5 hash of the binary. Computed from the local file and verified against the API response.
 - `id` (Number) Binary ID
 - `source` (Number) Source language:  
 0 - unknown  

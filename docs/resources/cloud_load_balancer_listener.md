@@ -60,8 +60,6 @@ Available values: "HTTP", "HTTPS", "PROMETHEUS", "TCP", "TERMINATED_HTTPS", "UDP
 Available values: "".
 - `sni_secret_id` (List of String) List of secrets IDs containing PKCS12 format certificate/key bundles for `TERMINATED_HTTPS` or PROMETHEUS listeners
 - `timeout_client_data` (Number) Frontend client inactivity timeout in milliseconds
-- `timeout_member_connect` (Number, Deprecated) Backend member connection timeout in milliseconds. We are recommending to use `pool.timeout_member_connect` instead.
-- `timeout_member_data` (Number, Deprecated) Backend member inactivity timeout in milliseconds. We are recommending to use `pool.timeout_member_data` instead.
 - `user_list` (Attributes List) Load balancer listener list of username and encrypted password items (see [below for nested schema](#nestedatt--user_list))
 
 ### Read-Only

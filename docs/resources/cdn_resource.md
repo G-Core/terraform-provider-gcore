@@ -37,10 +37,6 @@ resource "gcore_cdn_resource" "example_cdn_resource" {
       enabled = true
       value = "3600s"
     }
-    cache_http_headers = {
-      enabled = false
-      value = ["vary", "content-length", "last-modified", "connection", "accept-ranges", "content-type", "content-encoding", "etag", "cache-control", "expires", "keep-alive", "server"]
-    }
     cors = {
       enabled = true
       value = ["domain.com", "domain2.com"]
@@ -50,10 +46,6 @@ resource "gcore_cdn_resource" "example_cdn_resource" {
       enabled = true
       excepted_values = ["GB", "DE"]
       policy_type = "allow"
-    }
-    disable_cache = {
-      enabled = true
-      value = false
     }
     disable_proxy_force_ranges = {
       enabled = true
@@ -247,13 +239,6 @@ resource "gcore_cdn_resource" "example_cdn_resource" {
         always = false
       }]
     }
-    static_headers = {
-      enabled = true
-      value = {
-        X-Example = "Value_1"
-        X-Example-Multiple = ["Value_2", "Value_3"]
-      }
-    }
     static_request_headers = {
       enabled = true
       value = {
@@ -291,7 +276,6 @@ resource "gcore_cdn_resource" "example_cdn_resource" {
       value = true
     }
   }
-  origin = "example.com"
   origin_group = 132
   origin_protocol = "HTTPS"
   primary_resource = null
