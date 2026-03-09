@@ -1,4 +1,4 @@
-package cdn_cdn_resource_rule
+package cdn_resource_rule
 
 import (
 	"context"

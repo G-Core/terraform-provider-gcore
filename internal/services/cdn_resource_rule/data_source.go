@@ -1,6 +1,6 @@
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 
-package cdn_cdn_resource_rule
+package cdn_resource_rule
 
 import (
 	"context"
@@ -15,21 +15,21 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 )
 
-type CDNCDNResourceRuleDataSource struct {
+type CDNResourceRuleDataSource struct {
 	client *gcore.Client
 }
 
-var _ datasource.DataSourceWithConfigure = (*CDNCDNResourceRuleDataSource)(nil)
+var _ datasource.DataSourceWithConfigure = (*CDNResourceRuleDataSource)(nil)
 
-func NewCDNCDNResourceRuleDataSource() datasource.DataSource {
-	return &CDNCDNResourceRuleDataSource{}
+func NewCDNResourceRuleDataSource() datasource.DataSource {
+	return &CDNResourceRuleDataSource{}
 }
 
-func (d *CDNCDNResourceRuleDataSource) Metadata(ctx context.Context, req datasource.MetadataRequest, resp *datasource.MetadataResponse) {
-	resp.TypeName = req.ProviderTypeName + "_cdn_cdn_resource_rule"
+func (d *CDNResourceRuleDataSource) Metadata(ctx context.Context, req datasource.MetadataRequest, resp *datasource.MetadataResponse) {
+	resp.TypeName = req.ProviderTypeName + "_cdn_resource_rule"
 }
 
-func (d *CDNCDNResourceRuleDataSource) Configure(ctx context.Context, req datasource.ConfigureRequest, resp *datasource.ConfigureResponse) {
+func (d *CDNResourceRuleDataSource) Configure(ctx context.Context, req datasource.ConfigureRequest, resp *datasource.ConfigureResponse) {
 	if req.ProviderData == nil {
 		return
 	}
@@ -48,8 +48,8 @@ func (d *CDNCDNResourceRuleDataSource) Configure(ctx context.Context, req dataso
 	d.client = client
 }
 
-func (d *CDNCDNResourceRuleDataSource) Read(ctx context.Context, req datasource.ReadRequest, resp *datasource.ReadResponse) {
-	var data *CDNCDNResourceRuleDataSourceModel
+func (d *CDNResourceRuleDataSource) Read(ctx context.Context, req datasource.ReadRequest, resp *datasource.ReadResponse) {
+	var data *CDNResourceRuleDataSourceModel
 
 	resp.Diagnostics.Append(req.Config.Get(ctx, &data)...)
 

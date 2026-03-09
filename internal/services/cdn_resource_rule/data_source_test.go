@@ -1,4 +1,4 @@
-package cdn_cdn_resource_rule_test
+package cdn_resource_rule_test
 
 import (
 	"fmt"
