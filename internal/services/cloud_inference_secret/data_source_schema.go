@@ -5,15 +5,16 @@ package cloud_inference_secret
 import (
 	"context"
 
+	"github.com/G-Core/terraform-provider-gcore/internal/customfield"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/datasource/schema"
-	"github.com/stainless-sdks/gcore-terraform/internal/customfield"
 )
 
 var _ datasource.DataSourceWithConfigValidators = (*CloudInferenceSecretDataSource)(nil)
 
 func DataSourceSchema(ctx context.Context) schema.Schema {
 	return schema.Schema{
+		Description: "Inference secrets store sensitive values such as AWS credentials used for SQS-based autoscaling triggers in deployments.",
 		Attributes: map[string]schema.Attribute{
 			"id": schema.StringAttribute{
 				Description: "Inference secret name.",

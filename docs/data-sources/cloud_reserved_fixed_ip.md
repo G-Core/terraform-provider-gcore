@@ -3,12 +3,12 @@
 page_title: "gcore_cloud_reserved_fixed_ip Data Source - gcore"
 subcategory: ""
 description: |-
-  
+  Reserved fixed IPs are static IP addresses that persist independently of instances and can be used as virtual IPs (VIPs) for high availability.
 ---
 
 # gcore_cloud_reserved_fixed_ip (Data Source)
 
-
+Reserved fixed IPs are static IP addresses that persist independently of instances and can be used as virtual IPs (VIPs) for high availability.
 
 ## Example Usage
 
@@ -50,7 +50,6 @@ data "gcore_cloud_reserved_fixed_ip" "example_cloud_reserved_fixed_ip" {
 - `status` (String) Underlying port status
 - `subnet_id` (String) ID of the subnet that owns the IP address
 - `subnet_v6_id` (String) ID of the subnet that owns the IPv6 address
-- `task_id` (String) The UUID of the active task that currently holds a lock on the resource. This lock prevents concurrent modifications to ensure consistency. If `null`, the resource is not locked.
 - `updated_at` (String) Datetime when the reserved fixed IP was last updated
 
 <a id="nestedatt--allowed_address_pairs"></a>
@@ -91,7 +90,6 @@ Read-Only:
 - `shared` (Boolean) True when the network is shared with your project by external owner
 - `subnets` (List of String) List of subnetworks
 - `tags` (Attributes List) List of key-value tags associated with the resource. A tag is a key-value pair that can be associated with a resource, enabling efficient filtering and grouping for better organization and management. Some tags are read-only and cannot be modified by the user. Tags are also integrated with cost reports, allowing cost data to be filtered based on tag keys or values. (see [below for nested schema](#nestedatt--network--tags))
-- `task_id` (String) The UUID of the active task that currently holds a lock on the resource. This lock prevents concurrent modifications to ensure consistency. If `null`, the resource is not locked.
 - `type` (String) Network type (vlan, vxlan)
 - `updated_at` (String) Datetime when the network was last updated
 

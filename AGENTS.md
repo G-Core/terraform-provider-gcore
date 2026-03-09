@@ -102,7 +102,7 @@ Contains shared utilities used across all acceptance tests (following the AWS pr
 
 **Usage in acceptance tests:**
 ```go
-import "github.com/stainless-sdks/gcore-terraform/internal/acctest"
+import "github.com/G-Core/terraform-provider-gcore/internal/acctest"
 
 resource.ParallelTest(t, resource.TestCase{
     PreCheck:                 func() { acctest.PreCheck(t) },
@@ -175,8 +175,8 @@ import (
     "github.com/G-Core/gcore-go"
     "github.com/hashicorp/terraform-plugin-framework/resource"
 
-    "github.com/stainless-sdks/gcore-terraform/internal/apijson"
-    "github.com/stainless-sdks/gcore-terraform/internal/logging"
+    "github.com/G-Core/terraform-provider-gcore/internal/apijson"
+    "github.com/G-Core/terraform-provider-gcore/internal/logging"
 )
 ```
 

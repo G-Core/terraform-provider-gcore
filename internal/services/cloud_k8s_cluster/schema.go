@@ -6,7 +6,8 @@ import (
 	"context"
 	"strings"
 
-	"github.com/hashicorp/terraform-plugin-framework-jsontypes/jsontypes"
+	"github.com/G-Core/terraform-provider-gcore/internal/customfield"
+	"github.com/G-Core/terraform-provider-gcore/internal/planmodifiers"
 	"github.com/hashicorp/terraform-plugin-framework-validators/int64validator"
 	"github.com/hashicorp/terraform-plugin-framework-validators/listvalidator"
 	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
@@ -27,14 +28,13 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-framework/types/basetypes"
-	"github.com/stainless-sdks/gcore-terraform/internal/customfield"
-	"github.com/stainless-sdks/gcore-terraform/internal/planmodifiers"
 )
 
 var _ resource.ResourceWithConfigValidators = (*CloudK8SClusterResource)(nil)
 
 func ResourceSchema(ctx context.Context) schema.Schema {
 	return schema.Schema{
+		Description: "Managed Kubernetes clusters with configurable worker node pools, networking, and cluster add-ons.",
 		Attributes: map[string]schema.Attribute{
 			"id": schema.StringAttribute{
 				Description:   "The name of the cluster",
@@ -478,49 +478,6 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 							stringvalidator.OneOfCaseInsensitive("calico", "cilium"),
 						},
 						Default: stringdefault.StaticString("calico"),
-					},
-				},
-			},
-			"ddos_profile": schema.SingleNestedAttribute{
-				Description:   "Advanced DDoS Protection profile",
-				Computed:      true,
-				Optional:      true,
-				CustomType:    customfield.NewNestedObjectType[CloudK8SClusterDDOSProfileModel](ctx),
-				PlanModifiers: []planmodifier.Object{planmodifiers.UseStateForUnknownIncludingNullObject()},
-				Attributes: map[string]schema.Attribute{
-					"enabled": schema.BoolAttribute{
-						Description: "Enable advanced DDoS protection",
-						Required:    true,
-					},
-					"fields": schema.ListNestedAttribute{
-						Description: "DDoS profile parameters",
-						Computed:    true,
-						Optional:    true,
-						CustomType:  customfield.NewNestedObjectListType[CloudK8SClusterDDOSProfileFieldsModel](ctx),
-						NestedObject: schema.NestedAttributeObject{
-							Attributes: map[string]schema.Attribute{
-								"base_field": schema.Int64Attribute{
-									Required: true,
-								},
-								"field_value": schema.StringAttribute{
-									Description: "Complex value. Only one of 'value' or 'field_value' must be specified",
-									Optional:    true,
-									CustomType:  jsontypes.NormalizedType{},
-								},
-								"value": schema.StringAttribute{
-									Description: "Basic value. Only one of 'value' or 'field_value' must be specified",
-									Optional:    true,
-								},
-							},
-						},
-					},
-					"profile_template": schema.Int64Attribute{
-						Description: "DDoS profile template ID",
-						Optional:    true,
-					},
-					"profile_template_name": schema.StringAttribute{
-						Description: "DDoS profile template name",
-						Optional:    true,
 					},
 				},
 			},

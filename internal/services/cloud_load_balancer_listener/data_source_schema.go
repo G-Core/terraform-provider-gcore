@@ -5,6 +5,7 @@ package cloud_load_balancer_listener
 import (
 	"context"
 
+	"github.com/G-Core/terraform-provider-gcore/internal/customfield"
 	"github.com/hashicorp/terraform-plugin-framework-jsontypes/jsontypes"
 	"github.com/hashicorp/terraform-plugin-framework-validators/int64validator"
 	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
@@ -12,13 +13,13 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/datasource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
 	"github.com/hashicorp/terraform-plugin-framework/types"
-	"github.com/stainless-sdks/gcore-terraform/internal/customfield"
 )
 
 var _ datasource.DataSourceWithConfigValidators = (*CloudLoadBalancerListenerDataSource)(nil)
 
 func DataSourceSchema(ctx context.Context) schema.Schema {
 	return schema.Schema{
+		Description: "Load balancer listeners handle incoming traffic on specified protocols and ports, forwarding requests to backend pools.",
 		Attributes: map[string]schema.Attribute{
 			"id": schema.StringAttribute{
 				Description: "Listener ID",
@@ -119,10 +120,6 @@ func DataSourceSchema(ctx context.Context) schema.Schema {
 			},
 			"secret_id": schema.StringAttribute{
 				Description: "ID of the secret where PKCS12 file is stored for `TERMINATED_HTTPS` or PROMETHEUS load balancer",
-				Computed:    true,
-			},
-			"task_id": schema.StringAttribute{
-				Description: "The UUID of the active task that currently holds a lock on the resource. This lock prevents concurrent modifications to ensure consistency. If `null`, the resource is not locked.",
 				Computed:    true,
 			},
 			"timeout_client_data": schema.Int64Attribute{

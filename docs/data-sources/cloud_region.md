@@ -3,12 +3,12 @@
 page_title: "gcore_cloud_region Data Source - gcore"
 subcategory: ""
 description: |-
-  
+  Regions represent available Gcore cloud data centers with information about supported services and volume types.
 ---
 
 # gcore_cloud_region (Data Source)
 
-
+Regions represent available Gcore cloud data centers with information about supported services and volume types.
 
 ## Example Usage
 
@@ -57,7 +57,6 @@ Available values: "admin", "internal", "public".
 - `metrics_database_id` (Number) Foreign key to Metrics database entity
 - `state` (String) Region state
 Available values: "ACTIVE", "DELETED", "DELETING", "DELETION_FAILED", "INACTIVE", "MAINTENANCE", "NEW".
-- `task_id` (String, Deprecated) This field is deprecated and can be ignored
 - `vlan_physical_network` (String) Physical network name to create vlan networks
 - `zone` (String) Geographical zone
 Available values: "AMERICAS", "APAC", "EMEA", "RUSSIA_AND_CIS".

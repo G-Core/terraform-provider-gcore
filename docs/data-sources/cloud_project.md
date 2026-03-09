@@ -3,12 +3,12 @@
 page_title: "gcore_cloud_project Data Source - gcore"
 subcategory: ""
 description: |-
-  
+  Projects are organizational units that group cloud resources for access control and billing.
 ---
 
 # gcore_cloud_project (Data Source)
 
-
+Projects are organizational units that group cloud resources for access control and billing.
 
 ## Example Usage
 
@@ -35,4 +35,3 @@ data "gcore_cloud_project" "example_cloud_project" {
 - `is_default` (Boolean) Indicates if the project is the default one. Each client always has one default project.
 - `name` (String) Unique project name for a client.
 - `state` (String) The state of the project.
-- `task_id` (String) The UUID of the active task that currently holds a lock on the resource. This lock prevents concurrent modifications to ensure consistency. If `null`, the resource is not locked.

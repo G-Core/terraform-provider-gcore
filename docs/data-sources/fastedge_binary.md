@@ -3,12 +3,12 @@
 page_title: "gcore_fastedge_binary Data Source - gcore"
 subcategory: ""
 description: |-
-  Binaries are WebAssembly executables that are actually executed when app is ran.
+  FastEdge binaries are immutable WebAssembly modules that implement edge application logic.
 ---
 
 # gcore_fastedge_binary (Data Source)
 
-Binaries are WebAssembly executables that are actually executed when app is ran.
+FastEdge binaries are immutable WebAssembly modules that implement edge application logic.
 
 ## Example Usage
 

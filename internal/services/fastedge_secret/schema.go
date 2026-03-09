@@ -5,18 +5,18 @@ package fastedge_secret
 import (
 	"context"
 
+	"github.com/G-Core/terraform-provider-gcore/internal/customfield"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/int64planmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
-	"github.com/stainless-sdks/gcore-terraform/internal/customfield"
 )
 
 var _ resource.ResourceWithConfigValidators = (*FastedgeSecretResource)(nil)
 
 func ResourceSchema(ctx context.Context) schema.Schema {
 	return schema.Schema{
-		Description: "Secret values that can be used in apps",
+		Description: "FastEdge secrets store sensitive values such as API keys and tokens that can be referenced by FastEdge applications.",
 		Attributes: map[string]schema.Attribute{
 			"id": schema.Int64Attribute{
 				Description:   "The unique identifier of the secret.",

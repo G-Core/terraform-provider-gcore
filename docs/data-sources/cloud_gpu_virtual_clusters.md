@@ -3,12 +3,12 @@
 page_title: "gcore_cloud_gpu_virtual_clusters Data Source - gcore"
 subcategory: ""
 description: |-
-  
+  GPU virtual clusters provide managed virtual GPU servers with auto-scaling for parallel computation workloads.
 ---
 
 # gcore_cloud_gpu_virtual_clusters (Data Source)
 
-
+GPU virtual clusters provide managed virtual GPU servers with auto-scaling for parallel computation workloads.
 
 ## Example Usage
 
@@ -45,7 +45,7 @@ Read-Only:
 - `servers_ids` (List of String) List of cluster nodes
 - `servers_settings` (Attributes) (see [below for nested schema](#nestedatt--items--servers_settings))
 - `status` (String) Cluster status
-Available values: "active", "creating", "degraded", "deleting", "error", "new", "rebooting", "rebuilding", "resizing", "shutoff".
+Available values: "active", "creating", "degraded", "deleting", "error", "rebooting", "rebuilding", "resizing", "shutoff".
 - `tags` (Attributes List) List of key-value tags associated with the resource. A tag is a key-value pair that can be associated with a resource, enabling efficient filtering and grouping for better organization and management. Some tags are read-only and cannot be modified by the user. Tags are also integrated with cost reports, allowing cost data to be filtered based on tag keys or values. (see [below for nested schema](#nestedatt--items--tags))
 - `updated_at` (String) Cluster update date time
 
@@ -85,7 +85,7 @@ Available values: "dual", "ipv4", "ipv6".
 - `type` (String) Available values: "external", "subnet", "any_subnet".
 
 <a id="nestedatt--items--servers_settings--interfaces--floating_ip"></a>
-### Nested Schema for `items.servers_settings.interfaces.type`
+### Nested Schema for `items.servers_settings.interfaces.floating_ip`
 
 Read-Only:
 
@@ -117,7 +117,7 @@ Read-Only:
 Available values: "cold", "ssd_hiiops", "ssd_local", "ssd_lowlatency", "standard", "ultra".
 
 <a id="nestedatt--items--servers_settings--volumes--tags"></a>
-### Nested Schema for `items.servers_settings.volumes.type`
+### Nested Schema for `items.servers_settings.volumes.tags`
 
 Read-Only:
 

@@ -7,10 +7,10 @@ import (
 
 	"github.com/G-Core/gcore-go/cloud"
 	"github.com/G-Core/gcore-go/packages/param"
+	"github.com/G-Core/terraform-provider-gcore/internal/customfield"
 	"github.com/hashicorp/terraform-plugin-framework-timetypes/timetypes"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/types"
-	"github.com/stainless-sdks/gcore-terraform/internal/customfield"
 )
 
 type CloudReservedFixedIPsResultsListDataSourceEnvelope struct {
@@ -86,7 +86,6 @@ type CloudReservedFixedIPsItemsDataSourceModel struct {
 	ProjectID           types.Int64                                                                           `tfsdk:"project_id" json:"project_id,computed"`
 	SubnetID            types.String                                                                          `tfsdk:"subnet_id" json:"subnet_id,computed"`
 	SubnetV6ID          types.String                                                                          `tfsdk:"subnet_v6_id" json:"subnet_v6_id,computed"`
-	TaskID              types.String                                                                          `tfsdk:"task_id" json:"task_id,computed"`
 }
 
 type CloudReservedFixedIPsAllowedAddressPairsDataSourceModel struct {
@@ -115,7 +114,6 @@ type CloudReservedFixedIPsNetworkDataSourceModel struct {
 	Shared              types.Bool                                                                    `tfsdk:"shared" json:"shared,computed"`
 	Subnets             customfield.List[types.String]                                                `tfsdk:"subnets" json:"subnets,computed"`
 	Tags                customfield.NestedObjectList[CloudReservedFixedIPsNetworkTagsDataSourceModel] `tfsdk:"tags" json:"tags,computed"`
-	TaskID              types.String                                                                  `tfsdk:"task_id" json:"task_id,computed"`
 	Type                types.String                                                                  `tfsdk:"type" json:"type,computed"`
 	UpdatedAt           timetypes.RFC3339                                                             `tfsdk:"updated_at" json:"updated_at,computed" format:"date-time"`
 }

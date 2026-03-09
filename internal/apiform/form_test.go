@@ -16,8 +16,8 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-framework/types/basetypes"
 
-	"github.com/stainless-sdks/gcore-terraform/internal/customfield"
-	type_helpers "github.com/stainless-sdks/gcore-terraform/internal/types"
+	"github.com/G-Core/terraform-provider-gcore/internal/customfield"
+	type_helpers "github.com/G-Core/terraform-provider-gcore/internal/types"
 )
 
 func P[T any](v T) *T { return &v }

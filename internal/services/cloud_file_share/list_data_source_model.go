@@ -7,9 +7,9 @@ import (
 
 	"github.com/G-Core/gcore-go/cloud"
 	"github.com/G-Core/gcore-go/packages/param"
+	"github.com/G-Core/terraform-provider-gcore/internal/customfield"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/types"
-	"github.com/stainless-sdks/gcore-terraform/internal/customfield"
 )
 
 type CloudFileSharesResultsListDataSourceEnvelope struct {
@@ -63,7 +63,6 @@ type CloudFileSharesItemsDataSourceModel struct {
 	SubnetID         types.String                                                          `tfsdk:"subnet_id" json:"subnet_id,computed"`
 	SubnetName       types.String                                                          `tfsdk:"subnet_name" json:"subnet_name,computed"`
 	Tags             customfield.NestedObjectList[CloudFileSharesTagsDataSourceModel]      `tfsdk:"tags" json:"tags,computed"`
-	TaskID           types.String                                                          `tfsdk:"task_id" json:"task_id,computed"`
 	TypeName         types.String                                                          `tfsdk:"type_name" json:"type_name,computed"`
 }
 

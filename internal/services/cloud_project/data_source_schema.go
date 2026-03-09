@@ -14,6 +14,7 @@ var _ datasource.DataSourceWithConfigValidators = (*CloudProjectDataSource)(nil)
 
 func DataSourceSchema(ctx context.Context) schema.Schema {
 	return schema.Schema{
+		Description: "Projects are organizational units that group cloud resources for access control and billing.",
 		Attributes: map[string]schema.Attribute{
 			"project_id": schema.Int64Attribute{
 				Description: "Project ID",
@@ -51,10 +52,6 @@ func DataSourceSchema(ctx context.Context) schema.Schema {
 			},
 			"state": schema.StringAttribute{
 				Description: "The state of the project.",
-				Computed:    true,
-			},
-			"task_id": schema.StringAttribute{
-				Description: "The UUID of the active task that currently holds a lock on the resource. This lock prevents concurrent modifications to ensure consistency. If `null`, the resource is not locked.",
 				Computed:    true,
 			},
 		},

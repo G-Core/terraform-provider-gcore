@@ -3,12 +3,12 @@
 page_title: "gcore_cdn_trusted_ca_certificate Data Source - gcore"
 subcategory: ""
 description: |-
-  
+  Trusted CA certificates verify the authenticity of CDN origin servers during HTTPS connections.
 ---
 
 # gcore_cdn_trusted_ca_certificate (Data Source)
 
-
+Trusted CA certificates verify the authenticity of CDN origin servers during HTTPS connections.
 
 ## Example Usage
 

@@ -6,8 +6,8 @@ import (
 	"context"
 	"testing"
 
-	"github.com/stainless-sdks/gcore-terraform/internal/services/fastedge_app"
-	"github.com/stainless-sdks/gcore-terraform/internal/test_helpers"
+	"github.com/G-Core/terraform-provider-gcore/internal/services/fastedge_app"
+	"github.com/G-Core/terraform-provider-gcore/internal/test_helpers"
 )
 
 func TestFastedgeAppModelSchemaParity(t *testing.T) {

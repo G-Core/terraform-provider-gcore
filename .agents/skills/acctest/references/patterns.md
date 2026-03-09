@@ -38,7 +38,7 @@ import (
     "github.com/hashicorp/terraform-plugin-testing/statecheck"
     "github.com/hashicorp/terraform-plugin-testing/tfjsonpath"
 
-    "github.com/stainless-sdks/gcore-terraform/internal/acctest"
+    "github.com/G-Core/terraform-provider-gcore/internal/acctest"
 )
 
 func TestAccCloudSSHKey_basic(t *testing.T) {
@@ -468,8 +468,8 @@ import (
 
     "github.com/hashicorp/terraform-plugin-testing/helper/resource"
 
-    "github.com/stainless-sdks/gcore-terraform/internal/acctest"
-    "github.com/stainless-sdks/gcore-terraform/internal/sweep"
+    "github.com/G-Core/terraform-provider-gcore/internal/acctest"
+    "github.com/G-Core/terraform-provider-gcore/internal/sweep"
 )
 
 func init() {
@@ -549,8 +549,8 @@ import (
 
     // blank imports trigger init() in each service package, registering sweepers
     // MAINTENANCE: add a blank import for every service that has a sweep.go
-    _ "github.com/stainless-sdks/gcore-terraform/internal/services/cloud_ssh_key"
-    _ "github.com/stainless-sdks/gcore-terraform/internal/services/cloud_volume"
+    _ "github.com/G-Core/terraform-provider-gcore/internal/services/cloud_ssh_key"
+    _ "github.com/G-Core/terraform-provider-gcore/internal/services/cloud_volume"
 )
 
 func TestMain(m *testing.M) {

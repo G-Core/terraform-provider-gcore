@@ -5,7 +5,7 @@ package cloud_k8s_cluster
 import (
 	"context"
 
-	"github.com/hashicorp/terraform-plugin-framework-jsontypes/jsontypes"
+	"github.com/G-Core/terraform-provider-gcore/internal/customfield"
 	"github.com/hashicorp/terraform-plugin-framework-timetypes/timetypes"
 	"github.com/hashicorp/terraform-plugin-framework-validators/int64validator"
 	"github.com/hashicorp/terraform-plugin-framework-validators/listvalidator"
@@ -14,13 +14,13 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/datasource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
 	"github.com/hashicorp/terraform-plugin-framework/types"
-	"github.com/stainless-sdks/gcore-terraform/internal/customfield"
 )
 
 var _ datasource.DataSourceWithConfigValidators = (*CloudK8SClusterDataSource)(nil)
 
 func DataSourceSchema(ctx context.Context) schema.Schema {
 	return schema.Schema{
+		Description: "Managed Kubernetes clusters with configurable worker node pools, networking, and cluster add-ons.",
 		Attributes: map[string]schema.Attribute{
 			"id": schema.StringAttribute{
 				Description: "Cluster name",
@@ -96,10 +96,6 @@ func DataSourceSchema(ctx context.Context) schema.Schema {
 						"Provisioning",
 					),
 				},
-			},
-			"task_id": schema.StringAttribute{
-				Description: "The UUID of the active task that currently holds a lock on the resource. This lock prevents concurrent modifications to ensure consistency. If `null`, the resource is not locked.",
-				Computed:    true,
 			},
 			"version": schema.StringAttribute{
 				Description: "K8s version",
@@ -307,46 +303,6 @@ func DataSourceSchema(ctx context.Context) schema.Schema {
 								Computed:    true,
 							},
 						},
-					},
-				},
-			},
-			"ddos_profile": schema.SingleNestedAttribute{
-				Description: "Advanced DDoS Protection profile",
-				Computed:    true,
-				CustomType:  customfield.NewNestedObjectType[CloudK8SClusterDDOSProfileDataSourceModel](ctx),
-				Attributes: map[string]schema.Attribute{
-					"enabled": schema.BoolAttribute{
-						Description: "Enable advanced DDoS protection",
-						Computed:    true,
-					},
-					"fields": schema.ListNestedAttribute{
-						Description: "DDoS profile parameters",
-						Computed:    true,
-						CustomType:  customfield.NewNestedObjectListType[CloudK8SClusterDDOSProfileFieldsDataSourceModel](ctx),
-						NestedObject: schema.NestedAttributeObject{
-							Attributes: map[string]schema.Attribute{
-								"base_field": schema.Int64Attribute{
-									Computed: true,
-								},
-								"field_value": schema.StringAttribute{
-									Description: "Complex value. Only one of 'value' or 'field_value' must be specified",
-									Computed:    true,
-									CustomType:  jsontypes.NormalizedType{},
-								},
-								"value": schema.StringAttribute{
-									Description: "Basic value. Only one of 'value' or 'field_value' must be specified",
-									Computed:    true,
-								},
-							},
-						},
-					},
-					"profile_template": schema.Int64Attribute{
-						Description: "DDoS profile template ID",
-						Computed:    true,
-					},
-					"profile_template_name": schema.StringAttribute{
-						Description: "DDoS profile template name",
-						Computed:    true,
 					},
 				},
 			},

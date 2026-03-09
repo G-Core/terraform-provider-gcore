@@ -3,12 +3,12 @@
 page_title: "gcore_cloud_network_routers Data Source - gcore"
 subcategory: ""
 description: |-
-  
+  Routers interconnect subnets and manage network routing, including external gateway connectivity and static routes.
 ---
 
 # gcore_cloud_network_routers (Data Source)
 
-
+Routers interconnect subnets and manage network routing, including external gateway connectivity and static routes.
 
 ## Example Usage
 
@@ -49,7 +49,6 @@ Read-Only:
 - `region_id` (Number) Region ID
 - `routes` (Attributes List) List of custom routes. (see [below for nested schema](#nestedatt--items--routes))
 - `status` (String) Status of the router.
-- `task_id` (String) The UUID of the active task that currently holds a lock on the resource. This lock prevents concurrent modifications to ensure consistency. If `null`, the resource is not locked.
 - `updated_at` (String) Datetime when the router was last updated
 
 <a id="nestedatt--items--external_gateway_info"></a>

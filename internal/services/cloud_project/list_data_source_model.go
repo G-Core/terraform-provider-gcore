@@ -7,10 +7,10 @@ import (
 
 	"github.com/G-Core/gcore-go/cloud"
 	"github.com/G-Core/gcore-go/packages/param"
+	"github.com/G-Core/terraform-provider-gcore/internal/customfield"
 	"github.com/hashicorp/terraform-plugin-framework-timetypes/timetypes"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/types"
-	"github.com/stainless-sdks/gcore-terraform/internal/customfield"
 )
 
 type CloudProjectsResultsListDataSourceEnvelope struct {
@@ -54,5 +54,4 @@ type CloudProjectsItemsDataSourceModel struct {
 	IsDefault   types.Bool        `tfsdk:"is_default" json:"is_default,computed"`
 	Name        types.String      `tfsdk:"name" json:"name,computed"`
 	State       types.String      `tfsdk:"state" json:"state,computed"`
-	TaskID      types.String      `tfsdk:"task_id" json:"task_id,computed"`
 }

@@ -6,8 +6,8 @@ import (
 	"context"
 	"testing"
 
-	"github.com/stainless-sdks/gcore-terraform/internal/services/cloud_network_subnet"
-	"github.com/stainless-sdks/gcore-terraform/internal/test_helpers"
+	"github.com/G-Core/terraform-provider-gcore/internal/services/cloud_network_subnet"
+	"github.com/G-Core/terraform-provider-gcore/internal/test_helpers"
 )
 
 func TestCloudNetworkSubnetDataSourceModelSchemaParity(t *testing.T) {

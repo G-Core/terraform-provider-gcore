@@ -7,10 +7,10 @@ import (
 
 	"github.com/G-Core/gcore-go/cloud"
 	"github.com/G-Core/gcore-go/packages/param"
+	"github.com/G-Core/terraform-provider-gcore/internal/customfield"
 	"github.com/hashicorp/terraform-plugin-framework-timetypes/timetypes"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/types"
-	"github.com/stainless-sdks/gcore-terraform/internal/customfield"
 )
 
 type CloudRegionsResultsListDataSourceEnvelope struct {
@@ -70,7 +70,6 @@ type CloudRegionsItemsDataSourceModel struct {
 	KeystoneName         types.String                                                     `tfsdk:"keystone_name" json:"keystone_name,computed"`
 	MetricsDatabaseID    types.Int64                                                      `tfsdk:"metrics_database_id" json:"metrics_database_id,computed"`
 	State                types.String                                                     `tfsdk:"state" json:"state,computed"`
-	TaskID               types.String                                                     `tfsdk:"task_id" json:"task_id,computed"`
 	VlanPhysicalNetwork  types.String                                                     `tfsdk:"vlan_physical_network" json:"vlan_physical_network,computed"`
 	Zone                 types.String                                                     `tfsdk:"zone" json:"zone,computed"`
 	DDOSEndpointID       types.Int64                                                      `tfsdk:"ddos_endpoint_id" json:"ddos_endpoint_id,computed"`

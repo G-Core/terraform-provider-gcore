@@ -5,18 +5,19 @@ package cloud_network_router
 import (
 	"context"
 
+	"github.com/G-Core/terraform-provider-gcore/internal/customfield"
 	"github.com/hashicorp/terraform-plugin-framework-timetypes/timetypes"
 	"github.com/hashicorp/terraform-plugin-framework-validators/int64validator"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/datasource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
-	"github.com/stainless-sdks/gcore-terraform/internal/customfield"
 )
 
 var _ datasource.DataSourceWithConfigValidators = (*CloudNetworkRoutersDataSource)(nil)
 
 func ListDataSourceSchema(ctx context.Context) schema.Schema {
 	return schema.Schema{
+		Description: "Routers interconnect subnets and manage network routing, including external gateway connectivity and static routes.",
 		Attributes: map[string]schema.Attribute{
 			"project_id": schema.Int64Attribute{
 				Optional: true,
@@ -123,10 +124,6 @@ func ListDataSourceSchema(ctx context.Context) schema.Schema {
 						},
 						"status": schema.StringAttribute{
 							Description: "Status of the router.",
-							Computed:    true,
-						},
-						"task_id": schema.StringAttribute{
-							Description: "The UUID of the active task that currently holds a lock on the resource. This lock prevents concurrent modifications to ensure consistency. If `null`, the resource is not locked.",
 							Computed:    true,
 						},
 						"updated_at": schema.StringAttribute{

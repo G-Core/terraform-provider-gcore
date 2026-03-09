@@ -7,11 +7,11 @@ import (
 
 	"github.com/G-Core/gcore-go/cloud"
 	"github.com/G-Core/gcore-go/packages/param"
+	"github.com/G-Core/terraform-provider-gcore/internal/customfield"
 	"github.com/hashicorp/terraform-plugin-framework-jsontypes/jsontypes"
 	"github.com/hashicorp/terraform-plugin-framework-timetypes/timetypes"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/types"
-	"github.com/stainless-sdks/gcore-terraform/internal/customfield"
 )
 
 type CloudInstancesResultsListDataSourceEnvelope struct {
@@ -163,7 +163,6 @@ type CloudInstancesItemsDataSourceModel struct {
 	SSHKeyName          types.String                                                                          `tfsdk:"ssh_key_name" json:"ssh_key_name,computed"`
 	Status              types.String                                                                          `tfsdk:"status" json:"status,computed"`
 	Tags                customfield.NestedObjectList[CloudInstancesTagsDataSourceModel]                       `tfsdk:"tags" json:"tags,computed"`
-	TaskID              types.String                                                                          `tfsdk:"task_id" json:"task_id,computed"`
 	TaskState           types.String                                                                          `tfsdk:"task_state" json:"task_state,computed"`
 	VmState             types.String                                                                          `tfsdk:"vm_state" json:"vm_state,computed"`
 	Volumes             customfield.NestedObjectList[CloudInstancesVolumesDataSourceModel]                    `tfsdk:"volumes" json:"volumes,computed"`

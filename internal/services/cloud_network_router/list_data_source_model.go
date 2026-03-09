@@ -7,10 +7,10 @@ import (
 
 	"github.com/G-Core/gcore-go/cloud"
 	"github.com/G-Core/gcore-go/packages/param"
+	"github.com/G-Core/terraform-provider-gcore/internal/customfield"
 	"github.com/hashicorp/terraform-plugin-framework-timetypes/timetypes"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/types"
-	"github.com/stainless-sdks/gcore-terraform/internal/customfield"
 )
 
 type CloudNetworkRoutersResultsListDataSourceEnvelope struct {
@@ -48,7 +48,6 @@ type CloudNetworkRoutersItemsDataSourceModel struct {
 	RegionID            types.Int64                                                                     `tfsdk:"region_id" json:"region_id,computed"`
 	Routes              customfield.NestedObjectList[CloudNetworkRoutersRoutesDataSourceModel]          `tfsdk:"routes" json:"routes,computed"`
 	Status              types.String                                                                    `tfsdk:"status" json:"status,computed"`
-	TaskID              types.String                                                                    `tfsdk:"task_id" json:"task_id,computed"`
 	UpdatedAt           timetypes.RFC3339                                                               `tfsdk:"updated_at" json:"updated_at,computed" format:"date-time"`
 	CreatorTaskID       types.String                                                                    `tfsdk:"creator_task_id" json:"creator_task_id,computed"`
 	ExternalGatewayInfo customfield.NestedObject[CloudNetworkRoutersExternalGatewayInfoDataSourceModel] `tfsdk:"external_gateway_info" json:"external_gateway_info,computed"`

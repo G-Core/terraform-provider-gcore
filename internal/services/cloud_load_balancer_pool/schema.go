@@ -5,6 +5,8 @@ package cloud_load_balancer_pool
 import (
 	"context"
 
+	"github.com/G-Core/terraform-provider-gcore/internal/customfield"
+	"github.com/G-Core/terraform-provider-gcore/internal/planmodifiers"
 	"github.com/hashicorp/terraform-plugin-framework-validators/int64validator"
 	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
@@ -15,14 +17,13 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringplanmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
-	"github.com/stainless-sdks/gcore-terraform/internal/customfield"
-	"github.com/stainless-sdks/gcore-terraform/internal/planmodifiers"
 )
 
 var _ resource.ResourceWithConfigValidators = (*CloudLoadBalancerPoolResource)(nil)
 
 func ResourceSchema(ctx context.Context) schema.Schema {
 	return schema.Schema{
+		Description: "Load balancer pools group backend instances with a load balancing algorithm and health monitoring configuration.",
 		Attributes: map[string]schema.Attribute{
 			"id": schema.StringAttribute{
 				Computed:      true,
@@ -92,14 +93,6 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 			"secret_id": schema.StringAttribute{
 				Description: "Secret ID for TLS client authentication to the member servers",
 				Optional:    true,
-			},
-			"timeout_client_data": schema.Int64Attribute{
-				Description:        "Frontend client inactivity timeout in milliseconds. We are recommending to use `listener.timeout_client_data` instead.",
-				Optional:           true,
-				DeprecationMessage: "This attribute is deprecated.",
-				Validators: []validator.Int64{
-					int64validator.Between(0, 86400000),
-				},
 			},
 			"timeout_member_connect": schema.Int64Attribute{
 				Description: "Backend member connection timeout in milliseconds",

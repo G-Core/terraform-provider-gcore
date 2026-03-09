@@ -5,6 +5,7 @@ package cloud_region
 import (
 	"context"
 
+	"github.com/G-Core/terraform-provider-gcore/internal/customfield"
 	"github.com/hashicorp/terraform-plugin-framework-timetypes/timetypes"
 	"github.com/hashicorp/terraform-plugin-framework-validators/listvalidator"
 	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
@@ -12,13 +13,13 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/datasource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
 	"github.com/hashicorp/terraform-plugin-framework/types"
-	"github.com/stainless-sdks/gcore-terraform/internal/customfield"
 )
 
 var _ datasource.DataSourceWithConfigValidators = (*CloudRegionDataSource)(nil)
 
 func DataSourceSchema(ctx context.Context) schema.Schema {
 	return schema.Schema{
+		Description: "Regions represent available Gcore cloud data centers with information about supported services and volume types.",
 		Attributes: map[string]schema.Attribute{
 			"region_id": schema.Int64Attribute{
 				Description: "Region ID",
@@ -141,11 +142,6 @@ func DataSourceSchema(ctx context.Context) schema.Schema {
 						"NEW",
 					),
 				},
-			},
-			"task_id": schema.StringAttribute{
-				Description:        "This field is deprecated and can be ignored",
-				Computed:           true,
-				DeprecationMessage: "This attribute is deprecated.",
 			},
 			"vlan_physical_network": schema.StringAttribute{
 				Description: "Physical network name to create vlan networks",

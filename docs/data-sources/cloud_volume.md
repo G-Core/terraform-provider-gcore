@@ -3,12 +3,12 @@
 page_title: "gcore_cloud_volume Data Source - gcore"
 subcategory: ""
 description: |-
-  
+  Volumes are block storage devices that can be attached to instances as boot or data disks, with support for resizing and type changes.
 ---
 
 # gcore_cloud_volume (Data Source)
 
-
+Volumes are block storage devices that can be attached to instances as boot or data disks, with support for resizing and type changes.
 
 ## Example Usage
 
@@ -46,7 +46,6 @@ data "gcore_cloud_volume" "example_cloud_volume" {
 - `status` (String) The current status of the volume.
 Available values: "attaching", "available", "awaiting-transfer", "backing-up", "creating", "deleting", "detaching", "downloading", "error", "error_backing-up", "error_deleting", "error_extending", "error_restoring", "extending", "in-use", "maintenance", "reserved", "restoring-backup", "retyping", "reverting", "uploading".
 - `tags` (Attributes List) List of key-value tags associated with the resource. A tag is a key-value pair that can be associated with a resource, enabling efficient filtering and grouping for better organization and management. Some tags are read-only and cannot be modified by the user. Tags are also integrated with cost reports, allowing cost data to be filtered based on tag keys or values. (see [below for nested schema](#nestedatt--tags))
-- `task_id` (String) The UUID of the active task that currently holds a lock on the resource. This lock prevents concurrent modifications to ensure consistency. If `null`, the resource is not locked.
 - `updated_at` (String) The date and time when the volume was last updated.
 - `volume_image_metadata` (Map of String) Image metadata for volumes created from an image.
 - `volume_type` (String) The type of volume storage.

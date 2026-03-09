@@ -1,0 +1,34 @@
+---
+page_title: "{{ .Name }} {{ .Type }} - {{ .ProviderName }}"
+subcategory: ""
+description: |-
+  {{ .Description }}
+---
+
+# {{ .Name }} ({{ .Type }})
+
+{{ .Description }}
+
+## Example Usage
+
+### Basic CDN resource
+
+Create a CDN resource with an origin group and common caching and security options.
+
+{{tffile "examples/resources/gcore_cdn_resource/basic.tf"}}
+
+### Advanced CDN resource
+
+Create a CDN resource with a comprehensive set of options including caching, security, access control, compression, request/response manipulation, rate limiting, and more.
+
+{{tffile "examples/resources/gcore_cdn_resource/advanced.tf"}}
+
+{{ .SchemaMarkdown | trimspace }}
+
+{{ if .HasImport }}
+## Import
+
+Import is supported using the following syntax:
+
+{{ codefile "shell" .ImportFile }}
+{{ end }}

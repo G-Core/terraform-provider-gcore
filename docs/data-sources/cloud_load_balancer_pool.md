@@ -3,12 +3,12 @@
 page_title: "gcore_cloud_load_balancer_pool Data Source - gcore"
 subcategory: ""
 description: |-
-  
+  Load balancer pools group backend instances with a load balancing algorithm and health monitoring configuration.
 ---
 
 # gcore_cloud_load_balancer_pool (Data Source)
 
-
+Load balancer pools group backend instances with a load balancing algorithm and health monitoring configuration.
 
 ## Example Usage
 
@@ -54,7 +54,6 @@ Available values: "HTTP", "HTTPS", "PROXY", "PROXYV2", "TCP", "UDP".
 Available values: "ACTIVE", "DELETED", "ERROR", "PENDING_CREATE", "PENDING_DELETE", "PENDING_UPDATE".
 - `secret_id` (String) Secret ID for TLS client authentication to the member servers
 - `session_persistence` (Attributes) Session persistence parameters (see [below for nested schema](#nestedatt--session_persistence))
-- `task_id` (String) The UUID of the active task that currently holds a lock on the resource. This lock prevents concurrent modifications to ensure consistency. If `null`, the resource is not locked.
 - `timeout_client_data` (Number, Deprecated) Frontend client inactivity timeout in milliseconds
 - `timeout_member_connect` (Number) Backend member connection timeout in milliseconds
 - `timeout_member_data` (Number) Backend member inactivity timeout in milliseconds

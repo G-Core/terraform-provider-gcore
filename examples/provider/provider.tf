@@ -1,7 +1,14 @@
+terraform {
+  required_providers {
+    gcore = {
+      source  = "gcore/gcore"
+      version = "2.0.0-alpha.1"
+    }
+  }
+}
+
+# Configure the Gcore provider.
+# The API key can also be set via the GCORE_API_KEY environment variable.
 provider "gcore" {
-  api_key = "My API Key"
-  cloud_project_id = 0
-  cloud_region_id = 0
-  cloud_polling_interval_seconds = 0
-  cloud_polling_timeout_seconds = 0
+  api_key = "251$d3361.............1b35f26d8"
 }

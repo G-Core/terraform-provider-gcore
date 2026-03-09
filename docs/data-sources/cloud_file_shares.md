@@ -3,12 +3,12 @@
 page_title: "gcore_cloud_file_shares Data Source - gcore"
 subcategory: ""
 description: |-
-  
+  File shares provide NFS-based shared storage that can be mounted by virtual machines and Kubernetes clusters for persistent data.
 ---
 
 # gcore_cloud_file_shares (Data Source)
 
-
+File shares provide NFS-based shared storage that can be mounted by virtual machines and Kubernetes clusters for persistent data.
 
 ## Example Usage
 
@@ -61,7 +61,6 @@ Available values: "available", "awaiting_transfer", "backup_creating", "backup_r
 - `subnet_id` (String) Subnet ID.
 - `subnet_name` (String) Subnet name.
 - `tags` (Attributes List) List of key-value tags associated with the resource. A tag is a key-value pair that can be associated with a resource, enabling efficient filtering and grouping for better organization and management. Some tags are read-only and cannot be modified by the user. Tags are also integrated with cost reports, allowing cost data to be filtered based on tag keys or values. (see [below for nested schema](#nestedatt--items--tags))
-- `task_id` (String) The UUID of the active task that currently holds a lock on the resource. This lock prevents concurrent modifications to ensure consistency. If `null`, the resource is not locked.
 - `type_name` (String) File share type name
 Available values: "standard", "vast".
 

@@ -1,0 +1,63 @@
+name: Fix module imports
+
+on:
+  push:
+    branches:
+      - next
+
+permissions:
+  contents: write
+
+jobs:
+  fix-imports:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Get expected module path
+        id: modpath
+        run: |
+          MODULE_PATH=$(head -1 go.mod | awk '{print $2}')
+          echo "module_path=$MODULE_PATH" >> "$GITHUB_OUTPUT"
+
+      - name: Check for stale imports
+        id: check
+        run: |
+          STALE_MODULE="github.com/stainless-sdks/gcore-terraform"
+          EXPECTED="${{ steps.modpath.outputs.module_path }}"
+
+          if [ "$STALE_MODULE" = "$EXPECTED" ]; then
+            echo "Module path is already $STALE_MODULE, no rewrite needed"
+            echo "needs_fix=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          STALE_FILES=$(grep -rl "$STALE_MODULE" --include='*.go' . || true)
+          if [ -z "$STALE_FILES" ]; then
+            echo "No stale imports found"
+            echo "needs_fix=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "Found stale imports in:"
+            echo "$STALE_FILES"
+            echo "needs_fix=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Rewrite imports
+        if: steps.check.outputs.needs_fix == 'true'
+        run: |
+          STALE_MODULE="github.com/stainless-sdks/gcore-terraform"
+          EXPECTED="${{ steps.modpath.outputs.module_path }}"
+
+          find . -name '*.go' -exec grep -l "$STALE_MODULE" {} + | while read -r file; do
+            sed -i "s|$STALE_MODULE|$EXPECTED|g" "$file"
+            echo "Fixed: $file"
+          done
+
+      - name: Commit and push
+        if: steps.check.outputs.needs_fix == 'true'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add -A '*.go'
+          git commit -m "fix: auto-rewrite stale module path imports [skip ci]"
+          git push

@@ -11,13 +11,14 @@ import (
 	"github.com/G-Core/gcore-go/option"
 	"github.com/hashicorp/terraform-plugin-testing/helper/resource"
 
-	"github.com/stainless-sdks/gcore-terraform/internal/sweep"
+	"github.com/G-Core/terraform-provider-gcore/internal/sweep"
 )
 
 func init() {
 	resource.AddTestSweepers("gcore_dns_zone", &resource.Sweeper{
-		Name: "gcore_dns_zone",
-		F:    sweepDNSZones,
+		Name:         "gcore_dns_zone",
+		F:            sweepDNSZones,
+		Dependencies: []string{"gcore_dns_zone_rrset"},
 	})
 }
 

@@ -7,11 +7,10 @@ import (
 
 	"github.com/G-Core/gcore-go/cloud"
 	"github.com/G-Core/gcore-go/packages/param"
-	"github.com/hashicorp/terraform-plugin-framework-jsontypes/jsontypes"
+	"github.com/G-Core/terraform-provider-gcore/internal/customfield"
 	"github.com/hashicorp/terraform-plugin-framework-timetypes/timetypes"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/types"
-	"github.com/stainless-sdks/gcore-terraform/internal/customfield"
 )
 
 type CloudK8SClusterDataSourceModel struct {
@@ -32,14 +31,12 @@ type CloudK8SClusterDataSourceModel struct {
 	ServicesIPPool   types.String                                                           `tfsdk:"services_ip_pool" json:"services_ip_pool,computed"`
 	ServicesIpv6Pool types.String                                                           `tfsdk:"services_ipv6_pool" json:"services_ipv6_pool,computed"`
 	Status           types.String                                                           `tfsdk:"status" json:"status,computed"`
-	TaskID           types.String                                                           `tfsdk:"task_id" json:"task_id,computed"`
 	Version          types.String                                                           `tfsdk:"version" json:"version,computed"`
 	AutoscalerConfig customfield.Map[types.String]                                          `tfsdk:"autoscaler_config" json:"autoscaler_config,computed"`
 	AddOns           customfield.NestedObject[CloudK8SClusterAddOnsDataSourceModel]         `tfsdk:"add_ons" json:"add_ons,computed"`
 	Authentication   customfield.NestedObject[CloudK8SClusterAuthenticationDataSourceModel] `tfsdk:"authentication" json:"authentication,computed"`
 	Cni              customfield.NestedObject[CloudK8SClusterCniDataSourceModel]            `tfsdk:"cni" json:"cni,computed"`
 	Csi              customfield.NestedObject[CloudK8SClusterCsiDataSourceModel]            `tfsdk:"csi" json:"csi,computed"`
-	DDOSProfile      customfield.NestedObject[CloudK8SClusterDDOSProfileDataSourceModel]    `tfsdk:"ddos_profile" json:"ddos_profile,computed"`
 	Logging          customfield.NestedObject[CloudK8SClusterLoggingDataSourceModel]        `tfsdk:"logging" json:"logging,computed"`
 	Pools            customfield.NestedObjectList[CloudK8SClusterPoolsDataSourceModel]      `tfsdk:"pools" json:"pools,computed"`
 }
@@ -108,19 +105,6 @@ type CloudK8SClusterCsiDataSourceModel struct {
 
 type CloudK8SClusterCsiNfsDataSourceModel struct {
 	VastEnabled types.Bool `tfsdk:"vast_enabled" json:"vast_enabled,computed"`
-}
-
-type CloudK8SClusterDDOSProfileDataSourceModel struct {
-	Enabled             types.Bool                                                                    `tfsdk:"enabled" json:"enabled,computed"`
-	Fields              customfield.NestedObjectList[CloudK8SClusterDDOSProfileFieldsDataSourceModel] `tfsdk:"fields" json:"fields,computed"`
-	ProfileTemplate     types.Int64                                                                   `tfsdk:"profile_template" json:"profile_template,computed"`
-	ProfileTemplateName types.String                                                                  `tfsdk:"profile_template_name" json:"profile_template_name,computed"`
-}
-
-type CloudK8SClusterDDOSProfileFieldsDataSourceModel struct {
-	BaseField  types.Int64          `tfsdk:"base_field" json:"base_field,computed"`
-	FieldValue jsontypes.Normalized `tfsdk:"field_value" json:"field_value,computed"`
-	Value      types.String         `tfsdk:"value" json:"value,computed"`
 }
 
 type CloudK8SClusterLoggingDataSourceModel struct {

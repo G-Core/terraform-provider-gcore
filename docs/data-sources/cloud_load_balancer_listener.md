@@ -3,12 +3,12 @@
 page_title: "gcore_cloud_load_balancer_listener Data Source - gcore"
 subcategory: ""
 description: |-
-  
+  Load balancer listeners handle incoming traffic on specified protocols and ports, forwarding requests to backend pools.
 ---
 
 # gcore_cloud_load_balancer_listener (Data Source)
 
-
+Load balancer listeners handle incoming traffic on specified protocols and ports, forwarding requests to backend pools.
 
 ## Example Usage
 
@@ -55,7 +55,6 @@ Available values: "ACTIVE", "DELETED", "ERROR", "PENDING_CREATE", "PENDING_DELET
 - `secret_id` (String) ID of the secret where PKCS12 file is stored for `TERMINATED_HTTPS` or PROMETHEUS load balancer
 - `sni_secret_id` (List of String) List of secret's ID containing PKCS12 format certificate/key bundles for `TERMINATED_HTTPS` or PROMETHEUS listeners
 - `stats` (Attributes) Statistics of the load balancer. It is available only in get functions by a flag. (see [below for nested schema](#nestedatt--stats))
-- `task_id` (String) The UUID of the active task that currently holds a lock on the resource. This lock prevents concurrent modifications to ensure consistency. If `null`, the resource is not locked.
 - `timeout_client_data` (Number) Frontend client inactivity timeout in milliseconds
 - `timeout_member_connect` (Number, Deprecated) Backend member connection timeout in milliseconds
 - `timeout_member_data` (Number, Deprecated) Backend member inactivity timeout in milliseconds

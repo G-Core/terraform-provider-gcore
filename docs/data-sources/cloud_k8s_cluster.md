@@ -3,12 +3,12 @@
 page_title: "gcore_cloud_k8s_cluster Data Source - gcore"
 subcategory: ""
 description: |-
-  
+  Managed Kubernetes clusters with configurable worker node pools, networking, and cluster add-ons.
 ---
 
 # gcore_cloud_k8s_cluster (Data Source)
 
-
+Managed Kubernetes clusters with configurable worker node pools, networking, and cluster add-ons.
 
 ## Example Usage
 
@@ -43,7 +43,6 @@ It contains overrides to the default cluster-autoscaler parameters provided by t
 - `created_at` (String) Function creation date
 - `creator_task_id` (String) Task that created this entity
 - `csi` (Attributes) Cluster CSI settings (see [below for nested schema](#nestedatt--csi))
-- `ddos_profile` (Attributes) Advanced DDoS Protection profile (see [below for nested schema](#nestedatt--ddos_profile))
 - `fixed_network` (String) Fixed network id
 - `fixed_subnet` (String) Fixed subnet id
 - `id` (String) Cluster name
@@ -59,7 +58,6 @@ It contains overrides to the default cluster-autoscaler parameters provided by t
 - `services_ipv6_pool` (String) The IPv6 pool for the services
 - `status` (String) Status
 Available values: "Deleting", "Provisioned", "Provisioning".
-- `task_id` (String) The UUID of the active task that currently holds a lock on the resource. This lock prevents concurrent modifications to ensure consistency. If `null`, the resource is not locked.
 - `version` (String) K8s version
 
 <a id="nestedatt--add_ons"></a>
@@ -156,27 +154,6 @@ Read-Only:
 Read-Only:
 
 - `vast_enabled` (Boolean) Indicates the status of VAST NFS integration
-
-
-
-<a id="nestedatt--ddos_profile"></a>
-### Nested Schema for `ddos_profile`
-
-Read-Only:
-
-- `enabled` (Boolean) Enable advanced DDoS protection
-- `fields` (Attributes List) DDoS profile parameters (see [below for nested schema](#nestedatt--ddos_profile--fields))
-- `profile_template` (Number) DDoS profile template ID
-- `profile_template_name` (String) DDoS profile template name
-
-<a id="nestedatt--ddos_profile--fields"></a>
-### Nested Schema for `ddos_profile.fields`
-
-Read-Only:
-
-- `base_field` (Number)
-- `field_value` (String) Complex value. Only one of 'value' or 'field_value' must be specified
-- `value` (String) Basic value. Only one of 'value' or 'field_value' must be specified
 
 
 

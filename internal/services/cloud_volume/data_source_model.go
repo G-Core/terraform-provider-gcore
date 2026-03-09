@@ -7,10 +7,10 @@ import (
 
 	"github.com/G-Core/gcore-go/cloud"
 	"github.com/G-Core/gcore-go/packages/param"
+	"github.com/G-Core/terraform-provider-gcore/internal/customfield"
 	"github.com/hashicorp/terraform-plugin-framework-timetypes/timetypes"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/types"
-	"github.com/stainless-sdks/gcore-terraform/internal/customfield"
 )
 
 type CloudVolumeDataSourceModel struct {
@@ -26,7 +26,6 @@ type CloudVolumeDataSourceModel struct {
 	Region              types.String                                                        `tfsdk:"region" json:"region,computed"`
 	Size                types.Int64                                                         `tfsdk:"size" json:"size,computed"`
 	Status              types.String                                                        `tfsdk:"status" json:"status,computed"`
-	TaskID              types.String                                                        `tfsdk:"task_id" json:"task_id,computed"`
 	UpdatedAt           timetypes.RFC3339                                                   `tfsdk:"updated_at" json:"updated_at,computed" format:"date-time"`
 	VolumeType          types.String                                                        `tfsdk:"volume_type" json:"volume_type,computed"`
 	SnapshotIDs         customfield.List[types.String]                                      `tfsdk:"snapshot_ids" json:"snapshot_ids,computed"`

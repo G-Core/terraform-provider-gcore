@@ -1,0 +1,34 @@
+---
+page_title: "{{ .Name }} {{ .Type }} - {{ .ProviderName }}"
+subcategory: ""
+description: |-
+  {{ .Description }}
+---
+
+# {{ .Name }} ({{ .Type }})
+
+{{ .Description }}
+
+## Example Usage
+
+### Basic FastEdge app
+
+Create a FastEdge application from a Wasm binary with environment variables.
+
+{{tffile "examples/resources/gcore_fastedge_app/basic.tf"}}
+
+### App with secrets and response headers
+
+Create a FastEdge app that references secrets and sets custom response headers.
+
+{{tffile "examples/resources/gcore_fastedge_app/with-secrets.tf"}}
+
+{{ .SchemaMarkdown | trimspace }}
+
+{{ if .HasImport }}
+## Import
+
+Import is supported using the following syntax:
+
+{{ codefile "shell" .ImportFile }}
+{{ end }}

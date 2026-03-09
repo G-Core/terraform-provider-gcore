@@ -3,12 +3,12 @@
 page_title: "gcore_cloud_network_subnet Data Source - gcore"
 subcategory: ""
 description: |-
-  
+  Subnets define IP address ranges within a network for instance connectivity, with support for DHCP and DNS configuration.
 ---
 
 # gcore_cloud_network_subnet (Data Source)
 
-
+Subnets define IP address ranges within a network for instance connectivity, with support for DHCP and DNS configuration.
 
 ## Example Usage
 
@@ -48,7 +48,6 @@ Available values: 4, 6.
 - `network_id` (String) Network ID
 - `region` (String) Region name
 - `tags` (Attributes List) List of key-value tags associated with the resource. A tag is a key-value pair that can be associated with a resource, enabling efficient filtering and grouping for better organization and management. Some tags are read-only and cannot be modified by the user. Tags are also integrated with cost reports, allowing cost data to be filtered based on tag keys or values. (see [below for nested schema](#nestedatt--tags))
-- `task_id` (String) The UUID of the active task that currently holds a lock on the resource. This lock prevents concurrent modifications to ensure consistency. If `null`, the resource is not locked.
 - `total_ips` (Number) Total number of ips in subnet
 - `updated_at` (String) Datetime when the subnet was last updated
 

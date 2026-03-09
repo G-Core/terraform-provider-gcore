@@ -3,8 +3,8 @@
 package cdn_trusted_ca_certificate
 
 import (
+	"github.com/G-Core/terraform-provider-gcore/internal/apijson"
 	"github.com/hashicorp/terraform-plugin-framework/types"
-	"github.com/stainless-sdks/gcore-terraform/internal/apijson"
 )
 
 type CDNTrustedCaCertificateModel struct {

@@ -5,19 +5,20 @@ package cloud_reserved_fixed_ip
 import (
 	"context"
 
+	"github.com/G-Core/terraform-provider-gcore/internal/customfield"
 	"github.com/hashicorp/terraform-plugin-framework-timetypes/timetypes"
 	"github.com/hashicorp/terraform-plugin-framework-validators/int64validator"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/datasource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
 	"github.com/hashicorp/terraform-plugin-framework/types"
-	"github.com/stainless-sdks/gcore-terraform/internal/customfield"
 )
 
 var _ datasource.DataSourceWithConfigValidators = (*CloudReservedFixedIPsDataSource)(nil)
 
 func ListDataSourceSchema(ctx context.Context) schema.Schema {
 	return schema.Schema{
+		Description: "Reserved fixed IPs are static IP addresses that persist independently of instances and can be used as virtual IPs (VIPs) for high availability.",
 		Attributes: map[string]schema.Attribute{
 			"project_id": schema.Int64Attribute{
 				Optional: true,
@@ -202,10 +203,6 @@ func ListDataSourceSchema(ctx context.Context) schema.Schema {
 										},
 									},
 								},
-								"task_id": schema.StringAttribute{
-									Description: "The UUID of the active task that currently holds a lock on the resource. This lock prevents concurrent modifications to ensure consistency. If `null`, the resource is not locked.",
-									Computed:    true,
-								},
 								"type": schema.StringAttribute{
 									Description: "Network type (vlan, vxlan)",
 									Computed:    true,
@@ -283,10 +280,6 @@ func ListDataSourceSchema(ctx context.Context) schema.Schema {
 						},
 						"subnet_v6_id": schema.StringAttribute{
 							Description: "ID of the subnet that owns the IPv6 address",
-							Computed:    true,
-						},
-						"task_id": schema.StringAttribute{
-							Description: "The UUID of the active task that currently holds a lock on the resource. This lock prevents concurrent modifications to ensure consistency. If `null`, the resource is not locked.",
 							Computed:    true,
 						},
 					},

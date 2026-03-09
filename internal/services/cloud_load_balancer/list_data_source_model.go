@@ -7,11 +7,11 @@ import (
 
 	"github.com/G-Core/gcore-go/cloud"
 	"github.com/G-Core/gcore-go/packages/param"
+	"github.com/G-Core/terraform-provider-gcore/internal/customfield"
 	"github.com/hashicorp/terraform-plugin-framework-jsontypes/jsontypes"
 	"github.com/hashicorp/terraform-plugin-framework-timetypes/timetypes"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/types"
-	"github.com/stainless-sdks/gcore-terraform/internal/customfield"
 )
 
 type CloudLoadBalancersResultsListDataSourceEnvelope struct {
@@ -96,7 +96,6 @@ type CloudLoadBalancersItemsDataSourceModel struct {
 	Logging               customfield.NestedObject[CloudLoadBalancersLoggingDataSourceModel]            `tfsdk:"logging" json:"logging,computed"`
 	PreferredConnectivity types.String                                                                  `tfsdk:"preferred_connectivity" json:"preferred_connectivity,computed"`
 	Stats                 customfield.NestedObject[CloudLoadBalancersStatsDataSourceModel]              `tfsdk:"stats" json:"stats,computed"`
-	TaskID                types.String                                                                  `tfsdk:"task_id" json:"task_id,computed"`
 	UpdatedAt             timetypes.RFC3339                                                             `tfsdk:"updated_at" json:"updated_at,computed" format:"date-time"`
 	VipAddress            types.String                                                                  `tfsdk:"vip_address" json:"vip_address,computed"`
 	VipFqdn               types.String                                                                  `tfsdk:"vip_fqdn" json:"vip_fqdn,computed"`
@@ -193,7 +192,6 @@ type CloudLoadBalancersFloatingIPsDataSourceModel struct {
 	RouterID          types.String                                                                   `tfsdk:"router_id" json:"router_id,computed"`
 	Status            types.String                                                                   `tfsdk:"status" json:"status,computed"`
 	Tags              customfield.NestedObjectList[CloudLoadBalancersFloatingIPsTagsDataSourceModel] `tfsdk:"tags" json:"tags,computed"`
-	TaskID            types.String                                                                   `tfsdk:"task_id" json:"task_id,computed"`
 	UpdatedAt         timetypes.RFC3339                                                              `tfsdk:"updated_at" json:"updated_at,computed" format:"date-time"`
 }
 

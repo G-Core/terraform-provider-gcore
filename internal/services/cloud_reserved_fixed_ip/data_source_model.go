@@ -7,10 +7,10 @@ import (
 
 	"github.com/G-Core/gcore-go/cloud"
 	"github.com/G-Core/gcore-go/packages/param"
+	"github.com/G-Core/terraform-provider-gcore/internal/customfield"
 	"github.com/hashicorp/terraform-plugin-framework-timetypes/timetypes"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/types"
-	"github.com/stainless-sdks/gcore-terraform/internal/customfield"
 )
 
 type CloudReservedFixedIPDataSourceModel struct {
@@ -29,7 +29,6 @@ type CloudReservedFixedIPDataSourceModel struct {
 	Status              types.String                                                                         `tfsdk:"status" json:"status,computed"`
 	SubnetID            types.String                                                                         `tfsdk:"subnet_id" json:"subnet_id,computed"`
 	SubnetV6ID          types.String                                                                         `tfsdk:"subnet_v6_id" json:"subnet_v6_id,computed"`
-	TaskID              types.String                                                                         `tfsdk:"task_id" json:"task_id,computed"`
 	UpdatedAt           timetypes.RFC3339                                                                    `tfsdk:"updated_at" json:"updated_at,computed" format:"date-time"`
 	AllowedAddressPairs customfield.NestedObjectList[CloudReservedFixedIPAllowedAddressPairsDataSourceModel] `tfsdk:"allowed_address_pairs" json:"allowed_address_pairs,computed"`
 	Attachments         customfield.NestedObjectList[CloudReservedFixedIPAttachmentsDataSourceModel]         `tfsdk:"attachments" json:"attachments,computed"`
@@ -76,7 +75,6 @@ type CloudReservedFixedIPNetworkDataSourceModel struct {
 	Shared              types.Bool                                                                   `tfsdk:"shared" json:"shared,computed"`
 	Subnets             customfield.List[types.String]                                               `tfsdk:"subnets" json:"subnets,computed"`
 	Tags                customfield.NestedObjectList[CloudReservedFixedIPNetworkTagsDataSourceModel] `tfsdk:"tags" json:"tags,computed"`
-	TaskID              types.String                                                                 `tfsdk:"task_id" json:"task_id,computed"`
 	Type                types.String                                                                 `tfsdk:"type" json:"type,computed"`
 	UpdatedAt           timetypes.RFC3339                                                            `tfsdk:"updated_at" json:"updated_at,computed" format:"date-time"`
 }

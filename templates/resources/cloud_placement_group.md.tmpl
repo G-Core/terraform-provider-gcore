@@ -1,0 +1,34 @@
+---
+page_title: "{{ .Name }} {{ .Type }} - {{ .ProviderName }}"
+subcategory: ""
+description: |-
+  {{ .Description }}
+---
+
+# {{ .Name }} ({{ .Type }})
+
+{{ .Description }}
+
+## Example Usage
+
+### Basic placement group
+
+Creates an affinity placement group.
+
+{{tffile "examples/resources/gcore_cloud_placement_group/basic.tf"}}
+
+### Placement group with two instances
+
+Creates a placement group and assigns two compute instances to it.
+
+{{tffile "examples/resources/gcore_cloud_placement_group/with-two-instances.tf"}}
+
+{{ .SchemaMarkdown | trimspace }}
+
+{{ if .HasImport }}
+## Import
+
+Import is supported using the following syntax:
+
+{{ codefile "shell" .ImportFile }}
+{{ end }}

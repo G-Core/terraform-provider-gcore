@@ -1,0 +1,28 @@
+---
+page_title: "{{ .Name }} {{ .Type }} - {{ .ProviderName }}"
+subcategory: ""
+description: |-
+  {{ .Description }}
+---
+
+# {{ .Name }} ({{ .Type }})
+
+{{ .Description }}
+
+## Example Usage
+
+### Basic CDN rule
+
+Create a CDN resource rule that matches a URL pattern and overrides the origin protocol.
+
+{{tffile "examples/resources/gcore_cdn_resource_rule/basic.tf"}}
+
+{{ .SchemaMarkdown | trimspace }}
+
+{{ if .HasImport }}
+## Import
+
+Import is supported using the following syntax:
+
+{{ codefile "shell" .ImportFile }}
+{{ end }}

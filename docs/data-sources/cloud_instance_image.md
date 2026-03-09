@@ -3,12 +3,12 @@
 page_title: "gcore_cloud_instance_image Data Source - gcore"
 subcategory: ""
 description: |-
-  
+  Instance images are operating system images (public, private, or shared) used to boot cloud instances.
 ---
 
 # gcore_cloud_instance_image (Data Source)
 
-
+Instance images are operating system images (public, private, or shared) used to boot cloud instances.
 
 ## Example Usage
 
@@ -65,7 +65,6 @@ Available values: "linux", "windows".
 Available values: "allow", "deny", "required".
 - `status` (String) Image status, i.e. active
 - `tags` (Attributes List) List of key-value tags associated with the resource. A tag is a key-value pair that can be associated with a resource, enabling efficient filtering and grouping for better organization and management. Some tags are read-only and cannot be modified by the user. Tags are also integrated with cost reports, allowing cost data to be filtered based on tag keys or values. (see [below for nested schema](#nestedatt--tags))
-- `task_id` (String) The UUID of the active task that currently holds a lock on the resource. This lock prevents concurrent modifications to ensure consistency. If `null`, the resource is not locked.
 - `updated_at` (String) Datetime when the image was updated
 - `visibility` (String) Image visibility. Globally visible images are public
 

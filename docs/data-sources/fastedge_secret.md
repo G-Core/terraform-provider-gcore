@@ -3,12 +3,12 @@
 page_title: "gcore_fastedge_secret Data Source - gcore"
 subcategory: ""
 description: |-
-  Secret values that can be used in apps
+  FastEdge secrets store sensitive values such as API keys and tokens that can be referenced by FastEdge applications.
 ---
 
 # gcore_fastedge_secret (Data Source)
 
-Secret values that can be used in apps
+FastEdge secrets store sensitive values such as API keys and tokens that can be referenced by FastEdge applications.
 
 ## Example Usage
 

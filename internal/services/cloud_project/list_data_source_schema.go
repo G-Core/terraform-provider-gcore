@@ -5,19 +5,20 @@ package cloud_project
 import (
 	"context"
 
+	"github.com/G-Core/terraform-provider-gcore/internal/customfield"
 	"github.com/hashicorp/terraform-plugin-framework-timetypes/timetypes"
 	"github.com/hashicorp/terraform-plugin-framework-validators/int64validator"
 	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/datasource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
-	"github.com/stainless-sdks/gcore-terraform/internal/customfield"
 )
 
 var _ datasource.DataSourceWithConfigValidators = (*CloudProjectsDataSource)(nil)
 
 func ListDataSourceSchema(ctx context.Context) schema.Schema {
 	return schema.Schema{
+		Description: "Projects are organizational units that group cloud resources for access control and billing.",
 		Attributes: map[string]schema.Attribute{
 			"client_id": schema.Int64Attribute{
 				Description: "Client ID filter for administrators.",
@@ -90,10 +91,6 @@ func ListDataSourceSchema(ctx context.Context) schema.Schema {
 						},
 						"state": schema.StringAttribute{
 							Description: "The state of the project.",
-							Computed:    true,
-						},
-						"task_id": schema.StringAttribute{
-							Description: "The UUID of the active task that currently holds a lock on the resource. This lock prevents concurrent modifications to ensure consistency. If `null`, the resource is not locked.",
 							Computed:    true,
 						},
 					},

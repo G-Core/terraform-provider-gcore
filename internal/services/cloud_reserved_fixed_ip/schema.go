@@ -5,6 +5,7 @@ package cloud_reserved_fixed_ip
 import (
 	"context"
 
+	"github.com/G-Core/terraform-provider-gcore/internal/customfield"
 	"github.com/hashicorp/terraform-plugin-framework-timetypes/timetypes"
 	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
@@ -14,13 +15,13 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringplanmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
 	"github.com/hashicorp/terraform-plugin-framework/types"
-	"github.com/stainless-sdks/gcore-terraform/internal/customfield"
 )
 
 var _ resource.ResourceWithConfigValidators = (*CloudReservedFixedIPResource)(nil)
 
 func ResourceSchema(ctx context.Context) schema.Schema {
 	return schema.Schema{
+		Description: "Reserved fixed IPs are static IP addresses that persist independently of instances and can be used as virtual IPs (VIPs) for high availability.",
 		Attributes: map[string]schema.Attribute{
 			"id": schema.StringAttribute{
 				Computed:      true,
@@ -122,20 +123,10 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 				Description: "ID of the subnet that owns the IPv6 address",
 				Computed:    true,
 			},
-			"task_id": schema.StringAttribute{
-				Description: "The UUID of the active task that currently holds a lock on the resource. This lock prevents concurrent modifications to ensure consistency. If `null`, the resource is not locked.",
-				Computed:    true,
-			},
 			"updated_at": schema.StringAttribute{
 				Description: "Datetime when the reserved fixed IP was last updated",
 				Computed:    true,
 				CustomType:  timetypes.RFC3339Type{},
-			},
-			"tasks": schema.ListAttribute{
-				Description: "List of task IDs representing asynchronous operations. Use these IDs to monitor operation progress:\n- `GET /v1/tasks/{task_id}` - Check individual task status and details\nPoll task status until completion (`FINISHED`/`ERROR`) before proceeding with dependent operations.",
-				Computed:    true,
-				CustomType:  customfield.NewListType[types.String](ctx),
-				ElementType: types.StringType,
 			},
 			"allowed_address_pairs": schema.ListNestedAttribute{
 				Description: "Group of subnet masks and/or IP addresses that share the current IP as VIP",
@@ -255,10 +246,6 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 								},
 							},
 						},
-					},
-					"task_id": schema.StringAttribute{
-						Description: "The UUID of the active task that currently holds a lock on the resource. This lock prevents concurrent modifications to ensure consistency. If `null`, the resource is not locked.",
-						Computed:    true,
 					},
 					"type": schema.StringAttribute{
 						Description: "Network type (vlan, vxlan)",

@@ -5,6 +5,7 @@ package cloud_load_balancer_listener
 import (
 	"context"
 
+	"github.com/G-Core/terraform-provider-gcore/internal/customfield"
 	"github.com/hashicorp/terraform-plugin-framework-jsontypes/jsontypes"
 	"github.com/hashicorp/terraform-plugin-framework-validators/int64validator"
 	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
@@ -19,13 +20,13 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringplanmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
 	"github.com/hashicorp/terraform-plugin-framework/types"
-	"github.com/stainless-sdks/gcore-terraform/internal/customfield"
 )
 
 var _ resource.ResourceWithConfigValidators = (*CloudLoadBalancerListenerResource)(nil)
 
 func ResourceSchema(ctx context.Context) schema.Schema {
 	return schema.Schema{
+		Description: "Load balancer listeners handle incoming traffic on specified protocols and ports, forwarding requests to backend pools.",
 		Attributes: map[string]schema.Attribute{
 			"id": schema.StringAttribute{
 				Computed:      true,
@@ -119,30 +120,6 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 					int64planmodifier.UseStateForUnknown(),
 				},
 			},
-			"timeout_member_connect": schema.Int64Attribute{
-				Description:        "Backend member connection timeout in milliseconds. We are recommending to use `pool.timeout_member_connect` instead.",
-				Computed:           true,
-				Optional:           true,
-				DeprecationMessage: "This attribute is deprecated.",
-				Validators: []validator.Int64{
-					int64validator.Between(0, 86400000),
-				},
-				PlanModifiers: []planmodifier.Int64{
-					int64planmodifier.UseStateForUnknown(),
-				},
-			},
-			"timeout_member_data": schema.Int64Attribute{
-				Description:        "Backend member inactivity timeout in milliseconds. We are recommending to use `pool.timeout_member_data` instead.",
-				Computed:           true,
-				Optional:           true,
-				DeprecationMessage: "This attribute is deprecated.",
-				Validators: []validator.Int64{
-					int64validator.Between(0, 86400000),
-				},
-				PlanModifiers: []planmodifier.Int64{
-					int64planmodifier.UseStateForUnknown(),
-				},
-			},
 			"sni_secret_id": schema.ListAttribute{
 				Description: "List of secrets IDs containing PKCS12 format certificate/key bundles for `TERMINATED_HTTPS` or PROMETHEUS listeners",
 				Computed:    true,
@@ -155,9 +132,7 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 			},
 			"user_list": schema.ListNestedAttribute{
 				Description: "Load balancer listener list of username and encrypted password items",
-				Computed:    true,
 				Optional:    true,
-				CustomType:  customfield.NewNestedObjectListType[CloudLoadBalancerListenerUserListModel](ctx),
 				PlanModifiers: []planmodifier.List{
 					listplanmodifier.UseStateForUnknown(),
 				},
