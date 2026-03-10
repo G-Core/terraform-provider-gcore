@@ -63,6 +63,7 @@ type CDNResourceOptionsDataSourceModel struct {
 	FollowOriginRedirect        customfield.NestedObject[CDNResourceOptionsFollowOriginRedirectDataSourceModel]        `tfsdk:"follow_origin_redirect" json:"follow_origin_redirect,computed"`
 	ForceReturn                 customfield.NestedObject[CDNResourceOptionsForceReturnDataSourceModel]                 `tfsdk:"force_return" json:"force_return,computed"`
 	ForwardHostHeader           customfield.NestedObject[CDNResourceOptionsForwardHostHeaderDataSourceModel]           `tfsdk:"forward_host_header" json:"forward_host_header,computed"`
+	GrpcPassthrough             customfield.NestedObject[CDNResourceOptionsGrpcPassthroughDataSourceModel]             `tfsdk:"grpc_passthrough" json:"grpc_passthrough,computed"`
 	GzipOn                      customfield.NestedObject[CDNResourceOptionsGzipOnDataSourceModel]                      `tfsdk:"gzip_on" json:"gzipOn,computed"`
 	HostHeader                  customfield.NestedObject[CDNResourceOptionsHostHeaderDataSourceModel]                  `tfsdk:"host_header" json:"hostHeader,computed"`
 	Http3Enabled                customfield.NestedObject[CDNResourceOptionsHttp3EnabledDataSourceModel]                `tfsdk:"http3_enabled" json:"http3_enabled,computed"`
@@ -222,6 +223,11 @@ type CDNResourceOptionsForceReturnTimeIntervalDataSourceModel struct {
 }
 
 type CDNResourceOptionsForwardHostHeaderDataSourceModel struct {
+	Enabled types.Bool `tfsdk:"enabled" json:"enabled,computed"`
+	Value   types.Bool `tfsdk:"value" json:"value,computed"`
+}
+
+type CDNResourceOptionsGrpcPassthroughDataSourceModel struct {
 	Enabled types.Bool `tfsdk:"enabled" json:"enabled,computed"`
 	Value   types.Bool `tfsdk:"value" json:"value,computed"`
 }
