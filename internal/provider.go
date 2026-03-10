@@ -11,6 +11,7 @@ import (
 	"github.com/G-Core/gcore-go/option"
 	"github.com/G-Core/terraform-provider-gcore/internal/services/cdn_certificate"
 	"github.com/G-Core/terraform-provider-gcore/internal/services/cdn_origin_group"
+	"github.com/G-Core/terraform-provider-gcore/internal/services/cdn_resource"
 	"github.com/G-Core/terraform-provider-gcore/internal/services/cdn_resource_rule"
 	"github.com/G-Core/terraform-provider-gcore/internal/services/cdn_trusted_ca_certificate"
 	"github.com/G-Core/terraform-provider-gcore/internal/services/cloud_file_share"
@@ -218,6 +219,7 @@ func (p *GcoreProvider) Resources(ctx context.Context) []func() resource.Resourc
 		dns_zone.NewResource,
 		dns_zone_rrset.NewResource,
 		dns_network_mapping.NewResource,
+		cdn_resource.NewResource,
 		cdn_resource_rule.NewResource,
 		cdn_origin_group.NewResource,
 		cdn_certificate.NewResource,
@@ -277,6 +279,7 @@ func (p *GcoreProvider) DataSources(ctx context.Context) []func() datasource.Dat
 		dns_zone.NewDNSZoneDataSource,
 		dns_zone_rrset.NewDNSZoneRrsetDataSource,
 		dns_network_mapping.NewDNSNetworkMappingDataSource,
+		cdn_resource.NewCDNResourceDataSource,
 		cdn_resource_rule.NewCDNResourceRuleDataSource,
 		cdn_origin_group.NewCDNOriginGroupDataSource,
 		cdn_certificate.NewCDNCertificateDataSource,
