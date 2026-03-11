@@ -77,7 +77,6 @@ type CloudReservedFixedIPsItemsDataSourceModel struct {
 	PortID              types.String                                                                          `tfsdk:"port_id" json:"port_id,computed"`
 	Region              types.String                                                                          `tfsdk:"region" json:"region,computed"`
 	RegionID            types.Int64                                                                           `tfsdk:"region_id" json:"region_id,computed"`
-	Reservation         customfield.NestedObject[CloudReservedFixedIPsReservationDataSourceModel]             `tfsdk:"reservation" json:"reservation,computed"`
 	Status              types.String                                                                          `tfsdk:"status" json:"status,computed"`
 	UpdatedAt           timetypes.RFC3339                                                                     `tfsdk:"updated_at" json:"updated_at,computed" format:"date-time"`
 	CreatorTaskID       types.String                                                                          `tfsdk:"creator_task_id" json:"creator_task_id,computed"`
@@ -122,10 +121,4 @@ type CloudReservedFixedIPsNetworkTagsDataSourceModel struct {
 	Key      types.String `tfsdk:"key" json:"key,computed"`
 	ReadOnly types.Bool   `tfsdk:"read_only" json:"read_only,computed"`
 	Value    types.String `tfsdk:"value" json:"value,computed"`
-}
-
-type CloudReservedFixedIPsReservationDataSourceModel struct {
-	ResourceID   types.String `tfsdk:"resource_id" json:"resource_id,computed"`
-	ResourceType types.String `tfsdk:"resource_type" json:"resource_type,computed"`
-	Status       types.String `tfsdk:"status" json:"status,computed"`
 }

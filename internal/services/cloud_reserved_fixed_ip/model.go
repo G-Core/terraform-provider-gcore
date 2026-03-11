@@ -33,7 +33,6 @@ type CloudReservedFixedIPModel struct {
 	AllowedAddressPairs customfield.NestedObjectList[CloudReservedFixedIPAllowedAddressPairsModel] `tfsdk:"allowed_address_pairs" json:"allowed_address_pairs,computed"`
 	Attachments         customfield.NestedObjectList[CloudReservedFixedIPAttachmentsModel]         `tfsdk:"attachments" json:"attachments,computed"`
 	Network             customfield.NestedObject[CloudReservedFixedIPNetworkModel]                 `tfsdk:"network" json:"network,computed"`
-	Reservation         customfield.NestedObject[CloudReservedFixedIPReservationModel]             `tfsdk:"reservation" json:"reservation,computed"`
 }
 
 func (m CloudReservedFixedIPModel) MarshalJSON() (data []byte, err error) {
@@ -78,10 +77,4 @@ type CloudReservedFixedIPNetworkTagsModel struct {
 	Key      types.String `tfsdk:"key" json:"key,computed"`
 	ReadOnly types.Bool   `tfsdk:"read_only" json:"read_only,computed"`
 	Value    types.String `tfsdk:"value" json:"value,computed"`
-}
-
-type CloudReservedFixedIPReservationModel struct {
-	ResourceID   types.String `tfsdk:"resource_id" json:"resource_id,computed"`
-	ResourceType types.String `tfsdk:"resource_type" json:"resource_type,computed"`
-	Status       types.String `tfsdk:"status" json:"status,computed"`
 }
