@@ -4,7 +4,6 @@ resource "gcore_cloud_network" "network" {
   region_id     = 1
   name          = "my-network"
   type          = "vxlan"
-  create_router = true
   tags = {
     environment = "production"
   }
