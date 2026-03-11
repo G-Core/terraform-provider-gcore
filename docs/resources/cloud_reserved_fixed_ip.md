@@ -135,7 +135,6 @@ Available values: "dual", "ipv4", "ipv6".
 - `name` (String) Reserved fixed IP name
 - `network` (Attributes) Network details (see [below for nested schema](#nestedatt--network))
 - `region` (String) Region name
-- `reservation` (Attributes) Reserved fixed IP status with resource type and ID it is attached to (see [below for nested schema](#nestedatt--reservation))
 - `status` (String) Underlying port status
 - `subnet_v6_id` (String) ID of the subnet that owns the IPv6 address
 - `updated_at` (String) Datetime when the reserved fixed IP was last updated
@@ -189,17 +188,6 @@ Read-Only:
 - `key` (String) Tag key. Maximum 255 characters. Cannot contain spaces, tabs, newlines, empty string or '=' character.
 - `read_only` (Boolean) If true, the tag is read-only and cannot be modified by the user
 - `value` (String) Tag value. Maximum 255 characters. Cannot contain spaces, tabs, newlines, empty string or '=' character.
-
-
-
-<a id="nestedatt--reservation"></a>
-### Nested Schema for `reservation`
-
-Read-Only:
-
-- `resource_id` (String) ID of the instance or load balancer the IP is attached to
-- `resource_type` (String) Resource type of the resource the IP is attached to
-- `status` (String) IP reservation status
 
 
 ## Import
