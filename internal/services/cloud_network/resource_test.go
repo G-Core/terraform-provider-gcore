@@ -34,8 +34,6 @@ func TestAccCloudNetwork_basic(t *testing.T) {
 						tfjsonpath.New("id"), knownvalue.NotNull()),
 					statecheck.ExpectKnownValue("gcore_cloud_network.test",
 						tfjsonpath.New("type"), knownvalue.StringExact("vxlan")),
-					statecheck.ExpectKnownValue("gcore_cloud_network.test",
-						tfjsonpath.New("create_router"), knownvalue.Bool(false)),
 				},
 			},
 		},
@@ -81,11 +79,10 @@ func TestAccCloudNetwork_import(t *testing.T) {
 				Config: testAccCloudNetworkConfig(rName),
 			},
 			{
-				ResourceName:            "gcore_cloud_network.test",
-				ImportState:             true,
-				ImportStateIdFunc:       acctest.BuildImportID("gcore_cloud_network.test", "project_id", "region_id", "id"),
-				ImportStateVerify:       true,
-				ImportStateVerifyIgnore: []string{"create_router"},
+				ResourceName:      "gcore_cloud_network.test",
+				ImportState:       true,
+				ImportStateIdFunc: acctest.BuildImportID("gcore_cloud_network.test", "project_id", "region_id", "id"),
+				ImportStateVerify: true,
 			},
 		},
 	})
@@ -123,10 +120,9 @@ func testAccCheckCloudNetworkDestroy(s *terraform.State) error {
 func testAccCloudNetworkConfig(name string) string {
 	return fmt.Sprintf(`
 resource "gcore_cloud_network" "test" {
-  project_id    = %[1]s
-  region_id     = %[2]s
-  name          = %[3]q
-  create_router = false
-  type          = "vxlan"
+  project_id = %[1]s
+  region_id  = %[2]s
+  name       = %[3]q
+  type       = "vxlan"
 }`, acctest.ProjectID(), acctest.RegionID(), name)
 }

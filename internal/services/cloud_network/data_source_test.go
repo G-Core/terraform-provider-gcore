@@ -40,16 +40,15 @@ func TestAccCloudNetworkDataSource_basic(t *testing.T) {
 func testAccCloudNetworkDataSourceConfig(name string) string {
 	return fmt.Sprintf(`
 resource "gcore_cloud_network" "test" {
-  project_id    = %[1]s
-  region_id     = %[2]s
-  name          = %[3]q
-  create_router = false
-  type          = "vxlan"
+  project_id = %[1]s
+  region_id  = %[2]s
+  name       = %[3]q
+  type       = "vxlan"
 }
 
 data "gcore_cloud_network" "test" {
-  project_id  = %[1]s
-  region_id   = %[2]s
-  network_id  = gcore_cloud_network.test.id
+  project_id = %[1]s
+  region_id  = %[2]s
+  network_id = gcore_cloud_network.test.id
 }`, acctest.ProjectID(), acctest.RegionID(), name)
 }
