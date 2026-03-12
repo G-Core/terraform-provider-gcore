@@ -1,9 +1,9 @@
 data "gcore_fastedge_apps" "example_fastedge_apps" {
   api_type = "wasi-http"
-  binary = 0
-  name = "name"
+  binary = 1
+  name = "x"
   ordering = "name"
-  plan = 0
+  plan = 1
   status = 0
-  template = 0
+  template = 1
 }

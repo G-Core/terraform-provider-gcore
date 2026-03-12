@@ -33,7 +33,8 @@ resource "gcore_fastedge_binary" "example_fastedge_binary" {
 - `source` (Number) Source language:  
 0 - unknown  
 1 - Rust  
-2 - JavaScript
+2 - JavaScript  
+3 - Go
 - `status` (Number) Status code:  
 0 - pending  
 1 - compiled  
@@ -42,13 +43,3 @@ resource "gcore_fastedge_binary" "example_fastedge_binary" {
 4 - resulting binary exceeded the limit  
 5 - unsupported source language
 - `unref_since` (String) Not used since (UTC)
-
-## Import
-
-Import is supported using the following syntax:
-
-The [`terraform import` command](https://developer.hashicorp.com/terraform/cli/commands/import) can be used, for example:
-
-```shell
-$ terraform import gcore_fastedge_binary.example '<id>'
-```

@@ -17,8 +17,8 @@ resource "gcore_fastedge_secret" "example_fastedge_secret" {
   name = "name"
   comment = "comment"
   secret_slots = [{
-    slot = 0
-    value = "value"
+    slot = 1704067200
+    value = "P@ssw0rd123!"
   }]
 }
 ```
@@ -45,22 +45,12 @@ resource "gcore_fastedge_secret" "example_fastedge_secret" {
 
 Required:
 
-- `slot` (Number) Secret slot ID.
+- `slot` (Number) Unix timestamp (seconds since epoch) indicating when this secret version becomes active. Use for time-based secret rotation.
 
 Optional:
 
-- `value` (String) The value of the secret.
+- `value` (String) The plaintext secret value. Will be encrypted with AES-256-GCM before storage.
 
 Read-Only:
 
-- `checksum` (String) A checksum of the secret value for integrity verification.
-
-## Import
-
-Import is supported using the following syntax:
-
-The [`terraform import` command](https://developer.hashicorp.com/terraform/cli/commands/import) can be used, for example:
-
-```shell
-$ terraform import gcore_fastedge_secret.example '<id>'
-```
+- `checksum` (String) SHA-256 hash of the decrypted value for integrity verification (auto-generated)

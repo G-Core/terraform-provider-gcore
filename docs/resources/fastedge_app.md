@@ -14,15 +14,15 @@ FastEdge applications combine a WebAssembly binary with configuration, environme
 
 ```terraform
 resource "gcore_fastedge_app" "example_fastedge_app" {
-  binary = 0
-  comment = "comment"
-  debug = true
+  binary = 12345
+  comment = "Production API gateway for customer portal"
+  debug = false
   env = {
     var1 = "value1"
     var2 = "value2"
   }
   log = "kafka"
-  name = "name"
+  name = "my-edge-app"
   rsp_headers = {
     header1 = "value1"
     header2 = "value2"
@@ -32,7 +32,7 @@ resource "gcore_fastedge_app" "example_fastedge_app" {
       id = 0
     }
   }
-  status = 0
+  status = 1
   stores = {
     foo = {
       id = 0
@@ -47,21 +47,19 @@ resource "gcore_fastedge_app" "example_fastedge_app" {
 
 ### Optional
 
-- `binary` (Number) Binary ID
-- `comment` (String) App description
-- `debug` (Boolean) Switch on logging for 30 minutes (switched off by default)
+- `binary` (Number) ID of the WebAssembly binary to deploy
+- `comment` (String) Optional human-readable description of the application's purpose
+- `debug` (Boolean) Enable verbose debug logging for 30 minutes. Automatically expires to prevent performance impact.
 - `env` (Map of String) Environment variables
-- `log` (String) Logging channel (by default - kafka, which allows exploring logs with API)
+- `log` (String) Logging channel. Use 'kafka' to enable log collection (queryable via API), or 'none' to disable logging.
 Available values: "kafka", "none".
-- `name` (String) App name
+- `name` (String) Unique application name (alphanumeric, hyphens allowed)
 - `rsp_headers` (Map of String) Extra headers to add to the response
 - `secrets` (Attributes Map) Application secrets (see [below for nested schema](#nestedatt--secrets))
 - `status` (Number) Status code:  
 0 - draft (inactive)  
 1 - enabled  
 2 - disabled  
-3 - hourly call limit exceeded  
-4 - daily call limit exceeded  
 5 - suspended
 - `stores` (Attributes Map) Application edge stores (see [below for nested schema](#nestedatt--stores))
 - `template` (Number) Template ID
@@ -72,8 +70,8 @@ Available values: "kafka", "none".
 - `debug_until` (String) When debugging finishes
 - `id` (Number) App ID
 - `networks` (List of String) Networks
-- `plan` (String) Plan name
-- `plan_id` (Number) Plan ID
+- `plan` (String) Application plan name
+- `plan_id` (Number) Application plan ID
 - `template_name` (String) Template name
 - `upgradeable_to` (Number) ID of the binary the app can be upgraded to
 - `url` (String) App URL
@@ -102,13 +100,3 @@ Read-Only:
 
 - `comment` (String) A description of the store
 - `name` (String) The name of the store
-
-## Import
-
-Import is supported using the following syntax:
-
-The [`terraform import` command](https://developer.hashicorp.com/terraform/cli/commands/import) can be used, for example:
-
-```shell
-$ terraform import gcore_fastedge_app.example '<id>'
-```

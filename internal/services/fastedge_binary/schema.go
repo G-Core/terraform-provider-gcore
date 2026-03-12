@@ -5,11 +5,13 @@ package fastedge_binary
 import (
 	"context"
 
+	"github.com/hashicorp/terraform-plugin-framework-validators/int64validator"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/int64planmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringplanmodifier"
+	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
 )
 
 var _ resource.ResourceWithConfigValidators = (*FastedgeBinaryResource)(nil)
@@ -36,8 +38,11 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 				Computed:    true,
 			},
 			"source": schema.Int64Attribute{
-				Description: "Source language:  \n0 - unknown  \n1 - Rust  \n2 - JavaScript",
+				Description: "Source language:  \n0 - unknown  \n1 - Rust  \n2 - JavaScript  \n3 - Go",
 				Computed:    true,
+				Validators: []validator.Int64{
+					int64validator.Between(0, 3),
+				},
 			},
 			"status": schema.Int64Attribute{
 				Description: "Status code:  \n0 - pending  \n1 - compiled  \n2 - compilation failed (errors available)  \n3 - compilation failed (errors not available)  \n4 - resulting binary exceeded the limit  \n5 - unsupported source language",
