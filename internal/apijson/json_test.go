@@ -632,6 +632,11 @@ type MetaStringModel struct {
 }
 
 func TestDecode(t *testing.T) {
+	// Pin to UTC so that time.Parse does not resolve numeric UTC offsets (e.g.
+	// +0100) to a named local timezone (e.g. "CET"), which would cause
+	// reflect.DeepEqual comparisons against time.FixedZone("", offset) to fail
+	// on machines whose local timezone happens to share the same offset.
+	t.Setenv("TZ", "UTC")
 	spew.Config.SortKeys = true
 	for name, test := range merge(tests, decode_only_tests) {
 		t.Run(name, func(t *testing.T) {
