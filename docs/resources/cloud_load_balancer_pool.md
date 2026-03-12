@@ -197,8 +197,6 @@ Read-Only:
 
 Import is supported using the following syntax:
 
-The [`terraform import` command](https://developer.hashicorp.com/terraform/cli/commands/import) can be used, for example:
-
 ```shell
 $ terraform import gcore_cloud_load_balancer_pool.example '<project_id>/<region_id>/<pool_id>'
 ```

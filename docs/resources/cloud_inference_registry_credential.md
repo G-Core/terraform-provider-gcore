@@ -53,8 +53,6 @@ resource "gcore_cloud_inference_registry_credential" "example" {
 
 Import is supported using the following syntax:
 
-The [`terraform import` command](https://developer.hashicorp.com/terraform/cli/commands/import) can be used, for example:
-
 ```shell
 $ terraform import gcore_cloud_inference_registry_credential.example '<project_id>/<credential_name>'
 ```

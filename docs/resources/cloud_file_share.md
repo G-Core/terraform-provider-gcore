@@ -123,8 +123,6 @@ Available values: "LCD", "NPL".
 
 Import is supported using the following syntax:
 
-The [`terraform import` command](https://developer.hashicorp.com/terraform/cli/commands/import) can be used, for example:
-
 ```shell
 $ terraform import gcore_cloud_file_share.example '<project_id>/<region_id>/<file_share_id>'
 ```

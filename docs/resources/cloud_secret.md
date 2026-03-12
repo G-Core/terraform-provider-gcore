@@ -57,7 +57,6 @@ resource "gcore_cloud_secret" "example" {
 - `secret_type` (String) Secret type, base64 encoded. symmetric - Used for storing byte arrays such as keys suitable for symmetric encryption; public - Used for storing the public key of an asymmetric keypair; private - Used for storing the private key of an asymmetric keypair; passphrase - Used for storing plain text passphrases; certificate - Used for storing cryptographic certificates such as X.509 certificates; opaque - Used for backwards compatibility with previous versions of the API
 Available values: "certificate", "opaque", "passphrase", "private", "public", "symmetric".
 - `status` (String) Status
-Poll task status until completion (`FINISHED`/`ERROR`) before proceeding with dependent operations.
 
 <a id="nestedatt--payload"></a>
 ### Nested Schema for `payload`
@@ -72,8 +71,6 @@ Required:
 ## Import
 
 Import is supported using the following syntax:
-
-The [`terraform import` command](https://developer.hashicorp.com/terraform/cli/commands/import) can be used, for example:
 
 ```shell
 $ terraform import gcore_cloud_secret.example '<project_id>/<region_id>/<secret_id>'

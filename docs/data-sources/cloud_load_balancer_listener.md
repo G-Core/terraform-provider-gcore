@@ -56,8 +56,6 @@ Available values: "ACTIVE", "DELETED", "ERROR", "PENDING_CREATE", "PENDING_DELET
 - `sni_secret_id` (List of String) List of secret's ID containing PKCS12 format certificate/key bundles for `TERMINATED_HTTPS` or PROMETHEUS listeners
 - `stats` (Attributes) Statistics of the load balancer. It is available only in get functions by a flag. (see [below for nested schema](#nestedatt--stats))
 - `timeout_client_data` (Number) Frontend client inactivity timeout in milliseconds
-- `timeout_member_connect` (Number, Deprecated) Backend member connection timeout in milliseconds
-- `timeout_member_data` (Number, Deprecated) Backend member inactivity timeout in milliseconds
 - `user_list` (Attributes List) Load balancer listener users list (see [below for nested schema](#nestedatt--user_list))
 
 <a id="nestedatt--stats"></a>
