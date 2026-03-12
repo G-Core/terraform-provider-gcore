@@ -194,8 +194,6 @@ Read-Only:
 
 Import is supported using the following syntax:
 
-The [`terraform import` command](https://developer.hashicorp.com/terraform/cli/commands/import) can be used, for example:
-
 ```shell
 $ terraform import gcore_cloud_reserved_fixed_ip.example '<project_id>/<region_id>/<port_id>'
 ```
