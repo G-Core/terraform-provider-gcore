@@ -23,4 +23,3 @@ jobs:
         run: fossa analyze
       - name: Run FOSSA Test
         run: fossa test
-        continue-on-error: true
