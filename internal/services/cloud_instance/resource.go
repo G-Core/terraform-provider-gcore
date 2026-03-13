@@ -16,6 +16,7 @@ import (
 	"github.com/G-Core/gcore-go/packages/param"
 	"github.com/G-Core/gcore-go/shared/constant"
 	"github.com/G-Core/terraform-provider-gcore/internal/apijson"
+	"github.com/G-Core/terraform-provider-gcore/internal/custom"
 	"github.com/G-Core/terraform-provider-gcore/internal/importpath"
 	"github.com/G-Core/terraform-provider-gcore/internal/logging"
 	"github.com/hashicorp/terraform-plugin-framework/path"
@@ -1016,10 +1017,11 @@ func (r *CloudInstanceResource) Update(ctx context.Context, req resource.UpdateR
 	// Check if there are simple field changes that need the standard PATCH endpoint.
 	// This runs AFTER specialized endpoints, allowing combined updates like:
 	//   name = "new-name" (PATCH) + flavor = "g1-standard-2" (specialized /changeflavor)
-	// The PATCH endpoint handles: name (and potentially other simple fields in the future).
+	// The PATCH endpoint handles: name, tags (and potentially other simple fields in the future).
 	nameChanged := !data.Name.Equal(state.Name)
+	tagsChanged := !custom.TagsEqual(data.Tags, state.Tags)
 
-	if nameChanged {
+	if nameChanged || tagsChanged {
 		params := cloud.InstanceUpdateParams{}
 
 		if !data.ProjectID.IsNull() {
@@ -1044,7 +1046,7 @@ func (r *CloudInstanceResource) Update(ctx context.Context, req resource.UpdateR
 			option.WithMiddleware(logging.Middleware(ctx)),
 		)
 		if err != nil {
-			resp.Diagnostics.AddError("failed to update instance name", err.Error())
+			resp.Diagnostics.AddError("failed to update instance", err.Error())
 			return
 		}
 		stateHasChanged = true
