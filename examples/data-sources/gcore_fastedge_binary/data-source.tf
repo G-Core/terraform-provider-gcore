@@ -1,3 +1,3 @@
-data "gcore_fastedge_binary" "example" {
-  id = 12345
+data "gcore_fastedge_binary" "example_fastedge_binary" {
+  id = 0
 }
