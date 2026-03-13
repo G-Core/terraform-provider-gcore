@@ -73,3 +73,11 @@ Possible values:
 - `validity_not_before` (String) Date when certificate become valid (ISO 8601/RFC 3339 format, UTC.)
 
 
+## Import
+
+Import is supported using the following syntax:
+
+```shell
+$ terraform import gcore_cdn_certificate.example '<ssl_id>'
+```
+
