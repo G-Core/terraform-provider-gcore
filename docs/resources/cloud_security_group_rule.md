@@ -59,3 +59,11 @@ Available values: "ah", "any", "dccp", "egp", "esp", "gre", "icmp", "igmp", "ipe
 - `id` (String) The ID of this resource.
 
 
+## Import
+
+Import is supported using the following syntax:
+
+```shell
+$ terraform import gcore_cloud_security_group_rule.example '<project_id>/<region_id>/<group_id>/<rule_id>'
+```
+
