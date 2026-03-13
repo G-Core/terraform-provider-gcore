@@ -1,3 +1,3 @@
 data "gcore_fastedge_binary" "example_fastedge_binary" {
-  id = 0
+  binary_id = 0
 }

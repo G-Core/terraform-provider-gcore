@@ -48,12 +48,12 @@ resource "gcore_fastedge_binary" "example" {
 5 - unsupported source language
 - `unref_since` (String) Not used since (UTC)
 
-
 ## Import
 
 Import is supported using the following syntax:
 
-```shell
-$ terraform import gcore_fastedge_binary.example '<id>'
-```
+The [`terraform import` command](https://developer.hashicorp.com/terraform/cli/commands/import) can be used, for example:
 
+```shell
+$ terraform import gcore_fastedge_binary.example '<binary_id>'
+```
