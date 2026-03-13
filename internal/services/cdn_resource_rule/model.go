@@ -35,56 +35,56 @@ func (m CDNResourceRuleModel) MarshalJSONForUpdate(state CDNResourceRuleModel) (
 }
 
 type CDNResourceRuleOptionsModel struct {
-	AllowedHTTPMethods          *CDNResourceRuleOptionsAllowedHTTPMethodsModel                                   `tfsdk:"allowed_http_methods" json:"allowedHttpMethods,optional"`
-	BotProtection               *CDNResourceRuleOptionsBotProtectionModel                                        `tfsdk:"bot_protection" json:"bot_protection,optional"`
-	BrotliCompression           *CDNResourceRuleOptionsBrotliCompressionModel                                    `tfsdk:"brotli_compression" json:"brotli_compression,optional"`
-	BrowserCacheSettings        *CDNResourceRuleOptionsBrowserCacheSettingsModel                                 `tfsdk:"browser_cache_settings" json:"browser_cache_settings,optional"`
-	CacheHTTPHeaders            *CDNResourceRuleOptionsCacheHTTPHeadersModel                                     `tfsdk:"cache_http_headers" json:"cache_http_headers,optional"`
+	AllowedHTTPMethods          customfield.NestedObject[CDNResourceRuleOptionsAllowedHTTPMethodsModel]          `tfsdk:"allowed_http_methods" json:"allowedHttpMethods,computed_optional"`
+	BotProtection               customfield.NestedObject[CDNResourceRuleOptionsBotProtectionModel]               `tfsdk:"bot_protection" json:"bot_protection,computed_optional"`
+	BrotliCompression           customfield.NestedObject[CDNResourceRuleOptionsBrotliCompressionModel]           `tfsdk:"brotli_compression" json:"brotli_compression,computed_optional"`
+	BrowserCacheSettings        customfield.NestedObject[CDNResourceRuleOptionsBrowserCacheSettingsModel]        `tfsdk:"browser_cache_settings" json:"browser_cache_settings,computed_optional"`
+	CacheHTTPHeaders            customfield.NestedObject[CDNResourceRuleOptionsCacheHTTPHeadersModel]            `tfsdk:"cache_http_headers" json:"cache_http_headers,computed_optional"`
 	Cors                        customfield.NestedObject[CDNResourceRuleOptionsCorsModel]                        `tfsdk:"cors" json:"cors,computed_optional"`
-	CountryACL                  *CDNResourceRuleOptionsCountryACLModel                                           `tfsdk:"country_acl" json:"country_acl,optional"`
-	DisableCache                *CDNResourceRuleOptionsDisableCacheModel                                         `tfsdk:"disable_cache" json:"disable_cache,optional"`
-	DisableProxyForceRanges     *CDNResourceRuleOptionsDisableProxyForceRangesModel                              `tfsdk:"disable_proxy_force_ranges" json:"disable_proxy_force_ranges,optional"`
+	CountryACL                  customfield.NestedObject[CDNResourceRuleOptionsCountryACLModel]                  `tfsdk:"country_acl" json:"country_acl,computed_optional"`
+	DisableCache                customfield.NestedObject[CDNResourceRuleOptionsDisableCacheModel]                `tfsdk:"disable_cache" json:"disable_cache,computed_optional"`
+	DisableProxyForceRanges     customfield.NestedObject[CDNResourceRuleOptionsDisableProxyForceRangesModel]     `tfsdk:"disable_proxy_force_ranges" json:"disable_proxy_force_ranges,computed_optional"`
 	EdgeCacheSettings           customfield.NestedObject[CDNResourceRuleOptionsEdgeCacheSettingsModel]           `tfsdk:"edge_cache_settings" json:"edge_cache_settings,computed_optional"`
 	Fastedge                    customfield.NestedObject[CDNResourceRuleOptionsFastedgeModel]                    `tfsdk:"fastedge" json:"fastedge,computed_optional"`
-	FetchCompressed             *CDNResourceRuleOptionsFetchCompressedModel                                      `tfsdk:"fetch_compressed" json:"fetch_compressed,optional"`
-	FollowOriginRedirect        *CDNResourceRuleOptionsFollowOriginRedirectModel                                 `tfsdk:"follow_origin_redirect" json:"follow_origin_redirect,optional"`
+	FetchCompressed             customfield.NestedObject[CDNResourceRuleOptionsFetchCompressedModel]             `tfsdk:"fetch_compressed" json:"fetch_compressed,computed_optional"`
+	FollowOriginRedirect        customfield.NestedObject[CDNResourceRuleOptionsFollowOriginRedirectModel]        `tfsdk:"follow_origin_redirect" json:"follow_origin_redirect,computed_optional"`
 	ForceReturn                 customfield.NestedObject[CDNResourceRuleOptionsForceReturnModel]                 `tfsdk:"force_return" json:"force_return,computed_optional"`
-	ForwardHostHeader           *CDNResourceRuleOptionsForwardHostHeaderModel                                    `tfsdk:"forward_host_header" json:"forward_host_header,optional"`
-	GzipOn                      *CDNResourceRuleOptionsGzipOnModel                                               `tfsdk:"gzip_on" json:"gzipOn,optional"`
-	HostHeader                  *CDNResourceRuleOptionsHostHeaderModel                                           `tfsdk:"host_header" json:"hostHeader,optional"`
-	IgnoreCookie                *CDNResourceRuleOptionsIgnoreCookieModel                                         `tfsdk:"ignore_cookie" json:"ignore_cookie,optional"`
-	IgnoreQueryString           *CDNResourceRuleOptionsIgnoreQueryStringModel                                    `tfsdk:"ignore_query_string" json:"ignoreQueryString,optional"`
+	ForwardHostHeader           customfield.NestedObject[CDNResourceRuleOptionsForwardHostHeaderModel]           `tfsdk:"forward_host_header" json:"forward_host_header,computed_optional"`
+	GzipOn                      customfield.NestedObject[CDNResourceRuleOptionsGzipOnModel]                      `tfsdk:"gzip_on" json:"gzipOn,computed_optional"`
+	HostHeader                  customfield.NestedObject[CDNResourceRuleOptionsHostHeaderModel]                  `tfsdk:"host_header" json:"hostHeader,computed_optional"`
+	IgnoreCookie                customfield.NestedObject[CDNResourceRuleOptionsIgnoreCookieModel]                `tfsdk:"ignore_cookie" json:"ignore_cookie,computed_optional"`
+	IgnoreQueryString           customfield.NestedObject[CDNResourceRuleOptionsIgnoreQueryStringModel]           `tfsdk:"ignore_query_string" json:"ignoreQueryString,computed_optional"`
 	ImageStack                  customfield.NestedObject[CDNResourceRuleOptionsImageStackModel]                  `tfsdk:"image_stack" json:"image_stack,computed_optional"`
-	IPAddressACL                *CDNResourceRuleOptionsIPAddressACLModel                                         `tfsdk:"ip_address_acl" json:"ip_address_acl,optional"`
-	LimitBandwidth              *CDNResourceRuleOptionsLimitBandwidthModel                                       `tfsdk:"limit_bandwidth" json:"limit_bandwidth,optional"`
-	ProxyCacheKey               *CDNResourceRuleOptionsProxyCacheKeyModel                                        `tfsdk:"proxy_cache_key" json:"proxy_cache_key,optional"`
-	ProxyCacheMethodsSet        *CDNResourceRuleOptionsProxyCacheMethodsSetModel                                 `tfsdk:"proxy_cache_methods_set" json:"proxy_cache_methods_set,optional"`
-	ProxyConnectTimeout         *CDNResourceRuleOptionsProxyConnectTimeoutModel                                  `tfsdk:"proxy_connect_timeout" json:"proxy_connect_timeout,optional"`
-	ProxyReadTimeout            *CDNResourceRuleOptionsProxyReadTimeoutModel                                     `tfsdk:"proxy_read_timeout" json:"proxy_read_timeout,optional"`
-	QueryParamsBlacklist        *CDNResourceRuleOptionsQueryParamsBlacklistModel                                 `tfsdk:"query_params_blacklist" json:"query_params_blacklist,optional"`
-	QueryParamsWhitelist        *CDNResourceRuleOptionsQueryParamsWhitelistModel                                 `tfsdk:"query_params_whitelist" json:"query_params_whitelist,optional"`
-	QueryStringForwarding       *CDNResourceRuleOptionsQueryStringForwardingModel                                `tfsdk:"query_string_forwarding" json:"query_string_forwarding,optional"`
-	RedirectHTTPToHTTPS         *CDNResourceRuleOptionsRedirectHTTPToHTTPSModel                                  `tfsdk:"redirect_http_to_https" json:"redirect_http_to_https,optional"`
-	RedirectHTTPSToHTTP         *CDNResourceRuleOptionsRedirectHTTPSToHTTPModel                                  `tfsdk:"redirect_https_to_http" json:"redirect_https_to_http,optional"`
-	ReferrerACL                 *CDNResourceRuleOptionsReferrerACLModel                                          `tfsdk:"referrer_acl" json:"referrer_acl,optional"`
+	IPAddressACL                customfield.NestedObject[CDNResourceRuleOptionsIPAddressACLModel]                `tfsdk:"ip_address_acl" json:"ip_address_acl,computed_optional"`
+	LimitBandwidth              customfield.NestedObject[CDNResourceRuleOptionsLimitBandwidthModel]              `tfsdk:"limit_bandwidth" json:"limit_bandwidth,computed_optional"`
+	ProxyCacheKey               customfield.NestedObject[CDNResourceRuleOptionsProxyCacheKeyModel]               `tfsdk:"proxy_cache_key" json:"proxy_cache_key,computed_optional"`
+	ProxyCacheMethodsSet        customfield.NestedObject[CDNResourceRuleOptionsProxyCacheMethodsSetModel]        `tfsdk:"proxy_cache_methods_set" json:"proxy_cache_methods_set,computed_optional"`
+	ProxyConnectTimeout         customfield.NestedObject[CDNResourceRuleOptionsProxyConnectTimeoutModel]         `tfsdk:"proxy_connect_timeout" json:"proxy_connect_timeout,computed_optional"`
+	ProxyReadTimeout            customfield.NestedObject[CDNResourceRuleOptionsProxyReadTimeoutModel]            `tfsdk:"proxy_read_timeout" json:"proxy_read_timeout,computed_optional"`
+	QueryParamsBlacklist        customfield.NestedObject[CDNResourceRuleOptionsQueryParamsBlacklistModel]        `tfsdk:"query_params_blacklist" json:"query_params_blacklist,computed_optional"`
+	QueryParamsWhitelist        customfield.NestedObject[CDNResourceRuleOptionsQueryParamsWhitelistModel]        `tfsdk:"query_params_whitelist" json:"query_params_whitelist,computed_optional"`
+	QueryStringForwarding       customfield.NestedObject[CDNResourceRuleOptionsQueryStringForwardingModel]       `tfsdk:"query_string_forwarding" json:"query_string_forwarding,computed_optional"`
+	RedirectHTTPToHTTPS         customfield.NestedObject[CDNResourceRuleOptionsRedirectHTTPToHTTPSModel]         `tfsdk:"redirect_http_to_https" json:"redirect_http_to_https,computed_optional"`
+	RedirectHTTPSToHTTP         customfield.NestedObject[CDNResourceRuleOptionsRedirectHTTPSToHTTPModel]         `tfsdk:"redirect_https_to_http" json:"redirect_https_to_http,computed_optional"`
+	ReferrerACL                 customfield.NestedObject[CDNResourceRuleOptionsReferrerACLModel]                 `tfsdk:"referrer_acl" json:"referrer_acl,computed_optional"`
 	RequestLimiter              customfield.NestedObject[CDNResourceRuleOptionsRequestLimiterModel]              `tfsdk:"request_limiter" json:"request_limiter,computed_optional"`
 	ResponseHeadersHidingPolicy customfield.NestedObject[CDNResourceRuleOptionsResponseHeadersHidingPolicyModel] `tfsdk:"response_headers_hiding_policy" json:"response_headers_hiding_policy,computed_optional"`
 	Rewrite                     customfield.NestedObject[CDNResourceRuleOptionsRewriteModel]                     `tfsdk:"rewrite" json:"rewrite,computed_optional"`
 	SecureKey                   customfield.NestedObject[CDNResourceRuleOptionsSecureKeyModel]                   `tfsdk:"secure_key" json:"secure_key,computed_optional"`
-	Slice                       *CDNResourceRuleOptionsSliceModel                                                `tfsdk:"slice" json:"slice,optional"`
+	Slice                       customfield.NestedObject[CDNResourceRuleOptionsSliceModel]                       `tfsdk:"slice" json:"slice,computed_optional"`
 	Sni                         customfield.NestedObject[CDNResourceRuleOptionsSniModel]                         `tfsdk:"sni" json:"sni,computed_optional"`
-	Stale                       *CDNResourceRuleOptionsStaleModel                                                `tfsdk:"stale" json:"stale,optional"`
-	StaticResponseHeaders       *CDNResourceRuleOptionsStaticResponseHeadersModel                                `tfsdk:"static_response_headers" json:"static_response_headers,optional"`
-	StaticHeaders               *CDNResourceRuleOptionsStaticHeadersModel                                        `tfsdk:"static_headers" json:"staticHeaders,optional"`
-	StaticRequestHeaders        *CDNResourceRuleOptionsStaticRequestHeadersModel                                 `tfsdk:"static_request_headers" json:"staticRequestHeaders,optional"`
-	UserAgentACL                *CDNResourceRuleOptionsUserAgentACLModel                                         `tfsdk:"user_agent_acl" json:"user_agent_acl,optional"`
-	Waap                        *CDNResourceRuleOptionsWaapModel                                                 `tfsdk:"waap" json:"waap,optional"`
-	Websockets                  *CDNResourceRuleOptionsWebsocketsModel                                           `tfsdk:"websockets" json:"websockets,optional"`
+	Stale                       customfield.NestedObject[CDNResourceRuleOptionsStaleModel]                       `tfsdk:"stale" json:"stale,computed_optional"`
+	StaticResponseHeaders       customfield.NestedObject[CDNResourceRuleOptionsStaticResponseHeadersModel]       `tfsdk:"static_response_headers" json:"static_response_headers,computed_optional"`
+	StaticHeaders               customfield.NestedObject[CDNResourceRuleOptionsStaticHeadersModel]               `tfsdk:"static_headers" json:"staticHeaders,computed_optional"`
+	StaticRequestHeaders        customfield.NestedObject[CDNResourceRuleOptionsStaticRequestHeadersModel]        `tfsdk:"static_request_headers" json:"staticRequestHeaders,computed_optional"`
+	UserAgentACL                customfield.NestedObject[CDNResourceRuleOptionsUserAgentACLModel]                `tfsdk:"user_agent_acl" json:"user_agent_acl,computed_optional"`
+	Waap                        customfield.NestedObject[CDNResourceRuleOptionsWaapModel]                        `tfsdk:"waap" json:"waap,computed_optional"`
+	Websockets                  customfield.NestedObject[CDNResourceRuleOptionsWebsocketsModel]                  `tfsdk:"websockets" json:"websockets,computed_optional"`
 }
 
 type CDNResourceRuleOptionsAllowedHTTPMethodsModel struct {
-	Enabled types.Bool      `tfsdk:"enabled" json:"enabled,required"`
-	Value   *[]types.String `tfsdk:"value" json:"value,required"`
+	Enabled types.Bool                    `tfsdk:"enabled" json:"enabled,required"`
+	Value   customfield.Set[types.String] `tfsdk:"value" json:"value,required"`
 }
 
 type CDNResourceRuleOptionsBotProtectionModel struct {
@@ -97,8 +97,8 @@ type CDNResourceRuleOptionsBotProtectionBotChallengeModel struct {
 }
 
 type CDNResourceRuleOptionsBrotliCompressionModel struct {
-	Enabled types.Bool      `tfsdk:"enabled" json:"enabled,required"`
-	Value   *[]types.String `tfsdk:"value" json:"value,required"`
+	Enabled types.Bool                    `tfsdk:"enabled" json:"enabled,required"`
+	Value   customfield.Set[types.String] `tfsdk:"value" json:"value,required"`
 }
 
 type CDNResourceRuleOptionsBrowserCacheSettingsModel struct {
@@ -118,9 +118,9 @@ type CDNResourceRuleOptionsCorsModel struct {
 }
 
 type CDNResourceRuleOptionsCountryACLModel struct {
-	Enabled        types.Bool      `tfsdk:"enabled" json:"enabled,required"`
-	ExceptedValues *[]types.String `tfsdk:"excepted_values" json:"excepted_values,required"`
-	PolicyType     types.String    `tfsdk:"policy_type" json:"policy_type,required"`
+	Enabled        types.Bool                    `tfsdk:"enabled" json:"enabled,required"`
+	ExceptedValues customfield.Set[types.String] `tfsdk:"excepted_values" json:"excepted_values,required"`
+	PolicyType     types.String                  `tfsdk:"policy_type" json:"policy_type,required"`
 }
 
 type CDNResourceRuleOptionsDisableCacheModel struct {
@@ -186,8 +186,8 @@ type CDNResourceRuleOptionsFetchCompressedModel struct {
 }
 
 type CDNResourceRuleOptionsFollowOriginRedirectModel struct {
-	Codes   *[]types.Int64 `tfsdk:"codes" json:"codes,required"`
-	Enabled types.Bool     `tfsdk:"enabled" json:"enabled,required"`
+	Codes   customfield.Set[types.Int64] `tfsdk:"codes" json:"codes,required"`
+	Enabled types.Bool                   `tfsdk:"enabled" json:"enabled,required"`
 }
 
 type CDNResourceRuleOptionsForceReturnModel struct {
@@ -237,9 +237,9 @@ type CDNResourceRuleOptionsImageStackModel struct {
 }
 
 type CDNResourceRuleOptionsIPAddressACLModel struct {
-	Enabled        types.Bool      `tfsdk:"enabled" json:"enabled,required"`
-	ExceptedValues *[]types.String `tfsdk:"excepted_values" json:"excepted_values,required"`
-	PolicyType     types.String    `tfsdk:"policy_type" json:"policy_type,required"`
+	Enabled        types.Bool                    `tfsdk:"enabled" json:"enabled,required"`
+	ExceptedValues customfield.Set[types.String] `tfsdk:"excepted_values" json:"excepted_values,required"`
+	PolicyType     types.String                  `tfsdk:"policy_type" json:"policy_type,required"`
 }
 
 type CDNResourceRuleOptionsLimitBandwidthModel struct {
@@ -270,8 +270,8 @@ type CDNResourceRuleOptionsProxyReadTimeoutModel struct {
 }
 
 type CDNResourceRuleOptionsQueryParamsBlacklistModel struct {
-	Enabled types.Bool      `tfsdk:"enabled" json:"enabled,required"`
-	Value   *[]types.String `tfsdk:"value" json:"value,required"`
+	Enabled types.Bool                    `tfsdk:"enabled" json:"enabled,required"`
+	Value   customfield.Set[types.String] `tfsdk:"value" json:"value,required"`
 }
 
 type CDNResourceRuleOptionsQueryParamsWhitelistModel struct {
@@ -280,11 +280,11 @@ type CDNResourceRuleOptionsQueryParamsWhitelistModel struct {
 }
 
 type CDNResourceRuleOptionsQueryStringForwardingModel struct {
-	Enabled              types.Bool      `tfsdk:"enabled" json:"enabled,required"`
-	ForwardFromFileTypes *[]types.String `tfsdk:"forward_from_file_types" json:"forward_from_file_types,required"`
-	ForwardToFileTypes   *[]types.String `tfsdk:"forward_to_file_types" json:"forward_to_file_types,required"`
-	ForwardExceptKeys    *[]types.String `tfsdk:"forward_except_keys" json:"forward_except_keys,optional"`
-	ForwardOnlyKeys      *[]types.String `tfsdk:"forward_only_keys" json:"forward_only_keys,optional"`
+	Enabled              types.Bool                    `tfsdk:"enabled" json:"enabled,required"`
+	ForwardFromFileTypes customfield.Set[types.String] `tfsdk:"forward_from_file_types" json:"forward_from_file_types,required"`
+	ForwardToFileTypes   customfield.Set[types.String] `tfsdk:"forward_to_file_types" json:"forward_to_file_types,required"`
+	ForwardExceptKeys    customfield.Set[types.String] `tfsdk:"forward_except_keys" json:"forward_except_keys,optional"`
+	ForwardOnlyKeys      customfield.Set[types.String] `tfsdk:"forward_only_keys" json:"forward_only_keys,optional"`
 }
 
 type CDNResourceRuleOptionsRedirectHTTPToHTTPSModel struct {
@@ -298,9 +298,9 @@ type CDNResourceRuleOptionsRedirectHTTPSToHTTPModel struct {
 }
 
 type CDNResourceRuleOptionsReferrerACLModel struct {
-	Enabled        types.Bool      `tfsdk:"enabled" json:"enabled,required"`
-	ExceptedValues *[]types.String `tfsdk:"excepted_values" json:"excepted_values,required"`
-	PolicyType     types.String    `tfsdk:"policy_type" json:"policy_type,required"`
+	Enabled        types.Bool                    `tfsdk:"enabled" json:"enabled,required"`
+	ExceptedValues customfield.Set[types.String] `tfsdk:"excepted_values" json:"excepted_values,required"`
+	PolicyType     types.String                  `tfsdk:"policy_type" json:"policy_type,required"`
 }
 
 type CDNResourceRuleOptionsRequestLimiterModel struct {
@@ -341,8 +341,8 @@ type CDNResourceRuleOptionsSniModel struct {
 }
 
 type CDNResourceRuleOptionsStaleModel struct {
-	Enabled types.Bool      `tfsdk:"enabled" json:"enabled,required"`
-	Value   *[]types.String `tfsdk:"value" json:"value,required"`
+	Enabled types.Bool                    `tfsdk:"enabled" json:"enabled,required"`
+	Value   customfield.Set[types.String] `tfsdk:"value" json:"value,required"`
 }
 
 type CDNResourceRuleOptionsStaticResponseHeadersModel struct {
@@ -367,9 +367,9 @@ type CDNResourceRuleOptionsStaticRequestHeadersModel struct {
 }
 
 type CDNResourceRuleOptionsUserAgentACLModel struct {
-	Enabled        types.Bool      `tfsdk:"enabled" json:"enabled,required"`
-	ExceptedValues *[]types.String `tfsdk:"excepted_values" json:"excepted_values,required"`
-	PolicyType     types.String    `tfsdk:"policy_type" json:"policy_type,required"`
+	Enabled        types.Bool                    `tfsdk:"enabled" json:"enabled,required"`
+	ExceptedValues customfield.Set[types.String] `tfsdk:"excepted_values" json:"excepted_values,required"`
+	PolicyType     types.String                  `tfsdk:"policy_type" json:"policy_type,required"`
 }
 
 type CDNResourceRuleOptionsWaapModel struct {
