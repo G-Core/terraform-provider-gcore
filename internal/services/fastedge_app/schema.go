@@ -12,11 +12,8 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/booldefault"
-	"github.com/hashicorp/terraform-plugin-framework/resource/schema/boolplanmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/int64planmodifier"
-	"github.com/hashicorp/terraform-plugin-framework/resource/schema/mapplanmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
-	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringplanmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 )
@@ -33,12 +30,11 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 				Validators: []validator.Int64{
 					int64validator.AtLeast(1),
 				},
-				PlanModifiers: []planmodifier.Int64{int64planmodifier.UseStateForUnknown(), int64planmodifier.RequiresReplace()},
+				PlanModifiers: []planmodifier.Int64{int64planmodifier.UseStateForUnknown()},
 			},
 			"template": schema.Int64Attribute{
-				Description:   "Template ID",
-				Optional:      true,
-				PlanModifiers: []planmodifier.Int64{int64planmodifier.RequiresReplace()},
+				Description: "Template ID",
+				Optional:    true,
 			},
 			"binary": schema.Int64Attribute{
 				Description: "ID of the WebAssembly binary to deploy",
@@ -47,20 +43,17 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 				Validators: []validator.Int64{
 					int64validator.AtLeast(1),
 				},
-				PlanModifiers: []planmodifier.Int64{int64planmodifier.RequiresReplaceIfConfigured()},
 			},
 			"comment": schema.StringAttribute{
-				Description:   "Optional human-readable description of the application's purpose",
-				Computed:      true,
-				Optional:      true,
-				PlanModifiers: []planmodifier.String{stringplanmodifier.RequiresReplaceIfConfigured()},
+				Description: "Optional human-readable description of the application's purpose",
+				Computed:    true,
+				Optional:    true,
 			},
 			"debug": schema.BoolAttribute{
-				Description:   "Enable verbose debug logging for 30 minutes. Automatically expires to prevent performance impact.",
-				Computed:      true,
-				Optional:      true,
-				PlanModifiers: []planmodifier.Bool{boolplanmodifier.RequiresReplaceIfConfigured()},
-				Default:       booldefault.StaticBool(false),
+				Description: "Enable verbose debug logging for 30 minutes. Automatically expires to prevent performance impact.",
+				Computed:    true,
+				Optional:    true,
+				Default:     booldefault.StaticBool(false),
 			},
 			"log": schema.StringAttribute{
 				Description: "Logging channel. Use 'kafka' to enable log collection (queryable via API), or 'none' to disable logging.\nAvailable values: \"kafka\", \"none\".",
@@ -69,13 +62,11 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 				Validators: []validator.String{
 					stringvalidator.OneOfCaseInsensitive("kafka", "none"),
 				},
-				PlanModifiers: []planmodifier.String{stringplanmodifier.RequiresReplaceIfConfigured()},
 			},
 			"name": schema.StringAttribute{
-				Description:   "Unique application name (alphanumeric, hyphens allowed)",
-				Computed:      true,
-				Optional:      true,
-				PlanModifiers: []planmodifier.String{stringplanmodifier.RequiresReplaceIfConfigured()},
+				Description: "Unique application name (alphanumeric, hyphens allowed)",
+				Computed:    true,
+				Optional:    true,
 			},
 			"status": schema.Int64Attribute{
 				Description: "Status code:  \n0 - draft (inactive)  \n1 - enabled  \n2 - disabled  \n5 - suspended",
@@ -84,23 +75,20 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 				Validators: []validator.Int64{
 					int64validator.Between(0, 2),
 				},
-				PlanModifiers: []planmodifier.Int64{int64planmodifier.RequiresReplaceIfConfigured()},
 			},
 			"env": schema.MapAttribute{
-				Description:   "Environment variables",
-				Computed:      true,
-				Optional:      true,
-				CustomType:    customfield.NewMapType[types.String](ctx),
-				ElementType:   types.StringType,
-				PlanModifiers: []planmodifier.Map{mapplanmodifier.RequiresReplaceIfConfigured()},
+				Description: "Environment variables",
+				Computed:    true,
+				Optional:    true,
+				CustomType:  customfield.NewMapType[types.String](ctx),
+				ElementType: types.StringType,
 			},
 			"rsp_headers": schema.MapAttribute{
-				Description:   "Extra headers to add to the response",
-				Computed:      true,
-				Optional:      true,
-				CustomType:    customfield.NewMapType[types.String](ctx),
-				ElementType:   types.StringType,
-				PlanModifiers: []planmodifier.Map{mapplanmodifier.RequiresReplaceIfConfigured()},
+				Description: "Extra headers to add to the response",
+				Computed:    true,
+				Optional:    true,
+				CustomType:  customfield.NewMapType[types.String](ctx),
+				ElementType: types.StringType,
 			},
 			"secrets": schema.MapNestedAttribute{
 				Description: "Application secrets",
@@ -123,7 +111,6 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 						},
 					},
 				},
-				PlanModifiers: []planmodifier.Map{mapplanmodifier.RequiresReplaceIfConfigured()},
 			},
 			"stores": schema.MapNestedAttribute{
 				Description: "Application edge stores",
@@ -146,7 +133,6 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 						},
 					},
 				},
-				PlanModifiers: []planmodifier.Map{mapplanmodifier.RequiresReplaceIfConfigured()},
 			},
 			"api_type": schema.StringAttribute{
 				Description: "Wasm API type",
@@ -158,11 +144,11 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 				CustomType:  timetypes.RFC3339Type{},
 			},
 			"plan": schema.StringAttribute{
-				Description: "Application plan name",
+				Description: "Plan name",
 				Computed:    true,
 			},
 			"plan_id": schema.Int64Attribute{
-				Description: "Application plan ID",
+				Description: "Plan ID",
 				Computed:    true,
 			},
 			"template_name": schema.StringAttribute{
@@ -174,7 +160,7 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 				Computed:    true,
 			},
 			"url": schema.StringAttribute{
-				Description: "App URL",
+				Description: "Auto-generated URL where the application is accessible",
 				Computed:    true,
 			},
 			"networks": schema.ListAttribute{

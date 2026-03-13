@@ -51,6 +51,9 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 				Description:   "Status code:  \n0 - pending  \n1 - compiled  \n2 - compilation failed (errors available)  \n3 - compilation failed (errors not available)  \n4 - resulting binary exceeded the limit  \n5 - unsupported source language",
 				Computed:      true,
 				PlanModifiers: []planmodifier.Int64{int64planmodifier.UseStateForUnknown()},
+				Validators: []validator.Int64{
+					int64validator.Between(0, 5),
+				},
 			},
 			"unref_since": schema.StringAttribute{
 				Description:   "Not used since (UTC)",

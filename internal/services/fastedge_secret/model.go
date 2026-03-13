@@ -21,7 +21,7 @@ func (m FastedgeSecretModel) MarshalJSON() (data []byte, err error) {
 }
 
 func (m FastedgeSecretModel) MarshalJSONForUpdate(state FastedgeSecretModel) (data []byte, err error) {
-	return apijson.MarshalForUpdate(m, state)
+	return apijson.MarshalForPatch(m, state)
 }
 
 type FastedgeSecretSecretSlotsModel struct {
