@@ -1,13 +1,13 @@
 resource "gcore_fastedge_app" "example_fastedge_app" {
-  binary = 0
-  comment = "comment"
-  debug = true
+  binary = 12345
+  comment = "Production API gateway for customer portal"
+  debug = false
   env = {
     var1 = "value1"
     var2 = "value2"
   }
   log = "kafka"
-  name = "name"
+  name = "my-edge-app"
   rsp_headers = {
     header1 = "value1"
     header2 = "value2"
@@ -17,7 +17,7 @@ resource "gcore_fastedge_app" "example_fastedge_app" {
       id = 0
     }
   }
-  status = 0
+  status = 1
   stores = {
     foo = {
       id = 0

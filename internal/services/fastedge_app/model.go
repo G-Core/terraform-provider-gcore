@@ -27,7 +27,7 @@ type FastedgeAppModel struct {
 	Plan          types.String                                         `tfsdk:"plan" json:"plan,computed"`
 	PlanID        types.Int64                                          `tfsdk:"plan_id" json:"plan_id,computed"`
 	TemplateName  types.String                                         `tfsdk:"template_name" json:"template_name,computed"`
-	UpgradeableTo types.Int64                                          `tfsdk:"upgradeable_to" json:"upgradeable_to,computed,no_refresh"`
+	UpgradeableTo types.Int64                                          `tfsdk:"upgradeable_to" json:"upgradeable_to,computed"`
 	URL           types.String                                         `tfsdk:"url" json:"url,computed"`
 	Networks      customfield.List[types.String]                       `tfsdk:"networks" json:"networks,computed"`
 }
@@ -37,7 +37,7 @@ func (m FastedgeAppModel) MarshalJSON() (data []byte, err error) {
 }
 
 func (m FastedgeAppModel) MarshalJSONForUpdate(state FastedgeAppModel) (data []byte, err error) {
-	return apijson.MarshalForPatch(m, state)
+	return apijson.MarshalForUpdate(m, state)
 }
 
 // MergeWithState fills in unknown plan values from state for fields that
