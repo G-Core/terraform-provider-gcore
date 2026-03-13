@@ -6,41 +6,43 @@ import (
 	"context"
 
 	"github.com/G-Core/terraform-provider-gcore/internal/customfield"
-	"github.com/hashicorp/terraform-plugin-framework/resource"
-	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
-	"github.com/hashicorp/terraform-plugin-framework/resource/schema/int64planmodifier"
-	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
+	"github.com/hashicorp/terraform-plugin-framework/datasource"
+	"github.com/hashicorp/terraform-plugin-framework/datasource/schema"
 )
 
-var _ resource.ResourceWithConfigValidators = (*FastedgeSecretResource)(nil)
+var _ datasource.DataSourceWithConfigValidators = (*FastedgeSecretDataSource)(nil)
 
-func ResourceSchema(ctx context.Context) schema.Schema {
+func DataSourceSchema(ctx context.Context) schema.Schema {
 	return schema.Schema{
 		Description: "FastEdge secrets store sensitive values such as API keys and tokens that can be referenced by FastEdge applications.",
 		Attributes: map[string]schema.Attribute{
 			"id": schema.Int64Attribute{
-				Description:   "The unique identifier of the secret.",
-				Computed:      true,
-				PlanModifiers: []planmodifier.Int64{int64planmodifier.UseStateForUnknown()},
+				Computed: true,
 			},
-			"name": schema.StringAttribute{
-				Description: "The unique name of the secret.",
-				Required:    true,
+			"secret_id": schema.Int64Attribute{
+				Required: true,
+			},
+			"app_count": schema.Int64Attribute{
+				Description: "The number of applications that use this secret.",
+				Computed:    true,
 			},
 			"comment": schema.StringAttribute{
 				Description: "A description or comment about the secret.",
-				Optional:    true,
+				Computed:    true,
+			},
+			"name": schema.StringAttribute{
+				Description: "The unique name of the secret.",
+				Computed:    true,
 			},
 			"secret_slots": schema.SetNestedAttribute{
 				Description: "A list of secret slots associated with this secret.",
 				Computed:    true,
-				Optional:    true,
-				CustomType:  customfield.NewNestedObjectSetType[FastedgeSecretSecretSlotsModel](ctx),
+				CustomType:  customfield.NewNestedObjectSetType[FastedgeSecretSecretSlotsDataSourceModel](ctx),
 				NestedObject: schema.NestedAttributeObject{
 					Attributes: map[string]schema.Attribute{
 						"slot": schema.Int64Attribute{
 							Description: "Unix timestamp (seconds since epoch) indicating when this secret version becomes active. Use for time-based secret rotation.",
-							Required:    true,
+							Computed:    true,
 						},
 						"checksum": schema.StringAttribute{
 							Description: "SHA-256 hash of the decrypted value for integrity verification (auto-generated)",
@@ -48,23 +50,19 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 						},
 						"value": schema.StringAttribute{
 							Description: "The plaintext secret value. Will be encrypted with AES-256-GCM before storage.",
-							Optional:    true,
+							Computed:    true,
 						},
 					},
 				},
-			},
-			"app_count": schema.Int64Attribute{
-				Description: "The number of applications that use this secret.",
-				Computed:    true,
 			},
 		},
 	}
 }
 
-func (r *FastedgeSecretResource) Schema(ctx context.Context, req resource.SchemaRequest, resp *resource.SchemaResponse) {
-	resp.Schema = ResourceSchema(ctx)
+func (d *FastedgeSecretDataSource) Schema(ctx context.Context, req datasource.SchemaRequest, resp *datasource.SchemaResponse) {
+	resp.Schema = DataSourceSchema(ctx)
 }
 
-func (r *FastedgeSecretResource) ConfigValidators(_ context.Context) []resource.ConfigValidator {
-	return []resource.ConfigValidator{}
+func (d *FastedgeSecretDataSource) ConfigValidators(_ context.Context) []datasource.ConfigValidator {
+	return []datasource.ConfigValidator{}
 }

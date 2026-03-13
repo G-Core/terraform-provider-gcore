@@ -54,3 +54,13 @@ Optional:
 Read-Only:
 
 - `checksum` (String) SHA-256 hash of the decrypted value for integrity verification (auto-generated)
+
+## Import
+
+Import is supported using the following syntax:
+
+The [`terraform import` command](https://developer.hashicorp.com/terraform/cli/commands/import) can be used, for example:
+
+```shell
+$ terraform import gcore_fastedge_secret.example '<secret_id>'
+```

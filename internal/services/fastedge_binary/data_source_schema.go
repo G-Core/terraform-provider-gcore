@@ -6,28 +6,22 @@ import (
 	"context"
 
 	"github.com/hashicorp/terraform-plugin-framework-validators/int64validator"
-	"github.com/hashicorp/terraform-plugin-framework/resource"
-	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
-	"github.com/hashicorp/terraform-plugin-framework/resource/schema/int64planmodifier"
-	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
-	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringplanmodifier"
+	"github.com/hashicorp/terraform-plugin-framework/datasource"
+	"github.com/hashicorp/terraform-plugin-framework/datasource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
 )
 
-var _ resource.ResourceWithConfigValidators = (*FastedgeBinaryResource)(nil)
+var _ datasource.DataSourceWithConfigValidators = (*FastedgeBinaryDataSource)(nil)
 
-func ResourceSchema(ctx context.Context) schema.Schema {
+func DataSourceSchema(ctx context.Context) schema.Schema {
 	return schema.Schema{
 		Description: "FastEdge binaries are immutable WebAssembly modules that implement edge application logic.",
 		Attributes: map[string]schema.Attribute{
 			"id": schema.Int64Attribute{
-				Description:   "Binary ID",
-				Computed:      true,
-				PlanModifiers: []planmodifier.Int64{int64planmodifier.UseStateForUnknown(), int64planmodifier.RequiresReplace()},
+				Computed: true,
 			},
-			"body": schema.StringAttribute{
-				Required:      true,
-				PlanModifiers: []planmodifier.String{stringplanmodifier.RequiresReplace()},
+			"binary_id": schema.Int64Attribute{
+				Required: true,
 			},
 			"api_type": schema.StringAttribute{
 				Description: "Wasm API type",
@@ -59,10 +53,10 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 	}
 }
 
-func (r *FastedgeBinaryResource) Schema(ctx context.Context, req resource.SchemaRequest, resp *resource.SchemaResponse) {
-	resp.Schema = ResourceSchema(ctx)
+func (d *FastedgeBinaryDataSource) Schema(ctx context.Context, req datasource.SchemaRequest, resp *datasource.SchemaResponse) {
+	resp.Schema = DataSourceSchema(ctx)
 }
 
-func (r *FastedgeBinaryResource) ConfigValidators(_ context.Context) []resource.ConfigValidator {
-	return []resource.ConfigValidator{}
+func (d *FastedgeBinaryDataSource) ConfigValidators(_ context.Context) []datasource.ConfigValidator {
+	return []datasource.ConfigValidator{}
 }

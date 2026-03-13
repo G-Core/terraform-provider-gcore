@@ -3,24 +3,15 @@
 package fastedge_binary
 
 import (
-	"github.com/G-Core/terraform-provider-gcore/internal/apijson"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 )
 
-type FastedgeBinaryModel struct {
-	ID         types.Int64  `tfsdk:"id" json:"id,computed"`
-	Body       types.String `tfsdk:"body" json:"body,required,no_refresh"`
+type FastedgeBinaryDataSourceModel struct {
+	ID         types.Int64  `tfsdk:"id" path:"binary_id,computed"`
+	BinaryID   types.Int64  `tfsdk:"binary_id" path:"binary_id,required"`
 	APIType    types.String `tfsdk:"api_type" json:"api_type,computed"`
 	Checksum   types.String `tfsdk:"checksum" json:"checksum,computed"`
 	Source     types.Int64  `tfsdk:"source" json:"source,computed"`
 	Status     types.Int64  `tfsdk:"status" json:"status,computed"`
 	UnrefSince types.String `tfsdk:"unref_since" json:"unref_since,computed"`
-}
-
-func (m FastedgeBinaryModel) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(m.Body)
-}
-
-func (m FastedgeBinaryModel) MarshalJSONForUpdate(state FastedgeBinaryModel) (data []byte, err error) {
-	return apijson.MarshalForUpdate(m.Body, state.Body)
 }
