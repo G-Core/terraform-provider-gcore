@@ -1,5 +1,5 @@
 ---
-page_title: "gcore_cloud_network_subnet Resource - gcore"
+page_title: "gcore_cloud_network_subnet Resource - Gcore"
 subcategory: ""
 description: |-
   Subnets define IP address ranges within a network for instance connectivity, with support for DHCP and DNS configuration.
@@ -74,7 +74,6 @@ resource "gcore_cloud_network_subnet" "subnet_ipv6" {
 
 ### Optional
 
-- `connect_to_network_router` (Boolean) True if the network's router should get a gateway in this subnet. Must be explicitly 'false' when `gateway_ip` is null.
 - `dns_nameservers` (List of String) List IP addresses of DNS servers to advertise via DHCP.
 - `enable_dhcp` (Boolean) True if DHCP should be enabled
 - `gateway_ip` (String) Default GW IPv4 address to advertise in DHCP routes in this subnet. Omit this field to let the cloud backend allocate it automatically. Set to null if no gateway must be advertised by this subnet's DHCP (useful when attaching instances to multiple subnets in order to prevent default route conflicts).
@@ -83,7 +82,6 @@ resource "gcore_cloud_network_subnet" "subnet_ipv6" {
 Available values: 4, 6.
 - `project_id` (Number) Project ID
 - `region_id` (Number) Region ID
-- `router_id_to_connect` (String) ID of the router to connect to. Requires `connect_to_network_router` set to true. If not specified, attempts to find a router created during network creation.
 - `tags` (Map of String) Key-value tags to associate with the resource. A tag is a key-value pair that can be associated with a resource, enabling efficient filtering and grouping for better organization and management. Both tag keys and values have a maximum length of 255 characters. Some tags are read-only and cannot be modified by the user. Tags are also integrated with cost reports, allowing cost data to be filtered based on tag keys or values.
 
 ### Read-Only

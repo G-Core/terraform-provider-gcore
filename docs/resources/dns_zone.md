@@ -1,5 +1,5 @@
 ---
-page_title: "gcore_dns_zone Resource - gcore"
+page_title: "gcore_dns_zone Resource - Gcore"
 subcategory: ""
 description: |-
   DNS zones are authoritative containers for domain name records, with support for DNSSEC and SOA configuration.

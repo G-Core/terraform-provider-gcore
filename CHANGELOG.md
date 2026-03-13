@@ -1,5 +1,46 @@
 # Changelog
 
+## 2.0.0-alpha.2 (2026-03-13)
+
+Full Changelog: [v2.0.0-alpha.1...v2.0.0-alpha.2](https://github.com/G-Core/terraform-provider-gcore/compare/v2.0.0-alpha.1...v2.0.0-alpha.2)
+
+### Features
+
+* **api:** aggregated API specs update ([bd6b4b5](https://github.com/G-Core/terraform-provider-gcore/commit/bd6b4b5284ce172e6ff00113b07d550fe3c860bd))
+* **api:** aggregated API specs update ([f0c436d](https://github.com/G-Core/terraform-provider-gcore/commit/f0c436ddb8c2dd00fe158548e20fdfcb554ca004))
+* **api:** aggregated API specs update ([3038dfb](https://github.com/G-Core/terraform-provider-gcore/commit/3038dfb4d47b4fc72a63bc68f927777ff218b934))
+* **cloud:** remove create_router field from gcore_cloud_network ([87d1dde](https://github.com/G-Core/terraform-provider-gcore/commit/87d1dde603f3e3eea2aab28564c420f9ee6bcac5))
+* **cloud:** remove deprecated timeout_client_data from gcore_cloud_load_balancer_pool ([5a8385d](https://github.com/G-Core/terraform-provider-gcore/commit/5a8385d796a27b6646305bda1cc68cf0d0abdb3e))
+* **cloud:** remove deprecated timeout_member_connect and timeout_member_data from gcore_cloud_load_balancer_listener ([99f9be3](https://github.com/G-Core/terraform-provider-gcore/commit/99f9be3567006ae15e11a23a53ce580f8711928c))
+* **cloud:** remove reservation block from gcore_cloud_reserved_fixed_ip ([832fbc3](https://github.com/G-Core/terraform-provider-gcore/commit/832fbc3c4cdf1ce7d409488b182b938c54ce6251))
+* **cloud:** remove router attachment fields from gcore_cloud_network_subnet ([833ec8c](https://github.com/G-Core/terraform-provider-gcore/commit/833ec8c7776449e4dcc5b61969025126d8102bb8))
+
+
+### Bug Fixes
+
+* **cloud:** support PATCHing tags on gcore_cloud_instance update ([e989285](https://github.com/G-Core/terraform-provider-gcore/commit/e98928575813b5c7875b3b78513c489b8cf218bd))
+* **cloud:** use UseStateForUnknown for size of cloud_gpu_virtual_cluster_image ([49ba618](https://github.com/G-Core/terraform-provider-gcore/commit/49ba61872c7270c3f3d4656a8c5db5b2f21d927d))
+* **fastedge:** rename path parameters to match updated OpenAPI spec ([3a2115f](https://github.com/G-Core/terraform-provider-gcore/commit/3a2115f6de2409ce3437822e9e292b012efe6dc7))
+* **fastedge:** rename path parameters to match updated OpenAPI spec ([cb03da1](https://github.com/G-Core/terraform-provider-gcore/commit/cb03da139183caa25e3a1b9665dae2c57854a237))
+
+
+### Reverts
+
+* enable fossa failing on error ([351620c](https://github.com/G-Core/terraform-provider-gcore/commit/351620ca172eb16f31e5ef1fdb91eee19dfe2e3a))
+
+
+### Chores
+
+* add missing cdn_resource override name in config ([1011ce7](https://github.com/G-Core/terraform-provider-gcore/commit/1011ce7f2956dcabcaffe8af5b47e7d1f371c006))
+* add missing cdn_resource override name in config ([b32406a](https://github.com/G-Core/terraform-provider-gcore/commit/b32406af02bb78935ba35ae145258a3a8adcbed8))
+* **docs:** update terraform-plugin-docs to v0.24.0 ([21d566a](https://github.com/G-Core/terraform-provider-gcore/commit/21d566a256273a1dd6045d9e61c15fe32e35073a))
+
+
+### Documentation
+
+* add missing import examples for 3 resources ([1603c04](https://github.com/G-Core/terraform-provider-gcore/commit/1603c04dbe02978a2f0e5974ac5f0d27a97b6bf5))
+* regenerate index.md from template and fix instance examples ([a6be214](https://github.com/G-Core/terraform-provider-gcore/commit/a6be214c7061b0145bba482feeb5a3f91be9b160))
+
 ## 2.0.0-alpha.1 (2026-03-09)
 
 Full Changelog: [v0.0.1-alpha.0...v2.0.0-alpha.1](https://github.com/G-Core/terraform-provider-gcore/compare/v0.0.1-alpha.0...v2.0.0-alpha.1)

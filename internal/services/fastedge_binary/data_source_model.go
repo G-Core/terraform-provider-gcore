@@ -7,7 +7,8 @@ import (
 )
 
 type FastedgeBinaryDataSourceModel struct {
-	ID         types.Int64  `tfsdk:"id" path:"id,required"`
+	ID         types.Int64  `tfsdk:"id" path:"binary_id,computed"`
+	BinaryID   types.Int64  `tfsdk:"binary_id" path:"binary_id,required"`
 	APIType    types.String `tfsdk:"api_type" json:"api_type,computed"`
 	Checksum   types.String `tfsdk:"checksum" json:"checksum,computed"`
 	Source     types.Int64  `tfsdk:"source" json:"source,computed"`

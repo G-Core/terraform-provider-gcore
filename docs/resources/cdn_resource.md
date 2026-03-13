@@ -1,5 +1,5 @@
 ---
-page_title: "gcore_cdn_resource Resource - gcore"
+page_title: "gcore_cdn_resource Resource - Gcore"
 subcategory: ""
 description: |-
   
@@ -464,6 +464,7 @@ The following codes are reserved by our system and cannot be specified in this o
 - `forward_host_header` (Attributes) Forwards the Host header from a end-user request to an origin server.
 
 `hostHeader` and `forward_host_header` options cannot be enabled simultaneously. (see [below for nested schema](#nestedatt--options--forward_host_header))
+- `grpc_passthrough` (Attributes) Enables gRPC pass-through for the CDN resource. (see [below for nested schema](#nestedatt--options--grpc_passthrough))
 - `gzip_on` (Attributes) Compresses content with gzip on the CDN end. CDN servers will request only uncompressed content from the origin.
 
 Notes:
@@ -741,7 +742,7 @@ Possible values:
 Optional:
 
 - `on_request_body` (Attributes) Allows to configure FastEdge application that will be called to handle request body as soon as CDN receives incoming HTTP request. (see [below for nested schema](#nestedatt--options--fastedge--on_request_body))
-- `on_request_headers` (Attributes) Allows to configure FastEdge application that will be called to handle request headers as soon as CDN receives incoming HTTP request. (see [below for nested schema](#nestedatt--options--fastedge--on_request_headers))
+- `on_request_headers` (Attributes) Allows to configure FastEdge application that will be called to handle request headers as soon as CDN receives incoming HTTP request, **before cache**. (see [below for nested schema](#nestedatt--options--fastedge--on_request_headers))
 - `on_response_body` (Attributes) Allows to configure FastEdge application that will be called to handle response body before CDN sends the HTTP response. (see [below for nested schema](#nestedatt--options--fastedge--on_response_body))
 - `on_response_headers` (Attributes) Allows to configure FastEdge application that will be called to handle response headers before CDN sends the HTTP response. (see [below for nested schema](#nestedatt--options--fastedge--on_response_headers))
 
@@ -869,6 +870,21 @@ Optional:
 
 <a id="nestedatt--options--forward_host_header"></a>
 ### Nested Schema for `options.forward_host_header`
+
+Required:
+
+- `enabled` (Boolean) Controls the option state.
+
+Possible values:
+- **true** - Option is enabled.
+- **false** - Option is disabled.
+- `value` (Boolean) Possible values:
+- **true** - Option is enabled.
+- **false** - Option is disabled.
+
+
+<a id="nestedatt--options--grpc_passthrough"></a>
+### Nested Schema for `options.grpc_passthrough`
 
 Required:
 

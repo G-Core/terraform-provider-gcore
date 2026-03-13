@@ -47,7 +47,6 @@ resource "gcore_cloud_load_balancer_pool" "example_cloud_load_balancer_pool" {
     persistence_granularity = "persistence_granularity"
     persistence_timeout = 0
   }
-  timeout_client_data = 50000
   timeout_member_connect = 50000
   timeout_member_data = 0
 }

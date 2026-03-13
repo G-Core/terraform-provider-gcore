@@ -152,3 +152,101 @@ resource "gcore_cloud_instance" "test" {
   ]
 }`, acctest.ProjectID(), acctest.RegionID(), name, imageID)
 }
+
+func TestAccCloudInstance_tags(t *testing.T) {
+	rName := acctest.RandomName()
+	imageID := latestUbuntuImageID(t)
+
+	resource.ParallelTest(t, resource.TestCase{
+		PreCheck:                 func() { acctest.PreCheck(t) },
+		ProtoV6ProviderFactories: acctest.ProtoV6ProviderFactories,
+		CheckDestroy:             testAccCheckCloudInstanceDestroy,
+		Steps: []resource.TestStep{
+			{
+				Config: testAccCloudInstanceConfigWithTags(rName, imageID, map[string]string{
+					"env":  "test",
+					"team": "platform",
+				}),
+				ConfigStateChecks: []statecheck.StateCheck{
+					statecheck.ExpectKnownValue("gcore_cloud_instance.test",
+						tfjsonpath.New("name"), knownvalue.StringExact(rName)),
+					statecheck.ExpectKnownValue("gcore_cloud_instance.test",
+						tfjsonpath.New("tags"),
+						knownvalue.MapExact(map[string]knownvalue.Check{
+							"env":  knownvalue.StringExact("test"),
+							"team": knownvalue.StringExact("platform"),
+						})),
+				},
+			},
+			{
+				Config: testAccCloudInstanceConfigWithTags(rName, imageID, map[string]string{
+					"env":     "staging",
+					"team":    "platform",
+					"version": "2",
+				}),
+				ConfigStateChecks: []statecheck.StateCheck{
+					statecheck.ExpectKnownValue("gcore_cloud_instance.test",
+						tfjsonpath.New("tags"),
+						knownvalue.MapExact(map[string]knownvalue.Check{
+							"env":     knownvalue.StringExact("staging"),
+							"team":    knownvalue.StringExact("platform"),
+							"version": knownvalue.StringExact("2"),
+						})),
+				},
+			},
+			// Step 3: remove tags (verify JSON Merge Patch sends null for removed keys)
+			{
+				Config: testAccCloudInstanceConfigWithTags(rName, imageID, map[string]string{
+					"env": "staging",
+				}),
+				ConfigStateChecks: []statecheck.StateCheck{
+					statecheck.ExpectKnownValue("gcore_cloud_instance.test",
+						tfjsonpath.New("tags"),
+						knownvalue.MapExact(map[string]knownvalue.Check{
+							"env": knownvalue.StringExact("staging"),
+						})),
+				},
+			},
+		},
+	})
+}
+
+func testAccCloudInstanceConfigWithTags(name, imageID string, tags map[string]string) string {
+	tagLines := ""
+	for k, v := range tags {
+		tagLines += fmt.Sprintf("    %s = %q\n", k, v)
+	}
+	return fmt.Sprintf(`
+resource "gcore_cloud_volume" "boot" {
+  project_id = %[1]s
+  region_id  = %[2]s
+  name       = "%[3]s-vol"
+  size       = 10
+  type_name  = "ssd_hiiops"
+  source     = "image"
+  image_id   = %[4]q
+}
+
+resource "gcore_cloud_instance" "test" {
+  project_id = %[1]s
+  region_id  = %[2]s
+  name       = %[3]q
+  flavor     = "g1-standard-1-2"
+
+  volumes = [
+    {
+      volume_id  = gcore_cloud_volume.boot.id
+      boot_index = 0
+    }
+  ]
+
+  interfaces = [
+    {
+      type = "external"
+    }
+  ]
+
+  tags = {
+%[5]s  }
+}`, acctest.ProjectID(), acctest.RegionID(), name, imageID, tagLines)
+}

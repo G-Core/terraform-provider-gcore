@@ -1,5 +1,5 @@
 ---
-page_title: "gcore_cloud_floating_ip Resource - gcore"
+page_title: "gcore_cloud_floating_ip Resource - Gcore"
 subcategory: ""
 description: |-
   A floating IP is a static IP address that points to one of your Instances. It allows you to redirect network traffic to any of your Instances in the same datacenter.

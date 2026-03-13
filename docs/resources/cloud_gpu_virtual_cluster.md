@@ -1,5 +1,5 @@
 ---
-page_title: "gcore_cloud_gpu_virtual_cluster Resource - gcore"
+page_title: "gcore_cloud_gpu_virtual_cluster Resource - Gcore"
 subcategory: ""
 description: |-
   GPU virtual clusters provide managed virtual GPU servers with auto-scaling for parallel computation workloads.

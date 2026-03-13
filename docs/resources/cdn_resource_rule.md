@@ -1,5 +1,5 @@
 ---
-page_title: "gcore_cdn_resource_rule Resource - gcore"
+page_title: "gcore_cdn_resource_rule Resource - Gcore"
 subcategory: ""
 description: |-
   CDN resource rules set custom caching, delivery, and security options for specific URL patterns or file types.

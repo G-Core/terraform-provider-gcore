@@ -17,6 +17,9 @@ func DataSourceSchema(ctx context.Context) schema.Schema {
 		Description: "FastEdge secrets store sensitive values such as API keys and tokens that can be referenced by FastEdge applications.",
 		Attributes: map[string]schema.Attribute{
 			"id": schema.Int64Attribute{
+				Computed: true,
+			},
+			"secret_id": schema.Int64Attribute{
 				Required: true,
 			},
 			"app_count": schema.Int64Attribute{
@@ -38,15 +41,15 @@ func DataSourceSchema(ctx context.Context) schema.Schema {
 				NestedObject: schema.NestedAttributeObject{
 					Attributes: map[string]schema.Attribute{
 						"slot": schema.Int64Attribute{
-							Description: "Secret slot ID.",
+							Description: "Unix timestamp (seconds since epoch) indicating when this secret version becomes active. Use for time-based secret rotation.",
 							Computed:    true,
 						},
 						"checksum": schema.StringAttribute{
-							Description: "A checksum of the secret value for integrity verification.",
+							Description: "SHA-256 hash of the decrypted value for integrity verification (auto-generated)",
 							Computed:    true,
 						},
 						"value": schema.StringAttribute{
-							Description: "The value of the secret.",
+							Description: "The plaintext secret value. Will be encrypted with AES-256-GCM before storage.",
 							Computed:    true,
 						},
 					},

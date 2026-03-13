@@ -1,5 +1,5 @@
 ---
-page_title: "gcore_dns_zone_rrset Resource - gcore"
+page_title: "gcore_dns_zone_rrset Resource - Gcore"
 subcategory: ""
 description: |-
   DNS resource record sets (RRsets) define individual DNS records such as A, AAAA, CNAME, MX, and TXT with TTL and geo-balancing settings.
@@ -151,4 +151,12 @@ Read-Only:
 - `key` (String)
 - `message` (String)
 
+
+## Import
+
+Import is supported using the following syntax:
+
+```shell
+$ terraform import gcore_dns_zone_rrset.example '<zone_name>/<rrset_name>/<rrset_type>'
+```
 

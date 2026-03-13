@@ -229,11 +229,11 @@ func (p *GcoreProvider) Resources(ctx context.Context) []func() resource.Resourc
 		dns_zone.NewResource,
 		dns_zone_rrset.NewResource,
 		dns_network_mapping.NewResource,
+		cdn_resource.NewResource,
 		cdn_resource_rule.NewResource,
 		cdn_origin_group.NewResource,
 		cdn_certificate.NewResource,
 		cdn_trusted_ca_certificate.NewResource,
-		cdn_resource.NewResource,
 	}
 }
 
@@ -290,10 +290,10 @@ func (p *GcoreProvider) DataSources(ctx context.Context) []func() datasource.Dat
 		dns_zone.NewDNSZoneDataSource,
 		dns_zone_rrset.NewDNSZoneRrsetDataSource,
 		dns_network_mapping.NewDNSNetworkMappingDataSource,
+		cdn_resource.NewCDNResourceDataSource,
 		cdn_resource_rule.NewCDNResourceRuleDataSource,
 		cdn_certificate.NewCDNCertificateDataSource,
 		cdn_trusted_ca_certificate.NewCDNTrustedCaCertificateDataSource,
-		cdn_resource.NewCDNResourceDataSource,
 	}
 }
 

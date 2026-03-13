@@ -1,1 +1,1 @@
-$ terraform import gcore_fastedge_app.example '<id>'
+$ terraform import gcore_fastedge_app.example '<app_id>'

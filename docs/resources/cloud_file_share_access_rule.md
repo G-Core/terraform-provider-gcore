@@ -1,5 +1,5 @@
 ---
-page_title: "gcore_cloud_file_share_access_rule Resource - gcore"
+page_title: "gcore_cloud_file_share_access_rule Resource - Gcore"
 subcategory: ""
 description: |-
   File share access rules control which IP addresses can mount a file share and their permissions (read-only or read-write).

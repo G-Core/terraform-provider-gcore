@@ -1,5 +1,5 @@
 ---
-page_title: "gcore_cdn_certificate Resource - gcore"
+page_title: "gcore_cdn_certificate Resource - Gcore"
 subcategory: ""
 description: |-
   CDN SSL certificates enable HTTPS content delivery, supporting both uploaded certificates and automated Let's Encrypt provisioning.
@@ -72,4 +72,12 @@ Possible values:
 - `validity_not_after` (String) Date when certificate become untrusted (ISO 8601/RFC 3339 format, UTC.)
 - `validity_not_before` (String) Date when certificate become valid (ISO 8601/RFC 3339 format, UTC.)
 
+
+## Import
+
+Import is supported using the following syntax:
+
+```shell
+$ terraform import gcore_cdn_certificate.example '<ssl_id>'
+```
 

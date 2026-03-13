@@ -1,5 +1,5 @@
 ---
-page_title: "gcore_cloud_instance_image Resource - gcore"
+page_title: "gcore_cloud_instance_image Resource - Gcore"
 subcategory: ""
 description: |-
   Instance images are operating system images (public, private, or shared) used to boot cloud instances.

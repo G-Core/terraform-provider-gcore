@@ -8,6 +8,7 @@ import (
 	"github.com/G-Core/terraform-provider-gcore/internal/customfield"
 	"github.com/hashicorp/terraform-plugin-framework-timetypes/timetypes"
 	"github.com/hashicorp/terraform-plugin-framework-validators/datasourcevalidator"
+	"github.com/hashicorp/terraform-plugin-framework-validators/int64validator"
 	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/datasource/schema"
@@ -23,6 +24,9 @@ func DataSourceSchema(ctx context.Context) schema.Schema {
 		Description: "FastEdge applications combine a WebAssembly binary with configuration, environment variables, and secrets for deployment at the CDN edge.",
 		Attributes: map[string]schema.Attribute{
 			"id": schema.Int64Attribute{
+				Computed: true,
+			},
+			"app_id": schema.Int64Attribute{
 				Optional: true,
 			},
 			"api_type": schema.StringAttribute{
@@ -30,15 +34,18 @@ func DataSourceSchema(ctx context.Context) schema.Schema {
 				Computed:    true,
 			},
 			"binary": schema.Int64Attribute{
-				Description: "Binary ID",
+				Description: "ID of the WebAssembly binary to deploy",
 				Computed:    true,
+				Validators: []validator.Int64{
+					int64validator.AtLeast(1),
+				},
 			},
 			"comment": schema.StringAttribute{
-				Description: "App description",
+				Description: "Optional human-readable description of the application's purpose",
 				Computed:    true,
 			},
 			"debug": schema.BoolAttribute{
-				Description: "Switch on logging for 30 minutes (switched off by default)",
+				Description: "Enable verbose debug logging for 30 minutes. Automatically expires to prevent performance impact.",
 				Computed:    true,
 			},
 			"debug_until": schema.StringAttribute{
@@ -47,14 +54,14 @@ func DataSourceSchema(ctx context.Context) schema.Schema {
 				CustomType:  timetypes.RFC3339Type{},
 			},
 			"log": schema.StringAttribute{
-				Description: "Logging channel (by default - kafka, which allows exploring logs with API)\nAvailable values: \"kafka\", \"none\".",
+				Description: "Logging channel. Use 'kafka' to enable log collection (queryable via API), or 'none' to disable logging.\nAvailable values: \"kafka\", \"none\".",
 				Computed:    true,
 				Validators: []validator.String{
 					stringvalidator.OneOfCaseInsensitive("kafka", "none"),
 				},
 			},
 			"name": schema.StringAttribute{
-				Description: "App name",
+				Description: "Unique application name (alphanumeric, hyphens allowed)",
 				Computed:    true,
 			},
 			"plan": schema.StringAttribute{
@@ -66,8 +73,11 @@ func DataSourceSchema(ctx context.Context) schema.Schema {
 				Computed:    true,
 			},
 			"status": schema.Int64Attribute{
-				Description: "Status code:  \n0 - draft (inactive)  \n1 - enabled  \n2 - disabled  \n3 - hourly call limit exceeded  \n4 - daily call limit exceeded  \n5 - suspended",
+				Description: "Status code:  \n0 - draft (inactive)  \n1 - enabled  \n2 - disabled  \n5 - suspended",
 				Computed:    true,
+				Validators: []validator.Int64{
+					int64validator.Between(0, 2),
+				},
 			},
 			"template": schema.Int64Attribute{
 				Description: "Template ID",
@@ -78,7 +88,7 @@ func DataSourceSchema(ctx context.Context) schema.Schema {
 				Computed:    true,
 			},
 			"url": schema.StringAttribute{
-				Description: "App URL",
+				Description: "Auto-generated URL where the application is accessible",
 				Computed:    true,
 			},
 			"env": schema.MapAttribute{
@@ -152,15 +162,18 @@ func DataSourceSchema(ctx context.Context) schema.Schema {
 						},
 					},
 					"binary": schema.Int64Attribute{
-						Description: "Binary ID",
+						Description: "Filter by binary ID (shows apps using this binary)",
 						Optional:    true,
+						Validators: []validator.Int64{
+							int64validator.AtLeast(1),
+						},
 					},
 					"name": schema.StringAttribute{
-						Description: "Name of the app",
+						Description: "Filter by application name (case-insensitive partial match)",
 						Optional:    true,
 					},
 					"ordering": schema.StringAttribute{
-						Description: "Ordering\nAvailable values: \"name\", \"-name\", \"status\", \"-status\", \"id\", \"-id\", \"template\", \"-template\", \"binary\", \"-binary\", \"plan\", \"-plan\".",
+						Description: "Sort order. Use - prefix for descending (e.g., -name sorts by name descending)\nAvailable values: \"name\", \"-name\", \"status\", \"-status\", \"id\", \"-id\", \"template\", \"-template\", \"binary\", \"-binary\", \"plan\", \"-plan\".",
 						Optional:    true,
 						Validators: []validator.String{
 							stringvalidator.OneOfCaseInsensitive(
@@ -180,16 +193,25 @@ func DataSourceSchema(ctx context.Context) schema.Schema {
 						},
 					},
 					"plan": schema.Int64Attribute{
-						Description: "Plan ID",
+						Description: "Filter by plan ID",
 						Optional:    true,
+						Validators: []validator.Int64{
+							int64validator.AtLeast(1),
+						},
 					},
 					"status": schema.Int64Attribute{
 						Description: "Status code:  \n0 - draft (inactive)  \n1 - enabled  \n2 - disabled  \n3 - hourly call limit exceeded  \n4 - daily call limit exceeded  \n5 - suspended",
 						Optional:    true,
+						Validators: []validator.Int64{
+							int64validator.Between(0, 5),
+						},
 					},
 					"template": schema.Int64Attribute{
-						Description: "Template ID",
+						Description: "Filter by template ID (shows apps created from this template)",
 						Optional:    true,
+						Validators: []validator.Int64{
+							int64validator.AtLeast(1),
+						},
 					},
 				},
 			},
@@ -203,6 +225,6 @@ func (d *FastedgeAppDataSource) Schema(ctx context.Context, req datasource.Schem
 
 func (d *FastedgeAppDataSource) ConfigValidators(_ context.Context) []datasource.ConfigValidator {
 	return []datasource.ConfigValidator{
-		datasourcevalidator.ExactlyOneOf(path.MatchRoot("id"), path.MatchRoot("find_one_by")),
+		datasourcevalidator.ExactlyOneOf(path.MatchRoot("app_id"), path.MatchRoot("find_one_by")),
 	}
 }
