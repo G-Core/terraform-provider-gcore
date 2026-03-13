@@ -18,8 +18,9 @@ import (
 
 func init() {
 	resource.AddTestSweepers("gcore_cloud_network", &resource.Sweeper{
-		Name: "gcore_cloud_network",
-		F:    sweepCloudNetworks,
+		Name:         "gcore_cloud_network",
+		F:            sweepCloudNetworks,
+		Dependencies: []string{"gcore_cloud_network_subnet"},
 	})
 }
 
