@@ -2,13 +2,14 @@ name: Setup Go
 description: 'Sets up Go environment with private modules'
 inputs:
   stainless-api-key:
-    required: true
+    required: false
     description: the value of the STAINLESS_API_KEY secret
 runs:
   using: composite
   steps:
     - uses: stainless-api/retrieve-github-access-token@v1
       id: get_token
+      if: github.repository == 'stainless-sdks/gcore-terraform'
       with:
         repo: stainless-sdks/gcore-go
         stainless-api-key: ${{ inputs.stainless-api-key }}
