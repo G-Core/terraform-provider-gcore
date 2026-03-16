@@ -313,6 +313,24 @@ func (r *CloudReservedFixedIPResource) ImportState(ctx context.Context, req reso
 		data.ID = types.StringValue(data.PortID.ValueString())
 	}
 
+	// Infer the create-only Type field from API response fields, since the API does
+	// not return it after creation. Best-effort coverage:
+	//   external   → is_external == true
+	//   subnet     → is_external == false && subnet_id is set
+	//   any_subnet → is_external == false && network_id is set (no subnet_id)
+	// ip_address and port types cannot be distinguished from the API response;
+	// importing resources created with those types will produce a plan diff on the
+	// type field and require manual state fixup.
+	if data.Type.IsNull() || data.Type.ValueString() == "" {
+		if !data.IsExternal.IsNull() && data.IsExternal.ValueBool() {
+			data.Type = types.StringValue("external")
+		} else if !data.SubnetID.IsNull() && data.SubnetID.ValueString() != "" {
+			data.Type = types.StringValue("subnet")
+		} else if !data.NetworkID.IsNull() && data.NetworkID.ValueString() != "" {
+			data.Type = types.StringValue("any_subnet")
+		}
+	}
+
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
 }
 
