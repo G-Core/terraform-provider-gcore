@@ -250,7 +250,7 @@ func (r *CloudReservedFixedIPResource) Delete(ctx context.Context, req resource.
 		params.RegionID = param.NewOpt(data.RegionID.ValueInt64())
 	}
 
-	_, err := r.client.Cloud.ReservedFixedIPs.Delete(
+	err := r.client.Cloud.ReservedFixedIPs.DeleteAndPoll(
 		ctx,
 		data.PortID.ValueString(),
 		params,
