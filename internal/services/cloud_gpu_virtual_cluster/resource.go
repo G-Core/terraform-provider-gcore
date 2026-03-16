@@ -124,8 +124,10 @@ func (r *CloudGPUVirtualClusterResource) Update(ctx context.Context, req resourc
 
 	stateHasChanged := false
 
-	// Check for a cluster name change
-	if !data.Name.IsNull() && data.Name.ValueString() != state.Name.ValueString() {
+	// Check if name or tags have changed
+	nameChanged := !data.Name.IsNull() && data.Name.ValueString() != state.Name.ValueString()
+	tagsChanged := !data.Tags.IsNull() && !data.Tags.Equal(state.Tags)
+	if nameChanged || tagsChanged {
 		params := cloud.GPUVirtualClusterUpdateParams{}
 
 		if !data.ProjectID.IsNull() {
@@ -156,41 +158,6 @@ func (r *CloudGPUVirtualClusterResource) Update(ctx context.Context, req resourc
 		}
 		bytes, _ := io.ReadAll(res.Body)
 		err = apijson.UnmarshalComputed(bytes, &data)
-		if err != nil {
-			resp.Diagnostics.AddError("failed to deserialize http request", err.Error())
-			return
-		}
-		stateHasChanged = true
-	}
-
-	// Check if tags have changed
-	if !data.Tags.IsNull() && !data.Tags.Equal(state.Tags) {
-		params := cloud.GPUVirtualClusterActionParams{}
-		if !data.ProjectID.IsNull() {
-			params.ProjectID = param.NewOpt(data.ProjectID.ValueInt64())
-		}
-		if !data.RegionID.IsNull() {
-			params.RegionID = param.NewOpt(data.RegionID.ValueInt64())
-		}
-		tagsMap := make(map[string]string)
-		tagsValue, _ := data.Tags.Value(ctx)
-		for k, v := range tagsValue {
-			tagsMap[k] = v.ValueString()
-		}
-		params.OfUpdateTags = &cloud.GPUVirtualClusterActionParamsBodyUpdateTags{
-			Tags: tagsMap,
-		}
-		cluster, err := r.client.Cloud.GPUVirtual.Clusters.ActionAndPoll(
-			ctx,
-			data.ID.ValueString(),
-			params,
-			option.WithMiddleware(logging.Middleware(ctx)),
-		)
-		if err != nil {
-			resp.Diagnostics.AddError("failed to make http request", err.Error())
-			return
-		}
-		err = apijson.UnmarshalComputed([]byte(cluster.RawJSON()), &data)
 		if err != nil {
 			resp.Diagnostics.AddError("failed to deserialize http request", err.Error())
 			return
