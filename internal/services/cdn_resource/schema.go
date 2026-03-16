@@ -230,6 +230,7 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 							"value": schema.SetAttribute{
 								Description: "Value of the Access-Control-Allow-Origin header.\n\nPossible values:\n- **Adds * as the Access-Control-Allow-Origin header value** - Content will be uploaded for requests from any domain.\n`\"value\": [\"*\"]`\n- **Adds \"$http_origin\" as the Access-Control-Allow-Origin header value if the origin matches one of the listed domains** - Content will be uploaded only for requests from the domains specified in the field.\n`\"value\": [\"domain.com\", \"second.dom.com\"]`\n- **Adds \"$http_origin\" as the Access-Control-Allow-Origin header value** - Content will be uploaded for requests from any domain, and the domain from which the request was sent will be added to the \"Access-Control-Allow-Origin\" header in the response.\n`\"value\": [\"$http_origin\"]`",
 								Required:    true,
+								CustomType:  customfield.NewSetType[types.String](ctx),
 								ElementType: types.StringType,
 							},
 							"always": schema.BoolAttribute{
