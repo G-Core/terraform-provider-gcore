@@ -112,9 +112,9 @@ type CDNResourceRuleOptionsCacheHTTPHeadersModel struct {
 }
 
 type CDNResourceRuleOptionsCorsModel struct {
-	Enabled types.Bool      `tfsdk:"enabled" json:"enabled,required"`
-	Value   *[]types.String `tfsdk:"value" json:"value,required"`
-	Always  types.Bool      `tfsdk:"always" json:"always,computed_optional"`
+	Enabled types.Bool                    `tfsdk:"enabled" json:"enabled,required"`
+	Value   customfield.Set[types.String] `tfsdk:"value" json:"value,required"`
+	Always  types.Bool                    `tfsdk:"always" json:"always,computed_optional"`
 }
 
 type CDNResourceRuleOptionsCountryACLModel struct {
