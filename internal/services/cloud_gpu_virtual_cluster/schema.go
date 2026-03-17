@@ -328,7 +328,7 @@ func (v volumeImageSourceValidator) ValidateList(ctx context.Context, req valida
 	for i, vol := range volumes {
 		if !vol.Source.IsNull() && !vol.Source.IsUnknown() &&
 			vol.Source.ValueString() == "image" &&
-			(vol.ImageID.IsNull() || vol.ImageID.ValueString() == "") {
+			!vol.ImageID.IsUnknown() && (vol.ImageID.IsNull() || vol.ImageID.ValueString() == "") {
 			resp.Diagnostics.AddAttributeError(
 				req.Path.AtListIndex(i).AtName("image_id"),
 				"Missing required attribute",
@@ -360,10 +360,10 @@ func (v credentialsValidator) ValidateObject(_ context.Context, req validator.Ob
 	passwordWo := attrs["password_wo"]
 	passwordWoVersion := attrs["password_wo_version"]
 
-	hasSSHKey := !sshKeyName.IsNull() && !sshKeyName.IsUnknown()
-	hasUsername := !username.IsNull() && !username.IsUnknown()
-	hasPasswordWo := !passwordWo.IsNull() && !passwordWo.IsUnknown()
-	hasPasswordWoVersion := !passwordWoVersion.IsNull() && !passwordWoVersion.IsUnknown()
+	hasSSHKey := !sshKeyName.IsNull()
+	hasUsername := !username.IsNull()
+	hasPasswordWo := !passwordWo.IsNull()
+	hasPasswordWoVersion := !passwordWoVersion.IsNull()
 
 	// Valid scenarios (mutually exclusive):
 	// 1. Only ssh_key_name is provided (no username or password_wo or password_wo_version)
