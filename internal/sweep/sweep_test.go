@@ -14,6 +14,7 @@ import (
 	_ "github.com/G-Core/terraform-provider-gcore/internal/services/cloud_ssh_key"
 
 	// DNS
+	_ "github.com/G-Core/terraform-provider-gcore/internal/services/dns_network_mapping"
 	_ "github.com/G-Core/terraform-provider-gcore/internal/services/dns_zone"
 	_ "github.com/G-Core/terraform-provider-gcore/internal/services/dns_zone_rrset"
 )

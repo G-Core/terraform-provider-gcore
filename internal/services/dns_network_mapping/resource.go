@@ -113,17 +113,29 @@ func (r *DNSNetworkMappingResource) Update(ctx context.Context, req resource.Upd
 		resp.Diagnostics.AddError("failed to serialize http request", err.Error())
 		return
 	}
-	res := new(http.Response)
 	_, err = r.client.DNS.NetworkMappings.Replace(
 		ctx,
 		data.ID.ValueInt64(),
 		dns.NetworkMappingReplaceParams{},
 		option.WithRequestBody("application/json", dataBytes),
-		option.WithResponseBodyInto(&res),
 		option.WithMiddleware(logging.Middleware(ctx)),
 	)
 	if err != nil {
 		resp.Diagnostics.AddError("failed to make http request", err.Error())
+		return
+	}
+
+	// PUT returns an empty response body, so do a follow-up GET to read back
+	// the authoritative state from the API.
+	res := new(http.Response)
+	_, err = r.client.DNS.NetworkMappings.Get(
+		ctx,
+		data.ID.ValueInt64(),
+		option.WithResponseBodyInto(&res),
+		option.WithMiddleware(logging.Middleware(ctx)),
+	)
+	if err != nil {
+		resp.Diagnostics.AddError("failed to read network mapping after update", err.Error())
 		return
 	}
 	bytes, _ := io.ReadAll(res.Body)
