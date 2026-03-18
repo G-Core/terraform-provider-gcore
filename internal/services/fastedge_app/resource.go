@@ -314,8 +314,14 @@ func (r *FastedgeAppResource) ValidateConfig(ctx context.Context, req resource.V
 		return
 	}
 
-	templateSet := !data.Template.IsNull() && !data.Template.IsUnknown()
-	binarySet := !data.Binary.IsNull() && !data.Binary.IsUnknown()
+	templateSet := !data.Template.IsNull()
+	binarySet := !data.Binary.IsNull()
+
+	// If either value is unknown (e.g., from a variable or computed reference),
+	// skip validation — the value will be known after apply.
+	if data.Template.IsUnknown() || data.Binary.IsUnknown() {
+		return
+	}
 
 	if !templateSet && !binarySet {
 		resp.Diagnostics.AddError(
