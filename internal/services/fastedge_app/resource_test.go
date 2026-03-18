@@ -134,6 +134,27 @@ func TestAccFastedgeApp_import(t *testing.T) {
 	})
 }
 
+// TestAccFastedgeApp_unknownBinary verifies that plan succeeds when binary is
+// unknown during plan (e.g., from a resource reference). Regression test for
+// GCLOUD2-24005.
+func TestAccFastedgeApp_unknownBinary(t *testing.T) {
+	rName := acctest.RandomName()
+	wasmPath := createTestWasmFile(t)
+
+	resource.ParallelTest(t, resource.TestCase{
+		PreCheck:                 func() { acctest.PreCheck(t) },
+		ProtoV6ProviderFactories: acctest.ProtoV6ProviderFactories,
+		Steps: []resource.TestStep{
+			{
+				// binary = gcore_fastedge_binary.test.id is unknown during plan
+				Config:             testAccFastedgeAppConfig(wasmPath, rName),
+				PlanOnly:           true,
+				ExpectNonEmptyPlan: true,
+			},
+		},
+	})
+}
+
 func testAccCheckFastedgeAppDestroy(s *terraform.State) error {
 	return acctest.CheckResourceDestroyed(s, "gcore_fastedge_app", func(client *gcore.Client, id string) error {
 		idInt, err := strconv.ParseInt(id, 10, 64)
