@@ -18,7 +18,6 @@ type CloudProjectsResultsListDataSourceEnvelope struct {
 }
 
 type CloudProjectsDataSourceModel struct {
-	ClientID       types.Int64                                                     `tfsdk:"client_id" query:"client_id,optional"`
 	Name           types.String                                                    `tfsdk:"name" query:"name,optional"`
 	IncludeDeleted types.Bool                                                      `tfsdk:"include_deleted" query:"include_deleted,computed_optional"`
 	OrderBy        types.String                                                    `tfsdk:"order_by" query:"order_by,computed_optional"`
@@ -29,9 +28,6 @@ type CloudProjectsDataSourceModel struct {
 func (m *CloudProjectsDataSourceModel) toListParams(_ context.Context) (params cloud.ProjectListParams, diags diag.Diagnostics) {
 	params = cloud.ProjectListParams{}
 
-	if !m.ClientID.IsNull() {
-		params.ClientID = param.NewOpt(m.ClientID.ValueInt64())
-	}
 	if !m.IncludeDeleted.IsNull() {
 		params.IncludeDeleted = param.NewOpt(m.IncludeDeleted.ValueBool())
 	}

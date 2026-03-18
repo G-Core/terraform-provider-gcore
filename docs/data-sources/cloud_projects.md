@@ -14,7 +14,6 @@ Projects are organizational units that group cloud resources for access control 
 
 ```terraform
 data "gcore_cloud_projects" "example_cloud_projects" {
-  client_id = 1
   name = "my-project"
 }
 ```
@@ -24,7 +23,6 @@ data "gcore_cloud_projects" "example_cloud_projects" {
 
 ### Optional
 
-- `client_id` (Number) Client ID filter for administrators.
 - `include_deleted` (Boolean) Whether to include deleted projects in the response.
 - `max_items` (Number) Max items to fetch, default: 1000
 - `name` (String) Name to filter the results by.
