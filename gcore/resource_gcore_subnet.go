@@ -244,7 +244,10 @@ func resourceSubnetCreate(ctx context.Context, d *schema.ResourceData, m interfa
 	}
 
 	createOpts.Name = d.Get("name").(string)
-	createOpts.EnableDHCP = d.Get("enable_dhcp").(bool)
+	if !d.GetRawConfig().GetAttr("enable_dhcp").IsNull() {
+		enableDHCP := d.Get("enable_dhcp").(bool)
+		createOpts.EnableDHCP = &enableDHCP
+	}
 	createOpts.NetworkID = d.Get("network_id").(string)
 	createOpts.ConnectToNetworkRouter = d.Get("connect_to_network_router").(bool)
 	gatewayIP := d.Get("gateway_ip").(string)
@@ -394,7 +397,10 @@ func resourceSubnetUpdate(ctx context.Context, d *schema.ResourceData, m interfa
 	if d.HasChange("name") {
 		updateOpts.Name = d.Get("name").(string)
 	}
-	updateOpts.EnableDHCP = d.Get("enable_dhcp").(bool)
+	if d.HasChange("enable_dhcp") {
+		enableDHCP := d.Get("enable_dhcp").(bool)
+		updateOpts.EnableDHCP = &enableDHCP
+	}
 
 	// In the structure, the field is mandatory for the ability to transfer the absence of data,
 	// if you do not initialize it with a empty list, marshalling will send null and receive a validation error.

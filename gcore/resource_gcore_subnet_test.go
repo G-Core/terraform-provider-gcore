@@ -24,12 +24,12 @@ func checkSubnetAttrs(resourceName string, opts *subnets.CreateOpts) resource.Te
 		checksStore := []resource.TestCheckFunc{
 			resource.TestCheckResourceAttr(resourceName, "name", opts.Name),
 			resource.TestCheckResourceAttr(resourceName, "cidr", opts.CIDR.String()),
-			resource.TestCheckResourceAttr(resourceName, "enable_dhcp", strconv.FormatBool(opts.EnableDHCP)),
+			resource.TestCheckResourceAttr(resourceName, "enable_dhcp", strconv.FormatBool(*opts.EnableDHCP)),
 			resource.TestCheckResourceAttr(resourceName, "dns_nameservers.#", strconv.Itoa(len(opts.DNSNameservers))),
 			resource.TestCheckResourceAttr(resourceName, "host_routes.#", strconv.Itoa(len(opts.HostRoutes))),
 		}
 
-		if opts.GatewayIP == nil && !opts.EnableDHCP {
+		if opts.GatewayIP == nil && opts.EnableDHCP != nil && !*opts.EnableDHCP {
 			checksStore = append(checksStore, resource.TestCheckResourceAttr(resourceName, "gateway_ip", "disable"))
 		}
 
@@ -60,11 +60,14 @@ func TestAccSubnet(t *testing.T) {
 	cidr.IP = netIPNet.IP
 	cidr.Mask = netIPNet.Mask
 
+	enableDHCPTrue := true
+	enableDHCPFalse := false
+
 	createFixt := subnets.CreateOpts{
 		Name:           "create_subnet",
 		CIDR:           cidr,
 		DNSNameservers: []net.IP{net.ParseIP("8.8.4.4"), net.ParseIP("1.1.1.1")},
-		EnableDHCP:     true,
+		EnableDHCP:     &enableDHCPTrue,
 		HostRoutes: []subnets.HostRoute{
 			{
 				Destination: dst1,
@@ -83,7 +86,7 @@ func TestAccSubnet(t *testing.T) {
 		Name:           "update_subnet",
 		CIDR:           cidr,
 		DNSNameservers: make([]net.IP, 0),
-		EnableDHCP:     false,
+		EnableDHCP:     &enableDHCPFalse,
 		HostRoutes:     make([]subnets.HostRoute, 0),
 		GatewayIP:      &gateway,
 	}
