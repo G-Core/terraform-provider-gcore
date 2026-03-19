@@ -13,7 +13,6 @@ import (
 	"github.com/G-Core/terraform-provider-gcore/internal/services/cdn_origin_group"
 	"github.com/G-Core/terraform-provider-gcore/internal/services/cdn_resource"
 	"github.com/G-Core/terraform-provider-gcore/internal/services/cdn_resource_rule"
-	"github.com/G-Core/terraform-provider-gcore/internal/services/cdn_rule_template"
 	"github.com/G-Core/terraform-provider-gcore/internal/services/cdn_trusted_ca_certificate"
 	"github.com/G-Core/terraform-provider-gcore/internal/services/cloud_file_share"
 	"github.com/G-Core/terraform-provider-gcore/internal/services/cloud_file_share_access_rule"
@@ -225,7 +224,6 @@ func (p *GcoreProvider) Resources(ctx context.Context) []func() resource.Resourc
 		cdn_resource.NewResource,
 		cdn_resource_rule.NewResource,
 		cdn_origin_group.NewResource,
-		cdn_rule_template.NewResource,
 		cdn_certificate.NewResource,
 		cdn_trusted_ca_certificate.NewResource,
 	}
@@ -287,7 +285,6 @@ func (p *GcoreProvider) DataSources(ctx context.Context) []func() datasource.Dat
 		cdn_resource.NewCDNResourceDataSource,
 		cdn_resource_rule.NewCDNResourceRuleDataSource,
 		cdn_origin_group.NewCDNOriginGroupDataSource,
-		cdn_rule_template.NewCDNRuleTemplateDataSource,
 		cdn_certificate.NewCDNCertificateDataSource,
 		cdn_trusted_ca_certificate.NewCDNTrustedCaCertificateDataSource,
 	}
