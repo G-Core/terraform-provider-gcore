@@ -25,7 +25,6 @@ import (
 	"github.com/G-Core/terraform-provider-gcore/internal/services/cloud_instance"
 	"github.com/G-Core/terraform-provider-gcore/internal/services/cloud_instance_image"
 	"github.com/G-Core/terraform-provider-gcore/internal/services/cloud_k8s_cluster"
-	"github.com/G-Core/terraform-provider-gcore/internal/services/cloud_k8s_cluster_kubeconfig"
 	"github.com/G-Core/terraform-provider-gcore/internal/services/cloud_load_balancer"
 	"github.com/G-Core/terraform-provider-gcore/internal/services/cloud_load_balancer_listener"
 	"github.com/G-Core/terraform-provider-gcore/internal/services/cloud_load_balancer_pool"
@@ -198,6 +197,7 @@ func (p *GcoreProvider) ConfigValidators(_ context.Context) []provider.ConfigVal
 
 func (p *GcoreProvider) Resources(ctx context.Context) []func() resource.Resource {
 	return []func() resource.Resource{
+		cloud_project.NewResource,
 		cloud_secret.NewResource,
 		cloud_ssh_key.NewResource,
 		cloud_load_balancer.NewResource,
@@ -281,7 +281,6 @@ func (p *GcoreProvider) DataSources(ctx context.Context) []func() datasource.Dat
 		cloud_instance.NewCloudInstancesDataSource,
 		cloud_instance_image.NewCloudInstanceImageDataSource,
 		cloud_k8s_cluster.NewCloudK8SClusterDataSource,
-		cloud_k8s_cluster_kubeconfig.NewCloudK8SClusterKubeconfigDataSource,
 		waap_domain.NewWaapDomainDataSource,
 		waap_domain.NewWaapDomainsDataSource,
 		fastedge_secret.NewFastedgeSecretDataSource,
