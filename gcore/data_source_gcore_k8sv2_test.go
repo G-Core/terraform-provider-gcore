@@ -77,11 +77,12 @@ func TestAccK8sV2DataSource(t *testing.T) {
 	defer deleteTestNetwork(netClient, networkID)
 
 	gw := net.ParseIP("")
+	enableDHCP := true
 	subnetOpts := subnets.CreateOpts{
 		Name:                   subnetTestName,
 		NetworkID:              networkID,
 		ConnectToNetworkRouter: true,
-		EnableDHCP:             true,
+		EnableDHCP:             &enableDHCP,
 		GatewayIP:              &gw,
 	}
 
