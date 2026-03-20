@@ -190,6 +190,9 @@ func extractExternalGatewayInfoMap(gw []interface{}) (routers.GatewayInfo, error
 	if err != nil {
 		return GW, err
 	}
+	if GW.Type == "" {
+		GW.Type = "default"
+	}
 	return GW, nil
 }
 
