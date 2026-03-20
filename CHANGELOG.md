@@ -1,5 +1,75 @@
 # Changelog
 
+## 2.0.0-alpha.2 (2026-03-20)
+
+Full Changelog: [v2.0.0-alpha.1...v2.0.0-alpha.2](https://github.com/G-Core/terraform-provider-gcore/compare/v2.0.0-alpha.1...v2.0.0-alpha.2)
+
+### Features
+
+* **api:** aggregated API specs update ([d39c234](https://github.com/G-Core/terraform-provider-gcore/commit/d39c234101c273a9b64de6fd98abd1efc758f663))
+* **api:** aggregated API specs update ([bd6b4b5](https://github.com/G-Core/terraform-provider-gcore/commit/bd6b4b5284ce172e6ff00113b07d550fe3c860bd))
+* **api:** aggregated API specs update ([f0c436d](https://github.com/G-Core/terraform-provider-gcore/commit/f0c436ddb8c2dd00fe158548e20fdfcb554ca004))
+* **api:** aggregated API specs update ([3038dfb](https://github.com/G-Core/terraform-provider-gcore/commit/3038dfb4d47b4fc72a63bc68f927777ff218b934))
+* **api:** feat(cdn): enable terraform support for cdn_rule_template ([2b689b0](https://github.com/G-Core/terraform-provider-gcore/commit/2b689b08978d6f5964551e079f757c089652f1f5))
+* **api:** Revert "feat(cdn): enable terraform support for cdn_rule_template" ([46bc3ca](https://github.com/G-Core/terraform-provider-gcore/commit/46bc3ca531e9d60a84f82832c28cb57aef04cc01))
+* **cdn:** enable terraform support for cdn_rule_template ([303a9c4](https://github.com/G-Core/terraform-provider-gcore/commit/303a9c4ad2d79794ab680a0fbd509b5640077c30))
+* **cloud:** add gcore_cloud_k8s_kubeconfig data source ([d003c35](https://github.com/G-Core/terraform-provider-gcore/commit/d003c35fccdee0646c434bbb51efe405599c7f91))
+* **cloud:** add support for cloud_projects resource in Terraform ([4b35d5a](https://github.com/G-Core/terraform-provider-gcore/commit/4b35d5a5e230bde3b310d69145dac27de76a06c4))
+* **cloud:** add support for cloud_projects resource in Terraform ([21a2be4](https://github.com/G-Core/terraform-provider-gcore/commit/21a2be46834b8ead0916ce718b773ed4d621d0b1))
+* **cloud:** remove create_router field from gcore_cloud_network ([87d1dde](https://github.com/G-Core/terraform-provider-gcore/commit/87d1dde603f3e3eea2aab28564c420f9ee6bcac5))
+* **cloud:** remove deprecated timeout_client_data from gcore_cloud_load_balancer_pool ([5a8385d](https://github.com/G-Core/terraform-provider-gcore/commit/5a8385d796a27b6646305bda1cc68cf0d0abdb3e))
+* **cloud:** remove deprecated timeout_member_connect and timeout_member_data from gcore_cloud_load_balancer_listener ([99f9be3](https://github.com/G-Core/terraform-provider-gcore/commit/99f9be3567006ae15e11a23a53ce580f8711928c))
+* **cloud:** remove reservation block from gcore_cloud_reserved_fixed_ip ([832fbc3](https://github.com/G-Core/terraform-provider-gcore/commit/832fbc3c4cdf1ce7d409488b182b938c54ce6251))
+* **cloud:** remove router attachment fields from gcore_cloud_network_subnet ([833ec8c](https://github.com/G-Core/terraform-provider-gcore/commit/833ec8c7776449e4dcc5b61969025126d8102bb8))
+
+
+### Bug Fixes
+
+* **ci:** gracefully skip SDK link when branch doesn't exist ([b00d880](https://github.com/G-Core/terraform-provider-gcore/commit/b00d880abe38458d5f4e8a9533308bd4ac800484))
+* **cloud:** handle unknown values in GPU virtual cluster validators ([4069780](https://github.com/G-Core/terraform-provider-gcore/commit/4069780a5b73221b69e8957dc3468a9b7c0c6de7))
+* **cloud:** infer Type field on import to prevent plan diff ([ddb1d7e](https://github.com/G-Core/terraform-provider-gcore/commit/ddb1d7e232ea060319e35996ef72e73cb198ee53))
+* **cloud:** support PATCHing tags on gcore_cloud_instance update ([e989285](https://github.com/G-Core/terraform-provider-gcore/commit/e98928575813b5c7875b3b78513c489b8cf218bd))
+* **cloud:** use DeleteAndPoll to wait for resource removal ([5539e98](https://github.com/G-Core/terraform-provider-gcore/commit/5539e98efb9abe8b9dfe5b0a2a21a12466f5e15f))
+* **cloud:** use Update method for GPU virtual cluster tags ([cf80999](https://github.com/G-Core/terraform-provider-gcore/commit/cf8099979b70ff7cb79f4c3d19fe5411e2540682))
+* **cloud:** use UseStateForUnknown for size of cloud_gpu_virtual_cluster_image ([49ba618](https://github.com/G-Core/terraform-provider-gcore/commit/49ba61872c7270c3f3d4656a8c5db5b2f21d927d))
+* **dns:** fix update drift, name immutability, add tests for dns_network_mapping ([b08e721](https://github.com/G-Core/terraform-provider-gcore/commit/b08e721eec561a4698aafa4f21cc76ef2a3e9c05))
+* **fastedge:** remove id=0 workarounds after API fix ([789a674](https://github.com/G-Core/terraform-provider-gcore/commit/789a6749e53908aef69273dd735f7d03f1056cef))
+* **fastedge:** rename path parameters to match updated OpenAPI spec ([3a2115f](https://github.com/G-Core/terraform-provider-gcore/commit/3a2115f6de2409ce3437822e9e292b012efe6dc7))
+* **fastedge:** rename path parameters to match updated OpenAPI spec ([cb03da1](https://github.com/G-Core/terraform-provider-gcore/commit/cb03da139183caa25e3a1b9665dae2c57854a237))
+* **fastedge:** skip ValidateConfig when binary/template is unknown ([4d459c6](https://github.com/G-Core/terraform-provider-gcore/commit/4d459c61c16ccf14afb5a109ab22c5c63959fd47))
+* improve linking behavior when developing on a branch not in the Go SDK ([8d832d5](https://github.com/G-Core/terraform-provider-gcore/commit/8d832d5774840e2b84ef1c18179c2120b347f951))
+* improved workflow for developing on branches ([e500cee](https://github.com/G-Core/terraform-provider-gcore/commit/e500ceea19ab7a8a5e78520e4a5534eea316ef55))
+* **internal:** fix issue with some nested custom attributes ([8338de4](https://github.com/G-Core/terraform-provider-gcore/commit/8338de454f771800ea61ef742bcf7c32f5c368fa))
+* no longer require an API key when building on production repos ([6c3fce5](https://github.com/G-Core/terraform-provider-gcore/commit/6c3fce51b265cfb59558220b286cc4d96a98ba19))
+
+
+### Reverts
+
+* enable fossa failing on error ([351620c](https://github.com/G-Core/terraform-provider-gcore/commit/351620ca172eb16f31e5ef1fdb91eee19dfe2e3a))
+
+
+### Chores
+
+* add missing cdn_resource override name in config ([1011ce7](https://github.com/G-Core/terraform-provider-gcore/commit/1011ce7f2956dcabcaffe8af5b47e7d1f371c006))
+* add missing cdn_resource override name in config ([b32406a](https://github.com/G-Core/terraform-provider-gcore/commit/b32406af02bb78935ba35ae145258a3a8adcbed8))
+* **docs:** update terraform-plugin-docs to v0.24.0 ([21d566a](https://github.com/G-Core/terraform-provider-gcore/commit/21d566a256273a1dd6045d9e61c15fe32e35073a))
+* **internal:** codegen related update ([b7bd73d](https://github.com/G-Core/terraform-provider-gcore/commit/b7bd73d63540b89d2aeb1a75c64befde4b73e7f7))
+* **internal:** tweak CI branches ([1b6aedf](https://github.com/G-Core/terraform-provider-gcore/commit/1b6aedf09031fe2caee7ace6e3feee49ab287875))
+* **tests:** bump steady to v0.19.4 ([722d95f](https://github.com/G-Core/terraform-provider-gcore/commit/722d95f7cde269727344debdf2a8a6f31a359c3b))
+* **tests:** bump steady to v0.19.5 ([9da6050](https://github.com/G-Core/terraform-provider-gcore/commit/9da605055603d5b76cf5cf1f68f3b309234a680b))
+
+
+### Documentation
+
+* add missing import examples for 3 resources ([1603c04](https://github.com/G-Core/terraform-provider-gcore/commit/1603c04dbe02978a2f0e5974ac5f0d27a97b6bf5))
+* add support contact disclaimer to provider index ([881b03f](https://github.com/G-Core/terraform-provider-gcore/commit/881b03f45cb78b796fb4c25b67263a52646f9593))
+* regenerate index.md from template and fix instance examples ([a6be214](https://github.com/G-Core/terraform-provider-gcore/commit/a6be214c7061b0145bba482feeb5a3f91be9b160))
+
+
+### Refactors
+
+* **tests:** switch from prism to steady ([699f2fb](https://github.com/G-Core/terraform-provider-gcore/commit/699f2fbb086b94e1834c5e434e96a7b5e13a5b86))
+
 ## 2.0.0-alpha.1 (2026-03-09)
 
 Full Changelog: [v0.0.1-alpha.0...v2.0.0-alpha.1](https://github.com/G-Core/terraform-provider-gcore/compare/v0.0.1-alpha.0...v2.0.0-alpha.1)
