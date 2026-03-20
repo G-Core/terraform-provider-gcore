@@ -162,6 +162,7 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 							},
 							"value": schema.SetAttribute{
 								Required:    true,
+								CustomType:  customfield.NewSetType[types.String](ctx),
 								ElementType: types.StringType,
 							},
 						},
@@ -205,6 +206,7 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 							"value": schema.SetAttribute{
 								Description: "Allows to select the content types you want to compress.\n\n`text/html` is a mandatory content type.",
 								Required:    true,
+								CustomType:  customfield.NewSetType[types.String](ctx),
 								ElementType: types.StringType,
 							},
 						},
@@ -240,6 +242,7 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 							"value": schema.SetAttribute{
 								Description: "Value of the Access-Control-Allow-Origin header.\n\nPossible values:\n- **Adds * as the Access-Control-Allow-Origin header value** - Content will be uploaded for requests from any domain.\n`\"value\": [\"*\"]`\n- **Adds \"$http_origin\" as the Access-Control-Allow-Origin header value if the origin matches one of the listed domains** - Content will be uploaded only for requests from the domains specified in the field.\n`\"value\": [\"domain.com\", \"second.dom.com\"]`\n- **Adds \"$http_origin\" as the Access-Control-Allow-Origin header value** - Content will be uploaded for requests from any domain, and the domain from which the request was sent will be added to the \"Access-Control-Allow-Origin\" header in the response.\n`\"value\": [\"$http_origin\"]`",
 								Required:    true,
+								CustomType:  customfield.NewSetType[types.String](ctx),
 								ElementType: types.StringType,
 							},
 							"always": schema.BoolAttribute{
@@ -264,6 +267,7 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 							"excepted_values": schema.SetAttribute{
 								Description: "List of countries according to ISO-3166-1.\n\nThe meaning of the parameter depends on `policy_type` value:\n- **allow** - List of countries for which access is prohibited.\n- **deny** - List of countries for which access is allowed.",
 								Required:    true,
+								CustomType:  customfield.NewSetType[types.String](ctx),
 								ElementType: types.StringType,
 							},
 							"policy_type": schema.StringAttribute{
@@ -369,7 +373,7 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 								},
 							},
 							"on_request_headers": schema.SingleNestedAttribute{
-								Description:   "Allows to configure FastEdge application that will be called to handle request headers as soon as CDN receives incoming HTTP request.",
+								Description:   "Allows to configure FastEdge application that will be called to handle request headers as soon as CDN receives incoming HTTP request, **before cache**.",
 								Computed:      true,
 								Optional:      true,
 								CustomType:    customfield.NewNestedObjectType[CDNResourceOptionsFastedgeOnRequestHeadersModel](ctx),
@@ -508,6 +512,7 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 							"codes": schema.SetAttribute{
 								Description: "Redirect status code that the origin server returns.\n\nTo serve up to date content to end users, you will need to purge the cache after managing the option.",
 								Required:    true,
+								CustomType:  customfield.NewSetType[types.Int64](ctx),
 								ElementType: types.Int64Type,
 							},
 							"enabled": schema.BoolAttribute{
@@ -569,6 +574,22 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 						Optional:      true,
 						CustomType:    customfield.NewNestedObjectType[CDNResourceOptionsForwardHostHeaderModel](ctx),
 						PlanModifiers: []planmodifier.Object{planmodifiers.ObjectPreserveNullState()},
+						Attributes: map[string]schema.Attribute{
+							"enabled": schema.BoolAttribute{
+								Description: "Controls the option state.\n\nPossible values:\n- **true** - Option is enabled.\n- **false** - Option is disabled.",
+								Required:    true,
+							},
+							"value": schema.BoolAttribute{
+								Description: "Possible values:\n- **true** - Option is enabled.\n- **false** - Option is disabled.",
+								Required:    true,
+							},
+						},
+					},
+					"grpc_passthrough": schema.SingleNestedAttribute{
+						Description: "Enables gRPC pass-through for the CDN resource.",
+						Computed:    true,
+						Optional:    true,
+						CustomType:  customfield.NewNestedObjectType[CDNResourceOptionsGrpcPassthroughModel](ctx),
 						Attributes: map[string]schema.Attribute{
 							"enabled": schema.BoolAttribute{
 								Description: "Controls the option state.\n\nPossible values:\n- **true** - Option is enabled.\n- **false** - Option is disabled.",
@@ -719,6 +740,7 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 							"excepted_values": schema.SetAttribute{
 								Description: "List of IP addresses with a subnet mask.\n\nThe meaning of the parameter depends on `policy_type` value:\n- **allow** - List of IP addresses for which access is prohibited.\n- **deny** - List of IP addresses for which access is allowed.\n\nExamples:\n- `192.168.3.2/32`\n- `2a03:d000:2980:7::8/128`",
 								Required:    true,
+								CustomType:  customfield.NewSetType[types.String](ctx),
 								ElementType: types.StringType,
 							},
 							"policy_type": schema.StringAttribute{
@@ -846,6 +868,7 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 							"value": schema.SetAttribute{
 								Description: "List of query parameters.",
 								Required:    true,
+								CustomType:  customfield.NewSetType[types.String](ctx),
 								ElementType: types.StringType,
 							},
 						},
@@ -882,21 +905,25 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 							"forward_from_file_types": schema.SetAttribute{
 								Description: "The `forward_from_files_types` field specifies the types of playlist files from which parameters will be extracted and forwarded.\nThis typically includes formats that list multiple media chunk references, such as HLS and DASH playlists.\nParameters associated with these playlist files (like query strings or headers) will be propagated to the chunks they reference.",
 								Required:    true,
+								CustomType:  customfield.NewSetType[types.String](ctx),
 								ElementType: types.StringType,
 							},
 							"forward_to_file_types": schema.SetAttribute{
 								Description: "The field specifies the types of media chunk files to which parameters, extracted from playlist files, will be forwarded.\nThese refer to the actual segments of media content that are delivered to viewers.\nEnsuring the correct parameters are forwarded to these files is crucial for maintaining the integrity of the streaming session.",
 								Required:    true,
+								CustomType:  customfield.NewSetType[types.String](ctx),
 								ElementType: types.StringType,
 							},
 							"forward_except_keys": schema.SetAttribute{
 								Description: "The `forward_except_keys` field provides a mechanism to exclude specific parameters from being forwarded from playlist files to media chunk files.\nBy listing certain keys in this field, you can ensure that these parameters are omitted during the forwarding process.\nThis is particularly useful for preventing sensitive or irrelevant information from being included in requests for media chunks, thereby enhancing security and optimizing performance.",
 								Optional:    true,
+								CustomType:  customfield.NewSetType[types.String](ctx),
 								ElementType: types.StringType,
 							},
 							"forward_only_keys": schema.SetAttribute{
 								Description: "The `forward_only_keys` field allows for granular control over which specific parameters are forwarded from playlist files to media chunk files.\nBy specifying certain keys, only those parameters will be propagated, ensuring that only relevant information is passed along.\nThis is particularly useful for security and performance optimization, as it prevents unnecessary or sensitive data from being included in requests for media chunks.",
 								Optional:    true,
+								CustomType:  customfield.NewSetType[types.String](ctx),
 								ElementType: types.StringType,
 							},
 						},
@@ -949,6 +976,7 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 							"excepted_values": schema.SetAttribute{
 								Description: "List of domain names or wildcard domains (without protocol: `http://` or `https://`.)\n\nThe meaning of the parameter depends on `policy_type` value:\n- **allow** - List of domain names for which access is prohibited.\n- **deny** - List of IP domain names for which access is allowed.\n\nExamples:\n- `example.com`\n- `*.example.com`",
 								Required:    true,
+								CustomType:  customfield.NewSetType[types.String](ctx),
 								ElementType: types.StringType,
 							},
 							"policy_type": schema.StringAttribute{
@@ -1010,6 +1038,7 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 								Description: "List of HTTP headers.\n\nParameter meaning depends on the value of the `mode` field:\n- **show** - List of HTTP headers to hide from response.\n- **hide** - List of HTTP headers to include in response. Other HTTP headers will be hidden.\n\nThe following headers are required and cannot be hidden from response:\n- `Connection`\n- `Content-Length`\n- `Content-Type`\n- `Date`\n- `Server`",
 								Computed:    true,
 								Optional:    true,
+								CustomType:  customfield.NewSetType[types.String](ctx),
 								ElementType: types.StringType,
 								Validators: []validator.Set{
 									setvalidator.SizeAtLeast(1),
@@ -1139,6 +1168,7 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 							"value": schema.SetAttribute{
 								Description: `Defines list of errors for which "Always online" option is applied.`,
 								Required:    true,
+								CustomType:  customfield.NewSetType[types.String](ctx),
 								ElementType: types.StringType,
 							},
 						},
@@ -1211,6 +1241,7 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 							"value": schema.SetAttribute{
 								Description: "List of SSL/TLS protocol versions (case sensitive).",
 								Required:    true,
+								CustomType:  customfield.NewSetType[types.String](ctx),
 								ElementType: types.StringType,
 							},
 						},
@@ -1280,6 +1311,7 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 							"excepted_values": schema.SetAttribute{
 								Description: "List of User-Agents that will be allowed/denied.\n\nThe meaning of the parameter depends on `policy_type`:\n- **allow** - List of User-Agents for which access is prohibited.\n- **deny** - List of User-Agents for which access is allowed.\n\nYou can provide exact User-Agent strings or regular expressions. Regular expressions must start\nwith `~` (case-sensitive) or `~*` (case-insensitive).\n\nUse an empty string `\"\"` to allow/deny access when the User-Agent header is empty.",
 								Required:    true,
+								CustomType:  customfield.NewSetType[types.String](ctx),
 								ElementType: types.StringType,
 							},
 							"policy_type": schema.StringAttribute{

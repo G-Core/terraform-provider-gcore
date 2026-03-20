@@ -84,13 +84,13 @@ func (d *FastedgeAppDataSource) Read(ctx context.Context, req datasource.ReadReq
 		}
 		ts, diags := env.Apps.AsStructSliceT(ctx)
 		resp.Diagnostics.Append(diags...)
-		data.ID = ts[0].ID
+		data.AppID = ts[0].ID
 	}
 
 	res := new(http.Response)
 	_, err := d.client.Fastedge.Apps.Get(
 		ctx,
-		data.ID.ValueInt64(),
+		data.AppID.ValueInt64(),
 		option.WithResponseBodyInto(&res),
 		option.WithMiddleware(logging.Middleware(ctx)),
 	)
@@ -104,6 +104,7 @@ func (d *FastedgeAppDataSource) Read(ctx context.Context, req datasource.ReadReq
 		resp.Diagnostics.AddError("failed to deserialize http request", err.Error())
 		return
 	}
+	data.ID = data.AppID
 
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
 }

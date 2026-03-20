@@ -80,20 +80,17 @@ func (r *CloudGPUVirtualClusterImageResource) Create(ctx context.Context, req re
 		resp.Diagnostics.AddError("failed to serialize http request", err.Error())
 		return
 	}
-	res := new(http.Response)
-	_, err = r.client.Cloud.GPUVirtual.Clusters.Images.Upload(
+	image, err := r.client.Cloud.GPUVirtual.Clusters.Images.UploadAndPoll(
 		ctx,
 		params,
 		option.WithRequestBody("application/json", dataBytes),
-		option.WithResponseBodyInto(&res),
 		option.WithMiddleware(logging.Middleware(ctx)),
 	)
 	if err != nil {
 		resp.Diagnostics.AddError("failed to make http request", err.Error())
 		return
 	}
-	bytes, _ := io.ReadAll(res.Body)
-	err = apijson.UnmarshalComputed(bytes, &data)
+	err = apijson.UnmarshalComputed([]byte(image.RawJSON()), &data)
 	if err != nil {
 		resp.Diagnostics.AddError("failed to deserialize http request", err.Error())
 		return
@@ -171,7 +168,7 @@ func (r *CloudGPUVirtualClusterImageResource) Delete(ctx context.Context, req re
 		params.RegionID = param.NewOpt(data.RegionID.ValueInt64())
 	}
 
-	_, err := r.client.Cloud.GPUVirtual.Clusters.Images.Delete(
+	err := r.client.Cloud.GPUVirtual.Clusters.Images.DeleteAndPoll(
 		ctx,
 		data.ID.ValueString(),
 		params,
@@ -181,8 +178,6 @@ func (r *CloudGPUVirtualClusterImageResource) Delete(ctx context.Context, req re
 		resp.Diagnostics.AddError("failed to make http request", err.Error())
 		return
 	}
-
-	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
 }
 
 func (r *CloudGPUVirtualClusterImageResource) ImportState(ctx context.Context, req resource.ImportStateRequest, resp *resource.ImportStateResponse) {

@@ -1,19 +1,21 @@
 name: CI
 on:
   push:
-    branches-ignore:
-      - 'generated'
-      - 'codegen/**'
-      - 'integrated/**'
-      - 'stl-preview-head/**'
-      - 'stl-preview-base/**'
+    branches:
+      - '**'
+      - '!integrated/**'
+      - '!stl-preview-head/**'
+      - '!stl-preview-base/**'
+      - '!generated'
+      - '!codegen/**'
+      - 'codegen/stl/**'
   pull_request:
     branches-ignore:
       - 'stl-preview-head/**'
       - 'stl-preview-base/**'
 
 env:
-  GOPRIVATE: github.com/stainless-sdks/gcore-go
+  GOPRIVATE: github.com/G-Core/gcore-go,github.com/stainless-sdks/gcore-go
 
 jobs:
   lint:
@@ -25,6 +27,21 @@ jobs:
       - uses: ./.github/actions/setup-go
         with:
           stainless-api-key: ${{ secrets.STAINLESS_API_KEY }}
+
+      # TODO: GCLOUD2-24419 - remove workaround when Stainless fixes scripts/link to handle missing SDK branches
+      - name: Link staging branch
+        if: github.repository == 'stainless-sdks/gcore-terraform'
+        run: |
+          SDK_BRANCH="${{ github.ref_name }}"
+          if git ls-remote --exit-code --heads https://github.com/stainless-sdks/gcore-go.git "$SDK_BRANCH" >/dev/null 2>&1; then
+            echo "==> SDK branch '$SDK_BRANCH' found, linking..."
+            ./scripts/link "github.com/stainless-sdks/gcore-go@$SDK_BRANCH"
+          else
+            echo "==> SDK branch '$SDK_BRANCH' not found, skipping link step"
+          fi
+
+      - name: Bootstrap
+        run: ./scripts/bootstrap
 
       - name: Run lints
         run: ./scripts/lint
@@ -38,6 +55,21 @@ jobs:
       - uses: ./.github/actions/setup-go
         with:
           stainless-api-key: ${{ secrets.STAINLESS_API_KEY }}
+
+      # TODO: GCLOUD2-24419 - remove workaround when Stainless fixes scripts/link to handle missing SDK branches
+      - name: Link staging branch
+        if: github.repository == 'stainless-sdks/gcore-terraform'
+        run: |
+          SDK_BRANCH="${{ github.ref_name }}"
+          if git ls-remote --exit-code --heads https://github.com/stainless-sdks/gcore-go.git "$SDK_BRANCH" >/dev/null 2>&1; then
+            echo "==> SDK branch '$SDK_BRANCH' found, linking..."
+            ./scripts/link "github.com/stainless-sdks/gcore-go@$SDK_BRANCH"
+          else
+            echo "==> SDK branch '$SDK_BRANCH' not found, skipping link step"
+          fi
+
+      - name: Bootstrap
+        run: ./scripts/bootstrap
 
       - name: Run tests
         run: ./scripts/test

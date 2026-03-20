@@ -1,5 +1,5 @@
 ---
-page_title: "gcore_cloud_load_balancer_pool Resource - gcore"
+page_title: "gcore_cloud_load_balancer_pool Resource - Gcore"
 subcategory: ""
 description: |-
   Load balancer pools group backend instances with a load balancing algorithm and health monitoring configuration.

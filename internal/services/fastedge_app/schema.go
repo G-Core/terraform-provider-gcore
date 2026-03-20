@@ -7,6 +7,7 @@ import (
 
 	"github.com/G-Core/terraform-provider-gcore/internal/customfield"
 	"github.com/hashicorp/terraform-plugin-framework-timetypes/timetypes"
+	"github.com/hashicorp/terraform-plugin-framework-validators/int64validator"
 	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
@@ -24,8 +25,11 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 		Description: "FastEdge applications combine a WebAssembly binary with configuration, environment variables, and secrets for deployment at the CDN edge.",
 		Attributes: map[string]schema.Attribute{
 			"id": schema.Int64Attribute{
-				Description:   "App ID",
-				Computed:      true,
+				Description: "App ID",
+				Computed:    true,
+				Validators: []validator.Int64{
+					int64validator.AtLeast(1),
+				},
 				PlanModifiers: []planmodifier.Int64{int64planmodifier.UseStateForUnknown()},
 			},
 			"template": schema.Int64Attribute{
@@ -33,23 +37,26 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 				Optional:    true,
 			},
 			"binary": schema.Int64Attribute{
-				Description: "Binary ID",
+				Description: "ID of the WebAssembly binary to deploy",
 				Computed:    true,
 				Optional:    true,
+				Validators: []validator.Int64{
+					int64validator.AtLeast(1),
+				},
 			},
 			"comment": schema.StringAttribute{
-				Description: "App description",
+				Description: "Optional human-readable description of the application's purpose",
 				Computed:    true,
 				Optional:    true,
 			},
 			"debug": schema.BoolAttribute{
-				Description: "Switch on logging for 30 minutes (switched off by default)",
+				Description: "Enable verbose debug logging for 30 minutes. Automatically expires to prevent performance impact.",
 				Computed:    true,
 				Optional:    true,
 				Default:     booldefault.StaticBool(false),
 			},
 			"log": schema.StringAttribute{
-				Description: "Logging channel (by default - kafka, which allows exploring logs with API)\nAvailable values: \"kafka\", \"none\".",
+				Description: "Logging channel. Use 'kafka' to enable log collection (queryable via API), or 'none' to disable logging.\nAvailable values: \"kafka\", \"none\".",
 				Computed:    true,
 				Optional:    true,
 				Validators: []validator.String{
@@ -57,14 +64,17 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 				},
 			},
 			"name": schema.StringAttribute{
-				Description: "App name",
+				Description: "Unique application name (alphanumeric, hyphens allowed)",
 				Computed:    true,
 				Optional:    true,
 			},
 			"status": schema.Int64Attribute{
-				Description: "Status code:  \n0 - draft (inactive)  \n1 - enabled  \n2 - disabled  \n3 - hourly call limit exceeded  \n4 - daily call limit exceeded  \n5 - suspended",
+				Description: "Status code:  \n0 - draft (inactive)  \n1 - enabled  \n2 - disabled  \n5 - suspended",
 				Computed:    true,
 				Optional:    true,
+				Validators: []validator.Int64{
+					int64validator.Between(0, 2),
+				},
 			},
 			"env": schema.MapAttribute{
 				Description: "Environment variables",
@@ -150,7 +160,7 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 				Computed:    true,
 			},
 			"url": schema.StringAttribute{
-				Description: "App URL",
+				Description: "Auto-generated URL where the application is accessible",
 				Computed:    true,
 			},
 			"networks": schema.ListAttribute{

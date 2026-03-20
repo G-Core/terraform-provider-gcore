@@ -1,5 +1,5 @@
 ---
-page_title: "gcore_cdn_origin_group Resource - gcore"
+page_title: "gcore_cdn_origin_group Resource - Gcore"
 subcategory: ""
 description: |-
   CDN origin groups aggregate one or more origin servers with failover and load balancing for content delivery.

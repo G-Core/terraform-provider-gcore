@@ -1,5 +1,5 @@
 ---
-page_title: "gcore_cloud_k8s_cluster Resource - gcore"
+page_title: "gcore_cloud_k8s_cluster Resource - Gcore"
 subcategory: ""
 description: |-
   Managed Kubernetes clusters with configurable worker node pools, networking, and cluster add-ons.

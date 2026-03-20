@@ -14,7 +14,8 @@ import (
 )
 
 type FastedgeAppDataSourceModel struct {
-	ID           types.Int64                                                    `tfsdk:"id" path:"id,optional"`
+	ID           types.Int64                                                    `tfsdk:"id" path:"app_id,computed"`
+	AppID        types.Int64                                                    `tfsdk:"app_id" path:"app_id,optional"`
 	APIType      types.String                                                   `tfsdk:"api_type" json:"api_type,computed"`
 	Binary       types.Int64                                                    `tfsdk:"binary" json:"binary,computed"`
 	Comment      types.String                                                   `tfsdk:"comment" json:"comment,computed"`

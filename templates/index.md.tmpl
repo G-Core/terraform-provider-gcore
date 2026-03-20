@@ -6,47 +6,11 @@ description: |-
 
 # Gcore Provider
 
-The Gcore Terraform provider allows you to automate the provisioning, management, and testing of your Gcore resources programmatically.
+The Gcore provider allows you to configure your [Gcore](https://gcore.com) infrastructure.
 
-~> **V2 Alpha** — This provider is a complete rewrite with **breaking changes** compared to v0.x. Resource names, attribute schemas, and import IDs have changed. It is currently in **alpha** and under active development. The previous provider remains fully functional and is recommended for production workloads until v2 reaches GA. Install it from [`registry.terraform.io/providers/G-Core/gcore`](https://registry.terraform.io/providers/G-Core/gcore/latest).
+!> This provider is a complete rewrite with **breaking changes** compared to v0.x. Resource names, attribute schemas, and import IDs have changed. It is currently in **alpha** and under active development. The previous provider remains fully functional and is recommended for production workloads until v2 reaches GA. Install it from [`registry.terraform.io/providers/G-Core/gcore`](https://registry.terraform.io/providers/G-Core/gcore/latest).
 
-## Authentication and Configuration
-
-Configuration for the provider can be derived from two sources, applied in the following order:
-
-1. Parameters in the provider configuration
-2. Environment variables
-
-### Provider Configuration
-
-!> **Warning:** Hard-coded credentials are not recommended in any Terraform configuration and risk secret leakage should it ever be committed to a public version control system.
-
-The [API key](https://gcore.com/docs/account-settings/create-use-or-delete-a-permanent-api-token) can be provided by adding an `api_key` argument to the `gcore` provider block.
-
-Example:
-
-```terraform
-provider "gcore" {
-  api_key = "251$d3361.............1b35f26d8"
-}
-```
-
-The base URL can be overridden with the `base_url` argument if you need to target a different API endpoint.
-
-### Environment Variables
-
-The API key can be provided by setting the `GCORE_API_KEY` environment variable.
-
-```terraform
-provider "gcore" {}
-```
-
-```shell
-export GCORE_API_KEY='251$d3361.............1b35f26d8'
-terraform plan
-```
-
-The base URL can also be set via the `GCORE_BASE_URL` environment variable.
+-> **Need help?** If you encounter any issues or have questions about the Gcore Terraform provider, please reach out to [Gcore Support](https://support.gcore.com/hc/) for assistance.
 
 ## Example Usage
 

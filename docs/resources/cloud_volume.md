@@ -1,5 +1,5 @@
 ---
-page_title: "gcore_cloud_volume Resource - gcore"
+page_title: "gcore_cloud_volume Resource - Gcore"
 subcategory: ""
 description: |-
   Volumes are block storage devices that can be attached to instances as boot or data disks, with support for resizing and type changes.

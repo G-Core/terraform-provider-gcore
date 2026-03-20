@@ -230,25 +230,6 @@ func ListDataSourceSchema(ctx context.Context) schema.Schema {
 							Description: "Region ID",
 							Computed:    true,
 						},
-						"reservation": schema.SingleNestedAttribute{
-							Description: "Reserved fixed IP status with resource type and ID it is attached to",
-							Computed:    true,
-							CustomType:  customfield.NewNestedObjectType[CloudReservedFixedIPsReservationDataSourceModel](ctx),
-							Attributes: map[string]schema.Attribute{
-								"resource_id": schema.StringAttribute{
-									Description: "ID of the instance or load balancer the IP is attached to",
-									Computed:    true,
-								},
-								"resource_type": schema.StringAttribute{
-									Description: "Resource type of the resource the IP is attached to",
-									Computed:    true,
-								},
-								"status": schema.StringAttribute{
-									Description: "IP reservation status",
-									Computed:    true,
-								},
-							},
-						},
 						"status": schema.StringAttribute{
 							Description: "Underlying port status",
 							Computed:    true,

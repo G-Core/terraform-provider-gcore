@@ -71,7 +71,7 @@ func DataSourceSchema(ctx context.Context) schema.Schema {
 				Computed:    true,
 			},
 			"origin_group": schema.Int64Attribute{
-				Description: "Origin group ID with which the CDN resource is associated.\n\nYou can use either the `origin` or `originGroup` parameter in the request.",
+				Description: "Origin group ID with which the CDN resource is associated.",
 				Computed:    true,
 			},
 			"origin_group_name": schema.StringAttribute{
@@ -407,7 +407,7 @@ func DataSourceSchema(ctx context.Context) schema.Schema {
 								},
 							},
 							"on_request_headers": schema.SingleNestedAttribute{
-								Description: "Allows to configure FastEdge application that will be called to handle request headers as soon as CDN receives incoming HTTP request.",
+								Description: "Allows to configure FastEdge application that will be called to handle request headers as soon as CDN receives incoming HTTP request, **before cache**.",
 								Computed:    true,
 								CustomType:  customfield.NewNestedObjectType[CDNResourceOptionsFastedgeOnRequestHeadersDataSourceModel](ctx),
 								Attributes: map[string]schema.Attribute{
@@ -566,6 +566,21 @@ func DataSourceSchema(ctx context.Context) schema.Schema {
 						Description: "Forwards the Host header from a end-user request to an origin server.\n\n`hostHeader` and `forward_host_header` options cannot be enabled simultaneously.",
 						Computed:    true,
 						CustomType:  customfield.NewNestedObjectType[CDNResourceOptionsForwardHostHeaderDataSourceModel](ctx),
+						Attributes: map[string]schema.Attribute{
+							"enabled": schema.BoolAttribute{
+								Description: "Controls the option state.\n\nPossible values:\n- **true** - Option is enabled.\n- **false** - Option is disabled.",
+								Computed:    true,
+							},
+							"value": schema.BoolAttribute{
+								Description: "Possible values:\n- **true** - Option is enabled.\n- **false** - Option is disabled.",
+								Computed:    true,
+							},
+						},
+					},
+					"grpc_passthrough": schema.SingleNestedAttribute{
+						Description: "Enables gRPC pass-through for the CDN resource.",
+						Computed:    true,
+						CustomType:  customfield.NewNestedObjectType[CDNResourceOptionsGrpcPassthroughDataSourceModel](ctx),
 						Attributes: map[string]schema.Attribute{
 							"enabled": schema.BoolAttribute{
 								Description: "Controls the option state.\n\nPossible values:\n- **true** - Option is enabled.\n- **false** - Option is disabled.",

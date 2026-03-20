@@ -85,7 +85,9 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 				Attributes: map[string]schema.Attribute{
 					"allowed_http_methods": schema.SingleNestedAttribute{
 						Description: "HTTP methods allowed for content requests from the CDN.",
+						Computed:    true,
 						Optional:    true,
+						CustomType:  customfield.NewNestedObjectType[CDNResourceRuleOptionsAllowedHTTPMethodsModel](ctx),
 						Attributes: map[string]schema.Attribute{
 							"enabled": schema.BoolAttribute{
 								Description: "Controls the option state.\n\nPossible values:\n- **true** - Option is enabled.\n- **false** - Option is disabled.",
@@ -93,13 +95,16 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 							},
 							"value": schema.SetAttribute{
 								Required:    true,
+								CustomType:  customfield.NewSetType[types.String](ctx),
 								ElementType: types.StringType,
 							},
 						},
 					},
 					"bot_protection": schema.SingleNestedAttribute{
 						Description: "Allows to prevent online services from overloading and ensure your business workflow running smoothly.",
+						Computed:    true,
 						Optional:    true,
+						CustomType:  customfield.NewNestedObjectType[CDNResourceRuleOptionsBotProtectionModel](ctx),
 						Attributes: map[string]schema.Attribute{
 							"bot_challenge": schema.SingleNestedAttribute{
 								Description: "Controls the bot challenge module state.",
@@ -121,7 +126,9 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 					},
 					"brotli_compression": schema.SingleNestedAttribute{
 						Description: "Compresses content with Brotli on the CDN side. CDN servers will request only uncompressed content from the origin.\n\nNotes:\n\n1. CDN only supports \"Brotli compression\" when the \"origin shielding\" feature is activated.\n2. If a precache server is not active for a CDN resource, no compression occurs, even if the option is enabled.\n3. `brotli_compression` is not supported with `fetch_compressed` or `slice` options enabled.\n4. `fetch_compressed` option in CDN resource settings overrides `brotli_compression` in rules. If you enabled `fetch_compressed` in CDN resource and want to enable `brotli_compression` in a rule, you must specify `fetch_compressed:false` in the rule.",
+						Computed:    true,
 						Optional:    true,
+						CustomType:  customfield.NewNestedObjectType[CDNResourceRuleOptionsBrotliCompressionModel](ctx),
 						Attributes: map[string]schema.Attribute{
 							"enabled": schema.BoolAttribute{
 								Description: "Controls the option state.\n\nPossible values:\n- **true** - Option is enabled.\n- **false** - Option is disabled.",
@@ -130,13 +137,16 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 							"value": schema.SetAttribute{
 								Description: "Allows to select the content types you want to compress.\n\n`text/html` is a mandatory content type.",
 								Required:    true,
+								CustomType:  customfield.NewSetType[types.String](ctx),
 								ElementType: types.StringType,
 							},
 						},
 					},
 					"browser_cache_settings": schema.SingleNestedAttribute{
 						Description: "Cache expiration time for users browsers in seconds.\n\nCache expiration time is applied to the following response codes: 200, 201, 204, 206, 301, 302, 303, 304, 307, 308.\n\nResponses with other codes will not be cached.",
+						Computed:    true,
 						Optional:    true,
+						CustomType:  customfield.NewNestedObjectType[CDNResourceRuleOptionsBrowserCacheSettingsModel](ctx),
 						Attributes: map[string]schema.Attribute{
 							"enabled": schema.BoolAttribute{
 								Description: "Controls the option state.\n\nPossible values:\n- **true** - Option is enabled.\n- **false** - Option is disabled.",
@@ -150,8 +160,10 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 					},
 					"cache_http_headers": schema.SingleNestedAttribute{
 						Description:        "**Legacy option**. Use the `response_headers_hiding_policy` option instead.\n\nHTTP Headers that must be included in the response.",
+						Computed:           true,
 						Optional:           true,
 						DeprecationMessage: "This attribute is deprecated.",
+						CustomType:         customfield.NewNestedObjectType[CDNResourceRuleOptionsCacheHTTPHeadersModel](ctx),
 						Attributes: map[string]schema.Attribute{
 							"enabled": schema.BoolAttribute{
 								Description: "Controls the option state.\n\nPossible values:\n- **true** - Option is enabled.\n- **false** - Option is disabled.",
@@ -176,6 +188,7 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 							"value": schema.SetAttribute{
 								Description: "Value of the Access-Control-Allow-Origin header.\n\nPossible values:\n- **Adds * as the Access-Control-Allow-Origin header value** - Content will be uploaded for requests from any domain.\n`\"value\": [\"*\"]`\n- **Adds \"$http_origin\" as the Access-Control-Allow-Origin header value if the origin matches one of the listed domains** - Content will be uploaded only for requests from the domains specified in the field.\n`\"value\": [\"domain.com\", \"second.dom.com\"]`\n- **Adds \"$http_origin\" as the Access-Control-Allow-Origin header value** - Content will be uploaded for requests from any domain, and the domain from which the request was sent will be added to the \"Access-Control-Allow-Origin\" header in the response.\n`\"value\": [\"$http_origin\"]`",
 								Required:    true,
+								CustomType:  customfield.NewSetType[types.String](ctx),
 								ElementType: types.StringType,
 							},
 							"always": schema.BoolAttribute{
@@ -188,7 +201,9 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 					},
 					"country_acl": schema.SingleNestedAttribute{
 						Description: "Enables control access to content for specified countries.",
+						Computed:    true,
 						Optional:    true,
+						CustomType:  customfield.NewNestedObjectType[CDNResourceRuleOptionsCountryACLModel](ctx),
 						Attributes: map[string]schema.Attribute{
 							"enabled": schema.BoolAttribute{
 								Description: "Controls the option state.\n\nPossible values:\n- **true** - Option is enabled.\n- **false** - Option is disabled.",
@@ -197,6 +212,7 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 							"excepted_values": schema.SetAttribute{
 								Description: "List of countries according to ISO-3166-1.\n\nThe meaning of the parameter depends on `policy_type` value:\n- **allow** - List of countries for which access is prohibited.\n- **deny** - List of countries for which access is allowed.",
 								Required:    true,
+								CustomType:  customfield.NewSetType[types.String](ctx),
 								ElementType: types.StringType,
 							},
 							"policy_type": schema.StringAttribute{
@@ -210,8 +226,10 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 					},
 					"disable_cache": schema.SingleNestedAttribute{
 						Description:        "**Legacy option**. Use the `edge_cache_settings` option instead.\n\nAllows the complete disabling of content caching.",
+						Computed:           true,
 						Optional:           true,
 						DeprecationMessage: "This attribute is deprecated.",
+						CustomType:         customfield.NewNestedObjectType[CDNResourceRuleOptionsDisableCacheModel](ctx),
 						Attributes: map[string]schema.Attribute{
 							"enabled": schema.BoolAttribute{
 								Description: "Controls the option state.\n\nPossible values:\n- **true** - Option is enabled.\n- **false** - Option is disabled.",
@@ -225,7 +243,9 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 					},
 					"disable_proxy_force_ranges": schema.SingleNestedAttribute{
 						Description: "Allows 206 responses regardless of the settings of an origin source.",
+						Computed:    true,
 						Optional:    true,
+						CustomType:  customfield.NewNestedObjectType[CDNResourceRuleOptionsDisableProxyForceRangesModel](ctx),
 						Attributes: map[string]schema.Attribute{
 							"enabled": schema.BoolAttribute{
 								Description: "Controls the option state.\n\nPossible values:\n- **true** - Option is enabled.\n- **false** - Option is disabled.",
@@ -422,7 +442,9 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 					},
 					"fetch_compressed": schema.SingleNestedAttribute{
 						Description: "Makes the CDN request compressed content from the origin.\n\nThe origin server should support compression. CDN servers will not decompress your content even if a user browser does not accept compression.\n\nNotes:\n\n1. `fetch_compressed` is not supported with `gzipON` or `brotli_compression` or `slice` options enabled.\n2. `fetch_compressed` overrides `gzipON` and `brotli_compression` in rule. If you enable it in CDN resource and want to use `gzipON` and `brotli_compression` in a rule, you have to specify `\"fetch_compressed\": false` in the rule.",
+						Computed:    true,
 						Optional:    true,
+						CustomType:  customfield.NewNestedObjectType[CDNResourceRuleOptionsFetchCompressedModel](ctx),
 						Attributes: map[string]schema.Attribute{
 							"enabled": schema.BoolAttribute{
 								Description: "Controls the option state.\n\nPossible values:\n- **true** - Option is enabled.\n- **false** - Option is disabled.",
@@ -436,11 +458,14 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 					},
 					"follow_origin_redirect": schema.SingleNestedAttribute{
 						Description: "Enables redirection from origin.\nIf the origin server returns a redirect, the option allows the CDN to pull the requested content from the origin server that was returned in the redirect.",
+						Computed:    true,
 						Optional:    true,
+						CustomType:  customfield.NewNestedObjectType[CDNResourceRuleOptionsFollowOriginRedirectModel](ctx),
 						Attributes: map[string]schema.Attribute{
 							"codes": schema.SetAttribute{
 								Description: "Redirect status code that the origin server returns.\n\nTo serve up to date content to end users, you will need to purge the cache after managing the option.",
 								Required:    true,
+								CustomType:  customfield.NewSetType[types.Int64](ctx),
 								ElementType: types.Int64Type,
 							},
 							"enabled": schema.BoolAttribute{
@@ -496,7 +521,9 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 					},
 					"forward_host_header": schema.SingleNestedAttribute{
 						Description: "Forwards the Host header from a end-user request to an origin server.\n\n`hostHeader` and `forward_host_header` options cannot be enabled simultaneously.",
+						Computed:    true,
 						Optional:    true,
+						CustomType:  customfield.NewNestedObjectType[CDNResourceRuleOptionsForwardHostHeaderModel](ctx),
 						Attributes: map[string]schema.Attribute{
 							"enabled": schema.BoolAttribute{
 								Description: "Controls the option state.\n\nPossible values:\n- **true** - Option is enabled.\n- **false** - Option is disabled.",
@@ -510,7 +537,9 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 					},
 					"gzip_on": schema.SingleNestedAttribute{
 						Description: "Compresses content with gzip on the CDN end. CDN servers will request only uncompressed content from the origin.\n\nNotes:\n\n1. Compression with gzip is not supported with `fetch_compressed` or `slice` options enabled.\n2. `fetch_compressed` option in CDN resource settings overrides `gzipON` in rules. If you enable `fetch_compressed` in CDN resource and want to enable `gzipON` in rules, you need to specify `\"fetch_compressed\":false` for rules.",
+						Computed:    true,
 						Optional:    true,
+						CustomType:  customfield.NewNestedObjectType[CDNResourceRuleOptionsGzipOnModel](ctx),
 						Attributes: map[string]schema.Attribute{
 							"enabled": schema.BoolAttribute{
 								Description: "Controls the option state.\n\nPossible values:\n- **true** - Option is enabled.\n- **false** - Option is disabled.",
@@ -524,7 +553,9 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 					},
 					"host_header": schema.SingleNestedAttribute{
 						Description: "Sets the Host header that CDN servers use when request content from an origin server.\nYour server must be able to process requests with the chosen header.\n\nIf the option is `null`, the Host Header value is equal to first CNAME.\n\n`hostHeader` and `forward_host_header` options cannot be enabled simultaneously.",
+						Computed:    true,
 						Optional:    true,
+						CustomType:  customfield.NewNestedObjectType[CDNResourceRuleOptionsHostHeaderModel](ctx),
 						Attributes: map[string]schema.Attribute{
 							"enabled": schema.BoolAttribute{
 								Description: "Controls the option state.\n\nPossible values:\n- **true** - Option is enabled.\n- **false** - Option is disabled.",
@@ -538,7 +569,9 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 					},
 					"ignore_cookie": schema.SingleNestedAttribute{
 						Description: "Defines whether the files with the Set-Cookies header are cached as one file or as different ones.",
+						Computed:    true,
 						Optional:    true,
+						CustomType:  customfield.NewNestedObjectType[CDNResourceRuleOptionsIgnoreCookieModel](ctx),
 						Attributes: map[string]schema.Attribute{
 							"enabled": schema.BoolAttribute{
 								Description: "Controls the option state.\n\nPossible values:\n- **true** - Option is enabled.\n- **false** - Option is disabled.",
@@ -552,7 +585,9 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 					},
 					"ignore_query_string": schema.SingleNestedAttribute{
 						Description: "How a file with different query strings is cached: either as one object (option is enabled) or as different objects (option is disabled.)\n\n`ignoreQueryString`, `query_params_whitelist` and `query_params_blacklist` options cannot be enabled simultaneously.",
+						Computed:    true,
 						Optional:    true,
+						CustomType:  customfield.NewNestedObjectType[CDNResourceRuleOptionsIgnoreQueryStringModel](ctx),
 						Attributes: map[string]schema.Attribute{
 							"enabled": schema.BoolAttribute{
 								Description: "Controls the option state.\n\nPossible values:\n- **true** - Option is enabled.\n- **false** - Option is disabled.",
@@ -605,7 +640,9 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 					},
 					"ip_address_acl": schema.SingleNestedAttribute{
 						Description: "Controls access to the CDN resource content for specific IP addresses.\n\nIf you want to use IPs from our CDN servers IP list for IP ACL configuration, you have to independently monitor their relevance.\n\nWe recommend you use a script for automatically update IP ACL. [Read more.](/docs/api-reference/cdn/ip-addresses-list/get-cdn-servers-ip-addresses)",
+						Computed:    true,
 						Optional:    true,
+						CustomType:  customfield.NewNestedObjectType[CDNResourceRuleOptionsIPAddressACLModel](ctx),
 						Attributes: map[string]schema.Attribute{
 							"enabled": schema.BoolAttribute{
 								Description: "Controls the option state.\n\nPossible values:\n- **true** - Option is enabled.\n- **false** - Option is disabled.",
@@ -614,6 +651,7 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 							"excepted_values": schema.SetAttribute{
 								Description: "List of IP addresses with a subnet mask.\n\nThe meaning of the parameter depends on `policy_type` value:\n- **allow** - List of IP addresses for which access is prohibited.\n- **deny** - List of IP addresses for which access is allowed.\n\nExamples:\n- `192.168.3.2/32`\n- `2a03:d000:2980:7::8/128`",
 								Required:    true,
+								CustomType:  customfield.NewSetType[types.String](ctx),
 								ElementType: types.StringType,
 							},
 							"policy_type": schema.StringAttribute{
@@ -627,7 +665,9 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 					},
 					"limit_bandwidth": schema.SingleNestedAttribute{
 						Description: "Allows to control the download speed per connection.",
+						Computed:    true,
 						Optional:    true,
+						CustomType:  customfield.NewNestedObjectType[CDNResourceRuleOptionsLimitBandwidthModel](ctx),
 						Attributes: map[string]schema.Attribute{
 							"enabled": schema.BoolAttribute{
 								Description: "Controls the option state.\n\nPossible values:\n- **true** - Option is enabled.\n- **false** - Option is disabled.",
@@ -658,7 +698,9 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 					},
 					"proxy_cache_key": schema.SingleNestedAttribute{
 						Description: "Allows you to modify your cache key. If omitted, the default value is `$request_uri`.\n\nCombine the specified variables to create a key for caching.\n- **$`request_uri`**\n- **$scheme**\n- **$uri**\n\n**Warning**: Enabling and changing this option can invalidate your current cache and affect the cache hit ratio. Furthermore, the \"Purge by pattern\" option will not work.",
+						Computed:    true,
 						Optional:    true,
+						CustomType:  customfield.NewNestedObjectType[CDNResourceRuleOptionsProxyCacheKeyModel](ctx),
 						Attributes: map[string]schema.Attribute{
 							"enabled": schema.BoolAttribute{
 								Description: "Controls the option state.\n\nPossible values:\n- **true** - Option is enabled.\n- **false** - Option is disabled.",
@@ -672,7 +714,9 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 					},
 					"proxy_cache_methods_set": schema.SingleNestedAttribute{
 						Description: "Caching for POST requests along with default GET and HEAD.",
+						Computed:    true,
 						Optional:    true,
+						CustomType:  customfield.NewNestedObjectType[CDNResourceRuleOptionsProxyCacheMethodsSetModel](ctx),
 						Attributes: map[string]schema.Attribute{
 							"enabled": schema.BoolAttribute{
 								Description: "Controls the option state.\n\nPossible values:\n- **true** - Option is enabled.\n- **false** - Option is disabled.",
@@ -686,7 +730,9 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 					},
 					"proxy_connect_timeout": schema.SingleNestedAttribute{
 						Description: "The time limit for establishing a connection with the origin.",
+						Computed:    true,
 						Optional:    true,
+						CustomType:  customfield.NewNestedObjectType[CDNResourceRuleOptionsProxyConnectTimeoutModel](ctx),
 						Attributes: map[string]schema.Attribute{
 							"enabled": schema.BoolAttribute{
 								Description: "Controls the option state.\n\nPossible values:\n- **true** - Option is enabled.\n- **false** - Option is disabled.",
@@ -700,7 +746,9 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 					},
 					"proxy_read_timeout": schema.SingleNestedAttribute{
 						Description: "The time limit for receiving a partial response from the origin.\nIf no response is received within this time, the connection will be closed.\n\n**Note:**\nWhen used with a WebSocket connection, this option supports values only in the range 1–20 seconds (instead of the usual 1–30 seconds).",
+						Computed:    true,
 						Optional:    true,
+						CustomType:  customfield.NewNestedObjectType[CDNResourceRuleOptionsProxyReadTimeoutModel](ctx),
 						Attributes: map[string]schema.Attribute{
 							"enabled": schema.BoolAttribute{
 								Description: "Controls the option state.\n\nPossible values:\n- **true** - Option is enabled.\n- **false** - Option is disabled.",
@@ -714,7 +762,9 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 					},
 					"query_params_blacklist": schema.SingleNestedAttribute{
 						Description: "Files with the specified query parameters are cached as one object, files with other parameters are cached as different objects.\n\n`ignoreQueryString`, `query_params_whitelist` and `query_params_blacklist` options cannot be enabled simultaneously.",
+						Computed:    true,
 						Optional:    true,
+						CustomType:  customfield.NewNestedObjectType[CDNResourceRuleOptionsQueryParamsBlacklistModel](ctx),
 						Attributes: map[string]schema.Attribute{
 							"enabled": schema.BoolAttribute{
 								Description: "Controls the option state.\n\nPossible values:\n- **true** - Option is enabled.\n- **false** - Option is disabled.",
@@ -723,13 +773,16 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 							"value": schema.SetAttribute{
 								Description: "List of query parameters.",
 								Required:    true,
+								CustomType:  customfield.NewSetType[types.String](ctx),
 								ElementType: types.StringType,
 							},
 						},
 					},
 					"query_params_whitelist": schema.SingleNestedAttribute{
 						Description: "Files with the specified query parameters are cached as different objects, files with other parameters are cached as one object.\n\n`ignoreQueryString`, `query_params_whitelist` and `query_params_blacklist` options cannot be enabled simultaneously.",
+						Computed:    true,
 						Optional:    true,
+						CustomType:  customfield.NewNestedObjectType[CDNResourceRuleOptionsQueryParamsWhitelistModel](ctx),
 						Attributes: map[string]schema.Attribute{
 							"enabled": schema.BoolAttribute{
 								Description: "Controls the option state.\n\nPossible values:\n- **true** - Option is enabled.\n- **false** - Option is disabled.",
@@ -744,7 +797,9 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 					},
 					"query_string_forwarding": schema.SingleNestedAttribute{
 						Description: "The Query String Forwarding feature allows for the seamless transfer of parameters embedded in playlist files to the corresponding media chunk files.\nThis functionality ensures that specific attributes, such as authentication tokens or tracking information, are consistently passed along from the playlist manifest to the individual media segments.\nThis is particularly useful for maintaining continuity in security, analytics, and any other parameter-based operations across the entire media delivery workflow.",
+						Computed:    true,
 						Optional:    true,
+						CustomType:  customfield.NewNestedObjectType[CDNResourceRuleOptionsQueryStringForwardingModel](ctx),
 						Attributes: map[string]schema.Attribute{
 							"enabled": schema.BoolAttribute{
 								Description: "Controls the option state.\n\nPossible values:\n- **true** - Option is enabled.\n- **false** - Option is disabled.",
@@ -753,28 +808,34 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 							"forward_from_file_types": schema.SetAttribute{
 								Description: "The `forward_from_files_types` field specifies the types of playlist files from which parameters will be extracted and forwarded.\nThis typically includes formats that list multiple media chunk references, such as HLS and DASH playlists.\nParameters associated with these playlist files (like query strings or headers) will be propagated to the chunks they reference.",
 								Required:    true,
+								CustomType:  customfield.NewSetType[types.String](ctx),
 								ElementType: types.StringType,
 							},
 							"forward_to_file_types": schema.SetAttribute{
 								Description: "The field specifies the types of media chunk files to which parameters, extracted from playlist files, will be forwarded.\nThese refer to the actual segments of media content that are delivered to viewers.\nEnsuring the correct parameters are forwarded to these files is crucial for maintaining the integrity of the streaming session.",
 								Required:    true,
+								CustomType:  customfield.NewSetType[types.String](ctx),
 								ElementType: types.StringType,
 							},
 							"forward_except_keys": schema.SetAttribute{
 								Description: "The `forward_except_keys` field provides a mechanism to exclude specific parameters from being forwarded from playlist files to media chunk files.\nBy listing certain keys in this field, you can ensure that these parameters are omitted during the forwarding process.\nThis is particularly useful for preventing sensitive or irrelevant information from being included in requests for media chunks, thereby enhancing security and optimizing performance.",
 								Optional:    true,
+								CustomType:  customfield.NewSetType[types.String](ctx),
 								ElementType: types.StringType,
 							},
 							"forward_only_keys": schema.SetAttribute{
 								Description: "The `forward_only_keys` field allows for granular control over which specific parameters are forwarded from playlist files to media chunk files.\nBy specifying certain keys, only those parameters will be propagated, ensuring that only relevant information is passed along.\nThis is particularly useful for security and performance optimization, as it prevents unnecessary or sensitive data from being included in requests for media chunks.",
 								Optional:    true,
+								CustomType:  customfield.NewSetType[types.String](ctx),
 								ElementType: types.StringType,
 							},
 						},
 					},
 					"redirect_http_to_https": schema.SingleNestedAttribute{
 						Description: "Enables redirect from HTTP to HTTPS.\n\n`redirect_http_to_https` and `redirect_https_to_http` options cannot be enabled simultaneously.",
+						Computed:    true,
 						Optional:    true,
+						CustomType:  customfield.NewNestedObjectType[CDNResourceRuleOptionsRedirectHTTPToHTTPSModel](ctx),
 						Attributes: map[string]schema.Attribute{
 							"enabled": schema.BoolAttribute{
 								Description: "Controls the option state.\n\nPossible values:\n- **true** - Option is enabled.\n- **false** - Option is disabled.",
@@ -788,7 +849,9 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 					},
 					"redirect_https_to_http": schema.SingleNestedAttribute{
 						Description: "Enables redirect from HTTPS to HTTP.\n\n`redirect_http_to_https` and `redirect_https_to_http` options cannot be enabled simultaneously.",
+						Computed:    true,
 						Optional:    true,
+						CustomType:  customfield.NewNestedObjectType[CDNResourceRuleOptionsRedirectHTTPSToHTTPModel](ctx),
 						Attributes: map[string]schema.Attribute{
 							"enabled": schema.BoolAttribute{
 								Description: "Controls the option state.\n\nPossible values:\n- **true** - Option is enabled.\n- **false** - Option is disabled.",
@@ -802,7 +865,9 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 					},
 					"referrer_acl": schema.SingleNestedAttribute{
 						Description: "Controls access to the CDN resource content for specified domain names.",
+						Computed:    true,
 						Optional:    true,
+						CustomType:  customfield.NewNestedObjectType[CDNResourceRuleOptionsReferrerACLModel](ctx),
 						Attributes: map[string]schema.Attribute{
 							"enabled": schema.BoolAttribute{
 								Description: "Controls the option state.\n\nPossible values:\n- **true** - Option is enabled.\n- **false** - Option is disabled.",
@@ -811,6 +876,7 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 							"excepted_values": schema.SetAttribute{
 								Description: "List of domain names or wildcard domains (without protocol: `http://` or `https://`.)\n\nThe meaning of the parameter depends on `policy_type` value:\n- **allow** - List of domain names for which access is prohibited.\n- **deny** - List of IP domain names for which access is allowed.\n\nExamples:\n- `example.com`\n- `*.example.com`",
 								Required:    true,
+								CustomType:  customfield.NewSetType[types.String](ctx),
 								ElementType: types.StringType,
 							},
 							"policy_type": schema.StringAttribute{
@@ -939,7 +1005,9 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 					},
 					"slice": schema.SingleNestedAttribute{
 						Description: "Requests and caches files larger than 10 MB in parts (no larger than 10 MB per part.) This reduces time to first byte.\n\nThe option is based on the [Slice](https://nginx.org/en/docs/http/ngx_http_slice_module.html) module.\n\nNotes:\n\n1. Origin must support HTTP Range requests.\n2. Not supported with `gzipON`, `brotli_compression` or `fetch_compressed` options enabled.",
+						Computed:    true,
 						Optional:    true,
+						CustomType:  customfield.NewNestedObjectType[CDNResourceRuleOptionsSliceModel](ctx),
 						Attributes: map[string]schema.Attribute{
 							"enabled": schema.BoolAttribute{
 								Description: "Controls the option state.\n\nPossible values:\n- **true** - Option is enabled.\n- **false** - Option is disabled.",
@@ -978,7 +1046,9 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 					},
 					"stale": schema.SingleNestedAttribute{
 						Description: "Serves stale cached content in case of origin unavailability.",
+						Computed:    true,
 						Optional:    true,
+						CustomType:  customfield.NewNestedObjectType[CDNResourceRuleOptionsStaleModel](ctx),
 						Attributes: map[string]schema.Attribute{
 							"enabled": schema.BoolAttribute{
 								Description: "Controls the option state.\n\nPossible values:\n- **true** - Option is enabled.\n- **false** - Option is disabled.",
@@ -987,13 +1057,16 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 							"value": schema.SetAttribute{
 								Description: `Defines list of errors for which "Always online" option is applied.`,
 								Required:    true,
+								CustomType:  customfield.NewSetType[types.String](ctx),
 								ElementType: types.StringType,
 							},
 						},
 					},
 					"static_response_headers": schema.SingleNestedAttribute{
 						Description: "Custom HTTP Headers that a CDN server adds to a response.",
+						Computed:    true,
 						Optional:    true,
+						CustomType:  customfield.NewNestedObjectType[CDNResourceRuleOptionsStaticResponseHeadersModel](ctx),
 						Attributes: map[string]schema.Attribute{
 							"enabled": schema.BoolAttribute{
 								Description: "Controls the option state.\n\nPossible values:\n- **true** - Option is enabled.\n- **false** - Option is disabled.",
@@ -1025,8 +1098,10 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 					},
 					"static_headers": schema.SingleNestedAttribute{
 						Description:        "**Legacy option**. Use the `static_response_headers` option instead.\n\nCustom HTTP Headers that a CDN server adds to response. Up to fifty custom HTTP Headers can be specified. May contain a header with multiple values.",
+						Computed:           true,
 						Optional:           true,
 						DeprecationMessage: "This attribute is deprecated.",
+						CustomType:         customfield.NewNestedObjectType[CDNResourceRuleOptionsStaticHeadersModel](ctx),
 						Attributes: map[string]schema.Attribute{
 							"enabled": schema.BoolAttribute{
 								Description: "Controls the option state.\n\nPossible values:\n- **true** - Option is enabled.\n- **false** - Option is disabled.",
@@ -1041,7 +1116,9 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 					},
 					"static_request_headers": schema.SingleNestedAttribute{
 						Description: "Custom HTTP Headers for a CDN server to add to request. Up to fifty custom HTTP Headers can be specified.",
+						Computed:    true,
 						Optional:    true,
+						CustomType:  customfield.NewNestedObjectType[CDNResourceRuleOptionsStaticRequestHeadersModel](ctx),
 						Attributes: map[string]schema.Attribute{
 							"enabled": schema.BoolAttribute{
 								Description: "Controls the option state.\n\nPossible values:\n- **true** - Option is enabled.\n- **false** - Option is disabled.",
@@ -1056,7 +1133,9 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 					},
 					"user_agent_acl": schema.SingleNestedAttribute{
 						Description: "Controls access to the content for specified User-Agents.",
+						Computed:    true,
 						Optional:    true,
+						CustomType:  customfield.NewNestedObjectType[CDNResourceRuleOptionsUserAgentACLModel](ctx),
 						Attributes: map[string]schema.Attribute{
 							"enabled": schema.BoolAttribute{
 								Description: "Controls the option state.\n\nPossible values:\n- **true** - Option is enabled.\n- **false** - Option is disabled.",
@@ -1065,6 +1144,7 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 							"excepted_values": schema.SetAttribute{
 								Description: "List of User-Agents that will be allowed/denied.\n\nThe meaning of the parameter depends on `policy_type`:\n- **allow** - List of User-Agents for which access is prohibited.\n- **deny** - List of User-Agents for which access is allowed.\n\nYou can provide exact User-Agent strings or regular expressions. Regular expressions must start\nwith `~` (case-sensitive) or `~*` (case-insensitive).\n\nUse an empty string `\"\"` to allow/deny access when the User-Agent header is empty.",
 								Required:    true,
+								CustomType:  customfield.NewSetType[types.String](ctx),
 								ElementType: types.StringType,
 							},
 							"policy_type": schema.StringAttribute{
@@ -1078,7 +1158,9 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 					},
 					"waap": schema.SingleNestedAttribute{
 						Description: "Allows to enable WAAP (Web Application and API Protection).",
+						Computed:    true,
 						Optional:    true,
+						CustomType:  customfield.NewNestedObjectType[CDNResourceRuleOptionsWaapModel](ctx),
 						Attributes: map[string]schema.Attribute{
 							"enabled": schema.BoolAttribute{
 								Description: "Controls the option state.\n\nPossible values:\n- **true** - Option is enabled.\n- **false** - Option is disabled.",
@@ -1092,7 +1174,9 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 					},
 					"websockets": schema.SingleNestedAttribute{
 						Description: "Enables or disables WebSockets connections to an origin server.",
+						Computed:    true,
 						Optional:    true,
+						CustomType:  customfield.NewNestedObjectType[CDNResourceRuleOptionsWebsocketsModel](ctx),
 						Attributes: map[string]schema.Attribute{
 							"enabled": schema.BoolAttribute{
 								Description: "Controls the option state.\n\nPossible values:\n- **true** - Option is enabled.\n- **false** - Option is disabled.",

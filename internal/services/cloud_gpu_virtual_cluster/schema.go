@@ -17,7 +17,6 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/booldefault"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/int64planmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/listplanmodifier"
-	"github.com/hashicorp/terraform-plugin-framework/resource/schema/mapplanmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringplanmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
@@ -247,17 +246,16 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 				},
 				PlanModifiers: []planmodifier.Object{serversSettingsRequiresReplaceModifier{}},
 			},
-			"tags": schema.MapAttribute{
-				Description:   "Key-value tags to associate with the resource. A tag is a key-value pair that can be associated with a resource, enabling efficient filtering and grouping for better organization and management. Both tag keys and values have a maximum length of 255 characters. Some tags are read-only and cannot be modified by the user. Tags are also integrated with cost reports, allowing cost data to be filtered based on tag keys or values.",
-				Computed:      true,
-				Optional:      true,
-				CustomType:    customfield.NewMapType[types.String](ctx),
-				ElementType:   types.StringType,
-				PlanModifiers: []planmodifier.Map{mapplanmodifier.RequiresReplaceIfConfigured()},
-			},
 			"name": schema.StringAttribute{
 				Description: "Cluster name",
 				Required:    true,
+			},
+			"tags": schema.MapAttribute{
+				Description: "Key-value tags to associate with the resource. A tag is a key-value pair that can be associated with a resource, enabling efficient filtering and grouping for better organization and management. Both tag keys and values have a maximum length of 255 characters. Some tags are read-only and cannot be modified by the user. Tags are also integrated with cost reports, allowing cost data to be filtered based on tag keys or values.",
+				Computed:    true,
+				Optional:    true,
+				CustomType:  customfield.NewMapType[types.String](ctx),
+				ElementType: types.StringType,
 			},
 			"created_at": schema.StringAttribute{
 				Description: "Cluster creation date time",
@@ -330,7 +328,7 @@ func (v volumeImageSourceValidator) ValidateList(ctx context.Context, req valida
 	for i, vol := range volumes {
 		if !vol.Source.IsNull() && !vol.Source.IsUnknown() &&
 			vol.Source.ValueString() == "image" &&
-			(vol.ImageID.IsNull() || vol.ImageID.ValueString() == "") {
+			!vol.ImageID.IsUnknown() && (vol.ImageID.IsNull() || vol.ImageID.ValueString() == "") {
 			resp.Diagnostics.AddAttributeError(
 				req.Path.AtListIndex(i).AtName("image_id"),
 				"Missing required attribute",
@@ -362,10 +360,10 @@ func (v credentialsValidator) ValidateObject(_ context.Context, req validator.Ob
 	passwordWo := attrs["password_wo"]
 	passwordWoVersion := attrs["password_wo_version"]
 
-	hasSSHKey := !sshKeyName.IsNull() && !sshKeyName.IsUnknown()
-	hasUsername := !username.IsNull() && !username.IsUnknown()
-	hasPasswordWo := !passwordWo.IsNull() && !passwordWo.IsUnknown()
-	hasPasswordWoVersion := !passwordWoVersion.IsNull() && !passwordWoVersion.IsUnknown()
+	hasSSHKey := !sshKeyName.IsNull()
+	hasUsername := !username.IsNull()
+	hasPasswordWo := !passwordWo.IsNull()
+	hasPasswordWoVersion := !passwordWoVersion.IsNull()
 
 	// Valid scenarios (mutually exclusive):
 	// 1. Only ssh_key_name is provided (no username or password_wo or password_wo_version)

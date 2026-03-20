@@ -1,5 +1,5 @@
 ---
-page_title: "gcore_cloud_ssh_key Resource - gcore"
+page_title: "gcore_cloud_ssh_key Resource - Gcore"
 subcategory: ""
 description: |-
   SSH key pairs provide secure authentication to cloud instances, supporting both generated and imported public keys.

@@ -29,15 +29,18 @@ func ListDataSourceSchema(ctx context.Context) schema.Schema {
 				},
 			},
 			"binary": schema.Int64Attribute{
-				Description: "Binary ID",
+				Description: "Filter by binary ID (shows apps using this binary)",
 				Optional:    true,
+				Validators: []validator.Int64{
+					int64validator.AtLeast(1),
+				},
 			},
 			"name": schema.StringAttribute{
-				Description: "Name of the app",
+				Description: "Filter by application name (case-insensitive partial match)",
 				Optional:    true,
 			},
 			"ordering": schema.StringAttribute{
-				Description: "Ordering\nAvailable values: \"name\", \"-name\", \"status\", \"-status\", \"id\", \"-id\", \"template\", \"-template\", \"binary\", \"-binary\", \"plan\", \"-plan\".",
+				Description: "Sort order. Use - prefix for descending (e.g., -name sorts by name descending)\nAvailable values: \"name\", \"-name\", \"status\", \"-status\", \"id\", \"-id\", \"template\", \"-template\", \"binary\", \"-binary\", \"plan\", \"-plan\".",
 				Optional:    true,
 				Validators: []validator.String{
 					stringvalidator.OneOfCaseInsensitive(
@@ -57,16 +60,25 @@ func ListDataSourceSchema(ctx context.Context) schema.Schema {
 				},
 			},
 			"plan": schema.Int64Attribute{
-				Description: "Plan ID",
+				Description: "Filter by plan ID",
 				Optional:    true,
+				Validators: []validator.Int64{
+					int64validator.AtLeast(1),
+				},
 			},
 			"status": schema.Int64Attribute{
 				Description: "Status code:  \n0 - draft (inactive)  \n1 - enabled  \n2 - disabled  \n3 - hourly call limit exceeded  \n4 - daily call limit exceeded  \n5 - suspended",
 				Optional:    true,
+				Validators: []validator.Int64{
+					int64validator.Between(0, 5),
+				},
 			},
 			"template": schema.Int64Attribute{
-				Description: "Template ID",
+				Description: "Filter by template ID (shows apps created from this template)",
 				Optional:    true,
+				Validators: []validator.Int64{
+					int64validator.AtLeast(1),
+				},
 			},
 			"max_items": schema.Int64Attribute{
 				Description: "Max items to fetch, default: 1000",
@@ -84,6 +96,9 @@ func ListDataSourceSchema(ctx context.Context) schema.Schema {
 						"id": schema.Int64Attribute{
 							Description: "App ID",
 							Computed:    true,
+							Validators: []validator.Int64{
+								int64validator.AtLeast(1),
+							},
 						},
 						"api_type": schema.StringAttribute{
 							Description: "Wasm API type",

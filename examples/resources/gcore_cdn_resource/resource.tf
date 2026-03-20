@@ -97,6 +97,10 @@ resource "gcore_cdn_resource" "example_cdn_resource" {
       enabled = false
       value = false
     }
+    grpc_passthrough = {
+      enabled = true
+      value = true
+    }
     gzip_on = {
       enabled = true
       value = true

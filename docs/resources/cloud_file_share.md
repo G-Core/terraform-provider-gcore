@@ -1,5 +1,5 @@
 ---
-page_title: "gcore_cloud_file_share Resource - gcore"
+page_title: "gcore_cloud_file_share Resource - Gcore"
 subcategory: ""
 description: |-
   File shares provide NFS-based shared storage that can be mounted by virtual machines and Kubernetes clusters for persistent data.

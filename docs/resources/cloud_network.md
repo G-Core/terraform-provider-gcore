@@ -1,5 +1,5 @@
 ---
-page_title: "gcore_cloud_network Resource - gcore"
+page_title: "gcore_cloud_network Resource - Gcore"
 subcategory: ""
 description: |-
   Networks provide software-defined networking infrastructure for connecting instances and other cloud resources within a region.
@@ -22,7 +22,6 @@ resource "gcore_cloud_network" "network" {
   region_id     = 1
   name          = "my-network"
   type          = "vxlan"
-  create_router = true
   tags = {
     environment = "production"
   }
@@ -48,7 +47,6 @@ resource "gcore_cloud_network_subnet" "subnet" {
 
 ### Optional
 
-- `create_router` (Boolean) Defaults to True
 - `project_id` (Number) Project ID
 - `region_id` (Number) Region ID
 - `tags` (Map of String) Key-value tags to associate with the resource. A tag is a key-value pair that can be associated with a resource, enabling efficient filtering and grouping for better organization and management. Both tag keys and values have a maximum length of 255 characters. Some tags are read-only and cannot be modified by the user. Tags are also integrated with cost reports, allowing cost data to be filtered based on tag keys or values.

@@ -33,7 +33,6 @@ type CloudReservedFixedIPDataSourceModel struct {
 	AllowedAddressPairs customfield.NestedObjectList[CloudReservedFixedIPAllowedAddressPairsDataSourceModel] `tfsdk:"allowed_address_pairs" json:"allowed_address_pairs,computed"`
 	Attachments         customfield.NestedObjectList[CloudReservedFixedIPAttachmentsDataSourceModel]         `tfsdk:"attachments" json:"attachments,computed"`
 	Network             customfield.NestedObject[CloudReservedFixedIPNetworkDataSourceModel]                 `tfsdk:"network" json:"network,computed"`
-	Reservation         customfield.NestedObject[CloudReservedFixedIPReservationDataSourceModel]             `tfsdk:"reservation" json:"reservation,computed"`
 }
 
 func (m *CloudReservedFixedIPDataSourceModel) toReadParams(_ context.Context) (params cloud.ReservedFixedIPGetParams, diags diag.Diagnostics) {
@@ -83,10 +82,4 @@ type CloudReservedFixedIPNetworkTagsDataSourceModel struct {
 	Key      types.String `tfsdk:"key" json:"key,computed"`
 	ReadOnly types.Bool   `tfsdk:"read_only" json:"read_only,computed"`
 	Value    types.String `tfsdk:"value" json:"value,computed"`
-}
-
-type CloudReservedFixedIPReservationDataSourceModel struct {
-	ResourceID   types.String `tfsdk:"resource_id" json:"resource_id,computed"`
-	ResourceType types.String `tfsdk:"resource_type" json:"resource_type,computed"`
-	Status       types.String `tfsdk:"status" json:"status,computed"`
 }

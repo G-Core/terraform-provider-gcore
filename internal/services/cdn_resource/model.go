@@ -20,8 +20,8 @@ type CDNResourceModel struct {
 	PrimaryResource      types.Int64                                       `tfsdk:"primary_resource" json:"primary_resource,optional"`
 	WaapAPIDomainEnabled types.Bool                                        `tfsdk:"waap_api_domain_enabled" json:"waap_api_domain_enabled,optional,no_refresh"`
 	Origin               types.String                                      `tfsdk:"origin" json:"origin,computed_optional,no_refresh"`
-	Description          types.String                                      `tfsdk:"description" json:"description,computed_optional"`
 	Active               types.Bool                                        `tfsdk:"active" json:"active,computed_optional"`
+	Description          types.String                                      `tfsdk:"description" json:"description,computed_optional"`
 	Name                 types.String                                      `tfsdk:"name" json:"name,computed_optional"`
 	OriginGroup          types.Int64                                       `tfsdk:"origin_group" json:"originGroup,computed_optional"`
 	OriginProtocol       types.String                                      `tfsdk:"origin_protocol" json:"originProtocol,computed_optional"`
@@ -72,6 +72,7 @@ type CDNResourceOptionsModel struct {
 	FollowOriginRedirect        customfield.NestedObject[CDNResourceOptionsFollowOriginRedirectModel]        `tfsdk:"follow_origin_redirect" json:"follow_origin_redirect,computed_optional"`
 	ForceReturn                 customfield.NestedObject[CDNResourceOptionsForceReturnModel]                 `tfsdk:"force_return" json:"force_return,computed_optional"`
 	ForwardHostHeader           customfield.NestedObject[CDNResourceOptionsForwardHostHeaderModel]           `tfsdk:"forward_host_header" json:"forward_host_header,computed_optional"`
+	GrpcPassthrough             customfield.NestedObject[CDNResourceOptionsGrpcPassthroughModel]             `tfsdk:"grpc_passthrough" json:"grpc_passthrough,computed_optional"`
 	GzipOn                      customfield.NestedObject[CDNResourceOptionsGzipOnModel]                      `tfsdk:"gzip_on" json:"gzipOn,computed_optional"`
 	HostHeader                  customfield.NestedObject[CDNResourceOptionsHostHeaderModel]                  `tfsdk:"host_header" json:"hostHeader,computed_optional"`
 	Http3Enabled                customfield.NestedObject[CDNResourceOptionsHttp3EnabledModel]                `tfsdk:"http3_enabled" json:"http3_enabled,computed_optional"`
@@ -310,6 +311,11 @@ type CDNResourceOptionsForceReturnTimeIntervalModel struct {
 }
 
 type CDNResourceOptionsForwardHostHeaderModel struct {
+	Enabled types.Bool `tfsdk:"enabled" json:"enabled,required"`
+	Value   types.Bool `tfsdk:"value" json:"value,required"`
+}
+
+type CDNResourceOptionsGrpcPassthroughModel struct {
 	Enabled types.Bool `tfsdk:"enabled" json:"enabled,required"`
 	Value   types.Bool `tfsdk:"value" json:"value,required"`
 }

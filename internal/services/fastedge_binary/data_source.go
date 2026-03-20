@@ -60,7 +60,7 @@ func (d *FastedgeBinaryDataSource) Read(ctx context.Context, req datasource.Read
 	res := new(http.Response)
 	_, err := d.client.Fastedge.Binaries.Get(
 		ctx,
-		data.ID.ValueInt64(),
+		data.BinaryID.ValueInt64(),
 		option.WithResponseBodyInto(&res),
 		option.WithMiddleware(logging.Middleware(ctx)),
 	)
@@ -74,6 +74,7 @@ func (d *FastedgeBinaryDataSource) Read(ctx context.Context, req datasource.Read
 		resp.Diagnostics.AddError("failed to deserialize http request", err.Error())
 		return
 	}
+	data.ID = data.BinaryID
 
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
 }

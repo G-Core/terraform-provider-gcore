@@ -13,7 +13,6 @@ type CloudNetworkModel struct {
 	ID                  types.String                   `tfsdk:"id" json:"id,computed"`
 	ProjectID           types.Int64                    `tfsdk:"project_id" path:"project_id,optional"`
 	RegionID            types.Int64                    `tfsdk:"region_id" path:"region_id,optional"`
-	CreateRouter        types.Bool                     `tfsdk:"create_router" json:"create_router,computed_optional,no_refresh"`
 	Type                types.String                   `tfsdk:"type" json:"type,computed_optional"`
 	Name                types.String                   `tfsdk:"name" json:"name,required"`
 	Tags                *map[string]types.String       `tfsdk:"tags" json:"tags,optional,no_refresh"`

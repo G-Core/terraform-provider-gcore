@@ -1,5 +1,5 @@
 ---
-page_title: "gcore_cloud_network_router Resource - gcore"
+page_title: "gcore_cloud_network_router Resource - Gcore"
 subcategory: ""
 description: |-
   Routers interconnect subnets and manage network routing, including external gateway connectivity and static routes.

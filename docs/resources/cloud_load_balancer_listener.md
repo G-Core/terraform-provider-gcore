@@ -1,5 +1,5 @@
 ---
-page_title: "gcore_cloud_load_balancer_listener Resource - gcore"
+page_title: "gcore_cloud_load_balancer_listener Resource - Gcore"
 subcategory: ""
 description: |-
   Load balancer listeners handle incoming traffic on specified protocols and ports, forwarding requests to backend pools.
