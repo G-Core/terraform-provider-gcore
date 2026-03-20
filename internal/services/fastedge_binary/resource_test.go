@@ -81,6 +81,29 @@ func TestAccFastedgeBinary_import(t *testing.T) {
 	})
 }
 
+func TestAccFastedgeBinary_dataSource(t *testing.T) {
+	wasmPath := createTestWasmFile(t)
+
+	resource.ParallelTest(t, resource.TestCase{
+		PreCheck:                 func() { acctest.PreCheck(t) },
+		ProtoV6ProviderFactories: acctest.ProtoV6ProviderFactories,
+		CheckDestroy:             testAccCheckFastedgeBinaryDestroy,
+		Steps: []resource.TestStep{
+			{
+				Config: testAccFastedgeBinaryWithDataSourceConfig(wasmPath),
+				ConfigStateChecks: []statecheck.StateCheck{
+					statecheck.ExpectKnownValue("data.gcore_fastedge_binary.test",
+						tfjsonpath.New("id"), knownvalue.NotNull()),
+					statecheck.ExpectKnownValue("data.gcore_fastedge_binary.test",
+						tfjsonpath.New("checksum"), knownvalue.NotNull()),
+					statecheck.ExpectKnownValue("data.gcore_fastedge_binary.test",
+						tfjsonpath.New("status"), knownvalue.NotNull()),
+				},
+			},
+		},
+	})
+}
+
 func testAccCheckFastedgeBinaryDestroy(s *terraform.State) error {
 	return acctest.CheckResourceDestroyed(s, "gcore_fastedge_binary", func(client *gcore.Client, id string) error {
 		idInt, err := strconv.ParseInt(id, 10, 64)
@@ -97,4 +120,16 @@ func testAccFastedgeBinaryConfig(wasmPath string) string {
 resource "gcore_fastedge_binary" "test" {
   filename = %[1]q
 }`, wasmPath)
+}
+
+func testAccFastedgeBinaryWithDataSourceConfig(wasmPath string) string {
+	return fmt.Sprintf(`
+resource "gcore_fastedge_binary" "test" {
+  filename = %[1]q
+}
+
+data "gcore_fastedge_binary" "test" {
+  id = gcore_fastedge_binary.test.id
+}
+`, wasmPath)
 }
