@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 	"log"
-	"time"
 
 	gcorecloud "github.com/G-Core/gcorelabscloud-go"
 	"github.com/G-Core/gcorelabscloud-go/gcore/router/v1/routers"
@@ -12,6 +11,7 @@ import (
 	"github.com/G-Core/gcorelabscloud-go/gcore/task/v1/tasks"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/validation"
 )
 
 const RouterDeleting int = 1200
@@ -41,161 +41,170 @@ func resourceRouter() *schema.Resource {
 		},
 
 		Schema: map[string]*schema.Schema{
-		"project_id": &schema.Schema{
-			Type:        schema.TypeInt,
-			Optional:    true,
-			Description: "The id of the project. Either 'project_id' or 'project_name' must be specified.",
-			ExactlyOneOf: []string{
-				"project_id",
-				"project_name",
+			"project_id": &schema.Schema{
+				Type:        schema.TypeInt,
+				Optional:    true,
+				Description: "The id of the project. Either 'project_id' or 'project_name' must be specified.",
+				ExactlyOneOf: []string{
+					"project_id",
+					"project_name",
+				},
+				DiffSuppressFunc: suppressDiffProjectID,
 			},
-			DiffSuppressFunc: suppressDiffProjectID,
-		},
-		"region_id": &schema.Schema{
-			Type:        schema.TypeInt,
-			Optional:    true,
-			Description: "The id of the region. Either 'region_id' or 'region_name' must be specified.",
-			ExactlyOneOf: []string{
-				"region_id",
-				"region_name",
+			"region_id": &schema.Schema{
+				Type:        schema.TypeInt,
+				Optional:    true,
+				Description: "The id of the region. Either 'region_id' or 'region_name' must be specified.",
+				ExactlyOneOf: []string{
+					"region_id",
+					"region_name",
+				},
+				DiffSuppressFunc: suppressDiffRegionID,
 			},
-			DiffSuppressFunc: suppressDiffRegionID,
-		},
-		"project_name": &schema.Schema{
-			Type:        schema.TypeString,
-			Optional:    true,
-			Description: "The name of the project. Either 'project_id' or 'project_name' must be specified.",
-			ExactlyOneOf: []string{
-				"project_id",
-				"project_name",
+			"project_name": &schema.Schema{
+				Type:        schema.TypeString,
+				Optional:    true,
+				Description: "The name of the project. Either 'project_id' or 'project_name' must be specified.",
+				ExactlyOneOf: []string{
+					"project_id",
+					"project_name",
+				},
 			},
-		},
-		"region_name": &schema.Schema{
-			Type:        schema.TypeString,
-			Optional:    true,
-			Description: "The name of the region. Either 'region_id' or 'region_name' must be specified.",
-			ExactlyOneOf: []string{
-				"region_id",
-				"region_name",
+			"region_name": &schema.Schema{
+				Type:        schema.TypeString,
+				Optional:    true,
+				Description: "The name of the region. Either 'region_id' or 'region_name' must be specified.",
+				ExactlyOneOf: []string{
+					"region_id",
+					"region_name",
+				},
 			},
-		},
-		"name": &schema.Schema{
-			Type:        schema.TypeString,
-			Required:    true,
-			Description: "The name of the router.",
-		},
-		"external_gateway_info": {
-			Type:        schema.TypeList,
-			Optional:    true,
-			Computed:    true,
-			MaxItems:    1,
-			Description: "External gateway configuration for the router.",
-			Elem: &schema.Resource{
-				Schema: map[string]*schema.Schema{
-					"type": {
-						Type:        schema.TypeString,
-						Description: "Must be 'manual' or 'default'",
-						Optional:    true,
-						Computed:    true,
-					},
-					"enable_snat": {
-						Type:        schema.TypeBool,
-						Optional:    true,
-						Computed:    true,
-						Description: "Whether SNAT (Source Network Address Translation) is enabled on the external gateway.",
-					},
-					"network_id": {
-						Type:        schema.TypeString,
-						Description: "Id of the external network",
-						Optional:    true,
-						Computed:    true,
-					},
-					"external_fixed_ips": {
-						Type:        schema.TypeList,
-						Computed:    true,
-						Description: "List of external fixed IPs assigned to the router's gateway.",
-						Elem: &schema.Resource{
-							Schema: map[string]*schema.Schema{
-								"ip_address": {
-									Type:        schema.TypeString,
-									Required:    true,
-									Description: "The external IP address assigned to the router.",
-								},
-								"subnet_id": {
-									Type:        schema.TypeString,
-									Required:    true,
-									Description: "The subnet ID of the external fixed IP.",
+			"name": &schema.Schema{
+				Type:        schema.TypeString,
+				Required:    true,
+				Description: "The name of the router.",
+			},
+			"external_gateway_info": {
+				Type:        schema.TypeList,
+				Optional:    true,
+				Computed:    true,
+				MaxItems:    1,
+				Description: "External gateway configuration for the router.",
+				Elem: &schema.Resource{
+					Schema: map[string]*schema.Schema{
+						"type": {
+							Type:         schema.TypeString,
+							Description:  "Must be 'manual' or 'default'",
+							Optional:     true,
+							Default:      "default",
+							ValidateFunc: validation.StringInSlice([]string{"default", "manual"}, false),
+						},
+						"enable_snat": {
+							Type:        schema.TypeBool,
+							Optional:    true,
+							Computed:    true,
+							Description: "Whether SNAT (Source Network Address Translation) is enabled on the external gateway.",
+						},
+						"network_id": {
+							Type:        schema.TypeString,
+							Description: "Id of the external network",
+							Optional:    true,
+							Computed:    true,
+						},
+						"external_fixed_ips": {
+							Type:        schema.TypeList,
+							Computed:    true,
+							Description: "List of external fixed IPs assigned to the router's gateway.",
+							Elem: &schema.Resource{
+								Schema: map[string]*schema.Schema{
+									"ip_address": {
+										Type:        schema.TypeString,
+										Required:    true,
+										Description: "The external IP address assigned to the router.",
+									},
+									"subnet_id": {
+										Type:        schema.TypeString,
+										Required:    true,
+										Description: "The subnet ID of the external fixed IP.",
+									},
 								},
 							},
 						},
 					},
 				},
 			},
-		},
-		"interfaces": &schema.Schema{
-			Type:        schema.TypeSet,
-			Optional:    true,
-			Set:         routerInterfaceUniqueID,
-			Description: "Set of interfaces attached to the router. Each interface connects the router to a subnet.",
-			Elem: &schema.Resource{
-				Schema: map[string]*schema.Schema{
-					"type": {
-						Type:        schema.TypeString,
-						Description: "must be 'subnet'",
-						Required:    true,
+			"interfaces": &schema.Schema{
+				Type:        schema.TypeSet,
+				Optional:    true,
+				Set:         routerInterfaceUniqueID,
+				Description: "Set of interfaces attached to the router. Each interface connects the router to a subnet.",
+				Elem: &schema.Resource{
+					Schema: map[string]*schema.Schema{
+						"type": {
+							Type:        schema.TypeString,
+							Description: "must be 'subnet'",
+							Required:    true,
+						},
+						"subnet_id": {
+							Type:        schema.TypeString,
+							Description: "Subnet for router interface must have a gateway IP",
+							Required:    true,
+						},
+						"port_id": {
+							Type:        schema.TypeString,
+							Computed:    true,
+							Description: "The port ID of the router interface.",
+						},
+						"network_id": {
+							Type:        schema.TypeString,
+							Computed:    true,
+							Description: "The network ID the interface is connected to.",
+						},
+						"mac_address": {
+							Type:        schema.TypeString,
+							Computed:    true,
+							Description: "The MAC address of the router interface.",
+						},
+						"ip_address": {
+							Type:        schema.TypeString,
+							Computed:    true,
+							Description: "The IP address assigned to the router interface.",
+						},
 					},
-					"subnet_id": {
-						Type:        schema.TypeString,
-						Description: "Subnet for router interface must have a gateway IP",
-						Required:    true,
-					},
-					"port_id": {
-						Type:        schema.TypeString,
-						Computed:    true,
-						Description: "The port ID of the router interface.",
-					},
-					"network_id": {
-						Type:        schema.TypeString,
-						Computed:    true,
-						Description: "The network ID the interface is connected to.",
-					},
-					"mac_address": {
-						Type:        schema.TypeString,
-						Computed:    true,
-						Description: "The MAC address of the router interface.",
-					},
-					"ip_address": {
-						Type:        schema.TypeString,
-						Computed:    true,
-						Description: "The IP address assigned to the router interface.",
+				},
+			},
+			"routes": &schema.Schema{
+				Type:        schema.TypeList,
+				Optional:    true,
+				Description: "List of custom static routes to be advertised by the router.",
+				Elem: &schema.Resource{
+					Schema: map[string]*schema.Schema{
+						"destination": &schema.Schema{
+							Type:        schema.TypeString,
+							Required:    true,
+							Description: "The CIDR of the destination network.",
+						},
+						"nexthop": &schema.Schema{
+							Type:        schema.TypeString,
+							Required:    true,
+							Description: "IPv4 address to forward traffic to if it's destination IP matches 'destination' CIDR",
+						},
 					},
 				},
 			},
 		},
-		"routes": &schema.Schema{
-			Type:        schema.TypeList,
-			Optional:    true,
-			Description: "List of custom static routes to be advertised by the router.",
-			Elem: &schema.Resource{
-				Schema: map[string]*schema.Schema{
-					"destination": &schema.Schema{
-						Type:        schema.TypeString,
-						Required:    true,
-						Description: "The CIDR of the destination network.",
-					},
-					"nexthop": &schema.Schema{
-						Type:        schema.TypeString,
-						Required:    true,
-						Description: "IPv4 address to forward traffic to if it's destination IP matches 'destination' CIDR",
-					},
-				},
-			},
-		},
-		"last_updated": &schema.Schema{
-			Type:        schema.TypeString,
-			Computed:    true,
-			Description: "The timestamp of the last update.",
-		},
+		CustomizeDiff: func(_ context.Context, diff *schema.ResourceDiff, _ interface{}) error {
+			egi := diff.Get("external_gateway_info").([]interface{})
+			if len(egi) == 0 {
+				return nil
+			}
+			gw := egi[0].(map[string]interface{})
+			gwType, _ := gw["type"].(string)
+			networkID, _ := gw["network_id"].(string)
+			if gwType == "manual" && networkID == "" {
+				return fmt.Errorf("network_id is required when external_gateway_info type is 'manual'")
+			}
+			return nil
 		},
 	}
 }
@@ -222,6 +231,12 @@ func resourceRouterCreate(ctx context.Context, d *schema.ResourceData, m interfa
 			return diag.FromErr(err)
 		}
 		createOpts.ExternalGatewayInfo = gws
+	} else {
+		enableSNat := false
+		createOpts.ExternalGatewayInfo = routers.GatewayInfo{
+			Type:       "default",
+			EnableSNat: &enableSNat,
+		}
 	}
 
 	ifs := d.Get("interfaces").(*schema.Set)
@@ -307,6 +322,8 @@ func resourceRouterRead(ctx context.Context, d *schema.ResourceData, m interface
 				return diag.FromErr(err)
 			}
 			egi["type"] = gws.Type
+		} else {
+			egi["type"] = "default"
 		}
 
 		efip := make([]map[string]string, len(router.ExternalGatewayInfo.ExternalFixedIPs))
@@ -369,7 +386,6 @@ func resourceRouterUpdate(ctx context.Context, d *schema.ResourceData, m interfa
 		updateOpts.Name = d.Get("name").(string)
 	}
 
-	// Only one kind of update is supported when external manual gateway is set.
 	if d.HasChange("external_gateway_info") {
 		egi := d.Get("external_gateway_info")
 		if len(egi.([]interface{})) > 0 {
@@ -377,9 +393,18 @@ func resourceRouterUpdate(ctx context.Context, d *schema.ResourceData, m interfa
 			if err != nil {
 				return diag.FromErr(err)
 			}
-			if gws.Type == "manual" {
-				updateOpts.ExternalGatewayInfo = gws
+			if gws.NetworkID == "" {
+				// Resolve network_id from current state (set by Read from the API response).
+				oldEgi, _ := d.GetChange("external_gateway_info")
+				if oldList := oldEgi.([]interface{}); len(oldList) > 0 {
+					oldGw := oldList[0].(map[string]interface{})
+					if nid, ok := oldGw["network_id"].(string); ok && nid != "" {
+						gws.NetworkID = nid
+					}
+				}
 			}
+			gws.Type = "manual"
+			updateOpts.ExternalGatewayInfo = gws
 		}
 	}
 
@@ -438,7 +463,6 @@ func resourceRouterUpdate(ctx context.Context, d *schema.ResourceData, m interfa
 		return diag.FromErr(err)
 	}
 
-	d.Set("last_updated", time.Now().Format(time.RFC850))
 	log.Println("[DEBUG] Finish router updating")
 	return resourceRouterRead(ctx, d, m)
 }
