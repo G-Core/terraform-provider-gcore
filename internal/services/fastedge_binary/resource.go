@@ -100,13 +100,11 @@ func (r *FastedgeBinaryResource) Create(ctx context.Context, req resource.Create
 		return
 	}
 
-	// The Create response (BinaryShort) has the real ID but lacks the source field.
-	// The Get response includes source but returns id=0 (API quirk).
+	// The Create response (BinaryShort) lacks the source field.
 	// Read the full binary to populate all computed fields.
-	realID := result.ID
 	fullResult, err := r.client.Fastedge.Binaries.Get(
 		ctx,
-		realID,
+		result.ID,
 		option.WithMiddleware(logging.Middleware(ctx)),
 	)
 	if err != nil {
@@ -118,9 +116,6 @@ func (r *FastedgeBinaryResource) Create(ctx context.Context, req resource.Create
 		resp.Diagnostics.AddError("failed to deserialize http request", err.Error())
 		return
 	}
-
-	// ID is not in json tags (API returns id=0 in Get), set from Create response
-	data.ID = types.Int64Value(realID)
 
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
 }
@@ -161,14 +156,11 @@ func (r *FastedgeBinaryResource) Read(ctx context.Context, req resource.ReadRequ
 		return
 	}
 
-	// ID is not in json tags (API returns id=0 in Get), preserve from state
-	id := data.ID
 	err = apijson.UnmarshalComputed([]byte(result.RawJSON()), &data)
 	if err != nil {
 		resp.Diagnostics.AddError("failed to deserialize http request", err.Error())
 		return
 	}
-	data.ID = id
 
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
 }
@@ -230,9 +222,6 @@ func (r *FastedgeBinaryResource) ImportState(ctx context.Context, req resource.I
 		resp.Diagnostics.AddError("failed to deserialize http request", err.Error())
 		return
 	}
-
-	// ID is not in json tags (API returns id=0 in Get), set from import path
-	data.ID = types.Int64Value(path)
 
 	// Filename is unknown after import - user must provide it
 	data.Filename = types.StringNull()
