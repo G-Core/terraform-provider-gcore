@@ -40,7 +40,7 @@ type CloudGPUBaremetalClusterServersSettingsModel struct {
 	Credentials    *CloudGPUBaremetalClusterServersSettingsCredentialsModel                                 `tfsdk:"credentials" json:"credentials,optional,no_refresh"`
 	FileShares     customfield.NestedObjectList[CloudGPUBaremetalClusterServersSettingsFileSharesModel]     `tfsdk:"file_shares" json:"file_shares,computed_optional"`
 	SecurityGroups customfield.NestedObjectList[CloudGPUBaremetalClusterServersSettingsSecurityGroupsModel] `tfsdk:"security_groups" json:"security_groups,computed_optional"`
-	UserData       types.String                                                                             `tfsdk:"user_data" json:"user_data,computed_optional"`
+	UserData       types.String                                                                             `tfsdk:"user_data" json:"user_data,computed_optional,no_refresh"`
 }
 
 type CloudGPUBaremetalClusterServersSettingsInterfacesModel struct {
@@ -57,9 +57,10 @@ type CloudGPUBaremetalClusterServersSettingsInterfacesFloatingIPModel struct {
 }
 
 type CloudGPUBaremetalClusterServersSettingsCredentialsModel struct {
-	Password   types.String `tfsdk:"password" json:"password,optional"`
-	SSHKeyName types.String `tfsdk:"ssh_key_name" json:"ssh_key_name,optional"`
-	Username   types.String `tfsdk:"username" json:"username,optional"`
+	Password          types.String `tfsdk:"password_wo" json:"password,optional,no_refresh"`
+	SSHKeyName        types.String `tfsdk:"ssh_key_name" json:"ssh_key_name,optional"`
+	Username          types.String `tfsdk:"username" json:"username,optional"`
+	PasswordWoVersion types.Int64  `tfsdk:"password_wo_version"`
 }
 
 type CloudGPUBaremetalClusterServersSettingsFileSharesModel struct {

@@ -6,12 +6,10 @@ import (
 	"context"
 
 	"github.com/G-Core/terraform-provider-gcore/internal/customfield"
-	t "github.com/G-Core/terraform-provider-gcore/internal/types"
+	"github.com/G-Core/terraform-provider-gcore/internal/planmodifiers"
 	"github.com/hashicorp/terraform-plugin-framework-timetypes/timetypes"
 	"github.com/hashicorp/terraform-plugin-framework-validators/int64validator"
 	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
-	"github.com/hashicorp/terraform-plugin-framework/attr"
-	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/booldefault"
@@ -244,7 +242,7 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 						PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
 					},
 				},
-				PlanModifiers: []planmodifier.Object{serversSettingsRequiresReplaceModifier{}},
+				PlanModifiers: []planmodifier.Object{planmodifiers.RequiresReplaceOnConfigChange()},
 			},
 			"name": schema.StringAttribute{
 				Description: "Cluster name",
@@ -289,7 +287,7 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 				Computed:      true,
 				CustomType:    customfield.NewListType[types.String](ctx),
 				ElementType:   types.StringType,
-				PlanModifiers: []planmodifier.List{serversIDsPlanModifier{}},
+				PlanModifiers: []planmodifier.List{planmodifiers.UseStateUnlessCountChanges("servers_count")},
 			},
 		},
 	}
@@ -388,145 +386,4 @@ func (v credentialsValidator) ValidateObject(_ context.Context, req validator.Ob
 			"When using 'password_wo', you must also provide 'password_wo_version'. This field is used to track password changes since write-only fields are not stored in state.",
 		)
 	}
-}
-
-// serversIDsPlanModifier preserves the state value for servers_ids unless:
-// - The resource is being created (no prior state)
-// - The resource is being replaced (id becomes unknown)
-// - The servers_count attribute is changing (which affects servers_ids)
-type serversIDsPlanModifier struct{}
-
-func (m serversIDsPlanModifier) Description(_ context.Context) string {
-	return "Preserves state value unless resource is replaced or servers_count changes"
-}
-
-func (m serversIDsPlanModifier) MarkdownDescription(_ context.Context) string {
-	return "Preserves state value unless resource is replaced or servers_count changes"
-}
-
-func (m serversIDsPlanModifier) PlanModifyList(ctx context.Context, req planmodifier.ListRequest, resp *planmodifier.ListResponse) {
-	// If there's no state (new resource), nothing to preserve
-	if req.State.Raw.IsNull() {
-		return
-	}
-
-	// If the planned value is already known, don't override it
-	if !resp.PlanValue.IsUnknown() {
-		return
-	}
-
-	// Check if the resource is being replaced by checking if id is becoming unknown
-	var planID types.String
-	resp.Diagnostics.Append(req.Plan.GetAttribute(ctx, path.Root("id"), &planID)...)
-	if resp.Diagnostics.HasError() {
-		return
-	}
-	if planID.IsUnknown() {
-		// Resource is being replaced, don't preserve state
-		return
-	}
-
-	// Check if servers_count is changing
-	var stateServersCount, planServersCount types.Int64
-	resp.Diagnostics.Append(req.State.GetAttribute(ctx, path.Root("servers_count"), &stateServersCount)...)
-	resp.Diagnostics.Append(req.Plan.GetAttribute(ctx, path.Root("servers_count"), &planServersCount)...)
-	if resp.Diagnostics.HasError() {
-		return
-	}
-	if !stateServersCount.Equal(planServersCount) {
-		// servers_count is changing, servers_ids will change too
-		return
-	}
-
-	// Safe to preserve state value
-	resp.PlanValue = req.StateValue
-}
-
-// serversSettingsRequiresReplaceModifier triggers replacement only when user-specified fields change,
-// ignoring computed fields that may show as unknown during planning.
-type serversSettingsRequiresReplaceModifier struct{}
-
-func (m serversSettingsRequiresReplaceModifier) Description(_ context.Context) string {
-	return "Requires replacement only when user-specified server settings change"
-}
-
-func (m serversSettingsRequiresReplaceModifier) MarkdownDescription(_ context.Context) string {
-	return "Requires replacement only when user-specified server settings change"
-}
-
-func (m serversSettingsRequiresReplaceModifier) PlanModifyObject(ctx context.Context, req planmodifier.ObjectRequest, resp *planmodifier.ObjectResponse) {
-	// If there's no state (new resource), no replacement needed
-	if req.StateValue.IsNull() || req.StateValue.IsUnknown() {
-		return
-	}
-
-	// If config is null but state exists, resource is being removed
-	if req.ConfigValue.IsNull() {
-		return
-	}
-
-	// Compare config value with state value to determine if user-specified fields changed.
-	// We compare config (what user wrote) vs state (what was applied), not plan vs state,
-	// because plan may have computed fields marked as unknown.
-	// Use deep comparison that only checks fields explicitly set in config.
-	if configValuesChangedFromState(req.ConfigValue, req.StateValue) {
-		resp.RequiresReplace = true
-	}
-}
-
-// configValuesChangedFromState performs a deep comparison between config and state values,
-// only checking fields that are explicitly set in config (not null/unknown).
-// This allows computed fields in state to differ without triggering replacement.
-func configValuesChangedFromState(configVal, stateVal attr.Value) bool {
-	// If config value is null or unknown, consider it unchanged (computed field)
-	if configVal.IsNull() || configVal.IsUnknown() {
-		return false
-	}
-
-	// If state is null but config is not, something changed
-	if stateVal.IsNull() {
-		return true
-	}
-
-	// Handle objects/maps - compare only attributes present in config
-	if ok, configAttrs := t.ChildAttributes(configVal); ok {
-		if ok, stateAttrs := t.ChildAttributes(stateVal); ok {
-			for field, configFieldVal := range configAttrs {
-				// Skip fields not specified in config
-				if configFieldVal.IsNull() || configFieldVal.IsUnknown() {
-					continue
-				}
-
-				stateFieldVal, exists := stateAttrs[field]
-				if !exists {
-					return true
-				}
-
-				if configValuesChangedFromState(configFieldVal, stateFieldVal) {
-					return true
-				}
-			}
-			return false
-		}
-		return true
-	}
-
-	// Handle lists/tuples/sets - compare elements by index
-	if ok, configElems := t.ChildItems(configVal); ok {
-		if ok, stateElems := t.ChildItems(stateVal); ok {
-			if len(configElems) != len(stateElems) {
-				return true
-			}
-			for i, configElem := range configElems {
-				if configValuesChangedFromState(configElem, stateElems[i]) {
-					return true
-				}
-			}
-			return false
-		}
-		return true
-	}
-
-	// For primitive types, use direct comparison
-	return !configVal.Equal(stateVal)
 }

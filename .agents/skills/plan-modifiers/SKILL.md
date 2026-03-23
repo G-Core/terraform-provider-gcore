@@ -45,6 +45,8 @@ Cover at minimum:
 | `ObjectPreserveNullState()` | Object | Preserves null state when plan unknown; does not compute when neither config nor state specifies the object |
 | `StringRequiresReplaceIfConfiguredPreservingState()` | String | Import-safe replacement: requires replace only when both config and state have known values that differ. Skips replacement when state is null (e.g., after importing a resource with a write-only field like `origin` that the API doesn't return in GET responses) |
 | `SetSuppressServerAdditions()` | Set | Suppresses drift when the API enriches a user-provided set with server-managed elements. If every config element exists in state and state has more, uses state value |
+| `UseStateUnlessCountChanges(countAttr)` | List | Preserves list state unless resource replaced or specified count attr changes |
+| `RequiresReplaceOnConfigChange()` | Object | Requires replace only when user-specified config fields change (ignores computed) |
 
 ## Resource-Specific Modifier Inventory
 
@@ -54,6 +56,4 @@ Cover at minimum:
 | `ComputedIfPortSet` | String | `cloud_floating_ip/plan_modifiers.go` |
 | `authenticationRemovalPlanModifier` | Object | `cloud_k8s_cluster/plan_modifiers.go` |
 | `poolsNormalizeOrderPlanModifier` | List | `cloud_k8s_cluster/plan_modifiers.go` |
-| `serversIDsPlanModifier` | List | `cloud_gpu_virtual_cluster/plan_modifiers.go` |
-| `serversSettingsRequiresReplaceModifier` | Object | `cloud_gpu_virtual_cluster/plan_modifiers.go` |
 | `NormalizeDynamicPlanModifier` | Dynamic | `internal/customfield/dynamic.go` (exception) |
