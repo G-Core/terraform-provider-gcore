@@ -17,6 +17,7 @@ import (
 	"github.com/G-Core/terraform-provider-gcore/internal/services/cloud_file_share"
 	"github.com/G-Core/terraform-provider-gcore/internal/services/cloud_file_share_access_rule"
 	"github.com/G-Core/terraform-provider-gcore/internal/services/cloud_floating_ip"
+	"github.com/G-Core/terraform-provider-gcore/internal/services/cloud_gpu_baremetal_cluster"
 	"github.com/G-Core/terraform-provider-gcore/internal/services/cloud_gpu_baremetal_cluster_image"
 	"github.com/G-Core/terraform-provider-gcore/internal/services/cloud_gpu_virtual_cluster"
 	"github.com/G-Core/terraform-provider-gcore/internal/services/cloud_gpu_virtual_cluster_image"
@@ -217,6 +218,7 @@ func (p *GcoreProvider) Resources(ctx context.Context) []func() resource.Resourc
 		cloud_placement_group.NewResource,
 		cloud_file_share.NewResource,
 		cloud_file_share_access_rule.NewResource,
+		cloud_gpu_baremetal_cluster.NewResource,
 		cloud_gpu_baremetal_cluster_image.NewResource,
 		cloud_gpu_virtual_cluster.NewResource,
 		cloud_gpu_virtual_cluster_image.NewResource,
