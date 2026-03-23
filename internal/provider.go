@@ -275,6 +275,8 @@ func (p *GcoreProvider) DataSources(ctx context.Context) []func() datasource.Dat
 		cloud_placement_group.NewCloudPlacementGroupDataSource,
 		cloud_file_share.NewCloudFileShareDataSource,
 		cloud_file_share.NewCloudFileSharesDataSource,
+		cloud_gpu_baremetal_cluster.NewCloudGPUBaremetalClusterDataSource,
+		cloud_gpu_baremetal_cluster.NewCloudGPUBaremetalClustersDataSource,
 		cloud_gpu_baremetal_cluster_image.NewCloudGPUBaremetalClusterImageDataSource,
 		cloud_gpu_virtual_cluster.NewCloudGPUVirtualClusterDataSource,
 		cloud_gpu_virtual_cluster.NewCloudGPUVirtualClustersDataSource,
