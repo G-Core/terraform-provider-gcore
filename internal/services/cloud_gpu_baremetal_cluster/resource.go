@@ -4,6 +4,8 @@ package cloud_gpu_baremetal_cluster
 
 import (
 	"context"
+	"encoding/base64"
+	"encoding/json"
 	"fmt"
 	"io"
 	"net/http"
@@ -13,8 +15,10 @@ import (
 	"github.com/G-Core/gcore-go/option"
 	"github.com/G-Core/gcore-go/packages/param"
 	"github.com/G-Core/terraform-provider-gcore/internal/apijson"
+	"github.com/G-Core/terraform-provider-gcore/internal/customfield"
 	"github.com/G-Core/terraform-provider-gcore/internal/importpath"
 	"github.com/G-Core/terraform-provider-gcore/internal/logging"
+	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 )
@@ -65,6 +69,9 @@ func (r *CloudGPUBaremetalClusterResource) Create(ctx context.Context, req resou
 		return
 	}
 
+	// Preserve servers_settings from config (for no_refresh fields like credentials)
+	resp.Diagnostics.Append(req.Config.GetAttribute(ctx, path.Root("servers_settings"), &data.ServersSettings)...)
+
 	params := cloud.GPUBaremetalClusterNewParams{}
 
 	if !data.ProjectID.IsNull() {
@@ -80,20 +87,17 @@ func (r *CloudGPUBaremetalClusterResource) Create(ctx context.Context, req resou
 		resp.Diagnostics.AddError("failed to serialize http request", err.Error())
 		return
 	}
-	res := new(http.Response)
-	_, err = r.client.Cloud.GPUBaremetal.Clusters.New(
+	cluster, err := r.client.Cloud.GPUBaremetal.Clusters.NewAndPoll(
 		ctx,
 		params,
 		option.WithRequestBody("application/json", dataBytes),
-		option.WithResponseBodyInto(&res),
 		option.WithMiddleware(logging.Middleware(ctx)),
 	)
 	if err != nil {
 		resp.Diagnostics.AddError("failed to make http request", err.Error())
 		return
 	}
-	bytes, _ := io.ReadAll(res.Body)
-	err = apijson.UnmarshalComputed(bytes, &data)
+	err = apijson.UnmarshalComputed([]byte(cluster.RawJSON()), &data)
 	if err != nil {
 		resp.Diagnostics.AddError("failed to deserialize http request", err.Error())
 		return
@@ -119,42 +123,161 @@ func (r *CloudGPUBaremetalClusterResource) Update(ctx context.Context, req resou
 		return
 	}
 
-	params := cloud.GPUBaremetalClusterUpdateParams{}
+	stateHasChanged := false
 
-	if !data.ProjectID.IsNull() {
-		params.ProjectID = param.NewOpt(data.ProjectID.ValueInt64())
+	// Check if name or tags have changed.
+	// Skip unknown values — they indicate computed fields, not user changes.
+	nameChanged := !data.Name.IsUnknown() && !data.Name.Equal(state.Name)
+	tagsChanged := !data.Tags.IsUnknown() && !data.Tags.Equal(state.Tags)
+
+	if nameChanged || tagsChanged {
+		params := cloud.GPUBaremetalClusterUpdateParams{}
+		if !data.ProjectID.IsNull() {
+			params.ProjectID = param.NewOpt(data.ProjectID.ValueInt64())
+		}
+		if !data.RegionID.IsNull() {
+			params.RegionID = param.NewOpt(data.RegionID.ValueInt64())
+		}
+		// Build a model that only differs from state in name/tags, so
+		// MarshalJSONForUpdate produces a patch with only those fields.
+		updateData := *state
+		updateData.Name = data.Name
+		updateData.Tags = data.Tags
+		dataBytes, err := updateData.MarshalJSONForUpdate(*state)
+		if err != nil {
+			resp.Diagnostics.AddError("failed to serialize http request", err.Error())
+			return
+		}
+		res := new(http.Response)
+		_, err = r.client.Cloud.GPUBaremetal.Clusters.Update(
+			ctx,
+			data.ID.ValueString(),
+			params,
+			option.WithRequestBody("application/json", dataBytes),
+			option.WithResponseBodyInto(&res),
+			option.WithMiddleware(logging.Middleware(ctx)),
+		)
+		if err != nil {
+			resp.Diagnostics.AddError("failed to make http request", err.Error())
+			return
+		}
+		bytes, _ := io.ReadAll(res.Body)
+		err = apijson.UnmarshalComputed(bytes, &data)
+		if err != nil {
+			resp.Diagnostics.AddError("failed to deserialize http request", err.Error())
+			return
+		}
+		stateHasChanged = true
 	}
 
-	if !data.RegionID.IsNull() {
-		params.RegionID = param.NewOpt(data.RegionID.ValueInt64())
+	// Check if servers count has changed
+	if !data.ServersCount.IsNull() && data.ServersCount.ValueInt64() != state.ServersCount.ValueInt64() {
+		params := cloud.GPUBaremetalClusterResizeParams{
+			InstancesCount: data.ServersCount.ValueInt64(),
+		}
+		if !data.ProjectID.IsNull() {
+			params.ProjectID = param.NewOpt(data.ProjectID.ValueInt64())
+		}
+		if !data.RegionID.IsNull() {
+			params.RegionID = param.NewOpt(data.RegionID.ValueInt64())
+		}
+		cluster, err := r.client.Cloud.GPUBaremetal.Clusters.ResizeAndPoll(
+			ctx,
+			data.ID.ValueString(),
+			params,
+			option.WithMiddleware(logging.Middleware(ctx)),
+		)
+		if err != nil {
+			resp.Diagnostics.AddError("failed to make http request", err.Error())
+			return
+		}
+		err = apijson.UnmarshalComputed([]byte(cluster.RawJSON()), &data)
+		if err != nil {
+			resp.Diagnostics.AddError("failed to deserialize http request", err.Error())
+			return
+		}
+		stateHasChanged = true
 	}
 
-	dataBytes, err := data.MarshalJSONForUpdate(*state)
-	if err != nil {
-		resp.Diagnostics.AddError("failed to serialize http request", err.Error())
-		return
+	// Check if server settings that require UpdateServersSettings + Rebuild have changed
+	// (image_id, credentials, user_data)
+	imageChanged := !data.ImageID.IsNull() && data.ImageID.ValueString() != state.ImageID.ValueString()
+	credentialsChanged := false
+	if data.ServersSettings != nil && data.ServersSettings.Credentials != nil {
+		if state.ServersSettings == nil || state.ServersSettings.Credentials == nil {
+			credentialsChanged = true
+		} else {
+			credentialsChanged = !data.ServersSettings.Credentials.SSHKeyName.Equal(state.ServersSettings.Credentials.SSHKeyName) ||
+				!data.ServersSettings.Credentials.Username.Equal(state.ServersSettings.Credentials.Username) ||
+				!data.ServersSettings.Credentials.PasswordWoVersion.Equal(state.ServersSettings.Credentials.PasswordWoVersion)
+		}
 	}
-	res := new(http.Response)
-	_, err = r.client.Cloud.GPUBaremetal.Clusters.Update(
-		ctx,
-		data.ID.ValueString(),
-		params,
-		option.WithRequestBody("application/json", dataBytes),
-		option.WithResponseBodyInto(&res),
-		option.WithMiddleware(logging.Middleware(ctx)),
-	)
-	if err != nil {
-		resp.Diagnostics.AddError("failed to make http request", err.Error())
-		return
-	}
-	bytes, _ := io.ReadAll(res.Body)
-	err = apijson.UnmarshalComputed(bytes, &data)
-	if err != nil {
-		resp.Diagnostics.AddError("failed to deserialize http request", err.Error())
-		return
+	userDataChanged := false
+	if data.ServersSettings != nil && state.ServersSettings != nil {
+		userDataChanged = !data.ServersSettings.UserData.Equal(state.ServersSettings.UserData)
 	}
 
-	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
+	if imageChanged || credentialsChanged || userDataChanged {
+		updateParams := cloud.GPUBaremetalClusterUpdateServersSettingsParams{}
+		if !data.ProjectID.IsNull() {
+			updateParams.ProjectID = param.NewOpt(data.ProjectID.ValueInt64())
+		}
+		if !data.RegionID.IsNull() {
+			updateParams.RegionID = param.NewOpt(data.RegionID.ValueInt64())
+		}
+		if imageChanged {
+			updateParams.ImageID = param.NewOpt(data.ImageID.ValueString())
+		}
+		if data.ServersSettings != nil && data.ServersSettings.Credentials != nil {
+			creds := data.ServersSettings.Credentials
+			if !creds.SSHKeyName.IsNull() {
+				updateParams.ServersSettings.Credentials.SSHKeyName = param.NewOpt(creds.SSHKeyName.ValueString())
+			}
+		}
+		if data.ServersSettings != nil && !data.ServersSettings.UserData.IsNull() && !data.ServersSettings.UserData.IsUnknown() {
+			updateParams.ServersSettings.UserData = param.NewOpt(data.ServersSettings.UserData.ValueString())
+		}
+
+		_, err := r.client.Cloud.GPUBaremetal.Clusters.UpdateServersSettings(
+			ctx,
+			data.ID.ValueString(),
+			updateParams,
+			option.WithMiddleware(logging.Middleware(ctx)),
+		)
+		if err != nil {
+			resp.Diagnostics.AddError("failed to make http request", err.Error())
+			return
+		}
+
+		// Rebuild to apply changes to existing servers
+		rebuildParams := cloud.GPUBaremetalClusterRebuildParams{}
+		if !data.ProjectID.IsNull() {
+			rebuildParams.ProjectID = param.NewOpt(data.ProjectID.ValueInt64())
+		}
+		if !data.RegionID.IsNull() {
+			rebuildParams.RegionID = param.NewOpt(data.RegionID.ValueInt64())
+		}
+		cluster, err := r.client.Cloud.GPUBaremetal.Clusters.RebuildAndPoll(
+			ctx,
+			data.ID.ValueString(),
+			rebuildParams,
+			option.WithMiddleware(logging.Middleware(ctx)),
+		)
+		if err != nil {
+			resp.Diagnostics.AddError("failed to make http request", err.Error())
+			return
+		}
+		err = apijson.UnmarshalComputed([]byte(cluster.RawJSON()), &data)
+		if err != nil {
+			resp.Diagnostics.AddError("failed to deserialize http request", err.Error())
+			return
+		}
+		stateHasChanged = true
+	}
+
+	if stateHasChanged {
+		resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
+	}
 }
 
 func (r *CloudGPUBaremetalClusterResource) Read(ctx context.Context, req resource.ReadRequest, resp *resource.ReadResponse) {
@@ -222,7 +345,7 @@ func (r *CloudGPUBaremetalClusterResource) Delete(ctx context.Context, req resou
 		params.RegionID = param.NewOpt(data.RegionID.ValueInt64())
 	}
 
-	_, err := r.client.Cloud.GPUBaremetal.Clusters.Delete(
+	err := r.client.Cloud.GPUBaremetal.Clusters.DeleteAndPoll(
 		ctx,
 		data.ID.ValueString(),
 		params,
@@ -232,8 +355,6 @@ func (r *CloudGPUBaremetalClusterResource) Delete(ctx context.Context, req resou
 		resp.Diagnostics.AddError("failed to make http request", err.Error())
 		return
 	}
-
-	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
 }
 
 func (r *CloudGPUBaremetalClusterResource) ImportState(ctx context.Context, req resource.ImportStateRequest, resp *resource.ImportStateResponse) {
@@ -278,6 +399,49 @@ func (r *CloudGPUBaremetalClusterResource) ImportState(ctx context.Context, req 
 	if err != nil {
 		resp.Diagnostics.AddError("failed to deserialize http request", err.Error())
 		return
+	}
+
+	// Workaround: Fields with no_refresh tag are skipped during Unmarshal.
+	// For import, we need to manually extract these from the raw API response.
+	var rawResponse struct {
+		Tags []struct {
+			Key   string `json:"key"`
+			Value string `json:"value"`
+		} `json:"tags"`
+		ServersSettings struct {
+			UserData   string `json:"user_data"`
+			SSHKeyName string `json:"ssh_key_name"`
+			Username   string `json:"username"`
+		} `json:"servers_settings"`
+	}
+	if err := json.Unmarshal(bytes, &rawResponse); err == nil {
+		// tags: API returns array of {key, value} objects, but model expects map[string]string.
+		if len(rawResponse.Tags) > 0 {
+			tagsMap := make(map[string]types.String, len(rawResponse.Tags))
+			for _, tag := range rawResponse.Tags {
+				tagsMap[tag.Key] = types.StringValue(tag.Value)
+			}
+			data.Tags = customfield.NewMapMust[types.String](ctx, tagsMap)
+		}
+
+		// user_data: API returns plain text, but users send base64 encoded.
+		// Encode the API response so state matches what config would produce.
+		if rawResponse.ServersSettings.UserData != "" && data.ServersSettings != nil {
+			encoded := base64.StdEncoding.EncodeToString([]byte(rawResponse.ServersSettings.UserData))
+			data.ServersSettings.UserData = types.StringValue(encoded)
+		}
+
+		// credentials: API returns ssh_key_name and username at servers_settings level,
+		// but model expects them under credentials. password is write-only and not returned.
+		if (rawResponse.ServersSettings.SSHKeyName != "" || rawResponse.ServersSettings.Username != "") && data.ServersSettings != nil {
+			data.ServersSettings.Credentials = &CloudGPUBaremetalClusterServersSettingsCredentialsModel{}
+			if rawResponse.ServersSettings.SSHKeyName != "" {
+				data.ServersSettings.Credentials.SSHKeyName = types.StringValue(rawResponse.ServersSettings.SSHKeyName)
+			}
+			if rawResponse.ServersSettings.Username != "" {
+				data.ServersSettings.Credentials.Username = types.StringValue(rawResponse.ServersSettings.Username)
+			}
+		}
 	}
 
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
