@@ -839,10 +839,10 @@ func DataSourceSchema(ctx context.Context) schema.Schema {
 								Description: "Controls the option state.\n\nPossible values:\n- **true** - Option is enabled.\n- **false** - Option is disabled.",
 								Computed:    true,
 							},
-							"value": schema.ListAttribute{
+							"value": schema.SetAttribute{
 								Description: "List of query parameters.",
 								Computed:    true,
-								CustomType:  customfield.NewListType[types.String](ctx),
+								CustomType:  customfield.NewSetType[types.String](ctx),
 								ElementType: types.StringType,
 							},
 						},
