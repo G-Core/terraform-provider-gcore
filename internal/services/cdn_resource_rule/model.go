@@ -275,8 +275,8 @@ type CDNResourceRuleOptionsQueryParamsBlacklistModel struct {
 }
 
 type CDNResourceRuleOptionsQueryParamsWhitelistModel struct {
-	Enabled types.Bool      `tfsdk:"enabled" json:"enabled,required"`
-	Value   *[]types.String `tfsdk:"value" json:"value,required"`
+	Enabled types.Bool                    `tfsdk:"enabled" json:"enabled,required"`
+	Value   customfield.Set[types.String] `tfsdk:"value" json:"value,required"`
 }
 
 type CDNResourceRuleOptionsQueryStringForwardingModel struct {
