@@ -49,6 +49,7 @@ import (
 	"github.com/G-Core/terraform-provider-gcore/internal/services/fastedge_app"
 	"github.com/G-Core/terraform-provider-gcore/internal/services/fastedge_binary"
 	"github.com/G-Core/terraform-provider-gcore/internal/services/fastedge_secret"
+	"github.com/G-Core/terraform-provider-gcore/internal/services/fastedge_template"
 	"github.com/G-Core/terraform-provider-gcore/internal/services/waap_domain"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
@@ -227,6 +228,7 @@ func (p *GcoreProvider) Resources(ctx context.Context) []func() resource.Resourc
 		cloud_instance_image.NewResource,
 		cloud_k8s_cluster.NewResource,
 		waap_domain.NewResource,
+		fastedge_template.NewResource,
 		fastedge_secret.NewResource,
 		fastedge_binary.NewResource,
 		fastedge_app.NewResource,
@@ -289,6 +291,8 @@ func (p *GcoreProvider) DataSources(ctx context.Context) []func() datasource.Dat
 		cloud_k8s_cluster.NewCloudK8SClusterDataSource,
 		waap_domain.NewWaapDomainDataSource,
 		waap_domain.NewWaapDomainsDataSource,
+		fastedge_template.NewFastedgeTemplateDataSource,
+		fastedge_template.NewFastedgeTemplatesDataSource,
 		fastedge_secret.NewFastedgeSecretDataSource,
 		fastedge_binary.NewFastedgeBinaryDataSource,
 		fastedge_app.NewFastedgeAppDataSource,
