@@ -6,6 +6,7 @@ import (
 	"context"
 
 	"github.com/G-Core/terraform-provider-gcore/internal/customfield"
+	"github.com/G-Core/terraform-provider-gcore/internal/customvalidator"
 	"github.com/G-Core/terraform-provider-gcore/internal/planmodifiers"
 	"github.com/hashicorp/terraform-plugin-framework-timetypes/timetypes"
 	"github.com/hashicorp/terraform-plugin-framework-validators/int64validator"
@@ -179,7 +180,7 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 						Description: "Optional server access credentials",
 						Optional:    true,
 						Validators: []validator.Object{
-							credentialsValidator{},
+							customvalidator.CredentialsValidator{},
 						},
 						Attributes: map[string]schema.Attribute{
 							"password_wo": schema.StringAttribute{
@@ -333,57 +334,5 @@ func (v volumeImageSourceValidator) ValidateList(ctx context.Context, req valida
 				"image_id must be specified when source is 'image'",
 			)
 		}
-	}
-}
-
-type credentialsValidator struct{}
-
-func (v credentialsValidator) Description(_ context.Context) string {
-	return "validates that either ssh_key_name is provided, or both username and password_wo (with password_wo_version) are provided"
-}
-
-func (v credentialsValidator) MarkdownDescription(_ context.Context) string {
-	return "validates that either ssh_key_name is provided, or both username and password_wo (with password_wo_version) are provided"
-}
-
-func (v credentialsValidator) ValidateObject(_ context.Context, req validator.ObjectRequest, resp *validator.ObjectResponse) {
-	if req.ConfigValue.IsNull() || req.ConfigValue.IsUnknown() {
-		return
-	}
-
-	attrs := req.ConfigValue.Attributes()
-
-	sshKeyName := attrs["ssh_key_name"]
-	username := attrs["username"]
-	passwordWo := attrs["password_wo"]
-	passwordWoVersion := attrs["password_wo_version"]
-
-	hasSSHKey := !sshKeyName.IsNull()
-	hasUsername := !username.IsNull()
-	hasPasswordWo := !passwordWo.IsNull()
-	hasPasswordWoVersion := !passwordWoVersion.IsNull()
-
-	// Valid scenarios (mutually exclusive):
-	// 1. Only ssh_key_name is provided (no username or password_wo or password_wo_version)
-	// 2. Only username, password_wo, and password_wo_version are provided together (no ssh_key_name)
-
-	if hasSSHKey && (hasUsername || hasPasswordWo || hasPasswordWoVersion) {
-		resp.Diagnostics.AddAttributeError(
-			req.Path,
-			"Conflicting credentials configuration",
-			"Cannot specify 'ssh_key_name' together with 'username', 'password_wo', or 'password_wo_version'. Only one authentication method can be used.",
-		)
-	} else if !hasSSHKey && !(hasUsername && hasPasswordWo) {
-		resp.Diagnostics.AddAttributeError(
-			req.Path,
-			"Invalid credentials configuration",
-			"Either 'ssh_key_name' must be provided, or both 'username' and 'password_wo' (with 'password_wo_version') must be provided together.",
-		)
-	} else if hasPasswordWo && !hasPasswordWoVersion {
-		resp.Diagnostics.AddAttributeError(
-			req.Path,
-			"Missing password_wo_version",
-			"When using 'password_wo', you must also provide 'password_wo_version'. This field is used to track password changes since write-only fields are not stored in state.",
-		)
 	}
 }
