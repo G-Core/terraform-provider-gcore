@@ -78,8 +78,8 @@ Poll task status until completion (`FINISHED`/`ERROR`) before proceeding with de
 
 Required:
 
-- `destination` (String) CIDR of destination IPv4 subnet.
-- `nexthop` (String) IPv4 address to forward traffic to if it's destination IP matches 'destination' CIDR.
+- `destination` (String) CIDR of destination IPv4 or IPv6 subnet.
+- `nexthop` (String) IPv4 or IPv6 address to forward traffic to if it's destination IP matches 'destination' CIDR.
 
 ## Import
 
