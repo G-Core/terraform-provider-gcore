@@ -238,6 +238,31 @@ func (r *FastedgeTemplateResource) ImportState(ctx context.Context, req resource
 	// The API always returns owned=false; set to true to match the schema default
 	// and avoid unnecessary update plans after import
 	data.Owned = types.BoolValue(true)
+	// Normalize API response values to match Terraform conventions:
+	// - The API returns "" for unset optional strings (metadata, descr),
+	//   but Terraform configs use null when these are not specified.
+	// - The API returns null for empty params array, but Terraform uses [].
+	// Without this, import causes drift (see GCLOUD2-23812).
+	if data.Params == nil {
+		emptyParams := make([]*FastedgeTemplateParamsModel, 0)
+		data.Params = &emptyParams
+	} else {
+		for _, p := range *data.Params {
+			if p.Metadata.ValueString() == "" {
+				p.Metadata = types.StringNull()
+			}
+			if p.Descr.ValueString() == "" {
+				p.Descr = types.StringNull()
+			}
+		}
+	}
+	// Also normalize top-level optional strings
+	if data.ShortDescr.ValueString() == "" {
+		data.ShortDescr = types.StringNull()
+	}
+	if data.LongDescr.ValueString() == "" {
+		data.LongDescr = types.StringNull()
+	}
 
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
 }
