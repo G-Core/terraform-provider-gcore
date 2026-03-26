@@ -133,16 +133,16 @@ resource "gcore_dns_zone_record" "examplezone_failover" {
   // failover/healthchecks is on rrset meta, not resource record meta
   meta {
     failover {
-      frequency = 300
-      host = "failover.examplezone.com"
+      frequency        = 300
+      host             = "failover.examplezone.com"
       http_status_code = 200
-      method = "GET"
-      port = 80
-      protocol = "HTTP"
-      regexp = ""
-      timeout = 10
-      tls = false
-      url = "/"
+      method           = "GET"
+      port             = 80
+      protocol         = "HTTP"
+      regexp           = ""
+      timeout          = 10
+      tls              = false
+      url              = "/"
     }
   }
 }
@@ -221,10 +221,9 @@ Optional:
 - `cidr_mapping` (String) Cidr mapping rule name of DNS Zone RRSet resource.
 - `failover` (Block Set) Failover meta (eg. {"frequency": 60,"host": "www.gcore.com","http_status_code": null,"method": "GET","port": 80,"protocol": "HTTP","regexp": "","timeout": 10,"tls": false,"url": "/"}). (see [below for nested schema](#nestedblock--meta--failover))
 - `geodns_link` (String) Geodns link (domain, or cl-) of DNS Zone RRSet resource.
-- `healthchecks` (Block Set) **Deprecated:** Use 'failover' instead. This field is deprecated and will be removed in a future version. (see [below for nested schema](#nestedblock--meta--healthchecks))
+- `healthchecks` (Block Set, Deprecated) Failover meta (eg. {"frequency": 60,"host": "www.gcore.com","http_status_code": null,"method": "GET","port": 80,"protocol": "HTTP","regexp": "","timeout": 10,"tls": false,"url": "/"}). (see [below for nested schema](#nestedblock--meta--healthchecks))
 
 <a id="nestedblock--meta--failover"></a>
-
 ### Nested Schema for `meta.failover`
 
 Required:
@@ -244,11 +243,9 @@ Optional:
 - `tls` (Boolean) TLS/HTTPS enabled if protocol=HTTP, must be empty for non-HTTP.
 - `url` (String) URL path to check required if protocol=HTTP, must be empty for non-HTTP.
 
+
 <a id="nestedblock--meta--healthchecks"></a>
-
 ### Nested Schema for `meta.healthchecks`
-
-**Deprecated:** Use 'failover' instead. This field is deprecated and will be removed in a future version.
 
 Required:
 
@@ -266,6 +263,8 @@ Optional:
 - `regexp` (String) HTTP body or response payload to check if protocol<>ICMP, must be empty for ICMP.
 - `tls` (Boolean) TLS/HTTPS enabled if protocol=HTTP, must be empty for non-HTTP.
 - `url` (String) URL path to check required if protocol=HTTP, must be empty for non-HTTP.
+
+
 
 <a id="nestedblock--timeouts"></a>
 ### Nested Schema for `timeouts`
