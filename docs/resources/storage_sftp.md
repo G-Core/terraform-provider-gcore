@@ -29,7 +29,7 @@ resource "gcore_storage_sftp" "example_sftp" {
 
 ### Required
 
-- `location` (String) A location of new storage resource. One of (ams, sin, fra, mia)
+- `location` (String) A location of new storage resource.
 - `name` (String) A name of new storage resource.
 
 ### Optional

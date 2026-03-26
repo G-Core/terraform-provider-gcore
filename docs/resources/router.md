@@ -255,7 +255,6 @@ output "router_id" {
 ### Read-Only
 
 - `id` (String) The ID of this resource.
-- `last_updated` (String) The timestamp of the last update.
 
 <a id="nestedblock--external_gateway_info"></a>
 ### Nested Schema for `external_gateway_info`
