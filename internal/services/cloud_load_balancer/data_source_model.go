@@ -8,7 +8,6 @@ import (
 	"github.com/G-Core/gcore-go/cloud"
 	"github.com/G-Core/gcore-go/packages/param"
 	"github.com/G-Core/terraform-provider-gcore/internal/customfield"
-	"github.com/hashicorp/terraform-plugin-framework-jsontypes/jsontypes"
 	"github.com/hashicorp/terraform-plugin-framework-timetypes/timetypes"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/types"
@@ -35,7 +34,6 @@ type CloudLoadBalancerDataSourceModel struct {
 	VipIPFamily           types.String                                                                 `tfsdk:"vip_ip_family" json:"vip_ip_family,computed"`
 	VipPortID             types.String                                                                 `tfsdk:"vip_port_id" json:"vip_port_id,computed"`
 	AdditionalVips        customfield.NestedObjectList[CloudLoadBalancerAdditionalVipsDataSourceModel] `tfsdk:"additional_vips" json:"additional_vips,computed"`
-	DDOSProfile           customfield.NestedObject[CloudLoadBalancerDDOSProfileDataSourceModel]        `tfsdk:"ddos_profile" json:"ddos_profile,computed"`
 	Flavor                customfield.NestedObject[CloudLoadBalancerFlavorDataSourceModel]             `tfsdk:"flavor" json:"flavor,computed"`
 	FloatingIPs           customfield.NestedObjectList[CloudLoadBalancerFloatingIPsDataSourceModel]    `tfsdk:"floating_ips" json:"floating_ips,computed"`
 	Listeners             customfield.NestedObjectList[CloudLoadBalancerListenersDataSourceModel]      `tfsdk:"listeners" json:"listeners,computed"`
@@ -111,63 +109,6 @@ func (m *CloudLoadBalancerDataSourceModel) toListParams(_ context.Context) (para
 type CloudLoadBalancerAdditionalVipsDataSourceModel struct {
 	IPAddress types.String `tfsdk:"ip_address" json:"ip_address,computed"`
 	SubnetID  types.String `tfsdk:"subnet_id" json:"subnet_id,computed"`
-}
-
-type CloudLoadBalancerDDOSProfileDataSourceModel struct {
-	ID                         types.Int64                                                                          `tfsdk:"id" json:"id,computed"`
-	Fields                     customfield.NestedObjectList[CloudLoadBalancerDDOSProfileFieldsDataSourceModel]      `tfsdk:"fields" json:"fields,computed"`
-	Options                    customfield.NestedObject[CloudLoadBalancerDDOSProfileOptionsDataSourceModel]         `tfsdk:"options" json:"options,computed"`
-	ProfileTemplate            customfield.NestedObject[CloudLoadBalancerDDOSProfileProfileTemplateDataSourceModel] `tfsdk:"profile_template" json:"profile_template,computed"`
-	ProfileTemplateDescription types.String                                                                         `tfsdk:"profile_template_description" json:"profile_template_description,computed"`
-	Protocols                  customfield.NestedObjectList[CloudLoadBalancerDDOSProfileProtocolsDataSourceModel]   `tfsdk:"protocols" json:"protocols,computed"`
-	Site                       types.String                                                                         `tfsdk:"site" json:"site,computed"`
-	Status                     customfield.NestedObject[CloudLoadBalancerDDOSProfileStatusDataSourceModel]          `tfsdk:"status" json:"status,computed"`
-}
-
-type CloudLoadBalancerDDOSProfileFieldsDataSourceModel struct {
-	ID               types.Int64          `tfsdk:"id" json:"id,computed"`
-	BaseField        types.Int64          `tfsdk:"base_field" json:"base_field,computed"`
-	Default          types.String         `tfsdk:"default" json:"default,computed"`
-	Description      types.String         `tfsdk:"description" json:"description,computed"`
-	FieldName        types.String         `tfsdk:"field_name" json:"field_name,computed"`
-	FieldType        types.String         `tfsdk:"field_type" json:"field_type,computed"`
-	FieldValue       jsontypes.Normalized `tfsdk:"field_value" json:"field_value,computed"`
-	Name             types.String         `tfsdk:"name" json:"name,computed"`
-	Required         types.Bool           `tfsdk:"required" json:"required,computed"`
-	ValidationSchema jsontypes.Normalized `tfsdk:"validation_schema" json:"validation_schema,computed"`
-	Value            types.String         `tfsdk:"value" json:"value,computed"`
-}
-
-type CloudLoadBalancerDDOSProfileOptionsDataSourceModel struct {
-	Active types.Bool `tfsdk:"active" json:"active,computed"`
-	Bgp    types.Bool `tfsdk:"bgp" json:"bgp,computed"`
-}
-
-type CloudLoadBalancerDDOSProfileProfileTemplateDataSourceModel struct {
-	ID          types.Int64                                                                                    `tfsdk:"id" json:"id,computed"`
-	Description types.String                                                                                   `tfsdk:"description" json:"description,computed"`
-	Fields      customfield.NestedObjectList[CloudLoadBalancerDDOSProfileProfileTemplateFieldsDataSourceModel] `tfsdk:"fields" json:"fields,computed"`
-	Name        types.String                                                                                   `tfsdk:"name" json:"name,computed"`
-}
-
-type CloudLoadBalancerDDOSProfileProfileTemplateFieldsDataSourceModel struct {
-	ID               types.Int64          `tfsdk:"id" json:"id,computed"`
-	Default          types.String         `tfsdk:"default" json:"default,computed"`
-	Description      types.String         `tfsdk:"description" json:"description,computed"`
-	FieldType        types.String         `tfsdk:"field_type" json:"field_type,computed"`
-	Name             types.String         `tfsdk:"name" json:"name,computed"`
-	Required         types.Bool           `tfsdk:"required" json:"required,computed"`
-	ValidationSchema jsontypes.Normalized `tfsdk:"validation_schema" json:"validation_schema,computed"`
-}
-
-type CloudLoadBalancerDDOSProfileProtocolsDataSourceModel struct {
-	Port      types.String                   `tfsdk:"port" json:"port,computed"`
-	Protocols customfield.List[types.String] `tfsdk:"protocols" json:"protocols,computed"`
-}
-
-type CloudLoadBalancerDDOSProfileStatusDataSourceModel struct {
-	ErrorDescription types.String `tfsdk:"error_description" json:"error_description,computed"`
-	Status           types.String `tfsdk:"status" json:"status,computed"`
 }
 
 type CloudLoadBalancerFlavorDataSourceModel struct {

@@ -788,9 +788,10 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 								Description: "Controls the option state.\n\nPossible values:\n- **true** - Option is enabled.\n- **false** - Option is disabled.",
 								Required:    true,
 							},
-							"value": schema.ListAttribute{
+							"value": schema.SetAttribute{
 								Description: "List of query parameters.",
 								Required:    true,
+								CustomType:  customfield.NewSetType[types.String](ctx),
 								ElementType: types.StringType,
 							},
 						},

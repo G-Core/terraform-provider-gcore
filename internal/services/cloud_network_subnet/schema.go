@@ -92,11 +92,11 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 				NestedObject: schema.NestedAttributeObject{
 					Attributes: map[string]schema.Attribute{
 						"destination": schema.StringAttribute{
-							Description: "CIDR of destination IPv4 subnet.",
+							Description: "CIDR of destination IPv4 or IPv6 subnet.",
 							Required:    true,
 						},
 						"nexthop": schema.StringAttribute{
-							Description: "IPv4 address to forward traffic to if it's destination IP matches 'destination' CIDR.",
+							Description: "IPv4 or IPv6 address to forward traffic to if it's destination IP matches 'destination' CIDR.",
 							Required:    true,
 						},
 					},

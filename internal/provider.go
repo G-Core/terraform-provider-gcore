@@ -13,6 +13,7 @@ import (
 	"github.com/G-Core/terraform-provider-gcore/internal/services/cdn_origin_group"
 	"github.com/G-Core/terraform-provider-gcore/internal/services/cdn_resource"
 	"github.com/G-Core/terraform-provider-gcore/internal/services/cdn_resource_rule"
+	"github.com/G-Core/terraform-provider-gcore/internal/services/cdn_rule_template"
 	"github.com/G-Core/terraform-provider-gcore/internal/services/cdn_trusted_ca_certificate"
 	"github.com/G-Core/terraform-provider-gcore/internal/services/cloud_file_share"
 	"github.com/G-Core/terraform-provider-gcore/internal/services/cloud_file_share_access_rule"
@@ -21,6 +22,7 @@ import (
 	"github.com/G-Core/terraform-provider-gcore/internal/services/cloud_gpu_baremetal_cluster_image"
 	"github.com/G-Core/terraform-provider-gcore/internal/services/cloud_gpu_virtual_cluster"
 	"github.com/G-Core/terraform-provider-gcore/internal/services/cloud_gpu_virtual_cluster_image"
+	"github.com/G-Core/terraform-provider-gcore/internal/services/cloud_inference_flavor"
 	"github.com/G-Core/terraform-provider-gcore/internal/services/cloud_inference_registry_credential"
 	"github.com/G-Core/terraform-provider-gcore/internal/services/cloud_inference_secret"
 	"github.com/G-Core/terraform-provider-gcore/internal/services/cloud_instance"
@@ -48,6 +50,7 @@ import (
 	"github.com/G-Core/terraform-provider-gcore/internal/services/fastedge_app"
 	"github.com/G-Core/terraform-provider-gcore/internal/services/fastedge_binary"
 	"github.com/G-Core/terraform-provider-gcore/internal/services/fastedge_secret"
+	"github.com/G-Core/terraform-provider-gcore/internal/services/fastedge_template"
 	"github.com/G-Core/terraform-provider-gcore/internal/services/waap_domain"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
@@ -226,6 +229,7 @@ func (p *GcoreProvider) Resources(ctx context.Context) []func() resource.Resourc
 		cloud_instance_image.NewResource,
 		cloud_k8s_cluster.NewResource,
 		waap_domain.NewResource,
+		fastedge_template.NewResource,
 		fastedge_secret.NewResource,
 		fastedge_binary.NewResource,
 		fastedge_app.NewResource,
@@ -235,6 +239,7 @@ func (p *GcoreProvider) Resources(ctx context.Context) []func() resource.Resourc
 		cdn_resource.NewResource,
 		cdn_resource_rule.NewResource,
 		cdn_origin_group.NewResource,
+		cdn_rule_template.NewResource,
 		cdn_certificate.NewResource,
 		cdn_trusted_ca_certificate.NewResource,
 	}
@@ -268,6 +273,8 @@ func (p *GcoreProvider) DataSources(ctx context.Context) []func() datasource.Dat
 		cloud_floating_ip.NewCloudFloatingIPsDataSource,
 		cloud_security_group.NewCloudSecurityGroupDataSource,
 		cloud_security_group.NewCloudSecurityGroupsDataSource,
+		cloud_inference_flavor.NewCloudInferenceFlavorDataSource,
+		cloud_inference_flavor.NewCloudInferenceFlavorsDataSource,
 		cloud_inference_registry_credential.NewCloudInferenceRegistryCredentialDataSource,
 		cloud_inference_registry_credential.NewCloudInferenceRegistryCredentialsDataSource,
 		cloud_inference_secret.NewCloudInferenceSecretDataSource,
@@ -287,6 +294,8 @@ func (p *GcoreProvider) DataSources(ctx context.Context) []func() datasource.Dat
 		cloud_k8s_cluster.NewCloudK8SClusterDataSource,
 		waap_domain.NewWaapDomainDataSource,
 		waap_domain.NewWaapDomainsDataSource,
+		fastedge_template.NewFastedgeTemplateDataSource,
+		fastedge_template.NewFastedgeTemplatesDataSource,
 		fastedge_secret.NewFastedgeSecretDataSource,
 		fastedge_binary.NewFastedgeBinaryDataSource,
 		fastedge_app.NewFastedgeAppDataSource,
@@ -297,6 +306,7 @@ func (p *GcoreProvider) DataSources(ctx context.Context) []func() datasource.Dat
 		dns_network_mapping.NewDNSNetworkMappingDataSource,
 		cdn_resource.NewCDNResourceDataSource,
 		cdn_resource_rule.NewCDNResourceRuleDataSource,
+		cdn_rule_template.NewCDNRuleTemplateDataSource,
 		cdn_certificate.NewCDNCertificateDataSource,
 		cdn_trusted_ca_certificate.NewCDNTrustedCaCertificateDataSource,
 	}

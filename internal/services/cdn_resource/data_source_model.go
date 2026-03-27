@@ -304,8 +304,8 @@ type CDNResourceOptionsQueryParamsBlacklistDataSourceModel struct {
 }
 
 type CDNResourceOptionsQueryParamsWhitelistDataSourceModel struct {
-	Enabled types.Bool                     `tfsdk:"enabled" json:"enabled,computed"`
-	Value   customfield.List[types.String] `tfsdk:"value" json:"value,computed"`
+	Enabled types.Bool                    `tfsdk:"enabled" json:"enabled,computed"`
+	Value   customfield.Set[types.String] `tfsdk:"value" json:"value,computed"`
 }
 
 type CDNResourceOptionsQueryStringForwardingDataSourceModel struct {

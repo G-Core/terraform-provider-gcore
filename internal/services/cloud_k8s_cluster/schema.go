@@ -904,7 +904,6 @@ func (m poolsNormalizeOrderModifier) PlanModifyList(ctx context.Context, req pla
 
 	// Index plan pools by name and build ordered list
 	planPoolsByName := make(map[string]types.Object)
-	var planNames []string
 	planNamesSet := make(map[string]bool)
 	for _, elem := range req.PlanValue.Elements() {
 		obj, ok := elem.(types.Object)
@@ -914,7 +913,6 @@ func (m poolsNormalizeOrderModifier) PlanModifyList(ctx context.Context, req pla
 		name := getPoolName(obj)
 		if name != "" {
 			planPoolsByName[name] = obj
-			planNames = append(planNames, name)
 			planNamesSet[name] = true
 		}
 	}
