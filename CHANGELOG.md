@@ -1,5 +1,45 @@
 # Changelog
 
+## 2.0.0-alpha.3 (2026-03-30)
+
+Full Changelog: [v2.0.0-alpha.2...v2.0.0-alpha.3](https://github.com/G-Core/terraform-provider-gcore/compare/v2.0.0-alpha.2...v2.0.0-alpha.3)
+
+### Features
+
+* add release workflow skill for provider releases ([2a77358](https://github.com/G-Core/terraform-provider-gcore/commit/2a77358539eceb6a5e79c0559584ecea1e7884e6))
+* **api:** aggregated API specs update ([2d16176](https://github.com/G-Core/terraform-provider-gcore/commit/2d161766414a196cb585e62e6f45fe569d5a1eb9))
+* **api:** aggregated API specs update ([2c398a8](https://github.com/G-Core/terraform-provider-gcore/commit/2c398a800c88221b2df00fa17030d12fa8557577))
+* **api:** aggregated API specs update ([0a61dc7](https://github.com/G-Core/terraform-provider-gcore/commit/0a61dc7cdad7e5a2af7587c1050eab9e80a56471))
+* **api:** feat(cdn): enable terraform support for cdn_rule_template ([f492d9a](https://github.com/G-Core/terraform-provider-gcore/commit/f492d9a63dd9139365eb1044595aed4c5d227a05))
+* **cdn:** enable terraform support for cdn_rule_template ([3fc2b91](https://github.com/G-Core/terraform-provider-gcore/commit/3fc2b91ef2d1f1c0e978370488c9f50961383bfe))
+* **cloud:** add support for Baremetal servers in Terraform ([0e5d1a3](https://github.com/G-Core/terraform-provider-gcore/commit/0e5d1a388c102723511f990f952b668ada8f7ee7))
+* **cloud:** add support for Baremetal servers in Terraform ([dc2d54f](https://github.com/G-Core/terraform-provider-gcore/commit/dc2d54fcdf936f0d47839c802b7db88d13650935))
+* **cloud:** enable Terraform data source for inference flavors ([6f6d5cf](https://github.com/G-Core/terraform-provider-gcore/commit/6f6d5cf7437117941415b8cfc9e0e1af7b057d39))
+* **fastedge:** enable fastedge_template for Terraform ([ae3b638](https://github.com/G-Core/terraform-provider-gcore/commit/ae3b638234493f97318a52e835b805b47a020181))
+* **fastedge:** enable fastedge_template for Terraform ([f5fe838](https://github.com/G-Core/terraform-provider-gcore/commit/f5fe8383ae827a67f1adc30574d86ffeb09c339f))
+
+
+### Bug Fixes
+
+* **cloud:** harden GPU cluster credentials handling ([b4ba5dc](https://github.com/G-Core/terraform-provider-gcore/commit/b4ba5dc2140276fc1d0dee0639169229432817c1))
+* **cloud:** remove client_id from cloud project data sources ([1504311](https://github.com/G-Core/terraform-provider-gcore/commit/1504311863d34a21a5959df8f87ea94df3acf734))
+* **cloud:** remove ddos_profile from resource and data sources of gcore_cloud_load_balancer ([753bff2](https://github.com/G-Core/terraform-provider-gcore/commit/753bff2e5a2d2b140a1392a7bb8e7465a2eafe42))
+* **cloud:** remove dead planNames variable in plan modifier of cloud_k8s_cluster ([c732082](https://github.com/G-Core/terraform-provider-gcore/commit/c7320825053eb7d3716449352a53bd47eaaf0ee9))
+* **fastedge:** normalize ImportState response to prevent post-import drift ([453ba77](https://github.com/G-Core/terraform-provider-gcore/commit/453ba778f0db443196c7085d7308c07e71aacedb))
+* patch style requests should never send empty json body for objects ([8053c46](https://github.com/G-Core/terraform-provider-gcore/commit/8053c465f5a9e81ce8dbde02bffbf4103f5ebed6))
+
+
+### Chores
+
+* **internal:** update multipart form array serialization ([fec341f](https://github.com/G-Core/terraform-provider-gcore/commit/fec341face73433749aace59fadcafd2018ae13b))
+* **tests:** bump steady to v0.19.6 ([d8f4fc1](https://github.com/G-Core/terraform-provider-gcore/commit/d8f4fc1e5c47ab38e433bb04fb78c911821c88e5))
+* **tests:** bump steady to v0.19.7 ([50456eb](https://github.com/G-Core/terraform-provider-gcore/commit/50456eb6f82c4241415943fe62bc301fe25536be))
+
+
+### Documentation
+
+* update provider version example to 2.0.0-alpha.3 ([3bdb94f](https://github.com/G-Core/terraform-provider-gcore/commit/3bdb94f144c2ec62a1d72af9160560733bd74014))
+
 ## 2.0.0-alpha.2 (2026-03-23)
 
 Full Changelog: [v2.0.0-alpha.1...v2.0.0-alpha.2](https://github.com/G-Core/terraform-provider-gcore/compare/v2.0.0-alpha.1...v2.0.0-alpha.2)
