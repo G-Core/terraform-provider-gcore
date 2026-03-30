@@ -1,0 +1,52 @@
+---
+page_title: "{{ .Name }} {{ .Type }} - {{ .RenderedProviderName }}"
+subcategory: ""
+description: |-
+  {{ .Description }}
+---
+
+# {{ .Name }} ({{ .Type }})
+
+{{ .Description }}
+
+## Example Usage
+
+### Baremetal server with one public interface
+
+Create a basic baremetal server with a single external IPv4 interface.
+
+{{tffile "examples/resources/gcore_cloud_baremetal_server/basic.tf"}}
+
+### Baremetal server with two interfaces
+
+Create a baremetal server with two network interfaces: one public and one private.
+
+{{tffile "examples/resources/gcore_cloud_baremetal_server/two-interface.tf"}}
+
+### Windows baremetal server
+
+Create a Windows baremetal server with a public interface.
+
+{{tffile "examples/resources/gcore_cloud_baremetal_server/windows.tf"}}
+
+### Baremetal server with reserved public IP
+
+Create a baremetal server using a pre-allocated reserved fixed IP address.
+
+{{tffile "examples/resources/gcore_cloud_baremetal_server/reserved-address.tf"}}
+
+### Windows baremetal server with two users
+
+Create a Windows baremetal server and use userdata to add a second user during provisioning.
+
+{{tffile "examples/resources/gcore_cloud_baremetal_server/windows-userdata.tf"}}
+
+{{ .SchemaMarkdown | trimspace }}
+
+{{ if .HasImport }}
+## Import
+
+Import is supported using the following syntax:
+
+{{ codefile "shell" .ImportFile }}
+{{ end }}

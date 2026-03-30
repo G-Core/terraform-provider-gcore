@@ -39,10 +39,17 @@ resource "gcore_cloud_load_balancer_pool" "tcp_80" {
   lb_algorithm = "ROUND_ROBIN"
 
   healthmonitor = {
-    type        = "PING"
-    delay       = 10
-    max_retries = 5
-    timeout     = 5
+    delay = 10
+    max_retries = 3
+    timeout = 5
+    type = "HTTP"
+    admin_state_up = true
+    domain_name = "example.com"
+    expected_codes = "200,301,302"
+    http_method = "GET"
+    http_version = "1.1"
+    max_retries_down = 3
+    url_path = "/"
   }
 
   session_persistence = {
@@ -133,9 +140,12 @@ Available values: "HTTP", "HTTPS", "K8S", "PING", "TCP", "TLS-HELLO", "UDP-CONNE
 Optional:
 
 - `admin_state_up` (Boolean) Administrative state of the resource. When set to true, the resource is enabled and operational. When set to false, the resource is disabled and will not process traffic. Defaults to true.
+- `domain_name` (String) Domain name for HTTP host header. Can only be used together with `HTTP` or `HTTPS` health monitor type.
 - `expected_codes` (String) Expected HTTP response codes. Can be a single code or a range of codes. Can only be used together with `HTTP` or `HTTPS` health monitor type. For example, 200,202,300-302,401,403,404,500-504. If not specified, the default is 200.
 - `http_method` (String) HTTP method. Can only be used together with `HTTP` or `HTTPS` health monitor type.
 Available values: "CONNECT", "DELETE", "GET", "HEAD", "OPTIONS", "PATCH", "POST", "PUT", "TRACE".
+- `http_version` (String) HTTP version. Can only be used together with `HTTP` or `HTTPS` health monitor type. Supported values: 1.0, 1.1.
+Available values: "1.0", "1.1".
 - `max_retries_down` (Number) Number of failures before the member is switched to ERROR state.
 - `url_path` (String) URL Path. Defaults to '/'. Can only be used together with `HTTP` or `HTTPS` health monitor type.
 

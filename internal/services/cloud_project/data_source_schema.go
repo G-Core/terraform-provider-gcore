@@ -61,10 +61,6 @@ func DataSourceSchema(ctx context.Context) schema.Schema {
 			"find_one_by": schema.SingleNestedAttribute{
 				Optional: true,
 				Attributes: map[string]schema.Attribute{
-					"client_id": schema.Int64Attribute{
-						Description: "Client ID filter for administrators.",
-						Optional:    true,
-					},
 					"include_deleted": schema.BoolAttribute{
 						Description: "Whether to include deleted projects in the response.",
 						Computed:    true,

@@ -64,9 +64,12 @@ Read-Only:
 
 - `admin_state_up` (Boolean) Administrative state of the resource. When set to true, the resource is enabled and operational. When set to false, the resource is disabled and will not process traffic. Defaults to true.
 - `delay` (Number) The time, in seconds, between sending probes to members
+- `domain_name` (String) Domain name for HTTP host header. Can only be used together with `HTTP` or `HTTPS` health monitor type.
 - `expected_codes` (String) Expected HTTP response codes. Can be a single code or a range of codes. Can only be used together with `HTTP` or `HTTPS` health monitor type. For example, 200,202,300-302,401,403,404,500-504. If not specified, the default is 200.
 - `http_method` (String) HTTP method
 Available values: "CONNECT", "DELETE", "GET", "HEAD", "OPTIONS", "PATCH", "POST", "PUT", "TRACE".
+- `http_version` (String) HTTP version. Can only be used together with `HTTP` or `HTTPS` health monitor type.
+Available values: "1.0", "1.1".
 - `id` (String) Health monitor ID
 - `max_retries` (Number) Number of successes before the member is switched to ONLINE state
 - `max_retries_down` (Number) Number of failures before the member is switched to ERROR state

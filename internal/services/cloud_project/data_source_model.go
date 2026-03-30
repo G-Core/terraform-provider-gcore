@@ -38,9 +38,6 @@ func (m *CloudProjectDataSourceModel) toReadParams(_ context.Context) (params cl
 func (m *CloudProjectDataSourceModel) toListParams(_ context.Context) (params cloud.ProjectListParams, diags diag.Diagnostics) {
 	params = cloud.ProjectListParams{}
 
-	if !m.FindOneBy.ClientID.IsNull() {
-		params.ClientID = param.NewOpt(m.FindOneBy.ClientID.ValueInt64())
-	}
 	if !m.FindOneBy.IncludeDeleted.IsNull() {
 		params.IncludeDeleted = param.NewOpt(m.FindOneBy.IncludeDeleted.ValueBool())
 	}
@@ -55,7 +52,6 @@ func (m *CloudProjectDataSourceModel) toListParams(_ context.Context) (params cl
 }
 
 type CloudProjectFindOneByDataSourceModel struct {
-	ClientID       types.Int64  `tfsdk:"client_id" query:"client_id,optional"`
 	IncludeDeleted types.Bool   `tfsdk:"include_deleted" query:"include_deleted,computed_optional"`
 	Name           types.String `tfsdk:"name" query:"name,optional"`
 	OrderBy        types.String `tfsdk:"order_by" query:"order_by,computed_optional"`

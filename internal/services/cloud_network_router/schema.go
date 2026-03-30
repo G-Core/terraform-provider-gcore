@@ -65,12 +65,13 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 				Required:    true,
 			},
 			"external_gateway_info": schema.SingleNestedAttribute{
-				Computed:   true,
-				Optional:   true,
-				CustomType: customfield.NewNestedObjectType[CloudNetworkRouterExternalGatewayInfoModel](ctx),
+				Description: "External gateway configuration. Use type 'default' to let the platform automatically select the external network, or type 'manual' to specify a particular external network via `network_id`. If omitted, the router is created without an external gateway.",
+				Computed:    true,
+				Optional:    true,
+				CustomType:  customfield.NewNestedObjectType[CloudNetworkRouterExternalGatewayInfoModel](ctx),
 				Attributes: map[string]schema.Attribute{
 					"network_id": schema.StringAttribute{
-						Description:   "id of the external network.",
+						Description:   "ID of the external network to connect the router to.",
 						Computed:      true,
 						Optional:      true,
 						PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
@@ -82,7 +83,7 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 						Default:     booldefault.StaticBool(true),
 					},
 					"type": schema.StringAttribute{
-						Description:   "must be 'manual'.\nAvailable values: \"manual\", \"default\".",
+						Description:   "Gateway type. Use 'manual' to explicitly specify which external network the router connects to via `network_id`. Required for PATCH/update operations.\nAvailable values: \"manual\", \"default\".",
 						Computed:      true,
 						Optional:      true,
 						PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
@@ -100,11 +101,11 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 				NestedObject: schema.NestedAttributeObject{
 					Attributes: map[string]schema.Attribute{
 						"destination": schema.StringAttribute{
-							Description: "CIDR of destination IPv4 subnet.",
+							Description: "CIDR of destination IPv4 or IPv6 subnet.",
 							Required:    true,
 						},
 						"nexthop": schema.StringAttribute{
-							Description: "IPv4 address to forward traffic to if it's destination IP matches 'destination' CIDR.",
+							Description: "IPv4 or IPv6 address to forward traffic to if it's destination IP matches 'destination' CIDR.",
 							Required:    true,
 						},
 					},

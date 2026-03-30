@@ -202,16 +202,7 @@ func (r *CloudGPUBaremetalClusterResource) Update(ctx context.Context, req resou
 	// Check if server settings that require UpdateServersSettings + Rebuild have changed
 	// (image_id, credentials, user_data)
 	imageChanged := !data.ImageID.IsNull() && data.ImageID.ValueString() != state.ImageID.ValueString()
-	credentialsChanged := false
-	if data.ServersSettings != nil && data.ServersSettings.Credentials != nil {
-		if state.ServersSettings == nil || state.ServersSettings.Credentials == nil {
-			credentialsChanged = true
-		} else {
-			credentialsChanged = !data.ServersSettings.Credentials.SSHKeyName.Equal(state.ServersSettings.Credentials.SSHKeyName) ||
-				!data.ServersSettings.Credentials.Username.Equal(state.ServersSettings.Credentials.Username) ||
-				!data.ServersSettings.Credentials.PasswordWoVersion.Equal(state.ServersSettings.Credentials.PasswordWoVersion)
-		}
-	}
+	credentialsChanged := credentialsHaveChanged(data.ServersSettings, state.ServersSettings)
 	userDataChanged := false
 	if data.ServersSettings != nil && state.ServersSettings != nil {
 		userDataChanged = !data.ServersSettings.UserData.Equal(state.ServersSettings.UserData)
@@ -447,6 +438,59 @@ func (r *CloudGPUBaremetalClusterResource) ImportState(ctx context.Context, req 
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
 }
 
-func (r *CloudGPUBaremetalClusterResource) ModifyPlan(_ context.Context, _ resource.ModifyPlanRequest, _ *resource.ModifyPlanResponse) {
+func (r *CloudGPUBaremetalClusterResource) ModifyPlan(_ context.Context, req resource.ModifyPlanRequest, resp *resource.ModifyPlanResponse) {
+	// No validation needed on create or destroy.
+	if req.State.Raw.IsNull() || req.Plan.Raw.IsNull() {
+		return
+	}
 
+	var plan, state CloudGPUBaremetalClusterModel
+	resp.Diagnostics.Append(req.Plan.Get(context.Background(), &plan)...)
+	resp.Diagnostics.Append(req.State.Get(context.Background(), &state)...)
+	if resp.Diagnostics.HasError() {
+		return
+	}
+
+	// The UpdateServersSettings API only supports updating ssh_key_name.
+	// Reject username/password changes at plan time with a clear error.
+	if credentialsHaveChanged(plan.ServersSettings, state.ServersSettings) &&
+		usernameOrPasswordChanged(plan.ServersSettings, state.ServersSettings) {
+		resp.Diagnostics.AddError(
+			"Unsupported credential update",
+			"Updating username or password is not supported. These credentials can only be set during resource creation. To change them, the resource must be recreated.",
+		)
+	}
+}
+
+// credentialsHaveChanged returns true if any credential field has changed between plan and state.
+//
+// Compared fields: SSHKeyName, Username, PasswordWoVersion (which tracks password_wo changes).
+// If new credential fields are added to CloudGPUBaremetalClusterServersSettingsCredentialsModel,
+// this function must be updated to include them.
+func credentialsHaveChanged(plan, state *CloudGPUBaremetalClusterServersSettingsModel) bool {
+	if plan == nil || plan.Credentials == nil {
+		return false
+	}
+	if state == nil || state.Credentials == nil {
+		return true
+	}
+	return !plan.Credentials.SSHKeyName.Equal(state.Credentials.SSHKeyName) ||
+		!plan.Credentials.Username.Equal(state.Credentials.Username) ||
+		!plan.Credentials.PasswordWoVersion.Equal(state.Credentials.PasswordWoVersion)
+}
+
+// usernameOrPasswordChanged returns true if specifically the username or password
+// credential fields have changed (as opposed to ssh_key_name).
+// The UpdateServersSettings API only supports updating ssh_key_name, so changes to
+// username or password must be rejected.
+func usernameOrPasswordChanged(plan, state *CloudGPUBaremetalClusterServersSettingsModel) bool {
+	if plan == nil || plan.Credentials == nil {
+		return false
+	}
+	if state == nil || state.Credentials == nil {
+		// New credentials being set — check if they include username/password
+		return !plan.Credentials.Username.IsNull() || !plan.Credentials.PasswordWoVersion.IsNull()
+	}
+	return !plan.Credentials.Username.Equal(state.Credentials.Username) ||
+		!plan.Credentials.PasswordWoVersion.Equal(state.Credentials.PasswordWoVersion)
 }

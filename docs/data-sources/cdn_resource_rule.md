@@ -755,7 +755,7 @@ Read-Only:
 Possible values:
 - **true** - Option is enabled.
 - **false** - Option is disabled.
-- `value` (List of String) List of query parameters.
+- `value` (Set of String) List of query parameters.
 
 
 <a id="nestedatt--options--query_string_forwarding"></a>
