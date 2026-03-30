@@ -8,7 +8,6 @@ import (
 	"github.com/G-Core/gcore-go/cloud"
 	"github.com/G-Core/gcore-go/packages/param"
 	"github.com/G-Core/terraform-provider-gcore/internal/customfield"
-	"github.com/hashicorp/terraform-plugin-framework-jsontypes/jsontypes"
 	"github.com/hashicorp/terraform-plugin-framework-timetypes/timetypes"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/types"
@@ -30,7 +29,6 @@ type CloudBaremetalServerDataSourceModel struct {
 	VmState            types.String                                                                                `tfsdk:"vm_state" json:"vm_state,computed"`
 	Addresses          customfield.Map[customfield.NestedObjectList[CloudBaremetalServerAddressesDataSourceModel]] `tfsdk:"addresses" json:"addresses,computed"`
 	BlackholePorts     customfield.NestedObjectList[CloudBaremetalServerBlackholePortsDataSourceModel]             `tfsdk:"blackhole_ports" json:"blackhole_ports,computed"`
-	DDOSProfile        customfield.NestedObject[CloudBaremetalServerDDOSProfileDataSourceModel]                    `tfsdk:"ddos_profile" json:"ddos_profile,computed"`
 	FixedIPAssignments customfield.NestedObjectList[CloudBaremetalServerFixedIPAssignmentsDataSourceModel]         `tfsdk:"fixed_ip_assignments" json:"fixed_ip_assignments,computed"`
 	Flavor             customfield.NestedObject[CloudBaremetalServerFlavorDataSourceModel]                         `tfsdk:"flavor" json:"flavor,computed"`
 	InstanceIsolation  customfield.NestedObject[CloudBaremetalServerInstanceIsolationDataSourceModel]              `tfsdk:"instance_isolation" json:"instance_isolation,computed"`
@@ -58,11 +56,6 @@ func (m *CloudBaremetalServerDataSourceModel) toListParams(_ context.Context) (p
 			mFindOneByTagValue = append(mFindOneByTagValue, item.ValueString())
 		}
 	}
-	mFindOneByChangesBefore, errs := m.FindOneBy.ChangesBefore.ValueRFC3339Time()
-	diags.Append(errs...)
-	mFindOneByChangesSince, errs := m.FindOneBy.ChangesSince.ValueRFC3339Time()
-	diags.Append(errs...)
-
 	params = cloud.BaremetalServerListParams{
 		TagValue: mFindOneByTagValue,
 	}
@@ -73,10 +66,16 @@ func (m *CloudBaremetalServerDataSourceModel) toListParams(_ context.Context) (p
 	if !m.RegionID.IsNull() {
 		params.RegionID = param.NewOpt(m.RegionID.ValueInt64())
 	}
+	// TODO GCLOUD2-24414: Workaround for codegen bug — ValueRFC3339Time() errors on null.
+	// Move conversion inside null guard. Revert when Stainless fixes codegen.
 	if !m.FindOneBy.ChangesBefore.IsNull() {
+		mFindOneByChangesBefore, errs := m.FindOneBy.ChangesBefore.ValueRFC3339Time()
+		diags.Append(errs...)
 		params.ChangesBefore = param.NewOpt(mFindOneByChangesBefore)
 	}
 	if !m.FindOneBy.ChangesSince.IsNull() {
+		mFindOneByChangesSince, errs := m.FindOneBy.ChangesSince.ValueRFC3339Time()
+		diags.Append(errs...)
 		params.ChangesSince = param.NewOpt(mFindOneByChangesSince)
 	}
 	if !m.FindOneBy.FlavorID.IsNull() {
@@ -115,14 +114,8 @@ func (m *CloudBaremetalServerDataSourceModel) toListParams(_ context.Context) (p
 	if !m.FindOneBy.TagKeyValue.IsNull() {
 		params.TagKeyValue = param.NewOpt(m.FindOneBy.TagKeyValue.ValueString())
 	}
-	if !m.FindOneBy.TypeDDOSProfile.IsNull() {
-		params.TypeDDOSProfile = cloud.BaremetalServerListParamsTypeDDOSProfile(m.FindOneBy.TypeDDOSProfile.ValueString())
-	}
 	if !m.FindOneBy.Uuid.IsNull() {
 		params.Uuid = param.NewOpt(m.FindOneBy.Uuid.ValueString())
-	}
-	if !m.FindOneBy.WithDDOS.IsNull() {
-		params.WithDDOS = param.NewOpt(m.FindOneBy.WithDDOS.ValueBool())
 	}
 	if !m.FindOneBy.WithInterfacesName.IsNull() {
 		params.WithInterfacesName = param.NewOpt(m.FindOneBy.WithInterfacesName.ValueBool())
@@ -146,63 +139,6 @@ type CloudBaremetalServerBlackholePortsDataSourceModel struct {
 	AlertDuration types.String      `tfsdk:"alert_duration" json:"AlertDuration,computed"`
 	DestinationIP types.String      `tfsdk:"destination_ip" json:"DestinationIP,computed"`
 	ID            types.Int64       `tfsdk:"id" json:"ID,computed"`
-}
-
-type CloudBaremetalServerDDOSProfileDataSourceModel struct {
-	ID                         types.Int64                                                                             `tfsdk:"id" json:"id,computed"`
-	Fields                     customfield.NestedObjectList[CloudBaremetalServerDDOSProfileFieldsDataSourceModel]      `tfsdk:"fields" json:"fields,computed"`
-	Options                    customfield.NestedObject[CloudBaremetalServerDDOSProfileOptionsDataSourceModel]         `tfsdk:"options" json:"options,computed"`
-	ProfileTemplate            customfield.NestedObject[CloudBaremetalServerDDOSProfileProfileTemplateDataSourceModel] `tfsdk:"profile_template" json:"profile_template,computed"`
-	ProfileTemplateDescription types.String                                                                            `tfsdk:"profile_template_description" json:"profile_template_description,computed"`
-	Protocols                  customfield.NestedObjectList[CloudBaremetalServerDDOSProfileProtocolsDataSourceModel]   `tfsdk:"protocols" json:"protocols,computed"`
-	Site                       types.String                                                                            `tfsdk:"site" json:"site,computed"`
-	Status                     customfield.NestedObject[CloudBaremetalServerDDOSProfileStatusDataSourceModel]          `tfsdk:"status" json:"status,computed"`
-}
-
-type CloudBaremetalServerDDOSProfileFieldsDataSourceModel struct {
-	ID               types.Int64          `tfsdk:"id" json:"id,computed"`
-	BaseField        types.Int64          `tfsdk:"base_field" json:"base_field,computed"`
-	Default          types.String         `tfsdk:"default" json:"default,computed"`
-	Description      types.String         `tfsdk:"description" json:"description,computed"`
-	FieldName        types.String         `tfsdk:"field_name" json:"field_name,computed"`
-	FieldType        types.String         `tfsdk:"field_type" json:"field_type,computed"`
-	FieldValue       jsontypes.Normalized `tfsdk:"field_value" json:"field_value,computed"`
-	Name             types.String         `tfsdk:"name" json:"name,computed"`
-	Required         types.Bool           `tfsdk:"required" json:"required,computed"`
-	ValidationSchema jsontypes.Normalized `tfsdk:"validation_schema" json:"validation_schema,computed"`
-	Value            types.String         `tfsdk:"value" json:"value,computed"`
-}
-
-type CloudBaremetalServerDDOSProfileOptionsDataSourceModel struct {
-	Active types.Bool `tfsdk:"active" json:"active,computed"`
-	Bgp    types.Bool `tfsdk:"bgp" json:"bgp,computed"`
-}
-
-type CloudBaremetalServerDDOSProfileProfileTemplateDataSourceModel struct {
-	ID          types.Int64                                                                                       `tfsdk:"id" json:"id,computed"`
-	Description types.String                                                                                      `tfsdk:"description" json:"description,computed"`
-	Fields      customfield.NestedObjectList[CloudBaremetalServerDDOSProfileProfileTemplateFieldsDataSourceModel] `tfsdk:"fields" json:"fields,computed"`
-	Name        types.String                                                                                      `tfsdk:"name" json:"name,computed"`
-}
-
-type CloudBaremetalServerDDOSProfileProfileTemplateFieldsDataSourceModel struct {
-	ID               types.Int64          `tfsdk:"id" json:"id,computed"`
-	Default          types.String         `tfsdk:"default" json:"default,computed"`
-	Description      types.String         `tfsdk:"description" json:"description,computed"`
-	FieldType        types.String         `tfsdk:"field_type" json:"field_type,computed"`
-	Name             types.String         `tfsdk:"name" json:"name,computed"`
-	Required         types.Bool           `tfsdk:"required" json:"required,computed"`
-	ValidationSchema jsontypes.Normalized `tfsdk:"validation_schema" json:"validation_schema,computed"`
-}
-
-type CloudBaremetalServerDDOSProfileProtocolsDataSourceModel struct {
-	Port      types.String                   `tfsdk:"port" json:"port,computed"`
-	Protocols customfield.List[types.String] `tfsdk:"protocols" json:"protocols,computed"`
-}
-
-type CloudBaremetalServerDDOSProfileStatusDataSourceModel struct {
-	ErrorDescription types.String `tfsdk:"error_description" json:"error_description,computed"`
-	Status           types.String `tfsdk:"status" json:"status,computed"`
 }
 
 type CloudBaremetalServerFixedIPAssignmentsDataSourceModel struct {
@@ -256,8 +192,6 @@ type CloudBaremetalServerFindOneByDataSourceModel struct {
 	Status                  types.String      `tfsdk:"status" query:"status,optional"`
 	TagKeyValue             types.String      `tfsdk:"tag_key_value" query:"tag_key_value,optional"`
 	TagValue                *[]types.String   `tfsdk:"tag_value" query:"tag_value,optional"`
-	TypeDDOSProfile         types.String      `tfsdk:"type_ddos_profile" query:"type_ddos_profile,optional"`
 	Uuid                    types.String      `tfsdk:"uuid" query:"uuid,optional"`
-	WithDDOS                types.Bool        `tfsdk:"with_ddos" query:"with_ddos,computed_optional"`
 	WithInterfacesName      types.Bool        `tfsdk:"with_interfaces_name" query:"with_interfaces_name,computed_optional"`
 }

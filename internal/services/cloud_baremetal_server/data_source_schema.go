@@ -6,7 +6,6 @@ import (
 	"context"
 
 	"github.com/G-Core/terraform-provider-gcore/internal/customfield"
-	"github.com/hashicorp/terraform-plugin-framework-jsontypes/jsontypes"
 	"github.com/hashicorp/terraform-plugin-framework-timetypes/timetypes"
 	"github.com/hashicorp/terraform-plugin-framework-validators/datasourcevalidator"
 	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
@@ -215,186 +214,6 @@ func DataSourceSchema(ctx context.Context) schema.Schema {
 						},
 						"id": schema.Int64Attribute{
 							Computed: true,
-						},
-					},
-				},
-			},
-			"ddos_profile": schema.SingleNestedAttribute{
-				Description: "Bare metal advanced DDoS protection profile. It is always `null` if query parameter `with_ddos=true` is not set.",
-				Computed:    true,
-				CustomType:  customfield.NewNestedObjectType[CloudBaremetalServerDDOSProfileDataSourceModel](ctx),
-				Attributes: map[string]schema.Attribute{
-					"id": schema.Int64Attribute{
-						Description: "Unique identifier for the DDoS protection profile",
-						Computed:    true,
-					},
-					"fields": schema.ListNestedAttribute{
-						Description: "List of configured field values for the protection profile",
-						Computed:    true,
-						CustomType:  customfield.NewNestedObjectListType[CloudBaremetalServerDDOSProfileFieldsDataSourceModel](ctx),
-						NestedObject: schema.NestedAttributeObject{
-							Attributes: map[string]schema.Attribute{
-								"id": schema.Int64Attribute{
-									Description: "Unique identifier for the DDoS protection field",
-									Computed:    true,
-								},
-								"base_field": schema.Int64Attribute{
-									Description: "ID of DDoS profile field",
-									Computed:    true,
-								},
-								"default": schema.StringAttribute{
-									Description: "Predefined default value for the field if not specified",
-									Computed:    true,
-								},
-								"description": schema.StringAttribute{
-									Description: "Detailed description explaining the field's purpose and usage guidelines",
-									Computed:    true,
-								},
-								"field_name": schema.StringAttribute{
-									Description: "Name of DDoS profile field",
-									Computed:    true,
-								},
-								"field_type": schema.StringAttribute{
-									Description: "Data type classification of the field (e.g., string, integer, array)",
-									Computed:    true,
-								},
-								"field_value": schema.StringAttribute{
-									Description: "Complex value. Only one of 'value' or 'field_value' must be specified.",
-									Computed:    true,
-									CustomType:  jsontypes.NormalizedType{},
-								},
-								"name": schema.StringAttribute{
-									Description: "Human-readable name of the protection field",
-									Computed:    true,
-								},
-								"required": schema.BoolAttribute{
-									Description: "Indicates whether this field must be provided when creating a protection profile",
-									Computed:    true,
-								},
-								"validation_schema": schema.StringAttribute{
-									Description: "JSON schema defining validation rules and constraints for the field value",
-									Computed:    true,
-									CustomType:  jsontypes.NormalizedType{},
-								},
-								"value": schema.StringAttribute{
-									Description: "Basic type value. Only one of 'value' or 'field_value' must be specified.",
-									Computed:    true,
-								},
-							},
-						},
-					},
-					"options": schema.SingleNestedAttribute{
-						Description: "Configuration options controlling profile activation and BGP routing",
-						Computed:    true,
-						CustomType:  customfield.NewNestedObjectType[CloudBaremetalServerDDOSProfileOptionsDataSourceModel](ctx),
-						Attributes: map[string]schema.Attribute{
-							"active": schema.BoolAttribute{
-								Description: "Controls whether the DDoS protection profile is enabled and actively protecting the resource",
-								Computed:    true,
-							},
-							"bgp": schema.BoolAttribute{
-								Description: "Enables Border Gateway Protocol (BGP) routing for DDoS protection traffic",
-								Computed:    true,
-							},
-						},
-					},
-					"profile_template": schema.SingleNestedAttribute{
-						Description: "Complete template configuration data used for this profile",
-						Computed:    true,
-						CustomType:  customfield.NewNestedObjectType[CloudBaremetalServerDDOSProfileProfileTemplateDataSourceModel](ctx),
-						Attributes: map[string]schema.Attribute{
-							"id": schema.Int64Attribute{
-								Description: "Unique identifier for the DDoS protection template",
-								Computed:    true,
-							},
-							"description": schema.StringAttribute{
-								Description: "Detailed description explaining the template's purpose and use cases",
-								Computed:    true,
-							},
-							"fields": schema.ListNestedAttribute{
-								Description: "List of configurable fields that define the template's protection parameters",
-								Computed:    true,
-								CustomType:  customfield.NewNestedObjectListType[CloudBaremetalServerDDOSProfileProfileTemplateFieldsDataSourceModel](ctx),
-								NestedObject: schema.NestedAttributeObject{
-									Attributes: map[string]schema.Attribute{
-										"id": schema.Int64Attribute{
-											Description: "Unique identifier for the DDoS protection field",
-											Computed:    true,
-										},
-										"default": schema.StringAttribute{
-											Description: "Predefined default value for the field if not specified",
-											Computed:    true,
-										},
-										"description": schema.StringAttribute{
-											Description: "Detailed description explaining the field's purpose and usage guidelines",
-											Computed:    true,
-										},
-										"field_type": schema.StringAttribute{
-											Description: "Data type classification of the field (e.g., string, integer, array)",
-											Computed:    true,
-										},
-										"name": schema.StringAttribute{
-											Description: "Human-readable name of the protection field",
-											Computed:    true,
-										},
-										"required": schema.BoolAttribute{
-											Description: "Indicates whether this field must be provided when creating a protection profile",
-											Computed:    true,
-										},
-										"validation_schema": schema.StringAttribute{
-											Description: "JSON schema defining validation rules and constraints for the field value",
-											Computed:    true,
-											CustomType:  jsontypes.NormalizedType{},
-										},
-									},
-								},
-							},
-							"name": schema.StringAttribute{
-								Description: "Human-readable name of the protection template",
-								Computed:    true,
-							},
-						},
-					},
-					"profile_template_description": schema.StringAttribute{
-						Description: "Detailed description of the protection template used for this profile",
-						Computed:    true,
-					},
-					"protocols": schema.ListNestedAttribute{
-						Description: "List of network protocols and ports configured for protection",
-						Computed:    true,
-						CustomType:  customfield.NewNestedObjectListType[CloudBaremetalServerDDOSProfileProtocolsDataSourceModel](ctx),
-						NestedObject: schema.NestedAttributeObject{
-							Attributes: map[string]schema.Attribute{
-								"port": schema.StringAttribute{
-									Description: "Network port number for which protocols are configured",
-									Computed:    true,
-								},
-								"protocols": schema.ListAttribute{
-									Description: "List of network protocols enabled on the specified port",
-									Computed:    true,
-									CustomType:  customfield.NewListType[types.String](ctx),
-									ElementType: types.StringType,
-								},
-							},
-						},
-					},
-					"site": schema.StringAttribute{
-						Description: "Geographic site identifier where the protection is deployed",
-						Computed:    true,
-					},
-					"status": schema.SingleNestedAttribute{
-						Description: "Current operational status and any error information for the profile",
-						Computed:    true,
-						CustomType:  customfield.NewNestedObjectType[CloudBaremetalServerDDOSProfileStatusDataSourceModel](ctx),
-						Attributes: map[string]schema.Attribute{
-							"error_description": schema.StringAttribute{
-								Description: "Detailed error message describing any issues with the profile operation",
-								Computed:    true,
-							},
-							"status": schema.StringAttribute{
-								Description: "Current operational status of the DDoS protection profile",
-								Computed:    true,
-							},
 						},
 					},
 				},
@@ -613,20 +432,8 @@ func DataSourceSchema(ctx context.Context) schema.Schema {
 						Optional:    true,
 						ElementType: types.StringType,
 					},
-					"type_ddos_profile": schema.StringAttribute{
-						Description: "Return bare metals either only with advanced or only basic DDoS protection. Effective only with `with_ddos` set to true. (advanced or basic)\nAvailable values: \"basic\", \"advanced\".",
-						Optional:    true,
-						Validators: []validator.String{
-							stringvalidator.OneOfCaseInsensitive("basic", "advanced"),
-						},
-					},
 					"uuid": schema.StringAttribute{
 						Description: "Filter the server list result by the UUID of the server. Allowed UUID part",
-						Optional:    true,
-					},
-					"with_ddos": schema.BoolAttribute{
-						Description: "Include DDoS profile information for bare-metal servers in the response when set to `true`. Otherwise, the `ddos_profile` field in the response is `null` by default.",
-						Computed:    true,
 						Optional:    true,
 					},
 					"with_interfaces_name": schema.BoolAttribute{

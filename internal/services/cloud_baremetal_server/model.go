@@ -19,23 +19,19 @@ type CloudBaremetalServerModel struct {
 	ApptemplateID      types.String                                                                      `tfsdk:"apptemplate_id" json:"apptemplate_id,optional,no_refresh"`
 	ImageID            types.String                                                                      `tfsdk:"image_id" json:"image_id,optional,no_refresh"`
 	NameTemplate       types.String                                                                      `tfsdk:"name_template" json:"name_template,optional,no_refresh"`
-	Password           types.String                                                                      `tfsdk:"password" json:"password,optional,no_refresh"`
-	SSHKeyName         types.String                                                                      `tfsdk:"ssh_key_name" json:"ssh_key_name,optional"`
+	Password           types.String                                                                      `tfsdk:"password_wo" json:"password,optional,no_refresh"`
+	PasswordWoVersion  types.Int64                                                                       `tfsdk:"password_wo_version"`
+	SSHKeyName         types.String                                                                      `tfsdk:"ssh_key_name" json:"ssh_key_name,optional,no_refresh"`
 	UserData           types.String                                                                      `tfsdk:"user_data" json:"user_data,optional,no_refresh"`
 	Username           types.String                                                                      `tfsdk:"username" json:"username,optional,no_refresh"`
 	AppConfig          *map[string]jsontypes.Normalized                                                  `tfsdk:"app_config" json:"app_config,optional,no_refresh"`
-	DDOSProfile        *CloudBaremetalServerDDOSProfileModel                                             `tfsdk:"ddos_profile" json:"ddos_profile,optional"`
 	Name               types.String                                                                      `tfsdk:"name" json:"name,computed_optional"`
 	Tags               customfield.Map[types.String]                                                     `tfsdk:"tags" json:"tags,computed_optional,no_refresh"`
 	CreatedAt          timetypes.RFC3339                                                                 `tfsdk:"created_at" json:"created_at,computed" format:"date-time"`
-	CreatorTaskID      types.String                                                                      `tfsdk:"creator_task_id" json:"creator_task_id,computed"`
 	Region             types.String                                                                      `tfsdk:"region" json:"region,computed"`
 	Status             types.String                                                                      `tfsdk:"status" json:"status,computed"`
-	TaskID             types.String                                                                      `tfsdk:"task_id" json:"task_id,computed"`
-	TaskState          types.String                                                                      `tfsdk:"task_state" json:"task_state,computed"`
 	VmState            types.String                                                                      `tfsdk:"vm_state" json:"vm_state,computed"`
 	Addresses          customfield.Map[customfield.NestedObjectList[CloudBaremetalServerAddressesModel]] `tfsdk:"addresses" json:"addresses,computed"`
-	Tasks              customfield.List[types.String]                                                    `tfsdk:"tasks" json:"tasks,computed,no_refresh"`
 	BlackholePorts     customfield.NestedObjectList[CloudBaremetalServerBlackholePortsModel]             `tfsdk:"blackhole_ports" json:"blackhole_ports,computed"`
 	FixedIPAssignments customfield.NestedObjectList[CloudBaremetalServerFixedIPAssignmentsModel]         `tfsdk:"fixed_ip_assignments" json:"fixed_ip_assignments,computed"`
 	InstanceIsolation  customfield.NestedObject[CloudBaremetalServerInstanceIsolationModel]              `tfsdk:"instance_isolation" json:"instance_isolation,computed"`
@@ -66,23 +62,12 @@ type CloudBaremetalServerInterfacesFloatingIPModel struct {
 	ExistingFloatingID types.String `tfsdk:"existing_floating_id" json:"existing_floating_id,optional"`
 }
 
-type CloudBaremetalServerDDOSProfileModel struct {
-	ProfileTemplate types.Int64                                    `tfsdk:"profile_template" json:"profile_template,required,no_refresh"`
-	Fields          *[]*CloudBaremetalServerDDOSProfileFieldsModel `tfsdk:"fields" json:"fields,optional"`
-}
-
-type CloudBaremetalServerDDOSProfileFieldsModel struct {
-	BaseField  types.Int64          `tfsdk:"base_field" json:"base_field,optional"`
-	FieldValue jsontypes.Normalized `tfsdk:"field_value" json:"field_value,optional"`
-	Value      types.String         `tfsdk:"value" json:"value,optional"`
-}
-
 type CloudBaremetalServerAddressesModel struct {
-	Addr          types.String `tfsdk:"addr" json:"addr,required"`
-	Type          types.String `tfsdk:"type" json:"type,required"`
-	InterfaceName types.String `tfsdk:"interface_name" json:"interface_name,optional"`
-	SubnetID      types.String `tfsdk:"subnet_id" json:"subnet_id,optional"`
-	SubnetName    types.String `tfsdk:"subnet_name" json:"subnet_name,optional"`
+	Addr          types.String `tfsdk:"addr" json:"addr,computed"`
+	Type          types.String `tfsdk:"type" json:"type,computed"`
+	InterfaceName types.String `tfsdk:"interface_name" json:"interface_name,computed"`
+	SubnetID      types.String `tfsdk:"subnet_id" json:"subnet_id,computed"`
+	SubnetName    types.String `tfsdk:"subnet_name" json:"subnet_name,computed"`
 }
 
 type CloudBaremetalServerBlackholePortsModel struct {

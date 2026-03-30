@@ -6,6 +6,7 @@ import (
 	"context"
 
 	"github.com/G-Core/terraform-provider-gcore/internal/customfield"
+	"github.com/G-Core/terraform-provider-gcore/internal/planmodifiers"
 	"github.com/hashicorp/terraform-plugin-framework-jsontypes/jsontypes"
 	"github.com/hashicorp/terraform-plugin-framework-timetypes/timetypes"
 	"github.com/hashicorp/terraform-plugin-framework-validators/int64validator"
@@ -15,9 +16,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/int64default"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/int64planmodifier"
-	"github.com/hashicorp/terraform-plugin-framework/resource/schema/listplanmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/mapplanmodifier"
-	"github.com/hashicorp/terraform-plugin-framework/resource/schema/objectplanmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringplanmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
@@ -125,7 +124,7 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 						},
 					},
 				},
-				PlanModifiers: []planmodifier.List{listplanmodifier.RequiresReplace()},
+				PlanModifiers: []planmodifier.List{planmodifiers.ListRequiresReplaceIfNotNull()},
 			},
 			"apptemplate_id": schema.StringAttribute{
 				Description:   "Apptemplate ID. Either `image_id` or `apptemplate_id` is required.",
@@ -133,19 +132,24 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 				PlanModifiers: []planmodifier.String{stringplanmodifier.RequiresReplace()},
 			},
 			"image_id": schema.StringAttribute{
-				Description:   "Image ID. Either `image_id` or `apptemplate_id` is required.",
-				Optional:      true,
-				PlanModifiers: []planmodifier.String{stringplanmodifier.RequiresReplace()},
+				Description: "Image ID. Either `image_id` or `apptemplate_id` is required.",
+				Optional:    true,
 			},
 			"name_template": schema.StringAttribute{
 				Description:   "If you want server names to be automatically generated based on IP addresses, you can provide a name template instead of specifying the name manually. The template should include a placeholder that will be replaced during provisioning. Supported placeholders are: `{ip_octets}` (last 3 octets of the IP), `{two_ip_octets}`, and `{one_ip_octet}`.",
 				Optional:      true,
 				PlanModifiers: []planmodifier.String{stringplanmodifier.RequiresReplace()},
 			},
-			"password": schema.StringAttribute{
+			"password_wo": schema.StringAttribute{
 				Description:   "For Linux instances, 'username' and 'password' are used to create a new user. When only 'password' is provided, it is set as the password for the default user of the image. For Windows instances, 'username' cannot be specified. Use the 'password' field to set the password for the 'Admin' user on Windows. Use the 'user_data' field to provide a script to create new users on Windows. The password of the Admin user cannot be updated via 'user_data'.",
 				Optional:      true,
+				WriteOnly:     true,
 				PlanModifiers: []planmodifier.String{stringplanmodifier.RequiresReplace()},
+			},
+			"password_wo_version": schema.Int64Attribute{
+				Description:   "Version of the password write-only field. Increment this value to trigger a replacement when changing the password.",
+				Optional:      true,
+				PlanModifiers: []planmodifier.Int64{int64planmodifier.RequiresReplace()},
 			},
 			"ssh_key_name": schema.StringAttribute{
 				Description:   "Specifies the name of the SSH keypair, created via the\n[/v1/`ssh_keys` endpoint](/docs/api-reference/cloud/ssh-keys/add-or-generate-ssh-key).",
@@ -153,9 +157,8 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 				PlanModifiers: []planmodifier.String{stringplanmodifier.RequiresReplace()},
 			},
 			"user_data": schema.StringAttribute{
-				Description:   "String in base64 format. For Linux instances, 'user_data' is ignored when 'password' field is provided. For Windows instances, Admin user password is set by 'password' field and cannot be updated via 'user_data'. Examples of the `user_data`: https://cloudinit.readthedocs.io/en/latest/topics/examples.html",
-				Optional:      true,
-				PlanModifiers: []planmodifier.String{stringplanmodifier.RequiresReplace()},
+				Description: "String in base64 format. For Linux instances, 'user_data' is ignored when 'password' field is provided. For Windows instances, Admin user password is set by 'password' field and cannot be updated via 'user_data'. Examples of the `user_data`: https://cloudinit.readthedocs.io/en/latest/topics/examples.html",
+				Optional:    true,
 			},
 			"username": schema.StringAttribute{
 				Description:   "For Linux instances, 'username' and 'password' are used to create a new user. For Windows instances, 'username' cannot be specified. Use 'password' field to set the password for the 'Admin' user on Windows.",
@@ -167,38 +170,6 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 				Optional:      true,
 				ElementType:   jsontypes.NormalizedType{},
 				PlanModifiers: []planmodifier.Map{mapplanmodifier.RequiresReplace()},
-			},
-			"ddos_profile": schema.SingleNestedAttribute{
-				Description: "Enable advanced DDoS protection for the server",
-				Optional:    true,
-				Attributes: map[string]schema.Attribute{
-					"profile_template": schema.Int64Attribute{
-						Description: "Unique identifier of the DDoS protection template to use for this profile",
-						Required:    true,
-					},
-					"fields": schema.ListNestedAttribute{
-						Description: "List of field configurations that customize the protection parameters for this profile",
-						Optional:    true,
-						NestedObject: schema.NestedAttributeObject{
-							Attributes: map[string]schema.Attribute{
-								"base_field": schema.Int64Attribute{
-									Description: "Unique identifier of the DDoS protection field being configured",
-									Optional:    true,
-								},
-								"field_value": schema.StringAttribute{
-									Optional:   true,
-									CustomType: jsontypes.NormalizedType{},
-								},
-								"value": schema.StringAttribute{
-									Description:        "Basic type value. Only one of 'value' or 'field_value' must be specified.",
-									Optional:           true,
-									DeprecationMessage: "This attribute is deprecated.",
-								},
-							},
-						},
-					},
-				},
-				PlanModifiers: []planmodifier.Object{objectplanmodifier.RequiresReplace()},
 			},
 			"name": schema.StringAttribute{
 				Description: "Server name.",
@@ -216,10 +187,6 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 				Description: "Datetime when bare metal server was created",
 				Computed:    true,
 				CustomType:  timetypes.RFC3339Type{},
-			},
-			"creator_task_id": schema.StringAttribute{
-				Description: "Task that created this entity",
-				Computed:    true,
 			},
 			"region": schema.StringAttribute{
 				Description: "Region name",
@@ -252,14 +219,6 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 						"VERIFY_RESIZE",
 					),
 				},
-			},
-			"task_id": schema.StringAttribute{
-				Description: "The UUID of the active task that currently holds a lock on the resource. This lock prevents concurrent modifications to ensure consistency. If `null`, the resource is not locked.",
-				Computed:    true,
-			},
-			"task_state": schema.StringAttribute{
-				Description: "Task state",
-				Computed:    true,
 			},
 			"vm_state": schema.StringAttribute{
 				Description: "Bare metal server state\nAvailable values: \"active\", \"building\", \"deleted\", \"error\", \"paused\", \"rescued\", \"resized\", \"shelved\", \"shelved_offloaded\", \"soft-deleted\", \"stopped\", \"suspended\".",
@@ -308,12 +267,6 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 						}.GetType()},
 					},
 				},
-			},
-			"tasks": schema.ListAttribute{
-				Description: "List of task IDs representing asynchronous operations. Use these IDs to monitor operation progress:\n- `GET /v1/tasks/{task_id}` - Check individual task status and details\nPoll task status until completion (`FINISHED`/`ERROR`) before proceeding with dependent operations.",
-				Computed:    true,
-				CustomType:  customfield.NewListType[types.String](ctx),
-				ElementType: types.StringType,
 			},
 			"blackhole_ports": schema.ListNestedAttribute{
 				Description: "IP addresses of the instances that are blackholed by DDoS mitigation system",

@@ -13,6 +13,5 @@ data "gcore_cloud_baremetal_servers" "example_cloud_baremetal_servers" {
   status = "ACTIVE"
   tag_key_value = "tag_key_value"
   tag_value = ["value1", "value2"]
-  type_ddos_profile = "advanced"
   uuid = "b5b4d65d-945f-4b98-ab6f-332319c724ef"
 }

@@ -4,6 +4,7 @@ package cloud_baremetal_server
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"io"
 	"net/http"
@@ -13,8 +14,10 @@ import (
 	"github.com/G-Core/gcore-go/option"
 	"github.com/G-Core/gcore-go/packages/param"
 	"github.com/G-Core/terraform-provider-gcore/internal/apijson"
+	"github.com/G-Core/terraform-provider-gcore/internal/customfield"
 	"github.com/G-Core/terraform-provider-gcore/internal/importpath"
 	"github.com/G-Core/terraform-provider-gcore/internal/logging"
+	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 )
@@ -65,6 +68,9 @@ func (r *CloudBaremetalServerResource) Create(ctx context.Context, req resource.
 		return
 	}
 
+	// Write-only attributes are not available from the plan; read from config.
+	resp.Diagnostics.Append(req.Config.GetAttribute(ctx, path.Root("password_wo"), &data.Password)...)
+
 	params := cloud.BaremetalServerNewParams{}
 
 	if !data.ProjectID.IsNull() {
@@ -80,23 +86,27 @@ func (r *CloudBaremetalServerResource) Create(ctx context.Context, req resource.
 		resp.Diagnostics.AddError("failed to serialize http request", err.Error())
 		return
 	}
-	res := new(http.Response)
-	_, err = r.client.Cloud.Baremetal.Servers.New(
+	baremetalServer, err := r.client.Cloud.Baremetal.Servers.NewAndPoll(
 		ctx,
 		params,
 		option.WithRequestBody("application/json", dataBytes),
-		option.WithResponseBodyInto(&res),
 		option.WithMiddleware(logging.Middleware(ctx)),
 	)
 	if err != nil {
 		resp.Diagnostics.AddError("failed to make http request", err.Error())
 		return
 	}
-	bytes, _ := io.ReadAll(res.Body)
-	err = apijson.UnmarshalComputed(bytes, &data)
+	err = apijson.UnmarshalComputed([]byte(baremetalServer.RawJSON()), &data)
 	if err != nil {
 		resp.Diagnostics.AddError("failed to deserialize http request", err.Error())
 		return
+	}
+
+	// The API returns tags as an array of objects [{key, value, read_only}] which
+	// cannot be deserialized into a Map[string]. Resolve any remaining unknown
+	// tags to null so Terraform doesn't report unknown values after apply.
+	if data.Tags.IsUnknown() {
+		data.Tags = customfield.NullMap[types.String](ctx)
 	}
 
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
@@ -119,42 +129,103 @@ func (r *CloudBaremetalServerResource) Update(ctx context.Context, req resource.
 		return
 	}
 
-	params := cloud.BaremetalServerUpdateParams{}
+	stateHasChanged := false
 
-	if !data.ProjectID.IsNull() {
-		params.ProjectID = param.NewOpt(data.ProjectID.ValueInt64())
+	// Check if name or tags have changed.
+	// Skip unknown values — they indicate computed fields, not user changes.
+	nameChanged := !data.Name.IsUnknown() && !data.Name.Equal(state.Name)
+	tagsChanged := !data.Tags.IsUnknown() && !data.Tags.Equal(state.Tags)
+
+	if nameChanged || tagsChanged {
+		params := cloud.BaremetalServerUpdateParams{}
+
+		if !data.ProjectID.IsNull() {
+			params.ProjectID = param.NewOpt(data.ProjectID.ValueInt64())
+		}
+
+		if !data.RegionID.IsNull() {
+			params.RegionID = param.NewOpt(data.RegionID.ValueInt64())
+		}
+
+		dataBytes, err := data.MarshalJSONForUpdate(*state)
+		if err != nil {
+			resp.Diagnostics.AddError("failed to serialize http request", err.Error())
+			return
+		}
+		res := new(http.Response)
+		_, err = r.client.Cloud.Baremetal.Servers.Update(
+			ctx,
+			data.ID.ValueString(),
+			params,
+			option.WithRequestBody("application/json", dataBytes),
+			option.WithResponseBodyInto(&res),
+			option.WithMiddleware(logging.Middleware(ctx)),
+		)
+		if err != nil {
+			resp.Diagnostics.AddError("failed to make http request", err.Error())
+			return
+		}
+		bytes, _ := io.ReadAll(res.Body)
+		err = apijson.UnmarshalComputed(bytes, &data)
+		if err != nil {
+			resp.Diagnostics.AddError("failed to deserialize http request", err.Error())
+			return
+		}
+		stateHasChanged = true
 	}
 
-	if !data.RegionID.IsNull() {
-		params.RegionID = param.NewOpt(data.RegionID.ValueInt64())
+	// Check if image_id or user_data have changed, if so perform a server rebuild operation.
+	imageChanged := !data.ImageID.IsNull() && data.ImageID.ValueString() != state.ImageID.ValueString()
+	userDataChanged := !data.UserData.IsNull() && data.UserData.ValueString() != state.UserData.ValueString()
+
+	if imageChanged || userDataChanged {
+		params := cloud.BaremetalServerRebuildParams{}
+		if !data.ProjectID.IsNull() {
+			params.ProjectID = param.NewOpt(data.ProjectID.ValueInt64())
+		}
+		if !data.RegionID.IsNull() {
+			params.RegionID = param.NewOpt(data.RegionID.ValueInt64())
+		}
+		if !data.ImageID.IsNull() {
+			params.ImageID = param.NewOpt(data.ImageID.ValueString())
+		}
+		if !data.UserData.IsNull() {
+			params.UserData = param.NewOpt(data.UserData.ValueString())
+		}
+		server, err := r.client.Cloud.Baremetal.Servers.RebuildAndPoll(
+			ctx,
+			data.ID.ValueString(),
+			params,
+			option.WithMiddleware(logging.Middleware(ctx)),
+		)
+		if err != nil {
+			resp.Diagnostics.AddError("failed to make http request", err.Error())
+			return
+		}
+		err = apijson.UnmarshalComputed([]byte(server.RawJSON()), &data)
+		if err != nil {
+			resp.Diagnostics.AddError("failed to deserialize http request", err.Error())
+			return
+		}
+		stateHasChanged = true
 	}
 
-	dataBytes, err := data.MarshalJSONForUpdate(*state)
-	if err != nil {
-		resp.Diagnostics.AddError("failed to serialize http request", err.Error())
-		return
+	if stateHasChanged {
+		// The API returns tags as an array of objects [{key, value, read_only}] which
+		// cannot be deserialized into a Map[string]. Resolve any remaining unknown
+		// tags to null so Terraform doesn't report unknown values after apply.
+		if data.Tags.IsUnknown() {
+			data.Tags = customfield.NullMap[types.String](ctx)
+		}
+		resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
+	} else {
+		// No API changes were made, but no_refresh fields (like interfaces) may
+		// need to be populated in state from the plan. This handles the post-import
+		// scenario: after import, interfaces is null in state because the API doesn't
+		// return it. The one-time update-in-place persists the config value to state
+		// so that future changes trigger replacement correctly.
+		resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("interfaces"), data.Interfaces)...)
 	}
-	res := new(http.Response)
-	_, err = r.client.Cloud.Baremetal.Servers.Update(
-		ctx,
-		data.ID.ValueString(),
-		params,
-		option.WithRequestBody("application/json", dataBytes),
-		option.WithResponseBodyInto(&res),
-		option.WithMiddleware(logging.Middleware(ctx)),
-	)
-	if err != nil {
-		resp.Diagnostics.AddError("failed to make http request", err.Error())
-		return
-	}
-	bytes, _ := io.ReadAll(res.Body)
-	err = apijson.UnmarshalComputed(bytes, &data)
-	if err != nil {
-		resp.Diagnostics.AddError("failed to deserialize http request", err.Error())
-		return
-	}
-
-	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
 }
 
 func (r *CloudBaremetalServerResource) Read(ctx context.Context, req resource.ReadRequest, resp *resource.ReadResponse) {
@@ -222,7 +293,7 @@ func (r *CloudBaremetalServerResource) Delete(ctx context.Context, req resource.
 		params.RegionID = param.NewOpt(data.RegionID.ValueInt64())
 	}
 
-	_, err := r.client.Cloud.Baremetal.Servers.Delete(
+	err := r.client.Cloud.Baremetal.Servers.DeleteAndPoll(
 		ctx,
 		data.ID.ValueString(),
 		params,
@@ -278,6 +349,59 @@ func (r *CloudBaremetalServerResource) ImportState(ctx context.Context, req reso
 	if err != nil {
 		resp.Diagnostics.AddError("failed to deserialize http request", err.Error())
 		return
+	}
+
+	// Workaround: Fields with no_refresh tag are skipped during Unmarshal.
+	// For import, we need to manually extract these from the raw API response.
+	var rawResponse struct {
+		Tags []struct {
+			Key      string `json:"key"`
+			Value    string `json:"value"`
+			ReadOnly bool   `json:"read_only"`
+		} `json:"tags"`
+		Flavor struct {
+			FlavorName string `json:"flavor_name"`
+		} `json:"flavor"`
+		Metadata struct {
+			ImageID string `json:"image_id"`
+		} `json:"metadata"`
+		SSHKeyName string `json:"ssh_key_name"`
+	}
+	if err := json.Unmarshal(bytes, &rawResponse); err == nil {
+		// tags: API returns array of {key, value, read_only} objects, but model expects map[string]string.
+		// Filter out read-only tags (system-managed) so they don't cause drift.
+		tagsMap := make(map[string]types.String)
+		for _, tag := range rawResponse.Tags {
+			if !tag.ReadOnly {
+				tagsMap[tag.Key] = types.StringValue(tag.Value)
+			}
+		}
+		if len(tagsMap) > 0 {
+			data.Tags = customfield.NewMapMust[types.String](ctx, tagsMap)
+		} else {
+			data.Tags = customfield.NullMap[types.String](ctx)
+		}
+		// flavor: API returns nested object, model expects string.
+		if rawResponse.Flavor.FlavorName != "" {
+			data.Flavor = types.StringValue(rawResponse.Flavor.FlavorName)
+		}
+		// image_id: stored in metadata, not as a top-level field in the response.
+		if rawResponse.Metadata.ImageID != "" {
+			data.ImageID = types.StringValue(rawResponse.Metadata.ImageID)
+		}
+		// ssh_key_name: API returns keypair UUID, look up the human-readable name.
+		if rawResponse.SSHKeyName != "" {
+			sshKey, sshErr := r.client.Cloud.SSHKeys.Get(
+				ctx,
+				rawResponse.SSHKeyName,
+				cloud.SSHKeyGetParams{
+					ProjectID: param.NewOpt(path_project_id),
+				},
+			)
+			if sshErr == nil {
+				data.SSHKeyName = types.StringValue(sshKey.Name)
+			}
+		}
 	}
 
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
