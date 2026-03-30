@@ -15,6 +15,7 @@ import (
 	"github.com/G-Core/terraform-provider-gcore/internal/services/cdn_resource_rule"
 	"github.com/G-Core/terraform-provider-gcore/internal/services/cdn_rule_template"
 	"github.com/G-Core/terraform-provider-gcore/internal/services/cdn_trusted_ca_certificate"
+	"github.com/G-Core/terraform-provider-gcore/internal/services/cloud_baremetal_server"
 	"github.com/G-Core/terraform-provider-gcore/internal/services/cloud_file_share"
 	"github.com/G-Core/terraform-provider-gcore/internal/services/cloud_file_share_access_rule"
 	"github.com/G-Core/terraform-provider-gcore/internal/services/cloud_floating_ip"
@@ -219,6 +220,7 @@ func (p *GcoreProvider) Resources(ctx context.Context) []func() resource.Resourc
 		cloud_inference_registry_credential.NewResource,
 		cloud_inference_secret.NewResource,
 		cloud_placement_group.NewResource,
+		cloud_baremetal_server.NewResource,
 		cloud_file_share.NewResource,
 		cloud_file_share_access_rule.NewResource,
 		cloud_gpu_baremetal_cluster.NewResource,
@@ -280,6 +282,8 @@ func (p *GcoreProvider) DataSources(ctx context.Context) []func() datasource.Dat
 		cloud_inference_secret.NewCloudInferenceSecretDataSource,
 		cloud_inference_secret.NewCloudInferenceSecretsDataSource,
 		cloud_placement_group.NewCloudPlacementGroupDataSource,
+		cloud_baremetal_server.NewCloudBaremetalServerDataSource,
+		cloud_baremetal_server.NewCloudBaremetalServersDataSource,
 		cloud_file_share.NewCloudFileShareDataSource,
 		cloud_file_share.NewCloudFileSharesDataSource,
 		cloud_gpu_baremetal_cluster.NewCloudGPUBaremetalClusterDataSource,
