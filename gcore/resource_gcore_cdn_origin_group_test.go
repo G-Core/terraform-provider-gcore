@@ -4,12 +4,10 @@
 package gcore
 
 import (
-	"errors"
 	"fmt"
 	"testing"
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
-	"github.com/hashicorp/terraform-plugin-sdk/v2/terraform"
 )
 
 func TestAccOriginGroup(t *testing.T) {
@@ -53,14 +51,10 @@ func TestAccOriginGroup(t *testing.T) {
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckResourceExists(fullName),
 					resource.TestCheckResourceAttr(fullName, "name", "terraform_acctest_group"),
-					or(
-						resource.TestCheckResourceAttr(fullName, "origin.0.source", create.Source),
-						resource.TestCheckResourceAttr(fullName, "origin.1.source", create.Source),
-					),
-					or(
-						resource.TestCheckResourceAttr(fullName, "origin.0.enabled", create.Enabled),
-						resource.TestCheckResourceAttr(fullName, "origin.1.enabled", create.Enabled),
-					),
+					resource.TestCheckResourceAttr(fullName, "origin.0.source", create.Source),
+					resource.TestCheckResourceAttr(fullName, "origin.0.enabled", create.Enabled),
+					resource.TestCheckResourceAttr(fullName, "origin.1.source", "yandex.ru"),
+					resource.TestCheckResourceAttr(fullName, "origin.1.enabled", "true"),
 				),
 			},
 			{
@@ -68,33 +62,99 @@ func TestAccOriginGroup(t *testing.T) {
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckResourceExists(fullName),
 					resource.TestCheckResourceAttr(fullName, "name", "terraform_acctest_group"),
-					or(
-						resource.TestCheckResourceAttr(fullName, "origin.0.source", update.Source),
-						resource.TestCheckResourceAttr(fullName, "origin.1.source", update.Source),
-					),
-					or(
-						resource.TestCheckResourceAttr(fullName, "origin.0.enabled", update.Enabled),
-						resource.TestCheckResourceAttr(fullName, "origin.1.enabled", update.Enabled),
-					),
+					resource.TestCheckResourceAttr(fullName, "origin.0.source", update.Source),
+					resource.TestCheckResourceAttr(fullName, "origin.0.enabled", update.Enabled),
+					resource.TestCheckResourceAttr(fullName, "origin.1.source", "yandex.ru"),
+					resource.TestCheckResourceAttr(fullName, "origin.1.enabled", "true"),
 				),
 			},
 		},
 	})
 }
 
-func or(checks ...resource.TestCheckFunc) resource.TestCheckFunc {
-	return func(t *terraform.State) error {
-		var composed string
+func TestAccOriginGroupMixed(t *testing.T) {
+	fullName := "gcore_cdn_origingroup.acctest_mixed"
 
-		for _, check := range checks {
-			err := check(t)
-			if err == nil {
-				return nil
-			}
+	config := `
+		resource "gcore_cdn_origingroup" "acctest_mixed" {
+		  name     = "terraform_acctest_mixed_group"
+		  use_next = true
 
-			composed += err.Error() + "; "
+		  origin {
+		    source  = "cdn.example.com"
+		    enabled = true
+		  }
+
+		  origin {
+		    origin_type = "s3"
+		    enabled     = true
+		    backup      = true
+		    config {
+		      s3_type              = "amazon"
+		      s3_bucket_name       = "test-bucket"
+		      s3_region            = "eu-west-1"
+		      s3_access_key_id     = "AKIAIOSFODNN7EXAMPLE"
+		      s3_secret_access_key = "wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY"
+		    }
+		  }
 		}
+	`
 
-		return errors.New(composed)
-	}
+	resource.Test(t, resource.TestCase{
+		PreCheck: func() {
+			testAccPreCheckVars(t, GCORE_USERNAME_VAR, GCORE_PASSWORD_VAR, GCORE_CDN_URL_VAR)
+		},
+		ProviderFactories: testAccProviders,
+		Steps: []resource.TestStep{
+			{
+				Config: config,
+				Check: resource.ComposeTestCheckFunc(
+					testAccCheckResourceExists(fullName),
+					resource.TestCheckResourceAttr(fullName, "name", "terraform_acctest_mixed_group"),
+					resource.TestCheckResourceAttr(fullName, "origin.#", "2"),
+				),
+			},
+		},
+	})
 }
+
+func TestAccOriginGroupS3Origin(t *testing.T) {
+	fullName := "gcore_cdn_origingroup.acctest_s3"
+
+	config := `
+		resource "gcore_cdn_origingroup" "acctest_s3" {
+		  name     = "terraform_acctest_s3_group"
+		  use_next = true
+
+		  origin {
+		    origin_type = "s3"
+		    enabled     = true
+		    config {
+		      s3_type              = "amazon"
+		      s3_bucket_name       = "test-bucket"
+		      s3_region            = "eu-west-1"
+		      s3_access_key_id     = "AKIAIOSFODNN7EXAMPLE"
+		      s3_secret_access_key = "wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY"
+		    }
+		  }
+		}
+	`
+
+	resource.Test(t, resource.TestCase{
+		PreCheck: func() {
+			testAccPreCheckVars(t, GCORE_USERNAME_VAR, GCORE_PASSWORD_VAR, GCORE_CDN_URL_VAR)
+		},
+		ProviderFactories: testAccProviders,
+		Steps: []resource.TestStep{
+			{
+				Config: config,
+				Check: resource.ComposeTestCheckFunc(
+					testAccCheckResourceExists(fullName),
+					resource.TestCheckResourceAttr(fullName, "name", "terraform_acctest_s3_group"),
+					resource.TestCheckResourceAttr(fullName, "origin.#", "1"),
+				),
+			},
+		},
+	})
+}
+

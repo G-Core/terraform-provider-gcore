@@ -2,10 +2,7 @@ package gcore
 
 import (
 	"context"
-	"crypto/md5"
-	"encoding/binary"
 	"fmt"
-	"io"
 	"log"
 	"strconv"
 
@@ -40,15 +37,15 @@ func resourceCDNOriginGroup() *schema.Resource {
 				Description: "Available values: error, timeout, invalid_header, http_403, http_404, http_429, http_500, http_502, http_503, http_504.",
 			},
 			"origin": {
-				Type:        schema.TypeSet,
+				Type:        schema.TypeList,
 				Optional:    true,
-				Description: "Contains information about all IP address or Domain names of your origin and the port if custom. This field is required unless `auth` is specified. `origin` and `auth` cannot both be specified simultaneously.",
+				Description: "Contains information about origins in the group. Each origin can be a host origin or an S3 origin. Host origins require `source`, S3 origins require `origin_type = \"s3\"` and a `config` block.",
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
 						"source": {
 							Type:        schema.TypeString,
-							Required:    true,
-							Description: "IP address or Domain name of your origin and the port if custom",
+							Optional:    true,
+							Description: "IP address or Domain name of your origin and the port if custom. Required for host origins.",
 						},
 						"enabled": {
 							Type:        schema.TypeBool,
@@ -62,6 +59,68 @@ func resourceCDNOriginGroup() *schema.Resource {
 							Default:     false,
 							Description: "Defines whether the origin is a backup, meaning that it will not be used until one of active origins become unavailable. Default value is false.",
 						},
+						"origin_type": {
+							Type:         schema.TypeString,
+							Optional:     true,
+							Default:      "host",
+							ValidateFunc: validation.StringInSlice([]string{"host", "s3"}, false),
+							Description:  "Type of the origin: 'host' (default) or 's3'.",
+						},
+						"host_header_override": {
+							Type:        schema.TypeString,
+							Optional:    true,
+							Description: "Per-origin host header override.",
+						},
+						"config": {
+							Type:        schema.TypeList,
+							Optional:    true,
+							MaxItems:    1,
+							Description: "S3 configuration for the origin. Required when origin_type is 's3'.",
+							Elem: &schema.Resource{
+								Schema: map[string]*schema.Schema{
+									"s3_type": {
+										Type:         schema.TypeString,
+										Required:     true,
+										ValidateFunc: validation.StringInSlice([]string{"other", "amazon"}, false),
+										Description:  "Type of S3 storage: 'amazon' or 'other'.",
+									},
+									"s3_bucket_name": {
+										Type:        schema.TypeString,
+										Required:    true,
+										Description: "S3 bucket name.",
+									},
+									"s3_region": {
+										Type:        schema.TypeString,
+										Optional:    true,
+										Description: "S3 region. Required when s3_type is 'amazon'.",
+									},
+									"s3_storage_hostname": {
+										Type:        schema.TypeString,
+										Optional:    true,
+										Description: "S3 storage hostname. Required when s3_type is 'other'.",
+									},
+									"s3_access_key_id": {
+										Type:        schema.TypeString,
+										Required:    true,
+										Sensitive:   true,
+										Description: "S3 access key ID.",
+									},
+									"s3_secret_access_key": {
+										Type:        schema.TypeString,
+										Required:    true,
+										Sensitive:   true,
+										Description: "S3 secret access key.",
+									},
+									"s3_auth_type": {
+										Type:         schema.TypeString,
+										Optional:     true,
+										Default:      "awsSignatureV4",
+										ValidateFunc: validation.StringInSlice([]string{"awsSignatureV4"}, false),
+										Description:  "S3 authentication type. Default: 'awsSignatureV4'.",
+									},
+								},
+							},
+						},
 					},
 				},
 			},
@@ -69,7 +128,8 @@ func resourceCDNOriginGroup() *schema.Resource {
 				Type:        schema.TypeList,
 				Optional:    true,
 				MaxItems:    1,
-				Description: "Authentication configuration for S3 storage. This field is required unless `origin` is specified. `auth` and `origin` cannot both be specified simultaneously.",
+				Deprecated:  "Use `origin` blocks with `origin_type = \"s3\"` instead. The `auth` block will be removed in a future version.",
+				Description: "Deprecated: Authentication configuration for S3 storage. Use `origin` blocks with `origin_type = \"s3\"` instead.",
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
 						"s3_type": {
@@ -123,11 +183,11 @@ func validateCDNOriginGroupConfig(ctx context.Context, diff *schema.ResourceDiff
 	authRaw, authExists := diff.GetOk("auth")
 
 	if !originExists && !authExists {
-		return fmt.Errorf("One of `origin` or `auth` must be specified")
+		return fmt.Errorf("one of `origin` or `auth` must be specified")
 	}
 
 	if originExists && authExists {
-		return fmt.Errorf("Both `origin` and `auth` cannot be specified at the same time")
+		return fmt.Errorf("`origin` and `auth` cannot both be specified at the same time")
 	}
 
 	if authExists {
@@ -151,6 +211,56 @@ func validateCDNOriginGroupConfig(ctx context.Context, diff *schema.ResourceDiff
 		}
 	}
 
+	if originExists {
+		originList := diff.Get("origin").([]interface{})
+		for i, originRaw := range originList {
+			if originRaw == nil {
+				continue
+			}
+			origin := originRaw.(map[string]interface{})
+			originType, _ := origin["origin_type"].(string)
+			if originType == "" {
+				originType = "host"
+			}
+
+			if originType == "host" {
+				source, _ := origin["source"].(string)
+				if source == "" {
+					return fmt.Errorf("origin.%d: `source` is required for host origins", i)
+				}
+			}
+
+			if originType == "s3" {
+				configList, _ := origin["config"].([]interface{})
+				if len(configList) > 0 && configList[0] != nil {
+					if cfg, ok := configList[0].(map[string]interface{}); ok {
+						if err := validateS3ConfigFields(i, cfg); err != nil {
+							return err
+						}
+					}
+				}
+			}
+		}
+	}
+
+	return nil
+}
+
+func validateS3ConfigFields(index int, cfg map[string]interface{}) error {
+	s3Type, _ := cfg["s3_type"].(string)
+
+	if s3Type == "other" {
+		if val, ok := cfg["s3_storage_hostname"].(string); !ok || val == "" {
+			return fmt.Errorf("origin.%d.config: `s3_storage_hostname` is required when `s3_type` is 'other'", index)
+		}
+	}
+
+	if s3Type == "amazon" {
+		if val, ok := cfg["s3_region"].(string); !ok || val == "" {
+			return fmt.Errorf("origin.%d.config: `s3_region` is required when `s3_type` is 'amazon'", index)
+		}
+	}
+
 	return nil
 }
 
@@ -163,9 +273,9 @@ func resourceCDNOriginGroupCreate(ctx context.Context, d *schema.ResourceData, m
 	req.Name = d.Get("name").(string)
 	req.UseNext = d.Get("use_next").(bool)
 
-	if originSet, ok := d.GetOk("origin"); ok {
+	if originList, ok := d.GetOk("origin"); ok {
 		req.AuthType = "none"
-		req.Sources = setToSourceRequests(originSet.(*schema.Set))
+		req.Sources = listToSourceRequests(originList.([]interface{}))
 	} else {
 		req.AuthType = "awsSignatureV4"
 		req.Auth = listToAuthS3(d.Get("auth").([]interface{}))
@@ -229,12 +339,20 @@ func resourceCDNOriginGroupRead(ctx context.Context, d *schema.ResourceData, m i
 
 	d.Set("name", result.Name)
 	d.Set("use_next", result.UseNext)
-	if err := d.Set("origin", originsToSet(result.Sources)); err != nil {
-		return diag.FromErr(err)
-	}
 	d.Set("proxy_next_upstream", result.ProxyNextUpstream)
 
-	// keep s3_secret_access_key and s3_access_key_id unchanged by API response
+	// Preserve S3 credentials from current state before setting origins from API.
+	// The API masks sensitive values, so we keep the user-provided ones.
+	s3Credentials := preserveS3OriginCredentials(d)
+
+	originsList := sourcesToList(result.Sources)
+	restoreS3OriginCredentials(originsList, s3Credentials)
+
+	if err := d.Set("origin", originsList); err != nil {
+		return diag.FromErr(err)
+	}
+
+	// Legacy auth block: keep s3_secret_access_key and s3_access_key_id unchanged by API response
 	currentSecretAccessKey, keyExists := d.GetOk("auth.0.s3_secret_access_key")
 	currentAccessKeyID, keyIDExists := d.GetOk("auth.0.s3_access_key_id")
 	if err := d.Set("auth", authToList(result.Auth)); err != nil {
@@ -271,16 +389,16 @@ func resourceCDNOriginGroupUpdate(ctx context.Context, d *schema.ResourceData, m
 	req.Name = d.Get("name").(string)
 	req.UseNext = d.Get("use_next").(bool)
 
-	if originSet, ok := d.GetOk("origin"); ok {
+	if originList, ok := d.GetOk("origin"); ok {
 		req.AuthType = "none"
-		req.Sources = setToSourceRequests(originSet.(*schema.Set))
+		req.Sources = listToSourceRequests(originList.([]interface{}))
 	} else {
 		req.AuthType = "awsSignatureV4"
 		req.Auth = listToAuthS3(d.Get("auth").([]interface{}))
 		req.Sources = nil
 	}
 
-	if req.UseNext == true {
+	if req.UseNext {
 		proxyNextUpstream, ok := d.Get("proxy_next_upstream").(*schema.Set)
 		if ok && proxyNextUpstream.Len() > 0 {
 			req.ProxyNextUpstream = make([]string, 0)
@@ -337,52 +455,170 @@ func resourceCDNOriginGroupDelete(ctx context.Context, d *schema.ResourceData, m
 	return nil
 }
 
-func setToSourceRequests(s *schema.Set) (origins []origingroups.SourceRequest) {
-	for _, fields := range s.List() {
-		var originReq origingroups.SourceRequest
+func listToSourceRequests(origins []interface{}) []origingroups.SourceRequest {
+	var result []origingroups.SourceRequest
 
-		for key, val := range fields.(map[string]interface{}) {
-			switch key {
-			case "source":
-				originReq.Source = val.(string)
-			case "enabled":
-				originReq.Enabled = val.(bool)
-			case "backup":
-				originReq.Backup = val.(bool)
-			}
+	for _, raw := range origins {
+		if raw == nil {
+			continue
+		}
+		fields := raw.(map[string]interface{})
+		originType, _ := fields["origin_type"].(string)
+		if originType == "" {
+			originType = "host"
 		}
 
-		origins = append(origins, originReq)
+		originReq := origingroups.SourceRequest{
+			Enabled: fields["enabled"].(bool),
+			Backup:  fields["backup"].(bool),
+		}
+
+		if hostHeader, ok := fields["host_header_override"].(string); ok && hostHeader != "" {
+			originReq.HostHeaderOverride = &hostHeader
+		}
+
+		if originType == "s3" {
+			originReq.OriginType = "s3"
+			configList, _ := fields["config"].([]interface{})
+			if len(configList) > 0 && configList[0] != nil {
+				cfg := configList[0].(map[string]interface{})
+				s3AuthType, _ := cfg["s3_auth_type"].(string)
+				if s3AuthType == "" {
+					s3AuthType = "awsSignatureV4"
+				}
+				originReq.Config = &origingroups.S3Config{
+					S3Type:            cfg["s3_type"].(string),
+					S3BucketName:      cfg["s3_bucket_name"].(string),
+					S3AccessKeyID:     cfg["s3_access_key_id"].(string),
+					S3SecretAccessKey: cfg["s3_secret_access_key"].(string),
+					S3AuthType:        s3AuthType,
+				}
+				if region, ok := cfg["s3_region"].(string); ok && region != "" {
+					originReq.Config.S3Region = region
+				}
+				if hostname, ok := cfg["s3_storage_hostname"].(string); ok && hostname != "" {
+					originReq.Config.S3StorageHostname = hostname
+				}
+			}
+		} else {
+			originReq.Source, _ = fields["source"].(string)
+		}
+
+		result = append(result, originReq)
 	}
 
-	return origins
+	return result
 }
 
-func originsToSet(origins []origingroups.Source) *schema.Set {
-	s := &schema.Set{F: originSetIDFunc}
+func sourcesToList(sources []origingroups.Source) []interface{} {
+	var result []interface{}
 
-	for _, origin := range origins {
-		fields := make(map[string]interface{})
-		fields["source"] = origin.Source
-		fields["enabled"] = origin.Enabled
-		fields["backup"] = origin.Backup
+	for _, origin := range sources {
+		fields := map[string]interface{}{
+			"enabled":              origin.Enabled,
+			"backup":               origin.Backup,
+			"source":               origin.Source,
+			"origin_type":          "host",
+			"host_header_override": "",
+			"config":               []interface{}{},
+		}
 
-		s.Add(fields)
+		if origin.HostHeaderOverride != nil {
+			fields["host_header_override"] = *origin.HostHeaderOverride
+		}
+
+		if origin.OriginType == "s3" && origin.Config != nil {
+			fields["origin_type"] = "s3"
+			fields["source"] = ""
+			cfgMap := map[string]interface{}{
+				"s3_type":              origin.Config.S3Type,
+				"s3_bucket_name":       origin.Config.S3BucketName,
+				"s3_region":            origin.Config.S3Region,
+				"s3_storage_hostname":  origin.Config.S3StorageHostname,
+				"s3_access_key_id":     origin.Config.S3AccessKeyID,
+				"s3_secret_access_key": origin.Config.S3SecretAccessKey,
+				"s3_auth_type":         "awsSignatureV4",
+			}
+			if origin.Config.S3AuthType != "" {
+				cfgMap["s3_auth_type"] = origin.Config.S3AuthType
+			}
+			fields["config"] = []interface{}{cfgMap}
+		}
+
+		result = append(result, fields)
 	}
 
-	return s
+	return result
 }
 
-func originSetIDFunc(i interface{}) int {
-	fields := i.(map[string]interface{})
-	h := md5.New()
+// s3OriginCredentials stores S3 credentials keyed by bucket name for state preservation.
+type s3OriginCredentials struct {
+	accessKeyID     string
+	secretAccessKey string
+}
 
-	key := fmt.Sprintf("%d-%s-%t", fields["source"], fields["enabled"], fields["backup"])
-	log.Printf("[DEBUG] Origin Set ID = %s\n", key)
+// preserveS3OriginCredentials extracts S3 credentials from current state before API read overwrites them.
+func preserveS3OriginCredentials(d *schema.ResourceData) map[string]s3OriginCredentials {
+	creds := make(map[string]s3OriginCredentials)
+	originList, ok := d.GetOk("origin")
+	if !ok {
+		return creds
+	}
+	for _, raw := range originList.([]interface{}) {
+		if raw == nil {
+			continue
+		}
+		origin := raw.(map[string]interface{})
+		originType, _ := origin["origin_type"].(string)
+		if originType != "s3" {
+			continue
+		}
+		configList, ok := origin["config"].([]interface{})
+		if !ok || len(configList) == 0 || configList[0] == nil {
+			continue
+		}
+		cfg := configList[0].(map[string]interface{})
+		bucketName, _ := cfg["s3_bucket_name"].(string)
+		if bucketName == "" {
+			continue
+		}
+		accessKeyID, _ := cfg["s3_access_key_id"].(string)
+		secretAccessKey, _ := cfg["s3_secret_access_key"].(string)
+		if accessKeyID != "" || secretAccessKey != "" {
+			creds[bucketName] = s3OriginCredentials{
+				accessKeyID:     accessKeyID,
+				secretAccessKey: secretAccessKey,
+			}
+		}
+	}
+	return creds
+}
 
-	io.WriteString(h, key)
-
-	return int(binary.BigEndian.Uint64(h.Sum(nil)))
+// restoreS3OriginCredentials restores S3 credentials in the origins list after API read.
+func restoreS3OriginCredentials(origins []interface{}, creds map[string]s3OriginCredentials) {
+	if len(creds) == 0 {
+		return
+	}
+	for _, raw := range origins {
+		if raw == nil {
+			continue
+		}
+		origin := raw.(map[string]interface{})
+		originType, _ := origin["origin_type"].(string)
+		if originType != "s3" {
+			continue
+		}
+		configList, ok := origin["config"].([]interface{})
+		if !ok || len(configList) == 0 || configList[0] == nil {
+			continue
+		}
+		cfg := configList[0].(map[string]interface{})
+		bucketName, _ := cfg["s3_bucket_name"].(string)
+		if saved, ok := creds[bucketName]; ok {
+			cfg["s3_access_key_id"] = saved.accessKeyID
+			cfg["s3_secret_access_key"] = saved.secretAccessKey
+		}
+	}
 }
 
 func listToAuthS3(authList []interface{}) *origingroups.AuthS3 {
