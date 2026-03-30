@@ -238,6 +238,10 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 												Description: "Administrative state of the resource. When set to true, the resource is enabled and operational. When set to false, the resource is disabled and will not process traffic. Defaults to true.",
 												Optional:    true,
 											},
+											"domain_name": schema.StringAttribute{
+												Description: "Domain name for HTTP host header. Can only be used together with `HTTP` or `HTTPS` health monitor type.",
+												Optional:    true,
+											},
 											"expected_codes": schema.StringAttribute{
 												Description: "Expected HTTP response codes. Can be a single code or a range of codes. Can only be used together with `HTTP` or `HTTPS` health monitor type. For example, 200,202,300-302,401,403,404,500-504. If not specified, the default is 200.",
 												Optional:    true,
@@ -257,6 +261,13 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 														"PUT",
 														"TRACE",
 													),
+												},
+											},
+											"http_version": schema.StringAttribute{
+												Description: "HTTP version. Can only be used together with `HTTP` or `HTTPS` health monitor type. Supported values: 1.0, 1.1.\nAvailable values: \"1.0\", \"1.1\".",
+												Optional:    true,
+												Validators: []validator.String{
+													stringvalidator.OneOfCaseInsensitive("1.0", "1.1"),
 												},
 											},
 											"max_retries_down": schema.Int64Attribute{

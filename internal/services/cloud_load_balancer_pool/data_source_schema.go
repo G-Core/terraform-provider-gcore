@@ -158,6 +158,17 @@ func DataSourceSchema(ctx context.Context) schema.Schema {
 							int64validator.Between(1, 2147483647),
 						},
 					},
+					"domain_name": schema.StringAttribute{
+						Description: "Domain name for HTTP host header. Can only be used together with `HTTP` or `HTTPS` health monitor type.",
+						Computed:    true,
+					},
+					"http_version": schema.StringAttribute{
+						Description: "HTTP version. Can only be used together with `HTTP` or `HTTPS` health monitor type.\nAvailable values: \"1.0\", \"1.1\".",
+						Computed:    true,
+						Validators: []validator.String{
+							stringvalidator.OneOfCaseInsensitive("1.0", "1.1"),
+						},
+					},
 					"max_retries": schema.Int64Attribute{
 						Description: "Number of successes before the member is switched to ONLINE state",
 						Computed:    true,

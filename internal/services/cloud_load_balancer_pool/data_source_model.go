@@ -55,6 +55,8 @@ type CloudLoadBalancerPoolHealthmonitorDataSourceModel struct {
 	ID                 types.String `tfsdk:"id" json:"id,computed"`
 	AdminStateUp       types.Bool   `tfsdk:"admin_state_up" json:"admin_state_up,computed"`
 	Delay              types.Int64  `tfsdk:"delay" json:"delay,computed"`
+	DomainName         types.String `tfsdk:"domain_name" json:"domain_name,computed"`
+	HTTPVersion        types.String `tfsdk:"http_version" json:"http_version,computed"`
 	MaxRetries         types.Int64  `tfsdk:"max_retries" json:"max_retries,computed"`
 	MaxRetriesDown     types.Int64  `tfsdk:"max_retries_down" json:"max_retries_down,computed"`
 	OperatingStatus    types.String `tfsdk:"operating_status" json:"operating_status,computed"`

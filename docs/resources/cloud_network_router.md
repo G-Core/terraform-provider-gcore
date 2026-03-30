@@ -41,7 +41,7 @@ resource "gcore_cloud_network_router" "example_cloud_network_router" {
 
 ### Optional
 
-- `external_gateway_info` (Attributes) (see [below for nested schema](#nestedatt--external_gateway_info))
+- `external_gateway_info` (Attributes) External gateway configuration. Use type 'default' to let the platform automatically select the external network, or type 'manual' to specify a particular external network via `network_id`. If omitted, the router is created without an external gateway. (see [below for nested schema](#nestedatt--external_gateway_info))
 - `interfaces` (Attributes List) List of interfaces to attach to router immediately after creation. (see [below for nested schema](#nestedatt--interfaces))
 - `project_id` (Number)
 - `region_id` (Number)
@@ -67,8 +67,8 @@ Poll task status until completion (`FINISHED`/`ERROR`) before proceeding with de
 Optional:
 
 - `enable_snat` (Boolean) Is SNAT enabled. Defaults to true.
-- `network_id` (String) id of the external network.
-- `type` (String) must be 'manual'.
+- `network_id` (String) ID of the external network to connect the router to.
+- `type` (String) Gateway type. Use 'manual' to explicitly specify which external network the router connects to via `network_id`. Required for PATCH/update operations.
 Available values: "manual", "default".
 
 

@@ -50,8 +50,10 @@ type CloudLoadBalancerPoolHealthmonitorModel struct {
 	Timeout        types.Int64  `tfsdk:"timeout" json:"timeout,required"`
 	Type           types.String `tfsdk:"type" json:"type,required"`
 	AdminStateUp   types.Bool   `tfsdk:"admin_state_up" json:"admin_state_up,optional"`
+	DomainName     types.String `tfsdk:"domain_name" json:"domain_name,optional"`
 	ExpectedCodes  types.String `tfsdk:"expected_codes" json:"expected_codes,optional"`
 	HTTPMethod     types.String `tfsdk:"http_method" json:"http_method,optional"`
+	HTTPVersion    types.String `tfsdk:"http_version" json:"http_version,optional"`
 	MaxRetriesDown types.Int64  `tfsdk:"max_retries_down" json:"max_retries_down,optional"`
 	URLPath        types.String `tfsdk:"url_path" json:"url_path,optional"`
 }

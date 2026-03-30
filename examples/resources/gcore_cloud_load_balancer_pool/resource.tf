@@ -12,8 +12,10 @@ resource "gcore_cloud_load_balancer_pool" "example_cloud_load_balancer_pool" {
     timeout = 5
     type = "HTTP"
     admin_state_up = true
+    domain_name = "example.com"
     expected_codes = "200,301,302"
     http_method = "GET"
+    http_version = "1.1"
     max_retries_down = 3
     url_path = "/"
   }
