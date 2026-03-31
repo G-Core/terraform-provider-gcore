@@ -64,8 +64,7 @@ resource "gcore_fastedge_app" "api_gateway" {
 - `comment` (String) Optional human-readable description of the application's purpose
 - `debug` (Boolean) Enable verbose debug logging for 30 minutes. Automatically expires to prevent performance impact.
 - `env` (Map of String) Environment variables
-- `log` (String) Logging channel. Use 'kafka' to enable log collection (queryable via API), or 'none' to disable logging.
-Available values: "kafka", "none".
+- `log` (String, Deprecated) Available values: "kafka", "none".
 - `name` (String) Unique application name (alphanumeric, hyphens allowed)
 - `rsp_headers` (Map of String) Extra headers to add to the response
 - `secrets` (Attributes Map) Application secrets (see [below for nested schema](#nestedatt--secrets))
