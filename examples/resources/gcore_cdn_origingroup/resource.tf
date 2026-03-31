@@ -44,8 +44,9 @@ resource "gcore_cdn_origingroup" "mixed_origin_group" {
   use_next = true
 
   origin {
-    source  = "cdn.example.com"
-    enabled = true
+    source               = "cdn.example.com"
+    enabled              = true
+    host_header_override = "origin.example.com"
   }
 
   origin {
@@ -68,8 +69,9 @@ resource "gcore_cdn_origingroup" "s3_origin_group_new" {
   use_next = true
 
   origin {
-    origin_type = "s3"
-    enabled     = true
+    origin_type          = "s3"
+    enabled              = true
+    host_header_override = "storage.example.com"
     config {
       s3_type              = "other"
       s3_storage_hostname  = "s3.example.com"

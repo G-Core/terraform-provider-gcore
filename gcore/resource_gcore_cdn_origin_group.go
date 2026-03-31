@@ -228,16 +228,31 @@ func validateCDNOriginGroupConfig(ctx context.Context, diff *schema.ResourceDiff
 				if source == "" {
 					return fmt.Errorf("origin.%d: `source` is required for host origins", i)
 				}
+
+				if configList, ok := origin["config"].([]interface{}); ok {
+					if len(configList) > 0 && configList[0] != nil {
+						return fmt.Errorf("origin.%d: `config` cannot be specified for host origins", i)
+					}
+				}
 			}
 
 			if originType == "s3" {
+				if source, _ := origin["source"].(string); source != "" {
+					return fmt.Errorf("origin.%d: `source` cannot be specified for s3 origins", i)
+				}
+
 				configList, _ := origin["config"].([]interface{})
-				if len(configList) > 0 && configList[0] != nil {
-					if cfg, ok := configList[0].(map[string]interface{}); ok {
-						if err := validateS3ConfigFields(i, cfg); err != nil {
-							return err
-						}
-					}
+				if len(configList) == 0 || configList[0] == nil {
+					return fmt.Errorf("origin.%d: `config` block is required for s3 origins", i)
+				}
+
+				cfg, ok := configList[0].(map[string]interface{})
+				if !ok {
+					return fmt.Errorf("origin.%d: `config` must be an object for s3 origins", i)
+				}
+
+				if err := validateS3ConfigFields(i, cfg); err != nil {
+					return err
 				}
 			}
 		}
@@ -551,20 +566,20 @@ func sourcesToList(sources []origingroups.Source) []interface{} {
 	return result
 }
 
-// s3OriginCredentials stores S3 credentials keyed by bucket name for state preservation.
+// s3OriginCredentials stores S3 credentials keyed by origin list index for state preservation.
 type s3OriginCredentials struct {
 	accessKeyID     string
 	secretAccessKey string
 }
 
 // preserveS3OriginCredentials extracts S3 credentials from current state before API read overwrites them.
-func preserveS3OriginCredentials(d *schema.ResourceData) map[string]s3OriginCredentials {
-	creds := make(map[string]s3OriginCredentials)
+func preserveS3OriginCredentials(d *schema.ResourceData) map[int]s3OriginCredentials {
+	creds := make(map[int]s3OriginCredentials)
 	originList, ok := d.GetOk("origin")
 	if !ok {
 		return creds
 	}
-	for _, raw := range originList.([]interface{}) {
+	for i, raw := range originList.([]interface{}) {
 		if raw == nil {
 			continue
 		}
@@ -578,14 +593,10 @@ func preserveS3OriginCredentials(d *schema.ResourceData) map[string]s3OriginCred
 			continue
 		}
 		cfg := configList[0].(map[string]interface{})
-		bucketName, _ := cfg["s3_bucket_name"].(string)
-		if bucketName == "" {
-			continue
-		}
 		accessKeyID, _ := cfg["s3_access_key_id"].(string)
 		secretAccessKey, _ := cfg["s3_secret_access_key"].(string)
 		if accessKeyID != "" || secretAccessKey != "" {
-			creds[bucketName] = s3OriginCredentials{
+			creds[i] = s3OriginCredentials{
 				accessKeyID:     accessKeyID,
 				secretAccessKey: secretAccessKey,
 			}
@@ -595,11 +606,11 @@ func preserveS3OriginCredentials(d *schema.ResourceData) map[string]s3OriginCred
 }
 
 // restoreS3OriginCredentials restores S3 credentials in the origins list after API read.
-func restoreS3OriginCredentials(origins []interface{}, creds map[string]s3OriginCredentials) {
+func restoreS3OriginCredentials(origins []interface{}, creds map[int]s3OriginCredentials) {
 	if len(creds) == 0 {
 		return
 	}
-	for _, raw := range origins {
+	for i, raw := range origins {
 		if raw == nil {
 			continue
 		}
@@ -613,8 +624,7 @@ func restoreS3OriginCredentials(origins []interface{}, creds map[string]s3Origin
 			continue
 		}
 		cfg := configList[0].(map[string]interface{})
-		bucketName, _ := cfg["s3_bucket_name"].(string)
-		if saved, ok := creds[bucketName]; ok {
+		if saved, ok := creds[i]; ok {
 			cfg["s3_access_key_id"] = saved.accessKeyID
 			cfg["s3_secret_access_key"] = saved.secretAccessKey
 		}
