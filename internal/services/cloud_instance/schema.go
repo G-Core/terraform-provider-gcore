@@ -7,7 +7,6 @@ import (
 	"fmt"
 
 	"github.com/G-Core/terraform-provider-gcore/internal/customfield"
-	"github.com/G-Core/terraform-provider-gcore/internal/planmodifiers"
 	"github.com/hashicorp/terraform-plugin-framework-jsontypes/jsontypes"
 	"github.com/hashicorp/terraform-plugin-framework-timetypes/timetypes"
 	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
@@ -37,16 +36,14 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 				PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
 			},
 			"project_id": schema.Int64Attribute{
-				Description:   "Project ID. If not specified, uses GCORE_CLOUD_PROJECT_ID environment variable.",
-				Computed:      true,
+				Description:   "Project ID",
 				Optional:      true,
-				PlanModifiers: []planmodifier.Int64{planmodifiers.RequiresReplaceIfConfiguredPreservingState()},
+				PlanModifiers: []planmodifier.Int64{int64planmodifier.RequiresReplaceIfConfigured()},
 			},
 			"region_id": schema.Int64Attribute{
-				Description:   "Region ID. If not specified, uses GCORE_CLOUD_REGION_ID environment variable.",
-				Computed:      true,
+				Description:   "Region ID",
 				Optional:      true,
-				PlanModifiers: []planmodifier.Int64{planmodifiers.RequiresReplaceIfConfiguredPreservingState()},
+				PlanModifiers: []planmodifier.Int64{int64planmodifier.RequiresReplaceIfConfigured()},
 			},
 			"flavor": schema.StringAttribute{
 				Description: "The flavor of the instance.",

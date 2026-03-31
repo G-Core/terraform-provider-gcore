@@ -6,8 +6,6 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"os"
-	"strconv"
 	"time"
 
 	"github.com/G-Core/gcore-go"
@@ -112,25 +110,6 @@ func (r *CloudInstanceResource) Create(ctx context.Context, req resource.CreateR
 		if flavorObj, ok := rawResponse["flavor"].(map[string]interface{}); ok {
 			if flavorID, ok := flavorObj["flavor_id"].(string); ok {
 				data.Flavor = types.StringValue(flavorID)
-			}
-		}
-		// Extract project_id/region_id from API response (needed when user uses env vars)
-		if data.ProjectID.IsNull() || data.ProjectID.IsUnknown() {
-			if projectID, ok := rawResponse["project_id"].(float64); ok {
-				data.ProjectID = types.Int64Value(int64(projectID))
-			} else if envProjectID := os.Getenv("GCORE_CLOUD_PROJECT_ID"); envProjectID != "" {
-				if parsed, err := strconv.ParseInt(envProjectID, 10, 64); err == nil {
-					data.ProjectID = types.Int64Value(parsed)
-				}
-			}
-		}
-		if data.RegionID.IsNull() || data.RegionID.IsUnknown() {
-			if regionID, ok := rawResponse["region_id"].(float64); ok {
-				data.RegionID = types.Int64Value(int64(regionID))
-			} else if envRegionID := os.Getenv("GCORE_CLOUD_REGION_ID"); envRegionID != "" {
-				if parsed, err := strconv.ParseInt(envRegionID, 10, 64); err == nil {
-					data.RegionID = types.Int64Value(parsed)
-				}
 			}
 		}
 		// Note: volumes are user-provided (existing volumes only), no extraction needed
@@ -1179,7 +1158,6 @@ func (r *CloudInstanceResource) Read(ctx context.Context, req resource.ReadReque
 				data.Flavor = types.StringValue(flavorID)
 			}
 		}
-		// Note: project_id/region_id are always set in .tf config, no extraction needed
 		// Note: volumes are user-provided (existing volumes only), preserved from prior state above
 	}
 
