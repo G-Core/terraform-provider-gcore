@@ -18,7 +18,7 @@ type CloudFileShareModel struct {
 	TypeName         types.String                                               `tfsdk:"type_name" json:"type_name,computed_optional"`
 	AccessRuleIDs    customfield.List[types.String]                             `tfsdk:"access_rule_ids" json:"-,computed,no_refresh"`
 	Name             types.String                                               `tfsdk:"name" json:"name,required"`
-	Tags             *map[string]types.String                                   `tfsdk:"tags" json:"tags,optional,no_refresh"`
+	Tags             customfield.Map[types.String]                              `tfsdk:"tags" json:"tags,computed_optional,no_refresh"`
 	ShareSettings    customfield.NestedObject[CloudFileShareShareSettingsModel] `tfsdk:"share_settings" json:"share_settings,computed_optional"`
 	ConnectionPoint  types.String                                               `tfsdk:"connection_point" json:"connection_point,computed"`
 	CreatedAt        types.String                                               `tfsdk:"created_at" json:"created_at,computed"`
