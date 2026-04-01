@@ -21,8 +21,8 @@ type CloudLoadBalancerModel struct {
 	VipIPFamily           types.String                                                       `tfsdk:"vip_ip_family" json:"vip_ip_family,computed_optional"`
 	VipPortID             types.String                                                       `tfsdk:"vip_port_id" json:"vip_port_id,computed_optional"`
 	Name                  types.String                                                       `tfsdk:"name" json:"name,optional"`
-	Tags                  *map[string]types.String                                           `tfsdk:"tags" json:"tags,optional,no_refresh"`
 	PreferredConnectivity types.String                                                       `tfsdk:"preferred_connectivity" json:"preferred_connectivity,computed_optional"`
+	Tags                  customfield.Map[types.String]                                      `tfsdk:"tags" json:"tags,computed_optional,no_refresh"`
 	Logging               customfield.NestedObject[CloudLoadBalancerLoggingModel]            `tfsdk:"logging" json:"logging,computed_optional"`
 	AdminStateUp          types.Bool                                                         `tfsdk:"admin_state_up" json:"admin_state_up,computed"`
 	CreatedAt             timetypes.RFC3339                                                  `tfsdk:"created_at" json:"created_at,computed" format:"date-time"`

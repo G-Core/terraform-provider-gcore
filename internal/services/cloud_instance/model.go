@@ -29,7 +29,7 @@ type CloudInstanceModel struct {
 	Configuration       *map[string]jsontypes.Normalized                                           `tfsdk:"configuration" json:"configuration,optional,no_refresh"`
 	SecurityGroups      *[]*CloudInstanceSecurityGroupsModel                                       `tfsdk:"security_groups" json:"security_groups,optional"`
 	Name                types.String                                                               `tfsdk:"name" json:"name,optional"`
-	Tags                *map[string]types.String                                                   `tfsdk:"tags" json:"tags,optional,no_refresh"`
+	Tags                customfield.Map[types.String]                                              `tfsdk:"tags" json:"tags,computed_optional,no_refresh"`
 	CreatedAt           timetypes.RFC3339                                                          `tfsdk:"created_at" json:"created_at,computed" format:"date-time"`
 	CreatorTaskID       types.String                                                               `tfsdk:"creator_task_id" json:"creator_task_id,computed"`
 	InstanceDescription types.String                                                               `tfsdk:"instance_description" json:"instance_description,computed"`

@@ -6,8 +6,10 @@ import (
 	"context"
 
 	"github.com/G-Core/terraform-provider-gcore/internal/customfield"
+	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/datasource/schema"
+	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 )
 
@@ -59,7 +61,7 @@ func DataSourceSchema(ctx context.Context) schema.Schema {
 						Computed:    true,
 					},
 					"s3_bucket_name": schema.StringAttribute{
-						Description: "S3 bucket name.\n\nRestrictions:\n- Maximum 128 characters.",
+						Description: "S3 bucket name.",
 						Computed:    true,
 					},
 					"s3_secret_access_key": schema.StringAttribute{
@@ -81,11 +83,15 @@ func DataSourceSchema(ctx context.Context) schema.Schema {
 				},
 			},
 			"sources": schema.SetNestedAttribute{
-				Description: "List of origin sources in the origin group.",
+				Description: "List of origin sources in the origin group. Each entry can be a host origin or an S3 origin.\n\nHost origins have a `source` field with the hostname or IP. S3 origins have `origin_type: s3`\nand a `config` object with S3 credentials. Both types can be mixed in the same origin group.",
 				Computed:    true,
 				CustomType:  customfield.NewNestedObjectSetType[CDNOriginGroupSourcesDataSourceModel](ctx),
 				NestedObject: schema.NestedAttributeObject{
 					Attributes: map[string]schema.Attribute{
+						"source": schema.StringAttribute{
+							Description: "IP address or domain name of the origin and the port, if custom port is used.",
+							Computed:    true,
+						},
 						"backup": schema.BoolAttribute{
 							Description: "Defines whether the origin is a backup, meaning that it will not be used until one of active origins become unavailable.\n\nPossible values:\n- **true** - Origin is a backup.\n- **false** - Origin is not a backup.",
 							Computed:    true,
@@ -94,9 +100,58 @@ func DataSourceSchema(ctx context.Context) schema.Schema {
 							Description: "Enables or disables an origin source in the origin group.\n\nPossible values:\n- **true** - Origin is enabled and the CDN uses it to pull content.\n- **false** - Origin is disabled and the CDN does not use it to pull content.\n\nOrigin group must contain at least one enabled origin.",
 							Computed:    true,
 						},
-						"source": schema.StringAttribute{
-							Description: "IP address or domain name of the origin and the port, if custom port is used.",
+						"host_header_override": schema.StringAttribute{
+							Description: "Per-origin Host header override. When set, the CDN sends this value as the Host header when\nrequesting content from this origin instead of the default.",
 							Computed:    true,
+						},
+						"tag": schema.StringAttribute{
+							Description: "Tag for the origin source.",
+							Computed:    true,
+						},
+						"config": schema.SingleNestedAttribute{
+							Description: "S3 storage configuration. Required when `origin_type` is `s3`.",
+							Computed:    true,
+							CustomType:  customfield.NewNestedObjectType[CDNOriginGroupSourcesConfigDataSourceModel](ctx),
+							Attributes: map[string]schema.Attribute{
+								"s3_access_key_id": schema.StringAttribute{
+									Description: "Access key ID for the S3 account. Masked as `SECRET_VALUE` in responses.\n\nRestrictions:\n- Latin letters (A-Z, a-z), numbers (0-9), colon, dash, and underscore.\n- From 4 to 255 characters.",
+									Computed:    true,
+								},
+								"s3_bucket_name": schema.StringAttribute{
+									Description: "S3 bucket name.",
+									Computed:    true,
+								},
+								"s3_secret_access_key": schema.StringAttribute{
+									Description: "Secret access key for the S3 account. Masked as `SECRET_VALUE` in responses.\n\nRestrictions:\n- Latin letters (A-Z, a-z), numbers (0-9), pluses, slashes, dashes, colons and underscores.\n- From 16 to 255 characters.",
+									Computed:    true,
+								},
+								"s3_type": schema.StringAttribute{
+									Description: "Storage type compatible with S3.\n\nPossible values:\n- **amazon** - AWS S3 storage.\n- **other** - Other (not AWS) S3 compatible storage.\nAvailable values: \"amazon\", \"other\".",
+									Computed:    true,
+									Validators: []validator.String{
+										stringvalidator.OneOfCaseInsensitive("amazon", "other"),
+									},
+								},
+								"s3_auth_type": schema.StringAttribute{
+									Description: "S3 authentication type.",
+									Computed:    true,
+								},
+								"s3_region": schema.StringAttribute{
+									Description: "S3 storage region.\n\nThe parameter is required if `s3_type` is `amazon`.",
+									Computed:    true,
+								},
+								"s3_storage_hostname": schema.StringAttribute{
+									Description: "S3 storage hostname.\n\nThe parameter is required if `s3_type` is `other`.",
+									Computed:    true,
+								},
+							},
+						},
+						"origin_type": schema.StringAttribute{
+							Description: "Origin type. Present in responses only for S3 sources.\n\nPossible values:\n- **host** - A source server or endpoint from which content is fetched.\n- **s3** - S3 storage with either AWS v4 authentication or public access.\nAvailable values: \"host\", \"s3\".",
+							Computed:    true,
+							Validators: []validator.String{
+								stringvalidator.OneOfCaseInsensitive("host", "s3"),
+							},
 						},
 					},
 				},
