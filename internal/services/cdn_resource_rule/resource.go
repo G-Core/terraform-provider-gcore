@@ -11,6 +11,7 @@ import (
 	"github.com/G-Core/gcore-go"
 	"github.com/G-Core/gcore-go/cdn"
 	"github.com/G-Core/gcore-go/option"
+	"github.com/G-Core/gcore-go/packages/param"
 	"github.com/G-Core/terraform-provider-gcore/internal/apijson"
 	"github.com/G-Core/terraform-provider-gcore/internal/importpath"
 	"github.com/G-Core/terraform-provider-gcore/internal/logging"
@@ -101,15 +102,7 @@ func (r *CDNResourceRuleResource) Update(ctx context.Context, req resource.Updat
 		return
 	}
 
-	var state *CDNResourceRuleModel
-
-	resp.Diagnostics.Append(req.State.Get(ctx, &state)...)
-
-	if resp.Diagnostics.HasError() {
-		return
-	}
-
-	dataBytes, err := data.MarshalJSONForUpdate(*state)
+	dataBytes, err := data.MarshalJSON()
 	if err != nil {
 		resp.Diagnostics.AddError("failed to serialize http request", err.Error())
 		return
@@ -185,6 +178,25 @@ func (r *CDNResourceRuleResource) Delete(ctx context.Context, req resource.Delet
 	if resp.Diagnostics.HasError() {
 		return
 	}
+
+	// The CDN API requires rules to be deactivated before deletion.
+	// PATCH active=false first, then delete.
+	if data.Active.ValueBool() {
+		_, err := r.client.CDN.CDNResources.Rules.Update(
+			ctx,
+			data.ID.ValueInt64(),
+			cdn.CDNResourceRuleUpdateParams{
+				ResourceID: data.ResourceID.ValueInt64(),
+				Active:     param.NewOpt(false),
+			},
+			option.WithMiddleware(logging.Middleware(ctx)),
+		)
+		if err != nil {
+			resp.Diagnostics.AddError("failed to deactivate rule before deletion", err.Error())
+			return
+		}
+	}
+
 
 	err := r.client.CDN.CDNResources.Rules.Delete(
 		ctx,
