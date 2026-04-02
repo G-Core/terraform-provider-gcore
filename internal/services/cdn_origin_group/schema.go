@@ -97,14 +97,14 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 						},
 						"backup": schema.BoolAttribute{
 							Description: "Defines whether the origin is a backup, meaning that it will not be used until one of active origins become unavailable.\n\nPossible values:\n- **true** - Origin is a backup.\n- **false** - Origin is not a backup.\n\nDefault value is false.",
-							Optional:    true,
 							Computed:    true,
+							Optional:    true,
 							Default:     booldefault.StaticBool(false),
 						},
 						"enabled": schema.BoolAttribute{
 							Description: "Enables or disables an origin source in the origin group.\n\nPossible values:\n- **true** - Origin is enabled and the CDN uses it to pull content.\n- **false** - Origin is disabled and the CDN does not use it to pull content.\n\nOrigin group must contain at least one enabled origin.\n\nDefault value is true.",
-							Optional:    true,
 							Computed:    true,
+							Optional:    true,
 							Default:     booldefault.StaticBool(true),
 						},
 						"host_header_override": schema.StringAttribute{
