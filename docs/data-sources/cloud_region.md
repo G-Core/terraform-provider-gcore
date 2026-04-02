@@ -24,6 +24,7 @@ data "gcore_cloud_region" "example_cloud_region" {
 
 ### Optional
 
+- `find_one_by` (Attributes) (see [below for nested schema](#nestedatt--find_one_by))
 - `region_id` (Number) Region ID
 - `show_volume_types` (Boolean) If true, null `available_volume_type` is replaced with a list of available volume types.
 
@@ -60,6 +61,16 @@ Available values: "ACTIVE", "DELETED", "DELETING", "DELETION_FAILED", "INACTIVE"
 - `vlan_physical_network` (String) Physical network name to create vlan networks
 - `zone` (String) Geographical zone
 Available values: "AMERICAS", "APAC", "EMEA", "RUSSIA_AND_CIS".
+
+<a id="nestedatt--find_one_by"></a>
+### Nested Schema for `find_one_by`
+
+Optional:
+
+- `display_name` (String) Filter regions by display name. Case-insensitive exact match.
+- `product` (String) If defined then return only regions that support given product.
+Available values: "containers", "inference".
+
 
 <a id="nestedatt--coordinates"></a>
 ### Nested Schema for `coordinates`
