@@ -57,6 +57,37 @@ func (d *CloudRegionDataSource) Read(ctx context.Context, req datasource.ReadReq
 		return
 	}
 
+	// TODO(GCLOUD2-24776): Remove this custom find_one_by block once Stainless codegen generates it for data sources without a create method.
+	if data.FindOneBy != nil {
+		params, diags := data.toListParams(ctx)
+		resp.Diagnostics.Append(diags...)
+		if resp.Diagnostics.HasError() {
+			return
+		}
+
+		env := CloudRegionsResultsListDataSourceEnvelope{}
+		page, err := d.client.Cloud.Regions.List(ctx, params)
+		if err != nil {
+			resp.Diagnostics.AddError("failed to make http request", err.Error())
+			return
+		}
+
+		bytes := []byte(page.RawJSON())
+		err = apijson.UnmarshalComputed(bytes, &env)
+		if err != nil {
+			resp.Diagnostics.AddError("failed to unmarshal http request", err.Error())
+			return
+		}
+
+		if count := len(env.Results.Elements()); count != 1 {
+			resp.Diagnostics.AddError("failed to find exactly one result", fmt.Sprint(count)+" found")
+			return
+		}
+		ts, diags := env.Results.AsStructSliceT(ctx)
+		resp.Diagnostics.Append(diags...)
+		data.RegionID = ts[0].ID
+	}
+
 	params, diags := data.toReadParams(ctx)
 	resp.Diagnostics.Append(diags...)
 	if resp.Diagnostics.HasError() {
