@@ -20,6 +20,7 @@ type FastedgeAppsAppsListDataSourceEnvelope struct {
 type FastedgeAppsDataSourceModel struct {
 	APIType  types.String                                                   `tfsdk:"api_type" query:"api_type,optional"`
 	Binary   types.Int64                                                    `tfsdk:"binary" query:"binary,optional"`
+	Limit    types.Int64                                                    `tfsdk:"limit" query:"limit,optional"`
 	Name     types.String                                                   `tfsdk:"name" query:"name,optional"`
 	Ordering types.String                                                   `tfsdk:"ordering" query:"ordering,optional"`
 	Plan     types.Int64                                                    `tfsdk:"plan" query:"plan,optional"`
@@ -37,6 +38,9 @@ func (m *FastedgeAppsDataSourceModel) toListParams(_ context.Context) (params fa
 	}
 	if !m.Binary.IsNull() {
 		params.Binary = param.NewOpt(m.Binary.ValueInt64())
+	}
+	if !m.Limit.IsNull() {
+		params.Limit = param.NewOpt(m.Limit.ValueInt64())
 	}
 	if !m.Name.IsNull() {
 		params.Name = param.NewOpt(m.Name.ValueString())

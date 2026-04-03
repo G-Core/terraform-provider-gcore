@@ -8,6 +8,7 @@ import (
 	"github.com/G-Core/terraform-provider-gcore/internal/customfield"
 	"github.com/hashicorp/terraform-plugin-framework-timetypes/timetypes"
 	"github.com/hashicorp/terraform-plugin-framework-validators/datasourcevalidator"
+	"github.com/hashicorp/terraform-plugin-framework-validators/int64validator"
 	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/datasource/schema"
@@ -221,6 +222,14 @@ func DataSourceSchema(ctx context.Context) schema.Schema {
 					"instance_id": schema.StringAttribute{
 						Description: "Filter volumes by instance ID",
 						Optional:    true,
+					},
+					"limit": schema.Int64Attribute{
+						Description: "Optional. Limit the number of returned items",
+						Computed:    true,
+						Optional:    true,
+						Validators: []validator.Int64{
+							int64validator.AtMost(1000),
+						},
 					},
 					"name_part": schema.StringAttribute{
 						Description: "Filter volumes by `name_part` inclusion in volume name.Any substring can be used and volumes will be returned with names containing the substring.",

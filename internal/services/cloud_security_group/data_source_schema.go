@@ -192,6 +192,14 @@ func DataSourceSchema(ctx context.Context) schema.Schema {
 			"find_one_by": schema.SingleNestedAttribute{
 				Optional: true,
 				Attributes: map[string]schema.Attribute{
+					"limit": schema.Int64Attribute{
+						Description: "Limit of items on a single page",
+						Computed:    true,
+						Optional:    true,
+						Validators: []validator.Int64{
+							int64validator.AtMost(1000),
+						},
+					},
 					"name": schema.StringAttribute{
 						Description: "Optional. Filter by name. Must be specified a full name of the security group.",
 						Optional:    true,

@@ -31,6 +31,9 @@ func (m *FastedgeTemplateDataSourceModel) toListParams(_ context.Context) (param
 	if !m.FindOneBy.APIType.IsNull() {
 		params.APIType = fastedge.TemplateListParamsAPIType(m.FindOneBy.APIType.ValueString())
 	}
+	if !m.FindOneBy.Limit.IsNull() {
+		params.Limit = param.NewOpt(m.FindOneBy.Limit.ValueInt64())
+	}
 	if !m.FindOneBy.OnlyMine.IsNull() {
 		params.OnlyMine = param.NewOpt(m.FindOneBy.OnlyMine.ValueBool())
 	}
@@ -48,5 +51,6 @@ type FastedgeTemplateParamsDataSourceModel struct {
 
 type FastedgeTemplateFindOneByDataSourceModel struct {
 	APIType  types.String `tfsdk:"api_type" query:"api_type,optional"`
+	Limit    types.Int64  `tfsdk:"limit" query:"limit,computed_optional"`
 	OnlyMine types.Bool   `tfsdk:"only_mine" query:"only_mine,computed_optional"`
 }

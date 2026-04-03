@@ -15,7 +15,7 @@ import (
 
 type CloudGPUVirtualClusterDataSourceModel struct {
 	ID              types.String                                                                   `tfsdk:"id" path:"cluster_id,computed"`
-	ClusterID       types.String                                                                   `tfsdk:"cluster_id" path:"cluster_id,required"`
+	ClusterID       types.String                                                                   `tfsdk:"cluster_id" path:"cluster_id,optional"`
 	ProjectID       types.Int64                                                                    `tfsdk:"project_id" path:"project_id,optional"`
 	RegionID        types.Int64                                                                    `tfsdk:"region_id" path:"region_id,optional"`
 	CreatedAt       timetypes.RFC3339                                                              `tfsdk:"created_at" json:"created_at,computed" format:"date-time"`
@@ -27,6 +27,7 @@ type CloudGPUVirtualClusterDataSourceModel struct {
 	ServersIDs      customfield.List[types.String]                                                 `tfsdk:"servers_ids" json:"servers_ids,computed"`
 	ServersSettings customfield.NestedObject[CloudGPUVirtualClusterServersSettingsDataSourceModel] `tfsdk:"servers_settings" json:"servers_settings,computed"`
 	Tags            customfield.NestedObjectList[CloudGPUVirtualClusterTagsDataSourceModel]        `tfsdk:"tags" json:"tags,computed"`
+	FindOneBy       *CloudGPUVirtualClusterFindOneByDataSourceModel                                `tfsdk:"find_one_by"`
 }
 
 func (m *CloudGPUVirtualClusterDataSourceModel) toReadParams(_ context.Context) (params cloud.GPUVirtualClusterGetParams, diags diag.Diagnostics) {
@@ -37,6 +38,22 @@ func (m *CloudGPUVirtualClusterDataSourceModel) toReadParams(_ context.Context) 
 	}
 	if !m.RegionID.IsNull() {
 		params.RegionID = param.NewOpt(m.RegionID.ValueInt64())
+	}
+
+	return
+}
+
+func (m *CloudGPUVirtualClusterDataSourceModel) toListParams(_ context.Context) (params cloud.GPUVirtualClusterListParams, diags diag.Diagnostics) {
+	params = cloud.GPUVirtualClusterListParams{}
+
+	if !m.ProjectID.IsNull() {
+		params.ProjectID = param.NewOpt(m.ProjectID.ValueInt64())
+	}
+	if !m.RegionID.IsNull() {
+		params.RegionID = param.NewOpt(m.RegionID.ValueInt64())
+	}
+	if !m.FindOneBy.Limit.IsNull() {
+		params.Limit = param.NewOpt(m.FindOneBy.Limit.ValueInt64())
 	}
 
 	return
@@ -95,4 +112,8 @@ type CloudGPUVirtualClusterTagsDataSourceModel struct {
 	Key      types.String `tfsdk:"key" json:"key,computed"`
 	ReadOnly types.Bool   `tfsdk:"read_only" json:"read_only,computed"`
 	Value    types.String `tfsdk:"value" json:"value,computed"`
+}
+
+type CloudGPUVirtualClusterFindOneByDataSourceModel struct {
+	Limit types.Int64 `tfsdk:"limit" query:"limit,computed_optional"`
 }

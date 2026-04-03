@@ -5,8 +5,12 @@ package cloud_inference_registry_credential
 import (
 	"context"
 
+	"github.com/hashicorp/terraform-plugin-framework-validators/datasourcevalidator"
+	"github.com/hashicorp/terraform-plugin-framework-validators/int64validator"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/datasource/schema"
+	"github.com/hashicorp/terraform-plugin-framework/path"
+	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
 )
 
 var _ datasource.DataSourceWithConfigValidators = (*CloudInferenceRegistryCredentialDataSource)(nil)
@@ -21,7 +25,7 @@ func DataSourceSchema(ctx context.Context) schema.Schema {
 			},
 			"credential_name": schema.StringAttribute{
 				Description: "Registry credential name.",
-				Required:    true,
+				Optional:    true,
 			},
 			"project_id": schema.Int64Attribute{
 				Description: "Project ID",
@@ -39,6 +43,19 @@ func DataSourceSchema(ctx context.Context) schema.Schema {
 				Description: "Registry username.",
 				Computed:    true,
 			},
+			"find_one_by": schema.SingleNestedAttribute{
+				Optional: true,
+				Attributes: map[string]schema.Attribute{
+					"limit": schema.Int64Attribute{
+						Description: "Optional. Limit the number of returned items",
+						Computed:    true,
+						Optional:    true,
+						Validators: []validator.Int64{
+							int64validator.AtMost(1000),
+						},
+					},
+				},
+			},
 		},
 	}
 }
@@ -48,5 +65,7 @@ func (d *CloudInferenceRegistryCredentialDataSource) Schema(ctx context.Context,
 }
 
 func (d *CloudInferenceRegistryCredentialDataSource) ConfigValidators(_ context.Context) []datasource.ConfigValidator {
-	return []datasource.ConfigValidator{}
+	return []datasource.ConfigValidator{
+		datasourcevalidator.ExactlyOneOf(path.MatchRoot("credential_name"), path.MatchRoot("find_one_by")),
+	}
 }

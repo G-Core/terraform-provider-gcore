@@ -53,6 +53,14 @@ func ListDataSourceSchema(ctx context.Context) schema.Schema {
 				Optional:    true,
 				ElementType: types.StringType,
 			},
+			"limit": schema.Int64Attribute{
+				Description: "Optional. Limit the number of returned items",
+				Computed:    true,
+				Optional:    true,
+				Validators: []validator.Int64{
+					int64validator.AtMost(1000),
+				},
+			},
 			"order_by": schema.StringAttribute{
 				Description: "Ordering networks list result by `name`, `created_at` or `priority` fields and directions (e.g. `created_at.desc`). Default is `created_at.desc`. Use `priority.desc` to sort by shared network priority (relevant when `owned_by=any`).\nAvailable values: \"created_at.asc\", \"created_at.desc\", \"name.asc\", \"name.desc\", \"priority.desc\".",
 				Computed:    true,
