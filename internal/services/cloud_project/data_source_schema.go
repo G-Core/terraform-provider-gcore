@@ -7,6 +7,7 @@ import (
 
 	"github.com/hashicorp/terraform-plugin-framework-timetypes/timetypes"
 	"github.com/hashicorp/terraform-plugin-framework-validators/datasourcevalidator"
+	"github.com/hashicorp/terraform-plugin-framework-validators/int64validator"
 	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/datasource/schema"
@@ -65,6 +66,14 @@ func DataSourceSchema(ctx context.Context) schema.Schema {
 						Description: "Whether to include deleted projects in the response.",
 						Computed:    true,
 						Optional:    true,
+					},
+					"limit": schema.Int64Attribute{
+						Description: "Limit value is used to limit the number of records in the result",
+						Computed:    true,
+						Optional:    true,
+						Validators: []validator.Int64{
+							int64validator.AtMost(1000),
+						},
 					},
 					"name": schema.StringAttribute{
 						Description: "Name to filter the results by.",

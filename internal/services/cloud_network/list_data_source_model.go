@@ -25,6 +25,7 @@ type CloudNetworksDataSourceModel struct {
 	NetworkType types.String                                                    `tfsdk:"network_type" query:"network_type,optional"`
 	TagKeyValue types.String                                                    `tfsdk:"tag_key_value" query:"tag_key_value,optional"`
 	TagKey      *[]types.String                                                 `tfsdk:"tag_key" query:"tag_key,optional"`
+	Limit       types.Int64                                                     `tfsdk:"limit" query:"limit,computed_optional"`
 	OrderBy     types.String                                                    `tfsdk:"order_by" query:"order_by,computed_optional"`
 	OwnedBy     types.String                                                    `tfsdk:"owned_by" query:"owned_by,computed_optional"`
 	MaxItems    types.Int64                                                     `tfsdk:"max_items"`
@@ -51,6 +52,9 @@ func (m *CloudNetworksDataSourceModel) toListParams(_ context.Context) (params c
 	}
 	if !m.External.IsNull() {
 		params.External = param.NewOpt(m.External.ValueBool())
+	}
+	if !m.Limit.IsNull() {
+		params.Limit = param.NewOpt(m.Limit.ValueInt64())
 	}
 	if !m.Name.IsNull() {
 		params.Name = param.NewOpt(m.Name.ValueString())

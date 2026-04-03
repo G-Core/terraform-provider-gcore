@@ -50,6 +50,14 @@ func ListDataSourceSchema(ctx context.Context) schema.Schema {
 				Optional:    true,
 				ElementType: types.StringType,
 			},
+			"limit": schema.Int64Attribute{
+				Description: "Limit of items on a single page",
+				Computed:    true,
+				Optional:    true,
+				Validators: []validator.Int64{
+					int64validator.AtMost(1000),
+				},
+			},
 			"order_by": schema.StringAttribute{
 				Description: "Order by field and direction.\nAvailable values: \"created_at.asc\", \"created_at.desc\", \"flavor.asc\", \"flavor.desc\", \"name.asc\", \"name.desc\", \"operating_status.asc\", \"operating_status.desc\", \"provisioning_status.asc\", \"provisioning_status.desc\", \"updated_at.asc\", \"updated_at.desc\", \"vip_address.asc\", \"vip_address.desc\", \"vip_ip_family.asc\", \"vip_ip_family.desc\".",
 				Computed:    true,

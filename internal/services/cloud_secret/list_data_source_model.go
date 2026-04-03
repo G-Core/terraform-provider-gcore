@@ -20,6 +20,7 @@ type CloudSecretsResultsListDataSourceEnvelope struct {
 type CloudSecretsDataSourceModel struct {
 	ProjectID types.Int64                                                    `tfsdk:"project_id" path:"project_id,optional"`
 	RegionID  types.Int64                                                    `tfsdk:"region_id" path:"region_id,optional"`
+	Limit     types.Int64                                                    `tfsdk:"limit" query:"limit,computed_optional"`
 	MaxItems  types.Int64                                                    `tfsdk:"max_items"`
 	Items     customfield.NestedObjectList[CloudSecretsItemsDataSourceModel] `tfsdk:"items"`
 }
@@ -32,6 +33,9 @@ func (m *CloudSecretsDataSourceModel) toListParams(_ context.Context) (params cl
 	}
 	if !m.RegionID.IsNull() {
 		params.RegionID = param.NewOpt(m.RegionID.ValueInt64())
+	}
+	if !m.Limit.IsNull() {
+		params.Limit = param.NewOpt(m.Limit.ValueInt64())
 	}
 
 	return

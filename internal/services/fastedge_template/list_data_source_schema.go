@@ -26,6 +26,14 @@ func ListDataSourceSchema(ctx context.Context) schema.Schema {
 					stringvalidator.OneOfCaseInsensitive("wasi-http", "proxy-wasm"),
 				},
 			},
+			"limit": schema.Int64Attribute{
+				Description: "Maximum number of results to return",
+				Computed:    true,
+				Optional:    true,
+				Validators: []validator.Int64{
+					int64validator.Between(1, 1000),
+				},
+			},
 			"only_mine": schema.BoolAttribute{
 				Description: "When true, returns only templates created by the client. When false, includes shared templates.",
 				Computed:    true,

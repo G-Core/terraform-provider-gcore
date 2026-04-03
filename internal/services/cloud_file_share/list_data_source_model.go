@@ -21,6 +21,7 @@ type CloudFileSharesDataSourceModel struct {
 	RegionID  types.Int64                                                       `tfsdk:"region_id" path:"region_id,optional"`
 	Name      types.String                                                      `tfsdk:"name" query:"name,optional"`
 	TypeName  types.String                                                      `tfsdk:"type_name" query:"type_name,optional"`
+	Limit     types.Int64                                                       `tfsdk:"limit" query:"limit,computed_optional"`
 	MaxItems  types.Int64                                                       `tfsdk:"max_items"`
 	Items     customfield.NestedObjectList[CloudFileSharesItemsDataSourceModel] `tfsdk:"items"`
 }
@@ -33,6 +34,9 @@ func (m *CloudFileSharesDataSourceModel) toListParams(_ context.Context) (params
 	}
 	if !m.RegionID.IsNull() {
 		params.RegionID = param.NewOpt(m.RegionID.ValueInt64())
+	}
+	if !m.Limit.IsNull() {
+		params.Limit = param.NewOpt(m.Limit.ValueInt64())
 	}
 	if !m.Name.IsNull() {
 		params.Name = param.NewOpt(m.Name.ValueString())

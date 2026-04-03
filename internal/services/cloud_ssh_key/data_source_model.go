@@ -41,6 +41,9 @@ func (m *CloudSSHKeyDataSourceModel) toListParams(_ context.Context) (params clo
 	if !m.ProjectID.IsNull() {
 		params.ProjectID = param.NewOpt(m.ProjectID.ValueInt64())
 	}
+	if !m.FindOneBy.Limit.IsNull() {
+		params.Limit = param.NewOpt(m.FindOneBy.Limit.ValueInt64())
+	}
 	if !m.FindOneBy.Name.IsNull() {
 		params.Name = param.NewOpt(m.FindOneBy.Name.ValueString())
 	}
@@ -52,6 +55,7 @@ func (m *CloudSSHKeyDataSourceModel) toListParams(_ context.Context) (params clo
 }
 
 type CloudSSHKeyFindOneByDataSourceModel struct {
+	Limit   types.Int64  `tfsdk:"limit" query:"limit,computed_optional"`
 	Name    types.String `tfsdk:"name" query:"name,optional"`
 	OrderBy types.String `tfsdk:"order_by" query:"order_by,computed_optional"`
 }

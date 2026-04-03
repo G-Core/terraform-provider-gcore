@@ -28,6 +28,14 @@ func ListDataSourceSchema(ctx context.Context) schema.Schema {
 				Description: "SSH key name. Partial substring match. Example: `name=abc` matches any key containing `abc` in name.",
 				Optional:    true,
 			},
+			"limit": schema.Int64Attribute{
+				Description: "Maximum number of SSH keys to return",
+				Computed:    true,
+				Optional:    true,
+				Validators: []validator.Int64{
+					int64validator.Between(1, 1000),
+				},
+			},
 			"order_by": schema.StringAttribute{
 				Description: "Sort order for the SSH keys\nAvailable values: \"created_at.asc\", \"created_at.desc\", \"name.asc\", \"name.desc\".",
 				Computed:    true,

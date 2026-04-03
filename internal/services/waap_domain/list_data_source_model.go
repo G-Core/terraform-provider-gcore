@@ -22,6 +22,7 @@ type WaapDomainsDataSourceModel struct {
 	Ordering types.String                                                  `tfsdk:"ordering" query:"ordering,optional"`
 	Status   types.String                                                  `tfsdk:"status" query:"status,optional"`
 	IDs      *[]types.Int64                                                `tfsdk:"ids" query:"ids,optional"`
+	Limit    types.Int64                                                   `tfsdk:"limit" query:"limit,computed_optional"`
 	MaxItems types.Int64                                                   `tfsdk:"max_items"`
 	Items    customfield.NestedObjectList[WaapDomainsItemsDataSourceModel] `tfsdk:"items"`
 }
@@ -38,6 +39,9 @@ func (m *WaapDomainsDataSourceModel) toListParams(_ context.Context) (params waa
 		IDs: mIDs,
 	}
 
+	if !m.Limit.IsNull() {
+		params.Limit = param.NewOpt(m.Limit.ValueInt64())
+	}
 	if !m.Name.IsNull() {
 		params.Name = param.NewOpt(m.Name.ValueString())
 	}

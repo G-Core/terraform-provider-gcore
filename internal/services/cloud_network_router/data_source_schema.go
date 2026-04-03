@@ -7,8 +7,10 @@ import (
 
 	"github.com/G-Core/terraform-provider-gcore/internal/customfield"
 	"github.com/hashicorp/terraform-plugin-framework-timetypes/timetypes"
+	"github.com/hashicorp/terraform-plugin-framework-validators/datasourcevalidator"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/datasource/schema"
+	"github.com/hashicorp/terraform-plugin-framework/path"
 )
 
 var _ datasource.DataSourceWithConfigValidators = (*CloudNetworkRouterDataSource)(nil)
@@ -21,7 +23,7 @@ func DataSourceSchema(ctx context.Context) schema.Schema {
 				Computed: true,
 			},
 			"router_id": schema.StringAttribute{
-				Required: true,
+				Optional: true,
 			},
 			"project_id": schema.Int64Attribute{
 				Optional: true,
@@ -146,6 +148,15 @@ func DataSourceSchema(ctx context.Context) schema.Schema {
 					},
 				},
 			},
+			"find_one_by": schema.SingleNestedAttribute{
+				Optional: true,
+				Attributes: map[string]schema.Attribute{
+					"limit": schema.Int64Attribute{
+						Description: "Limit the number of returned routers",
+						Optional:    true,
+					},
+				},
+			},
 		},
 	}
 }
@@ -155,5 +166,7 @@ func (d *CloudNetworkRouterDataSource) Schema(ctx context.Context, req datasourc
 }
 
 func (d *CloudNetworkRouterDataSource) ConfigValidators(_ context.Context) []datasource.ConfigValidator {
-	return []datasource.ConfigValidator{}
+	return []datasource.ConfigValidator{
+		datasourcevalidator.ExactlyOneOf(path.MatchRoot("router_id"), path.MatchRoot("find_one_by")),
+	}
 }
