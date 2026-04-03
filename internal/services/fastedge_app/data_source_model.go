@@ -46,6 +46,9 @@ func (m *FastedgeAppDataSourceModel) toListParams(_ context.Context) (params fas
 	if !m.FindOneBy.Binary.IsNull() {
 		params.Binary = param.NewOpt(m.FindOneBy.Binary.ValueInt64())
 	}
+	if !m.FindOneBy.Limit.IsNull() {
+		params.Limit = param.NewOpt(m.FindOneBy.Limit.ValueInt64())
+	}
 	if !m.FindOneBy.Name.IsNull() {
 		params.Name = param.NewOpt(m.FindOneBy.Name.ValueString())
 	}
@@ -80,6 +83,7 @@ type FastedgeAppStoresDataSourceModel struct {
 type FastedgeAppFindOneByDataSourceModel struct {
 	APIType  types.String `tfsdk:"api_type" query:"api_type,optional"`
 	Binary   types.Int64  `tfsdk:"binary" query:"binary,optional"`
+	Limit    types.Int64  `tfsdk:"limit" query:"limit,optional"`
 	Name     types.String `tfsdk:"name" query:"name,optional"`
 	Ordering types.String `tfsdk:"ordering" query:"ordering,optional"`
 	Plan     types.Int64  `tfsdk:"plan" query:"plan,optional"`

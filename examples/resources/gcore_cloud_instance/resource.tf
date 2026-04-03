@@ -11,11 +11,13 @@ resource "gcore_cloud_instance" "example_cloud_instance" {
     }]
   }]
   volumes = [{
-    size = 20
-    source = "new-volume"
+    image_id = "e460e48c-6836-447e-bc9c-16fc4225d318"
+    source = "image"
     attachment_tag = "boot"
+    boot_index = 0
     delete_on_termination = false
     name = "boot-volume"
+    size = 50
     tags = {
       my-tag = "my-tag-value"
     }

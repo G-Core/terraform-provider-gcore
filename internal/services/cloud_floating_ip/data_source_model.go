@@ -63,6 +63,9 @@ func (m *CloudFloatingIPDataSourceModel) toListParams(_ context.Context) (params
 	if !m.RegionID.IsNull() {
 		params.RegionID = param.NewOpt(m.RegionID.ValueInt64())
 	}
+	if !m.FindOneBy.Limit.IsNull() {
+		params.Limit = param.NewOpt(m.FindOneBy.Limit.ValueInt64())
+	}
 	if !m.FindOneBy.Status.IsNull() {
 		params.Status = cloud.FloatingIPStatus(m.FindOneBy.Status.ValueString())
 	}
@@ -80,6 +83,7 @@ type CloudFloatingIPTagsDataSourceModel struct {
 }
 
 type CloudFloatingIPFindOneByDataSourceModel struct {
+	Limit       types.Int64     `tfsdk:"limit" query:"limit,computed_optional"`
 	Status      types.String    `tfsdk:"status" query:"status,optional"`
 	TagKey      *[]types.String `tfsdk:"tag_key" query:"tag_key,optional"`
 	TagKeyValue types.String    `tfsdk:"tag_key_value" query:"tag_key_value,optional"`

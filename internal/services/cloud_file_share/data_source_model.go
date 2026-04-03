@@ -60,6 +60,9 @@ func (m *CloudFileShareDataSourceModel) toListParams(_ context.Context) (params 
 	if !m.RegionID.IsNull() {
 		params.RegionID = param.NewOpt(m.RegionID.ValueInt64())
 	}
+	if !m.FindOneBy.Limit.IsNull() {
+		params.Limit = param.NewOpt(m.FindOneBy.Limit.ValueInt64())
+	}
 	if !m.FindOneBy.Name.IsNull() {
 		params.Name = param.NewOpt(m.FindOneBy.Name.ValueString())
 	}
@@ -84,6 +87,7 @@ type CloudFileShareTagsDataSourceModel struct {
 }
 
 type CloudFileShareFindOneByDataSourceModel struct {
+	Limit    types.Int64  `tfsdk:"limit" query:"limit,computed_optional"`
 	Name     types.String `tfsdk:"name" query:"name,optional"`
 	TypeName types.String `tfsdk:"type_name" query:"type_name,optional"`
 }

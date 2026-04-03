@@ -8,6 +8,7 @@ import (
 	"github.com/G-Core/terraform-provider-gcore/internal/customfield"
 	"github.com/hashicorp/terraform-plugin-framework-timetypes/timetypes"
 	"github.com/hashicorp/terraform-plugin-framework-validators/datasourcevalidator"
+	"github.com/hashicorp/terraform-plugin-framework-validators/int64validator"
 	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/datasource/schema"
@@ -125,6 +126,14 @@ func DataSourceSchema(ctx context.Context) schema.Schema {
 					"external": schema.BoolAttribute{
 						Description: "Filter by external network status",
 						Optional:    true,
+					},
+					"limit": schema.Int64Attribute{
+						Description: "Optional. Limit the number of returned items",
+						Computed:    true,
+						Optional:    true,
+						Validators: []validator.Int64{
+							int64validator.AtMost(1000),
+						},
 					},
 					"name": schema.StringAttribute{
 						Description: "Filter networks by name",

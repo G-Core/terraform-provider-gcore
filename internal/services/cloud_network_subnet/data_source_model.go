@@ -69,6 +69,9 @@ func (m *CloudNetworkSubnetDataSourceModel) toListParams(_ context.Context) (par
 	if !m.RegionID.IsNull() {
 		params.RegionID = param.NewOpt(m.RegionID.ValueInt64())
 	}
+	if !m.FindOneBy.Limit.IsNull() {
+		params.Limit = param.NewOpt(m.FindOneBy.Limit.ValueInt64())
+	}
 	if !m.FindOneBy.NetworkID.IsNull() {
 		params.NetworkID = param.NewOpt(m.FindOneBy.NetworkID.ValueString())
 	}
@@ -97,6 +100,7 @@ type CloudNetworkSubnetTagsDataSourceModel struct {
 }
 
 type CloudNetworkSubnetFindOneByDataSourceModel struct {
+	Limit       types.Int64     `tfsdk:"limit" query:"limit,computed_optional"`
 	NetworkID   types.String    `tfsdk:"network_id" query:"network_id,optional"`
 	OrderBy     types.String    `tfsdk:"order_by" query:"order_by,computed_optional"`
 	OwnedBy     types.String    `tfsdk:"owned_by" query:"owned_by,computed_optional"`

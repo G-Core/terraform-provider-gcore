@@ -578,6 +578,14 @@ func DataSourceSchema(ctx context.Context) schema.Schema {
 						Description: "With or without assigned floating IP",
 						Optional:    true,
 					},
+					"limit": schema.Int64Attribute{
+						Description: "Limit of items on a single page",
+						Computed:    true,
+						Optional:    true,
+						Validators: []validator.Int64{
+							int64validator.AtMost(1000),
+						},
+					},
 					"logging_enabled": schema.BoolAttribute{
 						Description: "With or without logging enabled",
 						Optional:    true,

@@ -20,7 +20,7 @@ resource "gcore_cloud_baremetal_server" "example_cloud_baremetal_server" {
       value = null
     }]
   }
-  image_id = "image_id"
+  image_id = "b5b4d65d-945f-4b98-ab6f-332319c724ef"
   name = "my-bare-metal"
   name_template = "name_template"
   password = "password"

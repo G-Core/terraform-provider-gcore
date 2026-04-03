@@ -25,6 +25,10 @@ func ListDataSourceSchema(ctx context.Context) schema.Schema {
 			"region_id": schema.Int64Attribute{
 				Optional: true,
 			},
+			"limit": schema.Int64Attribute{
+				Description: "Limit the number of returned routers",
+				Optional:    true,
+			},
 			"max_items": schema.Int64Attribute{
 				Description: "Max items to fetch, default: 1000",
 				Optional:    true,

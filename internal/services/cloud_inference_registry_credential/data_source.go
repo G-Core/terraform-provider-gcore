@@ -57,6 +57,36 @@ func (d *CloudInferenceRegistryCredentialDataSource) Read(ctx context.Context, r
 		return
 	}
 
+	if data.FindOneBy != nil {
+		params, diags := data.toListParams(ctx)
+		resp.Diagnostics.Append(diags...)
+		if resp.Diagnostics.HasError() {
+			return
+		}
+
+		env := CloudInferenceRegistryCredentialsResultsListDataSourceEnvelope{}
+		page, err := d.client.Cloud.Inference.RegistryCredentials.List(ctx, params)
+		if err != nil {
+			resp.Diagnostics.AddError("failed to make http request", err.Error())
+			return
+		}
+
+		bytes := []byte(page.RawJSON())
+		err = apijson.UnmarshalComputed(bytes, &env)
+		if err != nil {
+			resp.Diagnostics.AddError("failed to unmarshal http request", err.Error())
+			return
+		}
+
+		if count := len(env.Results.Elements()); count != 1 {
+			resp.Diagnostics.AddError("failed to find exactly one result", fmt.Sprint(count)+" found")
+			return
+		}
+		ts, diags := env.Results.AsStructSliceT(ctx)
+		resp.Diagnostics.Append(diags...)
+		data.CredentialName = ts[0].Name
+	}
+
 	params, diags := data.toReadParams(ctx)
 	resp.Diagnostics.Append(diags...)
 	if resp.Diagnostics.HasError() {

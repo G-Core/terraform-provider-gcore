@@ -6,6 +6,7 @@ data "gcore_cloud_reserved_fixed_ips" "example_cloud_reserved_fixed_ips" {
   external_only = true
   internal_only = true
   ip_address = "ip_address"
+  limit = 0
   order_by = "order_by"
   vip_only = true
 }

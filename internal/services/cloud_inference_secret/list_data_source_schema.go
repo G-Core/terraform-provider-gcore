@@ -22,6 +22,14 @@ func ListDataSourceSchema(ctx context.Context) schema.Schema {
 				Description: "Project ID",
 				Optional:    true,
 			},
+			"limit": schema.Int64Attribute{
+				Description: "Optional. Limit the number of returned items",
+				Computed:    true,
+				Optional:    true,
+				Validators: []validator.Int64{
+					int64validator.AtMost(1000),
+				},
+			},
 			"max_items": schema.Int64Attribute{
 				Description: "Max items to fetch, default: 1000",
 				Optional:    true,

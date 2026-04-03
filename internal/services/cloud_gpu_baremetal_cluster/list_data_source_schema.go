@@ -29,6 +29,14 @@ func ListDataSourceSchema(ctx context.Context) schema.Schema {
 				Description: "Region ID",
 				Optional:    true,
 			},
+			"limit": schema.Int64Attribute{
+				Description: "Limit of items on a single page",
+				Computed:    true,
+				Optional:    true,
+				Validators: []validator.Int64{
+					int64validator.AtMost(1000),
+				},
+			},
 			"managed_by": schema.ListAttribute{
 				Description: "Specifies the entity responsible for managing the resource.\n- `user`: The resource (cluster) is created and maintained directly by the user.\n- `k8s`: The resource is created and maintained automatically by Managed Kubernetes service",
 				Computed:    true,

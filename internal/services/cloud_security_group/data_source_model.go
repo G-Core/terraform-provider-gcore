@@ -60,6 +60,9 @@ func (m *CloudSecurityGroupDataSourceModel) toListParams(_ context.Context) (par
 	if !m.RegionID.IsNull() {
 		params.RegionID = param.NewOpt(m.RegionID.ValueInt64())
 	}
+	if !m.FindOneBy.Limit.IsNull() {
+		params.Limit = param.NewOpt(m.FindOneBy.Limit.ValueInt64())
+	}
 	if !m.FindOneBy.Name.IsNull() {
 		params.Name = param.NewOpt(m.FindOneBy.Name.ValueString())
 	}
@@ -93,6 +96,7 @@ type CloudSecurityGroupTagsV2DataSourceModel struct {
 }
 
 type CloudSecurityGroupFindOneByDataSourceModel struct {
+	Limit       types.Int64     `tfsdk:"limit" query:"limit,computed_optional"`
 	Name        types.String    `tfsdk:"name" query:"name,optional"`
 	TagKey      *[]types.String `tfsdk:"tag_key" query:"tag_key,optional"`
 	TagKeyValue types.String    `tfsdk:"tag_key_value" query:"tag_key_value,optional"`

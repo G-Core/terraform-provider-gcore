@@ -6,6 +6,7 @@ import (
 	"context"
 
 	"github.com/G-Core/gcore-go/cdn"
+	"github.com/G-Core/gcore-go/packages/param"
 	"github.com/G-Core/terraform-provider-gcore/internal/customfield"
 	"github.com/hashicorp/terraform-plugin-framework-jsontypes/jsontypes"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
@@ -17,12 +18,17 @@ type CDNRuleTemplatesResultsListDataSourceEnvelope struct {
 }
 
 type CDNRuleTemplatesDataSourceModel struct {
+	Limit    types.Int64                                                        `tfsdk:"limit" query:"limit,optional"`
 	MaxItems types.Int64                                                        `tfsdk:"max_items"`
 	Items    customfield.NestedObjectList[CDNRuleTemplatesItemsDataSourceModel] `tfsdk:"items"`
 }
 
 func (m *CDNRuleTemplatesDataSourceModel) toListParams(_ context.Context) (params cdn.RuleTemplateListParams, diags diag.Diagnostics) {
 	params = cdn.RuleTemplateListParams{}
+
+	if !m.Limit.IsNull() {
+		params.Limit = param.NewOpt(m.Limit.ValueInt64())
+	}
 
 	return
 }

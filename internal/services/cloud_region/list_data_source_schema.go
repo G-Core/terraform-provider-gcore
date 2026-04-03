@@ -33,6 +33,14 @@ func ListDataSourceSchema(ctx context.Context) schema.Schema {
 					stringvalidator.OneOfCaseInsensitive("containers", "inference"),
 				},
 			},
+			"limit": schema.Int64Attribute{
+				Description: "Limit the number of returned regions. Falls back to default of 100 if not specified. Limited by max limit value of 1000",
+				Computed:    true,
+				Optional:    true,
+				Validators: []validator.Int64{
+					int64validator.AtMost(1000),
+				},
+			},
 			"order_by": schema.StringAttribute{
 				Description: "Order by field and direction.\nAvailable values: \"created_at.asc\", \"created_at.desc\", \"display_name.asc\", \"display_name.desc\".",
 				Computed:    true,
