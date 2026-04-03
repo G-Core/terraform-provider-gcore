@@ -13,7 +13,7 @@ var _ datasource.DataSourceWithConfigValidators = (*CDNTrustedCaCertificateDataS
 
 func DataSourceSchema(ctx context.Context) schema.Schema {
 	return schema.Schema{
-		Description: "Trusted CA certificates verify the authenticity of CDN origin servers during HTTPS connections.",
+		MarkdownDescription: "Trusted CA certificates verify the authenticity of CDN origin servers during HTTPS connections.",
 		Attributes: map[string]schema.Attribute{
 			"id": schema.Int64Attribute{
 				Required: true,

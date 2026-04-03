@@ -14,7 +14,7 @@ var _ datasource.DataSourceWithConfigValidators = (*CloudK8SClusterKubeconfigDat
 
 func DataSourceSchema(ctx context.Context) schema.Schema {
 	return schema.Schema{
-		Description: "Kubeconfig provides the necessary configuration and credentials to access a Kubernetes cluster using kubectl or other Kubernetes clients.",
+		MarkdownDescription: "Kubeconfig provides the necessary configuration and credentials to access a Kubernetes cluster using kubectl or other Kubernetes clients.",
 		Attributes: map[string]schema.Attribute{
 			"cluster_name": schema.StringAttribute{
 				Description: "Cluster name",

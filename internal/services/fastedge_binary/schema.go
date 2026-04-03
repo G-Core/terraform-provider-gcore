@@ -18,7 +18,7 @@ var _ resource.ResourceWithConfigValidators = (*FastedgeBinaryResource)(nil)
 
 func ResourceSchema(ctx context.Context) schema.Schema {
 	return schema.Schema{
-		Description: "FastEdge binaries are immutable WebAssembly modules that implement edge application logic.",
+		MarkdownDescription: "FastEdge binaries are immutable WebAssembly modules that implement edge application logic.",
 		Attributes: map[string]schema.Attribute{
 			"id": schema.Int64Attribute{
 				Description:   "Binary ID",

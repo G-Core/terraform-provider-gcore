@@ -21,7 +21,7 @@ var _ datasource.DataSourceWithConfigValidators = (*FastedgeAppDataSource)(nil)
 
 func DataSourceSchema(ctx context.Context) schema.Schema {
 	return schema.Schema{
-		Description: "FastEdge applications combine a WebAssembly binary with configuration, environment variables, and secrets for deployment at the CDN edge.",
+		MarkdownDescription: "FastEdge applications combine a WebAssembly binary with configuration, environment variables, and secrets for deployment at the CDN edge.",
 		Attributes: map[string]schema.Attribute{
 			"id": schema.Int64Attribute{
 				Computed: true,

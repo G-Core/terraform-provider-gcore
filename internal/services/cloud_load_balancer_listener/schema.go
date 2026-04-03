@@ -24,7 +24,7 @@ var _ resource.ResourceWithConfigValidators = (*CloudLoadBalancerListenerResourc
 
 func ResourceSchema(ctx context.Context) schema.Schema {
 	return schema.Schema{
-		Description: "Load balancer listeners handle incoming traffic on specified protocols and ports, forwarding requests to backend pools.",
+		MarkdownDescription: "Load balancer listeners handle incoming traffic on specified protocols and ports, forwarding requests to backend pools.",
 		Attributes: map[string]schema.Attribute{
 			"id": schema.StringAttribute{
 				Computed:      true,

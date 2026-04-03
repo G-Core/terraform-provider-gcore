@@ -15,7 +15,7 @@ var _ datasource.DataSourceWithConfigValidators = (*CloudGPUVirtualClusterImageD
 
 func DataSourceSchema(ctx context.Context) schema.Schema {
 	return schema.Schema{
-		Description: "GPU virtual images are custom boot images for virtual GPU cluster instances.",
+		MarkdownDescription: "GPU virtual images are custom boot images for virtual GPU cluster instances.",
 		Attributes: map[string]schema.Attribute{
 			"id": schema.StringAttribute{
 				Description: "Image ID",

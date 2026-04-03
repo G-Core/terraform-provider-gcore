@@ -24,7 +24,7 @@ var _ resource.ResourceWithConfigValidators = (*CloudNetworkRouterResource)(nil)
 
 func ResourceSchema(ctx context.Context) schema.Schema {
 	return schema.Schema{
-		Description: "Routers interconnect subnets and manage network routing, including external gateway connectivity and static routes.",
+		MarkdownDescription: "Routers interconnect subnets and manage network routing, including external gateway connectivity and static routes.",
 		Attributes: map[string]schema.Attribute{
 			"id": schema.StringAttribute{
 				Computed:      true,

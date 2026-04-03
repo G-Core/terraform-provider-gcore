@@ -16,7 +16,7 @@ var _ resource.ResourceWithConfigValidators = (*FastedgeSecretResource)(nil)
 
 func ResourceSchema(ctx context.Context) schema.Schema {
 	return schema.Schema{
-		Description: "FastEdge secrets store sensitive values such as API keys and tokens that can be referenced by FastEdge applications.",
+		MarkdownDescription: "FastEdge secrets store sensitive values such as API keys and tokens that can be referenced by FastEdge applications.",
 		Attributes: map[string]schema.Attribute{
 			"id": schema.Int64Attribute{
 				Description:   "The unique identifier of the secret.",

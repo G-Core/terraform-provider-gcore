@@ -19,7 +19,7 @@ var _ datasource.DataSourceWithConfigValidators = (*CloudGPUVirtualClustersDataS
 
 func ListDataSourceSchema(ctx context.Context) schema.Schema {
 	return schema.Schema{
-		Description: "GPU virtual clusters provide managed virtual GPU servers with auto-scaling for parallel computation workloads.",
+		MarkdownDescription: "GPU virtual clusters provide managed virtual GPU servers with auto-scaling for parallel computation workloads.",
 		Attributes: map[string]schema.Attribute{
 			"project_id": schema.Int64Attribute{
 				Description: "Project ID",

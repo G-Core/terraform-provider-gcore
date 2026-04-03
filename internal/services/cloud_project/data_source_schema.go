@@ -19,7 +19,7 @@ var _ datasource.DataSourceWithConfigValidators = (*CloudProjectDataSource)(nil)
 
 func DataSourceSchema(ctx context.Context) schema.Schema {
 	return schema.Schema{
-		Description: "Projects are organizational units that group cloud resources for access control and billing.",
+		MarkdownDescription: "Projects are organizational units that group cloud resources for access control and billing.",
 		Attributes: map[string]schema.Attribute{
 			"id": schema.Int64Attribute{
 				Description: "Project ID",
