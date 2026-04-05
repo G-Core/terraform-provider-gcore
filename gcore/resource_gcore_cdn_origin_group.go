@@ -356,32 +356,35 @@ func resourceCDNOriginGroupRead(ctx context.Context, d *schema.ResourceData, m i
 	d.Set("use_next", result.UseNext)
 	d.Set("proxy_next_upstream", result.ProxyNextUpstream)
 
-	// Preserve S3 credentials from current state before setting origins from API.
-	// The API masks sensitive values, so we keep the user-provided ones.
-	s3Credentials := preserveS3OriginCredentials(d)
-
-	originsList := sourcesToList(result.Sources)
-	restoreS3OriginCredentials(originsList, s3Credentials)
-
-	if err := d.Set("origin", originsList); err != nil {
-		return diag.FromErr(err)
-	}
-
-	// Legacy auth block: keep s3_secret_access_key and s3_access_key_id unchanged by API response
-	currentSecretAccessKey, keyExists := d.GetOk("auth.0.s3_secret_access_key")
-	currentAccessKeyID, keyIDExists := d.GetOk("auth.0.s3_access_key_id")
-	if err := d.Set("auth", authToList(result.Auth)); err != nil {
-		return diag.FromErr(err)
-	}
-	if keyExists && keyIDExists {
-		authList := d.Get("auth").([]interface{})
-		if len(authList) > 0 {
-			authMap := authList[0].(map[string]interface{})
-			authMap["s3_secret_access_key"] = currentSecretAccessKey
-			authMap["s3_access_key_id"] = currentAccessKeyID
-			if err := d.Set("auth", []interface{}{authMap}); err != nil {
-				return diag.FromErr(err)
+	if result.Auth != nil {
+		// Legacy auth-based origin group: set auth block, skip origin to avoid phantom diffs.
+		// The API returns sources alongside auth, but they mirror the auth config.
+		currentSecretAccessKey, keyExists := d.GetOk("auth.0.s3_secret_access_key")
+		currentAccessKeyID, keyIDExists := d.GetOk("auth.0.s3_access_key_id")
+		if err := d.Set("auth", authToList(result.Auth)); err != nil {
+			return diag.FromErr(err)
+		}
+		if keyExists && keyIDExists {
+			authList := d.Get("auth").([]interface{})
+			if len(authList) > 0 {
+				authMap := authList[0].(map[string]interface{})
+				authMap["s3_secret_access_key"] = currentSecretAccessKey
+				authMap["s3_access_key_id"] = currentAccessKeyID
+				if err := d.Set("auth", []interface{}{authMap}); err != nil {
+					return diag.FromErr(err)
+				}
 			}
+		}
+	} else {
+		// Origin-based group: preserve S3 credentials from current state before setting
+		// origins from API, since the API masks sensitive values.
+		s3Credentials := preserveS3OriginCredentials(d)
+
+		originsList := sourcesToList(result.Sources)
+		restoreS3OriginCredentials(originsList, s3Credentials)
+
+		if err := d.Set("origin", originsList); err != nil {
+			return diag.FromErr(err)
 		}
 	}
 
@@ -431,18 +434,6 @@ func resourceCDNOriginGroupUpdate(ctx context.Context, d *schema.ResourceData, m
 
 	if diags.HasError() {
 		return diags
-	}
-
-	if authList, ok := d.GetOk("auth"); ok {
-		if len(authList.([]interface{})) > 0 {
-			authConfig := authList.([]interface{})[0].(map[string]interface{})
-			if secretAccessKey, ok := authConfig["s3_secret_access_key"].(string); ok {
-				d.Set("s3_secret_access_key", secretAccessKey)
-			}
-			if accessKeyID, ok := authConfig["s3_access_key_id"].(string); ok {
-				d.Set("s3_access_key_id", accessKeyID)
-			}
-		}
 	}
 
 	log.Println("[DEBUG] Finish CDN OriginGroup updating")
