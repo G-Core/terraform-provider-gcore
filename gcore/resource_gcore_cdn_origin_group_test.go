@@ -363,11 +363,11 @@ func TestValidateCDNOriginGroupConfig(t *testing.T) {
 		},
 	}
 
-	resource := resourceCDNOriginGroup()
+	originGroupResource := resourceCDNOriginGroup()
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			_, err := resource.Diff(context.Background(), nil, terraform.NewResourceConfigRaw(tt.config), nil)
+			_, err := originGroupResource.Diff(context.Background(), nil, terraform.NewResourceConfigRaw(tt.config), nil)
 			if tt.wantErr == "" {
 				if err != nil {
 					t.Fatalf("unexpected error: %v", err)
@@ -387,8 +387,8 @@ func TestValidateCDNOriginGroupConfig(t *testing.T) {
 }
 
 func TestPreserveRestoreS3OriginCredentialsByIndex(t *testing.T) {
-	resource := resourceCDNOriginGroup()
-	state := schema.TestResourceDataRaw(t, resource.Schema, map[string]interface{}{
+	originGroupResource := resourceCDNOriginGroup()
+	state := schema.TestResourceDataRaw(t, originGroupResource.Schema, map[string]interface{}{
 		"name": "terraform_acctest_group",
 		"origin": []interface{}{
 			map[string]interface{}{
