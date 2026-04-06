@@ -7,12 +7,9 @@ import (
 
 	"github.com/G-Core/terraform-provider-gcore/internal/customfield"
 	"github.com/hashicorp/terraform-plugin-framework-timetypes/timetypes"
-	"github.com/hashicorp/terraform-plugin-framework-validators/datasourcevalidator"
-	"github.com/hashicorp/terraform-plugin-framework-validators/int64validator"
 	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/datasource/schema"
-	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 )
@@ -29,7 +26,7 @@ func DataSourceSchema(ctx context.Context) schema.Schema {
 			},
 			"secret_id": schema.StringAttribute{
 				Description: "Secret ID",
-				Optional:    true,
+				Required:    true,
 			},
 			"project_id": schema.Int64Attribute{
 				Description: "Project ID",
@@ -89,19 +86,6 @@ func DataSourceSchema(ctx context.Context) schema.Schema {
 				CustomType:  customfield.NewMapType[types.String](ctx),
 				ElementType: types.StringType,
 			},
-			"find_one_by": schema.SingleNestedAttribute{
-				Optional: true,
-				Attributes: map[string]schema.Attribute{
-					"limit": schema.Int64Attribute{
-						Description: "Optional. Limit the number of returned items",
-						Computed:    true,
-						Optional:    true,
-						Validators: []validator.Int64{
-							int64validator.AtMost(1000),
-						},
-					},
-				},
-			},
 		},
 	}
 }
@@ -111,7 +95,5 @@ func (d *CloudSecretDataSource) Schema(ctx context.Context, req datasource.Schem
 }
 
 func (d *CloudSecretDataSource) ConfigValidators(_ context.Context) []datasource.ConfigValidator {
-	return []datasource.ConfigValidator{
-		datasourcevalidator.ExactlyOneOf(path.MatchRoot("secret_id"), path.MatchRoot("find_one_by")),
-	}
+	return []datasource.ConfigValidator{}
 }

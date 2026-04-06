@@ -46,10 +46,6 @@ func ListDataSourceSchema(ctx context.Context) schema.Schema {
 				Description: "An IPv4 address to filter results by. Regular expression allowed",
 				Optional:    true,
 			},
-			"limit": schema.Int64Attribute{
-				Description: "Limit the number of returned IPs",
-				Optional:    true,
-			},
 			"order_by": schema.StringAttribute{
 				Description: "Ordering reserved fixed IP list result by name, status, `updated_at`, `created_at` or `fixed_ip_address` fields and directions (status.asc), default is \"fixed_ip_address.asc\"",
 				Optional:    true,

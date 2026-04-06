@@ -24,7 +24,6 @@ type CloudFloatingIPsDataSourceModel struct {
 	Status      types.String                                                       `tfsdk:"status" query:"status,optional"`
 	TagKeyValue types.String                                                       `tfsdk:"tag_key_value" query:"tag_key_value,optional"`
 	TagKey      *[]types.String                                                    `tfsdk:"tag_key" query:"tag_key,optional"`
-	Limit       types.Int64                                                        `tfsdk:"limit" query:"limit,computed_optional"`
 	MaxItems    types.Int64                                                        `tfsdk:"max_items"`
 	Items       customfield.NestedObjectList[CloudFloatingIPsItemsDataSourceModel] `tfsdk:"items"`
 }
@@ -46,9 +45,6 @@ func (m *CloudFloatingIPsDataSourceModel) toListParams(_ context.Context) (param
 	}
 	if !m.RegionID.IsNull() {
 		params.RegionID = param.NewOpt(m.RegionID.ValueInt64())
-	}
-	if !m.Limit.IsNull() {
-		params.Limit = param.NewOpt(m.Limit.ValueInt64())
 	}
 	if !m.Status.IsNull() {
 		params.Status = cloud.FloatingIPStatus(m.Status.ValueString())

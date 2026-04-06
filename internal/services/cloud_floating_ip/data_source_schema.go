@@ -8,7 +8,6 @@ import (
 	"github.com/G-Core/terraform-provider-gcore/internal/customfield"
 	"github.com/hashicorp/terraform-plugin-framework-timetypes/timetypes"
 	"github.com/hashicorp/terraform-plugin-framework-validators/datasourcevalidator"
-	"github.com/hashicorp/terraform-plugin-framework-validators/int64validator"
 	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/datasource/schema"
@@ -108,14 +107,6 @@ func DataSourceSchema(ctx context.Context) schema.Schema {
 			"find_one_by": schema.SingleNestedAttribute{
 				Optional: true,
 				Attributes: map[string]schema.Attribute{
-					"limit": schema.Int64Attribute{
-						Description: "Optional. Limit the number of returned items",
-						Computed:    true,
-						Optional:    true,
-						Validators: []validator.Int64{
-							int64validator.AtMost(1000),
-						},
-					},
 					"status": schema.StringAttribute{
 						Description: "Filter by floating IP status. DOWN - unassigned (available). ACTIVE - attached to a port (in use). ERROR - error state.\nAvailable values: \"ACTIVE\", \"DOWN\", \"ERROR\".",
 						Optional:    true,
