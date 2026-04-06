@@ -61,6 +61,7 @@ Available values: "allow", "deny", "required".
 
 - `created_at` (String) Datetime when the image was created
 - `creator_task_id` (String) Task that created this entity
+- `currency_code` (String) Currency code. Shown if the `include_prices` query parameter if set to true
 - `description` (String) Image description
 - `disk_format` (String) Disk format
 - `display_order` (Number)
@@ -70,6 +71,10 @@ Available values: "allow", "deny", "required".
 - `id` (String) The ID of this resource.
 - `min_disk` (Number) Minimal boot volume required
 - `min_ram` (Number) Minimal VM RAM required
+- `price_per_hour` (Number) Price per hour. Shown if the `include_prices` query parameter if set to true
+- `price_per_month` (Number) Price per month. Shown if the `include_prices` query parameter if set to true
+- `price_status` (String) Price status for the UI
+Available values: "error", "hide", "show".
 - `region` (String) Region name
 - `size` (Number) Image size in bytes
 - `status` (String) Image status, i.e. active

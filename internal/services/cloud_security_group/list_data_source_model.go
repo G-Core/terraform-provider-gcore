@@ -23,7 +23,6 @@ type CloudSecurityGroupsDataSourceModel struct {
 	Name        types.String                                                          `tfsdk:"name" query:"name,optional"`
 	TagKeyValue types.String                                                          `tfsdk:"tag_key_value" query:"tag_key_value,optional"`
 	TagKey      *[]types.String                                                       `tfsdk:"tag_key" query:"tag_key,optional"`
-	Limit       types.Int64                                                           `tfsdk:"limit" query:"limit,computed_optional"`
 	MaxItems    types.Int64                                                           `tfsdk:"max_items"`
 	Items       customfield.NestedObjectList[CloudSecurityGroupsItemsDataSourceModel] `tfsdk:"items"`
 }
@@ -45,9 +44,6 @@ func (m *CloudSecurityGroupsDataSourceModel) toListParams(_ context.Context) (pa
 	}
 	if !m.RegionID.IsNull() {
 		params.RegionID = param.NewOpt(m.RegionID.ValueInt64())
-	}
-	if !m.Limit.IsNull() {
-		params.Limit = param.NewOpt(m.Limit.ValueInt64())
 	}
 	if !m.Name.IsNull() {
 		params.Name = param.NewOpt(m.Name.ValueString())

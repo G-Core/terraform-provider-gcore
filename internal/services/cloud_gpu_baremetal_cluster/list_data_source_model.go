@@ -20,7 +20,6 @@ type CloudGPUBaremetalClustersResultsListDataSourceEnvelope struct {
 type CloudGPUBaremetalClustersDataSourceModel struct {
 	ProjectID types.Int64                                                                 `tfsdk:"project_id" path:"project_id,optional"`
 	RegionID  types.Int64                                                                 `tfsdk:"region_id" path:"region_id,optional"`
-	Limit     types.Int64                                                                 `tfsdk:"limit" query:"limit,computed_optional"`
 	ManagedBy customfield.List[types.String]                                              `tfsdk:"managed_by" query:"managed_by,computed_optional"`
 	MaxItems  types.Int64                                                                 `tfsdk:"max_items"`
 	Items     customfield.NestedObjectList[CloudGPUBaremetalClustersItemsDataSourceModel] `tfsdk:"items"`
@@ -42,9 +41,6 @@ func (m *CloudGPUBaremetalClustersDataSourceModel) toListParams(ctx context.Cont
 	}
 	if !m.RegionID.IsNull() {
 		params.RegionID = param.NewOpt(m.RegionID.ValueInt64())
-	}
-	if !m.Limit.IsNull() {
-		params.Limit = param.NewOpt(m.Limit.ValueInt64())
 	}
 
 	return

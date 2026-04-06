@@ -41,7 +41,6 @@ type CloudInstancesDataSourceModel struct {
 	IncludeAI               types.Bool                                                       `tfsdk:"include_ai" query:"include_ai,computed_optional"`
 	IncludeBaremetal        types.Bool                                                       `tfsdk:"include_baremetal" query:"include_baremetal,computed_optional"`
 	IncludeK8S              types.Bool                                                       `tfsdk:"include_k8s" query:"include_k8s,computed_optional"`
-	Limit                   types.Int64                                                      `tfsdk:"limit" query:"limit,computed_optional"`
 	OnlyIsolated            types.Bool                                                       `tfsdk:"only_isolated" query:"only_isolated,computed_optional"`
 	OrderBy                 types.String                                                     `tfsdk:"order_by" query:"order_by,computed_optional"`
 	WithDDOS                types.Bool                                                       `tfsdk:"with_ddos" query:"with_ddos,computed_optional"`
@@ -104,9 +103,6 @@ func (m *CloudInstancesDataSourceModel) toListParams(_ context.Context) (params 
 	}
 	if !m.IP.IsNull() {
 		params.IP = param.NewOpt(m.IP.ValueString())
-	}
-	if !m.Limit.IsNull() {
-		params.Limit = param.NewOpt(m.Limit.ValueInt64())
 	}
 	if !m.Name.IsNull() {
 		params.Name = param.NewOpt(m.Name.ValueString())

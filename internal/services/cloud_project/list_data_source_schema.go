@@ -29,14 +29,6 @@ func ListDataSourceSchema(ctx context.Context) schema.Schema {
 				Computed:    true,
 				Optional:    true,
 			},
-			"limit": schema.Int64Attribute{
-				Description: "Limit value is used to limit the number of records in the result",
-				Computed:    true,
-				Optional:    true,
-				Validators: []validator.Int64{
-					int64validator.AtMost(1000),
-				},
-			},
 			"order_by": schema.StringAttribute{
 				Description: "Order by field and direction.\nAvailable values: \"created_at.asc\", \"created_at.desc\", \"name.asc\", \"name.desc\".",
 				Computed:    true,

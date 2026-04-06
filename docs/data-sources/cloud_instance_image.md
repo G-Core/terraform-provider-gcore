@@ -36,10 +36,11 @@ data "gcore_cloud_instance_image" "example_cloud_instance_image" {
 
 ### Read-Only
 
-- `architecture` (String) An image architecture type: aarch64, `x86_64`
+- `architecture` (String) An image architecture type: aarch64, `x86_64`.
 Available values: "aarch64", "x86_64".
 - `created_at` (String) Datetime when the image was created
 - `creator_task_id` (String) Task that created this entity
+- `currency_code` (String) Currency code. Shown if the `include_prices` query parameter if set to true
 - `description` (String) Image description
 - `disk_format` (String) Disk format
 - `display_order` (Number)
@@ -51,7 +52,7 @@ Available values: "bios", "uefi".
 - `hw_machine_type` (String) A virtual chipset type.
 Available values: "pc", "q35".
 - `id` (String) The ID of this resource.
-- `is_baremetal` (Boolean) Set to true if the image will be used by bare metal servers. Defaults to false.
+- `is_baremetal` (Boolean) Set to true if the image will be used by bare metal servers.
 - `min_disk` (Number) Minimal boot volume required
 - `min_ram` (Number) Minimal VM RAM required
 - `name` (String) Image display name
@@ -59,6 +60,10 @@ Available values: "pc", "q35".
 - `os_type` (String) The operating system installed on the image.
 Available values: "linux", "windows".
 - `os_version` (String) OS version, i.e. 19.04 (for Ubuntu) or 9.4 for Debian
+- `price_per_hour` (Number) Price per hour. Shown if the `include_prices` query parameter if set to true
+- `price_per_month` (Number) Price per month. Shown if the `include_prices` query parameter if set to true
+- `price_status` (String) Price status for the UI
+Available values: "error", "hide", "show".
 - `region` (String) Region name
 - `size` (Number) Image size in bytes
 - `ssh_key` (String) Whether the image supports SSH key or not

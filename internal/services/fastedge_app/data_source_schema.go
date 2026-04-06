@@ -169,13 +169,6 @@ func DataSourceSchema(ctx context.Context) schema.Schema {
 							int64validator.AtLeast(1),
 						},
 					},
-					"limit": schema.Int64Attribute{
-						Description: "Maximum number of results to return",
-						Optional:    true,
-						Validators: []validator.Int64{
-							int64validator.Between(1, 1000),
-						},
-					},
 					"name": schema.StringAttribute{
 						Description: "Filter by application name (case-insensitive partial match)",
 						Optional:    true,

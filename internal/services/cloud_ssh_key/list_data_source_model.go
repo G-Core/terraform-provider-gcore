@@ -20,7 +20,6 @@ type CloudSSHKeysResultsListDataSourceEnvelope struct {
 type CloudSSHKeysDataSourceModel struct {
 	ProjectID types.Int64                                                    `tfsdk:"project_id" path:"project_id,optional"`
 	Name      types.String                                                   `tfsdk:"name" query:"name,optional"`
-	Limit     types.Int64                                                    `tfsdk:"limit" query:"limit,computed_optional"`
 	OrderBy   types.String                                                   `tfsdk:"order_by" query:"order_by,computed_optional"`
 	MaxItems  types.Int64                                                    `tfsdk:"max_items"`
 	Items     customfield.NestedObjectList[CloudSSHKeysItemsDataSourceModel] `tfsdk:"items"`
@@ -31,9 +30,6 @@ func (m *CloudSSHKeysDataSourceModel) toListParams(_ context.Context) (params cl
 
 	if !m.ProjectID.IsNull() {
 		params.ProjectID = param.NewOpt(m.ProjectID.ValueInt64())
-	}
-	if !m.Limit.IsNull() {
-		params.Limit = param.NewOpt(m.Limit.ValueInt64())
 	}
 	if !m.Name.IsNull() {
 		params.Name = param.NewOpt(m.Name.ValueString())
