@@ -41,9 +41,6 @@ func (m *CloudProjectDataSourceModel) toListParams(_ context.Context) (params cl
 	if !m.FindOneBy.IncludeDeleted.IsNull() {
 		params.IncludeDeleted = param.NewOpt(m.FindOneBy.IncludeDeleted.ValueBool())
 	}
-	if !m.FindOneBy.Limit.IsNull() {
-		params.Limit = param.NewOpt(m.FindOneBy.Limit.ValueInt64())
-	}
 	if !m.FindOneBy.Name.IsNull() {
 		params.Name = param.NewOpt(m.FindOneBy.Name.ValueString())
 	}
@@ -56,7 +53,6 @@ func (m *CloudProjectDataSourceModel) toListParams(_ context.Context) (params cl
 
 type CloudProjectFindOneByDataSourceModel struct {
 	IncludeDeleted types.Bool   `tfsdk:"include_deleted" query:"include_deleted,computed_optional"`
-	Limit          types.Int64  `tfsdk:"limit" query:"limit,computed_optional"`
 	Name           types.String `tfsdk:"name" query:"name,optional"`
 	OrderBy        types.String `tfsdk:"order_by" query:"order_by,computed_optional"`
 }

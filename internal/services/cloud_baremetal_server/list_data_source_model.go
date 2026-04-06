@@ -34,7 +34,6 @@ type CloudBaremetalServersDataSourceModel struct {
 	Uuid                    types.String                                                            `tfsdk:"uuid" query:"uuid,optional"`
 	TagValue                *[]types.String                                                         `tfsdk:"tag_value" query:"tag_value,optional"`
 	IncludeK8S              types.Bool                                                              `tfsdk:"include_k8s" query:"include_k8s,computed_optional"`
-	Limit                   types.Int64                                                             `tfsdk:"limit" query:"limit,computed_optional"`
 	OnlyIsolated            types.Bool                                                              `tfsdk:"only_isolated" query:"only_isolated,computed_optional"`
 	OrderBy                 types.String                                                            `tfsdk:"order_by" query:"order_by,computed_optional"`
 	WithInterfacesName      types.Bool                                                              `tfsdk:"with_interfaces_name" query:"with_interfaces_name,computed_optional"`
@@ -82,9 +81,6 @@ func (m *CloudBaremetalServersDataSourceModel) toListParams(_ context.Context) (
 	}
 	if !m.IP.IsNull() {
 		params.IP = param.NewOpt(m.IP.ValueString())
-	}
-	if !m.Limit.IsNull() {
-		params.Limit = param.NewOpt(m.Limit.ValueInt64())
 	}
 	if !m.Name.IsNull() {
 		params.Name = param.NewOpt(m.Name.ValueString())

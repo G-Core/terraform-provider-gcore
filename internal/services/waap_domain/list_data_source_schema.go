@@ -58,14 +58,6 @@ func ListDataSourceSchema(ctx context.Context) schema.Schema {
 				Optional:    true,
 				ElementType: types.Int64Type,
 			},
-			"limit": schema.Int64Attribute{
-				Description: "Number of items to return",
-				Computed:    true,
-				Optional:    true,
-				Validators: []validator.Int64{
-					int64validator.Between(0, 100),
-				},
-			},
 			"max_items": schema.Int64Attribute{
 				Description: "Max items to fetch, default: 1000",
 				Optional:    true,

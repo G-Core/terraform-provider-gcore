@@ -23,7 +23,6 @@ type CloudNetworkSubnetsDataSourceModel struct {
 	NetworkID   types.String                                                          `tfsdk:"network_id" query:"network_id,optional"`
 	TagKeyValue types.String                                                          `tfsdk:"tag_key_value" query:"tag_key_value,optional"`
 	TagKey      *[]types.String                                                       `tfsdk:"tag_key" query:"tag_key,optional"`
-	Limit       types.Int64                                                           `tfsdk:"limit" query:"limit,computed_optional"`
 	OrderBy     types.String                                                          `tfsdk:"order_by" query:"order_by,computed_optional"`
 	OwnedBy     types.String                                                          `tfsdk:"owned_by" query:"owned_by,computed_optional"`
 	MaxItems    types.Int64                                                           `tfsdk:"max_items"`
@@ -47,9 +46,6 @@ func (m *CloudNetworkSubnetsDataSourceModel) toListParams(_ context.Context) (pa
 	}
 	if !m.RegionID.IsNull() {
 		params.RegionID = param.NewOpt(m.RegionID.ValueInt64())
-	}
-	if !m.Limit.IsNull() {
-		params.Limit = param.NewOpt(m.Limit.ValueInt64())
 	}
 	if !m.NetworkID.IsNull() {
 		params.NetworkID = param.NewOpt(m.NetworkID.ValueString())

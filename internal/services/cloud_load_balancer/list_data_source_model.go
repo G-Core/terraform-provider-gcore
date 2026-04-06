@@ -25,7 +25,6 @@ type CloudLoadBalancersDataSourceModel struct {
 	Name             types.String                                                         `tfsdk:"name" query:"name,optional"`
 	TagKeyValue      types.String                                                         `tfsdk:"tag_key_value" query:"tag_key_value,optional"`
 	TagKey           *[]types.String                                                      `tfsdk:"tag_key" query:"tag_key,optional"`
-	Limit            types.Int64                                                          `tfsdk:"limit" query:"limit,computed_optional"`
 	OrderBy          types.String                                                         `tfsdk:"order_by" query:"order_by,computed_optional"`
 	ShowStats        types.Bool                                                           `tfsdk:"show_stats" query:"show_stats,computed_optional"`
 	WithDDOS         types.Bool                                                           `tfsdk:"with_ddos" query:"with_ddos,computed_optional"`
@@ -53,9 +52,6 @@ func (m *CloudLoadBalancersDataSourceModel) toListParams(_ context.Context) (par
 	}
 	if !m.AssignedFloating.IsNull() {
 		params.AssignedFloating = param.NewOpt(m.AssignedFloating.ValueBool())
-	}
-	if !m.Limit.IsNull() {
-		params.Limit = param.NewOpt(m.Limit.ValueInt64())
 	}
 	if !m.LoggingEnabled.IsNull() {
 		params.LoggingEnabled = param.NewOpt(m.LoggingEnabled.ValueBool())

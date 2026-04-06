@@ -84,9 +84,6 @@ func (m *CloudLoadBalancerDataSourceModel) toListParams(_ context.Context) (para
 	if !m.FindOneBy.AssignedFloating.IsNull() {
 		params.AssignedFloating = param.NewOpt(m.FindOneBy.AssignedFloating.ValueBool())
 	}
-	if !m.FindOneBy.Limit.IsNull() {
-		params.Limit = param.NewOpt(m.FindOneBy.Limit.ValueInt64())
-	}
 	if !m.FindOneBy.LoggingEnabled.IsNull() {
 		params.LoggingEnabled = param.NewOpt(m.FindOneBy.LoggingEnabled.ValueBool())
 	}
@@ -180,7 +177,6 @@ type CloudLoadBalancerVrrpIPsDataSourceModel struct {
 
 type CloudLoadBalancerFindOneByDataSourceModel struct {
 	AssignedFloating types.Bool      `tfsdk:"assigned_floating" query:"assigned_floating,optional"`
-	Limit            types.Int64     `tfsdk:"limit" query:"limit,computed_optional"`
 	LoggingEnabled   types.Bool      `tfsdk:"logging_enabled" query:"logging_enabled,optional"`
 	Name             types.String    `tfsdk:"name" query:"name,optional"`
 	OrderBy          types.String    `tfsdk:"order_by" query:"order_by,computed_optional"`

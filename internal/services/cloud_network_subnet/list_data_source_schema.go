@@ -42,14 +42,6 @@ func ListDataSourceSchema(ctx context.Context) schema.Schema {
 				Optional:    true,
 				ElementType: types.StringType,
 			},
-			"limit": schema.Int64Attribute{
-				Description: "Optional. Limit the number of returned items",
-				Computed:    true,
-				Optional:    true,
-				Validators: []validator.Int64{
-					int64validator.AtMost(1000),
-				},
-			},
 			"order_by": schema.StringAttribute{
 				Description: "Ordering subnets list result by `name`, `created_at`, `updated_at`, `available_ips`, `total_ips`, and `cidr` (default) fields of the subnet and directions (`name.asc`).\nAvailable values: \"available_ips.asc\", \"available_ips.desc\", \"cidr.asc\", \"cidr.desc\", \"created_at.asc\", \"created_at.desc\", \"name.asc\", \"name.desc\", \"total_ips.asc\", \"total_ips.desc\", \"updated_at.asc\", \"updated_at.desc\".",
 				Computed:    true,

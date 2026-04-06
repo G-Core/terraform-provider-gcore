@@ -108,9 +108,6 @@ func (m *CloudInstanceDataSourceModel) toListParams(_ context.Context) (params c
 	if !m.FindOneBy.IP.IsNull() {
 		params.IP = param.NewOpt(m.FindOneBy.IP.ValueString())
 	}
-	if !m.FindOneBy.Limit.IsNull() {
-		params.Limit = param.NewOpt(m.FindOneBy.Limit.ValueInt64())
-	}
 	if !m.FindOneBy.Name.IsNull() {
 		params.Name = param.NewOpt(m.FindOneBy.Name.ValueString())
 	}
@@ -281,7 +278,6 @@ type CloudInstanceFindOneByDataSourceModel struct {
 	IncludeBaremetal        types.Bool        `tfsdk:"include_baremetal" query:"include_baremetal,computed_optional"`
 	IncludeK8S              types.Bool        `tfsdk:"include_k8s" query:"include_k8s,computed_optional"`
 	IP                      types.String      `tfsdk:"ip" query:"ip,optional"`
-	Limit                   types.Int64       `tfsdk:"limit" query:"limit,computed_optional"`
 	Name                    types.String      `tfsdk:"name" query:"name,optional"`
 	OnlyIsolated            types.Bool        `tfsdk:"only_isolated" query:"only_isolated,computed_optional"`
 	OnlyWithFixedExternalIP types.Bool        `tfsdk:"only_with_fixed_external_ip" query:"only_with_fixed_external_ip,optional"`
