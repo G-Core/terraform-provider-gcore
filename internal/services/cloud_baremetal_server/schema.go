@@ -183,16 +183,11 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 							Attributes: map[string]schema.Attribute{
 								"base_field": schema.Int64Attribute{
 									Description: "Unique identifier of the DDoS protection field being configured",
-									Optional:    true,
+									Required:    true,
 								},
 								"field_value": schema.StringAttribute{
 									Optional:   true,
 									CustomType: jsontypes.NormalizedType{},
-								},
-								"value": schema.StringAttribute{
-									Description:        "Basic type value. Only one of 'value' or 'field_value' must be specified.",
-									Optional:           true,
-									DeprecationMessage: "This attribute is deprecated.",
 								},
 							},
 						},

@@ -476,13 +476,9 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 									Required: true,
 								},
 								"field_value": schema.StringAttribute{
-									Description: "Complex value. Only one of 'value' or 'field_value' must be specified",
+									Description: "Complex value for the DDoS profile field",
 									Optional:    true,
 									CustomType:  jsontypes.NormalizedType{},
-								},
-								"value": schema.StringAttribute{
-									Description: "Basic value. Only one of 'value' or 'field_value' must be specified",
-									Optional:    true,
 								},
 							},
 						},

@@ -17,7 +17,6 @@ resource "gcore_cloud_baremetal_server" "example_cloud_baremetal_server" {
     fields = [{
       base_field = 10
       field_value = [45046, 45047]
-      value = null
     }]
   }
   image_id = "b5b4d65d-945f-4b98-ab6f-332319c724ef"

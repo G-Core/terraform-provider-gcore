@@ -183,13 +183,11 @@ type CloudBaremetalServersDDOSProfileFieldsDataSourceModel struct {
 	BaseField        types.Int64          `tfsdk:"base_field" json:"base_field,computed"`
 	Default          types.String         `tfsdk:"default" json:"default,computed"`
 	Description      types.String         `tfsdk:"description" json:"description,computed"`
-	FieldName        types.String         `tfsdk:"field_name" json:"field_name,computed"`
 	FieldType        types.String         `tfsdk:"field_type" json:"field_type,computed"`
 	FieldValue       jsontypes.Normalized `tfsdk:"field_value" json:"field_value,computed"`
 	Name             types.String         `tfsdk:"name" json:"name,computed"`
 	Required         types.Bool           `tfsdk:"required" json:"required,computed"`
 	ValidationSchema jsontypes.Normalized `tfsdk:"validation_schema" json:"validation_schema,computed"`
-	Value            types.String         `tfsdk:"value" json:"value,computed"`
 }
 
 type CloudBaremetalServersDDOSProfileOptionsDataSourceModel struct {

@@ -76,7 +76,6 @@ resource "gcore_cloud_k8s_cluster" "example_cloud_k8s_cluster" {
     fields = [{
       base_field = 10
       field_value = [45046, 45047]
-      value = null
     }]
     profile_template = 29
     profile_template_name = "profile_template_name"

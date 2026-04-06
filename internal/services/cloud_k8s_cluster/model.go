@@ -124,7 +124,6 @@ type CloudK8SClusterDDOSProfileModel struct {
 type CloudK8SClusterDDOSProfileFieldsModel struct {
 	BaseField  types.Int64          `tfsdk:"base_field" json:"base_field,required"`
 	FieldValue jsontypes.Normalized `tfsdk:"field_value" json:"field_value,optional"`
-	Value      types.String         `tfsdk:"value" json:"value,optional"`
 }
 
 type CloudK8SClusterLoggingModel struct {
