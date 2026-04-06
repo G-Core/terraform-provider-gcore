@@ -356,13 +356,26 @@ func resourceCDNOriginGroupRead(ctx context.Context, d *schema.ResourceData, m i
 	d.Set("use_next", result.UseNext)
 	d.Set("proxy_next_upstream", result.ProxyNextUpstream)
 
-	if result.Auth != nil {
-		// Legacy auth-based origin group: set auth block, skip origin to avoid phantom diffs.
-		// The API returns sources alongside auth, but they mirror the auth config.
+	if err := syncOriginGroupState(d, result.Auth, result.Sources); err != nil {
+		return diag.FromErr(err)
+	}
+
+	log.Println("[DEBUG] Finish CDN OriginGroup reading")
+	return nil
+}
+
+func syncOriginGroupState(d *schema.ResourceData, auth *origingroups.AuthS3, sources []origingroups.Source) error {
+	if auth != nil {
+		// Legacy auth-based origin group: clear origin to avoid stale state from previous reads.
+		if err := d.Set("origin", []interface{}{}); err != nil {
+			return err
+		}
+
+		// Keep sensitive auth credentials from current state because the API masks them.
 		currentSecretAccessKey, keyExists := d.GetOk("auth.0.s3_secret_access_key")
 		currentAccessKeyID, keyIDExists := d.GetOk("auth.0.s3_access_key_id")
-		if err := d.Set("auth", authToList(result.Auth)); err != nil {
-			return diag.FromErr(err)
+		if err := d.Set("auth", authToList(auth)); err != nil {
+			return err
 		}
 		if keyExists && keyIDExists {
 			authList := d.Get("auth").([]interface{})
@@ -371,24 +384,28 @@ func resourceCDNOriginGroupRead(ctx context.Context, d *schema.ResourceData, m i
 				authMap["s3_secret_access_key"] = currentSecretAccessKey
 				authMap["s3_access_key_id"] = currentAccessKeyID
 				if err := d.Set("auth", []interface{}{authMap}); err != nil {
-					return diag.FromErr(err)
+					return err
 				}
 			}
 		}
-	} else {
-		// Origin-based group: preserve S3 credentials from current state before setting
-		// origins from API, since the API masks sensitive values.
-		s3Credentials := preserveS3OriginCredentials(d)
 
-		originsList := sourcesToList(result.Sources)
-		restoreS3OriginCredentials(originsList, s3Credentials)
-
-		if err := d.Set("origin", originsList); err != nil {
-			return diag.FromErr(err)
-		}
+		return nil
 	}
 
-	log.Println("[DEBUG] Finish CDN OriginGroup reading")
+	// Origin-based group: clear deprecated auth state and preserve inline S3 credentials
+	// because the API masks sensitive values.
+	if err := d.Set("auth", []interface{}{}); err != nil {
+		return err
+	}
+
+	s3Credentials := preserveS3OriginCredentials(d)
+	originsList := sourcesToList(sources)
+	restoreS3OriginCredentials(originsList, s3Credentials)
+
+	if err := d.Set("origin", originsList); err != nil {
+		return err
+	}
+
 	return nil
 }
 
