@@ -17,7 +17,7 @@ var _ datasource.DataSourceWithConfigValidators = (*FastedgeTemplatesDataSource)
 
 func ListDataSourceSchema(ctx context.Context) schema.Schema {
 	return schema.Schema{
-		Description: "FastEdge templates encapsulate reusable configurations for FastEdge applications, including a WebAssembly binary reference and configurable parameters.",
+		MarkdownDescription: "FastEdge templates encapsulate reusable configurations for FastEdge applications, including a WebAssembly binary reference and configurable parameters.",
 		Attributes: map[string]schema.Attribute{
 			"api_type": schema.StringAttribute{
 				Description: "API type:  \nwasi-http - WASI with HTTP entry point  \nproxy-wasm - Proxy-Wasm app, callable from CDN\nAvailable values: \"wasi-http\", \"proxy-wasm\".",

@@ -22,7 +22,7 @@ var _ resource.ResourceWithConfigValidators = (*CloudSecretResource)(nil)
 
 func ResourceSchema(ctx context.Context) schema.Schema {
 	return schema.Schema{
-		Description: "Secrets store sensitive data such as TLS certificates and private keys in encrypted form within a cloud region.",
+		MarkdownDescription: "Secrets store sensitive data such as TLS certificates and private keys in encrypted form within a cloud region.",
 		Attributes: map[string]schema.Attribute{
 			"id": schema.StringAttribute{
 				Computed:      true,

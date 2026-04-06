@@ -25,7 +25,7 @@ var _ resource.ResourceWithConfigValidators = (*CDNRuleTemplateResource)(nil)
 
 func ResourceSchema(ctx context.Context) schema.Schema {
 	return schema.Schema{
-		Description: "CDN rule templates define reusable rule configurations that can be applied across multiple CDN resources for consistent caching, delivery, and security policies.",
+		MarkdownDescription: "CDN rule templates define reusable rule configurations that can be applied across multiple CDN resources for consistent caching, delivery, and security policies.",
 		Attributes: map[string]schema.Attribute{
 			"id": schema.Int64Attribute{
 				Description:   "Rule template ID.",
