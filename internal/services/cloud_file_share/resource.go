@@ -13,7 +13,6 @@ import (
 	"github.com/G-Core/gcore-go/option"
 	"github.com/G-Core/gcore-go/packages/param"
 	"github.com/G-Core/terraform-provider-gcore/internal/apijson"
-	"github.com/G-Core/terraform-provider-gcore/internal/custom"
 	"github.com/G-Core/terraform-provider-gcore/internal/customfield"
 	"github.com/G-Core/terraform-provider-gcore/internal/importpath"
 	"github.com/G-Core/terraform-provider-gcore/internal/logging"
@@ -121,7 +120,7 @@ func (r *CloudFileShareResource) Update(ctx context.Context, req resource.Update
 	}
 
 	// Check if fields that can be updated using the Update method have changed
-	if !data.Name.Equal(state.Name) || !custom.TagsEqual(data.Tags, state.Tags) || !data.ShareSettings.Equal(state.ShareSettings) {
+	if !data.Name.Equal(state.Name) || !data.Tags.Equal(state.Tags) || !data.ShareSettings.Equal(state.ShareSettings) {
 		params := cloud.FileShareUpdateParams{}
 
 		if !data.ProjectID.IsNull() {

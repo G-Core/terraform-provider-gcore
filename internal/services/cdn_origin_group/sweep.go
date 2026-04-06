@@ -44,7 +44,7 @@ func sweepCDNOriginGroups(_ string) error {
 		return nil
 	}
 
-	for _, group := range *groups {
+	for _, group := range groups.OfPlainList {
 		if !sweep.ShouldSweep("gcore_cdn_origin_group", group.Name) {
 			continue
 		}
