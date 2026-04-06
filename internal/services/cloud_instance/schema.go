@@ -29,7 +29,7 @@ var _ resource.ResourceWithConfigValidators = (*CloudInstanceResource)(nil)
 
 func ResourceSchema(ctx context.Context) schema.Schema {
 	return schema.Schema{
-		Description: "Instances are cloud virtual machines with configurable CPU, memory, storage, and networking, supporting various operating systems and workloads.",
+		MarkdownDescription: "Instances are cloud virtual machines with configurable CPU, memory, storage, and networking, supporting various operating systems and workloads.",
 		Attributes: map[string]schema.Attribute{
 			"id": schema.StringAttribute{
 				Computed:      true,

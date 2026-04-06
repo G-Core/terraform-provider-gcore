@@ -20,7 +20,7 @@ var _ resource.ResourceWithConfigValidators = (*CDNCertificateResource)(nil)
 
 func ResourceSchema(ctx context.Context) schema.Schema {
 	return schema.Schema{
-		Description: "CDN SSL certificates enable HTTPS content delivery, supporting both uploaded certificates and automated Let's Encrypt provisioning.",
+		MarkdownDescription: "CDN SSL certificates enable HTTPS content delivery, supporting both uploaded certificates and automated Let's Encrypt provisioning.",
 		Attributes: map[string]schema.Attribute{
 			"ssl_id": schema.Int64Attribute{
 				Computed:      true,

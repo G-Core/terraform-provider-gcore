@@ -24,7 +24,7 @@ var _ resource.ResourceWithConfigValidators = (*CDNResourceRuleResource)(nil)
 
 func ResourceSchema(ctx context.Context) schema.Schema {
 	return schema.Schema{
-		Description: "CDN resource rules set custom caching, delivery, and security options for specific URL patterns or file types.",
+		MarkdownDescription: "CDN resource rules set custom caching, delivery, and security options for specific URL patterns or file types.",
 		Attributes: map[string]schema.Attribute{
 			"id": schema.Int64Attribute{
 				Description:   "Rule ID.",

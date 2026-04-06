@@ -17,7 +17,7 @@ var _ datasource.DataSourceWithConfigValidators = (*CloudInstanceImageDataSource
 
 func DataSourceSchema(ctx context.Context) schema.Schema {
 	return schema.Schema{
-		Description: "Instance images are operating system images (public, private, or shared) used to boot cloud instances.",
+		MarkdownDescription: "Instance images are operating system images (public, private, or shared) used to boot cloud instances.",
 		Attributes: map[string]schema.Attribute{
 			"id": schema.StringAttribute{
 				Computed: true,

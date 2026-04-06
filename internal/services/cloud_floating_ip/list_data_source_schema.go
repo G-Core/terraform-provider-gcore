@@ -21,7 +21,7 @@ var _ datasource.DataSourceWithConfigValidators = (*CloudFloatingIPsDataSource)(
 
 func ListDataSourceSchema(ctx context.Context) schema.Schema {
 	return schema.Schema{
-		Description: "A floating IP is a static IP address that points to one of your Instances. It allows you to redirect network traffic to any of your Instances in the same datacenter.",
+		MarkdownDescription: "A floating IP is a static IP address that points to one of your Instances. It allows you to redirect network traffic to any of your Instances in the same datacenter.",
 		Attributes: map[string]schema.Attribute{
 			"project_id": schema.Int64Attribute{
 				Description: "Project ID",

@@ -19,7 +19,7 @@ var _ datasource.DataSourceWithConfigValidators = (*CDNRuleTemplatesDataSource)(
 
 func ListDataSourceSchema(ctx context.Context) schema.Schema {
 	return schema.Schema{
-		Description: "CDN rule templates define reusable rule configurations that can be applied across multiple CDN resources for consistent caching, delivery, and security policies.",
+		MarkdownDescription: "CDN rule templates define reusable rule configurations that can be applied across multiple CDN resources for consistent caching, delivery, and security policies.",
 		Attributes: map[string]schema.Attribute{
 			"limit": schema.Int64Attribute{
 				Description: "Maximum number of items to return in the response. Cannot exceed 1000.",

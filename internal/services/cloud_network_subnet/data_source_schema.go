@@ -21,7 +21,7 @@ var _ datasource.DataSourceWithConfigValidators = (*CloudNetworkSubnetDataSource
 
 func DataSourceSchema(ctx context.Context) schema.Schema {
 	return schema.Schema{
-		Description: "Subnets define IP address ranges within a network for instance connectivity, with support for DHCP and DNS configuration.",
+		MarkdownDescription: "Subnets define IP address ranges within a network for instance connectivity, with support for DHCP and DNS configuration.",
 		Attributes: map[string]schema.Attribute{
 			"id": schema.StringAttribute{
 				Description: "Subnet ID",

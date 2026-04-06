@@ -23,7 +23,7 @@ var _ resource.ResourceWithConfigValidators = (*CloudFileShareResource)(nil)
 
 func ResourceSchema(ctx context.Context) schema.Schema {
 	return schema.Schema{
-		Description: "File shares provide NFS-based shared storage that can be mounted by virtual machines and Kubernetes clusters for persistent data.",
+		MarkdownDescription: "File shares provide NFS-based shared storage that can be mounted by virtual machines and Kubernetes clusters for persistent data.",
 		Attributes: map[string]schema.Attribute{
 			"id": schema.StringAttribute{
 				Computed:      true,
