@@ -195,6 +195,10 @@ func ListDataSourceSchema(ctx context.Context) schema.Schema {
 							Description: "Foreign key to Metrics database entity",
 							Computed:    true,
 						},
+						"slug": schema.StringAttribute{
+							Description: "Short, human-readable region identifier (e.g. luxembourg-2, santa-clara-1).",
+							Computed:    true,
+						},
 						"state": schema.StringAttribute{
 							Description: "Region state\nAvailable values: \"ACTIVE\", \"DELETED\", \"DELETING\", \"DELETION_FAILED\", \"INACTIVE\", \"MAINTENANCE\", \"NEW\".",
 							Computed:    true,

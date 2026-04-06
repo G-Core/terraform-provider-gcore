@@ -22,6 +22,7 @@ type CloudInstanceImageDataSourceModel struct {
 	Architecture     types.String                                                        `tfsdk:"architecture" json:"architecture,computed"`
 	CreatedAt        timetypes.RFC3339                                                   `tfsdk:"created_at" json:"created_at,computed" format:"date-time"`
 	CreatorTaskID    types.String                                                        `tfsdk:"creator_task_id" json:"creator_task_id,computed"`
+	CurrencyCode     types.String                                                        `tfsdk:"currency_code" json:"currency_code,computed"`
 	Description      types.String                                                        `tfsdk:"description" json:"description,computed"`
 	DiskFormat       types.String                                                        `tfsdk:"disk_format" json:"disk_format,computed"`
 	DisplayOrder     types.Int64                                                         `tfsdk:"display_order" json:"display_order,computed"`
@@ -37,6 +38,9 @@ type CloudInstanceImageDataSourceModel struct {
 	OsDistro         types.String                                                        `tfsdk:"os_distro" json:"os_distro,computed"`
 	OsType           types.String                                                        `tfsdk:"os_type" json:"os_type,computed"`
 	OsVersion        types.String                                                        `tfsdk:"os_version" json:"os_version,computed"`
+	PricePerHour     types.Float64                                                       `tfsdk:"price_per_hour" json:"price_per_hour,computed"`
+	PricePerMonth    types.Float64                                                       `tfsdk:"price_per_month" json:"price_per_month,computed"`
+	PriceStatus      types.String                                                        `tfsdk:"price_status" json:"price_status,computed"`
 	Region           types.String                                                        `tfsdk:"region" json:"region,computed"`
 	Size             types.Int64                                                         `tfsdk:"size" json:"size,computed"`
 	SSHKey           types.String                                                        `tfsdk:"ssh_key" json:"ssh_key,computed"`
