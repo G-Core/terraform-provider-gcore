@@ -9,7 +9,6 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework-jsontypes/jsontypes"
 	"github.com/hashicorp/terraform-plugin-framework-timetypes/timetypes"
 	"github.com/hashicorp/terraform-plugin-framework-validators/datasourcevalidator"
-	"github.com/hashicorp/terraform-plugin-framework-validators/int64validator"
 	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
 	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
@@ -602,14 +601,6 @@ func DataSourceSchema(ctx context.Context) schema.Schema {
 					"ip": schema.StringAttribute{
 						Description: "An IPv4 address to filter results by. Note: partial matches are allowed. For example, searching for 192.168.0.1 will return 192.168.0.1, 192.168.0.10, 192.168.0.110, and so on.",
 						Optional:    true,
-					},
-					"limit": schema.Int64Attribute{
-						Description: "Optional. Limit the number of returned items",
-						Computed:    true,
-						Optional:    true,
-						Validators: []validator.Int64{
-							int64validator.AtMost(1000),
-						},
 					},
 					"name": schema.StringAttribute{
 						Description: "Filter instances by name. You can provide a full or partial name, instances with matching names will be returned. For example, entering 'test' will return all instances that contain 'test' in their name.",

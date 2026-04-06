@@ -70,9 +70,6 @@ func (m *CloudNetworkDataSourceModel) toListParams(_ context.Context) (params cl
 	if !m.FindOneBy.External.IsNull() {
 		params.External = param.NewOpt(m.FindOneBy.External.ValueBool())
 	}
-	if !m.FindOneBy.Limit.IsNull() {
-		params.Limit = param.NewOpt(m.FindOneBy.Limit.ValueInt64())
-	}
 	if !m.FindOneBy.Name.IsNull() {
 		params.Name = param.NewOpt(m.FindOneBy.Name.ValueString())
 	}
@@ -100,7 +97,6 @@ type CloudNetworkTagsDataSourceModel struct {
 
 type CloudNetworkFindOneByDataSourceModel struct {
 	External    types.Bool      `tfsdk:"external" query:"external,optional"`
-	Limit       types.Int64     `tfsdk:"limit" query:"limit,computed_optional"`
 	Name        types.String    `tfsdk:"name" query:"name,optional"`
 	NetworkType types.String    `tfsdk:"network_type" query:"network_type,optional"`
 	OrderBy     types.String    `tfsdk:"order_by" query:"order_by,computed_optional"`

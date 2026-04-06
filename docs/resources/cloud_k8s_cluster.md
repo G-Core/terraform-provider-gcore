@@ -91,7 +91,6 @@ resource "gcore_cloud_k8s_cluster" "example_cloud_k8s_cluster" {
     fields = [{
       base_field = 10
       field_value = [45046, 45047]
-      value = null
     }]
     profile_template = 29
     profile_template_name = "profile_template_name"
@@ -325,8 +324,7 @@ Required:
 
 Optional:
 
-- `field_value` (String) Complex value. Only one of 'value' or 'field_value' must be specified
-- `value` (String) Basic value. Only one of 'value' or 'field_value' must be specified
+- `field_value` (String) Complex value for the DDoS profile field
 
 
 

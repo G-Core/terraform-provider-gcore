@@ -32,10 +32,9 @@ resource "gcore_cloud_baremetal_server" "example_cloud_baremetal_server" {
     fields = [{
       base_field = 10
       field_value = [45046, 45047]
-      value = null
     }]
   }
-  image_id = "image_id"
+  image_id = "b5b4d65d-945f-4b98-ab6f-332319c724ef"
   name = "my-bare-metal"
   name_template = "name_template"
   password = "password"
@@ -141,11 +140,13 @@ Optional:
 <a id="nestedatt--ddos_profile--fields"></a>
 ### Nested Schema for `ddos_profile.fields`
 
-Optional:
+Required:
 
 - `base_field` (Number) Unique identifier of the DDoS protection field being configured
+
+Optional:
+
 - `field_value` (String)
-- `value` (String, Deprecated) Basic type value. Only one of 'value' or 'field_value' must be specified.
 
 
 

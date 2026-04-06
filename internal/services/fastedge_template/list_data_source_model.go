@@ -18,7 +18,6 @@ type FastedgeTemplatesTemplatesListDataSourceEnvelope struct {
 
 type FastedgeTemplatesDataSourceModel struct {
 	APIType  types.String                                                        `tfsdk:"api_type" query:"api_type,optional"`
-	Limit    types.Int64                                                         `tfsdk:"limit" query:"limit,computed_optional"`
 	OnlyMine types.Bool                                                          `tfsdk:"only_mine" query:"only_mine,computed_optional"`
 	MaxItems types.Int64                                                         `tfsdk:"max_items"`
 	Items    customfield.NestedObjectList[FastedgeTemplatesItemsDataSourceModel] `tfsdk:"items"`
@@ -29,9 +28,6 @@ func (m *FastedgeTemplatesDataSourceModel) toListParams(_ context.Context) (para
 
 	if !m.APIType.IsNull() {
 		params.APIType = fastedge.TemplateListParamsAPIType(m.APIType.ValueString())
-	}
-	if !m.Limit.IsNull() {
-		params.Limit = param.NewOpt(m.Limit.ValueInt64())
 	}
 	if !m.OnlyMine.IsNull() {
 		params.OnlyMine = param.NewOpt(m.OnlyMine.ValueBool())

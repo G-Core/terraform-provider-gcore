@@ -83,9 +83,6 @@ func (m *CloudVolumeDataSourceModel) toListParams(_ context.Context) (params clo
 	if !m.FindOneBy.InstanceID.IsNull() {
 		params.InstanceID = param.NewOpt(m.FindOneBy.InstanceID.ValueString())
 	}
-	if !m.FindOneBy.Limit.IsNull() {
-		params.Limit = param.NewOpt(m.FindOneBy.Limit.ValueInt64())
-	}
 	if !m.FindOneBy.NamePart.IsNull() {
 		params.NamePart = param.NewOpt(m.FindOneBy.NamePart.ValueString())
 	}
@@ -125,7 +122,6 @@ type CloudVolumeFindOneByDataSourceModel struct {
 	HasAttachments types.Bool      `tfsdk:"has_attachments" query:"has_attachments,optional"`
 	IDPart         types.String    `tfsdk:"id_part" query:"id_part,optional"`
 	InstanceID     types.String    `tfsdk:"instance_id" query:"instance_id,optional"`
-	Limit          types.Int64     `tfsdk:"limit" query:"limit,computed_optional"`
 	NamePart       types.String    `tfsdk:"name_part" query:"name_part,optional"`
 	TagKey         *[]types.String `tfsdk:"tag_key" query:"tag_key,optional"`
 	TagKeyValue    types.String    `tfsdk:"tag_key_value" query:"tag_key_value,optional"`

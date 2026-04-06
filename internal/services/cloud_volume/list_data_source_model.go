@@ -28,7 +28,6 @@ type CloudVolumesDataSourceModel struct {
 	NamePart       types.String                                                   `tfsdk:"name_part" query:"name_part,optional"`
 	TagKeyValue    types.String                                                   `tfsdk:"tag_key_value" query:"tag_key_value,optional"`
 	TagKey         *[]types.String                                                `tfsdk:"tag_key" query:"tag_key,optional"`
-	Limit          types.Int64                                                    `tfsdk:"limit" query:"limit,computed_optional"`
 	MaxItems       types.Int64                                                    `tfsdk:"max_items"`
 	Items          customfield.NestedObjectList[CloudVolumesItemsDataSourceModel] `tfsdk:"items"`
 }
@@ -65,9 +64,6 @@ func (m *CloudVolumesDataSourceModel) toListParams(_ context.Context) (params cl
 	}
 	if !m.InstanceID.IsNull() {
 		params.InstanceID = param.NewOpt(m.InstanceID.ValueString())
-	}
-	if !m.Limit.IsNull() {
-		params.Limit = param.NewOpt(m.Limit.ValueInt64())
 	}
 	if !m.NamePart.IsNull() {
 		params.NamePart = param.NewOpt(m.NamePart.ValueString())

@@ -3,19 +3,14 @@
 package cdn_rule_template
 
 import (
-	"context"
-
-	"github.com/G-Core/gcore-go/cdn"
-	"github.com/G-Core/gcore-go/packages/param"
 	"github.com/G-Core/terraform-provider-gcore/internal/customfield"
 	"github.com/hashicorp/terraform-plugin-framework-jsontypes/jsontypes"
-	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 )
 
 type CDNRuleTemplateDataSourceModel struct {
 	ID                     types.Int64                                                     `tfsdk:"id" path:"rule_template_id,computed"`
-	RuleTemplateID         types.Int64                                                     `tfsdk:"rule_template_id" path:"rule_template_id,optional"`
+	RuleTemplateID         types.Int64                                                     `tfsdk:"rule_template_id" path:"rule_template_id,required"`
 	Client                 types.Int64                                                     `tfsdk:"client" json:"client,computed"`
 	Default                types.Bool                                                      `tfsdk:"default" json:"default,computed"`
 	Deleted                types.Bool                                                      `tfsdk:"deleted" json:"deleted,computed"`
@@ -26,17 +21,6 @@ type CDNRuleTemplateDataSourceModel struct {
 	Template               types.Bool                                                      `tfsdk:"template" json:"template,computed"`
 	Weight                 types.Int64                                                     `tfsdk:"weight" json:"weight,computed"`
 	Options                customfield.NestedObject[CDNRuleTemplateOptionsDataSourceModel] `tfsdk:"options" json:"options,computed"`
-	FindOneBy              *CDNRuleTemplateFindOneByDataSourceModel                        `tfsdk:"find_one_by"`
-}
-
-func (m *CDNRuleTemplateDataSourceModel) toListParams(_ context.Context) (params cdn.RuleTemplateListParams, diags diag.Diagnostics) {
-	params = cdn.RuleTemplateListParams{}
-
-	if !m.FindOneBy.Limit.IsNull() {
-		params.Limit = param.NewOpt(m.FindOneBy.Limit.ValueInt64())
-	}
-
-	return
 }
 
 type CDNRuleTemplateOptionsDataSourceModel struct {
@@ -385,8 +369,4 @@ type CDNRuleTemplateOptionsWaapDataSourceModel struct {
 type CDNRuleTemplateOptionsWebsocketsDataSourceModel struct {
 	Enabled types.Bool `tfsdk:"enabled" json:"enabled,computed"`
 	Value   types.Bool `tfsdk:"value" json:"value,computed"`
-}
-
-type CDNRuleTemplateFindOneByDataSourceModel struct {
-	Limit types.Int64 `tfsdk:"limit" query:"limit,optional"`
 }

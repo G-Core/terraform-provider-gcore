@@ -6,7 +6,6 @@ import (
 	"context"
 
 	"github.com/G-Core/gcore-go/cdn"
-	"github.com/G-Core/gcore-go/packages/param"
 	"github.com/G-Core/terraform-provider-gcore/internal/customfield"
 	"github.com/hashicorp/terraform-plugin-framework-jsontypes/jsontypes"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
@@ -15,7 +14,7 @@ import (
 
 type CDNResourceRuleDataSourceModel struct {
 	ID                     types.Int64                                                     `tfsdk:"id" path:"rule_id,computed"`
-	RuleID                 types.Int64                                                     `tfsdk:"rule_id" path:"rule_id,optional"`
+	RuleID                 types.Int64                                                     `tfsdk:"rule_id" path:"rule_id,required"`
 	ResourceID             types.Int64                                                     `tfsdk:"resource_id" path:"resource_id,required"`
 	Active                 types.Bool                                                      `tfsdk:"active" json:"active,computed"`
 	Deleted                types.Bool                                                      `tfsdk:"deleted" json:"deleted,computed"`
@@ -29,24 +28,11 @@ type CDNResourceRuleDataSourceModel struct {
 	RuleType               types.Int64                                                     `tfsdk:"rule_type" json:"ruleType,computed"`
 	Weight                 types.Int64                                                     `tfsdk:"weight" json:"weight,computed"`
 	Options                customfield.NestedObject[CDNResourceRuleOptionsDataSourceModel] `tfsdk:"options" json:"options,computed"`
-	FindOneBy              *CDNResourceRuleFindOneByDataSourceModel                        `tfsdk:"find_one_by"`
 }
 
 func (m *CDNResourceRuleDataSourceModel) toReadParams(_ context.Context) (params cdn.CDNResourceRuleGetParams, diags diag.Diagnostics) {
 	params = cdn.CDNResourceRuleGetParams{
 		ResourceID: m.ResourceID.ValueInt64(),
-	}
-
-	return
-}
-
-func (m *CDNResourceRuleDataSourceModel) toListParams(_ context.Context) (params cdn.CDNResourceRuleListParams, diags diag.Diagnostics) {
-	params = cdn.CDNResourceRuleListParams{
-		ResourceID: m.ResourceID.ValueInt64(),
-	}
-
-	if !m.FindOneBy.Limit.IsNull() {
-		params.Limit = param.NewOpt(m.FindOneBy.Limit.ValueInt64())
 	}
 
 	return
@@ -398,8 +384,4 @@ type CDNResourceRuleOptionsWaapDataSourceModel struct {
 type CDNResourceRuleOptionsWebsocketsDataSourceModel struct {
 	Enabled types.Bool `tfsdk:"enabled" json:"enabled,computed"`
 	Value   types.Bool `tfsdk:"value" json:"value,computed"`
-}
-
-type CDNResourceRuleFindOneByDataSourceModel struct {
-	Limit types.Int64 `tfsdk:"limit" query:"limit,optional"`
 }

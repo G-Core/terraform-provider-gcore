@@ -18,7 +18,6 @@ type CloudInferenceRegistryCredentialsResultsListDataSourceEnvelope struct {
 
 type CloudInferenceRegistryCredentialsDataSourceModel struct {
 	ProjectID types.Int64                                                                         `tfsdk:"project_id" path:"project_id,optional"`
-	Limit     types.Int64                                                                         `tfsdk:"limit" query:"limit,computed_optional"`
 	MaxItems  types.Int64                                                                         `tfsdk:"max_items"`
 	Items     customfield.NestedObjectList[CloudInferenceRegistryCredentialsItemsDataSourceModel] `tfsdk:"items"`
 }
@@ -28,9 +27,6 @@ func (m *CloudInferenceRegistryCredentialsDataSourceModel) toListParams(_ contex
 
 	if !m.ProjectID.IsNull() {
 		params.ProjectID = param.NewOpt(m.ProjectID.ValueInt64())
-	}
-	if !m.Limit.IsNull() {
-		params.Limit = param.NewOpt(m.Limit.ValueInt64())
 	}
 
 	return

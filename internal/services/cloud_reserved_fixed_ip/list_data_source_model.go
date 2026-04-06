@@ -25,7 +25,6 @@ type CloudReservedFixedIPsDataSourceModel struct {
 	ExternalOnly  types.Bool                                                              `tfsdk:"external_only" query:"external_only,optional"`
 	InternalOnly  types.Bool                                                              `tfsdk:"internal_only" query:"internal_only,optional"`
 	IPAddress     types.String                                                            `tfsdk:"ip_address" query:"ip_address,optional"`
-	Limit         types.Int64                                                             `tfsdk:"limit" query:"limit,optional"`
 	OrderBy       types.String                                                            `tfsdk:"order_by" query:"order_by,optional"`
 	VipOnly       types.Bool                                                              `tfsdk:"vip_only" query:"vip_only,optional"`
 	MaxItems      types.Int64                                                             `tfsdk:"max_items"`
@@ -55,9 +54,6 @@ func (m *CloudReservedFixedIPsDataSourceModel) toListParams(_ context.Context) (
 	}
 	if !m.IPAddress.IsNull() {
 		params.IPAddress = param.NewOpt(m.IPAddress.ValueString())
-	}
-	if !m.Limit.IsNull() {
-		params.Limit = param.NewOpt(m.Limit.ValueInt64())
 	}
 	if !m.OrderBy.IsNull() {
 		params.OrderBy = param.NewOpt(m.OrderBy.ValueString())

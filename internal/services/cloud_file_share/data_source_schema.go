@@ -199,14 +199,6 @@ func DataSourceSchema(ctx context.Context) schema.Schema {
 			"find_one_by": schema.SingleNestedAttribute{
 				Optional: true,
 				Attributes: map[string]schema.Attribute{
-					"limit": schema.Int64Attribute{
-						Description: "Optional. Limit the number of returned items",
-						Computed:    true,
-						Optional:    true,
-						Validators: []validator.Int64{
-							int64validator.AtMost(1000),
-						},
-					},
 					"name": schema.StringAttribute{
 						Description: "File share name. Uses partial match.",
 						Optional:    true,

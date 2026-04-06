@@ -67,6 +67,7 @@ Available values: "admin", "internal", "public".
 - `keystone_id` (Number) Foreign key to Keystone entity
 - `keystone_name` (String) Technical region name
 - `metrics_database_id` (Number) Foreign key to Metrics database entity
+- `slug` (String) Short, human-readable region identifier (e.g. luxembourg-2, santa-clara-1).
 - `state` (String) Region state
 Available values: "ACTIVE", "DELETED", "DELETING", "DELETION_FAILED", "INACTIVE", "MAINTENANCE", "NEW".
 - `task_id` (String, Deprecated) This field is deprecated and can be ignored

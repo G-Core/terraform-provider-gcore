@@ -62,9 +62,6 @@ func (m *CloudGPUBaremetalClusterDataSourceModel) toListParams(ctx context.Conte
 	if !m.RegionID.IsNull() {
 		params.RegionID = param.NewOpt(m.RegionID.ValueInt64())
 	}
-	if !m.FindOneBy.Limit.IsNull() {
-		params.Limit = param.NewOpt(m.FindOneBy.Limit.ValueInt64())
-	}
 
 	return
 }
@@ -108,6 +105,5 @@ type CloudGPUBaremetalClusterTagsDataSourceModel struct {
 }
 
 type CloudGPUBaremetalClusterFindOneByDataSourceModel struct {
-	Limit     types.Int64                    `tfsdk:"limit" query:"limit,computed_optional"`
 	ManagedBy customfield.List[types.String] `tfsdk:"managed_by" query:"managed_by,computed_optional"`
 }

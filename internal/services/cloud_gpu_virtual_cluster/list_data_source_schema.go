@@ -29,14 +29,6 @@ func ListDataSourceSchema(ctx context.Context) schema.Schema {
 				Description: "Region ID",
 				Optional:    true,
 			},
-			"limit": schema.Int64Attribute{
-				Description: "Limit of items on a single page",
-				Computed:    true,
-				Optional:    true,
-				Validators: []validator.Int64{
-					int64validator.AtMost(1000),
-				},
-			},
 			"max_items": schema.Int64Attribute{
 				Description: "Max items to fetch, default: 1000",
 				Optional:    true,

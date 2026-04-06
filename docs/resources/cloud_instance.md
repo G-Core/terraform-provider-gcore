@@ -26,11 +26,13 @@ resource "gcore_cloud_instance" "example_cloud_instance" {
     }]
   }]
   volumes = [{
-    size = 20
-    source = "new-volume"
+    image_id = "e460e48c-6836-447e-bc9c-16fc4225d318"
+    source = "image"
     attachment_tag = "boot"
+    boot_index = 0
     delete_on_termination = false
     name = "boot-volume"
+    size = 50
     tags = {
       my-tag = "my-tag-value"
     }
@@ -224,14 +226,12 @@ Read-Only:
 - `base_field` (Number) ID of DDoS profile field
 - `default` (String) Predefined default value for the field if not specified
 - `description` (String) Detailed description explaining the field's purpose and usage guidelines
-- `field_name` (String) Name of DDoS profile field
 - `field_type` (String) Data type classification of the field (e.g., string, integer, array)
-- `field_value` (String) Complex value. Only one of 'value' or 'field_value' must be specified.
+- `field_value` (String) Complex value for the DDoS profile field
 - `id` (Number) Unique identifier for the DDoS protection field
 - `name` (String) Human-readable name of the protection field
 - `required` (Boolean) Indicates whether this field must be provided when creating a protection profile
 - `validation_schema` (String) JSON schema defining validation rules and constraints for the field value
-- `value` (String) Basic type value. Only one of 'value' or 'field_value' must be specified.
 
 
 <a id="nestedatt--ddos_profile--options"></a>
