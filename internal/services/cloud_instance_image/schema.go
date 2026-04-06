@@ -131,6 +131,10 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 				Computed:      true,
 				PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
 			},
+			"currency_code": schema.StringAttribute{
+				Description: "Currency code. Shown if the `include_prices` query parameter if set to true",
+				Computed:    true,
+			},
 			"description": schema.StringAttribute{
 				Description:   "Image description",
 				Computed:      true,
@@ -169,6 +173,25 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 				Description:   "Minimal VM RAM required",
 				Computed:      true,
 				PlanModifiers: []planmodifier.Int64{int64planmodifier.UseStateForUnknown()},
+			},
+			"price_per_hour": schema.Float64Attribute{
+				Description: "Price per hour. Shown if the `include_prices` query parameter if set to true",
+				Computed:    true,
+			},
+			"price_per_month": schema.Float64Attribute{
+				Description: "Price per month. Shown if the `include_prices` query parameter if set to true",
+				Computed:    true,
+			},
+			"price_status": schema.StringAttribute{
+				Description: "Price status for the UI\nAvailable values: \"error\", \"hide\", \"show\".",
+				Computed:    true,
+				Validators: []validator.String{
+					stringvalidator.OneOfCaseInsensitive(
+						"error",
+						"hide",
+						"show",
+					),
+				},
 			},
 			"region": schema.StringAttribute{
 				Description:   "Region name",

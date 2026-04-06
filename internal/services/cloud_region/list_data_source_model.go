@@ -73,6 +73,7 @@ type CloudRegionsItemsDataSourceModel struct {
 	KeystoneID           types.Int64                                                      `tfsdk:"keystone_id" json:"keystone_id,computed"`
 	KeystoneName         types.String                                                     `tfsdk:"keystone_name" json:"keystone_name,computed"`
 	MetricsDatabaseID    types.Int64                                                      `tfsdk:"metrics_database_id" json:"metrics_database_id,computed"`
+	Slug                 types.String                                                     `tfsdk:"slug" json:"slug,computed"`
 	State                types.String                                                     `tfsdk:"state" json:"state,computed"`
 	VlanPhysicalNetwork  types.String                                                     `tfsdk:"vlan_physical_network" json:"vlan_physical_network,computed"`
 	Zone                 types.String                                                     `tfsdk:"zone" json:"zone,computed"`

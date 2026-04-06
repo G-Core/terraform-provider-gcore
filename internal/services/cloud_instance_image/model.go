@@ -26,6 +26,7 @@ type CloudInstanceImageModel struct {
 	SSHKey           types.String             `tfsdk:"ssh_key" json:"ssh_key,computed_optional"`
 	CreatedAt        timetypes.RFC3339        `tfsdk:"created_at" json:"created_at,computed" format:"date-time"`
 	CreatorTaskID    types.String             `tfsdk:"creator_task_id" json:"creator_task_id,computed"`
+	CurrencyCode     types.String                   `tfsdk:"currency_code" json:"currency_code,computed"`
 	Description      types.String             `tfsdk:"description" json:"description,computed"`
 	DiskFormat       types.String             `tfsdk:"disk_format" json:"disk_format,computed"`
 	DisplayOrder     types.Int64              `tfsdk:"display_order" json:"display_order,computed"`
@@ -34,6 +35,9 @@ type CloudInstanceImageModel struct {
 	GPUDriverVersion types.String             `tfsdk:"gpu_driver_version" json:"gpu_driver_version,computed"`
 	MinDisk          types.Int64              `tfsdk:"min_disk" json:"min_disk,computed"`
 	MinRam           types.Int64              `tfsdk:"min_ram" json:"min_ram,computed"`
+	PricePerHour     types.Float64                  `tfsdk:"price_per_hour" json:"price_per_hour,computed"`
+	PricePerMonth    types.Float64                  `tfsdk:"price_per_month" json:"price_per_month,computed"`
+	PriceStatus      types.String                   `tfsdk:"price_status" json:"price_status,computed"`
 	Region           types.String             `tfsdk:"region" json:"region,computed"`
 	Size             types.Int64              `tfsdk:"size" json:"size,computed"`
 	Status           types.String             `tfsdk:"status" json:"status,computed"`
