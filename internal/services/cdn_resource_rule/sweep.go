@@ -55,12 +55,12 @@ func sweepCDNResourceRules(_ string) error {
 		return nil
 	}
 
-	for _, cdnRes := range *cdnResources {
+	for _, cdnRes := range cdnResources.OfPlainList {
 		if !isTestCDNResource(cdnRes) {
 			continue
 		}
 
-		rules, err := client.CDN.CDNResources.Rules.List(ctx, cdnRes.ID)
+		rules, err := client.CDN.CDNResources.Rules.List(ctx, cdnRes.ID, cdn.CDNResourceRuleListParams{})
 		if err != nil {
 			log.Printf("[ERROR] Failed to list rules for CDN resource %d: %s", cdnRes.ID, err)
 			continue
@@ -69,7 +69,7 @@ func sweepCDNResourceRules(_ string) error {
 			continue
 		}
 
-		for _, rule := range *rules {
+		for _, rule := range rules.Results {
 			if !sweep.ShouldSweep("gcore_cdn_resource_rule", rule.Name) {
 				continue
 			}
@@ -111,7 +111,7 @@ func sweepCDNResources(_ string) error {
 		return nil
 	}
 
-	for _, cdnRes := range *cdnResources {
+	for _, cdnRes := range cdnResources.OfPlainList {
 		if !isTestCDNResource(cdnRes) {
 			continue
 		}

@@ -41,10 +41,6 @@ func (m *CDNResourceRuleDataSourceModel) toReadParams(_ context.Context) (params
 }
 
 func (m *CDNResourceRuleDataSourceModel) toListParams(_ context.Context) (params cdn.CDNResourceRuleListParams, diags diag.Diagnostics) {
-	params = cdn.CDNResourceRuleListParams{
-		ResourceID: m.ResourceID.ValueInt64(),
-	}
-
 	if !m.FindOneBy.Limit.IsNull() {
 		params.Limit = param.NewOpt(m.FindOneBy.Limit.ValueInt64())
 	}
