@@ -15,7 +15,7 @@ import (
 
 type CDNResourceRuleDataSourceModel struct {
 	ID                     types.Int64                                                     `tfsdk:"id" path:"rule_id,computed"`
-	RuleID                 types.Int64                                                     `tfsdk:"rule_id" path:"rule_id,optional"`
+	RuleID                 types.Int64                                                     `tfsdk:"rule_id" path:"rule_id,required"`
 	ResourceID             types.Int64                                                     `tfsdk:"resource_id" path:"resource_id,required"`
 	Active                 types.Bool                                                      `tfsdk:"active" json:"active,computed"`
 	Deleted                types.Bool                                                      `tfsdk:"deleted" json:"deleted,computed"`
