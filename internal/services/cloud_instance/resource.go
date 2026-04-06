@@ -14,7 +14,7 @@ import (
 	"github.com/G-Core/gcore-go/packages/param"
 	"github.com/G-Core/gcore-go/shared/constant"
 	"github.com/G-Core/terraform-provider-gcore/internal/apijson"
-	"github.com/G-Core/terraform-provider-gcore/internal/custom"
+	"github.com/G-Core/terraform-provider-gcore/internal/customfield"
 	"github.com/G-Core/terraform-provider-gcore/internal/importpath"
 	"github.com/G-Core/terraform-provider-gcore/internal/logging"
 	"github.com/hashicorp/terraform-plugin-framework/path"
@@ -998,7 +998,7 @@ func (r *CloudInstanceResource) Update(ctx context.Context, req resource.UpdateR
 	//   name = "new-name" (PATCH) + flavor = "g1-standard-2" (specialized /changeflavor)
 	// The PATCH endpoint handles: name, tags (and potentially other simple fields in the future).
 	nameChanged := !data.Name.Equal(state.Name)
-	tagsChanged := !custom.TagsEqual(data.Tags, state.Tags)
+	tagsChanged := !data.Tags.Equal(state.Tags)
 
 	if nameChanged || tagsChanged {
 		params := cloud.InstanceUpdateParams{}
@@ -1327,7 +1327,7 @@ func (r *CloudInstanceResource) ImportState(ctx context.Context, req resource.Im
 				}
 			}
 			if len(tags) > 0 {
-				data.Tags = &tags
+				data.Tags = customfield.NewMapMust[types.String](ctx, tags)
 			}
 		}
 	}

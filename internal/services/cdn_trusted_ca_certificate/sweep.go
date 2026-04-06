@@ -40,7 +40,7 @@ func sweepCDNTrustedCaCertificates(_ string) error {
 		return fmt.Errorf("error listing CDN trusted CA certificates: %w", err)
 	}
 
-	for _, cert := range *certs {
+	for _, cert := range certs.OfPlainList {
 		if !sweep.ShouldSweep("gcore_cdn_trusted_ca_certificate", cert.Name) {
 			continue
 		}

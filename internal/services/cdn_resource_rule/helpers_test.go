@@ -50,10 +50,12 @@ func setupCDNResource(t *testing.T) *cdnResourceFixture {
 	originGroup, err := client.CDN.OriginGroups.New(ctx, cdn.OriginGroupNewParams{
 		OfNoneAuth: &cdn.OriginGroupNewParamsBodyNoneAuth{
 			Name: name,
-			Sources: []cdn.OriginGroupNewParamsBodyNoneAuthSource{
+			Sources: []cdn.OriginGroupNewParamsBodyNoneAuthSourceUnion{
 				{
-					Source:  param.NewOpt("example.com"),
-					Enabled: param.NewOpt(true),
+					OfHostSource: &cdn.OriginGroupNewParamsBodyNoneAuthSourceHostSource{
+						Source:  "example.com",
+						Enabled: param.NewOpt(true),
+					},
 				},
 			},
 		},
