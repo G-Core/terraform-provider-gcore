@@ -14,7 +14,7 @@ var _ datasource.DataSourceWithConfigValidators = (*CloudPlacementGroupDataSourc
 
 func DataSourceSchema(ctx context.Context) schema.Schema {
 	return schema.Schema{
-		Description: "Placement groups enforce affinity or anti-affinity policies that control whether virtual machines are hosted on the same or different physical servers.",
+		MarkdownDescription: "Placement groups enforce affinity or anti-affinity policies that control whether virtual machines are hosted on the same or different physical servers.",
 		Attributes: map[string]schema.Attribute{
 			"id": schema.StringAttribute{
 				Computed: true,

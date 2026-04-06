@@ -16,7 +16,7 @@ var _ resource.ResourceWithConfigValidators = (*CloudInferenceSecretResource)(ni
 
 func ResourceSchema(ctx context.Context) schema.Schema {
 	return schema.Schema{
-		Description: "Inference secrets store sensitive values such as AWS credentials used for SQS-based autoscaling triggers in deployments.",
+		MarkdownDescription: "Inference secrets store sensitive values such as AWS credentials used for SQS-based autoscaling triggers in deployments.",
 		Attributes: map[string]schema.Attribute{
 			"id": schema.StringAttribute{
 				Description:   "Secret name.",

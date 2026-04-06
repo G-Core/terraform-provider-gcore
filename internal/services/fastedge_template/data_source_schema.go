@@ -19,7 +19,7 @@ var _ datasource.DataSourceWithConfigValidators = (*FastedgeTemplateDataSource)(
 
 func DataSourceSchema(ctx context.Context) schema.Schema {
 	return schema.Schema{
-		Description: "FastEdge templates encapsulate reusable configurations for FastEdge applications, including a WebAssembly binary reference and configurable parameters.",
+		MarkdownDescription: "FastEdge templates encapsulate reusable configurations for FastEdge applications, including a WebAssembly binary reference and configurable parameters.",
 		Attributes: map[string]schema.Attribute{
 			"id": schema.Int64Attribute{
 				Computed: true,

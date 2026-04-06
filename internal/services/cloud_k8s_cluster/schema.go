@@ -34,7 +34,7 @@ var _ resource.ResourceWithConfigValidators = (*CloudK8SClusterResource)(nil)
 
 func ResourceSchema(ctx context.Context) schema.Schema {
 	return schema.Schema{
-		Description: "Managed Kubernetes clusters with configurable worker node pools, networking, and cluster add-ons.",
+		MarkdownDescription: "Managed Kubernetes clusters with configurable worker node pools, networking, and cluster add-ons.",
 		Attributes: map[string]schema.Attribute{
 			"id": schema.StringAttribute{
 				Description:   "The name of the cluster",

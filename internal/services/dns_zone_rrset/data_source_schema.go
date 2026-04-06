@@ -18,7 +18,7 @@ var _ datasource.DataSourceWithConfigValidators = (*DNSZoneRrsetDataSource)(nil)
 
 func DataSourceSchema(ctx context.Context) schema.Schema {
 	return schema.Schema{
-		Description: "DNS resource record sets (RRsets) define individual DNS records such as A, AAAA, CNAME, MX, and TXT with TTL and geo-balancing settings.",
+		MarkdownDescription: "DNS resource record sets (RRsets) define individual DNS records such as A, AAAA, CNAME, MX, and TXT with TTL and geo-balancing settings.",
 		Attributes: map[string]schema.Attribute{
 			"rrset_name": schema.StringAttribute{
 				Required: true,
