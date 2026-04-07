@@ -312,9 +312,7 @@ func (p *GcoreProvider) DataSources(ctx context.Context) []func() datasource.Dat
 		dns_network_mapping.NewDNSNetworkMappingDataSource,
 		cdn_resource.NewCDNResourceDataSource,
 		cdn_resource_rule.NewCDNResourceRuleDataSource,
-		cdn_resource_rule.NewCDNResourceRulesDataSource,
 		cdn_rule_template.NewCDNRuleTemplateDataSource,
-		cdn_rule_template.NewCDNRuleTemplatesDataSource,
 		cdn_certificate.NewCDNCertificateDataSource,
 		cdn_trusted_ca_certificate.NewCDNTrustedCaCertificateDataSource,
 	}
