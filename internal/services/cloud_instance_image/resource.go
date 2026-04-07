@@ -133,7 +133,7 @@ func (r *CloudInstanceImageResource) Update(ctx context.Context, req resource.Up
 		return
 	}
 	// Fix: API rejects "tags":null, expects "tags":{} when removing all tags
-	if data.Tags == nil && state.Tags != nil {
+	if data.Tags.IsNull() && !state.Tags.IsNull() {
 		dataBytes = bytes.Replace(dataBytes, []byte(`"tags":null`), []byte(`"tags":{}`), 1)
 	}
 	res := new(http.Response)
