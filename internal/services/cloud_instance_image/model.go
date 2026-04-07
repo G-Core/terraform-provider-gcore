@@ -21,10 +21,10 @@ type CloudInstanceImageModel struct {
 	Name             types.String                   `tfsdk:"name" json:"name,required"`
 	HwFirmwareType   types.String                   `tfsdk:"hw_firmware_type" json:"hw_firmware_type,optional"`
 	HwMachineType    types.String                   `tfsdk:"hw_machine_type" json:"hw_machine_type,optional"`
-	Tags             *map[string]types.String       `tfsdk:"tags" json:"tags,optional,no_refresh"`
 	IsBaremetal      types.Bool                     `tfsdk:"is_baremetal" json:"is_baremetal,computed_optional"`
 	OsType           types.String                   `tfsdk:"os_type" json:"os_type,computed_optional"`
 	SSHKey           types.String                   `tfsdk:"ssh_key" json:"ssh_key,computed_optional"`
+	Tags             customfield.Map[types.String]  `tfsdk:"tags" json:"tags,computed_optional,no_refresh"`
 	CreatedAt        timetypes.RFC3339              `tfsdk:"created_at" json:"created_at,computed" format:"date-time"`
 	CreatorTaskID    types.String                   `tfsdk:"creator_task_id" json:"creator_task_id,computed"`
 	CurrencyCode     types.String                   `tfsdk:"currency_code" json:"currency_code,computed"`
