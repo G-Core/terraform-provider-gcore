@@ -26,8 +26,9 @@ func DataSourceSchema(ctx context.Context) schema.Schema {
 				Required: true,
 			},
 			"auth_type": schema.StringAttribute{
-				Description: "Origin authentication type.\n\nPossible values:\n- **none** - Used for public origins.\n- **awsSignatureV4** - Used for S3 storage.",
-				Computed:    true,
+				Description:        "**Deprecated.** No longer necessary. Defaults to `none`.\n\nOrigin authentication type.\n\nPossible values:\n- **none** - Used for public origins.\n- **awsSignatureV4** - Used for S3 storage.",
+				Computed:           true,
+				DeprecationMessage: "This attribute is deprecated.",
 			},
 			"has_related_resources": schema.BoolAttribute{
 				Description: "Defines whether the origin group has related CDN resources.\n\nPossible values:\n- **true** - Origin group has related CDN resources.\n- **false** - Origin group does not have related CDN resources.",
@@ -38,8 +39,9 @@ func DataSourceSchema(ctx context.Context) schema.Schema {
 				Computed:    true,
 			},
 			"path": schema.StringAttribute{
-				Description: "Parameter is **deprecated**.",
-				Computed:    true,
+				Description:        "**Deprecated.** No longer necessary. Omit this field and the default origin path behavior will be used.\n\nOrigin path prefix.",
+				Computed:           true,
+				DeprecationMessage: "This attribute is deprecated.",
 			},
 			"use_next": schema.BoolAttribute{
 				Description: "Defines whether to use the next origin from the origin group if origin responds with the cases specified in `proxy_next_upstream`.\nIf you enable it, you must specify cases in `proxy_next_upstream`.\n\nPossible values:\n- **true** - Option is enabled.\n- **false** - Option is disabled.",
@@ -52,9 +54,10 @@ func DataSourceSchema(ctx context.Context) schema.Schema {
 				ElementType: types.StringType,
 			},
 			"auth": schema.SingleNestedAttribute{
-				Description: "Credentials to access the private bucket.",
-				Computed:    true,
-				CustomType:  customfield.NewNestedObjectType[CDNOriginGroupAuthDataSourceModel](ctx),
+				Description:        "**Deprecated.** To create S3 origins, configure them directly in sources with `origin_type` and `config` instead.\n\nCredentials to access the private bucket.",
+				Computed:           true,
+				DeprecationMessage: "This attribute is deprecated.",
+				CustomType:         customfield.NewNestedObjectType[CDNOriginGroupAuthDataSourceModel](ctx),
 				Attributes: map[string]schema.Attribute{
 					"s3_access_key_id": schema.StringAttribute{
 						Description: "Access key ID for the S3 account.\n\nRestrictions:\n- Latin letters (A-Z, a-z), numbers (0-9), colon, dash, and underscore.\n- From 3 to 512 characters.",
