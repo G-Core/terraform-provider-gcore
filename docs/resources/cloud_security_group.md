@@ -77,8 +77,8 @@ Optional:
 Available values: "IPv4", "IPv6".
 - `port_range_max` (Number) The maximum port number in the range that is matched by the security group rule
 - `port_range_min` (Number) The minimum port number in the range that is matched by the security group rule
-- `protocol` (String) Protocol
-Available values: "ah", "any", "dccp", "egp", "esp", "gre", "icmp", "igmp", "ipencap", "ipip", "ipv6-encap", "ipv6-frag", "ipv6-icmp", "ipv6-nonxt", "ipv6-opts", "ipv6-route", "ospf", "pgm", "rsvp", "sctp", "tcp", "udp", "udplite", "vrrp".
+- `protocol` (String) V2 protocol enum without 'any'. Use null for all protocols instead.
+Available values: "ah", "dccp", "egp", "esp", "gre", "icmp", "igmp", "ipencap", "ipip", "ipv6-encap", "ipv6-frag", "ipv6-icmp", "ipv6-nonxt", "ipv6-opts", "ipv6-route", "ospf", "pgm", "rsvp", "sctp", "tcp", "udp", "udplite", "vrrp".
 - `remote_group_id` (String) The remote group UUID to associate with this security group
 - `remote_ip_prefix` (String) The remote IP prefix that is matched by this security group rule
 
