@@ -37,13 +37,19 @@ resource "gcore_cdn_origin_group" "example_cdn_origin_group" {
 
 ### Optional
 
-- `auth` (Attributes) Credentials to access the private bucket. (see [below for nested schema](#nestedatt--auth))
-- `auth_type` (String) Origin authentication type.
+- `auth` (Attributes, Deprecated) **Deprecated.** To create S3 origins, configure them directly in sources with `origin_type` and `config` instead.
+
+Credentials to access the private bucket. (see [below for nested schema](#nestedatt--auth))
+- `auth_type` (String, Deprecated) **Deprecated.** No longer necessary. Defaults to `none`.
+
+Origin authentication type.
 
 Possible values:
 - **none** - Used for public origins.
 - **awsSignatureV4** - Used for S3 storage.
-- `path` (String) Parameter is **deprecated**.
+- `path` (String, Deprecated) **Deprecated.** No longer necessary. Omit this field and the default origin path behavior will be used.
+
+Origin path prefix.
 - `proxy_next_upstream` (List of String) Defines cases when the request should be passed on to the next origin.
 
 Possible values:
