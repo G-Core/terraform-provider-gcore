@@ -14,13 +14,12 @@ type CloudLoadBalancerModel struct {
 	ProjectID             types.Int64                                                        `tfsdk:"project_id" path:"project_id,optional"`
 	RegionID              types.Int64                                                        `tfsdk:"region_id" path:"region_id,optional"`
 	Flavor                types.String                                                       `tfsdk:"flavor" json:"flavor,optional,no_refresh"`
-	NameTemplate          types.String                                                       `tfsdk:"name_template" json:"name_template,optional,no_refresh"`
 	VipNetworkID          types.String                                                       `tfsdk:"vip_network_id" json:"vip_network_id,optional,no_refresh"`
 	VipSubnetID           types.String                                                       `tfsdk:"vip_subnet_id" json:"vip_subnet_id,optional,no_refresh"`
 	FloatingIP            *CloudLoadBalancerFloatingIPModel                                  `tfsdk:"floating_ip" json:"floating_ip,optional,no_refresh"`
 	VipIPFamily           types.String                                                       `tfsdk:"vip_ip_family" json:"vip_ip_family,computed_optional"`
 	VipPortID             types.String                                                       `tfsdk:"vip_port_id" json:"vip_port_id,computed_optional"`
-	Name                  types.String                                                       `tfsdk:"name" json:"name,optional"`
+	Name                  types.String                                                       `tfsdk:"name" json:"name,required"`
 	PreferredConnectivity types.String                                                       `tfsdk:"preferred_connectivity" json:"preferred_connectivity,computed_optional"`
 	Tags                  customfield.Map[types.String]                                      `tfsdk:"tags" json:"tags,computed_optional,no_refresh"`
 	Logging               customfield.NestedObject[CloudLoadBalancerLoggingModel]            `tfsdk:"logging" json:"logging,computed_optional"`
