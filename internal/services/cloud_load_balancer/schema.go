@@ -46,11 +46,6 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 				Optional:      true,
 				PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
 			},
-			"name_template": schema.StringAttribute{
-				Description:   "Load balancer name which will be changed by template. Either `name` or `name_template` should be specified.",
-				Optional:      true,
-				PlanModifiers: []planmodifier.String{stringplanmodifier.RequiresReplace()},
-			},
 			"vip_network_id": schema.StringAttribute{
 				Description:   "Network ID for load balancer. If not specified, default external network will be used. Mutually exclusive with `vip_port_id`",
 				Optional:      true,
@@ -105,8 +100,8 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 				},
 			},
 			"name": schema.StringAttribute{
-				Description: "Load balancer name. Either `name` or `name_template` should be specified.",
-				Optional:    true,
+				Description: "Load balancer name.",
+				Required:    true,
 			},
 			"preferred_connectivity": schema.StringAttribute{
 				Description: "Preferred option to establish connectivity between load balancer and its pools members. L2 provides best performance, L3 provides less IPs usage. It is taking effect only if `instance_id` + `ip_address` is provided, not `subnet_id` + `ip_address`, because we're considering this as intentional `subnet_id` specification.\nAvailable values: \"L2\", \"L3\".",
