@@ -3,7 +3,11 @@
 package cloud_inference_flavor
 
 import (
+	"context"
+
+	"github.com/G-Core/gcore-go/cloud"
 	"github.com/G-Core/terraform-provider-gcore/internal/customfield"
+	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 )
 
@@ -14,6 +18,12 @@ type CloudInferenceFlavorsResultsListDataSourceEnvelope struct {
 type CloudInferenceFlavorsDataSourceModel struct {
 	MaxItems types.Int64                                                             `tfsdk:"max_items"`
 	Items    customfield.NestedObjectList[CloudInferenceFlavorsItemsDataSourceModel] `tfsdk:"items"`
+}
+
+func (m *CloudInferenceFlavorsDataSourceModel) toListParams(_ context.Context) (params cloud.InferenceFlavorListParams, diags diag.Diagnostics) {
+	params = cloud.InferenceFlavorListParams{}
+
+	return
 }
 
 type CloudInferenceFlavorsItemsDataSourceModel struct {
