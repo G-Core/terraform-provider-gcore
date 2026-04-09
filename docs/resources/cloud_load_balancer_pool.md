@@ -39,17 +39,10 @@ resource "gcore_cloud_load_balancer_pool" "tcp_80" {
   lb_algorithm = "ROUND_ROBIN"
 
   healthmonitor = {
-    delay = 10
-    max_retries = 3
-    timeout = 5
-    type = "HTTP"
-    admin_state_up = true
-    domain_name = "example.com"
-    expected_codes = "200,301,302"
-    http_method = "GET"
-    http_version = "1.1"
-    max_retries_down = 3
-    url_path = "/"
+    type        = "PING"
+    delay       = 10
+    max_retries = 5
+    timeout     = 5
   }
 
   session_persistence = {
