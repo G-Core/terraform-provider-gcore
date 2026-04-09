@@ -36,12 +36,12 @@ resource "gcore_fastedge_template" "example_fastedge_template" {
 
 - `binary_id` (Number) ID of the WebAssembly binary to use for this template
 - `name` (String) Unique name for the template (used for identification and searching)
-- `owned` (Boolean) Is the template owned by user?
 - `params` (Attributes List) Parameters (see [below for nested schema](#nestedatt--params))
 
 ### Optional
 
 - `long_descr` (String) Detailed markdown description explaining template features and usage
+- `owned` (Boolean) Is the template owned by user?
 - `short_descr` (String) Brief one-line description displayed in template listings
 
 ### Read-Only
