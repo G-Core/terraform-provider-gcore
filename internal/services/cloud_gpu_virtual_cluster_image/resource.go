@@ -13,6 +13,7 @@ import (
 	"github.com/G-Core/gcore-go/option"
 	"github.com/G-Core/gcore-go/packages/param"
 	"github.com/G-Core/terraform-provider-gcore/internal/apijson"
+	"github.com/G-Core/terraform-provider-gcore/internal/custom"
 	"github.com/G-Core/terraform-provider-gcore/internal/importpath"
 	"github.com/G-Core/terraform-provider-gcore/internal/logging"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
@@ -95,6 +96,9 @@ func (r *CloudGPUVirtualClusterImageResource) Create(ctx context.Context, req re
 		resp.Diagnostics.AddError("failed to deserialize http request", err.Error())
 		return
 	}
+	if tags, ok := custom.ConvertAPITagsToCustomfieldMap(ctx, []byte(image.RawJSON())); ok {
+		data.Tags = tags
+	}
 
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
 }
@@ -144,6 +148,10 @@ func (r *CloudGPUVirtualClusterImageResource) Read(ctx context.Context, req reso
 	if err != nil {
 		resp.Diagnostics.AddError("failed to deserialize http request", err.Error())
 		return
+	}
+
+	if tags, ok := custom.ConvertAPITagsToCustomfieldMap(ctx, bytes); ok {
+		data.Tags = tags
 	}
 
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
@@ -222,6 +230,10 @@ func (r *CloudGPUVirtualClusterImageResource) ImportState(ctx context.Context, r
 	if err != nil {
 		resp.Diagnostics.AddError("failed to deserialize http request", err.Error())
 		return
+	}
+
+	if tags, ok := custom.ConvertAPITagsToCustomfieldMap(ctx, bytes); ok {
+		data.Tags = tags
 	}
 
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
