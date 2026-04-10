@@ -25,10 +25,10 @@ resource "gcore_dns_zone_rrset" "a_record" {
 
   resource_records = [
     {
-      content = [jsonencode("127.0.0.100")]
+      content = ["127.0.0.100"]
     },
     {
-      content = [jsonencode("127.0.0.200")]
+      content = ["127.0.0.200"]
     },
   ]
 }
@@ -47,7 +47,7 @@ resource "gcore_dns_zone_rrset" "mx_record" {
   ttl        = 300
 
   resource_records = [{
-    content = [jsonencode("10 mail.example.com.")]
+    content = ["10 mail.example.com."]
     enabled = true
   }]
 }
@@ -66,7 +66,7 @@ resource "gcore_dns_zone_rrset" "txt_record" {
   ttl        = 120
 
   resource_records = [{
-    content = [jsonencode("v=spf1 include:_spf.google.com ~all")]
+    content = ["v=spf1 include:_spf.google.com ~all"]
     enabled = true
   }]
 

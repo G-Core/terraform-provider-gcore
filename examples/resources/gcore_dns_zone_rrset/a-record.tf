@@ -7,10 +7,10 @@ resource "gcore_dns_zone_rrset" "a_record" {
 
   resource_records = [
     {
-      content = [jsonencode("127.0.0.100")]
+      content = ["127.0.0.100"]
     },
     {
-      content = [jsonencode("127.0.0.200")]
+      content = ["127.0.0.200"]
     },
   ]
 }
