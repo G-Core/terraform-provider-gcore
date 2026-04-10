@@ -14,6 +14,7 @@ import (
 	"github.com/G-Core/gcore-go/option"
 	"github.com/G-Core/gcore-go/packages/param"
 	"github.com/G-Core/terraform-provider-gcore/internal/apijson"
+	"github.com/G-Core/terraform-provider-gcore/internal/custom"
 	"github.com/G-Core/terraform-provider-gcore/internal/customfield"
 	"github.com/G-Core/terraform-provider-gcore/internal/importpath"
 	"github.com/G-Core/terraform-provider-gcore/internal/logging"
@@ -101,12 +102,8 @@ func (r *CloudBaremetalServerResource) Create(ctx context.Context, req resource.
 		resp.Diagnostics.AddError("failed to deserialize http request", err.Error())
 		return
 	}
-
-	// The API returns tags as an array of objects [{key, value, read_only}] which
-	// cannot be deserialized into a Map[string]. Resolve any remaining unknown
-	// tags to null so Terraform doesn't report unknown values after apply.
-	if data.Tags.IsUnknown() {
-		data.Tags = customfield.NullMap[types.String](ctx)
+	if tags, ok := custom.ConvertAPITagsToCustomfieldMap(ctx, []byte(baremetalServer.RawJSON())); ok {
+		data.Tags = tags
 	}
 
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
@@ -171,6 +168,9 @@ func (r *CloudBaremetalServerResource) Update(ctx context.Context, req resource.
 			resp.Diagnostics.AddError("failed to deserialize http request", err.Error())
 			return
 		}
+		if tags, ok := custom.ConvertAPITagsToCustomfieldMap(ctx, bytes); ok {
+			data.Tags = tags
+		}
 		stateHasChanged = true
 	}
 
@@ -207,16 +207,13 @@ func (r *CloudBaremetalServerResource) Update(ctx context.Context, req resource.
 			resp.Diagnostics.AddError("failed to deserialize http request", err.Error())
 			return
 		}
+		if tags, ok := custom.ConvertAPITagsToCustomfieldMap(ctx, []byte(server.RawJSON())); ok {
+			data.Tags = tags
+		}
 		stateHasChanged = true
 	}
 
 	if stateHasChanged {
-		// The API returns tags as an array of objects [{key, value, read_only}] which
-		// cannot be deserialized into a Map[string]. Resolve any remaining unknown
-		// tags to null so Terraform doesn't report unknown values after apply.
-		if data.Tags.IsUnknown() {
-			data.Tags = customfield.NullMap[types.String](ctx)
-		}
 		resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
 	} else {
 		// No API changes were made, but no_refresh fields (like interfaces) may
@@ -269,6 +266,10 @@ func (r *CloudBaremetalServerResource) Read(ctx context.Context, req resource.Re
 	if err != nil {
 		resp.Diagnostics.AddError("failed to deserialize http request", err.Error())
 		return
+	}
+
+	if tags, ok := custom.ConvertAPITagsToCustomfieldMap(ctx, bytes); ok {
+		data.Tags = tags
 	}
 
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
@@ -349,6 +350,10 @@ func (r *CloudBaremetalServerResource) ImportState(ctx context.Context, req reso
 	if err != nil {
 		resp.Diagnostics.AddError("failed to deserialize http request", err.Error())
 		return
+	}
+
+	if tags, ok := custom.ConvertAPITagsToCustomfieldMap(ctx, bytes); ok {
+		data.Tags = tags
 	}
 
 	// Workaround: Fields with no_refresh tag are skipped during Unmarshal.
