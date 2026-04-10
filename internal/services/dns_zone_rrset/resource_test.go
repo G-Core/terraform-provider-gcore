@@ -277,7 +277,7 @@ resource "gcore_dns_zone_rrset" "test" {
 
   resource_records = [
     {
-      content = ["\"192.168.1.1\""]
+      content = ["192.168.1.1"]
       enabled = true
     },
   ]
@@ -298,11 +298,11 @@ resource "gcore_dns_zone_rrset" "test" {
 
   resource_records = [
     {
-      content = ["\"192.168.1.1\""]
+      content = ["192.168.1.1"]
       enabled = true
     },
     {
-      content = ["\"10.0.0.1\""]
+      content = ["10.0.0.1"]
       enabled = true
     },
   ]
@@ -323,7 +323,7 @@ resource "gcore_dns_zone_rrset" "test" {
 
   resource_records = [
     {
-      content = ["\"192.168.1.1\""]
+      content = ["192.168.1.1"]
       enabled = true
       meta = {
         latlong = "[51.5,31.5]"
@@ -332,7 +332,7 @@ resource "gcore_dns_zone_rrset" "test" {
       }
     },
     {
-      content = ["\"10.0.0.1\""]
+      content = ["10.0.0.1"]
       enabled = true
       meta = {
         latlong = "[40.0,20.0]"
@@ -366,7 +366,7 @@ resource "gcore_dns_zone_rrset" "test" {
 
   resource_records = [
     {
-      content = ["\"192.168.1.1\""]
+      content = ["192.168.1.1"]
       enabled = true
       meta = {
         latlong = "[52.0,32.0]"
@@ -375,7 +375,7 @@ resource "gcore_dns_zone_rrset" "test" {
       }
     },
     {
-      content = ["\"10.0.0.1\""]
+      content = ["10.0.0.1"]
       enabled = true
       meta = {
         latlong = "[41.0,21.0]"
@@ -409,15 +409,15 @@ resource "gcore_dns_zone_rrset" "test" {
 
   resource_records = [
     {
-      content = ["\"192.168.1.1\""]
+      content = ["192.168.1.1"]
       enabled = true
     },
     {
-      content = ["\"10.0.0.1\""]
+      content = ["10.0.0.1"]
       enabled = true
     },
     {
-      content = ["\"172.16.0.1\""]
+      content = ["172.16.0.1"]
       enabled = true
     },
   ]

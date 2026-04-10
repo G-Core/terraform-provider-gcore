@@ -5,7 +5,6 @@ package dns_zone_rrset
 import (
 	"github.com/G-Core/terraform-provider-gcore/internal/apijson"
 	"github.com/G-Core/terraform-provider-gcore/internal/customfield"
-	"github.com/hashicorp/terraform-plugin-framework-jsontypes/jsontypes"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 )
 
@@ -34,7 +33,7 @@ func (m DNSZoneRrsetModel) MarshalJSONForUpdate(state DNSZoneRrsetModel) (data [
 
 type DNSZoneRrsetResourceRecordsModel struct {
 	ID      types.Int64                             `tfsdk:"id" json:"id,computed"`
-	Content *[]jsontypes.Normalized                 `tfsdk:"content" json:"content,required"`
+	Content *[]customfield.MetaStringValue          `tfsdk:"content" json:"content,required"`
 	Enabled types.Bool                              `tfsdk:"enabled" json:"enabled,computed_optional"`
 	Meta    *map[string]customfield.MetaStringValue `tfsdk:"meta" json:"meta,optional"`
 }
