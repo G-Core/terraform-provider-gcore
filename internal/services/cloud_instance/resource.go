@@ -14,7 +14,7 @@ import (
 	"github.com/G-Core/gcore-go/packages/param"
 	"github.com/G-Core/gcore-go/shared/constant"
 	"github.com/G-Core/terraform-provider-gcore/internal/apijson"
-	"github.com/G-Core/terraform-provider-gcore/internal/customfield"
+	"github.com/G-Core/terraform-provider-gcore/internal/custom"
 	"github.com/G-Core/terraform-provider-gcore/internal/importpath"
 	"github.com/G-Core/terraform-provider-gcore/internal/logging"
 	"github.com/hashicorp/terraform-plugin-framework/path"
@@ -101,6 +101,9 @@ func (r *CloudInstanceResource) Create(ctx context.Context, req resource.CreateR
 	if err != nil {
 		resp.Diagnostics.AddError("failed to deserialize http request", err.Error())
 		return
+	}
+	if tags, ok := custom.ConvertAPITagsToCustomfieldMap(ctx, []byte(instance.RawJSON())); ok {
+		data.Tags = tags
 	}
 
 	// Extract fields from the API response that aren't mapped via json tags
@@ -242,6 +245,9 @@ func (r *CloudInstanceResource) Update(ctx context.Context, req resource.UpdateR
 					resp.Diagnostics.AddError("failed to deserialize instance after resize", err.Error())
 					return
 				}
+				if tags, ok := custom.ConvertAPITagsToCustomfieldMap(ctx, []byte(instance.RawJSON())); ok {
+					data.Tags = tags
+				}
 				tflog.Info(ctx, "Flavor change completed", map[string]interface{}{
 					"instance_id":     instanceID,
 					"expected_flavor": expectedFlavor,
@@ -320,6 +326,9 @@ func (r *CloudInstanceResource) Update(ctx context.Context, req resource.UpdateR
 		if err != nil {
 			resp.Diagnostics.AddError("failed to deserialize instance after vm_state change", err.Error())
 			return
+		}
+		if tags, ok := custom.ConvertAPITagsToCustomfieldMap(ctx, []byte(instance.RawJSON())); ok {
+			data.Tags = tags
 		}
 		stateHasChanged = true
 	}
@@ -1057,6 +1066,9 @@ func (r *CloudInstanceResource) Update(ctx context.Context, req resource.UpdateR
 			resp.Diagnostics.AddError("failed to deserialize instance after update", err.Error())
 			return
 		}
+		if tags, ok := custom.ConvertAPITagsToCustomfieldMap(ctx, []byte(instance.RawJSON())); ok {
+			data.Tags = tags
+		}
 
 		// Extract flavor_id from the flavor object in the API response
 		// API returns: {"flavor": {"flavor_id": "...", ...}}
@@ -1147,6 +1159,10 @@ func (r *CloudInstanceResource) Read(ctx context.Context, req resource.ReadReque
 	if err != nil {
 		resp.Diagnostics.AddError("failed to deserialize http request", err.Error())
 		return
+	}
+
+	if tags, ok := custom.ConvertAPITagsToCustomfieldMap(ctx, []byte(instance.RawJSON())); ok {
+		data.Tags = tags
 	}
 
 	// Extract fields from the API response that aren't mapped via json tags
@@ -1305,30 +1321,8 @@ func (r *CloudInstanceResource) ImportState(ctx context.Context, req resource.Im
 			data.Volumes = &volumes
 		}
 
-		// Extract tags from API response
-		// API returns: "tags": [{"key": "k1", "value": "v1", "read_only": bool}, ...]
-		// Resource model uses: map[string]string
-		// Note: Skip read_only tags as they are system-generated (e.g., image_id, os_distro)
-		if tagsArr, ok := rawResponse["tags"].([]interface{}); ok && len(tagsArr) > 0 {
-			tags := make(map[string]types.String, len(tagsArr))
-			for _, tag := range tagsArr {
-				tagMap, ok := tag.(map[string]interface{})
-				if !ok {
-					continue
-				}
-				// Skip read-only tags (system-generated)
-				if readOnly, ok := tagMap["read_only"].(bool); ok && readOnly {
-					continue
-				}
-				key, keyOk := tagMap["key"].(string)
-				value, valueOk := tagMap["value"].(string)
-				if keyOk && valueOk {
-					tags[key] = types.StringValue(value)
-				}
-			}
-			if len(tags) > 0 {
-				data.Tags = customfield.NewMapMust[types.String](ctx, tags)
-			}
+		if tags, ok := custom.ConvertAPITagsToCustomfieldMap(ctx, []byte(rawJSON)); ok {
+			data.Tags = tags
 		}
 	}
 

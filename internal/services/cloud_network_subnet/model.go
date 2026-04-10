@@ -20,7 +20,7 @@ type CloudNetworkSubnetModel struct {
 	EnableDhcp     types.Bool                                                      `tfsdk:"enable_dhcp" json:"enable_dhcp,computed_optional"`
 	GatewayIP      types.String                                                    `tfsdk:"gateway_ip" json:"gateway_ip,computed_optional"`
 	DNSNameservers customfield.List[types.String]                                  `tfsdk:"dns_nameservers" json:"dns_nameservers,computed_optional"`
-	Tags                   customfield.Map[types.String]                                   `tfsdk:"tags" json:"tags,computed_optional,no_refresh"`
+	Tags           customfield.Map[types.String]                                   `tfsdk:"tags" json:"tags,computed_optional,no_refresh"`
 	HostRoutes     customfield.NestedObjectList[CloudNetworkSubnetHostRoutesModel] `tfsdk:"host_routes" json:"host_routes,computed_optional"`
 	AvailableIPs   types.Int64                                                     `tfsdk:"available_ips" json:"available_ips,computed"`
 	CreatedAt      timetypes.RFC3339                                               `tfsdk:"created_at" json:"created_at,computed" format:"date-time"`

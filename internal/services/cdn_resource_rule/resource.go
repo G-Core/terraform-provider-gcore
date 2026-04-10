@@ -197,7 +197,6 @@ func (r *CDNResourceRuleResource) Delete(ctx context.Context, req resource.Delet
 		}
 	}
 
-
 	err := r.client.CDN.CDNResources.Rules.Delete(
 		ctx,
 		data.ID.ValueInt64(),

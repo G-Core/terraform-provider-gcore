@@ -15,7 +15,7 @@ import (
 	"github.com/G-Core/gcore-go/option"
 	"github.com/G-Core/gcore-go/packages/param"
 	"github.com/G-Core/terraform-provider-gcore/internal/apijson"
-	"github.com/G-Core/terraform-provider-gcore/internal/customfield"
+	"github.com/G-Core/terraform-provider-gcore/internal/custom"
 	"github.com/G-Core/terraform-provider-gcore/internal/importpath"
 	"github.com/G-Core/terraform-provider-gcore/internal/logging"
 	"github.com/hashicorp/terraform-plugin-framework/path"
@@ -102,6 +102,9 @@ func (r *CloudGPUBaremetalClusterResource) Create(ctx context.Context, req resou
 		resp.Diagnostics.AddError("failed to deserialize http request", err.Error())
 		return
 	}
+	if tags, ok := custom.ConvertAPITagsToCustomfieldMap(ctx, []byte(cluster.RawJSON())); ok {
+		data.Tags = tags
+	}
 
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
 }
@@ -167,6 +170,9 @@ func (r *CloudGPUBaremetalClusterResource) Update(ctx context.Context, req resou
 			resp.Diagnostics.AddError("failed to deserialize http request", err.Error())
 			return
 		}
+		if tags, ok := custom.ConvertAPITagsToCustomfieldMap(ctx, bytes); ok {
+			data.Tags = tags
+		}
 		stateHasChanged = true
 	}
 
@@ -195,6 +201,9 @@ func (r *CloudGPUBaremetalClusterResource) Update(ctx context.Context, req resou
 		if err != nil {
 			resp.Diagnostics.AddError("failed to deserialize http request", err.Error())
 			return
+		}
+		if tags, ok := custom.ConvertAPITagsToCustomfieldMap(ctx, []byte(cluster.RawJSON())); ok {
+			data.Tags = tags
 		}
 		stateHasChanged = true
 	}
@@ -263,6 +272,9 @@ func (r *CloudGPUBaremetalClusterResource) Update(ctx context.Context, req resou
 			resp.Diagnostics.AddError("failed to deserialize http request", err.Error())
 			return
 		}
+		if tags, ok := custom.ConvertAPITagsToCustomfieldMap(ctx, []byte(cluster.RawJSON())); ok {
+			data.Tags = tags
+		}
 		stateHasChanged = true
 	}
 
@@ -312,6 +324,10 @@ func (r *CloudGPUBaremetalClusterResource) Read(ctx context.Context, req resourc
 	if err != nil {
 		resp.Diagnostics.AddError("failed to deserialize http request", err.Error())
 		return
+	}
+
+	if tags, ok := custom.ConvertAPITagsToCustomfieldMap(ctx, bytes); ok {
+		data.Tags = tags
 	}
 
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
@@ -395,10 +411,6 @@ func (r *CloudGPUBaremetalClusterResource) ImportState(ctx context.Context, req 
 	// Workaround: Fields with no_refresh tag are skipped during Unmarshal.
 	// For import, we need to manually extract these from the raw API response.
 	var rawResponse struct {
-		Tags []struct {
-			Key   string `json:"key"`
-			Value string `json:"value"`
-		} `json:"tags"`
 		ServersSettings struct {
 			UserData   string `json:"user_data"`
 			SSHKeyName string `json:"ssh_key_name"`
@@ -406,13 +418,8 @@ func (r *CloudGPUBaremetalClusterResource) ImportState(ctx context.Context, req 
 		} `json:"servers_settings"`
 	}
 	if err := json.Unmarshal(bytes, &rawResponse); err == nil {
-		// tags: API returns array of {key, value} objects, but model expects map[string]string.
-		if len(rawResponse.Tags) > 0 {
-			tagsMap := make(map[string]types.String, len(rawResponse.Tags))
-			for _, tag := range rawResponse.Tags {
-				tagsMap[tag.Key] = types.StringValue(tag.Value)
-			}
-			data.Tags = customfield.NewMapMust[types.String](ctx, tagsMap)
+		if tags, ok := custom.ConvertAPITagsToCustomfieldMap(ctx, bytes); ok {
+			data.Tags = tags
 		}
 
 		// user_data: API returns plain text, but users send base64 encoded.
