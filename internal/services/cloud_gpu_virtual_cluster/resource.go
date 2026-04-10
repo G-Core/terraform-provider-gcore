@@ -269,7 +269,9 @@ func (r *CloudGPUVirtualClusterResource) Delete(ctx context.Context, req resourc
 		return
 	}
 
-	params := cloud.GPUVirtualClusterDeleteParams{}
+	params := cloud.GPUVirtualClusterDeleteParams{
+		AllVolumes: param.NewOpt(true),
+	}
 
 	if !data.ProjectID.IsNull() {
 		params.ProjectID = param.NewOpt(data.ProjectID.ValueInt64())
