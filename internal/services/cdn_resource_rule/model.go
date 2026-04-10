@@ -5,7 +5,6 @@ package cdn_resource_rule
 import (
 	"github.com/G-Core/terraform-provider-gcore/internal/apijson"
 	"github.com/G-Core/terraform-provider-gcore/internal/customfield"
-	"github.com/hashicorp/terraform-plugin-framework-jsontypes/jsontypes"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 )
 
@@ -357,8 +356,8 @@ type CDNResourceRuleOptionsStaticResponseHeadersValueModel struct {
 }
 
 type CDNResourceRuleOptionsStaticHeadersModel struct {
-	Enabled types.Bool           `tfsdk:"enabled" json:"enabled,required"`
-	Value   jsontypes.Normalized `tfsdk:"value" json:"value,required"`
+	Enabled types.Bool                  `tfsdk:"enabled" json:"enabled,required"`
+	Value   customfield.MetaStringValue `tfsdk:"value" json:"value,required"`
 }
 
 type CDNResourceRuleOptionsStaticRequestHeadersModel struct {

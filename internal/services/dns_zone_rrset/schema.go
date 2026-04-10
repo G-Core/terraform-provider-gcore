@@ -6,7 +6,6 @@ import (
 	"context"
 
 	"github.com/G-Core/terraform-provider-gcore/internal/customfield"
-	"github.com/hashicorp/terraform-plugin-framework-jsontypes/jsontypes"
 	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
@@ -46,7 +45,7 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 						"content": schema.ListAttribute{
 							Description: "Content of resource record\nThe exact length of the array depends on the type of rrset,\neach individual record parameter must be a separate element of the array. For example\nSRV-record: `[100, 1, 5061, \"example.com\"]`\nCNAME-record: `[ \"the.target.domain\" ]`\nA-record: `[ \"1.2.3.4\", \"5.6.7.8\" ]`\nAAAA-record: `[ \"2001:db8::1\", \"2001:db8::2\" ]`\nMX-record: `[ \"mail1.example.com\", \"mail2.example.com\" ]`\nSVCB/HTTPS-record: `[ 1, \".\", [\"alpn\", \"h3\", \"h2\"], [ \"port\", 1443 ], [ \"ipv4hint\", \"10.0.0.1\" ], [ \"ech\", \"AEn+DQBFKwAgACABWIHUGj4u+PIggYXcR5JF0gYk3dCRioBW8uJq9H4mKAAIAAEAAQABAANAEnB1YmxpYy50bHMtZWNoLmRldgAA\" ] ]`",
 							Required:    true,
-							ElementType: jsontypes.NormalizedType{},
+							ElementType: customfield.MetaStringType{},
 						},
 						"enabled": schema.BoolAttribute{
 							Computed: true,

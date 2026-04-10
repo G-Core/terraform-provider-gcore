@@ -197,7 +197,7 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 			"configuration": schema.MapAttribute{
 				Description:   "Parameters for the application template if creating the instance from an `apptemplate`.",
 				Optional:      true,
-				ElementType:   jsontypes.NormalizedType{},
+				ElementType:   customfield.MetaStringType{},
 				PlanModifiers: []planmodifier.Map{mapplanmodifier.RequiresReplace()},
 			},
 			"security_groups": schema.ListNestedAttribute{
