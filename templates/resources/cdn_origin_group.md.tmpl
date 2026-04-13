@@ -17,11 +17,17 @@ Create a CDN origin group with a primary origin and a backup origin for failover
 
 {{tffile "examples/resources/gcore_cdn_origin_group/basic.tf"}}
 
-### Origin group with S3 authentication
+### S3 origin group with inline credentials
 
-Create a CDN origin group that pulls content from an S3-compatible bucket using AWS Signature V4 authentication.
+Create CDN origin groups that pull content from S3-compatible buckets. S3 credentials are write-only — they are sent to the API but never stored in Terraform state. Use `s3_credentials_version` to trigger credential re-sends.
 
 {{tffile "examples/resources/gcore_cdn_origin_group/s3-auth.tf"}}
+
+### Mixed origin group with host and S3 origins
+
+Create a CDN origin group that combines host origins with S3 origins for failover.
+
+{{tffile "examples/resources/gcore_cdn_origin_group/mixed.tf"}}
 
 {{ .SchemaMarkdown | trimspace }}
 
