@@ -54,7 +54,7 @@ func resourceCDNOriginShieldingRead(ctx context.Context, d *schema.ResourceData,
 			return diag.Diagnostics{
 				{
 					Severity: diag.Warning,
-					Summary:  fmt.Sprintf("Origin Shielding with id %s not found, removing from state", resourceID),
+					Summary:  fmt.Sprintf("Origin Shielding with id %d not found, removing from state", resourceID),
 				},
 			}
 		}
