@@ -928,7 +928,7 @@ func getSuitableSecurityGroup(sgs []securitygroups.SecurityGroup, name string, p
 func filterSecurityGroupRules(rules []securitygroups.SecurityGroupRule) []securitygroups.SecurityGroupRule {
 	newRules := []securitygroups.SecurityGroupRule{}
 	for _, rule := range rules {
-		if *rule.Description == "system" {
+		if rule.Description != nil && *rule.Description == "system" {
 			continue
 		}
 		newRules = append(newRules, rule)
