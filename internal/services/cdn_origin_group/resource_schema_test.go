@@ -3,12 +3,17 @@
 package cdn_origin_group_test
 
 import (
+	"context"
 	"testing"
+
+	"github.com/G-Core/terraform-provider-gcore/internal/services/cdn_origin_group"
+	"github.com/G-Core/terraform-provider-gcore/internal/test_helpers"
 )
 
 func TestCDNOriginGroupModelSchemaParity(t *testing.T) {
-	// Skip: The test helper has a bug that incorrectly reports schema/model mismatches
-	// for the auth nested attribute. Manual verification confirms the model and schema
-	// are correct. The s3_credentials_version field has no json tag (Terraform-only trigger).
-	t.Skip("Test helper has non-deterministic bug with nested attributes - needs investigation")
+	t.Parallel()
+	model := (*cdn_origin_group.CDNOriginGroupModel)(nil)
+	schema := cdn_origin_group.ResourceSchema(context.TODO())
+	errs := test_helpers.ValidateResourceModelSchemaIntegrity(model, schema)
+	errs.Report(t)
 }

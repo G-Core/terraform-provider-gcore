@@ -36,9 +36,9 @@ resource "gcore_cdn_origin_group" "example" {
 }
 ```
 
-### Origin group with S3 authentication
+### S3 origin group with inline credentials
 
-Create a CDN origin group that pulls content from an S3-compatible bucket using AWS Signature V4 authentication.
+Create CDN origin groups that pull content from S3-compatible buckets. S3 credentials are write-only — they are sent to the API but never stored in Terraform state. Use `s3_credentials_version` to trigger credential re-sends.
 
 ```terraform
 variable "s3_access_key" {
@@ -51,19 +51,76 @@ variable "s3_secret_key" {
   sensitive = true
 }
 
-# Create an origin group with S3 authentication
-resource "gcore_cdn_origin_group" "s3_origin" {
-  name      = "s3-origin-group"
-  auth_type = "awsSignatureV4"
+# Create an origin group with an S3 origin (Amazon S3)
+resource "gcore_cdn_origin_group" "s3_amazon" {
+  name                   = "s3-amazon-origin-group"
+  s3_credentials_version = 1
 
-  auth = {
-    s3_type                 = "amazon"
-    s3_access_key_id        = var.s3_access_key
-    s3_secret_access_key    = var.s3_secret_key
-    s3_bucket_name          = "my-bucket"
-    s3_region               = "eu-west-1"
-    s3_credentials_version  = 1
-  }
+  sources = [
+    {
+      origin_type = "s3"
+      enabled     = true
+      config = {
+        s3_type              = "amazon"
+        s3_bucket_name       = "my-bucket"
+        s3_access_key_id     = var.s3_access_key
+        s3_secret_access_key = var.s3_secret_key
+        s3_region            = "eu-west-1"
+      }
+    }
+  ]
+}
+
+# Create an origin group with an S3 origin (other S3-compatible storage)
+resource "gcore_cdn_origin_group" "s3_other" {
+  name                   = "s3-other-origin-group"
+  s3_credentials_version = 1
+
+  sources = [
+    {
+      origin_type = "s3"
+      enabled     = true
+      config = {
+        s3_type              = "other"
+        s3_bucket_name       = "my-bucket"
+        s3_access_key_id     = var.s3_access_key
+        s3_secret_access_key = var.s3_secret_key
+        s3_storage_hostname  = "s3.example.com"
+      }
+    }
+  ]
+}
+```
+
+### Mixed origin group with host and S3 origins
+
+Create a CDN origin group that combines host origins with S3 origins for failover.
+
+```terraform
+# Mixed origin group with host and S3 origins
+resource "gcore_cdn_origin_group" "mixed" {
+  name                   = "mixed-origin-group"
+  use_next               = true
+  s3_credentials_version = 1
+
+  sources = [
+    {
+      source  = "cdn.example.com"
+      enabled = true
+    },
+    {
+      origin_type = "s3"
+      enabled     = true
+      backup      = true
+      config = {
+        s3_type              = "amazon"
+        s3_bucket_name       = "my-bucket"
+        s3_access_key_id     = var.s3_access_key
+        s3_secret_access_key = var.s3_secret_key
+        s3_region            = "eu-west-1"
+      }
+    }
+  ]
 }
 ```
 
@@ -73,22 +130,10 @@ resource "gcore_cdn_origin_group" "s3_origin" {
 ### Required
 
 - `name` (String) Origin group name.
+- `sources` (Attributes List) List of origin sources. Each source can be a host origin (with `source` field) or an S3 origin (with `origin_type = "s3"` and a `config` block). (see [below for nested schema](#nestedatt--sources))
 
 ### Optional
 
-- `auth` (Attributes, Deprecated) **Deprecated.** To create S3 origins, configure them directly in sources with `origin_type` and `config` instead.
-
-Credentials to access the private bucket. (see [below for nested schema](#nestedatt--auth))
-- `auth_type` (String, Deprecated) **Deprecated.** No longer necessary. Defaults to `none`.
-
-Origin authentication type.
-
-Possible values:
-- **none** - Used for public origins.
-- **awsSignatureV4** - Used for S3 storage.
-- `path` (String, Deprecated) **Deprecated.** No longer necessary. Omit this field and the default origin path behavior will be used.
-
-Origin path prefix.
 - `proxy_next_upstream` (List of String) Defines cases when the request should be passed on to the next origin.
 
 Possible values:
@@ -102,7 +147,7 @@ Possible values:
 - **`http_502`** - a origin returned a response with the code 502
 - **`http_503`** - a origin returned a response with the code 503
 - **`http_504`** - a origin returned a response with the code 504
-- `sources` (Attributes List) (see [below for nested schema](#nestedatt--sources))
+- `s3_credentials_version` (Number) Version number for S3 credentials. Increment this value to force Terraform to re-send the write-only S3 credentials (s3_access_key_id, s3_secret_access_key) to the API. Required when any source has origin_type "s3".
 - `use_next` (Boolean) Defines whether to use the next origin from the origin group if origin responds with the cases specified in `proxy_next_upstream`.
 If you enable it, you must specify cases in `proxy_next_upstream`.
 
@@ -118,40 +163,6 @@ Possible values:
 - **true** - Origin group has related CDN resources.
 - **false** - Origin group does not have related CDN resources.
 - `id` (Number) Origin group ID.
-
-<a id="nestedatt--auth"></a>
-### Nested Schema for `auth`
-
-Required:
-
-- `s3_access_key_id` (String, [Write-only](https://developer.hashicorp.com/terraform/language/resources/ephemeral#write-only-arguments)) Access key ID for the S3 account. This is a write-only field - it will be sent to the API but never stored in state. 
-
-Restrictions:
-- Latin letters (A-Z, a-z), numbers (0-9), colon, dash, and underscore.
-- From 3 to 512 characters.
-- `s3_bucket_name` (String) S3 bucket name.
-- `s3_credentials_version` (Number) Version number for S3 credentials. Increment this value to force Terraform to re-send the S3 credentials to the API. Since credentials are write-only and not stored in state, changing this value is the way to update credentials.
-- `s3_secret_access_key` (String, [Write-only](https://developer.hashicorp.com/terraform/language/resources/ephemeral#write-only-arguments)) Secret access key for the S3 account. This is a write-only field - it will be sent to the API but never stored in state. 
-
-Restrictions:
-- Latin letters (A-Z, a-z), numbers (0-9), pluses, slashes, dashes, colons and underscores.
-- If "`s3_type`": amazon, length should be 40 characters.
-- If "`s3_type`": other, length should be from 16 to 255 characters.
-- `s3_type` (String) Storage type compatible with S3.
-
-Possible values:
-- **amazon** – AWS S3 storage.
-- **other** – Other (not AWS) S3 compatible storage.
-
-Optional:
-
-- `s3_region` (String) S3 storage region.
-
-The parameter is required, if "s3_type": amazon.
-- `s3_storage_hostname` (String) S3 storage hostname.
-
-The parameter is required, if "s3_type": other.
-
 
 <a id="nestedatt--sources"></a>
 ### Nested Schema for `sources`
@@ -177,7 +188,7 @@ Origin group must contain at least one enabled origin.
 Default value is true.
 - `host_header_override` (String) Per-origin Host header override. When set, the CDN sends this value as the Host header when
 requesting content from this origin instead of the default.
-- `origin_type` (String) Origin type. Present in responses only for S3 sources.
+- `origin_type` (String) Origin type.
 
 Possible values:
 - **host** - A source server or endpoint from which content is fetched.
@@ -191,13 +202,13 @@ Available values: "host", "s3".
 
 Required:
 
-- `s3_access_key_id` (String) Access key ID for the S3 account. Masked as `SECRET_VALUE` in responses.
+- `s3_access_key_id` (String, [Write-only](https://developer.hashicorp.com/terraform/language/resources/ephemeral#write-only-arguments)) Access key ID for the S3 account. This is a write-only field — it will be sent to the API but never stored in state. Increment `s3_credentials_version` to force re-send.
 
 Restrictions:
 - Latin letters (A-Z, a-z), numbers (0-9), colon, dash, and underscore.
 - From 4 to 255 characters.
 - `s3_bucket_name` (String) S3 bucket name.
-- `s3_secret_access_key` (String) Secret access key for the S3 account. Masked as `SECRET_VALUE` in responses.
+- `s3_secret_access_key` (String, [Write-only](https://developer.hashicorp.com/terraform/language/resources/ephemeral#write-only-arguments)) Secret access key for the S3 account. This is a write-only field — it will be sent to the API but never stored in state. Increment `s3_credentials_version` to force re-send.
 
 Restrictions:
 - Latin letters (A-Z, a-z), numbers (0-9), pluses, slashes, dashes, colons and underscores.
