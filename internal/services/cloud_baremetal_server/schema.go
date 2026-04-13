@@ -27,7 +27,7 @@ var _ resource.ResourceWithConfigValidators = (*CloudBaremetalServerResource)(ni
 
 func ResourceSchema(ctx context.Context) schema.Schema {
 	return schema.Schema{
-		Description: "Bare metal servers are dedicated physical machines with direct hardware access, supporting provisioning, rebuilding, and network configuration within a cloud region.",
+		MarkdownDescription: "Bare metal servers are dedicated physical machines with direct hardware access, supporting provisioning, rebuilding, and network configuration within a cloud region.",
 		Attributes: map[string]schema.Attribute{
 			"id": schema.StringAttribute{
 				Computed:      true,
@@ -36,12 +36,12 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 			"project_id": schema.Int64Attribute{
 				Description:   "Project ID",
 				Optional:      true,
-				PlanModifiers: []planmodifier.Int64{int64planmodifier.RequiresReplace()},
+				PlanModifiers: []planmodifier.Int64{int64planmodifier.RequiresReplaceIfConfigured()},
 			},
 			"region_id": schema.Int64Attribute{
 				Description:   "Region ID",
 				Optional:      true,
-				PlanModifiers: []planmodifier.Int64{int64planmodifier.RequiresReplace()},
+				PlanModifiers: []planmodifier.Int64{int64planmodifier.RequiresReplaceIfConfigured()},
 			},
 			"flavor": schema.StringAttribute{
 				Description:   "The flavor of the instance.",

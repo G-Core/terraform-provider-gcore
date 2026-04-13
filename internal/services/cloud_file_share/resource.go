@@ -97,6 +97,9 @@ func (r *CloudFileShareResource) Create(ctx context.Context, req resource.Create
 		resp.Diagnostics.AddError("failed to deserialize http request", err.Error())
 		return
 	}
+	if tags, ok := custom.ConvertAPITagsToCustomfieldMap(ctx, []byte(fileShare.RawJSON())); ok {
+		data.Tags = tags
+	}
 	// AccessRuleIDs is read-only, so set it to null
 	data.AccessRuleIDs = customfield.NullList[types.String](ctx)
 
@@ -121,7 +124,7 @@ func (r *CloudFileShareResource) Update(ctx context.Context, req resource.Update
 	}
 
 	// Check if fields that can be updated using the Update method have changed
-	if !data.Name.Equal(state.Name) || !custom.TagsEqual(data.Tags, state.Tags) || !data.ShareSettings.Equal(state.ShareSettings) {
+	if !data.Name.Equal(state.Name) || !data.Tags.Equal(state.Tags) || !data.ShareSettings.Equal(state.ShareSettings) {
 		params := cloud.FileShareUpdateParams{}
 
 		if !data.ProjectID.IsNull() {
@@ -153,6 +156,9 @@ func (r *CloudFileShareResource) Update(ctx context.Context, req resource.Update
 			resp.Diagnostics.AddError("failed to deserialize http request", err.Error())
 			return
 		}
+		if tags, ok := custom.ConvertAPITagsToCustomfieldMap(ctx, []byte(fileShare.RawJSON())); ok {
+			data.Tags = tags
+		}
 	}
 
 	// Check if size has changed, which requires a resize operation
@@ -178,6 +184,9 @@ func (r *CloudFileShareResource) Update(ctx context.Context, req resource.Update
 		if err != nil {
 			resp.Diagnostics.AddError("failed to deserialize http request", err.Error())
 			return
+		}
+		if tags, ok := custom.ConvertAPITagsToCustomfieldMap(ctx, []byte(fileShare.RawJSON())); ok {
+			data.Tags = tags
 		}
 	}
 
@@ -225,6 +234,10 @@ func (r *CloudFileShareResource) Read(ctx context.Context, req resource.ReadRequ
 	if err != nil {
 		resp.Diagnostics.AddError("failed to deserialize http request", err.Error())
 		return
+	}
+
+	if tags, ok := custom.ConvertAPITagsToCustomfieldMap(ctx, bytes); ok {
+		data.Tags = tags
 	}
 
 	// Read access_rule_ids separately using the Access Rules list endpoint
@@ -329,6 +342,10 @@ func (r *CloudFileShareResource) ImportState(ctx context.Context, req resource.I
 	if err != nil {
 		resp.Diagnostics.AddError("failed to deserialize http request", err.Error())
 		return
+	}
+
+	if tags, ok := custom.ConvertAPITagsToCustomfieldMap(ctx, bytes); ok {
+		data.Tags = tags
 	}
 
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)

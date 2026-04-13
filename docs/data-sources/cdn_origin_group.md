@@ -27,8 +27,12 @@ data "gcore_cdn_origin_group" "example_cdn_origin_group" {
 
 ### Read-Only
 
-- `auth` (Attributes) Credentials to access the private bucket. (see [below for nested schema](#nestedatt--auth))
-- `auth_type` (String) Origin authentication type.
+- `auth` (Attributes, Deprecated) **Deprecated.** To create S3 origins, configure them directly in sources with `origin_type` and `config` instead.
+
+Credentials to access the private bucket. (see [below for nested schema](#nestedatt--auth))
+- `auth_type` (String, Deprecated) **Deprecated.** No longer necessary. Defaults to `none`.
+
+Origin authentication type.
 
 Possible values:
 - **none** - Used for public origins.
@@ -40,7 +44,9 @@ Possible values:
 - **false** - Origin group does not have related CDN resources.
 - `id` (Number) The ID of this resource.
 - `name` (String) Origin group name.
-- `path` (String) Parameter is **deprecated**.
+- `path` (String, Deprecated) **Deprecated.** No longer necessary. Omit this field and the default origin path behavior will be used.
+
+Origin path prefix.
 - `proxy_next_upstream` (List of String) Defines cases when the request should be passed on to the next origin.
 
 Possible values:
@@ -54,7 +60,10 @@ Possible values:
 - **`http_502`** - a origin returned a response with the code 502
 - **`http_503`** - a origin returned a response with the code 503
 - **`http_504`** - a origin returned a response with the code 504
-- `sources` (Attributes Set) List of origin sources in the origin group. (see [below for nested schema](#nestedatt--sources))
+- `sources` (Attributes Set) List of origin sources in the origin group. Each entry can be a host origin or an S3 origin.
+
+Host origins have a `source` field with the hostname or IP. S3 origins have `origin_type: s3`
+and a `config` object with S3 credentials. Both types can be mixed in the same origin group. (see [below for nested schema](#nestedatt--sources))
 - `use_next` (Boolean) Defines whether to use the next origin from the origin group if origin responds with the cases specified in `proxy_next_upstream`.
 If you enable it, you must specify cases in `proxy_next_upstream`.
 
@@ -73,9 +82,6 @@ Restrictions:
 - Latin letters (A-Z, a-z), numbers (0-9), colon, dash, and underscore.
 - From 3 to 512 characters.
 - `s3_bucket_name` (String) S3 bucket name.
-
-Restrictions:
-- Maximum 128 characters.
 - `s3_region` (String) S3 storage region.
 
 The parameter is required, if "s3_type": amazon.
@@ -105,6 +111,7 @@ Read-Only:
 Possible values:
 - **true** - Origin is a backup.
 - **false** - Origin is not a backup.
+- `config` (Attributes) S3 storage configuration. Required when `origin_type` is `s3`. (see [below for nested schema](#nestedatt--sources--config))
 - `enabled` (Boolean) Enables or disables an origin source in the origin group.
 
 Possible values:
@@ -112,4 +119,43 @@ Possible values:
 - **false** - Origin is disabled and the CDN does not use it to pull content.
 
 Origin group must contain at least one enabled origin.
+- `host_header_override` (String) Per-origin Host header override. When set, the CDN sends this value as the Host header when
+requesting content from this origin instead of the default.
+- `origin_type` (String) Origin type. Present in responses only for S3 sources.
+
+Possible values:
+- **host** - A source server or endpoint from which content is fetched.
+- **s3** - S3 storage with either AWS v4 authentication or public access.
+Available values: "host", "s3".
 - `source` (String) IP address or domain name of the origin and the port, if custom port is used.
+- `tag` (String) Tag for the origin source.
+
+<a id="nestedatt--sources--config"></a>
+### Nested Schema for `sources.config`
+
+Read-Only:
+
+- `s3_access_key_id` (String) Access key ID for the S3 account. Masked as `SECRET_VALUE` in responses.
+
+Restrictions:
+- Latin letters (A-Z, a-z), numbers (0-9), colon, dash, and underscore.
+- From 4 to 255 characters.
+- `s3_auth_type` (String) S3 authentication type.
+- `s3_bucket_name` (String) S3 bucket name.
+- `s3_region` (String) S3 storage region.
+
+The parameter is required if `s3_type` is `amazon`.
+- `s3_secret_access_key` (String) Secret access key for the S3 account. Masked as `SECRET_VALUE` in responses.
+
+Restrictions:
+- Latin letters (A-Z, a-z), numbers (0-9), pluses, slashes, dashes, colons and underscores.
+- From 16 to 255 characters.
+- `s3_storage_hostname` (String) S3 storage hostname.
+
+The parameter is required if `s3_type` is `other`.
+- `s3_type` (String) Storage type compatible with S3.
+
+Possible values:
+- **amazon** - AWS S3 storage.
+- **other** - Other (not AWS) S3 compatible storage.
+Available values: "amazon", "other".

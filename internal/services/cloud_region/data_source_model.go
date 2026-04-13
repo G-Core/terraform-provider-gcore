@@ -37,12 +37,14 @@ type CloudRegionDataSourceModel struct {
 	KeystoneID           types.Int64                                                     `tfsdk:"keystone_id" json:"keystone_id,computed"`
 	KeystoneName         types.String                                                    `tfsdk:"keystone_name" json:"keystone_name,computed"`
 	MetricsDatabaseID    types.Int64                                                     `tfsdk:"metrics_database_id" json:"metrics_database_id,computed"`
+	Slug                 types.String                                                    `tfsdk:"slug" json:"slug,computed"`
 	State                types.String                                                    `tfsdk:"state" json:"state,computed"`
 	VlanPhysicalNetwork  types.String                                                    `tfsdk:"vlan_physical_network" json:"vlan_physical_network,computed"`
 	Zone                 types.String                                                    `tfsdk:"zone" json:"zone,computed"`
 	AvailableVolumeTypes customfield.List[types.String]                                  `tfsdk:"available_volume_types" json:"available_volume_types,computed"`
 	FileShareTypes       customfield.List[types.String]                                  `tfsdk:"file_share_types" json:"file_share_types,computed"`
 	Coordinates          customfield.NestedObject[CloudRegionCoordinatesDataSourceModel] `tfsdk:"coordinates" json:"coordinates,computed"`
+	FindOneBy            *CloudRegionFindOneByDataSourceModel                            `tfsdk:"find_one_by"`
 }
 
 func (m *CloudRegionDataSourceModel) toReadParams(_ context.Context) (params cloud.RegionGetParams, diags diag.Diagnostics) {
@@ -58,7 +60,28 @@ func (m *CloudRegionDataSourceModel) toReadParams(_ context.Context) (params clo
 	return
 }
 
+func (m *CloudRegionDataSourceModel) toListParams(_ context.Context) (params cloud.RegionListParams, diags diag.Diagnostics) {
+	params = cloud.RegionListParams{}
+
+	if !m.FindOneBy.DisplayName.IsNull() {
+		params.DisplayName = param.NewOpt(m.FindOneBy.DisplayName.ValueString())
+	}
+	if !m.FindOneBy.Product.IsNull() {
+		params.Product = cloud.RegionListParamsProduct(m.FindOneBy.Product.ValueString())
+	}
+	if !m.ShowVolumeTypes.IsNull() {
+		params.ShowVolumeTypes = param.NewOpt(m.ShowVolumeTypes.ValueBool())
+	}
+
+	return
+}
+
 type CloudRegionCoordinatesDataSourceModel struct {
 	Latitude  types.String `tfsdk:"latitude" json:"latitude,computed"`
 	Longitude types.String `tfsdk:"longitude" json:"longitude,computed"`
+}
+
+type CloudRegionFindOneByDataSourceModel struct {
+	DisplayName types.String `tfsdk:"display_name" query:"display_name,optional"`
+	Product     types.String `tfsdk:"product" query:"product,optional"`
 }

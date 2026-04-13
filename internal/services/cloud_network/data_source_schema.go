@@ -20,7 +20,7 @@ var _ datasource.DataSourceWithConfigValidators = (*CloudNetworkDataSource)(nil)
 
 func DataSourceSchema(ctx context.Context) schema.Schema {
 	return schema.Schema{
-		Description: "Networks provide software-defined networking infrastructure for connecting instances and other cloud resources within a region.",
+		MarkdownDescription: "Networks provide software-defined networking infrastructure for connecting instances and other cloud resources within a region.",
 		Attributes: map[string]schema.Attribute{
 			"id": schema.StringAttribute{
 				Description: "Network ID",

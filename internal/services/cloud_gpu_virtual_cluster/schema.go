@@ -16,6 +16,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/booldefault"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/int64planmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/listplanmodifier"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/mapplanmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringplanmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
@@ -26,7 +27,7 @@ var _ resource.ResourceWithConfigValidators = (*CloudGPUVirtualClusterResource)(
 
 func ResourceSchema(ctx context.Context) schema.Schema {
 	return schema.Schema{
-		Description: "GPU virtual clusters provide managed virtual GPU servers with auto-scaling for parallel computation workloads.",
+		MarkdownDescription: "GPU virtual clusters provide managed virtual GPU servers with auto-scaling for parallel computation workloads.",
 		Attributes: map[string]schema.Attribute{
 			"id": schema.StringAttribute{
 				Computed:      true,
@@ -35,12 +36,12 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 			"project_id": schema.Int64Attribute{
 				Description:   "Project ID",
 				Optional:      true,
-				PlanModifiers: []planmodifier.Int64{int64planmodifier.RequiresReplace()},
+				PlanModifiers: []planmodifier.Int64{int64planmodifier.RequiresReplaceIfConfigured()},
 			},
 			"region_id": schema.Int64Attribute{
 				Description:   "Region ID",
 				Optional:      true,
-				PlanModifiers: []planmodifier.Int64{int64planmodifier.RequiresReplace()},
+				PlanModifiers: []planmodifier.Int64{int64planmodifier.RequiresReplaceIfConfigured()},
 			},
 			"flavor": schema.StringAttribute{
 				Description:   "Cluster flavor ID",
@@ -250,11 +251,12 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 				Required:    true,
 			},
 			"tags": schema.MapAttribute{
-				Description: "Key-value tags to associate with the resource. A tag is a key-value pair that can be associated with a resource, enabling efficient filtering and grouping for better organization and management. Both tag keys and values have a maximum length of 255 characters. Some tags are read-only and cannot be modified by the user. Tags are also integrated with cost reports, allowing cost data to be filtered based on tag keys or values.",
-				Computed:    true,
-				Optional:    true,
-				CustomType:  customfield.NewMapType[types.String](ctx),
-				ElementType: types.StringType,
+				Description:   "Key-value tags to associate with the resource. A tag is a key-value pair that can be associated with a resource, enabling efficient filtering and grouping for better organization and management. Both tag keys and values have a maximum length of 255 characters. Some tags are read-only and cannot be modified by the user. Tags are also integrated with cost reports, allowing cost data to be filtered based on tag keys or values.",
+				Computed:      true,
+				Optional:      true,
+				CustomType:    customfield.NewMapType[types.String](ctx),
+				ElementType:   types.StringType,
+				PlanModifiers: []planmodifier.Map{mapplanmodifier.UseStateForUnknown()},
 			},
 			"created_at": schema.StringAttribute{
 				Description: "Cluster creation date time",

@@ -7,7 +7,6 @@ import (
 	"fmt"
 
 	"github.com/G-Core/terraform-provider-gcore/internal/customfield"
-	"github.com/G-Core/terraform-provider-gcore/internal/planmodifiers"
 	"github.com/hashicorp/terraform-plugin-framework-jsontypes/jsontypes"
 	"github.com/hashicorp/terraform-plugin-framework-timetypes/timetypes"
 	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
@@ -30,23 +29,21 @@ var _ resource.ResourceWithConfigValidators = (*CloudInstanceResource)(nil)
 
 func ResourceSchema(ctx context.Context) schema.Schema {
 	return schema.Schema{
-		Description: "Instances are cloud virtual machines with configurable CPU, memory, storage, and networking, supporting various operating systems and workloads.",
+		MarkdownDescription: "Instances are cloud virtual machines with configurable CPU, memory, storage, and networking, supporting various operating systems and workloads.",
 		Attributes: map[string]schema.Attribute{
 			"id": schema.StringAttribute{
 				Computed:      true,
 				PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
 			},
 			"project_id": schema.Int64Attribute{
-				Description:   "Project ID. If not specified, uses GCORE_CLOUD_PROJECT_ID environment variable.",
-				Computed:      true,
+				Description:   "Project ID",
 				Optional:      true,
-				PlanModifiers: []planmodifier.Int64{planmodifiers.RequiresReplaceIfConfiguredPreservingState()},
+				PlanModifiers: []planmodifier.Int64{int64planmodifier.RequiresReplaceIfConfigured()},
 			},
 			"region_id": schema.Int64Attribute{
-				Description:   "Region ID. If not specified, uses GCORE_CLOUD_REGION_ID environment variable.",
-				Computed:      true,
+				Description:   "Region ID",
 				Optional:      true,
-				PlanModifiers: []planmodifier.Int64{planmodifiers.RequiresReplaceIfConfiguredPreservingState()},
+				PlanModifiers: []planmodifier.Int64{int64planmodifier.RequiresReplaceIfConfigured()},
 			},
 			"flavor": schema.StringAttribute{
 				Description: "The flavor of the instance.",
@@ -200,7 +197,7 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 			"configuration": schema.MapAttribute{
 				Description:   "Parameters for the application template if creating the instance from an `apptemplate`.",
 				Optional:      true,
-				ElementType:   jsontypes.NormalizedType{},
+				ElementType:   customfield.MetaStringType{},
 				PlanModifiers: []planmodifier.Map{mapplanmodifier.RequiresReplace()},
 			},
 			"security_groups": schema.ListNestedAttribute{
@@ -221,7 +218,9 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 			},
 			"tags": schema.MapAttribute{
 				Description: "Key-value tags to associate with the resource. A tag is a key-value pair that can be associated with a resource, enabling efficient filtering and grouping for better organization and management. Both tag keys and values have a maximum length of 255 characters. Some tags are read-only and cannot be modified by the user. Tags are also integrated with cost reports, allowing cost data to be filtered based on tag keys or values.",
+				Computed:    true,
 				Optional:    true,
+				CustomType:  customfield.NewMapType[types.String](ctx),
 				ElementType: types.StringType,
 			},
 			"created_at": schema.StringAttribute{
@@ -424,16 +423,12 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 									Description: "Detailed description explaining the field's purpose and usage guidelines",
 									Computed:    true,
 								},
-								"field_name": schema.StringAttribute{
-									Description: "Name of DDoS profile field",
-									Computed:    true,
-								},
 								"field_type": schema.StringAttribute{
 									Description: "Data type classification of the field (e.g., string, integer, array)",
 									Computed:    true,
 								},
 								"field_value": schema.StringAttribute{
-									Description: "Complex value. Only one of 'value' or 'field_value' must be specified.",
+									Description: "Complex value for the DDoS profile field",
 									Computed:    true,
 									CustomType:  jsontypes.NormalizedType{},
 								},
@@ -449,10 +444,6 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 									Description: "JSON schema defining validation rules and constraints for the field value",
 									Computed:    true,
 									CustomType:  jsontypes.NormalizedType{},
-								},
-								"value": schema.StringAttribute{
-									Description: "Basic type value. Only one of 'value' or 'field_value' must be specified.",
-									Computed:    true,
 								},
 							},
 						},

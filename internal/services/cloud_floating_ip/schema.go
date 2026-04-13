@@ -5,6 +5,7 @@ package cloud_floating_ip
 import (
 	"context"
 
+	"github.com/G-Core/terraform-provider-gcore/internal/customfield"
 	"github.com/G-Core/terraform-provider-gcore/internal/planmodifiers"
 	"github.com/hashicorp/terraform-plugin-framework-timetypes/timetypes"
 	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
@@ -21,7 +22,7 @@ var _ resource.ResourceWithConfigValidators = (*CloudFloatingIPResource)(nil)
 
 func ResourceSchema(ctx context.Context) schema.Schema {
 	return schema.Schema{
-		Description: "A floating IP is a static IP address that points to one of your Instances. It allows you to redirect network traffic to any of your Instances in the same datacenter.",
+		MarkdownDescription: "A floating IP is a static IP address that points to one of your Instances. It allows you to redirect network traffic to any of your Instances in the same datacenter.",
 		Attributes: map[string]schema.Attribute{
 			"id": schema.StringAttribute{
 				Computed:      true,
@@ -30,17 +31,12 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 			"project_id": schema.Int64Attribute{
 				Description:   "Project ID",
 				Optional:      true,
-				PlanModifiers: []planmodifier.Int64{int64planmodifier.RequiresReplace()},
+				PlanModifiers: []planmodifier.Int64{int64planmodifier.RequiresReplaceIfConfigured()},
 			},
 			"region_id": schema.Int64Attribute{
 				Description:   "Region ID",
 				Optional:      true,
-				PlanModifiers: []planmodifier.Int64{int64planmodifier.RequiresReplace()},
-			},
-			"tags": schema.MapAttribute{
-				Description: "Key-value tags to associate with the resource. A tag is a key-value pair that can be associated with a resource, enabling efficient filtering and grouping for better organization and management. Both tag keys and values have a maximum length of 255 characters. Some tags are read-only and cannot be modified by the user. Tags are also integrated with cost reports, allowing cost data to be filtered based on tag keys or values.",
-				Optional:    true,
-				ElementType: types.StringType,
+				PlanModifiers: []planmodifier.Int64{int64planmodifier.RequiresReplaceIfConfigured()},
 			},
 			"fixed_ip_address": schema.StringAttribute{
 				Description:   "If the port has multiple IP addresses, a specific one can be selected using this field. If not specified, the first IP in the port's list will be used by default.",
@@ -53,6 +49,13 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 				Computed:      true,
 				Optional:      true,
 				PlanModifiers: []planmodifier.String{planmodifiers.UseNullForRemoval()},
+			},
+			"tags": schema.MapAttribute{
+				Description: "Key-value tags to associate with the resource. A tag is a key-value pair that can be associated with a resource, enabling efficient filtering and grouping for better organization and management. Both tag keys and values have a maximum length of 255 characters. Some tags are read-only and cannot be modified by the user. Tags are also integrated with cost reports, allowing cost data to be filtered based on tag keys or values.",
+				Computed:    true,
+				Optional:    true,
+				CustomType:  customfield.NewMapType[types.String](ctx),
+				ElementType: types.StringType,
 			},
 			"created_at": schema.StringAttribute{
 				Description: "Datetime when the floating IP was created",

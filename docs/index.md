@@ -18,8 +18,9 @@ The Gcore provider allows you to configure your [Gcore](https://gcore.com) infra
 terraform {
   required_providers {
     gcore = {
-      source  = "G-Core/gcore"
-      version = "2.0.0-alpha.3"
+      source = "G-Core/gcore"
+      # Change the version to the one you want to test
+      version = "2.0.0-alpha.1"
     }
   }
 }

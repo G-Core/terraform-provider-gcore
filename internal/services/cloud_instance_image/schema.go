@@ -5,6 +5,7 @@ package cloud_instance_image
 import (
 	"context"
 
+	"github.com/G-Core/terraform-provider-gcore/internal/customfield"
 	"github.com/hashicorp/terraform-plugin-framework-timetypes/timetypes"
 	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
@@ -23,7 +24,7 @@ var _ resource.ResourceWithConfigValidators = (*CloudInstanceImageResource)(nil)
 
 func ResourceSchema(ctx context.Context) schema.Schema {
 	return schema.Schema{
-		Description: "Instance images are operating system images (public, private, or shared) used to boot cloud instances.",
+		MarkdownDescription: "Instance images are operating system images (public, private, or shared) used to boot cloud instances.",
 		Attributes: map[string]schema.Attribute{
 			"id": schema.StringAttribute{
 				Computed:      true,
@@ -31,11 +32,11 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 			},
 			"project_id": schema.Int64Attribute{
 				Optional:      true,
-				PlanModifiers: []planmodifier.Int64{int64planmodifier.RequiresReplace()},
+				PlanModifiers: []planmodifier.Int64{int64planmodifier.RequiresReplaceIfConfigured()},
 			},
 			"region_id": schema.Int64Attribute{
 				Optional:      true,
-				PlanModifiers: []planmodifier.Int64{int64planmodifier.RequiresReplace()},
+				PlanModifiers: []planmodifier.Int64{int64planmodifier.RequiresReplaceIfConfigured()},
 			},
 			"url": schema.StringAttribute{
 				Description:   "URL of the image to download.",
@@ -87,11 +88,6 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 					stringvalidator.OneOfCaseInsensitive("pc", "q35"),
 				},
 			},
-			"tags": schema.MapAttribute{
-				Description: "Key-value tags to associate with the resource. A tag is a key-value pair that can be associated with a resource, enabling efficient filtering and grouping for better organization and management. Both tag keys and values have a maximum length of 255 characters. Some tags are read-only and cannot be modified by the user. Tags are also integrated with cost reports, allowing cost data to be filtered based on tag keys or values.",
-				Optional:    true,
-				ElementType: types.StringType,
-			},
 			"is_baremetal": schema.BoolAttribute{
 				Description: "Set to true if the image will be used by bare metal servers. Defaults to false.",
 				Computed:    true,
@@ -120,6 +116,13 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 				},
 				Default: stringdefault.StaticString("allow"),
 			},
+			"tags": schema.MapAttribute{
+				Description: "Key-value tags to associate with the resource. A tag is a key-value pair that can be associated with a resource, enabling efficient filtering and grouping for better organization and management. Both tag keys and values have a maximum length of 255 characters. Some tags are read-only and cannot be modified by the user. Tags are also integrated with cost reports, allowing cost data to be filtered based on tag keys or values.",
+				Computed:    true,
+				Optional:    true,
+				CustomType:  customfield.NewMapType[types.String](ctx),
+				ElementType: types.StringType,
+			},
 			"created_at": schema.StringAttribute{
 				Description:   "Datetime when the image was created",
 				Computed:      true,
@@ -130,6 +133,10 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 				Description:   "Task that created this entity",
 				Computed:      true,
 				PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
+			},
+			"currency_code": schema.StringAttribute{
+				Description: "Currency code. Shown if the `include_prices` query parameter if set to true",
+				Computed:    true,
 			},
 			"description": schema.StringAttribute{
 				Description:   "Image description",
@@ -169,6 +176,25 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 				Description:   "Minimal VM RAM required",
 				Computed:      true,
 				PlanModifiers: []planmodifier.Int64{int64planmodifier.UseStateForUnknown()},
+			},
+			"price_per_hour": schema.Float64Attribute{
+				Description: "Price per hour. Shown if the `include_prices` query parameter if set to true",
+				Computed:    true,
+			},
+			"price_per_month": schema.Float64Attribute{
+				Description: "Price per month. Shown if the `include_prices` query parameter if set to true",
+				Computed:    true,
+			},
+			"price_status": schema.StringAttribute{
+				Description: "Price status for the UI\nAvailable values: \"error\", \"hide\", \"show\".",
+				Computed:    true,
+				Validators: []validator.String{
+					stringvalidator.OneOfCaseInsensitive(
+						"error",
+						"hide",
+						"show",
+					),
+				},
 			},
 			"region": schema.StringAttribute{
 				Description:   "Region name",

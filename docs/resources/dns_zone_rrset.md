@@ -25,10 +25,10 @@ resource "gcore_dns_zone_rrset" "a_record" {
 
   resource_records = [
     {
-      content = [jsonencode("127.0.0.100")]
+      content = ["127.0.0.100"]
     },
     {
-      content = [jsonencode("127.0.0.200")]
+      content = ["127.0.0.200"]
     },
   ]
 }
@@ -47,7 +47,7 @@ resource "gcore_dns_zone_rrset" "mx_record" {
   ttl        = 300
 
   resource_records = [{
-    content = [jsonencode("10 mail.example.com.")]
+    content = ["10 mail.example.com."]
     enabled = true
   }]
 }
@@ -66,7 +66,7 @@ resource "gcore_dns_zone_rrset" "txt_record" {
   ttl        = 120
 
   resource_records = [{
-    content = [jsonencode("v=spf1 include:_spf.google.com ~all")]
+    content = ["v=spf1 include:_spf.google.com ~all"]
     enabled = true
   }]
 
@@ -111,11 +111,15 @@ readonly (see [below for nested schema](#nestedatt--warnings))
 
 Required:
 
-- `content` (List of String) Content of resource record.
-Values must be valid JSON (strings need inner quotes).
-Examples:
-+ A-record: `["\"192.168.1.1\""]`
-+ MX-record: `[10, "\"mail.example.com.\""]`
+- `content` (List of String) Content of resource record
+The exact length of the array depends on the type of rrset,
+each individual record parameter must be a separate element of the array. For example
+SRV-record: `[100, 1, 5061, "example.com"]`
+CNAME-record: `[ "the.target.domain" ]`
+A-record: `[ "1.2.3.4", "5.6.7.8" ]`
+AAAA-record: `[ "2001:db8::1", "2001:db8::2" ]`
+MX-record: `[ "mail1.example.com", "mail2.example.com" ]`
+SVCB/HTTPS-record: `[ 1, ".", ["alpn", "h3", "h2"], [ "port", 1443 ], [ "ipv4hint", "10.0.0.1" ], [ "ech", "AEn+DQBFKwAgACABWIHUGj4u+PIggYXcR5JF0gYk3dCRioBW8uJq9H4mKAAIAAEAAQABAANAEnB1YmxpYy50bHMtZWNoLmRldgAA" ] ]`
 
 Optional:
 

@@ -19,7 +19,7 @@ var _ resource.ResourceWithConfigValidators = (*CloudSecurityGroupRuleResource)(
 
 func ResourceSchema(ctx context.Context) schema.Schema {
 	return schema.Schema{
-		Description: "Security group rules define individual traffic permissions specifying protocol, port range, direction, and allowed sources.",
+		MarkdownDescription: "Security group rules define individual traffic permissions specifying protocol, port range, direction, and allowed sources.",
 		Attributes: map[string]schema.Attribute{
 			"id": schema.StringAttribute{
 				Computed:      true,
@@ -33,12 +33,12 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 			"project_id": schema.Int64Attribute{
 				Description:   "Project ID",
 				Optional:      true,
-				PlanModifiers: []planmodifier.Int64{int64planmodifier.RequiresReplace()},
+				PlanModifiers: []planmodifier.Int64{int64planmodifier.RequiresReplaceIfConfigured()},
 			},
 			"region_id": schema.Int64Attribute{
 				Description:   "Region ID",
 				Optional:      true,
-				PlanModifiers: []planmodifier.Int64{int64planmodifier.RequiresReplace()},
+				PlanModifiers: []planmodifier.Int64{int64planmodifier.RequiresReplaceIfConfigured()},
 			},
 			"direction": schema.StringAttribute{
 				Description: "Ingress or egress, which is the direction in which the security group is applied\nAvailable values: \"egress\", \"ingress\".",
@@ -78,12 +78,11 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 				PlanModifiers: []planmodifier.Int64{int64planmodifier.RequiresReplace()},
 			},
 			"protocol": schema.StringAttribute{
-				Description: "Protocol\nAvailable values: \"ah\", \"any\", \"dccp\", \"egp\", \"esp\", \"gre\", \"icmp\", \"igmp\", \"ipencap\", \"ipip\", \"ipv6-encap\", \"ipv6-frag\", \"ipv6-icmp\", \"ipv6-nonxt\", \"ipv6-opts\", \"ipv6-route\", \"ospf\", \"pgm\", \"rsvp\", \"sctp\", \"tcp\", \"udp\", \"udplite\", \"vrrp\".",
+				Description: "V2 protocol enum without 'any'. Use null for all protocols instead.\nAvailable values: \"ah\", \"dccp\", \"egp\", \"esp\", \"gre\", \"icmp\", \"igmp\", \"ipencap\", \"ipip\", \"ipv6-encap\", \"ipv6-frag\", \"ipv6-icmp\", \"ipv6-nonxt\", \"ipv6-opts\", \"ipv6-route\", \"ospf\", \"pgm\", \"rsvp\", \"sctp\", \"tcp\", \"udp\", \"udplite\", \"vrrp\".",
 				Optional:    true,
 				Validators: []validator.String{
 					stringvalidator.OneOfCaseInsensitive(
 						"ah",
-						"any",
 						"dccp",
 						"egp",
 						"esp",

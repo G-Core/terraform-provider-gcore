@@ -18,7 +18,7 @@ var _ datasource.DataSourceWithConfigValidators = (*CloudSSHKeyDataSource)(nil)
 
 func DataSourceSchema(ctx context.Context) schema.Schema {
 	return schema.Schema{
-		Description: "SSH key pairs provide secure authentication to cloud instances, supporting both generated and imported public keys.",
+		MarkdownDescription: "SSH key pairs provide secure authentication to cloud instances, supporting both generated and imported public keys.",
 		Attributes: map[string]schema.Attribute{
 			"id": schema.StringAttribute{
 				Description: "SSH key ID",

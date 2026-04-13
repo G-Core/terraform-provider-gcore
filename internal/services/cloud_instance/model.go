@@ -26,10 +26,10 @@ type CloudInstanceModel struct {
 	SSHKeyName          types.String                                                               `tfsdk:"ssh_key_name" json:"ssh_key_name,optional"`
 	UserData            types.String                                                               `tfsdk:"user_data" json:"user_data,optional,no_refresh"`
 	Username            types.String                                                               `tfsdk:"username" json:"username,optional,no_refresh"`
-	Configuration       *map[string]jsontypes.Normalized                                           `tfsdk:"configuration" json:"configuration,optional,no_refresh"`
+	Configuration       *map[string]customfield.MetaStringValue                                    `tfsdk:"configuration" json:"configuration,optional,no_refresh"`
 	SecurityGroups      *[]*CloudInstanceSecurityGroupsModel                                       `tfsdk:"security_groups" json:"security_groups,optional"`
 	Name                types.String                                                               `tfsdk:"name" json:"name,optional"`
-	Tags                *map[string]types.String                                                   `tfsdk:"tags" json:"tags,optional,no_refresh"`
+	Tags                customfield.Map[types.String]                                              `tfsdk:"tags" json:"tags,computed_optional,no_refresh"`
 	CreatedAt           timetypes.RFC3339                                                          `tfsdk:"created_at" json:"created_at,computed" format:"date-time"`
 	CreatorTaskID       types.String                                                               `tfsdk:"creator_task_id" json:"creator_task_id,computed"`
 	InstanceDescription types.String                                                               `tfsdk:"instance_description" json:"instance_description,computed"`
@@ -137,13 +137,11 @@ type CloudInstanceDDOSProfileFieldsModel struct {
 	BaseField        types.Int64          `tfsdk:"base_field" json:"base_field,computed"`
 	Default          types.String         `tfsdk:"default" json:"default,computed"`
 	Description      types.String         `tfsdk:"description" json:"description,computed"`
-	FieldName        types.String         `tfsdk:"field_name" json:"field_name,computed"`
 	FieldType        types.String         `tfsdk:"field_type" json:"field_type,computed"`
 	FieldValue       jsontypes.Normalized `tfsdk:"field_value" json:"field_value,computed"`
 	Name             types.String         `tfsdk:"name" json:"name,computed"`
 	Required         types.Bool           `tfsdk:"required" json:"required,computed"`
 	ValidationSchema jsontypes.Normalized `tfsdk:"validation_schema" json:"validation_schema,computed"`
-	Value            types.String         `tfsdk:"value" json:"value,computed"`
 }
 
 type CloudInstanceDDOSProfileOptionsModel struct {

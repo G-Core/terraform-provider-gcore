@@ -21,7 +21,7 @@ var _ datasource.DataSourceWithConfigValidators = (*FastedgeAppDataSource)(nil)
 
 func DataSourceSchema(ctx context.Context) schema.Schema {
 	return schema.Schema{
-		Description: "FastEdge applications combine a WebAssembly binary with configuration, environment variables, and secrets for deployment at the CDN edge.",
+		MarkdownDescription: "FastEdge applications combine a WebAssembly binary with configuration, environment variables, and secrets for deployment at the CDN edge.",
 		Attributes: map[string]schema.Attribute{
 			"id": schema.Int64Attribute{
 				Computed: true,
@@ -54,8 +54,9 @@ func DataSourceSchema(ctx context.Context) schema.Schema {
 				CustomType:  timetypes.RFC3339Type{},
 			},
 			"log": schema.StringAttribute{
-				Description: "Logging channel. Use 'kafka' to enable log collection (queryable via API), or 'none' to disable logging.\nAvailable values: \"kafka\", \"none\".",
-				Computed:    true,
+				Description:        `Available values: "kafka", "none".`,
+				Computed:           true,
+				DeprecationMessage: "This attribute is deprecated.",
 				Validators: []validator.String{
 					stringvalidator.OneOfCaseInsensitive("kafka", "none"),
 				},
@@ -76,7 +77,7 @@ func DataSourceSchema(ctx context.Context) schema.Schema {
 				Description: "Status code:  \n0 - draft (inactive)  \n1 - enabled  \n2 - disabled  \n5 - suspended",
 				Computed:    true,
 				Validators: []validator.Int64{
-					int64validator.Between(0, 2),
+					int64validator.Between(0, 5),
 				},
 			},
 			"template": schema.Int64Attribute{

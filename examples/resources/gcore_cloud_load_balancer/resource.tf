@@ -1,6 +1,7 @@
 resource "gcore_cloud_load_balancer" "example_cloud_load_balancer" {
   project_id = 1
   region_id  = 7
+  name                   = "new_load_balancer"
   flavor     = "lb1-1-2"
   floating_ip = {
     existing_floating_id = "c64e5db1-5f1f-43ec-a8d9-5090df85b82d"
@@ -79,13 +80,11 @@ resource "gcore_cloud_load_balancer" "example_cloud_load_balancer" {
     }
     topic_name = "my-log-name"
   }
-  name                   = "new_load_balancer"
-  name_template          = "lb_name_template"
   preferred_connectivity = "L2"
   tags = {
     my-tag = "my-tag-value"
   }
-  vip_ip_family  = "dual"
+  vip_ip_family  = "ipv4"
   vip_network_id = "ac307687-31a4-4a11-a949-6bea1b2878f5"
   vip_port_id    = "ff83e13a-b256-4be2-ba5d-028d3f0ab450"
   vip_subnet_id  = "4e7802d3-5023-44b8-b298-7726558fddf4"

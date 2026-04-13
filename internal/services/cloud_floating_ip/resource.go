@@ -13,6 +13,7 @@ import (
 	"github.com/G-Core/gcore-go/option"
 	"github.com/G-Core/gcore-go/packages/param"
 	"github.com/G-Core/terraform-provider-gcore/internal/apijson"
+	"github.com/G-Core/terraform-provider-gcore/internal/custom"
 	"github.com/G-Core/terraform-provider-gcore/internal/importpath"
 	"github.com/G-Core/terraform-provider-gcore/internal/logging"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
@@ -95,6 +96,9 @@ func (r *CloudFloatingIPResource) Create(ctx context.Context, req resource.Creat
 		resp.Diagnostics.AddError("failed to deserialize http request", err.Error())
 		return
 	}
+	if tags, ok := custom.ConvertAPITagsToCustomfieldMap(ctx, []byte(floatingIP.RawJSON())); ok {
+		data.Tags = tags
+	}
 
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
 }
@@ -150,6 +154,9 @@ func (r *CloudFloatingIPResource) Update(ctx context.Context, req resource.Updat
 		resp.Diagnostics.AddError("failed to deserialize http request", err.Error())
 		return
 	}
+	if tags, ok := custom.ConvertAPITagsToCustomfieldMap(ctx, bytes); ok {
+		data.Tags = tags
+	}
 
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
 }
@@ -195,6 +202,10 @@ func (r *CloudFloatingIPResource) Read(ctx context.Context, req resource.ReadReq
 	if err != nil {
 		resp.Diagnostics.AddError("failed to deserialize http request", err.Error())
 		return
+	}
+
+	if tags, ok := custom.ConvertAPITagsToCustomfieldMap(ctx, bytes); ok {
+		data.Tags = tags
 	}
 
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
@@ -275,6 +286,10 @@ func (r *CloudFloatingIPResource) ImportState(ctx context.Context, req resource.
 	if err != nil {
 		resp.Diagnostics.AddError("failed to deserialize http request", err.Error())
 		return
+	}
+
+	if tags, ok := custom.ConvertAPITagsToCustomfieldMap(ctx, bytes); ok {
+		data.Tags = tags
 	}
 
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)

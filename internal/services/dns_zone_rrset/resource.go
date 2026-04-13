@@ -15,7 +15,6 @@ import (
 	"github.com/G-Core/terraform-provider-gcore/internal/apijson"
 	"github.com/G-Core/terraform-provider-gcore/internal/customfield"
 	"github.com/G-Core/terraform-provider-gcore/internal/logging"
-	"github.com/hashicorp/terraform-plugin-framework-jsontypes/jsontypes"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/types"
@@ -278,7 +277,7 @@ func copyResourceRecords(src *[]*DNSZoneRrsetResourceRecordsModel) *[]*DNSZoneRr
 		}
 		// Deep-copy content slice
 		if rec.Content != nil {
-			c := make([]jsontypes.Normalized, len(*rec.Content))
+			c := make([]customfield.MetaStringValue, len(*rec.Content))
 			copy(c, *rec.Content)
 			cp.Content = &c
 		}

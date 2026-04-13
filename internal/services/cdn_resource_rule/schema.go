@@ -6,7 +6,6 @@ import (
 	"context"
 
 	"github.com/G-Core/terraform-provider-gcore/internal/customfield"
-	"github.com/hashicorp/terraform-plugin-framework-jsontypes/jsontypes"
 	"github.com/hashicorp/terraform-plugin-framework-validators/int64validator"
 	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
@@ -24,7 +23,7 @@ var _ resource.ResourceWithConfigValidators = (*CDNResourceRuleResource)(nil)
 
 func ResourceSchema(ctx context.Context) schema.Schema {
 	return schema.Schema{
-		Description: "CDN resource rules set custom caching, delivery, and security options for specific URL patterns or file types.",
+		MarkdownDescription: "CDN resource rules set custom caching, delivery, and security options for specific URL patterns or file types.",
 		Attributes: map[string]schema.Attribute{
 			"id": schema.Int64Attribute{
 				Description:   "Rule ID.",
@@ -1111,7 +1110,7 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 							"value": schema.StringAttribute{
 								Description: "A MAP for static headers in a format of `header_name: header_value`.\n\nRestrictions:\n- **Header name** - Maximum 128 symbols, may contain Latin letters (A-Z, a-z), numbers (0-9), dashes, and underscores.\n- **Header value** - Maximum 512 symbols, may contain letters (a-z), numbers (0-9), spaces, and symbols (`~!@#%%^&*()-_=+ /|\\\";:?.,><{}[]). Must start with a letter, number, asterisk or {.",
 								Required:    true,
-								CustomType:  jsontypes.NormalizedType{},
+								CustomType:  customfield.MetaStringType{},
 							},
 						},
 					},

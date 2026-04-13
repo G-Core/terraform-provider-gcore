@@ -21,7 +21,7 @@ var _ resource.ResourceWithConfigValidators = (*CloudReservedFixedIPResource)(ni
 
 func ResourceSchema(ctx context.Context) schema.Schema {
 	return schema.Schema{
-		Description: "Reserved fixed IPs are static IP addresses that persist independently of instances and can be used as virtual IPs (VIPs) for high availability.",
+		MarkdownDescription: "Reserved fixed IPs are static IP addresses that persist independently of instances and can be used as virtual IPs (VIPs) for high availability.",
 		Attributes: map[string]schema.Attribute{
 			"id": schema.StringAttribute{
 				Computed:      true,
@@ -29,11 +29,11 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 			},
 			"project_id": schema.Int64Attribute{
 				Optional:      true,
-				PlanModifiers: []planmodifier.Int64{int64planmodifier.RequiresReplace()},
+				PlanModifiers: []planmodifier.Int64{int64planmodifier.RequiresReplaceIfConfigured()},
 			},
 			"region_id": schema.Int64Attribute{
 				Optional:      true,
-				PlanModifiers: []planmodifier.Int64{int64planmodifier.RequiresReplace()},
+				PlanModifiers: []planmodifier.Int64{int64planmodifier.RequiresReplaceIfConfigured()},
 			},
 			"type": schema.StringAttribute{
 				Description: "Must be 'external'\nAvailable values: \"external\", \"subnet\", \"any_subnet\", \"ip_address\", \"port\".",

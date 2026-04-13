@@ -15,9 +15,5 @@ func TestCloudInstanceModelSchemaParity(t *testing.T) {
 	model := (*cloud_instance.CloudInstanceModel)(nil)
 	schema := cloud_instance.ResourceSchema(context.TODO())
 	errs := test_helpers.ValidateResourceModelSchemaIntegrity(model, schema)
-	// project_id and region_id are URL path parameters (not JSON body fields) that use
-	// provider defaults when not specified. The schema marks them as computed_optional,
-	// but the model uses path tags which don't support the computed_optional semantic.
-	errs.Ignore(t, ".@CloudInstanceModel.project_id", ".@CloudInstanceModel.region_id")
 	errs.Report(t)
 }

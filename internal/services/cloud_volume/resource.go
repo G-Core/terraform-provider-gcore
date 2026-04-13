@@ -97,6 +97,9 @@ func (r *CloudVolumeResource) Create(ctx context.Context, req resource.CreateReq
 		resp.Diagnostics.AddError("failed to deserialize http request", err.Error())
 		return
 	}
+	if tags, ok := custom.ConvertAPITagsToCustomfieldMap(ctx, []byte(volume.RawJSON())); ok {
+		data.Tags = tags
+	}
 
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
 }
@@ -149,11 +152,14 @@ func (r *CloudVolumeResource) Update(ctx context.Context, req resource.UpdateReq
 			resp.Diagnostics.AddError("failed to deserialize http request", err.Error())
 			return
 		}
+		if tags, ok := custom.ConvertAPITagsToCustomfieldMap(ctx, []byte(resizedVolume.RawJSON())); ok {
+			data.Tags = tags
+		}
 	}
 
 	// Check if name or tags have changed before sending update request
 	nameChanged := !data.Name.Equal(state.Name)
-	tagsChanged := !custom.TagsEqual(data.Tags, state.Tags)
+	tagsChanged := !data.Tags.Equal(state.Tags)
 
 	// Only send update request if name or tags changed
 	if nameChanged || tagsChanged {
@@ -190,6 +196,9 @@ func (r *CloudVolumeResource) Update(ctx context.Context, req resource.UpdateReq
 		if err != nil {
 			resp.Diagnostics.AddError("failed to deserialize http request", err.Error())
 			return
+		}
+		if tags, ok := custom.ConvertAPITagsToCustomfieldMap(ctx, bytes); ok {
+			data.Tags = tags
 		}
 	}
 
@@ -237,6 +246,10 @@ func (r *CloudVolumeResource) Read(ctx context.Context, req resource.ReadRequest
 	if err != nil {
 		resp.Diagnostics.AddError("failed to deserialize http request", err.Error())
 		return
+	}
+
+	if tags, ok := custom.ConvertAPITagsToCustomfieldMap(ctx, bytes); ok {
+		data.Tags = tags
 	}
 
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
@@ -317,6 +330,10 @@ func (r *CloudVolumeResource) ImportState(ctx context.Context, req resource.Impo
 	if err != nil {
 		resp.Diagnostics.AddError("failed to deserialize http request", err.Error())
 		return
+	}
+
+	if tags, ok := custom.ConvertAPITagsToCustomfieldMap(ctx, bytes); ok {
+		data.Tags = tags
 	}
 
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)

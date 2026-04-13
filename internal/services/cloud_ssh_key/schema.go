@@ -20,7 +20,7 @@ var _ resource.ResourceWithConfigValidators = (*CloudSSHKeyResource)(nil)
 
 func ResourceSchema(ctx context.Context) schema.Schema {
 	return schema.Schema{
-		Description: "SSH key pairs provide secure authentication to cloud instances, supporting both generated and imported public keys.",
+		MarkdownDescription: "SSH key pairs provide secure authentication to cloud instances, supporting both generated and imported public keys.",
 		Attributes: map[string]schema.Attribute{
 			"id": schema.StringAttribute{
 				Description:   "SSH key ID",
@@ -30,7 +30,7 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 			"project_id": schema.Int64Attribute{
 				Description:   "Project ID",
 				Optional:      true,
-				PlanModifiers: []planmodifier.Int64{int64planmodifier.RequiresReplace()},
+				PlanModifiers: []planmodifier.Int64{int64planmodifier.RequiresReplaceIfConfigured()},
 			},
 			"name": schema.StringAttribute{
 				Description:   "SSH key name",

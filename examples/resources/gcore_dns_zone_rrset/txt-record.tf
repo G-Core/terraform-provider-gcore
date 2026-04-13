@@ -6,7 +6,7 @@ resource "gcore_dns_zone_rrset" "txt_record" {
   ttl        = 120
 
   resource_records = [{
-    content = [jsonencode("v=spf1 include:_spf.google.com ~all")]
+    content = ["v=spf1 include:_spf.google.com ~all"]
     enabled = true
   }]
 

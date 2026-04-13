@@ -497,8 +497,8 @@ resource "gcore_cloud_instance" "windows_with_userdata" {
 - `name_template` (String) If you want the instance name to be automatically generated based on IP addresses, you can provide a name template instead of specifying the name manually. The template should include a placeholder that will be replaced during provisioning. Supported placeholders are: `{ip_octets}` (last 3 octets of the IP), `{two_ip_octets}`, and `{one_ip_octet}`.
 - `password_wo` (String, [Write-only](https://developer.hashicorp.com/terraform/language/resources/ephemeral#write-only-arguments)) For Linux instances, 'username' and 'password' are used to create a new user. When only 'password' is provided, it is set as the password for the default user of the image. For Windows instances, 'username' cannot be specified. Use the 'password' field to set the password for the 'Admin' user on Windows. Use the 'user_data' field to provide a script to create new users on Windows. The password of the Admin user cannot be updated via 'user_data'.
 - `password_wo_version` (Number) Instance password write-only version. Used to trigger updates of the write-only password field.
-- `project_id` (Number) Project ID. If not specified, uses GCORE_CLOUD_PROJECT_ID environment variable.
-- `region_id` (Number) Region ID. If not specified, uses GCORE_CLOUD_REGION_ID environment variable.
+- `project_id` (Number) Project ID
+- `region_id` (Number) Region ID
 - `security_groups` (Attributes List) Specifies security group UUIDs to be applied to all instance network interfaces. (see [below for nested schema](#nestedatt--security_groups))
 - `servergroup_id` (String) Placement group ID for instance placement policy.
 
@@ -629,14 +629,12 @@ Read-Only:
 - `base_field` (Number) ID of DDoS profile field
 - `default` (String) Predefined default value for the field if not specified
 - `description` (String) Detailed description explaining the field's purpose and usage guidelines
-- `field_name` (String) Name of DDoS profile field
 - `field_type` (String) Data type classification of the field (e.g., string, integer, array)
-- `field_value` (String) Complex value. Only one of 'value' or 'field_value' must be specified.
+- `field_value` (String) Complex value for the DDoS profile field
 - `id` (Number) Unique identifier for the DDoS protection field
 - `name` (String) Human-readable name of the protection field
 - `required` (Boolean) Indicates whether this field must be provided when creating a protection profile
 - `validation_schema` (String) JSON schema defining validation rules and constraints for the field value
-- `value` (String) Basic type value. Only one of 'value' or 'field_value' must be specified.
 
 
 <a id="nestedatt--ddos_profile--options"></a>

@@ -6,8 +6,6 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"os"
-	"strconv"
 	"time"
 
 	"github.com/G-Core/gcore-go"
@@ -104,6 +102,9 @@ func (r *CloudInstanceResource) Create(ctx context.Context, req resource.CreateR
 		resp.Diagnostics.AddError("failed to deserialize http request", err.Error())
 		return
 	}
+	if tags, ok := custom.ConvertAPITagsToCustomfieldMap(ctx, []byte(instance.RawJSON())); ok {
+		data.Tags = tags
+	}
 
 	// Extract fields from the API response that aren't mapped via json tags
 	// API returns: {"flavor": {"flavor_id": "..."}, "project_id": N, "region_id": N, ...}
@@ -112,25 +113,6 @@ func (r *CloudInstanceResource) Create(ctx context.Context, req resource.CreateR
 		if flavorObj, ok := rawResponse["flavor"].(map[string]interface{}); ok {
 			if flavorID, ok := flavorObj["flavor_id"].(string); ok {
 				data.Flavor = types.StringValue(flavorID)
-			}
-		}
-		// Extract project_id/region_id from API response (needed when user uses env vars)
-		if data.ProjectID.IsNull() || data.ProjectID.IsUnknown() {
-			if projectID, ok := rawResponse["project_id"].(float64); ok {
-				data.ProjectID = types.Int64Value(int64(projectID))
-			} else if envProjectID := os.Getenv("GCORE_CLOUD_PROJECT_ID"); envProjectID != "" {
-				if parsed, err := strconv.ParseInt(envProjectID, 10, 64); err == nil {
-					data.ProjectID = types.Int64Value(parsed)
-				}
-			}
-		}
-		if data.RegionID.IsNull() || data.RegionID.IsUnknown() {
-			if regionID, ok := rawResponse["region_id"].(float64); ok {
-				data.RegionID = types.Int64Value(int64(regionID))
-			} else if envRegionID := os.Getenv("GCORE_CLOUD_REGION_ID"); envRegionID != "" {
-				if parsed, err := strconv.ParseInt(envRegionID, 10, 64); err == nil {
-					data.RegionID = types.Int64Value(parsed)
-				}
 			}
 		}
 		// Note: volumes are user-provided (existing volumes only), no extraction needed
@@ -263,6 +245,9 @@ func (r *CloudInstanceResource) Update(ctx context.Context, req resource.UpdateR
 					resp.Diagnostics.AddError("failed to deserialize instance after resize", err.Error())
 					return
 				}
+				if tags, ok := custom.ConvertAPITagsToCustomfieldMap(ctx, []byte(instance.RawJSON())); ok {
+					data.Tags = tags
+				}
 				tflog.Info(ctx, "Flavor change completed", map[string]interface{}{
 					"instance_id":     instanceID,
 					"expected_flavor": expectedFlavor,
@@ -341,6 +326,9 @@ func (r *CloudInstanceResource) Update(ctx context.Context, req resource.UpdateR
 		if err != nil {
 			resp.Diagnostics.AddError("failed to deserialize instance after vm_state change", err.Error())
 			return
+		}
+		if tags, ok := custom.ConvertAPITagsToCustomfieldMap(ctx, []byte(instance.RawJSON())); ok {
+			data.Tags = tags
 		}
 		stateHasChanged = true
 	}
@@ -1019,7 +1007,7 @@ func (r *CloudInstanceResource) Update(ctx context.Context, req resource.UpdateR
 	//   name = "new-name" (PATCH) + flavor = "g1-standard-2" (specialized /changeflavor)
 	// The PATCH endpoint handles: name, tags (and potentially other simple fields in the future).
 	nameChanged := !data.Name.Equal(state.Name)
-	tagsChanged := !custom.TagsEqual(data.Tags, state.Tags)
+	tagsChanged := !data.Tags.Equal(state.Tags)
 
 	if nameChanged || tagsChanged {
 		params := cloud.InstanceUpdateParams{}
@@ -1077,6 +1065,9 @@ func (r *CloudInstanceResource) Update(ctx context.Context, req resource.UpdateR
 		if err != nil {
 			resp.Diagnostics.AddError("failed to deserialize instance after update", err.Error())
 			return
+		}
+		if tags, ok := custom.ConvertAPITagsToCustomfieldMap(ctx, []byte(instance.RawJSON())); ok {
+			data.Tags = tags
 		}
 
 		// Extract flavor_id from the flavor object in the API response
@@ -1170,6 +1161,10 @@ func (r *CloudInstanceResource) Read(ctx context.Context, req resource.ReadReque
 		return
 	}
 
+	if tags, ok := custom.ConvertAPITagsToCustomfieldMap(ctx, []byte(instance.RawJSON())); ok {
+		data.Tags = tags
+	}
+
 	// Extract fields from the API response that aren't mapped via json tags
 	// API returns: {"flavor": {"flavor_id": "..."}, "project_id": N, "region_id": N, ...}
 	var rawResponse map[string]interface{}
@@ -1179,7 +1174,6 @@ func (r *CloudInstanceResource) Read(ctx context.Context, req resource.ReadReque
 				data.Flavor = types.StringValue(flavorID)
 			}
 		}
-		// Note: project_id/region_id are always set in .tf config, no extraction needed
 		// Note: volumes are user-provided (existing volumes only), preserved from prior state above
 	}
 
@@ -1327,30 +1321,8 @@ func (r *CloudInstanceResource) ImportState(ctx context.Context, req resource.Im
 			data.Volumes = &volumes
 		}
 
-		// Extract tags from API response
-		// API returns: "tags": [{"key": "k1", "value": "v1", "read_only": bool}, ...]
-		// Resource model uses: map[string]string
-		// Note: Skip read_only tags as they are system-generated (e.g., image_id, os_distro)
-		if tagsArr, ok := rawResponse["tags"].([]interface{}); ok && len(tagsArr) > 0 {
-			tags := make(map[string]types.String, len(tagsArr))
-			for _, tag := range tagsArr {
-				tagMap, ok := tag.(map[string]interface{})
-				if !ok {
-					continue
-				}
-				// Skip read-only tags (system-generated)
-				if readOnly, ok := tagMap["read_only"].(bool); ok && readOnly {
-					continue
-				}
-				key, keyOk := tagMap["key"].(string)
-				value, valueOk := tagMap["value"].(string)
-				if keyOk && valueOk {
-					tags[key] = types.StringValue(value)
-				}
-			}
-			if len(tags) > 0 {
-				data.Tags = &tags
-			}
+		if tags, ok := custom.ConvertAPITagsToCustomfieldMap(ctx, []byte(rawJSON)); ok {
+			data.Tags = tags
 		}
 	}
 

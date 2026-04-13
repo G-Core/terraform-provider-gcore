@@ -19,7 +19,7 @@ var _ resource.ResourceWithConfigValidators = (*CloudPlacementGroupResource)(nil
 
 func ResourceSchema(ctx context.Context) schema.Schema {
 	return schema.Schema{
-		Description: "Placement groups enforce affinity or anti-affinity policies that control whether virtual machines are hosted on the same or different physical servers.",
+		MarkdownDescription: "Placement groups enforce affinity or anti-affinity policies that control whether virtual machines are hosted on the same or different physical servers.",
 		Attributes: map[string]schema.Attribute{
 			"id": schema.StringAttribute{
 				Description:   "The ID of the server group.",
@@ -33,11 +33,11 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 			},
 			"project_id": schema.Int64Attribute{
 				Optional:      true,
-				PlanModifiers: []planmodifier.Int64{int64planmodifier.RequiresReplace()},
+				PlanModifiers: []planmodifier.Int64{int64planmodifier.RequiresReplaceIfConfigured()},
 			},
 			"region_id": schema.Int64Attribute{
 				Optional:      true,
-				PlanModifiers: []planmodifier.Int64{int64planmodifier.RequiresReplace()},
+				PlanModifiers: []planmodifier.Int64{int64planmodifier.RequiresReplaceIfConfigured()},
 			},
 			"name": schema.StringAttribute{
 				Description:   "The name of the server group.",

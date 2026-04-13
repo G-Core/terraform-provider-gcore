@@ -17,7 +17,7 @@ var _ datasource.DataSourceWithConfigValidators = (*CloudInstanceImageDataSource
 
 func DataSourceSchema(ctx context.Context) schema.Schema {
 	return schema.Schema{
-		Description: "Instance images are operating system images (public, private, or shared) used to boot cloud instances.",
+		MarkdownDescription: "Instance images are operating system images (public, private, or shared) used to boot cloud instances.",
 		Attributes: map[string]schema.Attribute{
 			"id": schema.StringAttribute{
 				Computed: true,
@@ -36,7 +36,7 @@ func DataSourceSchema(ctx context.Context) schema.Schema {
 				Optional:    true,
 			},
 			"architecture": schema.StringAttribute{
-				Description: "An image architecture type: aarch64, `x86_64`\nAvailable values: \"aarch64\", \"x86_64\".",
+				Description: "An image architecture type: aarch64, `x86_64`.\nAvailable values: \"aarch64\", \"x86_64\".",
 				Computed:    true,
 				Validators: []validator.String{
 					stringvalidator.OneOfCaseInsensitive("aarch64", "x86_64"),
@@ -49,6 +49,10 @@ func DataSourceSchema(ctx context.Context) schema.Schema {
 			},
 			"creator_task_id": schema.StringAttribute{
 				Description: "Task that created this entity",
+				Computed:    true,
+			},
+			"currency_code": schema.StringAttribute{
+				Description: "Currency code. Shown if the `include_prices` query parameter if set to true",
 				Computed:    true,
 			},
 			"description": schema.StringAttribute{
@@ -89,7 +93,7 @@ func DataSourceSchema(ctx context.Context) schema.Schema {
 				},
 			},
 			"is_baremetal": schema.BoolAttribute{
-				Description: "Set to true if the image will be used by bare metal servers. Defaults to false.",
+				Description: "Set to true if the image will be used by bare metal servers.",
 				Computed:    true,
 			},
 			"min_disk": schema.Int64Attribute{
@@ -118,6 +122,25 @@ func DataSourceSchema(ctx context.Context) schema.Schema {
 			"os_version": schema.StringAttribute{
 				Description: "OS version, i.e. 19.04 (for Ubuntu) or 9.4 for Debian",
 				Computed:    true,
+			},
+			"price_per_hour": schema.Float64Attribute{
+				Description: "Price per hour. Shown if the `include_prices` query parameter if set to true",
+				Computed:    true,
+			},
+			"price_per_month": schema.Float64Attribute{
+				Description: "Price per month. Shown if the `include_prices` query parameter if set to true",
+				Computed:    true,
+			},
+			"price_status": schema.StringAttribute{
+				Description: "Price status for the UI\nAvailable values: \"error\", \"hide\", \"show\".",
+				Computed:    true,
+				Validators: []validator.String{
+					stringvalidator.OneOfCaseInsensitive(
+						"error",
+						"hide",
+						"show",
+					),
+				},
 			},
 			"region": schema.StringAttribute{
 				Description: "Region name",

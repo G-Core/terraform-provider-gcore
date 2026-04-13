@@ -13,7 +13,7 @@ var _ datasource.DataSourceWithConfigValidators = (*CloudInferenceFlavorDataSour
 
 func DataSourceSchema(ctx context.Context) schema.Schema {
 	return schema.Schema{
-		Description: "Inference flavors define the GPU and CPU resource configurations available for inference deployments.",
+		MarkdownDescription: "Inference flavors define the GPU and CPU resource configurations available for inference deployments.",
 		Attributes: map[string]schema.Attribute{
 			"flavor_name": schema.StringAttribute{
 				Description: "Inference flavor name.",

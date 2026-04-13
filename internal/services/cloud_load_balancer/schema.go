@@ -25,7 +25,7 @@ var _ resource.ResourceWithConfigValidators = (*CloudLoadBalancerResource)(nil)
 
 func ResourceSchema(ctx context.Context) schema.Schema {
 	return schema.Schema{
-		Description: "Load balancers distribute incoming traffic across multiple instances with support for listeners, pools, and health monitoring.",
+		MarkdownDescription: "Load balancers distribute incoming traffic across multiple instances with support for listeners, pools, and health monitoring.",
 		Attributes: map[string]schema.Attribute{
 			"id": schema.StringAttribute{
 				Computed:      true,
@@ -34,22 +34,17 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 			"project_id": schema.Int64Attribute{
 				Description:   "Project ID",
 				Optional:      true,
-				PlanModifiers: []planmodifier.Int64{int64planmodifier.RequiresReplace()},
+				PlanModifiers: []planmodifier.Int64{int64planmodifier.RequiresReplaceIfConfigured()},
 			},
 			"region_id": schema.Int64Attribute{
 				Description:   "Region ID",
 				Optional:      true,
-				PlanModifiers: []planmodifier.Int64{int64planmodifier.RequiresReplace()},
+				PlanModifiers: []planmodifier.Int64{int64planmodifier.RequiresReplaceIfConfigured()},
 			},
 			"flavor": schema.StringAttribute{
 				Description:   "Load balancer flavor name",
 				Optional:      true,
 				PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
-			},
-			"name_template": schema.StringAttribute{
-				Description:   "Load balancer name which will be changed by template. Either `name` or `name_template` should be specified.",
-				Optional:      true,
-				PlanModifiers: []planmodifier.String{stringplanmodifier.RequiresReplace()},
 			},
 			"vip_network_id": schema.StringAttribute{
 				Description:   "Network ID for load balancer. If not specified, default external network will be used. Mutually exclusive with `vip_port_id`",
@@ -105,13 +100,8 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 				},
 			},
 			"name": schema.StringAttribute{
-				Description: "Load balancer name. Either `name` or `name_template` should be specified.",
-				Optional:    true,
-			},
-			"tags": schema.MapAttribute{
-				Description: "Key-value tags to associate with the resource. A tag is a key-value pair that can be associated with a resource, enabling efficient filtering and grouping for better organization and management. Both tag keys and values have a maximum length of 255 characters. Some tags are read-only and cannot be modified by the user. Tags are also integrated with cost reports, allowing cost data to be filtered based on tag keys or values.",
-				Optional:    true,
-				ElementType: types.StringType,
+				Description: "Load balancer name.",
+				Required:    true,
 			},
 			"preferred_connectivity": schema.StringAttribute{
 				Description: "Preferred option to establish connectivity between load balancer and its pools members. L2 provides best performance, L3 provides less IPs usage. It is taking effect only if `instance_id` + `ip_address` is provided, not `subnet_id` + `ip_address`, because we're considering this as intentional `subnet_id` specification.\nAvailable values: \"L2\", \"L3\".",
@@ -121,6 +111,13 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 					stringvalidator.OneOfCaseInsensitive("L2", "L3"),
 				},
 				PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
+			},
+			"tags": schema.MapAttribute{
+				Description: "Key-value tags to associate with the resource. A tag is a key-value pair that can be associated with a resource, enabling efficient filtering and grouping for better organization and management. Both tag keys and values have a maximum length of 255 characters. Some tags are read-only and cannot be modified by the user. Tags are also integrated with cost reports, allowing cost data to be filtered based on tag keys or values.",
+				Computed:    true,
+				Optional:    true,
+				CustomType:  customfield.NewMapType[types.String](ctx),
+				ElementType: types.StringType,
 			},
 			"logging": schema.SingleNestedAttribute{
 				Description: "Logging configuration",

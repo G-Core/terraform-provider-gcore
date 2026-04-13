@@ -15,6 +15,7 @@ import (
 	"github.com/G-Core/gcore-go/option"
 	"github.com/G-Core/gcore-go/packages/param"
 	"github.com/G-Core/terraform-provider-gcore/internal/apijson"
+	"github.com/G-Core/terraform-provider-gcore/internal/custom"
 	"github.com/G-Core/terraform-provider-gcore/internal/importpath"
 	"github.com/G-Core/terraform-provider-gcore/internal/logging"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
@@ -104,6 +105,9 @@ func (r *CloudLoadBalancerResource) Create(ctx context.Context, req resource.Cre
 		resp.Diagnostics.AddError("failed to deserialize http request", err.Error())
 		return
 	}
+	if tags, ok := custom.ConvertAPITagsToCustomfieldMap(ctx, []byte(loadBalancer.RawJSON())); ok {
+		data.Tags = tags
+	}
 
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
 }
@@ -158,6 +162,9 @@ func (r *CloudLoadBalancerResource) Update(ctx context.Context, req resource.Upd
 			resp.Diagnostics.AddError("failed to deserialize resize response", err.Error())
 			return
 		}
+		if tags, ok := custom.ConvertAPITagsToCustomfieldMap(ctx, []byte(loadBalancer.RawJSON())); ok {
+			data.Tags = tags
+		}
 
 		// After resize, set state and return (don't call regular Update)
 		resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
@@ -206,6 +213,9 @@ func (r *CloudLoadBalancerResource) Update(ctx context.Context, req resource.Upd
 			resp.Diagnostics.AddError("failed to deserialize response", err.Error())
 			return
 		}
+		if tags, ok := custom.ConvertAPITagsToCustomfieldMap(ctx, bytes); ok {
+			data.Tags = tags
+		}
 		resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
 		return
 	}
@@ -246,6 +256,9 @@ func (r *CloudLoadBalancerResource) Update(ctx context.Context, req resource.Upd
 	if err != nil {
 		resp.Diagnostics.AddError("failed to deserialize http request", err.Error())
 		return
+	}
+	if tags, ok := custom.ConvertAPITagsToCustomfieldMap(ctx, bytes); ok {
+		data.Tags = tags
 	}
 
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
@@ -292,6 +305,10 @@ func (r *CloudLoadBalancerResource) Read(ctx context.Context, req resource.ReadR
 	if err != nil {
 		resp.Diagnostics.AddError("failed to deserialize http request", err.Error())
 		return
+	}
+
+	if tags, ok := custom.ConvertAPITagsToCustomfieldMap(ctx, bytes); ok {
+		data.Tags = tags
 	}
 
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
@@ -372,6 +389,10 @@ func (r *CloudLoadBalancerResource) ImportState(ctx context.Context, req resourc
 	if err != nil {
 		resp.Diagnostics.AddError("failed to deserialize http request", err.Error())
 		return
+	}
+
+	if tags, ok := custom.ConvertAPITagsToCustomfieldMap(ctx, bytes); ok {
+		data.Tags = tags
 	}
 
 	// Populate flavor from the nested flavor object in API response.

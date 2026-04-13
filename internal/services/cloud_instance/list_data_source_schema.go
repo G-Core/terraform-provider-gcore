@@ -21,7 +21,7 @@ var _ datasource.DataSourceWithConfigValidators = (*CloudInstancesDataSource)(ni
 
 func ListDataSourceSchema(ctx context.Context) schema.Schema {
 	return schema.Schema{
-		Description: "Instances are cloud virtual machines with configurable CPU, memory, storage, and networking, supporting various operating systems and workloads.",
+		MarkdownDescription: "Instances are cloud virtual machines with configurable CPU, memory, storage, and networking, supporting various operating systems and workloads.",
 		Attributes: map[string]schema.Attribute{
 			"project_id": schema.Int64Attribute{
 				Description: "Project ID",
@@ -338,16 +338,12 @@ func ListDataSourceSchema(ctx context.Context) schema.Schema {
 												Description: "Detailed description explaining the field's purpose and usage guidelines",
 												Computed:    true,
 											},
-											"field_name": schema.StringAttribute{
-												Description: "Name of DDoS profile field",
-												Computed:    true,
-											},
 											"field_type": schema.StringAttribute{
 												Description: "Data type classification of the field (e.g., string, integer, array)",
 												Computed:    true,
 											},
 											"field_value": schema.StringAttribute{
-												Description: "Complex value. Only one of 'value' or 'field_value' must be specified.",
+												Description: "Complex value for the DDoS profile field",
 												Computed:    true,
 												CustomType:  jsontypes.NormalizedType{},
 											},
@@ -363,10 +359,6 @@ func ListDataSourceSchema(ctx context.Context) schema.Schema {
 												Description: "JSON schema defining validation rules and constraints for the field value",
 												Computed:    true,
 												CustomType:  jsontypes.NormalizedType{},
-											},
-											"value": schema.StringAttribute{
-												Description: "Basic type value. Only one of 'value' or 'field_value' must be specified.",
-												Computed:    true,
 											},
 										},
 									},

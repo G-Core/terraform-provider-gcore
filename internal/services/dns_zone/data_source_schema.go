@@ -16,7 +16,7 @@ var _ datasource.DataSourceWithConfigValidators = (*DNSZoneDataSource)(nil)
 
 func DataSourceSchema(ctx context.Context) schema.Schema {
 	return schema.Schema{
-		Description: "DNS zones are authoritative containers for domain name records, with support for DNSSEC and SOA configuration.",
+		MarkdownDescription: "DNS zones are authoritative containers for domain name records, with support for DNSSEC and SOA configuration.",
 		Attributes: map[string]schema.Attribute{
 			"name": schema.StringAttribute{
 				Required: true,

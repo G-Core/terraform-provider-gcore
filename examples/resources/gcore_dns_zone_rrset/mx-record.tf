@@ -6,7 +6,7 @@ resource "gcore_dns_zone_rrset" "mx_record" {
   ttl        = 300
 
   resource_records = [{
-    content = [jsonencode("10 mail.example.com.")]
+    content = ["10 mail.example.com."]
     enabled = true
   }]
 }

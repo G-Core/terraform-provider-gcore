@@ -35,8 +35,7 @@ data "gcore_fastedge_app" "example_fastedge_app" {
 - `debug_until` (String) When debugging finishes
 - `env` (Map of String) Environment variables
 - `id` (Number) The ID of this resource.
-- `log` (String) Logging channel. Use 'kafka' to enable log collection (queryable via API), or 'none' to disable logging.
-Available values: "kafka", "none".
+- `log` (String, Deprecated) Available values: "kafka", "none".
 - `name` (String) Unique application name (alphanumeric, hyphens allowed)
 - `networks` (List of String) Networks
 - `plan` (String) Plan name

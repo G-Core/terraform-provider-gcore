@@ -22,7 +22,7 @@ var _ resource.ResourceWithConfigValidators = (*FastedgeAppResource)(nil)
 
 func ResourceSchema(ctx context.Context) schema.Schema {
 	return schema.Schema{
-		Description: "FastEdge applications combine a WebAssembly binary with configuration, environment variables, and secrets for deployment at the CDN edge.",
+		MarkdownDescription: "FastEdge applications combine a WebAssembly binary with configuration, environment variables, and secrets for deployment at the CDN edge.",
 		Attributes: map[string]schema.Attribute{
 			"id": schema.Int64Attribute{
 				Description: "App ID",
@@ -56,9 +56,10 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 				Default:     booldefault.StaticBool(false),
 			},
 			"log": schema.StringAttribute{
-				Description: "Logging channel. Use 'kafka' to enable log collection (queryable via API), or 'none' to disable logging.\nAvailable values: \"kafka\", \"none\".",
-				Computed:    true,
-				Optional:    true,
+				Description:        `Available values: "kafka", "none".`,
+				Computed:           true,
+				Optional:           true,
+				DeprecationMessage: "This attribute is deprecated.",
 				Validators: []validator.String{
 					stringvalidator.OneOfCaseInsensitive("kafka", "none"),
 				},
@@ -73,7 +74,7 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 				Computed:    true,
 				Optional:    true,
 				Validators: []validator.Int64{
-					int64validator.Between(0, 2),
+					int64validator.Between(0, 5),
 				},
 			},
 			"env": schema.MapAttribute{

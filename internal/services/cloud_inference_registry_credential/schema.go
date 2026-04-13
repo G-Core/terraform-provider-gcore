@@ -16,7 +16,7 @@ var _ resource.ResourceWithConfigValidators = (*CloudInferenceRegistryCredential
 
 func ResourceSchema(ctx context.Context) schema.Schema {
 	return schema.Schema{
-		Description: "Registry credentials store authentication details for private container registries used by inference deployments.",
+		MarkdownDescription: "Registry credentials store authentication details for private container registries used by inference deployments.",
 		Attributes: map[string]schema.Attribute{
 			"id": schema.StringAttribute{
 				Description:   "Registry credential name.",
@@ -31,7 +31,7 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 			"project_id": schema.Int64Attribute{
 				Description:   "Project ID",
 				Optional:      true,
-				PlanModifiers: []planmodifier.Int64{int64planmodifier.RequiresReplace()},
+				PlanModifiers: []planmodifier.Int64{int64planmodifier.RequiresReplaceIfConfigured()},
 			},
 			"password_wo": schema.StringAttribute{
 				Description: "Registry password.",

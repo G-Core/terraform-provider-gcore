@@ -30,7 +30,21 @@ type CDNOriginGroupAuthDataSourceModel struct {
 }
 
 type CDNOriginGroupSourcesDataSourceModel struct {
-	Backup  types.Bool   `tfsdk:"backup" json:"backup,computed"`
-	Enabled types.Bool   `tfsdk:"enabled" json:"enabled,computed"`
-	Source  types.String `tfsdk:"source" json:"source,computed"`
+	Source             types.String                                                         `tfsdk:"source" json:"source,computed"`
+	Backup             types.Bool                                                           `tfsdk:"backup" json:"backup,computed"`
+	Enabled            types.Bool                                                           `tfsdk:"enabled" json:"enabled,computed"`
+	HostHeaderOverride types.String                                                         `tfsdk:"host_header_override" json:"host_header_override,computed"`
+	Tag                types.String                                                         `tfsdk:"tag" json:"tag,computed"`
+	Config             customfield.NestedObject[CDNOriginGroupSourcesConfigDataSourceModel] `tfsdk:"config" json:"config,computed"`
+	OriginType         types.String                                                         `tfsdk:"origin_type" json:"origin_type,computed"`
+}
+
+type CDNOriginGroupSourcesConfigDataSourceModel struct {
+	S3AccessKeyID     types.String `tfsdk:"s3_access_key_id" json:"s3_access_key_id,computed"`
+	S3BucketName      types.String `tfsdk:"s3_bucket_name" json:"s3_bucket_name,computed"`
+	S3SecretAccessKey types.String `tfsdk:"s3_secret_access_key" json:"s3_secret_access_key,computed"`
+	S3Type            types.String `tfsdk:"s3_type" json:"s3_type,computed"`
+	S3AuthType        types.String `tfsdk:"s3_auth_type" json:"s3_auth_type,computed"`
+	S3Region          types.String `tfsdk:"s3_region" json:"s3_region,computed"`
+	S3StorageHostname types.String `tfsdk:"s3_storage_hostname" json:"s3_storage_hostname,computed"`
 }

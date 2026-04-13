@@ -16,7 +16,7 @@ var _ datasource.DataSourceWithConfigValidators = (*CloudInferenceFlavorsDataSou
 
 func ListDataSourceSchema(ctx context.Context) schema.Schema {
 	return schema.Schema{
-		Description: "Inference flavors define the GPU and CPU resource configurations available for inference deployments.",
+		MarkdownDescription: "Inference flavors define the GPU and CPU resource configurations available for inference deployments.",
 		Attributes: map[string]schema.Attribute{
 			"max_items": schema.Int64Attribute{
 				Description: "Max items to fetch, default: 1000",

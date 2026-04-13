@@ -26,7 +26,7 @@ var _ resource.ResourceWithConfigValidators = (*CloudLoadBalancerListenerResourc
 
 func ResourceSchema(ctx context.Context) schema.Schema {
 	return schema.Schema{
-		Description: "Load balancer listeners handle incoming traffic on specified protocols and ports, forwarding requests to backend pools.",
+		MarkdownDescription: "Load balancer listeners handle incoming traffic on specified protocols and ports, forwarding requests to backend pools.",
 		Attributes: map[string]schema.Attribute{
 			"id": schema.StringAttribute{
 				Computed:      true,
@@ -35,12 +35,12 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 			"project_id": schema.Int64Attribute{
 				Description:   "Project ID",
 				Optional:      true,
-				PlanModifiers: []planmodifier.Int64{int64planmodifier.RequiresReplace()},
+				PlanModifiers: []planmodifier.Int64{int64planmodifier.RequiresReplaceIfConfigured()},
 			},
 			"region_id": schema.Int64Attribute{
 				Description:   "Region ID",
 				Optional:      true,
-				PlanModifiers: []planmodifier.Int64{int64planmodifier.RequiresReplace()},
+				PlanModifiers: []planmodifier.Int64{int64planmodifier.RequiresReplaceIfConfigured()},
 			},
 			"load_balancer_id": schema.StringAttribute{
 				Description:   "ID of already existent Load Balancer.",
