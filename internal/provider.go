@@ -101,11 +101,11 @@ func ProviderSchema(ctx context.Context) schema.Schema {
 				Sensitive:   true,
 			},
 			"cloud_project_id": schema.Int64Attribute{
-				Description: "Default cloud project ID to use for cloud resources. Can also be set via the `GCORE_CLOUD_PROJECT_ID` environment variable.",
+				Description: "Default cloud project ID to use for cloud resources. Serves as a convenience fallback for local development; for production, prefer setting `project_id` explicitly on each resource. Can also be set via the `GCORE_CLOUD_PROJECT_ID` environment variable.",
 				Optional:    true,
 			},
 			"cloud_region_id": schema.Int64Attribute{
-				Description: "Default cloud region ID to use for cloud resources. Can also be set via the `GCORE_CLOUD_REGION_ID` environment variable.",
+				Description: "Default cloud region ID to use for cloud resources. Serves as a convenience fallback for local development; for production, prefer setting `region_id` explicitly on each resource. Can also be set via the `GCORE_CLOUD_REGION_ID` environment variable.",
 				Optional:    true,
 			},
 			"cloud_polling_interval_seconds": schema.Int64Attribute{

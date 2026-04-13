@@ -39,5 +39,27 @@ provider "gcore" {
 - `base_url` (String) Set the base url that the provider connects to.
 - `cloud_polling_interval_seconds` (Number) Interval in seconds between polling requests for long-running cloud operations. Defaults to `3`.
 - `cloud_polling_timeout_seconds` (Number) Timeout in seconds for polling long-running cloud operations. Defaults to `7200`.
-- `cloud_project_id` (Number) Default cloud project ID to use for cloud resources. Can also be set via the `GCORE_CLOUD_PROJECT_ID` environment variable.
-- `cloud_region_id` (Number) Default cloud region ID to use for cloud resources. Can also be set via the `GCORE_CLOUD_REGION_ID` environment variable.
+- `cloud_project_id` (Number) Default cloud project ID to use for cloud resources. Serves as a convenience fallback for local development; for production, prefer setting `project_id` explicitly on each resource. Can also be set via the `GCORE_CLOUD_PROJECT_ID` environment variable.
+- `cloud_region_id` (Number) Default cloud region ID to use for cloud resources. Serves as a convenience fallback for local development; for production, prefer setting `region_id` explicitly on each resource. Can also be set via the `GCORE_CLOUD_REGION_ID` environment variable.
+
+## Best Practices
+
+### Project and Region Configuration
+
+Cloud resources accept `project_id` and `region_id` as explicit attributes. The provider-level
+`cloud_project_id` / `cloud_region_id` (and their `GCORE_CLOUD_PROJECT_ID` / `GCORE_CLOUD_REGION_ID`
+environment variable counterparts) serve as **convenience fallbacks for local development and testing**.
+
+For production configurations, always set `project_id` and `region_id` explicitly on each resource:
+
+```terraform
+resource "gcore_cloud_volume" "example" {
+  project_id = 1
+  region_id  = 1
+  name       = "my-volume"
+  # ...
+}
+```
+
+This makes your Terraform configuration self-contained, portable, and unambiguous — it won't
+silently change behavior when run in a different environment.
