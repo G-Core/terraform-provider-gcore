@@ -22,16 +22,21 @@ func TestFilterSecurityGroupRules_NilDescription(t *testing.T) {
 		{ID: "system-rule", Direction: types.RuleDirectionIngress, Description: strPtr("system")},
 	}
 
-	defer func() {
-		if r := recover(); r != nil {
-			t.Fatalf("filterSecurityGroupRules panicked on nil Description: %v", r)
-		}
-	}()
-
 	result := filterSecurityGroupRules(rules)
 
-	if len(result) != 2 {
-		t.Errorf("expected 2 rules (system filtered, nil kept), got %d", len(result))
+	resultIDs := make(map[string]bool, len(result))
+	for _, rule := range result {
+		resultIDs[rule.ID] = true
+	}
+
+	if !resultIDs["user-rule"] {
+		t.Errorf("expected result to contain %q", "user-rule")
+	}
+	if !resultIDs["nil-desc"] {
+		t.Errorf("expected result to contain %q", "nil-desc")
+	}
+	if resultIDs["system-rule"] {
+		t.Errorf("expected result to exclude %q", "system-rule")
 	}
 }
 
