@@ -17,3 +17,25 @@ The Gcore provider allows you to configure your [Gcore](https://gcore.com) infra
 {{ tffile "examples/provider/provider.tf" }}
 
 {{ .SchemaMarkdown | trimspace }}
+
+## Best Practices
+
+### Project and Region Configuration
+
+Cloud resources accept `project_id` and `region_id` as explicit attributes. The provider-level
+`cloud_project_id` / `cloud_region_id` (and their `GCORE_CLOUD_PROJECT_ID` / `GCORE_CLOUD_REGION_ID`
+environment variable counterparts) serve as **convenience fallbacks for local development and testing**.
+
+For production configurations, always set `project_id` and `region_id` explicitly on each resource:
+
+```terraform
+resource "gcore_cloud_volume" "example" {
+  project_id = 1
+  region_id  = 1
+  name       = "my-volume"
+  # ...
+}
+```
+
+This makes your Terraform configuration self-contained, portable, and unambiguous — it won't
+silently change behavior when run in a different environment.
