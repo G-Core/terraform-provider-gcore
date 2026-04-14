@@ -1622,14 +1622,14 @@ func resourceK8sV2UpdateClusterPool(client *gcorecloud.ServiceClient, clusterNam
 	if v, ok := pool["auto_healing_enabled"].(bool); ok {
 		opts.AutoHealingEnabled = &v
 	}
-	if labels, ok := pool["labels"].(map[string]interface{}); ok && len(labels) > 0 {
+	if labels, ok := pool["labels"].(map[string]interface{}); ok {
 		result := map[string]string{}
 		for k, v := range labels {
 			result[k] = v.(string)
 		}
 		opts.Labels = &result
 	}
-	if taints, ok := pool["taints"].(map[string]interface{}); ok && len(taints) > 0 {
+	if taints, ok := pool["taints"].(map[string]interface{}); ok {
 		result := map[string]string{}
 		for k, v := range taints {
 			result[k] = v.(string)
