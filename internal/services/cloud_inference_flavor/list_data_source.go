@@ -55,13 +55,19 @@ func (d *CloudInferenceFlavorsDataSource) Read(ctx context.Context, req datasour
 		return
 	}
 
+	params, diags := data.toListParams(ctx)
+	resp.Diagnostics.Append(diags...)
+	if resp.Diagnostics.HasError() {
+		return
+	}
+
 	env := CloudInferenceFlavorsResultsListDataSourceEnvelope{}
 	maxItems := int(data.MaxItems.ValueInt64())
 	acc := []attr.Value{}
 	if maxItems <= 0 {
 		maxItems = 1000
 	}
-	page, err := d.client.Cloud.Inference.Flavors.List(ctx)
+	page, err := d.client.Cloud.Inference.Flavors.List(ctx, params)
 	if err != nil {
 		resp.Diagnostics.AddError("failed to make http request", err.Error())
 		return

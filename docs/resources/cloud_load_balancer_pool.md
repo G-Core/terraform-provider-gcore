@@ -16,7 +16,7 @@ Load balancer pools group backend instances with a load balancing algorithm and 
 resource "gcore_cloud_load_balancer_pool" "example_cloud_load_balancer_pool" {
   project_id = 1
   region_id = 1
-  lb_algorithm = "LEAST_CONNECTIONS"
+  lb_algorithm = "ROUND_ROBIN"
   name = "pool_name"
   protocol = "HTTP"
   ca_secret_id = "ca_secret_id"
