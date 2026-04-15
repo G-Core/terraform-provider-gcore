@@ -263,6 +263,10 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 				Computed:    true,
 				CustomType:  timetypes.RFC3339Type{},
 			},
+			"has_pending_changes": schema.BoolAttribute{
+				Description: "True if any server in the cluster has pending (not yet applied) settings changes",
+				Computed:    true,
+			},
 			"status": schema.StringAttribute{
 				Description: "Cluster status\nAvailable values: \"active\", \"creating\", \"degraded\", \"deleting\", \"error\", \"rebooting\", \"rebuilding\", \"resizing\", \"shutoff\".",
 				Computed:    true,

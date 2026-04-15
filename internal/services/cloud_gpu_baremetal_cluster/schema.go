@@ -200,6 +200,10 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 				Computed:    true,
 				CustomType:  timetypes.RFC3339Type{},
 			},
+			"has_pending_changes": schema.BoolAttribute{
+				Description: "True if any server in the cluster has pending (not yet applied) settings changes",
+				Computed:    true,
+			},
 			"managed_by": schema.StringAttribute{
 				Description: "User type managing the resource\nAvailable values: \"k8s\", \"user\".",
 				Computed:    true,

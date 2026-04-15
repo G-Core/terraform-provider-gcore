@@ -14,22 +14,23 @@ import (
 )
 
 type CloudGPUBaremetalClusterDataSourceModel struct {
-	ID              types.String                                                                     `tfsdk:"id" path:"cluster_id,computed"`
-	ClusterID       types.String                                                                     `tfsdk:"cluster_id" path:"cluster_id,optional"`
-	ProjectID       types.Int64                                                                      `tfsdk:"project_id" path:"project_id,optional"`
-	RegionID        types.Int64                                                                      `tfsdk:"region_id" path:"region_id,optional"`
-	CreatedAt       timetypes.RFC3339                                                                `tfsdk:"created_at" json:"created_at,computed" format:"date-time"`
-	Flavor          types.String                                                                     `tfsdk:"flavor" json:"flavor,computed"`
-	ImageID         types.String                                                                     `tfsdk:"image_id" json:"image_id,computed"`
-	ManagedBy       types.String                                                                     `tfsdk:"managed_by" json:"managed_by,computed"`
-	Name            types.String                                                                     `tfsdk:"name" json:"name,computed"`
-	ServersCount    types.Int64                                                                      `tfsdk:"servers_count" json:"servers_count,computed"`
-	Status          types.String                                                                     `tfsdk:"status" json:"status,computed"`
-	UpdatedAt       timetypes.RFC3339                                                                `tfsdk:"updated_at" json:"updated_at,computed" format:"date-time"`
-	ServersIDs      customfield.List[types.String]                                                   `tfsdk:"servers_ids" json:"servers_ids,computed"`
-	ServersSettings customfield.NestedObject[CloudGPUBaremetalClusterServersSettingsDataSourceModel] `tfsdk:"servers_settings" json:"servers_settings,computed"`
-	Tags            customfield.NestedObjectList[CloudGPUBaremetalClusterTagsDataSourceModel]        `tfsdk:"tags" json:"tags,computed"`
-	FindOneBy       *CloudGPUBaremetalClusterFindOneByDataSourceModel                                `tfsdk:"find_one_by"`
+	ID                types.String                                                                     `tfsdk:"id" path:"cluster_id,computed"`
+	ClusterID         types.String                                                                     `tfsdk:"cluster_id" path:"cluster_id,optional"`
+	ProjectID         types.Int64                                                                      `tfsdk:"project_id" path:"project_id,optional"`
+	RegionID          types.Int64                                                                      `tfsdk:"region_id" path:"region_id,optional"`
+	CreatedAt         timetypes.RFC3339                                                                `tfsdk:"created_at" json:"created_at,computed" format:"date-time"`
+	Flavor            types.String                                                                     `tfsdk:"flavor" json:"flavor,computed"`
+	HasPendingChanges types.Bool                                                                       `tfsdk:"has_pending_changes" json:"has_pending_changes,computed"`
+	ImageID           types.String                                                                     `tfsdk:"image_id" json:"image_id,computed"`
+	ManagedBy         types.String                                                                     `tfsdk:"managed_by" json:"managed_by,computed"`
+	Name              types.String                                                                     `tfsdk:"name" json:"name,computed"`
+	ServersCount      types.Int64                                                                      `tfsdk:"servers_count" json:"servers_count,computed"`
+	Status            types.String                                                                     `tfsdk:"status" json:"status,computed"`
+	UpdatedAt         timetypes.RFC3339                                                                `tfsdk:"updated_at" json:"updated_at,computed" format:"date-time"`
+	ServersIDs        customfield.List[types.String]                                                   `tfsdk:"servers_ids" json:"servers_ids,computed"`
+	ServersSettings   customfield.NestedObject[CloudGPUBaremetalClusterServersSettingsDataSourceModel] `tfsdk:"servers_settings" json:"servers_settings,computed"`
+	Tags              customfield.NestedObjectList[CloudGPUBaremetalClusterTagsDataSourceModel]        `tfsdk:"tags" json:"tags,computed"`
+	FindOneBy         *CloudGPUBaremetalClusterFindOneByDataSourceModel                                `tfsdk:"find_one_by"`
 }
 
 func (m *CloudGPUBaremetalClusterDataSourceModel) toReadParams(_ context.Context) (params cloud.GPUBaremetalClusterGetParams, diags diag.Diagnostics) {
