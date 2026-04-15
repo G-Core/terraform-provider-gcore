@@ -10,19 +10,20 @@ import (
 )
 
 type CloudGPUVirtualClusterModel struct {
-	ID              types.String                                `tfsdk:"id" json:"id,computed"`
-	ProjectID       types.Int64                                 `tfsdk:"project_id" path:"project_id,optional"`
-	RegionID        types.Int64                                 `tfsdk:"region_id" path:"region_id,optional"`
-	Flavor          types.String                                `tfsdk:"flavor" json:"flavor,required"`
-	ServersCount    types.Int64                                 `tfsdk:"servers_count" json:"servers_count,required"`
-	ServersSettings *CloudGPUVirtualClusterServersSettingsModel `tfsdk:"servers_settings" json:"servers_settings,required"`
-	Name            types.String                                `tfsdk:"name" json:"name,required"`
-	Tags            customfield.Map[types.String]               `tfsdk:"tags" json:"tags,computed_optional,no_refresh"`
-	CreatedAt       timetypes.RFC3339                           `tfsdk:"created_at" json:"created_at,computed" format:"date-time"`
-	Status          types.String                                `tfsdk:"status" json:"status,computed"`
-	UpdatedAt       timetypes.RFC3339                           `tfsdk:"updated_at" json:"updated_at,computed" format:"date-time"`
-	ServersIDs      customfield.List[types.String]              `tfsdk:"servers_ids" json:"servers_ids,computed"`
-	Tasks           customfield.List[types.String]              `tfsdk:"tasks" json:"tasks,computed,no_refresh"`
+	ID                types.String                                `tfsdk:"id" json:"id,computed"`
+	ProjectID         types.Int64                                 `tfsdk:"project_id" path:"project_id,optional"`
+	RegionID          types.Int64                                 `tfsdk:"region_id" path:"region_id,optional"`
+	Flavor            types.String                                `tfsdk:"flavor" json:"flavor,required"`
+	ServersCount      types.Int64                                 `tfsdk:"servers_count" json:"servers_count,required"`
+	ServersSettings   *CloudGPUVirtualClusterServersSettingsModel `tfsdk:"servers_settings" json:"servers_settings,required"`
+	Name              types.String                                `tfsdk:"name" json:"name,required"`
+	Tags              customfield.Map[types.String]               `tfsdk:"tags" json:"tags,computed_optional,no_refresh"`
+	CreatedAt         timetypes.RFC3339                           `tfsdk:"created_at" json:"created_at,computed" format:"date-time"`
+	HasPendingChanges types.Bool                                  `tfsdk:"has_pending_changes" json:"has_pending_changes,computed"`
+	Status            types.String                                `tfsdk:"status" json:"status,computed"`
+	UpdatedAt         timetypes.RFC3339                           `tfsdk:"updated_at" json:"updated_at,computed" format:"date-time"`
+	ServersIDs        customfield.List[types.String]              `tfsdk:"servers_ids" json:"servers_ids,computed"`
+	Tasks             customfield.List[types.String]              `tfsdk:"tasks" json:"tasks,computed,no_refresh"`
 }
 
 func (m CloudGPUVirtualClusterModel) MarshalJSON() (data []byte, err error) {

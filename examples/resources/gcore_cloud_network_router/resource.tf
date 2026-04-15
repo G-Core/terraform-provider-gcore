@@ -1,6 +1,6 @@
 resource "gcore_cloud_network_router" "example_cloud_network_router" {
-  project_id = 0
-  region_id = 0
+  project_id = 1
+  region_id = 1
   name = "my_wonderful_router"
   external_gateway_info = {
     enable_snat = true

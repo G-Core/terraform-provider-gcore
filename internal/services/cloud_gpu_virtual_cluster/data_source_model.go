@@ -14,19 +14,20 @@ import (
 )
 
 type CloudGPUVirtualClusterDataSourceModel struct {
-	ID              types.String                                                                   `tfsdk:"id" path:"cluster_id,computed"`
-	ClusterID       types.String                                                                   `tfsdk:"cluster_id" path:"cluster_id,required"`
-	ProjectID       types.Int64                                                                    `tfsdk:"project_id" path:"project_id,optional"`
-	RegionID        types.Int64                                                                    `tfsdk:"region_id" path:"region_id,optional"`
-	CreatedAt       timetypes.RFC3339                                                              `tfsdk:"created_at" json:"created_at,computed" format:"date-time"`
-	Flavor          types.String                                                                   `tfsdk:"flavor" json:"flavor,computed"`
-	Name            types.String                                                                   `tfsdk:"name" json:"name,computed"`
-	ServersCount    types.Int64                                                                    `tfsdk:"servers_count" json:"servers_count,computed"`
-	Status          types.String                                                                   `tfsdk:"status" json:"status,computed"`
-	UpdatedAt       timetypes.RFC3339                                                              `tfsdk:"updated_at" json:"updated_at,computed" format:"date-time"`
-	ServersIDs      customfield.List[types.String]                                                 `tfsdk:"servers_ids" json:"servers_ids,computed"`
-	ServersSettings customfield.NestedObject[CloudGPUVirtualClusterServersSettingsDataSourceModel] `tfsdk:"servers_settings" json:"servers_settings,computed"`
-	Tags            customfield.NestedObjectList[CloudGPUVirtualClusterTagsDataSourceModel]        `tfsdk:"tags" json:"tags,computed"`
+	ID                types.String                                                                   `tfsdk:"id" path:"cluster_id,computed"`
+	ClusterID         types.String                                                                   `tfsdk:"cluster_id" path:"cluster_id,required"`
+	ProjectID         types.Int64                                                                    `tfsdk:"project_id" path:"project_id,optional"`
+	RegionID          types.Int64                                                                    `tfsdk:"region_id" path:"region_id,optional"`
+	CreatedAt         timetypes.RFC3339                                                              `tfsdk:"created_at" json:"created_at,computed" format:"date-time"`
+	Flavor            types.String                                                                   `tfsdk:"flavor" json:"flavor,computed"`
+	HasPendingChanges types.Bool                                                                     `tfsdk:"has_pending_changes" json:"has_pending_changes,computed"`
+	Name              types.String                                                                   `tfsdk:"name" json:"name,computed"`
+	ServersCount      types.Int64                                                                    `tfsdk:"servers_count" json:"servers_count,computed"`
+	Status            types.String                                                                   `tfsdk:"status" json:"status,computed"`
+	UpdatedAt         timetypes.RFC3339                                                              `tfsdk:"updated_at" json:"updated_at,computed" format:"date-time"`
+	ServersIDs        customfield.List[types.String]                                                 `tfsdk:"servers_ids" json:"servers_ids,computed"`
+	ServersSettings   customfield.NestedObject[CloudGPUVirtualClusterServersSettingsDataSourceModel] `tfsdk:"servers_settings" json:"servers_settings,computed"`
+	Tags              customfield.NestedObjectList[CloudGPUVirtualClusterTagsDataSourceModel]        `tfsdk:"tags" json:"tags,computed"`
 }
 
 func (m *CloudGPUVirtualClusterDataSourceModel) toReadParams(_ context.Context) (params cloud.GPUVirtualClusterGetParams, diags diag.Diagnostics) {
