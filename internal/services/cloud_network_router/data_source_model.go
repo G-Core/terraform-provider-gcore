@@ -15,7 +15,7 @@ import (
 
 type CloudNetworkRouterDataSourceModel struct {
 	ID                  types.String                                                                   `tfsdk:"id" path:"router_id,computed"`
-	RouterID            types.String                                                                   `tfsdk:"router_id" path:"router_id,required"`
+	RouterID            types.String                                                                   `tfsdk:"router_id" path:"router_id,optional"`
 	ProjectID           types.Int64                                                                    `tfsdk:"project_id" path:"project_id,optional"`
 	RegionID            types.Int64                                                                    `tfsdk:"region_id" path:"region_id,optional"`
 	CreatedAt           timetypes.RFC3339                                                              `tfsdk:"created_at" json:"created_at,computed" format:"date-time"`
@@ -28,6 +28,7 @@ type CloudNetworkRouterDataSourceModel struct {
 	ExternalGatewayInfo customfield.NestedObject[CloudNetworkRouterExternalGatewayInfoDataSourceModel] `tfsdk:"external_gateway_info" json:"external_gateway_info,computed"`
 	Interfaces          customfield.NestedObjectList[CloudNetworkRouterInterfacesDataSourceModel]      `tfsdk:"interfaces" json:"interfaces,computed"`
 	Routes              customfield.NestedObjectList[CloudNetworkRouterRoutesDataSourceModel]          `tfsdk:"routes" json:"routes,computed"`
+	FindOneBy           *CloudNetworkRouterFindOneByDataSourceModel                                    `tfsdk:"find_one_by"`
 }
 
 func (m *CloudNetworkRouterDataSourceModel) toReadParams(_ context.Context) (params cloud.NetworkRouterGetParams, diags diag.Diagnostics) {
@@ -38,6 +39,22 @@ func (m *CloudNetworkRouterDataSourceModel) toReadParams(_ context.Context) (par
 	}
 	if !m.RegionID.IsNull() {
 		params.RegionID = param.NewOpt(m.RegionID.ValueInt64())
+	}
+
+	return
+}
+
+func (m *CloudNetworkRouterDataSourceModel) toListParams(_ context.Context) (params cloud.NetworkRouterListParams, diags diag.Diagnostics) {
+	params = cloud.NetworkRouterListParams{}
+
+	if !m.ProjectID.IsNull() {
+		params.ProjectID = param.NewOpt(m.ProjectID.ValueInt64())
+	}
+	if !m.RegionID.IsNull() {
+		params.RegionID = param.NewOpt(m.RegionID.ValueInt64())
+	}
+	if !m.FindOneBy.Name.IsNull() {
+		params.Name = param.NewOpt(m.FindOneBy.Name.ValueString())
 	}
 
 	return
@@ -69,4 +86,8 @@ type CloudNetworkRouterInterfacesIPAssignmentsDataSourceModel struct {
 type CloudNetworkRouterRoutesDataSourceModel struct {
 	Destination types.String `tfsdk:"destination" json:"destination,computed"`
 	Nexthop     types.String `tfsdk:"nexthop" json:"nexthop,computed"`
+}
+
+type CloudNetworkRouterFindOneByDataSourceModel struct {
+	Name types.String `tfsdk:"name" query:"name,optional"`
 }

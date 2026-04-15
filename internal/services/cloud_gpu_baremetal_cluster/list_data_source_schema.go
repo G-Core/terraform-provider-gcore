@@ -67,6 +67,10 @@ func ListDataSourceSchema(ctx context.Context) schema.Schema {
 							Description: "Cluster flavor name",
 							Computed:    true,
 						},
+						"has_pending_changes": schema.BoolAttribute{
+							Description: "True if any server in the cluster has pending (not yet applied) settings changes",
+							Computed:    true,
+						},
 						"image_id": schema.StringAttribute{
 							Description: "Image ID",
 							Computed:    true,

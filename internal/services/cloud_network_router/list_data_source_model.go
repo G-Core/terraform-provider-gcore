@@ -20,6 +20,7 @@ type CloudNetworkRoutersResultsListDataSourceEnvelope struct {
 type CloudNetworkRoutersDataSourceModel struct {
 	ProjectID types.Int64                                                           `tfsdk:"project_id" path:"project_id,optional"`
 	RegionID  types.Int64                                                           `tfsdk:"region_id" path:"region_id,optional"`
+	Name      types.String                                                          `tfsdk:"name" query:"name,optional"`
 	MaxItems  types.Int64                                                           `tfsdk:"max_items"`
 	Items     customfield.NestedObjectList[CloudNetworkRoutersItemsDataSourceModel] `tfsdk:"items"`
 }
@@ -32,6 +33,9 @@ func (m *CloudNetworkRoutersDataSourceModel) toListParams(_ context.Context) (pa
 	}
 	if !m.RegionID.IsNull() {
 		params.RegionID = param.NewOpt(m.RegionID.ValueInt64())
+	}
+	if !m.Name.IsNull() {
+		params.Name = param.NewOpt(m.Name.ValueString())
 	}
 
 	return
