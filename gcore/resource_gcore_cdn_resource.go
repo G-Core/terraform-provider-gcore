@@ -536,15 +536,6 @@ func listToOptions(l []interface{}) *gcdn.Options {
 			opts.ReferrerACL.ExceptedValues = append(opts.ReferrerACL.ExceptedValues, v.(string))
 		}
 	}
-	if opt, ok := getOptByName(fields, "request_limiter"); ok {
-		opts.RequestLimiter = &gcdn.RequestLimiter{
-			Enabled:  opt["enabled"].(bool),
-			Rate:     opt["rate"].(int),
-			Burst:    opt["burst"].(int),
-			RateUnit: opt["rate_unit"].(string),
-			Delay:    opt["delay"].(int),
-		}
-	}
 	if opt, ok := getOptByName(fields, "response_headers_hiding_policy"); ok {
 		opts.ResponseHeadersHidingPolicy = &gcdn.ResponseHeadersHidingPolicy{
 			Enabled: opt["enabled"].(bool),
@@ -827,10 +818,6 @@ func optionsToList(options *gcdn.Options) []interface{} {
 	if options.ReferrerACL != nil {
 		m := structToMap(options.ReferrerACL)
 		result["referrer_acl"] = []interface{}{m}
-	}
-	if options.RequestLimiter != nil {
-		m := structToMap(options.RequestLimiter)
-		result["request_limiter"] = []interface{}{m}
 	}
 	if options.ResponseHeadersHidingPolicy != nil {
 		m := structToMap(options.ResponseHeadersHidingPolicy)
