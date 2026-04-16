@@ -722,39 +722,6 @@ var (
 				},
 			},
 		},
-		"request_limiter": {
-			Type:        schema.TypeList,
-			MaxItems:    1,
-			Optional:    true,
-			Description: "It allows to limit the amount of HTTP requests",
-			Elem: &schema.Resource{
-				Schema: map[string]*schema.Schema{
-					"enabled": {
-						Type:     schema.TypeBool,
-						Optional: true,
-						Default:  true,
-					},
-					"rate": {
-						Type:     schema.TypeInt,
-						Required: true,
-					},
-					"burst": {
-						Type:     schema.TypeInt,
-						Required: true,
-					},
-					"rate_unit": {
-						Type:     schema.TypeString,
-						Optional: true,
-						Default:  "r/s",
-					},
-					"delay": {
-						Type:     schema.TypeInt,
-						Optional: true,
-						Default:  0,
-					},
-				},
-			},
-		},
 		"response_headers_hiding_policy": {
 			Type:        schema.TypeList,
 			MaxItems:    1,

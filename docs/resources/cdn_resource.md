@@ -56,11 +56,6 @@ resource "gcore_cdn_resource" "cdn_example_com" {
     redirect_http_to_https {
       value = true
     }
-    request_limiter {
-      rate_unit = "r/s"
-      rate = 5
-      burst = 1
-    }
     gzip_on {
       value = true
     }
@@ -150,7 +145,6 @@ Optional:
 - `redirect_http_to_https` (Block List, Max: 1) When enabled, HTTP requests are redirected to HTTPS. (see [below for nested schema](#nestedblock--options--redirect_http_to_https))
 - `redirect_https_to_http` (Block List, Max: 1) When enabled, HTTPS requests are redirected to HTTP. (see [below for nested schema](#nestedblock--options--redirect_https_to_http))
 - `referrer_acl` (Block List, Max: 1) Referrer access policy option allows to control access to the CDN Resource content for specified domain names. (see [below for nested schema](#nestedblock--options--referrer_acl))
-- `request_limiter` (Block List, Max: 1) It allows to limit the amount of HTTP requests (see [below for nested schema](#nestedblock--options--request_limiter))
 - `response_headers_hiding_policy` (Block List, Max: 1) Define HTTP headers (specified at an origin server) that a CDN server hides from the response. (see [below for nested schema](#nestedblock--options--response_headers_hiding_policy))
 - `rewrite` (Block List, Max: 1) Rewrite option changes and redirects the requests from the CDN to the origin. It operates according to the Nginx configuration. (see [below for nested schema](#nestedblock--options--rewrite))
 - `secure_key` (Block List, Max: 1) The option allows configuring an access with tokenized URLs. It makes impossible to access content without a valid (unexpired) hash key. When enabled, you need to specify a key that you use to generate a token. (see [below for nested schema](#nestedblock--options--secure_key))
@@ -595,21 +589,6 @@ Required:
 Optional:
 
 - `enabled` (Boolean)
-
-
-<a id="nestedblock--options--request_limiter"></a>
-### Nested Schema for `options.request_limiter`
-
-Required:
-
-- `burst` (Number)
-- `rate` (Number)
-
-Optional:
-
-- `delay` (Number)
-- `enabled` (Boolean)
-- `rate_unit` (String)
 
 
 <a id="nestedblock--options--response_headers_hiding_policy"></a>

@@ -160,12 +160,6 @@ resource "gcore_cdn_resource" "cdn_example_com" {
         "*.google.com"
       ]
     }
-    request_limiter {
-      rate = 5
-      burst = 1
-      rate_unit = "r/s"
-      delay = 0
-    }
     response_headers_hiding_policy {
       mode = "hide"
       excepted = [
