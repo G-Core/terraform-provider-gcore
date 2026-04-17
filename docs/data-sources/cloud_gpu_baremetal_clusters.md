@@ -42,6 +42,7 @@ Read-Only:
 
 - `created_at` (String) Cluster creation date time
 - `flavor` (String) Cluster flavor name
+- `has_pending_changes` (Boolean) True if any server in the cluster has pending (not yet applied) settings changes
 - `id` (String) Cluster unique identifier
 - `image_id` (String) Image ID
 - `managed_by` (String) User type managing the resource
