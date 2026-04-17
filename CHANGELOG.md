@@ -1,5 +1,66 @@
 # Changelog
 
+## 2.0.0-alpha.4 (2026-04-17)
+
+Full Changelog: [v2.0.0-alpha.3...v2.0.0-alpha.4](https://github.com/G-Core/terraform-provider-gcore/compare/v2.0.0-alpha.3...v2.0.0-alpha.4)
+
+### Features
+
+* add per-resource api permissions to schema description ([fe2ef35](https://github.com/G-Core/terraform-provider-gcore/commit/fe2ef3539059262ec0f5ef34d3430b97e2cd9318))
+* **api:** aggregated API specs update ([3a7edbb](https://github.com/G-Core/terraform-provider-gcore/commit/3a7edbb756a95c4cde4121c142343ef53dbce400))
+* **api:** aggregated API specs update ([5cca998](https://github.com/G-Core/terraform-provider-gcore/commit/5cca9989fb646cca3fe2add7135fd9ada16b25ee))
+* **api:** aggregated API specs update ([e29876a](https://github.com/G-Core/terraform-provider-gcore/commit/e29876a8e8ce79aa3c8260de0c935609d358254d))
+* **api:** aggregated API specs update ([5e9437f](https://github.com/G-Core/terraform-provider-gcore/commit/5e9437f8ff350b375fde3adedb8b827794641ff0))
+* **api:** aggregated API specs update ([88f1919](https://github.com/G-Core/terraform-provider-gcore/commit/88f1919fd51eaa4930d99e6791ffd349ac2a9484))
+* **api:** aggregated API specs update ([a3837f4](https://github.com/G-Core/terraform-provider-gcore/commit/a3837f4d7d7a075b095e82f1753787cddd32e298))
+* **api:** aggregated API specs update ([8c9baaa](https://github.com/G-Core/terraform-provider-gcore/commit/8c9baaa25b48963842f5e21bdcb9d9bbf9aa8fbb))
+* **api:** aggregated API specs update ([16692ef](https://github.com/G-Core/terraform-provider-gcore/commit/16692ef28abb3f86dd934084e3b014c7377a091c))
+* **api:** aggregated API specs update ([2fd8a29](https://github.com/G-Core/terraform-provider-gcore/commit/2fd8a2920732b014c98c7e73cf3f2bfa18d130b6))
+* **api:** aggregated API specs update ([3187470](https://github.com/G-Core/terraform-provider-gcore/commit/3187470a92e1efc60b376beda978f278587cc13e))
+* **api:** aggregated API specs update ([1837170](https://github.com/G-Core/terraform-provider-gcore/commit/18371707f6f1bb4544f9bdcd6c1c529e29c12235))
+* **api:** api update ([4d81d0a](https://github.com/G-Core/terraform-provider-gcore/commit/4d81d0aa7c53aab279875100c87fb360b07128d1))
+* **api:** feat(cli): add x-stainless-skip for limit/offset parameters in CLI target ([d34a7e0](https://github.com/G-Core/terraform-provider-gcore/commit/d34a7e0983268ed3b48a694e392e8e5aaa31d16c))
+* **api:** fix: skip offset parameter only for cli, not terraform ([f35645a](https://github.com/G-Core/terraform-provider-gcore/commit/f35645a1cbd67eefc73dc32f24d2b05059025908))
+* **api:** fix(cdn): harmonize pagination across CDN list endpoints ([29cd2d9](https://github.com/G-Core/terraform-provider-gcore/commit/29cd2d9a81b4e29f98d15c0538757d2316baf52f))
+* **cdn:** add S3 inline origins for origin groups ([aee1680](https://github.com/G-Core/terraform-provider-gcore/commit/aee1680c09f9a6eae1cb5f00026c5c656a929bf7))
+* **cloud:** add find_one_by to cloud_region data source ([7d3fcbd](https://github.com/G-Core/terraform-provider-gcore/commit/7d3fcbdbdd40f70c04544cf8d604c9bd8cced13b))
+
+
+### Bug Fixes
+
+* align cdn_resource_rule data source model tag with schema ([2ac73c9](https://github.com/G-Core/terraform-provider-gcore/commit/2ac73c9777bf796899e2cc512d2ad8e6b8643ffe))
+* **cdn:** deactivate cdn_resource_rule before deletion, mark deleted as no_refresh ([ec83f2d](https://github.com/G-Core/terraform-provider-gcore/commit/ec83f2dcec4d2b59a5cbddca0e5e86cb4c5469cb))
+* **ci:** add disk cleanup before goreleaser ([976ab43](https://github.com/G-Core/terraform-provider-gcore/commit/976ab4359ad552508c52c300b61ba459489d7ac9))
+* **ci:** in custom setup-go, pass through go-version and cache-dependency-path ([a6970f9](https://github.com/G-Core/terraform-provider-gcore/commit/a6970f90830450f5ce798ef985a159050d75035d))
+* **cloud:** allow tags to be refreshed ([44b8965](https://github.com/G-Core/terraform-provider-gcore/commit/44b8965ce20afb896aa331036b89ec0c7bcf5166))
+* **cloud:** prevent forced replacement of project_id/region_id after import ([1e85cb9](https://github.com/G-Core/terraform-provider-gcore/commit/1e85cb90e6ef60533463b3562d4821f58e439f64))
+* **cloud:** restore cloud_k8s_cluster_kubeconfig data source ([032b755](https://github.com/G-Core/terraform-provider-gcore/commit/032b75553ed30bd3c3de23e9f160321a30d460d8))
+* **cloud:** restore missing customfield import in cloud_instance_image ([3e1c5b2](https://github.com/G-Core/terraform-provider-gcore/commit/3e1c5b2ad6018155e76dcfd47811df708c29c7af))
+* **cloud:** restore params for inference flavors list data source ([70b0109](https://github.com/G-Core/terraform-provider-gcore/commit/70b010998820fa1e161a07d1bacd172daf060b27))
+* fall back to main branch if linking fails in CI ([1f6c142](https://github.com/G-Core/terraform-provider-gcore/commit/1f6c1421e102af0613623c67aaed045a13f5e449))
+* fix for failing to drop invalid module replace in link script ([add67cf](https://github.com/G-Core/terraform-provider-gcore/commit/add67cf831de25a5d926c844f70235db211c9dbe))
+* fix quoting typo ([ccf4b27](https://github.com/G-Core/terraform-provider-gcore/commit/ccf4b27325110b4bbc1cbcb5b9a31500419c4b3f))
+* remove jsonencode() requirement for content fields ([f6b926d](https://github.com/G-Core/terraform-provider-gcore/commit/f6b926df5438bdd59f1286cd4cf333cf64ff9c53))
+* update custom code for Go SDK v0.41.0 compatibility ([ec863f1](https://github.com/G-Core/terraform-provider-gcore/commit/ec863f156372b899a704a1e015284a3123b74880))
+
+
+### Chores
+
+* add comment ([1b19948](https://github.com/G-Core/terraform-provider-gcore/commit/1b1994840da9922d53265c2ae97911e5b64ebe05))
+* **internal:** codegen related update ([75911d6](https://github.com/G-Core/terraform-provider-gcore/commit/75911d66de2abcb7b69746a819499753a5897969))
+* pin go releaser version ([5fc2d04](https://github.com/G-Core/terraform-provider-gcore/commit/5fc2d046cbf1200fe9bc1e7abb34d0219d18b36c))
+* regenerate docs ([fd0fe40](https://github.com/G-Core/terraform-provider-gcore/commit/fd0fe409afdc40ca8e78883d10bd048522fe91fc))
+* skip shared CDN limit $ref parameter in terraform codegen ([2ccac86](https://github.com/G-Core/terraform-provider-gcore/commit/2ccac86f61c7e2aeac8fb003b2554eb5fde04f18))
+* skip shared CDN limit $ref parameter in terraform codegen ([3f9e63c](https://github.com/G-Core/terraform-provider-gcore/commit/3f9e63cf26a2cb8f4afcccc1e2a01559cb16c786))
+* **tests:** bump steady to v0.20.1 ([5126625](https://github.com/G-Core/terraform-provider-gcore/commit/5126625b77f16ace6b13d5482f7bf62d581dc116))
+* **tests:** bump steady to v0.20.2 ([d17bfc7](https://github.com/G-Core/terraform-provider-gcore/commit/d17bfc7390fc0c67218c82c0b900ad3b81d41fe0))
+
+
+### Documentation
+
+* clarify provider-level project/region IDs as dev convenience ([9f148a5](https://github.com/G-Core/terraform-provider-gcore/commit/9f148a5d3c4df1ff2bd0dc573c0cbe12a0c13c50))
+* update examples ([8562e89](https://github.com/G-Core/terraform-provider-gcore/commit/8562e891578446bffc2a2ee53afb7add7148ab79))
+
 ## 2.0.0-alpha.3 (2026-03-30)
 
 Full Changelog: [v2.0.0-alpha.2...v2.0.0-alpha.3](https://github.com/G-Core/terraform-provider-gcore/compare/v2.0.0-alpha.2...v2.0.0-alpha.3)
