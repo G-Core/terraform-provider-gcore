@@ -14,8 +14,8 @@ Routers interconnect subnets and manage network routing, including external gate
 
 ```terraform
 resource "gcore_cloud_network_router" "example_cloud_network_router" {
-  project_id = 0
-  region_id = 0
+  project_id = 1
+  region_id = 1
   name = "my_wonderful_router"
   external_gateway_info = {
     enable_snat = true
@@ -43,8 +43,8 @@ resource "gcore_cloud_network_router" "example_cloud_network_router" {
 
 - `external_gateway_info` (Attributes) External gateway configuration. Use type 'default' to let the platform automatically select the external network, or type 'manual' to specify a particular external network via `network_id`. If omitted, the router is created without an external gateway. (see [below for nested schema](#nestedatt--external_gateway_info))
 - `interfaces` (Attributes List) List of interfaces to attach to router immediately after creation. (see [below for nested schema](#nestedatt--interfaces))
-- `project_id` (Number)
-- `region_id` (Number)
+- `project_id` (Number) Project ID
+- `region_id` (Number) Region ID
 - `routes` (Attributes List) List of custom routes. (see [below for nested schema](#nestedatt--routes))
 
 ### Read-Only

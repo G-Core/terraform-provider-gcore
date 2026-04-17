@@ -14,8 +14,9 @@ Routers interconnect subnets and manage network routing, including external gate
 
 ```terraform
 data "gcore_cloud_network_routers" "example_cloud_network_routers" {
-  project_id = 0
-  region_id = 0
+  project_id = 1
+  region_id = 1
+  name = "router-name"
 }
 ```
 
@@ -25,8 +26,9 @@ data "gcore_cloud_network_routers" "example_cloud_network_routers" {
 ### Optional
 
 - `max_items` (Number) Max items to fetch, default: 1000
-- `project_id` (Number)
-- `region_id` (Number)
+- `name` (String) Optional. Filter routers by name
+- `project_id` (Number) Project ID
+- `region_id` (Number) Region ID
 
 ### Read-Only
 

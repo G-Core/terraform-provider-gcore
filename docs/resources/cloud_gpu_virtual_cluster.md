@@ -75,6 +75,7 @@ resource "gcore_cloud_gpu_virtual_cluster" "example_cloud_gpu_virtual_cluster" {
 ### Read-Only
 
 - `created_at` (String) Cluster creation date time
+- `has_pending_changes` (Boolean) True if any server in the cluster has pending (not yet applied) settings changes
 - `id` (String) The ID of this resource.
 - `servers_ids` (List of String) List of cluster nodes
 - `status` (String) Cluster status
