@@ -1,5 +1,13 @@
 # Changelog
 
+## 2.0.0-alpha.5 (2026-04-17)
+
+Full Changelog: [v2.0.0-alpha.4...v2.0.0-alpha.5](https://github.com/G-Core/terraform-provider-gcore/compare/v2.0.0-alpha.4...v2.0.0-alpha.5)
+
+### Chores
+
+* **tests:** bump steady to v0.22.1 ([7622522](https://github.com/G-Core/terraform-provider-gcore/commit/76225229a9f0cbe7afa1f2464593b3893cbf31c7))
+
 ## 2.0.0-alpha.4 (2026-04-17)
 
 Full Changelog: [v2.0.0-alpha.3...v2.0.0-alpha.4](https://github.com/G-Core/terraform-provider-gcore/compare/v2.0.0-alpha.3...v2.0.0-alpha.4)
