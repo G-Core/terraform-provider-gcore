@@ -22,7 +22,7 @@ terraform {
   required_providers {
     gcore = {
       source  = "G-Core/gcore"
-      version = "~> 2.0.0-alpha.3"
+      version = "~> 2.0.0-alpha.4"
     }
   }
 }
