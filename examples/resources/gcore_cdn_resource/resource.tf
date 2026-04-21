@@ -8,12 +8,6 @@ resource "gcore_cdn_resource" "example_cdn_resource" {
       enabled = true
       value = ["GET", "POST"]
     }
-    bot_protection = {
-      bot_challenge = {
-        enabled = true
-      }
-      enabled = true
-    }
     brotli_compression = {
       enabled = true
       value = ["text/html", "text/plain"]

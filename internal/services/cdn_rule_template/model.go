@@ -33,7 +33,6 @@ func (m CDNRuleTemplateModel) MarshalJSONForUpdate(state CDNRuleTemplateModel) (
 
 type CDNRuleTemplateOptionsModel struct {
 	AllowedHTTPMethods          customfield.NestedObject[CDNRuleTemplateOptionsAllowedHTTPMethodsModel]          `tfsdk:"allowed_http_methods" json:"allowedHttpMethods,computed_optional"`
-	BotProtection               customfield.NestedObject[CDNRuleTemplateOptionsBotProtectionModel]               `tfsdk:"bot_protection" json:"bot_protection,computed_optional"`
 	BrotliCompression           customfield.NestedObject[CDNRuleTemplateOptionsBrotliCompressionModel]           `tfsdk:"brotli_compression" json:"brotli_compression,computed_optional"`
 	BrowserCacheSettings        customfield.NestedObject[CDNRuleTemplateOptionsBrowserCacheSettingsModel]        `tfsdk:"browser_cache_settings" json:"browser_cache_settings,computed_optional"`
 	CacheHTTPHeaders            customfield.NestedObject[CDNRuleTemplateOptionsCacheHTTPHeadersModel]            `tfsdk:"cache_http_headers" json:"cache_http_headers,computed_optional"`
@@ -82,15 +81,6 @@ type CDNRuleTemplateOptionsModel struct {
 type CDNRuleTemplateOptionsAllowedHTTPMethodsModel struct {
 	Enabled types.Bool                    `tfsdk:"enabled" json:"enabled,required"`
 	Value   customfield.Set[types.String] `tfsdk:"value" json:"value,required"`
-}
-
-type CDNRuleTemplateOptionsBotProtectionModel struct {
-	BotChallenge *CDNRuleTemplateOptionsBotProtectionBotChallengeModel `tfsdk:"bot_challenge" json:"bot_challenge,required"`
-	Enabled      types.Bool                                            `tfsdk:"enabled" json:"enabled,required"`
-}
-
-type CDNRuleTemplateOptionsBotProtectionBotChallengeModel struct {
-	Enabled types.Bool `tfsdk:"enabled" json:"enabled,computed_optional"`
 }
 
 type CDNRuleTemplateOptionsBrotliCompressionModel struct {

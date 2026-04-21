@@ -49,7 +49,6 @@ type CDNResourceDataSourceModel struct {
 
 type CDNResourceOptionsDataSourceModel struct {
 	AllowedHTTPMethods          customfield.NestedObject[CDNResourceOptionsAllowedHTTPMethodsDataSourceModel]          `tfsdk:"allowed_http_methods" json:"allowedHttpMethods,computed"`
-	BotProtection               customfield.NestedObject[CDNResourceOptionsBotProtectionDataSourceModel]               `tfsdk:"bot_protection" json:"bot_protection,computed"`
 	BrotliCompression           customfield.NestedObject[CDNResourceOptionsBrotliCompressionDataSourceModel]           `tfsdk:"brotli_compression" json:"brotli_compression,computed"`
 	BrowserCacheSettings        customfield.NestedObject[CDNResourceOptionsBrowserCacheSettingsDataSourceModel]        `tfsdk:"browser_cache_settings" json:"browser_cache_settings,computed"`
 	CacheHTTPHeaders            customfield.NestedObject[CDNResourceOptionsCacheHTTPHeadersDataSourceModel]            `tfsdk:"cache_http_headers" json:"cache_http_headers,computed"`
@@ -104,15 +103,6 @@ type CDNResourceOptionsDataSourceModel struct {
 type CDNResourceOptionsAllowedHTTPMethodsDataSourceModel struct {
 	Enabled types.Bool                    `tfsdk:"enabled" json:"enabled,computed"`
 	Value   customfield.Set[types.String] `tfsdk:"value" json:"value,computed"`
-}
-
-type CDNResourceOptionsBotProtectionDataSourceModel struct {
-	BotChallenge customfield.NestedObject[CDNResourceOptionsBotProtectionBotChallengeDataSourceModel] `tfsdk:"bot_challenge" json:"bot_challenge,computed"`
-	Enabled      types.Bool                                                                           `tfsdk:"enabled" json:"enabled,computed"`
-}
-
-type CDNResourceOptionsBotProtectionBotChallengeDataSourceModel struct {
-	Enabled types.Bool `tfsdk:"enabled" json:"enabled,computed"`
 }
 
 type CDNResourceOptionsBrotliCompressionDataSourceModel struct {

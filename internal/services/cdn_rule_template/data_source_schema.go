@@ -97,28 +97,6 @@ func DataSourceSchema(ctx context.Context) schema.Schema {
 							},
 						},
 					},
-					"bot_protection": schema.SingleNestedAttribute{
-						Description: "Allows to prevent online services from overloading and ensure your business workflow running smoothly.",
-						Computed:    true,
-						CustomType:  customfield.NewNestedObjectType[CDNRuleTemplateOptionsBotProtectionDataSourceModel](ctx),
-						Attributes: map[string]schema.Attribute{
-							"bot_challenge": schema.SingleNestedAttribute{
-								Description: "Controls the bot challenge module state.",
-								Computed:    true,
-								CustomType:  customfield.NewNestedObjectType[CDNRuleTemplateOptionsBotProtectionBotChallengeDataSourceModel](ctx),
-								Attributes: map[string]schema.Attribute{
-									"enabled": schema.BoolAttribute{
-										Description: "Possible values:\n- **true** - Bot challenge is enabled.\n- **false** - Bot challenge is disabled.",
-										Computed:    true,
-									},
-								},
-							},
-							"enabled": schema.BoolAttribute{
-								Description: "Controls the option state.\n\nPossible values:\n- **true** - Option is enabled.\n- **false** - Option is disabled.",
-								Computed:    true,
-							},
-						},
-					},
 					"brotli_compression": schema.SingleNestedAttribute{
 						Description: "Compresses content with Brotli on the CDN side. CDN servers will request only uncompressed content from the origin.\n\nNotes:\n\n1. CDN only supports \"Brotli compression\" when the \"origin shielding\" feature is activated.\n2. If a precache server is not active for a CDN resource, no compression occurs, even if the option is enabled.\n3. `brotli_compression` is not supported with `fetch_compressed` or `slice` options enabled.\n4. `fetch_compressed` option in CDN resource settings overrides `brotli_compression` in rules. If you enabled `fetch_compressed` in CDN resource and want to enable `brotli_compression` in a rule, you must specify `fetch_compressed:false` in the rule.",
 						Computed:    true,
