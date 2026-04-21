@@ -7,12 +7,6 @@ resource "gcore_cdn_rule_template" "example_cdn_rule_template" {
       enabled = true
       value = ["GET", "POST"]
     }
-    bot_protection = {
-      bot_challenge = {
-        enabled = true
-      }
-      enabled = true
-    }
     brotli_compression = {
       enabled = true
       value = ["text/html", "text/plain"]
