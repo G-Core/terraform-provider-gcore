@@ -70,7 +70,6 @@ type CDNResourceRuleOptionsDataSourceModel struct {
 	RedirectHTTPToHTTPS         customfield.NestedObject[CDNResourceRuleOptionsRedirectHTTPToHTTPSDataSourceModel]         `tfsdk:"redirect_http_to_https" json:"redirect_http_to_https,computed"`
 	RedirectHTTPSToHTTP         customfield.NestedObject[CDNResourceRuleOptionsRedirectHTTPSToHTTPDataSourceModel]         `tfsdk:"redirect_https_to_http" json:"redirect_https_to_http,computed"`
 	ReferrerACL                 customfield.NestedObject[CDNResourceRuleOptionsReferrerACLDataSourceModel]                 `tfsdk:"referrer_acl" json:"referrer_acl,computed"`
-	RequestLimiter              customfield.NestedObject[CDNResourceRuleOptionsRequestLimiterDataSourceModel]              `tfsdk:"request_limiter" json:"request_limiter,computed"`
 	ResponseHeadersHidingPolicy customfield.NestedObject[CDNResourceRuleOptionsResponseHeadersHidingPolicyDataSourceModel] `tfsdk:"response_headers_hiding_policy" json:"response_headers_hiding_policy,computed"`
 	Rewrite                     customfield.NestedObject[CDNResourceRuleOptionsRewriteDataSourceModel]                     `tfsdk:"rewrite" json:"rewrite,computed"`
 	SecureKey                   customfield.NestedObject[CDNResourceRuleOptionsSecureKeyDataSourceModel]                   `tfsdk:"secure_key" json:"secure_key,computed"`
@@ -295,14 +294,6 @@ type CDNResourceRuleOptionsReferrerACLDataSourceModel struct {
 	Enabled        types.Bool                    `tfsdk:"enabled" json:"enabled,computed"`
 	ExceptedValues customfield.Set[types.String] `tfsdk:"excepted_values" json:"excepted_values,computed"`
 	PolicyType     types.String                  `tfsdk:"policy_type" json:"policy_type,computed"`
-}
-
-type CDNResourceRuleOptionsRequestLimiterDataSourceModel struct {
-	Enabled  types.Bool   `tfsdk:"enabled" json:"enabled,computed"`
-	Rate     types.Int64  `tfsdk:"rate" json:"rate,computed"`
-	Burst    types.Int64  `tfsdk:"burst" json:"burst,computed"`
-	Delay    types.Int64  `tfsdk:"delay" json:"delay,computed"`
-	RateUnit types.String `tfsdk:"rate_unit" json:"rate_unit,computed"`
 }
 
 type CDNResourceRuleOptionsResponseHeadersHidingPolicyDataSourceModel struct {
