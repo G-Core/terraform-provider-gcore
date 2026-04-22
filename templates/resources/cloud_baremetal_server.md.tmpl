@@ -35,6 +35,12 @@ Create a baremetal server using a pre-allocated reserved fixed IP address.
 
 {{tffile "examples/resources/gcore_cloud_baremetal_server/reserved-address.tf"}}
 
+### Baremetal server with floating IP
+
+Create a baremetal server and attach a floating IP address for external access.
+
+{{tffile "examples/resources/gcore_cloud_baremetal_server/fip.tf"}}
+
 ### Windows baremetal server with two users
 
 Create a Windows baremetal server and use userdata to add a second user during provisioning.
