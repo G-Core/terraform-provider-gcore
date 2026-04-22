@@ -22,12 +22,6 @@ resource "gcore_cdn_rule_template" "example_cdn_rule_template" {
       enabled = true
       value = ["GET", "POST"]
     }
-    bot_protection = {
-      bot_challenge = {
-        enabled = true
-      }
-      enabled = true
-    }
     brotli_compression = {
       enabled = true
       value = ["text/html", "text/plain"]
@@ -332,7 +326,6 @@ Possible values:
 Optional:
 
 - `allowed_http_methods` (Attributes) HTTP methods allowed for content requests from the CDN. (see [below for nested schema](#nestedatt--options--allowed_http_methods))
-- `bot_protection` (Attributes) Allows to prevent online services from overloading and ensure your business workflow running smoothly. (see [below for nested schema](#nestedatt--options--bot_protection))
 - `brotli_compression` (Attributes) Compresses content with Brotli on the CDN side. CDN servers will request only uncompressed content from the origin.
 
 Notes:
@@ -472,29 +465,6 @@ Possible values:
 - **true** - Option is enabled.
 - **false** - Option is disabled.
 - `value` (Set of String)
-
-
-<a id="nestedatt--options--bot_protection"></a>
-### Nested Schema for `options.bot_protection`
-
-Required:
-
-- `bot_challenge` (Attributes) Controls the bot challenge module state. (see [below for nested schema](#nestedatt--options--bot_protection--bot_challenge))
-- `enabled` (Boolean) Controls the option state.
-
-Possible values:
-- **true** - Option is enabled.
-- **false** - Option is disabled.
-
-<a id="nestedatt--options--bot_protection--bot_challenge"></a>
-### Nested Schema for `options.bot_protection.bot_challenge`
-
-Optional:
-
-- `enabled` (Boolean) Possible values:
-- **true** - Bot challenge is enabled.
-- **false** - Bot challenge is disabled.
-
 
 
 <a id="nestedatt--options--brotli_compression"></a>
