@@ -53,6 +53,7 @@ import (
 	"github.com/G-Core/terraform-provider-gcore/internal/services/fastedge_binary"
 	"github.com/G-Core/terraform-provider-gcore/internal/services/fastedge_secret"
 	"github.com/G-Core/terraform-provider-gcore/internal/services/fastedge_template"
+	"github.com/G-Core/terraform-provider-gcore/internal/services/storage_location"
 	"github.com/G-Core/terraform-provider-gcore/internal/services/waap_domain"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
@@ -310,6 +311,7 @@ func (p *GcoreProvider) DataSources(ctx context.Context) []func() datasource.Dat
 		dns_zone.NewDNSZoneDataSource,
 		dns_zone_rrset.NewDNSZoneRrsetDataSource,
 		dns_network_mapping.NewDNSNetworkMappingDataSource,
+		storage_location.NewStorageLocationsDataSource,
 		cdn_resource.NewCDNResourceDataSource,
 		cdn_resource_rule.NewCDNResourceRuleDataSource,
 		cdn_rule_template.NewCDNRuleTemplateDataSource,
