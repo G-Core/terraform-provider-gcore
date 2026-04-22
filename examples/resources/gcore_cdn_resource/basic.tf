@@ -47,10 +47,5 @@ resource "gcore_cdn_resource" "example" {
       code    = 200
       body    = "OK"
     }
-    request_limiter = {
-      enabled   = true
-      rate_unit = "r/s"
-      rate      = 5
-    }
   }
 }

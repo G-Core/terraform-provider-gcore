@@ -65,11 +65,6 @@ resource "gcore_cdn_resource" "example" {
       code    = 200
       body    = "OK"
     }
-    request_limiter = {
-      enabled   = true
-      rate_unit = "r/s"
-      rate      = 5
-    }
   }
 }
 ```
@@ -230,12 +225,6 @@ resource "gcore_cdn_resource" "example" {
       excepted = ["my-header"]
     }
 
-    # Rate limiting
-    request_limiter = {
-      enabled   = true
-      rate      = 5
-      rate_unit = "r/s"
-    }
     limit_bandwidth = {
       enabled    = true
       limit_type = "static"
@@ -521,7 +510,6 @@ This is particularly useful for maintaining continuity in security, analytics, a
 
 `redirect_http_to_https` and `redirect_https_to_http` options cannot be enabled simultaneously. (see [below for nested schema](#nestedatt--options--redirect_https_to_http))
 - `referrer_acl` (Attributes) Controls access to the CDN resource content for specified domain names. (see [below for nested schema](#nestedatt--options--referrer_acl))
-- `request_limiter` (Attributes) Option allows to limit the amount of HTTP requests. (see [below for nested schema](#nestedatt--options--request_limiter))
 - `response_headers_hiding_policy` (Attributes) Hides HTTP headers from an origin server in the CDN response. (see [below for nested schema](#nestedatt--options--response_headers_hiding_policy))
 - `rewrite` (Attributes) Changes and redirects requests from the CDN to the origin. It operates according to the [Nginx](https://nginx.org/en/docs/http/ngx_http_rewrite_module.html#rewrite) configuration. (see [below for nested schema](#nestedatt--options--rewrite))
 - `secure_key` (Attributes) Configures access with tokenized URLs. This makes impossible to access content without a valid (unexpired) token. (see [below for nested schema](#nestedatt--options--secure_key))
@@ -1190,35 +1178,6 @@ Possible values:
 - **allow** - Allow access to all domain names except the domain names specified in `excepted_values` field.
 - **deny** - Deny access to all domain names except the domain names specified in `excepted_values` field.
 Available values: "allow", "deny".
-
-
-<a id="nestedatt--options--request_limiter"></a>
-### Nested Schema for `options.request_limiter`
-
-Required:
-
-- `enabled` (Boolean) Controls the option state.
-
-Possible values:
-- **true** - Option is enabled.
-- **false** - Option is disabled.
-- `rate` (Number) Maximum request rate.
-
-Optional:
-
-- `rate_unit` (String) Units of measurement for the `rate` field.
-
-Possible values:
-- **r/s** - Requests per second.
-- **r/m** - Requests per minute.
-
-If the rate is less than one request per second, it is specified in request per minute (r/m.)
-Available values: "r/s", "r/m".
-
-Read-Only:
-
-- `burst` (Number)
-- `delay` (Number)
 
 
 <a id="nestedatt--options--response_headers_hiding_policy"></a>
