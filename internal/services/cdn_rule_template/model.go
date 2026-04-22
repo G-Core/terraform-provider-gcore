@@ -63,7 +63,6 @@ type CDNRuleTemplateOptionsModel struct {
 	RedirectHTTPToHTTPS         customfield.NestedObject[CDNRuleTemplateOptionsRedirectHTTPToHTTPSModel]         `tfsdk:"redirect_http_to_https" json:"redirect_http_to_https,computed_optional"`
 	RedirectHTTPSToHTTP         customfield.NestedObject[CDNRuleTemplateOptionsRedirectHTTPSToHTTPModel]         `tfsdk:"redirect_https_to_http" json:"redirect_https_to_http,computed_optional"`
 	ReferrerACL                 customfield.NestedObject[CDNRuleTemplateOptionsReferrerACLModel]                 `tfsdk:"referrer_acl" json:"referrer_acl,computed_optional"`
-	RequestLimiter              customfield.NestedObject[CDNRuleTemplateOptionsRequestLimiterModel]              `tfsdk:"request_limiter" json:"request_limiter,computed_optional"`
 	ResponseHeadersHidingPolicy customfield.NestedObject[CDNRuleTemplateOptionsResponseHeadersHidingPolicyModel] `tfsdk:"response_headers_hiding_policy" json:"response_headers_hiding_policy,computed_optional"`
 	Rewrite                     customfield.NestedObject[CDNRuleTemplateOptionsRewriteModel]                     `tfsdk:"rewrite" json:"rewrite,computed_optional"`
 	SecureKey                   customfield.NestedObject[CDNRuleTemplateOptionsSecureKeyModel]                   `tfsdk:"secure_key" json:"secure_key,computed_optional"`
@@ -288,14 +287,6 @@ type CDNRuleTemplateOptionsReferrerACLModel struct {
 	Enabled        types.Bool                    `tfsdk:"enabled" json:"enabled,required"`
 	ExceptedValues customfield.Set[types.String] `tfsdk:"excepted_values" json:"excepted_values,required"`
 	PolicyType     types.String                  `tfsdk:"policy_type" json:"policy_type,required"`
-}
-
-type CDNRuleTemplateOptionsRequestLimiterModel struct {
-	Enabled  types.Bool   `tfsdk:"enabled" json:"enabled,required"`
-	Rate     types.Int64  `tfsdk:"rate" json:"rate,required"`
-	Burst    types.Int64  `tfsdk:"burst" json:"burst,computed"`
-	Delay    types.Int64  `tfsdk:"delay" json:"delay,computed"`
-	RateUnit types.String `tfsdk:"rate_unit" json:"rate_unit,computed_optional"`
 }
 
 type CDNRuleTemplateOptionsResponseHeadersHidingPolicyModel struct {

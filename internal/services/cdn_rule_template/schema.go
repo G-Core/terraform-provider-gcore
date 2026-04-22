@@ -852,40 +852,6 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 							},
 						},
 					},
-					"request_limiter": schema.SingleNestedAttribute{
-						Description: "Option allows to limit the amount of HTTP requests.",
-						Computed:    true,
-						Optional:    true,
-						CustomType:  customfield.NewNestedObjectType[CDNRuleTemplateOptionsRequestLimiterModel](ctx),
-						Attributes: map[string]schema.Attribute{
-							"enabled": schema.BoolAttribute{
-								Description: "Controls the option state.\n\nPossible values:\n- **true** - Option is enabled.\n- **false** - Option is disabled.",
-								Required:    true,
-							},
-							"rate": schema.Int64Attribute{
-								Description: "Maximum request rate.",
-								Required:    true,
-								Validators: []validator.Int64{
-									int64validator.AtLeast(1),
-								},
-							},
-							"burst": schema.Int64Attribute{
-								Computed: true,
-							},
-							"delay": schema.Int64Attribute{
-								Computed: true,
-							},
-							"rate_unit": schema.StringAttribute{
-								Description: "Units of measurement for the `rate` field.\n\nPossible values:\n- **r/s** - Requests per second.\n- **r/m** - Requests per minute.\n\nIf the rate is less than one request per second, it is specified in request per minute (r/m.)\nAvailable values: \"r/s\", \"r/m\".",
-								Computed:    true,
-								Optional:    true,
-								Validators: []validator.String{
-									stringvalidator.OneOfCaseInsensitive("r/s", "r/m"),
-								},
-								Default: stringdefault.StaticString("r/s"),
-							},
-						},
-					},
 					"response_headers_hiding_policy": schema.SingleNestedAttribute{
 						Description: "Hides HTTP headers from an origin server in the CDN response.",
 						Computed:    true,

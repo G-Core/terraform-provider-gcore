@@ -185,11 +185,6 @@ resource "gcore_cdn_resource" "example_cdn_resource" {
       excepted_values = ["example.com", "*.example.net"]
       policy_type = "deny"
     }
-    request_limiter = {
-      enabled = true
-      rate = 5
-      rate_unit = "r/s"
-    }
     response_headers_hiding_policy = {
       enabled = true
       excepted = ["my-header"]
