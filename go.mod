@@ -96,3 +96,5 @@ require (
 	gopkg.in/yaml.v2 v2.3.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
+
+replace github.com/G-Core/gcore-go => github.com/G-Core/gcore-go v0.42.1-0.20260421094608-36ca505ce285

@@ -85,10 +85,3 @@ func ConvertAPITagsToCustomfieldMap(ctx context.Context, jsonBytes []byte) (cust
 	}
 	return customfield.NewMapMust(ctx, *tags), true
 }
-
-// ConvertAPITagsToMap parses raw API JSON and extracts the tags array,
-// returning a *map[string]types.String. Filters out read_only system tags.
-// Returns nil only if JSON parsing fails entirely.
-func ConvertAPITagsToMap(jsonBytes []byte) *map[string]types.String {
-	return parseTagsFromJSON(jsonBytes)
-}

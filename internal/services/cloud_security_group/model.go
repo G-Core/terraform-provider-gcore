@@ -15,8 +15,7 @@ type CloudSecurityGroupModel struct {
 	RegionID       types.Int64                                                 `tfsdk:"region_id" path:"region_id,optional"`
 	Name           types.String                                                `tfsdk:"name" json:"name,required"`
 	Description    types.String                                                `tfsdk:"description" json:"description,computed_optional"`
-	Rules              *[]*CloudSecurityGroupRulesModel                                        `tfsdk:"rules" json:"rules,optional,no_refresh"`
-	Tags               customfield.Map[types.String]                                           `tfsdk:"tags" json:"tags,computed_optional,no_refresh"`
+	Tags           customfield.Map[types.String]                               `tfsdk:"tags" json:"tags,computed_optional,no_refresh"`
 	CreatedAt      timetypes.RFC3339                                           `tfsdk:"created_at" json:"created_at,computed" format:"date-time"`
 	Region         types.String                                                `tfsdk:"region" json:"region,computed"`
 	RevisionNumber types.Int64                                                 `tfsdk:"revision_number" json:"revision_number,computed"`

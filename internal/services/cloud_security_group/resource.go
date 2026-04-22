@@ -99,7 +99,9 @@ func (r *CloudSecurityGroupResource) Create(ctx context.Context, req resource.Cr
 		resp.Diagnostics.AddError("failed to deserialize http request", err.Error())
 		return
 	}
-	data.Tags = custom.ConvertAPITagsToMap([]byte(securityGroup.RawJSON()))
+	if tags, ok := custom.ConvertAPITagsToCustomfieldMap(ctx, []byte(securityGroup.RawJSON())); ok {
+		data.Tags = tags
+	}
 
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
 }
@@ -152,7 +154,9 @@ func (r *CloudSecurityGroupResource) Update(ctx context.Context, req resource.Up
 		resp.Diagnostics.AddError("failed to deserialize http request", err.Error())
 		return
 	}
-	data.Tags = custom.ConvertAPITagsToMap([]byte(securityGroup.RawJSON()))
+	if tags, ok := custom.ConvertAPITagsToCustomfieldMap(ctx, []byte(securityGroup.RawJSON())); ok {
+		data.Tags = tags
+	}
 
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
 }
@@ -200,7 +204,9 @@ func (r *CloudSecurityGroupResource) Read(ctx context.Context, req resource.Read
 		return
 	}
 
-	data.Tags = custom.ConvertAPITagsToMap(bytes)
+	if tags, ok := custom.ConvertAPITagsToCustomfieldMap(ctx, bytes); ok {
+		data.Tags = tags
+	}
 
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
 }
@@ -282,7 +288,9 @@ func (r *CloudSecurityGroupResource) ImportState(ctx context.Context, req resour
 		return
 	}
 
-	data.Tags = custom.ConvertAPITagsToMap(bytes)
+	if tags, ok := custom.ConvertAPITagsToCustomfieldMap(ctx, bytes); ok {
+		data.Tags = tags
+	}
 
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
 }
