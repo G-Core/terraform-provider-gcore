@@ -149,12 +149,6 @@ resource "gcore_cdn_resource" "example" {
       excepted = ["my-header"]
     }
 
-    # Rate limiting
-    request_limiter = {
-      enabled   = true
-      rate      = 5
-      rate_unit = "r/s"
-    }
     limit_bandwidth = {
       enabled    = true
       limit_type = "static"
