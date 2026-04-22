@@ -9,9 +9,12 @@ import (
 )
 
 // UseNullForRemoval returns a plan modifier that:
-// - Uses the state value when the config value is unknown (computed behavior)
-// - Uses null when the config value is explicitly null (removal behavior)
-// - Uses the config value when explicitly set
+//   - Uses the state value when the config value is unknown and state has a value
+//     (computed behavior during updates)
+//   - Keeps the plan value unknown when the config value is unknown and state is
+//     null (resource creation referencing another resource's computed attribute)
+//   - Uses null when the config value is explicitly null (removal behavior)
+//   - Uses the config value when explicitly set
 //
 // This solves the "computed_optional removal" problem where Terraform doesn't
 // distinguish between "not set" and "explicitly removed".
@@ -30,8 +33,15 @@ func (m useNullForRemovalModifier) MarkdownDescription(_ context.Context) string
 }
 
 func (m useNullForRemovalModifier) PlanModifyString(_ context.Context, req planmodifier.StringRequest, resp *planmodifier.StringResponse) {
-	// If the config value is unknown, use the state value (computed behavior)
+	// If the config value is unknown (e.g. references a computed attribute on
+	// another resource), preserve state during updates. On Create there is no
+	// prior state, so keep the plan unknown - otherwise Terraform rejects a
+	// null plan that does not match the unknown config value.
 	if req.ConfigValue.IsUnknown() {
+		if req.StateValue.IsNull() {
+			resp.PlanValue = types.StringUnknown()
+			return
+		}
 		resp.PlanValue = req.StateValue
 		return
 	}

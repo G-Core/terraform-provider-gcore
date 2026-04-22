@@ -36,7 +36,7 @@ Cover at minimum:
 
 | Modifier | Type | Description |
 |----------|------|-------------|
-| `UseNullForRemoval()` | String | Uses null when config removed, state when unknown |
+| `UseNullForRemoval()` | String | Uses null when config removed; state when unknown with prior state; unknown when unknown without prior state (Create) |
 | `RequiresReplaceIfConfiguredPreservingState()` | Int64 | Requires replace only when user explicitly sets a different value; preserves state when config is null |
 | `UseEmptyListWhenConfigNull()` | List | Sets empty list when config null (for clearing lists) |
 | `UseStateForUnknownIncludingNullString()` | String | Preserves state (including null) when plan unknown |

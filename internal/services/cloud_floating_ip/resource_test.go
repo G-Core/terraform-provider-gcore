@@ -8,6 +8,7 @@ import (
 
 	"github.com/G-Core/gcore-go/cloud"
 	"github.com/G-Core/gcore-go/packages/param"
+	"github.com/hashicorp/terraform-plugin-testing/compare"
 	"github.com/hashicorp/terraform-plugin-testing/helper/resource"
 	"github.com/hashicorp/terraform-plugin-testing/knownvalue"
 	"github.com/hashicorp/terraform-plugin-testing/statecheck"
@@ -58,6 +59,45 @@ func TestAccCloudFloatingIP_withTags(t *testing.T) {
 				ConfigStateChecks: []statecheck.StateCheck{
 					statecheck.ExpectKnownValue("gcore_cloud_floating_ip.test",
 						tfjsonpath.New("tags").AtMapKey("test_key"), knownvalue.StringExact("value2")),
+				},
+			},
+		},
+	})
+}
+
+// TestAccCloudFloatingIP_withReservedFixedIP is the regression guard for
+// GCLOUD2-24423: creating a floating IP whose port_id/fixed_ip_address
+// reference a reserved fixed IP in the same apply must succeed in a single
+// plan-apply cycle (no "Provider produced invalid plan" error).
+func TestAccCloudFloatingIP_withReservedFixedIP(t *testing.T) {
+	rName := acctest.RandomName()
+	comparePortID := statecheck.CompareValuePairs(
+		"gcore_cloud_reserved_fixed_ip.test", tfjsonpath.New("port_id"),
+		"gcore_cloud_floating_ip.test", tfjsonpath.New("port_id"),
+		compare.ValuesSame(),
+	)
+	compareFixedIP := statecheck.CompareValuePairs(
+		"gcore_cloud_reserved_fixed_ip.test", tfjsonpath.New("fixed_ip_address"),
+		"gcore_cloud_floating_ip.test", tfjsonpath.New("fixed_ip_address"),
+		compare.ValuesSame(),
+	)
+
+	resource.ParallelTest(t, resource.TestCase{
+		PreCheck:                 func() { acctest.PreCheck(t) },
+		ProtoV6ProviderFactories: acctest.ProtoV6ProviderFactories,
+		CheckDestroy:             testAccCheckCloudFloatingIPDestroy,
+		Steps: []resource.TestStep{
+			{
+				Config: testAccCloudFloatingIPConfigWithReservedFixedIP(rName),
+				ConfigStateChecks: []statecheck.StateCheck{
+					statecheck.ExpectKnownValue("gcore_cloud_floating_ip.test",
+						tfjsonpath.New("id"), knownvalue.NotNull()),
+					statecheck.ExpectKnownValue("gcore_cloud_floating_ip.test",
+						tfjsonpath.New("port_id"), knownvalue.NotNull()),
+					statecheck.ExpectKnownValue("gcore_cloud_floating_ip.test",
+						tfjsonpath.New("fixed_ip_address"), knownvalue.NotNull()),
+					comparePortID,
+					compareFixedIP,
 				},
 			},
 		},
@@ -118,6 +158,40 @@ resource "gcore_cloud_floating_ip" "test" {
   project_id = %[1]s
   region_id  = %[2]s
 }`, acctest.ProjectID(), acctest.RegionID())
+}
+
+func testAccCloudFloatingIPConfigWithReservedFixedIP(name string) string {
+	return fmt.Sprintf(`
+resource "gcore_cloud_network" "test" {
+  project_id = %[1]s
+  region_id  = %[2]s
+  name       = "%[3]s-net"
+  type       = "vxlan"
+}
+
+resource "gcore_cloud_network_subnet" "test" {
+  project_id  = %[1]s
+  region_id   = %[2]s
+  name        = "%[3]s-subnet"
+  network_id  = gcore_cloud_network.test.id
+  cidr        = "192.168.30.0/24"
+  enable_dhcp = true
+}
+
+resource "gcore_cloud_reserved_fixed_ip" "test" {
+  project_id = %[1]s
+  region_id  = %[2]s
+  type       = "subnet"
+  network_id = gcore_cloud_network.test.id
+  subnet_id  = gcore_cloud_network_subnet.test.id
+}
+
+resource "gcore_cloud_floating_ip" "test" {
+  project_id       = %[1]s
+  region_id        = %[2]s
+  port_id          = gcore_cloud_reserved_fixed_ip.test.port_id
+  fixed_ip_address = gcore_cloud_reserved_fixed_ip.test.fixed_ip_address
+}`, acctest.ProjectID(), acctest.RegionID(), name)
 }
 
 func testAccCloudFloatingIPConfigWithTags(tagValue string) string {

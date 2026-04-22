@@ -71,7 +71,7 @@ func TestUseNullForRemoval_ExplicitValue(t *testing.T) {
 	}
 }
 
-func TestUseNullForRemoval_NullState(t *testing.T) {
+func TestUseNullForRemoval_UnknownConfig_NullState(t *testing.T) {
 	t.Parallel()
 
 	resp := &planmodifier.StringResponse{
@@ -87,7 +87,7 @@ func TestUseNullForRemoval_NullState(t *testing.T) {
 	if resp.Diagnostics.HasError() {
 		t.Fatalf("unexpected error: %s", resp.Diagnostics.Errors())
 	}
-	if !resp.PlanValue.IsNull() {
-		t.Fatalf("expected null (state value), got %s", resp.PlanValue)
+	if !resp.PlanValue.IsUnknown() {
+		t.Fatalf("expected unknown, got %s", resp.PlanValue)
 	}
 }
