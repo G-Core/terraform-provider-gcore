@@ -1,5 +1,36 @@
 # Changelog
 
+## 2.0.0-alpha.5 (2026-04-22)
+
+Full Changelog: [v2.0.0-alpha.4...v2.0.0-alpha.5](https://github.com/G-Core/terraform-provider-gcore/compare/v2.0.0-alpha.4...v2.0.0-alpha.5)
+
+### Features
+
+* **api:** aggregated API specs update ([c5d3ae8](https://github.com/G-Core/terraform-provider-gcore/commit/c5d3ae80474e6891ea6f8e2e23014c6387b5630a))
+* **api:** aggregated API specs update ([632cb5f](https://github.com/G-Core/terraform-provider-gcore/commit/632cb5f4a56b6f0e412640ce92d5fb8fef1cd16d))
+* **api:** aggregated API specs update ([aa1747b](https://github.com/G-Core/terraform-provider-gcore/commit/aa1747ba34d1282036385d21cfc137d1b645d18a))
+* **storage:** support Terraform generation for locations ([c76341a](https://github.com/G-Core/terraform-provider-gcore/commit/c76341a0e7ff1185a10a048b2b956c48795b77d3))
+
+
+### Bug Fixes
+
+* **cdn:** remove bot_protection from schema and regenerate docs ([1779b52](https://github.com/G-Core/terraform-provider-gcore/commit/1779b52011645fd5867ea55dd5e52f0204f94398))
+* **cdn:** remove request_limiter from cdn_resource, cdn_resource_rule, and cdn_rule_template ([1785476](https://github.com/G-Core/terraform-provider-gcore/commit/17854768788517b99a7bb64117aa5f9566d3e7dd))
+* **cloud:** fix security_group import drift and tag handling ([94725d8](https://github.com/G-Core/terraform-provider-gcore/commit/94725d87a4bfe458aa5036e4ee9dcd1ed085ef12))
+* **cloud:** floating_ip preserve unknown plan when port_id references a computed attribute ([8381a7c](https://github.com/G-Core/terraform-provider-gcore/commit/8381a7c80f0d24f34f235f1d1be4a4614961f5f1))
+* **tests:** update hc-install to fix PGP key mismatch ([fa16cbd](https://github.com/G-Core/terraform-provider-gcore/commit/fa16cbd960c08a65da8cc4997f3f4bc5cc30fbce))
+
+
+### Chores
+
+* **internal:** more robust bootstrap script ([a8dc042](https://github.com/G-Core/terraform-provider-gcore/commit/a8dc04269ed33f29ae81a6fdd405fed0c2b688a7))
+* **tests:** bump steady to v0.22.1 ([7622522](https://github.com/G-Core/terraform-provider-gcore/commit/76225229a9f0cbe7afa1f2464593b3893cbf31c7))
+
+
+### Documentation
+
+* **cloud:** add baremetal server with floating IP example ([cf8c167](https://github.com/G-Core/terraform-provider-gcore/commit/cf8c16733ebe70c470de0a0c20d5297b9fa89df7))
+
 ## 2.0.0-alpha.4 (2026-04-17)
 
 Full Changelog: [v2.0.0-alpha.3...v2.0.0-alpha.4](https://github.com/G-Core/terraform-provider-gcore/compare/v2.0.0-alpha.3...v2.0.0-alpha.4)
