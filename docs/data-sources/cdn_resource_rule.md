@@ -91,7 +91,6 @@ If requested URI matches multiple rules, the one higher in the order of the rule
 Read-Only:
 
 - `allowed_http_methods` (Attributes) HTTP methods allowed for content requests from the CDN. (see [below for nested schema](#nestedatt--options--allowed_http_methods))
-- `bot_protection` (Attributes) Allows to prevent online services from overloading and ensure your business workflow running smoothly. (see [below for nested schema](#nestedatt--options--bot_protection))
 - `brotli_compression` (Attributes) Compresses content with Brotli on the CDN side. CDN servers will request only uncompressed content from the origin.
 
 Notes:
@@ -192,7 +191,6 @@ This is particularly useful for maintaining continuity in security, analytics, a
 
 `redirect_http_to_https` and `redirect_https_to_http` options cannot be enabled simultaneously. (see [below for nested schema](#nestedatt--options--redirect_https_to_http))
 - `referrer_acl` (Attributes) Controls access to the CDN resource content for specified domain names. (see [below for nested schema](#nestedatt--options--referrer_acl))
-- `request_limiter` (Attributes) Option allows to limit the amount of HTTP requests. (see [below for nested schema](#nestedatt--options--request_limiter))
 - `response_headers_hiding_policy` (Attributes) Hides HTTP headers from an origin server in the CDN response. (see [below for nested schema](#nestedatt--options--response_headers_hiding_policy))
 - `rewrite` (Attributes) Changes and redirects requests from the CDN to the origin. It operates according to the [Nginx](https://nginx.org/en/docs/http/ngx_http_rewrite_module.html#rewrite) configuration. (see [below for nested schema](#nestedatt--options--rewrite))
 - `secure_key` (Attributes) Configures access with tokenized URLs. This makes impossible to access content without a valid (unexpired) token. (see [below for nested schema](#nestedatt--options--secure_key))
@@ -231,29 +229,6 @@ Possible values:
 - **true** - Option is enabled.
 - **false** - Option is disabled.
 - `value` (Set of String)
-
-
-<a id="nestedatt--options--bot_protection"></a>
-### Nested Schema for `options.bot_protection`
-
-Read-Only:
-
-- `bot_challenge` (Attributes) Controls the bot challenge module state. (see [below for nested schema](#nestedatt--options--bot_protection--bot_challenge))
-- `enabled` (Boolean) Controls the option state.
-
-Possible values:
-- **true** - Option is enabled.
-- **false** - Option is disabled.
-
-<a id="nestedatt--options--bot_protection--bot_challenge"></a>
-### Nested Schema for `options.bot_protection.bot_challenge`
-
-Read-Only:
-
-- `enabled` (Boolean) Possible values:
-- **true** - Bot challenge is enabled.
-- **false** - Bot challenge is disabled.
-
 
 
 <a id="nestedatt--options--brotli_compression"></a>
@@ -837,29 +812,6 @@ Possible values:
 - **allow** - Allow access to all domain names except the domain names specified in `excepted_values` field.
 - **deny** - Deny access to all domain names except the domain names specified in `excepted_values` field.
 Available values: "allow", "deny".
-
-
-<a id="nestedatt--options--request_limiter"></a>
-### Nested Schema for `options.request_limiter`
-
-Read-Only:
-
-- `burst` (Number)
-- `delay` (Number)
-- `enabled` (Boolean) Controls the option state.
-
-Possible values:
-- **true** - Option is enabled.
-- **false** - Option is disabled.
-- `rate` (Number) Maximum request rate.
-- `rate_unit` (String) Units of measurement for the `rate` field.
-
-Possible values:
-- **r/s** - Requests per second.
-- **r/m** - Requests per minute.
-
-If the rate is less than one request per second, it is specified in request per minute (r/m.)
-Available values: "r/s", "r/m".
 
 
 <a id="nestedatt--options--response_headers_hiding_policy"></a>
