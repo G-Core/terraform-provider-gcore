@@ -54,6 +54,7 @@ import (
 	"github.com/G-Core/terraform-provider-gcore/internal/services/fastedge_secret"
 	"github.com/G-Core/terraform-provider-gcore/internal/services/fastedge_template"
 	"github.com/G-Core/terraform-provider-gcore/internal/services/storage_location"
+	"github.com/G-Core/terraform-provider-gcore/internal/services/storage_ssh_key"
 	"github.com/G-Core/terraform-provider-gcore/internal/services/waap_domain"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
@@ -230,6 +231,7 @@ func (p *GcoreProvider) Resources(ctx context.Context) []func() resource.Resourc
 		dns_zone.NewResource,
 		dns_zone_rrset.NewResource,
 		dns_network_mapping.NewResource,
+		storage_ssh_key.NewResource,
 		cdn_resource.NewResource,
 		cdn_resource_rule.NewResource,
 		cdn_origin_group.NewResource,
@@ -301,6 +303,8 @@ func (p *GcoreProvider) DataSources(ctx context.Context) []func() datasource.Dat
 		dns_zone_rrset.NewDNSZoneRrsetDataSource,
 		dns_network_mapping.NewDNSNetworkMappingDataSource,
 		storage_location.NewStorageLocationsDataSource,
+		storage_ssh_key.NewStorageSSHKeyDataSource,
+		storage_ssh_key.NewStorageSSHKeysDataSource,
 		cdn_resource.NewCDNResourceDataSource,
 		cdn_resource_rule.NewCDNResourceRuleDataSource,
 		cdn_origin_group.NewCDNOriginGroupDataSource,
