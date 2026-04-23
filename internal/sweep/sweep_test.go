@@ -17,6 +17,9 @@ import (
 	_ "github.com/G-Core/terraform-provider-gcore/internal/services/dns_network_mapping"
 	_ "github.com/G-Core/terraform-provider-gcore/internal/services/dns_zone"
 	_ "github.com/G-Core/terraform-provider-gcore/internal/services/dns_zone_rrset"
+
+	// Storage
+	_ "github.com/G-Core/terraform-provider-gcore/internal/services/storage_ssh_key"
 )
 
 func TestMain(m *testing.M) {
