@@ -1,5 +1,19 @@
 # Changelog
 
+## 2.0.0-alpha.6 (2026-04-27)
+
+Full Changelog: [v2.0.0-alpha.5...v2.0.0-alpha.6](https://github.com/G-Core/terraform-provider-gcore/compare/v2.0.0-alpha.5...v2.0.0-alpha.6)
+
+### Features
+
+* **storage:** support Terraform for ssh keys ([07f24d5](https://github.com/G-Core/terraform-provider-gcore/commit/07f24d5692307ebd4f448cb05288029873d9d5cd))
+* **storage:** support TF for ssh keys ([6d73f7f](https://github.com/G-Core/terraform-provider-gcore/commit/6d73f7fa4fd7759b7d3fa02b9ecbf601c6a3c9a1))
+
+
+### Chores
+
+* add local tmpfile directory ([ec36738](https://github.com/G-Core/terraform-provider-gcore/commit/ec367383085c63d0c34c94acd8ff3e3b648cab27))
+
 ## 2.0.0-alpha.5 (2026-04-22)
 
 Full Changelog: [v2.0.0-alpha.4...v2.0.0-alpha.5](https://github.com/G-Core/terraform-provider-gcore/compare/v2.0.0-alpha.4...v2.0.0-alpha.5)
