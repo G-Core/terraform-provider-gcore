@@ -16,10 +16,10 @@ type CloudReservedFixedIPModel struct {
 	Type                types.String                                                               `tfsdk:"type" json:"type,required,no_refresh"`
 	IPAddress           types.String                                                               `tfsdk:"ip_address" json:"ip_address,optional,no_refresh"`
 	IPFamily            types.String                                                               `tfsdk:"ip_family" json:"ip_family,optional,no_refresh"`
-	NetworkID           types.String                                                               `tfsdk:"network_id" json:"network_id,optional"`
-	SubnetID            types.String                                                               `tfsdk:"subnet_id" json:"subnet_id,optional"`
+	NetworkID           types.String                                                               `tfsdk:"network_id" json:"network_id,computed_optional"`
 	PortID              types.String                                                               `tfsdk:"port_id" json:"port_id,computed_optional"`
-	IsVip               types.Bool                                                                 `tfsdk:"is_vip" json:"is_vip,optional"`
+	SubnetID            types.String                                                               `tfsdk:"subnet_id" json:"subnet_id,computed_optional"`
+	IsVip               types.Bool                                                                 `tfsdk:"is_vip" json:"is_vip,computed_optional"`
 	CreatedAt           timetypes.RFC3339                                                          `tfsdk:"created_at" json:"created_at,computed" format:"date-time"`
 	CreatorTaskID       types.String                                                               `tfsdk:"creator_task_id" json:"creator_task_id,computed"`
 	FixedIPAddress      types.String                                                               `tfsdk:"fixed_ip_address" json:"fixed_ip_address,computed"`
