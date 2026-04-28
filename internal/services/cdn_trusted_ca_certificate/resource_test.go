@@ -8,6 +8,7 @@ import (
 
 	"github.com/hashicorp/terraform-plugin-testing/helper/resource"
 	"github.com/hashicorp/terraform-plugin-testing/knownvalue"
+	"github.com/hashicorp/terraform-plugin-testing/plancheck"
 	"github.com/hashicorp/terraform-plugin-testing/statecheck"
 	"github.com/hashicorp/terraform-plugin-testing/terraform"
 	"github.com/hashicorp/terraform-plugin-testing/tfjsonpath"
@@ -43,26 +44,89 @@ func TestAccCDNTrustedCaCertificate_basic(t *testing.T) {
 				ResourceName:            "gcore_cdn_trusted_ca_certificate.test",
 				ImportState:             true,
 				ImportStateVerify:       true,
-				ImportStateIdFunc:       testAccCDNTrustedCaCertificateImportStateIDFunc("gcore_cdn_trusted_ca_certificate.test"),
+				ImportStateIdFunc:       acctest.BuildImportID("gcore_cdn_trusted_ca_certificate.test", "id"),
 				ImportStateVerifyIgnore: []string{"ssl_certificate", "deleted"},
 			},
 		},
 	})
 }
 
-// testAccCDNTrustedCaCertificateImportStateIDFunc returns the ID as a string for import.
-func testAccCDNTrustedCaCertificateImportStateIDFunc(resourceName string) func(*terraform.State) (string, error) {
-	return func(s *terraform.State) (string, error) {
-		rs, ok := s.RootModule().Resources[resourceName]
-		if !ok {
-			return "", fmt.Errorf("resource not found: %s", resourceName)
-		}
-		id := rs.Primary.Attributes["id"]
-		if id == "" {
-			return "", fmt.Errorf("id not set in state for %s", resourceName)
-		}
-		return id, nil
-	}
+func TestAccCDNTrustedCaCertificate_update(t *testing.T) {
+	t.Parallel()
+	rName := acctest.RandomName()
+	rNameUpdated := acctest.RandomName()
+	resourceName := "gcore_cdn_trusted_ca_certificate.test"
+
+	var certID string
+
+	resource.Test(t, resource.TestCase{
+		PreCheck:                 func() { acctest.PreCheck(t) },
+		ProtoV6ProviderFactories: acctest.ProtoV6ProviderFactories,
+		CheckDestroy:             testAccCheckCDNTrustedCaCertificateDestroy,
+		Steps: []resource.TestStep{
+			{
+				Config: testAccCDNTrustedCaCertificateConfig(rName),
+				ConfigStateChecks: []statecheck.StateCheck{
+					statecheck.ExpectKnownValue(resourceName,
+						tfjsonpath.New("name"), knownvalue.StringExact(rName)),
+				},
+				Check: func(s *terraform.State) error {
+					rs := s.RootModule().Resources[resourceName]
+					certID = rs.Primary.ID
+					return nil
+				},
+			},
+			{
+				Config: testAccCDNTrustedCaCertificateConfig(rNameUpdated),
+				ConfigStateChecks: []statecheck.StateCheck{
+					statecheck.ExpectKnownValue(resourceName,
+						tfjsonpath.New("name"), knownvalue.StringExact(rNameUpdated)),
+				},
+				Check: func(s *terraform.State) error {
+					rs := s.RootModule().Resources[resourceName]
+					if rs.Primary.ID != certID {
+						return fmt.Errorf("resource was recreated: ID changed from %s to %s", certID, rs.Primary.ID)
+					}
+					return nil
+				},
+			},
+		},
+	})
+}
+
+func TestAccCDNTrustedCaCertificate_importDrift(t *testing.T) {
+	t.Parallel()
+	rName := acctest.RandomName()
+	resourceName := "gcore_cdn_trusted_ca_certificate.test"
+
+	resource.Test(t, resource.TestCase{
+		PreCheck:                 func() { acctest.PreCheck(t) },
+		ProtoV6ProviderFactories: acctest.ProtoV6ProviderFactories,
+		CheckDestroy:             testAccCheckCDNTrustedCaCertificateDestroy,
+		Steps: []resource.TestStep{
+			{
+				Config: testAccCDNTrustedCaCertificateConfig(rName),
+			},
+			{
+				ResourceName:            resourceName,
+				ImportState:             true,
+				ImportStateVerify:       true,
+				ImportStateVerifyIgnore: []string{"ssl_certificate", "deleted"},
+				ImportStateIdFunc:       acctest.BuildImportID(resourceName, "id"),
+			},
+			{
+				// After import, ssl_certificate is null in state because the API
+				// doesn't return the PEM. Re-applying the same config should NOT
+				// trigger replacement.
+				Config: testAccCDNTrustedCaCertificateConfig(rName),
+				ConfigPlanChecks: resource.ConfigPlanChecks{
+					PreApply: []plancheck.PlanCheck{
+						plancheck.ExpectEmptyPlan(),
+					},
+				},
+			},
+		},
+	})
 }
 
 func testAccCheckCDNTrustedCaCertificateDestroy(s *terraform.State) error {

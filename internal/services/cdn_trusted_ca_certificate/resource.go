@@ -92,7 +92,36 @@ func (r *CDNTrustedCaCertificateResource) Create(ctx context.Context, req resour
 }
 
 func (r *CDNTrustedCaCertificateResource) Update(ctx context.Context, req resource.UpdateRequest, resp *resource.UpdateResponse) {
-	// Update is not supported for this resource
+	var data *CDNTrustedCaCertificateModel
+
+	resp.Diagnostics.Append(req.Plan.Get(ctx, &data)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
+
+	res := new(http.Response)
+	_, err := r.client.CDN.TrustedCaCertificates.Replace(
+		ctx,
+		data.ID.ValueInt64(),
+		cdn.TrustedCaCertificateReplaceParams{
+			Name: data.Name.ValueString(),
+		},
+		option.WithResponseBodyInto(&res),
+		option.WithMiddleware(logging.Middleware(ctx)),
+	)
+	if err != nil {
+		resp.Diagnostics.AddError("failed to make http request", err.Error())
+		return
+	}
+	bytes, _ := io.ReadAll(res.Body)
+	err = apijson.UnmarshalComputed(bytes, &data)
+	if err != nil {
+		resp.Diagnostics.AddError("failed to deserialize http request", err.Error())
+		return
+	}
+
+	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
 }
 
 func (r *CDNTrustedCaCertificateResource) Read(ctx context.Context, req resource.ReadRequest, resp *resource.ReadResponse) {
