@@ -175,11 +175,10 @@ resource "gcore_cloud_network_router" "test" {
 func testAccCloudNetworkRouterWithSubnetConfig(name string, routes string) string {
 	return fmt.Sprintf(`
 resource "gcore_cloud_network" "test" {
-  project_id    = %[1]s
-  region_id     = %[2]s
-  name          = "tf-test-net-%[3]s"
-  create_router = false
-  type          = "vxlan"
+  project_id = %[1]s
+  region_id  = %[2]s
+  name       = "tf-test-net-%[3]s"
+  type       = "vxlan"
 }
 
 resource "gcore_cloud_network_subnet" "test" {

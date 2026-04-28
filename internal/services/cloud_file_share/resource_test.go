@@ -150,11 +150,10 @@ func testAccCheckCloudFileShareDestroy(s *terraform.State) error {
 func testAccCloudFileShareConfig(name string) string {
 	return fmt.Sprintf(`
 resource "gcore_cloud_network" "test" {
-  project_id    = %[1]s
-  region_id     = %[2]s
-  name          = "%[3]s-network"
-  create_router = true
-  type          = "vxlan"
+  project_id = %[1]s
+  region_id  = %[2]s
+  name       = "%[3]s-network"
+  type       = "vxlan"
 }
 
 resource "gcore_cloud_network_subnet" "test" {
@@ -182,11 +181,10 @@ resource "gcore_cloud_file_share" "test" {
 func testAccCloudFileShareConfigUpdated(name string) string {
 	return fmt.Sprintf(`
 resource "gcore_cloud_network" "test" {
-  project_id    = %[1]s
-  region_id     = %[2]s
-  name          = "%[3]s-network"
-  create_router = true
-  type          = "vxlan"
+  project_id = %[1]s
+  region_id  = %[2]s
+  name       = "%[3]s-network"
+  type       = "vxlan"
 }
 
 resource "gcore_cloud_network_subnet" "test" {
