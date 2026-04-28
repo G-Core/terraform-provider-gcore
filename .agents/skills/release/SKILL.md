@@ -235,10 +235,15 @@ by CI, not this skill).
 
    ```bash
    gh release view --repo G-Core/terraform-provider-gcore \
-     --json tagName,body,url
+     --json tagName,body,url,isPrerelease
    ```
 
-2. Build the final release body by combining the disclaimer, Part 1, and the
+2. Determine pre-release status from the version per SemVer 2.0.0
+   (https://semver.org/#spec-item-9): if the version contains a hyphen
+   followed by a pre-release identifier (e.g., `-alpha`, `-beta.2`, `-rc.1`),
+   set `{PRERELEASE_FLAG}` to `true`; otherwise `false`.
+
+3. Build the final release body by combining the disclaimer, Part 1, and the
    existing Part 2:
 
    ```
@@ -252,17 +257,18 @@ by CI, not this skill).
    {Part 2 — auto-generated changelog already in release body}
    ```
 
-3. Update the release via Bash:
+4. Update the release via Bash:
    ```bash
    gh release edit v{VERSION} \
      --repo G-Core/terraform-provider-gcore \
+     --prerelease={PRERELEASE_FLAG} \
      --notes "$(cat <<'RELEASE_EOF'
    {combined release notes}
    RELEASE_EOF
    )"
    ```
 
-4. Display the release URL and confirm completion.
+5. Display the release URL and confirm completion.
 
 ## Failure Modes
 
