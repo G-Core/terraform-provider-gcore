@@ -14,8 +14,8 @@ Instance images are operating system images (public, private, or shared) used to
 
 ```terraform
 resource "gcore_cloud_instance_image" "example_cloud_instance_image" {
-  project_id = 0
-  region_id = 0
+  project_id = 1
+  region_id = 7
   name = "my-image"
   url = "http://mirror.noris.net/cirros/0.4.0/cirros-0.4.0-x86_64-disk.img"
   architecture = "x86_64"
@@ -49,14 +49,14 @@ Available values: "aarch64", "x86_64".
 - `hw_firmware_type` (String) Specifies the type of firmware with which to boot the guest.
 Available values: "bios", "uefi".
 - `hw_machine_type` (String) A virtual chipset type.
-Available values: "pc", "q35".
+Available values: "i440", "q35".
 - `is_baremetal` (Boolean) Set to true if the image will be used by bare metal servers. Defaults to false.
 - `os_distro` (String) OS Distribution, i.e. Debian, CentOS, Ubuntu, CoreOS etc.
 - `os_type` (String) The operating system installed on the image.
 Available values: "linux", "windows".
 - `os_version` (String) OS version, i.e. 22.04 (for Ubuntu) or 9.4 for Debian
-- `project_id` (Number)
-- `region_id` (Number)
+- `project_id` (Number) Project ID
+- `region_id` (Number) Region ID
 - `ssh_key` (String) Whether the image supports SSH key or not
 Available values: "allow", "deny", "required".
 - `tags` (Map of String) Key-value tags to associate with the resource. A tag is a key-value pair that can be associated with a resource, enabling efficient filtering and grouping for better organization and management. Both tag keys and values have a maximum length of 255 characters. Some tags are read-only and cannot be modified by the user. Tags are also integrated with cost reports, allowing cost data to be filtered based on tag keys or values.

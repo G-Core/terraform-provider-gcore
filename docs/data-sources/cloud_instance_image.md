@@ -14,10 +14,10 @@ Instance images are operating system images (public, private, or shared) used to
 
 ```terraform
 data "gcore_cloud_instance_image" "example_cloud_instance_image" {
-  project_id = 0
-  region_id = 0
-  image_id = "image_id"
-  include_prices = true
+  project_id = 1
+  region_id = 7
+  image_id = "8cab6f28-09ca-4201-b3f7-23c7893f4bd6"
+  include_prices = false
 }
 ```
 
@@ -26,13 +26,13 @@ data "gcore_cloud_instance_image" "example_cloud_instance_image" {
 
 ### Required
 
-- `image_id` (String)
+- `image_id` (String) Image ID
 
 ### Optional
 
 - `include_prices` (Boolean) Show price
-- `project_id` (Number)
-- `region_id` (Number)
+- `project_id` (Number) Project ID
+- `region_id` (Number) Region ID
 
 ### Read-Only
 
@@ -50,8 +50,8 @@ Available values: "aarch64", "x86_64".
 - `hw_firmware_type` (String) Specifies the type of firmware with which to boot the guest.
 Available values: "bios", "uefi".
 - `hw_machine_type` (String) A virtual chipset type.
-Available values: "pc", "q35".
-- `id` (String) The ID of this resource.
+Available values: "i440", "q35".
+- `id` (String) Image ID
 - `is_baremetal` (Boolean) Set to true if the image will be used by bare metal servers.
 - `min_disk` (Number) Minimal boot volume required
 - `min_ram` (Number) Minimal VM RAM required

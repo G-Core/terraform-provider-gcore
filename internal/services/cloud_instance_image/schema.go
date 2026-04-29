@@ -31,10 +31,12 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 				PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
 			},
 			"project_id": schema.Int64Attribute{
+				Description:   "Project ID",
 				Optional:      true,
 				PlanModifiers: []planmodifier.Int64{int64planmodifier.RequiresReplace()},
 			},
 			"region_id": schema.Int64Attribute{
+				Description:   "Region ID",
 				Optional:      true,
 				PlanModifiers: []planmodifier.Int64{int64planmodifier.RequiresReplace()},
 			},
@@ -82,10 +84,10 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 				},
 			},
 			"hw_machine_type": schema.StringAttribute{
-				Description: "A virtual chipset type.\nAvailable values: \"pc\", \"q35\".",
+				Description: "A virtual chipset type.\nAvailable values: \"i440\", \"q35\".",
 				Optional:    true,
 				Validators: []validator.String{
-					stringvalidator.OneOfCaseInsensitive("pc", "q35"),
+					stringvalidator.OneOfCaseInsensitive("i440", "q35"),
 				},
 			},
 			"is_baremetal": schema.BoolAttribute{

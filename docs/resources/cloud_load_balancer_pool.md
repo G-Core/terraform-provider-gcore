@@ -134,7 +134,13 @@ Available values: "CONNECT", "DELETE", "GET", "HEAD", "OPTIONS", "PATCH", "POST"
 - `http_version` (String) HTTP version. Can only be used together with `HTTP` or `HTTPS` health monitor type. Supported values: 1.0, 1.1.
 Available values: "1.0", "1.1".
 - `max_retries_down` (Number) Number of failures before the member is switched to ERROR state.
-- `url_path` (String) URL Path. Defaults to '/'. Can only be used together with `HTTP` or `HTTPS` health monitor type.
+- `url_path` (String) The HTTP path the health monitor requests on each member. Defaults to `/` if not set. Can only be used with `HTTP` or `HTTPS` health monitor type.
+
+Must start with `/`. Examples of valid paths:
+- `/` — check the root (most common, default)
+- `/healthz` — a dedicated health endpoint
+
+Paths starting with `//` are not valid URL paths and will be rejected.
 
 
 <a id="nestedatt--members"></a>

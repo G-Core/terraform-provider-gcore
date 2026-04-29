@@ -97,7 +97,7 @@ Optional:
 
 - `credentials` (Attributes) Optional server access credentials (see [below for nested schema](#nestedatt--servers_settings--credentials))
 - `file_shares` (Attributes List) List of file shares to be mounted across the cluster. (see [below for nested schema](#nestedatt--servers_settings--file_shares))
-- `security_groups` (Attributes List) List of security groups UUIDs (see [below for nested schema](#nestedatt--servers_settings--security_groups))
+- `security_groups` (Attributes List) List of security group UUIDs. If omitted or an empty list, the default security group will be used. (see [below for nested schema](#nestedatt--servers_settings--security_groups))
 - `user_data` (String) Optional custom user data (Base64-encoded)
 
 <a id="nestedatt--servers_settings--interfaces"></a>
