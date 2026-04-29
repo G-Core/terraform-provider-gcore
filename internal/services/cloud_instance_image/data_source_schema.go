@@ -20,19 +20,24 @@ func DataSourceSchema(ctx context.Context) schema.Schema {
 		MarkdownDescription: "Instance images are operating system images (public, private, or shared) used to boot cloud instances.",
 		Attributes: map[string]schema.Attribute{
 			"id": schema.StringAttribute{
-				Computed: true,
+				Description: "Image ID",
+				Computed:    true,
 			},
 			"image_id": schema.StringAttribute{
-				Required: true,
+				Description: "Image ID",
+				Required:    true,
 			},
 			"project_id": schema.Int64Attribute{
-				Optional: true,
+				Description: "Project ID",
+				Optional:    true,
 			},
 			"region_id": schema.Int64Attribute{
-				Optional: true,
+				Description: "Region ID",
+				Optional:    true,
 			},
 			"include_prices": schema.BoolAttribute{
 				Description: "Show price",
+				Computed:    true,
 				Optional:    true,
 			},
 			"architecture": schema.StringAttribute{
@@ -86,10 +91,10 @@ func DataSourceSchema(ctx context.Context) schema.Schema {
 				},
 			},
 			"hw_machine_type": schema.StringAttribute{
-				Description: "A virtual chipset type.\nAvailable values: \"pc\", \"q35\".",
+				Description: "A virtual chipset type.\nAvailable values: \"i440\", \"q35\".",
 				Computed:    true,
 				Validators: []validator.String{
-					stringvalidator.OneOfCaseInsensitive("pc", "q35"),
+					stringvalidator.OneOfCaseInsensitive("i440", "q35"),
 				},
 			},
 			"is_baremetal": schema.BoolAttribute{

@@ -18,7 +18,7 @@ type CloudInstanceImageDataSourceModel struct {
 	ImageID          types.String                                                        `tfsdk:"image_id" path:"image_id,required"`
 	ProjectID        types.Int64                                                         `tfsdk:"project_id" path:"project_id,optional"`
 	RegionID         types.Int64                                                         `tfsdk:"region_id" path:"region_id,optional"`
-	IncludePrices    types.Bool                                                          `tfsdk:"include_prices" query:"include_prices,optional"`
+	IncludePrices    types.Bool                                                          `tfsdk:"include_prices" query:"include_prices,computed_optional"`
 	Architecture     types.String                                                        `tfsdk:"architecture" json:"architecture,computed"`
 	CreatedAt        timetypes.RFC3339                                                   `tfsdk:"created_at" json:"created_at,computed" format:"date-time"`
 	CreatorTaskID    types.String                                                        `tfsdk:"creator_task_id" json:"creator_task_id,computed"`

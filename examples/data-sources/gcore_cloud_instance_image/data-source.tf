@@ -1,6 +1,6 @@
 data "gcore_cloud_instance_image" "example_cloud_instance_image" {
-  project_id = 0
-  region_id = 0
-  image_id = "image_id"
-  include_prices = true
+  project_id = 1
+  region_id = 7
+  image_id = "8cab6f28-09ca-4201-b3f7-23c7893f4bd6"
+  include_prices = false
 }
