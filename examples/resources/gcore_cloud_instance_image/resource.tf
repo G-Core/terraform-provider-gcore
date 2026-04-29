@@ -1,6 +1,6 @@
 resource "gcore_cloud_instance_image" "example_cloud_instance_image" {
-  project_id = 0
-  region_id = 0
+  project_id = 1
+  region_id = 7
   name = "my-image"
   url = "http://mirror.noris.net/cirros/0.4.0/cirros-0.4.0-x86_64-disk.img"
   architecture = "x86_64"

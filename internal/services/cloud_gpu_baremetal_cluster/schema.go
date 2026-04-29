@@ -161,7 +161,7 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 						},
 					},
 					"security_groups": schema.ListNestedAttribute{
-						Description:   "List of security groups UUIDs",
+						Description:   "List of security group UUIDs. If omitted or an empty list, the default security group will be used.",
 						Computed:      true,
 						Optional:      true,
 						CustomType:    customfield.NewNestedObjectListType[CloudGPUBaremetalClusterServersSettingsSecurityGroupsModel](ctx),

@@ -194,7 +194,7 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 						},
 					},
 					"url_path": schema.StringAttribute{
-						Description: "URL Path. Defaults to '/'. Can only be used together with `HTTP` or `HTTPS` health monitor type.",
+						Description: "The HTTP path the health monitor requests on each member. Defaults to `/` if not set. Can only be used with `HTTP` or `HTTPS` health monitor type.\n\nMust start with `/`. Examples of valid paths:\n- `/` — check the root (most common, default)\n- `/healthz` — a dedicated health endpoint\n\nPaths starting with `//` are not valid URL paths and will be rejected.",
 						Optional:    true,
 					},
 				},
