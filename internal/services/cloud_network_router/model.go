@@ -3,6 +3,8 @@
 package cloud_network_router
 
 import (
+	"context"
+
 	"github.com/G-Core/terraform-provider-gcore/internal/apijson"
 	"github.com/G-Core/terraform-provider-gcore/internal/customfield"
 	"github.com/hashicorp/terraform-plugin-framework-timetypes/timetypes"
@@ -22,7 +24,6 @@ type CloudNetworkRouterModel struct {
 	Distributed         types.Bool                                                           `tfsdk:"distributed" json:"distributed,computed"`
 	Region              types.String                                                         `tfsdk:"region" json:"region,computed"`
 	Status              types.String                                                         `tfsdk:"status" json:"status,computed"`
-	UpdatedAt           timetypes.RFC3339                                                    `tfsdk:"updated_at" json:"updated_at,computed" format:"date-time"`
 }
 
 func (m CloudNetworkRouterModel) MarshalJSON() (data []byte, err error) {
@@ -34,7 +35,58 @@ func (m CloudNetworkRouterModel) MarshalJSONForUpdate(state CloudNetworkRouterMo
 	mCopy := m
 	mCopy.Interfaces = state.Interfaces
 
-	return apijson.MarshalForPatch(mCopy, state)
+	// The v1 router PATCH endpoint requires the FULL external_gateway_info
+	// block whenever any subfield changes — network_id is server-required
+	// even when the user only toggles enable_snat. MarshalForPatch normally
+	// emits per-subfield diffs, which would send {"enable_snat":false} alone
+	// and the API rejects with `400 ... 'network_id': ['Field required']`.
+	// Force full-object emission by zeroing the state's gateway when it
+	// differs from the plan, so the encoder sees plan=non-null, state=null
+	// and emits every subfield.
+	stateCopy := state
+	if !m.ExternalGatewayInfo.IsNull() && !m.ExternalGatewayInfo.IsUnknown() &&
+		!m.ExternalGatewayInfo.Equal(state.ExternalGatewayInfo) {
+		stateCopy.ExternalGatewayInfo = customfield.NestedObject[CloudNetworkRouterExternalGatewayInfoModel]{}
+	}
+
+	return apijson.MarshalForPatch(mCopy, stateCopy)
+}
+
+// NormalizeExternalGateway reconciles the external_gateway_info field with the
+// shape Terraform expects, after unmarshalling an API response. Two
+// adjustments:
+//
+//  1. The SDK's Router.ExternalGatewayInfo is a value type, so a router with no
+//     gateway round-trips as an empty object ({"network_id":"","enable_snat":false,...})
+//     rather than null. Detect that empty shape and force the field to null so
+//     plan == state for gateway-less routers.
+//  2. The API GET payload omits the type field. The platform only exposes
+//     "manual" as a stable post-create value (the "default" form is a
+//     Create-time convenience that resolves to a concrete network_id), so we
+//     treat any returned gateway with a non-empty network_id as manual.
+func (m *CloudNetworkRouterModel) NormalizeExternalGateway(ctx context.Context) {
+	if m.ExternalGatewayInfo.IsNull() || m.ExternalGatewayInfo.IsUnknown() {
+		return
+	}
+	gw, diags := m.ExternalGatewayInfo.Value(ctx)
+	if diags.HasError() || gw == nil {
+		return
+	}
+	hasNetworkID := !gw.NetworkID.IsNull() && !gw.NetworkID.IsUnknown() && gw.NetworkID.ValueString() != ""
+	if !hasNetworkID {
+		// Empty gateway object from the SDK's value-type struct → null in state.
+		m.ExternalGatewayInfo = customfield.NullObject[CloudNetworkRouterExternalGatewayInfoModel](ctx)
+		return
+	}
+	if !gw.Type.IsNull() && !gw.Type.IsUnknown() && gw.Type.ValueString() != "" {
+		return
+	}
+	gw.Type = types.StringValue("manual")
+	updated, diags := customfield.NewObject(ctx, gw)
+	if diags.HasError() {
+		return
+	}
+	m.ExternalGatewayInfo = updated
 }
 
 type CloudNetworkRouterInterfacesModel struct {

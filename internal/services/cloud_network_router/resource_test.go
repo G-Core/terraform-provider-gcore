@@ -182,13 +182,12 @@ resource "gcore_cloud_network" "test" {
 }
 
 resource "gcore_cloud_network_subnet" "test" {
-  project_id                = %[1]s
-  region_id                 = %[2]s
-  name                      = "tf-test-subnet-%[3]s"
-  network_id                = gcore_cloud_network.test.id
-  cidr                      = "10.0.0.0/24"
-  enable_dhcp               = true
-  connect_to_network_router = false
+  project_id  = %[1]s
+  region_id   = %[2]s
+  name        = "tf-test-subnet-%[3]s"
+  network_id  = gcore_cloud_network.test.id
+  cidr        = "10.0.0.0/24"
+  enable_dhcp = true
 }
 
 resource "gcore_cloud_network_router" "test" {
