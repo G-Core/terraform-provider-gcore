@@ -106,6 +106,7 @@ func (r *CloudNetworkRouterResource) Create(ctx context.Context, req resource.Cr
 		resp.Diagnostics.AddError("failed to deserialize http request", err.Error())
 		return
 	}
+	data.NormalizeExternalGateway(ctx)
 
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
 }
@@ -203,6 +204,7 @@ func (r *CloudNetworkRouterResource) Update(ctx context.Context, req resource.Up
 			resp.Diagnostics.AddError("failed to deserialize http request", err.Error())
 			return
 		}
+		data.NormalizeExternalGateway(ctx)
 	}
 
 	// Step 3: Detach old interfaces LAST (after PATCH)
@@ -252,6 +254,7 @@ func (r *CloudNetworkRouterResource) Update(ctx context.Context, req resource.Up
 		resp.Diagnostics.AddError("failed to deserialize router after update", err.Error())
 		return
 	}
+	data.NormalizeExternalGateway(ctx)
 
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
 }
@@ -298,6 +301,7 @@ func (r *CloudNetworkRouterResource) Read(ctx context.Context, req resource.Read
 		resp.Diagnostics.AddError("failed to deserialize http request", err.Error())
 		return
 	}
+	data.NormalizeExternalGateway(ctx)
 
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
 }
@@ -373,50 +377,41 @@ func (r *CloudNetworkRouterResource) ImportState(ctx context.Context, req resour
 		return
 	}
 	bytes, _ := io.ReadAll(res.Body)
-	err = apijson.UnmarshalComputed(bytes, &data)
+	err = apijson.Unmarshal(bytes, &data)
 	if err != nil {
 		resp.Diagnostics.AddError("failed to deserialize http request", err.Error())
 		return
 	}
+	data.NormalizeExternalGateway(ctx)
 
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
 }
 
 func (r *CloudNetworkRouterResource) ModifyPlan(ctx context.Context, req resource.ModifyPlanRequest, resp *resource.ModifyPlanResponse) {
+	// Skip on resource create or destroy.
 	if req.State.Raw.IsNull() || req.Plan.Raw.IsNull() {
 		return
 	}
 
-	var plan *CloudNetworkRouterModel
-	resp.Diagnostics.Append(req.Plan.Get(ctx, &plan)...)
-	if resp.Diagnostics.HasError() {
-		return
-	}
-
-	var state *CloudNetworkRouterModel
-	resp.Diagnostics.Append(req.State.Get(ctx, &state)...)
-	if resp.Diagnostics.HasError() {
-		return
-	}
-
-	var configRoutes customfield.NestedObjectList[CloudNetworkRouterRoutesModel]
-	diagsRoutes := req.Config.GetAttribute(ctx, path.Root("routes"), &configRoutes)
-
-	var configRoutesList []CloudNetworkRouterRoutesModel
-	configRoutesEmpty := false
-	if !diagsRoutes.HasError() && !configRoutes.IsNull() {
-		configRoutes.ElementsAs(ctx, &configRoutesList, false)
-		configRoutesEmpty = len(configRoutesList) == 0
-	}
-
-	routesRemovedFromConfig := !diagsRoutes.HasError() &&
-		(configRoutes.IsNull() || configRoutesEmpty) &&
-		!state.Routes.IsNull() &&
-		!state.Routes.IsUnknown()
-
-	if routesRemovedFromConfig {
-		plan.Routes = customfield.NewObjectListMust(ctx, []CloudNetworkRouterRoutesModel{})
-		resp.Diagnostics.Append(resp.Plan.Set(ctx, plan)...)
+	// The Gcore PATCH endpoint only accepts external_gateway_info.type == "manual"
+	// (with an explicit network_id). The "default" form is a Create-time convenience
+	// that the platform resolves into a concrete network_id at create time. Surface
+	// this as a plan-time error so users don't see an opaque 400 during apply.
+	var configGateway customfield.NestedObject[CloudNetworkRouterExternalGatewayInfoModel]
+	if diags := req.Config.GetAttribute(ctx, path.Root("external_gateway_info"), &configGateway); !diags.HasError() &&
+		!configGateway.IsNull() && !configGateway.IsUnknown() {
+		gw, gwDiags := configGateway.Value(ctx)
+		if !gwDiags.HasError() && gw != nil &&
+			!gw.Type.IsNull() && !gw.Type.IsUnknown() &&
+			gw.Type.ValueString() == "default" {
+			resp.Diagnostics.AddAttributeError(
+				path.Root("external_gateway_info").AtName("type"),
+				"external_gateway_info.type cannot be \"default\" on update",
+				"The Gcore router PATCH endpoint only accepts type = \"manual\" with an explicit network_id. "+
+					"The \"default\" type is only valid during initial creation and is resolved into a concrete network_id at that point. "+
+					"Set type = \"manual\" and provide network_id to update the gateway.",
+			)
+		}
 	}
 }
 

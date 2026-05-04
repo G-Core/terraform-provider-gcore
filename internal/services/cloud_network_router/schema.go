@@ -6,6 +6,7 @@ import (
 	"context"
 
 	"github.com/G-Core/terraform-provider-gcore/internal/customfield"
+	"github.com/G-Core/terraform-provider-gcore/internal/planmodifiers"
 	"github.com/hashicorp/terraform-plugin-framework-timetypes/timetypes"
 	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
@@ -13,6 +14,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/booldefault"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/boolplanmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/int64planmodifier"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/objectplanmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringdefault"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringplanmodifier"
@@ -40,10 +42,11 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 				PlanModifiers: []planmodifier.Int64{int64planmodifier.RequiresReplaceIfConfigured()},
 			},
 			"interfaces": schema.ListNestedAttribute{
-				Description: "List of interfaces to attach to router immediately after creation.",
-				Computed:    true,
-				Optional:    true,
-				CustomType:  customfield.NewNestedObjectListType[CloudNetworkRouterInterfacesModel](ctx),
+				Description:   "List of interfaces to attach to router immediately after creation.",
+				Computed:      true,
+				Optional:      true,
+				CustomType:    customfield.NewNestedObjectListType[CloudNetworkRouterInterfacesModel](ctx),
+				PlanModifiers: []planmodifier.List{planmodifiers.UseEmptyListWhenConfigNull()},
 				NestedObject: schema.NestedAttributeObject{
 					Attributes: map[string]schema.Attribute{
 						"subnet_id": schema.StringAttribute{
@@ -71,6 +74,13 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 				Computed:    true,
 				Optional:    true,
 				CustomType:  customfield.NewNestedObjectType[CloudNetworkRouterExternalGatewayInfoModel](ctx),
+				// NOTE: the v1 router PATCH endpoint silently ignores
+				// {"external_gateway_info":null}, so removal-via-omit cannot work on
+				// this codepath. Use UseStateForUnknown so an omitted block is a
+				// no-op. The ObjectUseNullForRemoval modifier (verified via unit
+				// tests) is retained for the eventual v2 migration that does
+				// honour null removal.
+				PlanModifiers: []planmodifier.Object{objectplanmodifier.UseStateForUnknown()},
 				Attributes: map[string]schema.Attribute{
 					"network_id": schema.StringAttribute{
 						Description:   "ID of the external network to connect the router to.",
@@ -96,10 +106,11 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 				},
 			},
 			"routes": schema.ListNestedAttribute{
-				Description: "List of custom routes.",
-				Computed:    true,
-				Optional:    true,
-				CustomType:  customfield.NewNestedObjectListType[CloudNetworkRouterRoutesModel](ctx),
+				Description:   "List of custom routes.",
+				Computed:      true,
+				Optional:      true,
+				CustomType:    customfield.NewNestedObjectListType[CloudNetworkRouterRoutesModel](ctx),
+				PlanModifiers: []planmodifier.List{planmodifiers.UseEmptyListWhenConfigNull()},
 				NestedObject: schema.NestedAttributeObject{
 					Attributes: map[string]schema.Attribute{
 						"destination": schema.StringAttribute{
@@ -138,11 +149,6 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 				Description:   "Status of the router.",
 				Computed:      true,
 				PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
-			},
-			"updated_at": schema.StringAttribute{
-				Description: "Datetime when the router was last updated",
-				Computed:    true,
-				CustomType:  timetypes.RFC3339Type{},
 			},
 		},
 	}
