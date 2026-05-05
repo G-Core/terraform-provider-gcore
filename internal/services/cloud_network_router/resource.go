@@ -186,7 +186,7 @@ func (r *CloudNetworkRouterResource) Update(ctx context.Context, req resource.Up
 
 	if shouldSendPatch(dataBytes) {
 		res := new(http.Response)
-		_, err = r.client.Cloud.Networks.Routers.Update(
+		_, err = r.client.Cloud.Networks.Routers.UpdateAndPoll(
 			ctx,
 			routerID,
 			params,
