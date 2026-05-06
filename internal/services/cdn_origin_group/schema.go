@@ -17,6 +17,8 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/types"
 )
 
+var _ resource.ResourceWithConfigValidators = (*CDNOriginGroupResource)(nil)
+
 func ResourceSchema(ctx context.Context) schema.Schema {
 	return schema.Schema{
 		MarkdownDescription: "CDN origin groups aggregate one or more origin servers with failover and load balancing for content delivery.",
@@ -78,38 +80,31 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 							Optional:    true,
 							Default:     stringdefault.StaticString("default"),
 						},
-						"origin_type": schema.StringAttribute{
-							Description: "Origin type.\n\nPossible values:\n- **host** - A source server or endpoint from which content is fetched.\n- **s3** - S3 storage with either AWS v4 authentication or public access.\nAvailable values: \"host\", \"s3\".",
-							Optional:    true,
-							Validators: []validator.String{
-								stringvalidator.OneOfCaseInsensitive("host", "s3"),
-							},
-						},
 						"config": schema.SingleNestedAttribute{
 							Description: "S3 storage configuration. Required when `origin_type` is `s3`.",
 							Optional:    true,
 							CustomType:  customfield.NewNestedObjectType[CDNOriginGroupSourcesConfigModel](ctx),
 							Attributes: map[string]schema.Attribute{
+								"s3_access_key_id": schema.StringAttribute{
+									Description: "Access key ID for the S3 account. Required when `origin_type` is `s3`. This is a write-only field — it will be sent to the API but never stored in state. Increment `s3_credentials_version` to force re-send.\n\nRestrictions:\n- Latin letters (A-Z, a-z), numbers (0-9), colon, dash, and underscore.\n- From 4 to 255 characters.",
+									Optional:    true,
+									WriteOnly:   true,
+								},
+								"s3_bucket_name": schema.StringAttribute{
+									Description: "S3 bucket name. Required when `origin_type` is `s3`.",
+									Optional:    true,
+								},
+								"s3_secret_access_key": schema.StringAttribute{
+									Description: "Secret access key for the S3 account. Required when `origin_type` is `s3`. This is a write-only field — it will be sent to the API but never stored in state. Increment `s3_credentials_version` to force re-send.\n\nRestrictions:\n- Latin letters (A-Z, a-z), numbers (0-9), pluses, slashes, dashes, colons and underscores.\n- From 16 to 255 characters.",
+									Optional:    true,
+									WriteOnly:   true,
+								},
 								"s3_type": schema.StringAttribute{
-									Description: "Storage type compatible with S3.\n\nPossible values:\n- **amazon** - AWS S3 storage.\n- **other** - Other (not AWS) S3 compatible storage.\nAvailable values: \"amazon\", \"other\".",
-									Required:    true,
+									Description: "Storage type compatible with S3. Required when `origin_type` is `s3`.\n\nPossible values:\n- **amazon** - AWS S3 storage.\n- **other** - Other (not AWS) S3 compatible storage.\nAvailable values: \"amazon\", \"other\".",
+									Optional:    true,
 									Validators: []validator.String{
 										stringvalidator.OneOfCaseInsensitive("amazon", "other"),
 									},
-								},
-								"s3_bucket_name": schema.StringAttribute{
-									Description: "S3 bucket name.",
-									Required:    true,
-								},
-								"s3_access_key_id": schema.StringAttribute{
-									Description: "Access key ID for the S3 account. This is a write-only field — it will be sent to the API but never stored in state. Increment `s3_credentials_version` to force re-send.\n\nRestrictions:\n- Latin letters (A-Z, a-z), numbers (0-9), colon, dash, and underscore.\n- From 4 to 255 characters.",
-									Required:    true,
-									WriteOnly:   true,
-								},
-								"s3_secret_access_key": schema.StringAttribute{
-									Description: "Secret access key for the S3 account. This is a write-only field — it will be sent to the API but never stored in state. Increment `s3_credentials_version` to force re-send.\n\nRestrictions:\n- Latin letters (A-Z, a-z), numbers (0-9), pluses, slashes, dashes, colons and underscores.\n- From 16 to 255 characters.",
-									Required:    true,
-									WriteOnly:   true,
 								},
 								"s3_auth_type": schema.StringAttribute{
 									Description: "S3 authentication type.",
@@ -125,6 +120,21 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 									Description: "S3 storage hostname.\n\nThe parameter is required if `s3_type` is `other`.",
 									Optional:    true,
 								},
+								"app_id": schema.StringAttribute{
+									Description: "ID of the FastEdge application served as origin (string, matching the existing\nfastedge option's convention). Required when `origin_type` is `fastedge`. The CDN dispatches requests to the local FastEdge runtime\non the edge node using this identifier. The application must belong to the requesting\nclient, be enabled, and have `wasi-http` API type.",
+									Optional:    true,
+								},
+							},
+						},
+						"origin_type": schema.StringAttribute{
+							Description: "Origin type. Present in responses for S3 and FastEdge sources.\n\nPossible values:\n- **host** - A source server or endpoint from which content is fetched.\n- **s3** - S3 storage with either AWS v4 authentication or public access.\n- **fastedge** - A FastEdge application served directly from the local FastEdge runtime on the edge node, identified by `app_id`.\nAvailable values: \"host\", \"s3\", \"fastedge\".",
+							Optional:    true,
+							Validators: []validator.String{
+								stringvalidator.OneOfCaseInsensitive(
+									"host",
+									"s3",
+									"fastedge",
+								),
 							},
 						},
 					},
@@ -140,4 +150,8 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 
 func (r *CDNOriginGroupResource) Schema(ctx context.Context, req resource.SchemaRequest, resp *resource.SchemaResponse) {
 	resp.Schema = ResourceSchema(ctx)
+}
+
+func (r *CDNOriginGroupResource) ConfigValidators(_ context.Context) []resource.ConfigValidator {
+	return []resource.ConfigValidator{}
 }
