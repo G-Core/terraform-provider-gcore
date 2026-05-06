@@ -47,4 +47,5 @@ type CDNOriginGroupSourcesConfigDataSourceModel struct {
 	S3AuthType        types.String `tfsdk:"s3_auth_type" json:"s3_auth_type,computed"`
 	S3Region          types.String `tfsdk:"s3_region" json:"s3_region,computed"`
 	S3StorageHostname types.String `tfsdk:"s3_storage_hostname" json:"s3_storage_hostname,computed"`
+	AppID             types.String `tfsdk:"app_id" json:"app_id,computed"`
 }

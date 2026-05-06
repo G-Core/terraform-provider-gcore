@@ -121,12 +121,13 @@ Possible values:
 Origin group must contain at least one enabled origin.
 - `host_header_override` (String) Per-origin Host header override. When set, the CDN sends this value as the Host header when
 requesting content from this origin instead of the default.
-- `origin_type` (String) Origin type. Present in responses only for S3 sources.
+- `origin_type` (String) Origin type. Present in responses for S3 and FastEdge sources.
 
 Possible values:
 - **host** - A source server or endpoint from which content is fetched.
 - **s3** - S3 storage with either AWS v4 authentication or public access.
-Available values: "host", "s3".
+- **fastedge** - A FastEdge application served directly from the local FastEdge runtime on the edge node, identified by `app_id`.
+Available values: "host", "s3", "fastedge".
 - `source` (String) IP address or domain name of the origin and the port, if custom port is used.
 - `tag` (String) Tag for the origin source.
 
@@ -135,6 +136,10 @@ Available values: "host", "s3".
 
 Read-Only:
 
+- `app_id` (String) ID of the FastEdge application served as origin (string, matching the existing
+fastedge option's convention). The CDN dispatches requests to the local FastEdge runtime
+on the edge node using this identifier. The application must belong to the requesting
+client, be enabled, and have `wasi-http` API type.
 - `s3_access_key_id` (String) Access key ID for the S3 account. Masked as `SECRET_VALUE` in responses.
 
 Restrictions:

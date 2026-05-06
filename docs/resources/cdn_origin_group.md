@@ -133,47 +133,49 @@ Possible values:
 Origin group must contain at least one enabled origin.
 - `host_header_override` (String) Per-origin Host header override. When set, the CDN sends this value as the Host header when
 requesting content from this origin instead of the default.
-- `origin_type` (String) Origin type. Present in responses only for S3 sources.
+- `origin_type` (String) Origin type. Present in responses for S3 and FastEdge sources.
 
 Possible values:
 - **host** - A source server or endpoint from which content is fetched.
 - **s3** - S3 storage with either AWS v4 authentication or public access.
-Available values: "host", "s3".
+- **fastedge** - A FastEdge application served directly from the local FastEdge runtime on the edge node, identified by `app_id`.
+Available values: "host", "s3", "fastedge".
 - `source` (String) IP address or domain name of the origin and the port, if custom port is used.
 - `tag` (String) Tag for the origin source.
 
 <a id="nestedatt--sources--config"></a>
 ### Nested Schema for `sources.config`
 
-Required:
+Optional:
 
+- `app_id` (String) ID of the FastEdge application served as origin (string, matching the existing
+fastedge option's convention). The CDN dispatches requests to the local FastEdge runtime
+on the edge node using this identifier. The application must belong to the requesting
+client, be enabled, and have `wasi-http` API type.
 - `s3_access_key_id` (String) Access key ID for the S3 account. Masked as `SECRET_VALUE` in responses.
 
 Restrictions:
 - Latin letters (A-Z, a-z), numbers (0-9), colon, dash, and underscore.
 - From 4 to 255 characters.
+- `s3_auth_type` (String) S3 authentication type.
 - `s3_bucket_name` (String) S3 bucket name.
+- `s3_region` (String) S3 storage region.
+
+The parameter is required if `s3_type` is `amazon`.
 - `s3_secret_access_key` (String) Secret access key for the S3 account. Masked as `SECRET_VALUE` in responses.
 
 Restrictions:
 - Latin letters (A-Z, a-z), numbers (0-9), pluses, slashes, dashes, colons and underscores.
 - From 16 to 255 characters.
+- `s3_storage_hostname` (String) S3 storage hostname.
+
+The parameter is required if `s3_type` is `other`.
 - `s3_type` (String) Storage type compatible with S3.
 
 Possible values:
 - **amazon** - AWS S3 storage.
 - **other** - Other (not AWS) S3 compatible storage.
 Available values: "amazon", "other".
-
-Optional:
-
-- `s3_auth_type` (String) S3 authentication type.
-- `s3_region` (String) S3 storage region.
-
-The parameter is required if `s3_type` is `amazon`.
-- `s3_storage_hostname` (String) S3 storage hostname.
-
-The parameter is required if `s3_type` is `other`.
 
 ## Import
 

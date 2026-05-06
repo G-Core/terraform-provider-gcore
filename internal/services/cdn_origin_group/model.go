@@ -48,11 +48,12 @@ type CDNOriginGroupSourcesModel struct {
 }
 
 type CDNOriginGroupSourcesConfigModel struct {
-	S3AccessKeyID     types.String `tfsdk:"s3_access_key_id" json:"s3_access_key_id,required"`
-	S3BucketName      types.String `tfsdk:"s3_bucket_name" json:"s3_bucket_name,required"`
-	S3SecretAccessKey types.String `tfsdk:"s3_secret_access_key" json:"s3_secret_access_key,required"`
-	S3Type            types.String `tfsdk:"s3_type" json:"s3_type,required"`
+	S3AccessKeyID     types.String `tfsdk:"s3_access_key_id" json:"s3_access_key_id,optional"`
+	S3BucketName      types.String `tfsdk:"s3_bucket_name" json:"s3_bucket_name,optional"`
+	S3SecretAccessKey types.String `tfsdk:"s3_secret_access_key" json:"s3_secret_access_key,optional"`
+	S3Type            types.String `tfsdk:"s3_type" json:"s3_type,optional"`
 	S3AuthType        types.String `tfsdk:"s3_auth_type" json:"s3_auth_type,computed_optional"`
 	S3Region          types.String `tfsdk:"s3_region" json:"s3_region,optional"`
 	S3StorageHostname types.String `tfsdk:"s3_storage_hostname" json:"s3_storage_hostname,optional"`
+	AppID             types.String `tfsdk:"app_id" json:"app_id,optional"`
 }
