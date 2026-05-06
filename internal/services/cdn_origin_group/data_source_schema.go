@@ -147,13 +147,21 @@ func DataSourceSchema(ctx context.Context) schema.Schema {
 									Description: "S3 storage hostname.\n\nThe parameter is required if `s3_type` is `other`.",
 									Computed:    true,
 								},
+								"app_id": schema.StringAttribute{
+									Description: "ID of the FastEdge application served as origin (string, matching the existing\nfastedge option's convention). The CDN dispatches requests to the local FastEdge runtime\non the edge node using this identifier. The application must belong to the requesting\nclient, be enabled, and have `wasi-http` API type.",
+									Computed:    true,
+								},
 							},
 						},
 						"origin_type": schema.StringAttribute{
-							Description: "Origin type. Present in responses only for S3 sources.\n\nPossible values:\n- **host** - A source server or endpoint from which content is fetched.\n- **s3** - S3 storage with either AWS v4 authentication or public access.\nAvailable values: \"host\", \"s3\".",
+							Description: "Origin type. Present in responses for S3 and FastEdge sources.\n\nPossible values:\n- **host** - A source server or endpoint from which content is fetched.\n- **s3** - S3 storage with either AWS v4 authentication or public access.\n- **fastedge** - A FastEdge application served directly from the local FastEdge runtime on the edge node, identified by `app_id`.\nAvailable values: \"host\", \"s3\", \"fastedge\".",
 							Computed:    true,
 							Validators: []validator.String{
-								stringvalidator.OneOfCaseInsensitive("host", "s3"),
+								stringvalidator.OneOfCaseInsensitive(
+									"host",
+									"s3",
+									"fastedge",
+								),
 							},
 						},
 					},
