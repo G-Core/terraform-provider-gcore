@@ -77,12 +77,12 @@ type GcoreProvider struct {
 
 // GcoreProviderModel describes the provider data model.
 type GcoreProviderModel struct {
-	BaseURL                     types.String `tfsdk:"base_url" json:"base_url,optional"`
-	APIKey                      types.String `tfsdk:"api_key" json:"api_key,optional"`
-	CloudProjectID              types.Int64  `tfsdk:"cloud_project_id" json:"cloud_project_id,optional"`
-	CloudRegionID               types.Int64  `tfsdk:"cloud_region_id" json:"cloud_region_id,optional"`
-	CloudPollingIntervalSeconds types.Int64  `tfsdk:"cloud_polling_interval_seconds" json:"cloud_polling_interval_seconds,optional"`
-	CloudPollingTimeoutSeconds  types.Int64  `tfsdk:"cloud_polling_timeout_seconds" json:"cloud_polling_timeout_seconds,optional"`
+	BaseURL                types.String `tfsdk:"base_url" json:"base_url,optional"`
+	APIKey                 types.String `tfsdk:"api_key" json:"api_key,optional"`
+	CloudProjectID         types.Int64  `tfsdk:"cloud_project_id" json:"cloud_project_id,optional"`
+	CloudRegionID          types.Int64  `tfsdk:"cloud_region_id" json:"cloud_region_id,optional"`
+	PollingIntervalSeconds types.Int64  `tfsdk:"polling_interval_seconds" json:"polling_interval_seconds,optional"`
+	PollingTimeoutSeconds  types.Int64  `tfsdk:"polling_timeout_seconds" json:"polling_timeout_seconds,optional"`
 }
 
 func (p *GcoreProvider) Metadata(ctx context.Context, req provider.MetadataRequest, resp *provider.MetadataResponse) {
@@ -106,10 +106,10 @@ func ProviderSchema(ctx context.Context) schema.Schema {
 			"cloud_region_id": schema.Int64Attribute{
 				Optional: true,
 			},
-			"cloud_polling_interval_seconds": schema.Int64Attribute{
+			"polling_interval_seconds": schema.Int64Attribute{
 				Optional: true,
 			},
-			"cloud_polling_timeout_seconds": schema.Int64Attribute{
+			"polling_timeout_seconds": schema.Int64Attribute{
 				Optional: true,
 			},
 		},
@@ -169,16 +169,16 @@ func (p *GcoreProvider) Configure(ctx context.Context, req provider.ConfigureReq
 		opts = append(opts, option.WithCloudRegionID(parsed))
 	}
 
-	if !data.CloudPollingIntervalSeconds.IsNull() && !data.CloudPollingIntervalSeconds.IsUnknown() {
-		opts = append(opts, option.WithCloudPollingIntervalSeconds(data.CloudPollingIntervalSeconds.ValueInt64()))
+	if !data.PollingIntervalSeconds.IsNull() && !data.PollingIntervalSeconds.IsUnknown() {
+		opts = append(opts, option.WithPollingIntervalSeconds(data.PollingIntervalSeconds.ValueInt64()))
 	} else {
-		opts = append(opts, option.WithCloudPollingIntervalSeconds(3))
+		opts = append(opts, option.WithPollingIntervalSeconds(3))
 	}
 
-	if !data.CloudPollingTimeoutSeconds.IsNull() && !data.CloudPollingTimeoutSeconds.IsUnknown() {
-		opts = append(opts, option.WithCloudPollingTimeoutSeconds(data.CloudPollingTimeoutSeconds.ValueInt64()))
+	if !data.PollingTimeoutSeconds.IsNull() && !data.PollingTimeoutSeconds.IsUnknown() {
+		opts = append(opts, option.WithPollingTimeoutSeconds(data.PollingTimeoutSeconds.ValueInt64()))
 	} else {
-		opts = append(opts, option.WithCloudPollingTimeoutSeconds(7200))
+		opts = append(opts, option.WithPollingTimeoutSeconds(7200))
 	}
 
 	client := gcore.NewClient(
