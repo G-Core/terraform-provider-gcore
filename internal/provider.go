@@ -77,12 +77,12 @@ type GcoreProvider struct {
 
 // GcoreProviderModel describes the provider data model.
 type GcoreProviderModel struct {
-	BaseURL                     types.String `tfsdk:"base_url" json:"base_url,optional"`
-	APIKey                      types.String `tfsdk:"api_key" json:"api_key,optional"`
-	CloudProjectID              types.Int64  `tfsdk:"cloud_project_id" json:"cloud_project_id,optional"`
-	CloudRegionID               types.Int64  `tfsdk:"cloud_region_id" json:"cloud_region_id,optional"`
-	CloudPollingIntervalSeconds types.Int64  `tfsdk:"cloud_polling_interval_seconds" json:"cloud_polling_interval_seconds,optional"`
-	CloudPollingTimeoutSeconds  types.Int64  `tfsdk:"cloud_polling_timeout_seconds" json:"cloud_polling_timeout_seconds,optional"`
+	BaseURL                types.String `tfsdk:"base_url" json:"base_url,optional"`
+	APIKey                 types.String `tfsdk:"api_key" json:"api_key,optional"`
+	CloudProjectID         types.Int64  `tfsdk:"cloud_project_id" json:"cloud_project_id,optional"`
+	CloudRegionID          types.Int64  `tfsdk:"cloud_region_id" json:"cloud_region_id,optional"`
+	PollingIntervalSeconds types.Int64  `tfsdk:"polling_interval_seconds" json:"polling_interval_seconds,optional"`
+	PollingTimeoutSeconds  types.Int64  `tfsdk:"polling_timeout_seconds" json:"polling_timeout_seconds,optional"`
 }
 
 func (p *GcoreProvider) Metadata(ctx context.Context, req provider.MetadataRequest, resp *provider.MetadataResponse) {
@@ -110,11 +110,11 @@ func ProviderSchema(ctx context.Context) schema.Schema {
 				Description: "Default cloud region ID to use for cloud resources. Serves as a convenience fallback for local development; for production, prefer setting `region_id` explicitly on each resource. Can also be set via the `GCORE_CLOUD_REGION_ID` environment variable.",
 				Optional:    true,
 			},
-			"cloud_polling_interval_seconds": schema.Int64Attribute{
+			"polling_interval_seconds": schema.Int64Attribute{
 				Description: "Interval in seconds between polling requests for long-running cloud operations. Defaults to `3`.",
 				Optional:    true,
 			},
-			"cloud_polling_timeout_seconds": schema.Int64Attribute{
+			"polling_timeout_seconds": schema.Int64Attribute{
 				Description: "Timeout in seconds for polling long-running cloud operations. Defaults to `7200`.",
 				Optional:    true,
 			},
@@ -175,16 +175,16 @@ func (p *GcoreProvider) Configure(ctx context.Context, req provider.ConfigureReq
 		opts = append(opts, option.WithCloudRegionID(parsed))
 	}
 
-	if !data.CloudPollingIntervalSeconds.IsNull() && !data.CloudPollingIntervalSeconds.IsUnknown() {
-		opts = append(opts, option.WithCloudPollingIntervalSeconds(data.CloudPollingIntervalSeconds.ValueInt64()))
+	if !data.PollingIntervalSeconds.IsNull() && !data.PollingIntervalSeconds.IsUnknown() {
+		opts = append(opts, option.WithPollingIntervalSeconds(data.PollingIntervalSeconds.ValueInt64()))
 	} else {
-		opts = append(opts, option.WithCloudPollingIntervalSeconds(3))
+		opts = append(opts, option.WithPollingIntervalSeconds(3))
 	}
 
-	if !data.CloudPollingTimeoutSeconds.IsNull() && !data.CloudPollingTimeoutSeconds.IsUnknown() {
-		opts = append(opts, option.WithCloudPollingTimeoutSeconds(data.CloudPollingTimeoutSeconds.ValueInt64()))
+	if !data.PollingTimeoutSeconds.IsNull() && !data.PollingTimeoutSeconds.IsUnknown() {
+		opts = append(opts, option.WithPollingTimeoutSeconds(data.PollingTimeoutSeconds.ValueInt64()))
 	} else {
-		opts = append(opts, option.WithCloudPollingTimeoutSeconds(7200))
+		opts = append(opts, option.WithPollingTimeoutSeconds(7200))
 	}
 
 	// Override Go SDK max retries to 4 from 2 which is the default.
