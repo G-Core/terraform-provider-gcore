@@ -16,8 +16,8 @@ provider "gcore" {
   api_key = "My API Key"
   cloud_project_id = 0
   cloud_region_id = 0
-  cloud_polling_interval_seconds = 0
-  cloud_polling_timeout_seconds = 0
+  polling_interval_seconds = 0
+  polling_timeout_seconds = 0
 }
 ```
 
@@ -28,7 +28,7 @@ provider "gcore" {
 
 - `api_key` (String)
 - `base_url` (String) Set the base url that the provider connects to.
-- `cloud_polling_interval_seconds` (Number)
-- `cloud_polling_timeout_seconds` (Number)
 - `cloud_project_id` (Number)
 - `cloud_region_id` (Number)
+- `polling_interval_seconds` (Number)
+- `polling_timeout_seconds` (Number)
