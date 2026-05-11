@@ -100,6 +100,12 @@ func ListDataSourceSchema(ctx context.Context) schema.Schema {
 								),
 							},
 						},
+						"aliases": schema.ListAttribute{
+							Description: "CNAME aliases pointing at this domain's CDN resource",
+							Computed:    true,
+							CustomType:  customfield.NewListType[types.String](ctx),
+							ElementType: types.StringType,
+						},
 					},
 				},
 			},

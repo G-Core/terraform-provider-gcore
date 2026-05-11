@@ -16,6 +16,7 @@ type WaapDomainModel struct {
 	CustomPageSet types.Int64                                        `tfsdk:"custom_page_set" json:"custom_page_set,computed"`
 	ID            types.Int64                                        `tfsdk:"id" json:"id,computed"`
 	Name          types.String                                       `tfsdk:"name" json:"name,computed"`
+	Aliases       customfield.List[types.String]                     `tfsdk:"aliases" json:"aliases,computed"`
 	Quotas        customfield.NestedObjectMap[WaapDomainQuotasModel] `tfsdk:"quotas" json:"quotas,computed"`
 }
 

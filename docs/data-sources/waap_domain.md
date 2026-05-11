@@ -27,6 +27,7 @@ data "gcore_waap_domain" "example_waap_domain" {
 
 ### Read-Only
 
+- `aliases` (List of String) CNAME aliases pointing at this domain's CDN resource
 - `created_at` (String) The date and time the domain was created in ISO 8601 format
 - `custom_page_set` (Number) The ID of the custom page set
 - `id` (Number) The domain ID

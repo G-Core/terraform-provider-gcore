@@ -11,6 +11,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/datasource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
+	"github.com/hashicorp/terraform-plugin-framework/types"
 )
 
 var _ datasource.DataSourceWithConfigValidators = (*WaapDomainDataSource)(nil)
@@ -51,6 +52,12 @@ func DataSourceSchema(ctx context.Context) schema.Schema {
 						"locked",
 					),
 				},
+			},
+			"aliases": schema.ListAttribute{
+				Description: "CNAME aliases pointing at this domain's CDN resource",
+				Computed:    true,
+				CustomType:  customfield.NewListType[types.String](ctx),
+				ElementType: types.StringType,
 			},
 			"quotas": schema.MapNestedAttribute{
 				Description: "Domain level quotas",
