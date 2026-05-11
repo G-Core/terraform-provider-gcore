@@ -6,6 +6,8 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"io"
+	"net/http"
 	"time"
 
 	"github.com/G-Core/gcore-go"
@@ -87,29 +89,32 @@ func (r *CloudInstanceResource) Create(ctx context.Context, req resource.CreateR
 		return
 	}
 
-	instance, err := r.client.Cloud.Instances.NewAndPoll(
+	res := new(http.Response)
+	_, err = r.client.Cloud.Instances.NewAndPoll(
 		ctx,
 		params,
 		option.WithRequestBody("application/json", dataBytes),
+		option.WithResponseBodyInto(&res),
 		option.WithMiddleware(logging.Middleware(ctx)),
 	)
 	if err != nil {
 		resp.Diagnostics.AddError("failed to make http request", err.Error())
 		return
 	}
-	err = apijson.UnmarshalComputed([]byte(instance.RawJSON()), &data)
+	bytes, _ := io.ReadAll(res.Body)
+	err = apijson.UnmarshalComputed(bytes, &data)
 	if err != nil {
 		resp.Diagnostics.AddError("failed to deserialize http request", err.Error())
 		return
 	}
-	if tags, ok := custom.ConvertAPITagsToCustomfieldMap(ctx, []byte(instance.RawJSON())); ok {
+	if tags, ok := custom.ConvertAPITagsToCustomfieldMap(ctx, bytes); ok {
 		data.Tags = tags
 	}
 
 	// Extract fields from the API response that aren't mapped via json tags
 	// API returns: {"flavor": {"flavor_id": "..."}, "project_id": N, "region_id": N, ...}
 	var rawResponse map[string]interface{}
-	if err := json.Unmarshal([]byte(instance.RawJSON()), &rawResponse); err == nil {
+	if err := json.Unmarshal(bytes, &rawResponse); err == nil {
 		if flavorObj, ok := rawResponse["flavor"].(map[string]interface{}); ok {
 			if flavorID, ok := flavorObj["flavor_id"].(string); ok {
 				data.Flavor = types.StringValue(flavorID)
@@ -310,10 +315,12 @@ func (r *CloudInstanceResource) Update(ctx context.Context, req resource.UpdateR
 			return
 		}
 
-		instance, err := r.client.Cloud.Instances.ActionAndPoll(
+		resAction := new(http.Response)
+		_, err := r.client.Cloud.Instances.ActionAndPoll(
 			ctx,
 			instanceID,
 			actionParams,
+			option.WithResponseBodyInto(&resAction),
 			option.WithMiddleware(logging.Middleware(ctx)),
 		)
 		if err != nil {
@@ -322,12 +329,13 @@ func (r *CloudInstanceResource) Update(ctx context.Context, req resource.UpdateR
 		}
 
 		// Update state with new instance data after action
-		err = apijson.UnmarshalComputed([]byte(instance.RawJSON()), &data)
+		bytesAction, _ := io.ReadAll(resAction.Body)
+		err = apijson.UnmarshalComputed(bytesAction, &data)
 		if err != nil {
 			resp.Diagnostics.AddError("failed to deserialize instance after vm_state change", err.Error())
 			return
 		}
-		if tags, ok := custom.ConvertAPITagsToCustomfieldMap(ctx, []byte(instance.RawJSON())); ok {
+		if tags, ok := custom.ConvertAPITagsToCustomfieldMap(ctx, bytesAction); ok {
 			data.Tags = tags
 		}
 		stateHasChanged = true

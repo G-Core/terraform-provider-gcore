@@ -81,22 +81,25 @@ func (r *CloudGPUVirtualClusterImageResource) Create(ctx context.Context, req re
 		resp.Diagnostics.AddError("failed to serialize http request", err.Error())
 		return
 	}
-	image, err := r.client.Cloud.GPUVirtual.Clusters.Images.UploadAndPoll(
+	res := new(http.Response)
+	_, err = r.client.Cloud.GPUVirtual.Clusters.Images.UploadAndPoll(
 		ctx,
 		params,
 		option.WithRequestBody("application/json", dataBytes),
+		option.WithResponseBodyInto(&res),
 		option.WithMiddleware(logging.Middleware(ctx)),
 	)
 	if err != nil {
 		resp.Diagnostics.AddError("failed to make http request", err.Error())
 		return
 	}
-	err = apijson.UnmarshalComputed([]byte(image.RawJSON()), &data)
+	bytes, _ := io.ReadAll(res.Body)
+	err = apijson.UnmarshalComputed(bytes, &data)
 	if err != nil {
 		resp.Diagnostics.AddError("failed to deserialize http request", err.Error())
 		return
 	}
-	if tags, ok := custom.ConvertAPITagsToCustomfieldMap(ctx, []byte(image.RawJSON())); ok {
+	if tags, ok := custom.ConvertAPITagsToCustomfieldMap(ctx, bytes); ok {
 		data.Tags = tags
 	}
 

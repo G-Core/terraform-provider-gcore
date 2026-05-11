@@ -88,10 +88,12 @@ func (r *CloudSecretResource) Create(ctx context.Context, req resource.CreateReq
 		return
 	}
 
-	secret, err := r.client.Cloud.Secrets.UploadTlsCertificateAndPoll(
+	res := new(http.Response)
+	_, err = r.client.Cloud.Secrets.UploadTlsCertificateAndPoll(
 		ctx,
 		params,
 		option.WithRequestBody("application/json", dataBytes),
+		option.WithResponseBodyInto(&res),
 		option.WithMiddleware(logging.Middleware(ctx)),
 	)
 	if err != nil {
@@ -99,7 +101,8 @@ func (r *CloudSecretResource) Create(ctx context.Context, req resource.CreateReq
 		return
 	}
 
-	err = apijson.UnmarshalComputed([]byte(secret.RawJSON()), &data)
+	bytes, _ := io.ReadAll(res.Body)
+	err = apijson.UnmarshalComputed(bytes, &data)
 	if err != nil {
 		resp.Diagnostics.AddError("failed to deserialize http request", err.Error())
 		return

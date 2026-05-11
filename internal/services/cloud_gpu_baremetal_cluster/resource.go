@@ -87,22 +87,25 @@ func (r *CloudGPUBaremetalClusterResource) Create(ctx context.Context, req resou
 		resp.Diagnostics.AddError("failed to serialize http request", err.Error())
 		return
 	}
-	cluster, err := r.client.Cloud.GPUBaremetal.Clusters.NewAndPoll(
+	res := new(http.Response)
+	_, err = r.client.Cloud.GPUBaremetal.Clusters.NewAndPoll(
 		ctx,
 		params,
 		option.WithRequestBody("application/json", dataBytes),
+		option.WithResponseBodyInto(&res),
 		option.WithMiddleware(logging.Middleware(ctx)),
 	)
 	if err != nil {
 		resp.Diagnostics.AddError("failed to make http request", err.Error())
 		return
 	}
-	err = apijson.UnmarshalComputed([]byte(cluster.RawJSON()), &data)
+	bytes, _ := io.ReadAll(res.Body)
+	err = apijson.UnmarshalComputed(bytes, &data)
 	if err != nil {
 		resp.Diagnostics.AddError("failed to deserialize http request", err.Error())
 		return
 	}
-	if tags, ok := custom.ConvertAPITagsToCustomfieldMap(ctx, []byte(cluster.RawJSON())); ok {
+	if tags, ok := custom.ConvertAPITagsToCustomfieldMap(ctx, bytes); ok {
 		data.Tags = tags
 	}
 
@@ -187,22 +190,25 @@ func (r *CloudGPUBaremetalClusterResource) Update(ctx context.Context, req resou
 		if !data.RegionID.IsNull() {
 			params.RegionID = param.NewOpt(data.RegionID.ValueInt64())
 		}
-		cluster, err := r.client.Cloud.GPUBaremetal.Clusters.ResizeAndPoll(
+		res := new(http.Response)
+		_, err := r.client.Cloud.GPUBaremetal.Clusters.ResizeAndPoll(
 			ctx,
 			data.ID.ValueString(),
 			params,
+			option.WithResponseBodyInto(&res),
 			option.WithMiddleware(logging.Middleware(ctx)),
 		)
 		if err != nil {
 			resp.Diagnostics.AddError("failed to make http request", err.Error())
 			return
 		}
-		err = apijson.UnmarshalComputed([]byte(cluster.RawJSON()), &data)
+		bytes, _ := io.ReadAll(res.Body)
+		err = apijson.UnmarshalComputed(bytes, &data)
 		if err != nil {
 			resp.Diagnostics.AddError("failed to deserialize http request", err.Error())
 			return
 		}
-		if tags, ok := custom.ConvertAPITagsToCustomfieldMap(ctx, []byte(cluster.RawJSON())); ok {
+		if tags, ok := custom.ConvertAPITagsToCustomfieldMap(ctx, bytes); ok {
 			data.Tags = tags
 		}
 		stateHasChanged = true
@@ -257,22 +263,25 @@ func (r *CloudGPUBaremetalClusterResource) Update(ctx context.Context, req resou
 		if !data.RegionID.IsNull() {
 			rebuildParams.RegionID = param.NewOpt(data.RegionID.ValueInt64())
 		}
-		cluster, err := r.client.Cloud.GPUBaremetal.Clusters.RebuildAndPoll(
+		res := new(http.Response)
+		_, err = r.client.Cloud.GPUBaremetal.Clusters.RebuildAndPoll(
 			ctx,
 			data.ID.ValueString(),
 			rebuildParams,
+			option.WithResponseBodyInto(&res),
 			option.WithMiddleware(logging.Middleware(ctx)),
 		)
 		if err != nil {
 			resp.Diagnostics.AddError("failed to make http request", err.Error())
 			return
 		}
-		err = apijson.UnmarshalComputed([]byte(cluster.RawJSON()), &data)
+		bytes, _ := io.ReadAll(res.Body)
+		err = apijson.UnmarshalComputed(bytes, &data)
 		if err != nil {
 			resp.Diagnostics.AddError("failed to deserialize http request", err.Error())
 			return
 		}
-		if tags, ok := custom.ConvertAPITagsToCustomfieldMap(ctx, []byte(cluster.RawJSON())); ok {
+		if tags, ok := custom.ConvertAPITagsToCustomfieldMap(ctx, bytes); ok {
 			data.Tags = tags
 		}
 		stateHasChanged = true

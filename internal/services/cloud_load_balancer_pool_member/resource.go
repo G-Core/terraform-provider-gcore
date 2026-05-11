@@ -5,6 +5,8 @@ package cloud_load_balancer_pool_member
 import (
 	"context"
 	"fmt"
+	"io"
+	"net/http"
 
 	"github.com/G-Core/gcore-go"
 	"github.com/G-Core/gcore-go/cloud"
@@ -75,18 +77,21 @@ func (r *CloudLoadBalancerPoolMemberResource) Create(ctx context.Context, req re
 		resp.Diagnostics.AddError("failed to serialize http request", err.Error())
 		return
 	}
-	member, err := r.client.Cloud.LoadBalancers.Pools.Members.NewAndPoll(
+	res := new(http.Response)
+	_, err = r.client.Cloud.LoadBalancers.Pools.Members.NewAndPoll(
 		ctx,
 		data.PoolID.ValueString(),
 		params,
 		option.WithRequestBody("application/json", dataBytes),
+		option.WithResponseBodyInto(&res),
 		option.WithMiddleware(logging.Middleware(ctx)),
 	)
 	if err != nil {
 		resp.Diagnostics.AddError("failed to make http request", err.Error())
 		return
 	}
-	err = apijson.UnmarshalComputed([]byte(member.RawJSON()), &data)
+	bytes, _ := io.ReadAll(res.Body)
+	err = apijson.UnmarshalComputed(bytes, &data)
 	if err != nil {
 		resp.Diagnostics.AddError("failed to deserialize http request", err.Error())
 		return

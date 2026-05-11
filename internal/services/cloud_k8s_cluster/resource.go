@@ -83,17 +83,20 @@ func (r *CloudK8SClusterResource) Create(ctx context.Context, req resource.Creat
 	}
 	// explicitly set params.Name which is needed to perform the get request after the polling is done
 	params.Name = data.Name.ValueString()
-	cluster, err := r.client.Cloud.K8S.Clusters.NewAndPoll(
+	res := new(http.Response)
+	_, err = r.client.Cloud.K8S.Clusters.NewAndPoll(
 		ctx,
 		params,
 		option.WithRequestBody("application/json", dataBytes),
+		option.WithResponseBodyInto(&res),
 		option.WithMiddleware(logging.Middleware(ctx)),
 	)
 	if err != nil {
 		resp.Diagnostics.AddError("failed to make http request", err.Error())
 		return
 	}
-	err = apijson.UnmarshalComputed([]byte(cluster.RawJSON()), &data)
+	bytes, _ := io.ReadAll(res.Body)
+	err = apijson.UnmarshalComputed(bytes, &data)
 	if err != nil {
 		resp.Diagnostics.AddError("failed to deserialize http request", err.Error())
 		return
@@ -141,17 +144,20 @@ func (r *CloudK8SClusterResource) Update(ctx context.Context, req resource.Updat
 			upgradeParams.RegionID = param.NewOpt(data.RegionID.ValueInt64())
 		}
 		upgradeParams.Version = data.Version.ValueString()
-		cluster, err := r.client.Cloud.K8S.Clusters.UpgradeAndPoll(
+		res := new(http.Response)
+		_, err := r.client.Cloud.K8S.Clusters.UpgradeAndPoll(
 			ctx,
 			data.Name.ValueString(),
 			upgradeParams,
+			option.WithResponseBodyInto(&res),
 			option.WithMiddleware(logging.Middleware(ctx)),
 		)
 		if err != nil {
 			resp.Diagnostics.AddError("failed to upgrade k8s cluster", err.Error())
 			return
 		}
-		err = apijson.UnmarshalComputed([]byte(cluster.RawJSON()), &data)
+		bytes, _ := io.ReadAll(res.Body)
+		err = apijson.UnmarshalComputed(bytes, &data)
 		if err != nil {
 			resp.Diagnostics.AddError("failed to deserialize http request", err.Error())
 			return
@@ -182,18 +188,21 @@ func (r *CloudK8SClusterResource) Update(ctx context.Context, req resource.Updat
 			resp.Diagnostics.AddError("failed to serialize http request", err.Error())
 			return
 		}
-		cluster, err := r.client.Cloud.K8S.Clusters.UpdateAndPoll(
+		res := new(http.Response)
+		_, err = r.client.Cloud.K8S.Clusters.UpdateAndPoll(
 			ctx,
 			data.Name.ValueString(),
 			params,
 			option.WithRequestBody("application/json", dataBytes),
+			option.WithResponseBodyInto(&res),
 			option.WithMiddleware(logging.Middleware(ctx)),
 		)
 		if err != nil {
 			resp.Diagnostics.AddError("failed to make http request", err.Error())
 			return
 		}
-		err = apijson.UnmarshalComputed([]byte(cluster.RawJSON()), &data)
+		bytes, _ := io.ReadAll(res.Body)
+		err = apijson.UnmarshalComputed(bytes, &data)
 		if err != nil {
 			resp.Diagnostics.AddError("failed to deserialize http request", err.Error())
 			return

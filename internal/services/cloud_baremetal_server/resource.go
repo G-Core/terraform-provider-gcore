@@ -87,22 +87,25 @@ func (r *CloudBaremetalServerResource) Create(ctx context.Context, req resource.
 		resp.Diagnostics.AddError("failed to serialize http request", err.Error())
 		return
 	}
-	baremetalServer, err := r.client.Cloud.Baremetal.Servers.NewAndPoll(
+	res := new(http.Response)
+	_, err = r.client.Cloud.Baremetal.Servers.NewAndPoll(
 		ctx,
 		params,
 		option.WithRequestBody("application/json", dataBytes),
+		option.WithResponseBodyInto(&res),
 		option.WithMiddleware(logging.Middleware(ctx)),
 	)
 	if err != nil {
 		resp.Diagnostics.AddError("failed to make http request", err.Error())
 		return
 	}
-	err = apijson.UnmarshalComputed([]byte(baremetalServer.RawJSON()), &data)
+	bytes, _ := io.ReadAll(res.Body)
+	err = apijson.UnmarshalComputed(bytes, &data)
 	if err != nil {
 		resp.Diagnostics.AddError("failed to deserialize http request", err.Error())
 		return
 	}
-	if tags, ok := custom.ConvertAPITagsToCustomfieldMap(ctx, []byte(baremetalServer.RawJSON())); ok {
+	if tags, ok := custom.ConvertAPITagsToCustomfieldMap(ctx, bytes); ok {
 		data.Tags = tags
 	}
 
@@ -192,22 +195,25 @@ func (r *CloudBaremetalServerResource) Update(ctx context.Context, req resource.
 		if !data.UserData.IsNull() {
 			params.UserData = param.NewOpt(data.UserData.ValueString())
 		}
-		server, err := r.client.Cloud.Baremetal.Servers.RebuildAndPoll(
+		res := new(http.Response)
+		_, err := r.client.Cloud.Baremetal.Servers.RebuildAndPoll(
 			ctx,
 			data.ID.ValueString(),
 			params,
+			option.WithResponseBodyInto(&res),
 			option.WithMiddleware(logging.Middleware(ctx)),
 		)
 		if err != nil {
 			resp.Diagnostics.AddError("failed to make http request", err.Error())
 			return
 		}
-		err = apijson.UnmarshalComputed([]byte(server.RawJSON()), &data)
+		bytes, _ := io.ReadAll(res.Body)
+		err = apijson.UnmarshalComputed(bytes, &data)
 		if err != nil {
 			resp.Diagnostics.AddError("failed to deserialize http request", err.Error())
 			return
 		}
-		if tags, ok := custom.ConvertAPITagsToCustomfieldMap(ctx, []byte(server.RawJSON())); ok {
+		if tags, ok := custom.ConvertAPITagsToCustomfieldMap(ctx, bytes); ok {
 			data.Tags = tags
 		}
 		stateHasChanged = true

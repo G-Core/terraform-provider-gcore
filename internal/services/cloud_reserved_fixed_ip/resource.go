@@ -81,20 +81,20 @@ func (r *CloudReservedFixedIPResource) Create(ctx context.Context, req resource.
 		return
 	}
 
-	// Use NewAndPoll to automatically handle async operation and task polling
-	reservedFixedIP, err := r.client.Cloud.ReservedFixedIPs.NewAndPoll(
+	res := new(http.Response)
+	_, err = r.client.Cloud.ReservedFixedIPs.NewAndPoll(
 		ctx,
 		params,
 		option.WithRequestBody("application/json", dataBytes),
+		option.WithResponseBodyInto(&res),
 		option.WithMiddleware(logging.Middleware(ctx)),
 	)
 	if err != nil {
-		resp.Diagnostics.AddError("failed to create reserved fixed IP", err.Error())
+		resp.Diagnostics.AddError("failed to make http request", err.Error())
 		return
 	}
-
-	// Use RawJSON from the NewAndPoll response directly
-	err = apijson.UnmarshalComputed([]byte(reservedFixedIP.RawJSON()), &data)
+	bytes, _ := io.ReadAll(res.Body)
+	err = apijson.UnmarshalComputed(bytes, &data)
 	if err != nil {
 		resp.Diagnostics.AddError("failed to deserialize http request", err.Error())
 		return

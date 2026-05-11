@@ -82,22 +82,25 @@ func (r *CloudFileShareResource) Create(ctx context.Context, req resource.Create
 		resp.Diagnostics.AddError("failed to serialize http request", err.Error())
 		return
 	}
-	fileShare, err := r.client.Cloud.FileShares.NewAndPoll(
+	res := new(http.Response)
+	_, err = r.client.Cloud.FileShares.NewAndPoll(
 		ctx,
 		params,
 		option.WithRequestBody("application/json", dataBytes),
+		option.WithResponseBodyInto(&res),
 		option.WithMiddleware(logging.Middleware(ctx)),
 	)
 	if err != nil {
 		resp.Diagnostics.AddError("failed to make http request", err.Error())
 		return
 	}
-	err = apijson.UnmarshalComputed([]byte(fileShare.RawJSON()), &data)
+	bytes, _ := io.ReadAll(res.Body)
+	err = apijson.UnmarshalComputed(bytes, &data)
 	if err != nil {
 		resp.Diagnostics.AddError("failed to deserialize http request", err.Error())
 		return
 	}
-	if tags, ok := custom.ConvertAPITagsToCustomfieldMap(ctx, []byte(fileShare.RawJSON())); ok {
+	if tags, ok := custom.ConvertAPITagsToCustomfieldMap(ctx, bytes); ok {
 		data.Tags = tags
 	}
 	// AccessRuleIDs is read-only, so set it to null
@@ -140,23 +143,26 @@ func (r *CloudFileShareResource) Update(ctx context.Context, req resource.Update
 			resp.Diagnostics.AddError("failed to serialize http request", err.Error())
 			return
 		}
-		fileShare, err := r.client.Cloud.FileShares.UpdateAndPoll(
+		res := new(http.Response)
+		_, err = r.client.Cloud.FileShares.UpdateAndPoll(
 			ctx,
 			data.ID.ValueString(),
 			params,
 			option.WithRequestBody("application/json", dataBytes),
+			option.WithResponseBodyInto(&res),
 			option.WithMiddleware(logging.Middleware(ctx)),
 		)
 		if err != nil {
 			resp.Diagnostics.AddError("failed to make http request", err.Error())
 			return
 		}
-		err = apijson.UnmarshalComputed([]byte(fileShare.RawJSON()), &data)
+		bytes, _ := io.ReadAll(res.Body)
+		err = apijson.UnmarshalComputed(bytes, &data)
 		if err != nil {
 			resp.Diagnostics.AddError("failed to deserialize http request", err.Error())
 			return
 		}
-		if tags, ok := custom.ConvertAPITagsToCustomfieldMap(ctx, []byte(fileShare.RawJSON())); ok {
+		if tags, ok := custom.ConvertAPITagsToCustomfieldMap(ctx, bytes); ok {
 			data.Tags = tags
 		}
 	}
@@ -170,22 +176,25 @@ func (r *CloudFileShareResource) Update(ctx context.Context, req resource.Update
 		if !data.RegionID.IsNull() {
 			params.RegionID = param.NewOpt(data.RegionID.ValueInt64())
 		}
-		fileShare, err := r.client.Cloud.FileShares.ResizeAndPoll(
+		res := new(http.Response)
+		_, err := r.client.Cloud.FileShares.ResizeAndPoll(
 			ctx,
 			data.ID.ValueString(),
 			params,
+			option.WithResponseBodyInto(&res),
 			option.WithMiddleware(logging.Middleware(ctx)),
 		)
 		if err != nil {
 			resp.Diagnostics.AddError("failed to make http request", err.Error())
 			return
 		}
-		err = apijson.UnmarshalComputed([]byte(fileShare.RawJSON()), &data)
+		bytes, _ := io.ReadAll(res.Body)
+		err = apijson.UnmarshalComputed(bytes, &data)
 		if err != nil {
 			resp.Diagnostics.AddError("failed to deserialize http request", err.Error())
 			return
 		}
-		if tags, ok := custom.ConvertAPITagsToCustomfieldMap(ctx, []byte(fileShare.RawJSON())); ok {
+		if tags, ok := custom.ConvertAPITagsToCustomfieldMap(ctx, bytes); ok {
 			data.Tags = tags
 		}
 	}
