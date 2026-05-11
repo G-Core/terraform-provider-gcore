@@ -15,6 +15,7 @@ type WaapDomainDataSourceModel struct {
 	ID            types.Int64                                                  `tfsdk:"id" json:"id,computed"`
 	Name          types.String                                                 `tfsdk:"name" json:"name,computed"`
 	Status        types.String                                                 `tfsdk:"status" json:"status,computed"`
+	Aliases       customfield.List[types.String]                               `tfsdk:"aliases" json:"aliases,computed"`
 	Quotas        customfield.NestedObjectMap[WaapDomainQuotasDataSourceModel] `tfsdk:"quotas" json:"quotas,computed"`
 }
 

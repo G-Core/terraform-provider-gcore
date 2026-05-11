@@ -13,6 +13,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/int64planmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
+	"github.com/hashicorp/terraform-plugin-framework/types"
 )
 
 var _ resource.ResourceWithConfigValidators = (*WaapDomainResource)(nil)
@@ -49,6 +50,12 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 			"name": schema.StringAttribute{
 				Description: "The domain name",
 				Computed:    true,
+			},
+			"aliases": schema.ListAttribute{
+				Description: "CNAME aliases pointing at this domain's CDN resource",
+				Computed:    true,
+				CustomType:  customfield.NewListType[types.String](ctx),
+				ElementType: types.StringType,
 			},
 			"quotas": schema.MapNestedAttribute{
 				Description: "Domain level quotas",
