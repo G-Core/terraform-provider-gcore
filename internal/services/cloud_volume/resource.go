@@ -81,10 +81,12 @@ func (r *CloudVolumeResource) Create(ctx context.Context, req resource.CreateReq
 		resp.Diagnostics.AddError("failed to serialize http request", err.Error())
 		return
 	}
-	volume, err := r.client.Cloud.Volumes.NewAndPoll(
+	res := new(http.Response)
+	_, err = r.client.Cloud.Volumes.NewAndPoll(
 		ctx,
 		params,
 		option.WithRequestBody("application/json", dataBytes),
+		option.WithResponseBodyInto(&res),
 		option.WithMiddleware(logging.Middleware(ctx)),
 	)
 	if err != nil {
@@ -92,12 +94,13 @@ func (r *CloudVolumeResource) Create(ctx context.Context, req resource.CreateReq
 		return
 	}
 	// Use raw JSON from the response to unmarshal the "computed" fields into the data model
-	err = apijson.UnmarshalComputed([]byte(volume.RawJSON()), &data)
+	bytes, _ := io.ReadAll(res.Body)
+	err = apijson.UnmarshalComputed(bytes, &data)
 	if err != nil {
 		resp.Diagnostics.AddError("failed to deserialize http request", err.Error())
 		return
 	}
-	if tags, ok := custom.ConvertAPITagsToCustomfieldMap(ctx, []byte(volume.RawJSON())); ok {
+	if tags, ok := custom.ConvertAPITagsToCustomfieldMap(ctx, bytes); ok {
 		data.Tags = tags
 	}
 
@@ -137,22 +140,25 @@ func (r *CloudVolumeResource) Update(ctx context.Context, req resource.UpdateReq
 			resizeParams.RegionID = param.NewOpt(data.RegionID.ValueInt64())
 		}
 
-		resizedVolume, err := r.client.Cloud.Volumes.ResizeAndPoll(
+		res := new(http.Response)
+		_, err := r.client.Cloud.Volumes.ResizeAndPoll(
 			ctx,
 			data.ID.ValueString(),
 			resizeParams,
+			option.WithResponseBodyInto(&res),
 			option.WithMiddleware(logging.Middleware(ctx)),
 		)
 		if err != nil {
 			resp.Diagnostics.AddError("failed to make http request", err.Error())
 			return
 		}
-		err = apijson.UnmarshalComputed([]byte(resizedVolume.RawJSON()), &data)
+		bytes, _ := io.ReadAll(res.Body)
+		err = apijson.UnmarshalComputed(bytes, &data)
 		if err != nil {
 			resp.Diagnostics.AddError("failed to deserialize http request", err.Error())
 			return
 		}
-		if tags, ok := custom.ConvertAPITagsToCustomfieldMap(ctx, []byte(resizedVolume.RawJSON())); ok {
+		if tags, ok := custom.ConvertAPITagsToCustomfieldMap(ctx, bytes); ok {
 			data.Tags = tags
 		}
 	}

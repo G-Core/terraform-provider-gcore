@@ -83,23 +83,26 @@ func (r *CloudSecurityGroupResource) Create(ctx context.Context, req resource.Cr
 	}
 	// Send "rules":[] so the API creates no default egress rules.
 	// Per OAS: "If rules are explicitly set to empty, no rules will be created."
-	securityGroup, err := r.client.Cloud.SecurityGroups.NewAndPoll(
+	res := new(http.Response)
+	_, err = r.client.Cloud.SecurityGroups.NewAndPoll(
 		ctx,
 		params,
 		option.WithRequestBody("application/json", dataBytes),
 		option.WithJSONSet("rules", []any{}),
+		option.WithResponseBodyInto(&res),
 		option.WithMiddleware(logging.Middleware(ctx)),
 	)
 	if err != nil {
 		resp.Diagnostics.AddError("failed to make http request", err.Error())
 		return
 	}
-	err = apijson.UnmarshalComputed([]byte(securityGroup.RawJSON()), &data)
+	bytes, _ := io.ReadAll(res.Body)
+	err = apijson.UnmarshalComputed(bytes, &data)
 	if err != nil {
 		resp.Diagnostics.AddError("failed to deserialize http request", err.Error())
 		return
 	}
-	if tags, ok := custom.ConvertAPITagsToCustomfieldMap(ctx, []byte(securityGroup.RawJSON())); ok {
+	if tags, ok := custom.ConvertAPITagsToCustomfieldMap(ctx, bytes); ok {
 		data.Tags = tags
 	}
 
@@ -138,23 +141,26 @@ func (r *CloudSecurityGroupResource) Update(ctx context.Context, req resource.Up
 		resp.Diagnostics.AddError("failed to serialize http request", err.Error())
 		return
 	}
-	securityGroup, err := r.client.Cloud.SecurityGroups.UpdateAndPoll(
+	res := new(http.Response)
+	_, err = r.client.Cloud.SecurityGroups.UpdateAndPoll(
 		ctx,
 		data.ID.ValueString(),
 		params,
 		option.WithRequestBody("application/json", dataBytes),
+		option.WithResponseBodyInto(&res),
 		option.WithMiddleware(logging.Middleware(ctx)),
 	)
 	if err != nil {
 		resp.Diagnostics.AddError("failed to make http request", err.Error())
 		return
 	}
-	err = apijson.UnmarshalComputed([]byte(securityGroup.RawJSON()), &data)
+	bytes, _ := io.ReadAll(res.Body)
+	err = apijson.UnmarshalComputed(bytes, &data)
 	if err != nil {
 		resp.Diagnostics.AddError("failed to deserialize http request", err.Error())
 		return
 	}
-	if tags, ok := custom.ConvertAPITagsToCustomfieldMap(ctx, []byte(securityGroup.RawJSON())); ok {
+	if tags, ok := custom.ConvertAPITagsToCustomfieldMap(ctx, bytes); ok {
 		data.Tags = tags
 	}
 

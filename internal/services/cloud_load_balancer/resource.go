@@ -88,24 +88,24 @@ func (r *CloudLoadBalancerResource) Create(ctx context.Context, req resource.Cre
 		params.RegionID = param.NewOpt(data.RegionID.ValueInt64())
 	}
 
-	// Use NewAndPoll to get the LoadBalancer directly instead of task_id
-	loadBalancer, err := r.client.Cloud.LoadBalancers.NewAndPoll(
+	res := new(http.Response)
+	_, err = r.client.Cloud.LoadBalancers.NewAndPoll(
 		ctx,
 		params,
+		option.WithResponseBodyInto(&res),
 		option.WithMiddleware(logging.Middleware(ctx)),
 	)
 	if err != nil {
 		resp.Diagnostics.AddError("failed to make http request", err.Error())
 		return
 	}
-
-	// Update data with the returned LoadBalancer
-	err = apijson.UnmarshalComputed([]byte(loadBalancer.RawJSON()), &data)
+	bytes, _ := io.ReadAll(res.Body)
+	err = apijson.UnmarshalComputed(bytes, &data)
 	if err != nil {
 		resp.Diagnostics.AddError("failed to deserialize http request", err.Error())
 		return
 	}
-	if tags, ok := custom.ConvertAPITagsToCustomfieldMap(ctx, []byte(loadBalancer.RawJSON())); ok {
+	if tags, ok := custom.ConvertAPITagsToCustomfieldMap(ctx, bytes); ok {
 		data.Tags = tags
 	}
 
@@ -145,24 +145,25 @@ func (r *CloudLoadBalancerResource) Update(ctx context.Context, req resource.Upd
 			resizeParams.RegionID = param.NewOpt(data.RegionID.ValueInt64())
 		}
 
-		loadBalancer, err := r.client.Cloud.LoadBalancers.ResizeAndPoll(
+		res := new(http.Response)
+		_, err := r.client.Cloud.LoadBalancers.ResizeAndPoll(
 			ctx,
 			data.ID.ValueString(),
 			resizeParams,
+			option.WithResponseBodyInto(&res),
 			option.WithMiddleware(logging.Middleware(ctx)),
 		)
 		if err != nil {
 			resp.Diagnostics.AddError("failed to resize load balancer", err.Error())
 			return
 		}
-
-		// Update data with resized LoadBalancer
-		err = apijson.UnmarshalComputed([]byte(loadBalancer.RawJSON()), &data)
+		bytes, _ := io.ReadAll(res.Body)
+		err = apijson.UnmarshalComputed(bytes, &data)
 		if err != nil {
 			resp.Diagnostics.AddError("failed to deserialize resize response", err.Error())
 			return
 		}
-		if tags, ok := custom.ConvertAPITagsToCustomfieldMap(ctx, []byte(loadBalancer.RawJSON())); ok {
+		if tags, ok := custom.ConvertAPITagsToCustomfieldMap(ctx, bytes); ok {
 			data.Tags = tags
 		}
 

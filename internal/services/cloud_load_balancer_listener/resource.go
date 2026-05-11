@@ -86,17 +86,19 @@ func (r *CloudLoadBalancerListenerResource) Create(ctx context.Context, req reso
 		params.RegionID = param.NewOpt(data.RegionID.ValueInt64())
 	}
 
-	listener, err := r.client.Cloud.LoadBalancers.Listeners.NewAndPoll(
+	res := new(http.Response)
+	_, err = r.client.Cloud.LoadBalancers.Listeners.NewAndPoll(
 		ctx,
 		params,
+		option.WithResponseBodyInto(&res),
 		option.WithMiddleware(logging.Middleware(ctx)),
 	)
 	if err != nil {
 		resp.Diagnostics.AddError("failed to make http request", err.Error())
 		return
 	}
-	// Use raw JSON from the response to unmarshal the "computed" fields into the data model
-	err = apijson.UnmarshalComputed([]byte(listener.RawJSON()), &data)
+	bytes, _ := io.ReadAll(res.Body)
+	err = apijson.UnmarshalComputed(bytes, &data)
 	if err != nil {
 		resp.Diagnostics.AddError("failed to deserialize http request", err.Error())
 		return
@@ -176,18 +178,20 @@ func (r *CloudLoadBalancerListenerResource) Update(ctx context.Context, req reso
 		params.RegionID = param.NewOpt(data.RegionID.ValueInt64())
 	}
 
-	listener, err := r.client.Cloud.LoadBalancers.Listeners.UpdateAndPoll(
+	resUpdate := new(http.Response)
+	_, err = r.client.Cloud.LoadBalancers.Listeners.UpdateAndPoll(
 		ctx,
 		data.ID.ValueString(),
 		params,
+		option.WithResponseBodyInto(&resUpdate),
 		option.WithMiddleware(logging.Middleware(ctx)),
 	)
 	if err != nil {
 		resp.Diagnostics.AddError("failed to make http request", err.Error())
 		return
 	}
-	// Use raw JSON from the response to unmarshal the "computed" fields into the data model
-	err = apijson.UnmarshalComputed([]byte(listener.RawJSON()), &data)
+	bytesUpdate, _ := io.ReadAll(resUpdate.Body)
+	err = apijson.UnmarshalComputed(bytesUpdate, &data)
 	if err != nil {
 		resp.Diagnostics.AddError("failed to deserialize http request", err.Error())
 		return
