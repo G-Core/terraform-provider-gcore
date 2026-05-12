@@ -121,7 +121,15 @@ Exit codes: `0` = all pass, `8` = pending, `1` = failure.
 |---|---|
 | exit `0` / all checks pass | Report **CI green**, proceed |
 | exit `8` / pending | Warn user checks are running. Ask: wait or proceed? |
-| exit `1` / failure | Show failing checks. **Do not offer to merge.** |
+| exit `1` / failure, **FOSSA-only** | Show the failing FOSSA checks. Note that FOSSA failures are typically non-blocking. Ask the user whether to proceed; merge only after explicit confirmation that the FOSSA failure is acceptable. |
+| exit `1` / failure, any non-FOSSA check failing | Show failing checks. **Do not offer to merge.** |
+
+**Detecting FOSSA-only failures.** From the `gh pr checks` JSON,
+collect every check whose state is failing. If every failing check's
+`name` matches `fossa` case-insensitively (substring match — catches
+`fossa`, `fossa / fossa`, `fossa/license-scanning`, `fossa-scan`,
+etc.), classify the run as a FOSSA-only failure. If any failing check
+does not match, classify as a hard failure.
 
 ### Step 4 — Generate Human-Readable Release Notes
 
@@ -275,7 +283,8 @@ by CI, not this skill).
 | Situation | Action |
 |---|---|
 | No open release PR | Inform user, stop |
-| CI failing | Show failures, do not merge |
+| CI failing (FOSSA-only) | Show failures, ask the user to confirm proceeding; merge only on explicit confirmation |
+| CI failing (any non-FOSSA check) | Show failures, do not merge |
 | CI pending | Warn, ask user preference |
 | Merge conflict | Report, suggest manual resolution |
 | Merge fails | Report error, stop |
