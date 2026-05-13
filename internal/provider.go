@@ -53,6 +53,7 @@ import (
 	"github.com/G-Core/terraform-provider-gcore/internal/services/fastedge_binary"
 	"github.com/G-Core/terraform-provider-gcore/internal/services/fastedge_secret"
 	"github.com/G-Core/terraform-provider-gcore/internal/services/fastedge_template"
+	"github.com/G-Core/terraform-provider-gcore/internal/services/storage_access_key"
 	"github.com/G-Core/terraform-provider-gcore/internal/services/storage_location"
 	"github.com/G-Core/terraform-provider-gcore/internal/services/storage_ssh_key"
 	"github.com/G-Core/terraform-provider-gcore/internal/services/waap_domain"
@@ -241,6 +242,7 @@ func (p *GcoreProvider) Resources(ctx context.Context) []func() resource.Resourc
 		dns_zone.NewResource,
 		dns_zone_rrset.NewResource,
 		dns_network_mapping.NewResource,
+		storage_access_key.NewResource,
 		storage_ssh_key.NewResource,
 		cdn_resource.NewResource,
 		cdn_resource_rule.NewResource,
