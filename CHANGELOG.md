@@ -1,5 +1,43 @@
 # Changelog
 
+## 2.0.0-alpha.7 (2026-05-13)
+
+Full Changelog: [v2.0.0-alpha.6...v2.0.0-alpha.7](https://github.com/G-Core/terraform-provider-gcore/compare/v2.0.0-alpha.6...v2.0.0-alpha.7)
+
+### Features
+
+* **api:** aggregated API specs update ([0b4cf22](https://github.com/G-Core/terraform-provider-gcore/commit/0b4cf2243b76cf7f6f16db0e6071528efa61d15a))
+* **api:** aggregated API specs update ([886c08b](https://github.com/G-Core/terraform-provider-gcore/commit/886c08bc3b1d2451b7f84d063ed78e6c27a29c20))
+* **api:** aggregated API specs update ([7ff2013](https://github.com/G-Core/terraform-provider-gcore/commit/7ff2013b6b50a626e74af36c42beb5011f66bda4))
+* **api:** aggregated API specs update ([28e7950](https://github.com/G-Core/terraform-provider-gcore/commit/28e7950371dc059b8de6c23447dfb5339d206fce))
+* **api:** aggregated API specs update ([4da4fd7](https://github.com/G-Core/terraform-provider-gcore/commit/4da4fd7c3565a263f153d98e147a39ed080cc14d))
+* **api:** api update ([72c895c](https://github.com/G-Core/terraform-provider-gcore/commit/72c895c858aa77f259367c8d6b2f7f4f48db7b90))
+* **cdn:** implement update logic and tests for cdn_trusted_ca_certificate ([557afa0](https://github.com/G-Core/terraform-provider-gcore/commit/557afa083ea2124b527090e2e2bff9066f58b4cd))
+* **storage:** support storage access keys resource in Terraform ([2095daf](https://github.com/G-Core/terraform-provider-gcore/commit/2095dafb0ff7c17aaff1d9deedd85054a72708c9))
+* **storage:** support storage access keys resource in Terraform ([d74982b](https://github.com/G-Core/terraform-provider-gcore/commit/d74982b6962eae3a731a1cc5d2262bd922e91bf7))
+
+
+### Bug Fixes
+
+* **cdn:** drop static s3_auth_type default to unblock fastedge origins ([0b67a6b](https://github.com/G-Core/terraform-provider-gcore/commit/0b67a6ba04407a278ba21df9f9c75dec20892251))
+* **cloud:** revert AndPoll workarounds for gpu baremetal cluster image ([2b293a3](https://github.com/G-Core/terraform-provider-gcore/commit/2b293a3472493fe4af4f52b4edc0df5247f7f5ac))
+* **cloud:** router schema, import, and PATCH-body fixes ([b83f2db](https://github.com/G-Core/terraform-provider-gcore/commit/b83f2db5581ce889f88042fa410e3a3b5d4f25fa))
+* **cloud:** use UpdateAndPoll for router update ([9ef6e89](https://github.com/G-Core/terraform-provider-gcore/commit/9ef6e89e61a8e1d7887284dec51f851b1694d9aa))
+
+
+### Chores
+
+* **client:** rename cloud_polling_* opts to polling_* ([030c2a9](https://github.com/G-Core/terraform-provider-gcore/commit/030c2a907564e174a90f65696868111343e9be80))
+* go mod tidy ([0e37a2a](https://github.com/G-Core/terraform-provider-gcore/commit/0e37a2ad938bee071ab00a6fb7e8e2ff25d2c5fe))
+* **internal:** codegen related update ([3f0c3c6](https://github.com/G-Core/terraform-provider-gcore/commit/3f0c3c658aea4f454134b4949c085fdccf8f5949))
+* mark as pre-release based on semver tag ([7e52465](https://github.com/G-Core/terraform-provider-gcore/commit/7e5246565ab80131f6f3af8710e55cd056307f98))
+* relax /release skill blocking when fossa checks fail in CI ([f557a3a](https://github.com/G-Core/terraform-provider-gcore/commit/f557a3a16101278931c14e376db9498dbc56a67a))
+
+
+### Documentation
+
+* improve provider warning tone on registry page ([1752b0c](https://github.com/G-Core/terraform-provider-gcore/commit/1752b0cb8b8cabd3799a6ce6d699cd921513b99b))
+
 ## 2.0.0-alpha.6 (2026-04-27)
 
 Full Changelog: [v2.0.0-alpha.5...v2.0.0-alpha.6](https://github.com/G-Core/terraform-provider-gcore/compare/v2.0.0-alpha.5...v2.0.0-alpha.6)
