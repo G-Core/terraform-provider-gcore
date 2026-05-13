@@ -110,7 +110,6 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 									Description: "S3 authentication type.",
 									Computed:    true,
 									Optional:    true,
-									Default:     stringdefault.StaticString("awsSignatureV4"),
 								},
 								"s3_region": schema.StringAttribute{
 									Description: "S3 storage region.\n\nThe parameter is required if `s3_type` is `amazon`.",
