@@ -29,7 +29,8 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 			},
 			"status": schema.StringAttribute{
 				Description: "The current status of the domain\nAvailable values: \"active\", \"monitor\".",
-				Required:    true,
+				Computed:    true,
+				Optional:    true,
 				Validators: []validator.String{
 					stringvalidator.OneOfCaseInsensitive("active", "monitor"),
 				},
