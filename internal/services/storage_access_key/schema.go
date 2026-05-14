@@ -22,12 +22,12 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 			"id": schema.StringAttribute{
 				Description:   "Access key ID used as the username in S3 authentication. Pass this in the `AWS_ACCESS_KEY_ID` field of your S3 client.",
 				Computed:      true,
-				PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown(), stringplanmodifier.RequiresReplace()},
+				PlanModifiers: []planmodifier.String{stringplanmodifier.UseNonNullStateForUnknown(), stringplanmodifier.RequiresReplace()},
 			},
 			"access_key": schema.StringAttribute{
 				Description:   "Access key ID used as the username in S3 authentication. Pass this in the `AWS_ACCESS_KEY_ID` field of your S3 client.",
 				Computed:      true,
-				PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown(), stringplanmodifier.RequiresReplace()},
+				PlanModifiers: []planmodifier.String{stringplanmodifier.UseNonNullStateForUnknown(), stringplanmodifier.RequiresReplace()},
 			},
 			"storage_id": schema.Int64Attribute{
 				Required:      true,

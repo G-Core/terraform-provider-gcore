@@ -29,7 +29,7 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 			"id": schema.Int64Attribute{
 				Description:   "Rule template ID.",
 				Computed:      true,
-				PlanModifiers: []planmodifier.Int64{int64planmodifier.UseStateForUnknown()},
+				PlanModifiers: []planmodifier.Int64{int64planmodifier.UseNonNullStateForUnknown()},
 			},
 			"rule": schema.StringAttribute{
 				Description: "Path to the file or folder for which the rule will be applied.\n\nThe rule is applied if the requested URI matches the rule path.\n\nWe add a leading forward slash to any rule path. Specify a path without a forward slash.",
