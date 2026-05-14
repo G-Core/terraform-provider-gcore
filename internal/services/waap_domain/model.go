@@ -11,7 +11,7 @@ import (
 
 type WaapDomainModel struct {
 	DomainID      types.Int64                                        `tfsdk:"domain_id" path:"domain_id,required"`
-	Status        types.String                                       `tfsdk:"status" json:"status,required"`
+	Status        types.String                                       `tfsdk:"status" json:"status,computed_optional"`
 	CreatedAt     timetypes.RFC3339                                  `tfsdk:"created_at" json:"created_at,computed" format:"date-time"`
 	CustomPageSet types.Int64                                        `tfsdk:"custom_page_set" json:"custom_page_set,computed"`
 	ID            types.Int64                                        `tfsdk:"id" json:"id,computed"`
