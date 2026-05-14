@@ -112,11 +112,11 @@ func ProviderSchema(ctx context.Context) schema.Schema {
 				Optional:    true,
 			},
 			"polling_interval_seconds": schema.Int64Attribute{
-				Description: "Interval in seconds between polling requests for long-running cloud operations. Defaults to `3`.",
+				Description: "Interval in seconds between polling requests for long-running operations. Defaults to `3`.",
 				Optional:    true,
 			},
 			"polling_timeout_seconds": schema.Int64Attribute{
-				Description: "Timeout in seconds for polling long-running cloud operations. Defaults to `7200`.",
+				Description: "Timeout in seconds for polling long-running operations. Defaults to `7200`.",
 				Optional:    true,
 			},
 		},

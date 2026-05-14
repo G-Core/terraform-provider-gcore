@@ -9,7 +9,8 @@ description: |-
 
 The Gcore provider allows you to configure your [Gcore](https://gcore.com) infrastructure.
 
-~> **This is the next-generation Gcore provider (v2)**, rebuilt from the ground up with a modern architecture. Resource names, schemas, and import IDs have been redesigned and differ from v0.x. The provider is in **alpha** and may introduce breaking changes. **We'd love for you to try it out and [share your feedback](https://support.gcore.com/hc/)!** For production workloads, the [stable v0.x provider](https://registry.terraform.io/providers/G-Core/gcore/latest) remains fully supported until v2 reaches GA.
+~> **This is the next-generation Gcore provider (v2)**
+Rebuilt from the ground up with a modern architecture. Resource names, schemas, and import IDs have been redesigned and differ from v0.x. The provider is in **alpha** and may introduce breaking changes. **We'd love for you to try it out and [share your feedback](https://support.gcore.com/hc/)!** For production workloads, the [stable v0.x provider](https://registry.terraform.io/providers/G-Core/gcore/latest) remains fully supported until v2 reaches GA.
 
 -> **Need help?** If you encounter any issues or have questions about the Gcore Terraform provider, please reach out to [Gcore Support](https://support.gcore.com/hc/) for assistance.
 
@@ -20,8 +21,7 @@ terraform {
   required_providers {
     gcore = {
       source = "G-Core/gcore"
-      # Change the version to the one you want to test
-      version = "2.0.0-alpha.1"
+      version = "2.0.0-alpha.8"
     }
   }
 }
@@ -38,10 +38,10 @@ provider "gcore" {
 
 - `api_key` (String, Sensitive) The API key for authenticating with the Gcore API. Can also be set via the `GCORE_API_KEY` environment variable.
 - `base_url` (String) Set the base url that the provider connects to.
-- `polling_interval_seconds` (Number) Interval in seconds between polling requests for long-running cloud operations. Defaults to `3`.
-- `polling_timeout_seconds` (Number) Timeout in seconds for polling long-running cloud operations. Defaults to `7200`.
 - `cloud_project_id` (Number) Default cloud project ID to use for cloud resources. Serves as a convenience fallback for local development; for production, prefer setting `project_id` explicitly on each resource. Can also be set via the `GCORE_CLOUD_PROJECT_ID` environment variable.
 - `cloud_region_id` (Number) Default cloud region ID to use for cloud resources. Serves as a convenience fallback for local development; for production, prefer setting `region_id` explicitly on each resource. Can also be set via the `GCORE_CLOUD_REGION_ID` environment variable.
+- `polling_interval_seconds` (Number) Interval in seconds between polling requests for long-running operations. Defaults to `3`.
+- `polling_timeout_seconds` (Number) Timeout in seconds for polling long-running operations. Defaults to `7200`.
 
 ## Best Practices
 
