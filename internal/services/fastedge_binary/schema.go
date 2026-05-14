@@ -24,7 +24,7 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 			"id": schema.Int64Attribute{
 				Description:   "Binary ID",
 				Computed:      true,
-				PlanModifiers: []planmodifier.Int64{int64planmodifier.UseStateForUnknown(), int64planmodifier.RequiresReplace()},
+				PlanModifiers: []planmodifier.Int64{int64planmodifier.UseNonNullStateForUnknown(), int64planmodifier.RequiresReplace()},
 			},
 			"filename": schema.StringAttribute{
 				Description: "Path to the WebAssembly binary file to upload. Changes to file content (detected via checksum) will trigger resource replacement.",
