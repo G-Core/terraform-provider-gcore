@@ -25,6 +25,9 @@ resource "gcore_waap_domain" "example_waap_domain" {
 ### Required
 
 - `domain_id` (Number) The domain ID
+
+### Optional
+
 - `status` (String) The current status of the domain
 Available values: "active", "monitor".
 
