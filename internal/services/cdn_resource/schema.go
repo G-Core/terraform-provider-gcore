@@ -35,7 +35,7 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 			"id": schema.Int64Attribute{
 				Description:   "CDN resource ID.",
 				Computed:      true,
-				PlanModifiers: []planmodifier.Int64{int64planmodifier.UseStateForUnknown()},
+				PlanModifiers: []planmodifier.Int64{int64planmodifier.UseNonNullStateForUnknown()},
 			},
 			"cname": schema.StringAttribute{
 				Description:   "Delivery domains that will be used for content delivery through a CDN.\n\nDelivery domains should be added to your DNS settings.",

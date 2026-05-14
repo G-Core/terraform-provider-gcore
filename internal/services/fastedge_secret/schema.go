@@ -21,7 +21,7 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 			"id": schema.Int64Attribute{
 				Description:   "The unique identifier of the secret.",
 				Computed:      true,
-				PlanModifiers: []planmodifier.Int64{int64planmodifier.UseStateForUnknown()},
+				PlanModifiers: []planmodifier.Int64{int64planmodifier.UseNonNullStateForUnknown()},
 			},
 			"name": schema.StringAttribute{
 				Description: "The unique name of the secret.",

@@ -26,12 +26,12 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 			"id": schema.StringAttribute{
 				Description:   "name of DNS zone",
 				Computed:      true,
-				PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown(), stringplanmodifier.RequiresReplace()},
+				PlanModifiers: []planmodifier.String{stringplanmodifier.UseNonNullStateForUnknown(), stringplanmodifier.RequiresReplace()},
 			},
 			"name": schema.StringAttribute{
 				Description:   "name of DNS zone",
 				Required:      true,
-				PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown(), stringplanmodifier.RequiresReplace()},
+				PlanModifiers: []planmodifier.String{stringplanmodifier.UseNonNullStateForUnknown(), stringplanmodifier.RequiresReplace()},
 			},
 			"contact": schema.StringAttribute{
 				Description:   "email address of the administrator responsible for this zone",

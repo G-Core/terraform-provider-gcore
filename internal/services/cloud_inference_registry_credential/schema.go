@@ -21,12 +21,12 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 			"id": schema.StringAttribute{
 				Description:   "Registry credential name.",
 				Computed:      true,
-				PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown(), stringplanmodifier.RequiresReplace()},
+				PlanModifiers: []planmodifier.String{stringplanmodifier.UseNonNullStateForUnknown(), stringplanmodifier.RequiresReplace()},
 			},
 			"name": schema.StringAttribute{
 				Description:   "Registry credential name.",
 				Required:      true,
-				PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown(), stringplanmodifier.RequiresReplace()},
+				PlanModifiers: []planmodifier.String{stringplanmodifier.UseNonNullStateForUnknown(), stringplanmodifier.RequiresReplace()},
 			},
 			"project_id": schema.Int64Attribute{
 				Description:   "Project ID",
