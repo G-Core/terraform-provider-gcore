@@ -12,6 +12,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/int64planmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringplanmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 )
@@ -35,21 +36,25 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 				},
 			},
 			"created_at": schema.StringAttribute{
-				Description: "The date and time the domain was created in ISO 8601 format",
-				Computed:    true,
-				CustomType:  timetypes.RFC3339Type{},
+				Description:   "The date and time the domain was created in ISO 8601 format",
+				Computed:      true,
+				CustomType:    timetypes.RFC3339Type{},
+				PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
 			},
 			"custom_page_set": schema.Int64Attribute{
-				Description: "The ID of the custom page set",
-				Computed:    true,
+				Description:   "The ID of the custom page set",
+				Computed:      true,
+				PlanModifiers: []planmodifier.Int64{int64planmodifier.UseStateForUnknown()},
 			},
 			"id": schema.Int64Attribute{
-				Description: "The domain ID",
-				Computed:    true,
+				Description:   "The domain ID",
+				Computed:      true,
+				PlanModifiers: []planmodifier.Int64{int64planmodifier.UseStateForUnknown()},
 			},
 			"name": schema.StringAttribute{
-				Description: "The domain name",
-				Computed:    true,
+				Description:   "The domain name",
+				Computed:      true,
+				PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
 			},
 			"aliases": schema.ListAttribute{
 				Description: "CNAME aliases pointing at this domain's CDN resource",

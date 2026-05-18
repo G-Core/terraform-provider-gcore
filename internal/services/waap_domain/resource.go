@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"strconv"
 
 	"github.com/G-Core/gcore-go"
 	"github.com/G-Core/gcore-go/option"
@@ -14,11 +15,13 @@ import (
 	"github.com/G-Core/terraform-provider-gcore/internal/apijson"
 	"github.com/G-Core/terraform-provider-gcore/internal/logging"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
+	"github.com/hashicorp/terraform-plugin-framework/types"
 )
 
 // Ensure provider defined types fully satisfy framework interfaces.
 var _ resource.ResourceWithConfigure = (*WaapDomainResource)(nil)
 var _ resource.ResourceWithModifyPlan = (*WaapDomainResource)(nil)
+var _ resource.ResourceWithImportState = (*WaapDomainResource)(nil)
 
 func NewResource() resource.Resource {
 	return &WaapDomainResource{}
@@ -66,17 +69,28 @@ func (r *WaapDomainResource) Create(ctx context.Context, req resource.CreateRequ
 		resp.Diagnostics.AddError("failed to serialize http request", err.Error())
 		return
 	}
-	res := new(http.Response)
 	err = r.client.Waap.Domains.Update(
 		ctx,
 		data.DomainID.ValueInt64(),
 		waap.DomainUpdateParams{},
 		option.WithRequestBody("application/json", dataBytes),
-		option.WithResponseBodyInto(&res),
 		option.WithMiddleware(logging.Middleware(ctx)),
 	)
 	if err != nil {
 		resp.Diagnostics.AddError("failed to make http request", err.Error())
+		return
+	}
+
+	// PATCH returns 204 No Content — read back the full domain state
+	res := new(http.Response)
+	_, err = r.client.Waap.Domains.Get(
+		ctx,
+		data.DomainID.ValueInt64(),
+		option.WithResponseBodyInto(&res),
+		option.WithMiddleware(logging.Middleware(ctx)),
+	)
+	if err != nil {
+		resp.Diagnostics.AddError("failed to read domain after create", err.Error())
 		return
 	}
 	bytes, _ := io.ReadAll(res.Body)
@@ -111,17 +125,28 @@ func (r *WaapDomainResource) Update(ctx context.Context, req resource.UpdateRequ
 		resp.Diagnostics.AddError("failed to serialize http request", err.Error())
 		return
 	}
-	res := new(http.Response)
 	err = r.client.Waap.Domains.Update(
 		ctx,
 		data.DomainID.ValueInt64(),
 		waap.DomainUpdateParams{},
 		option.WithRequestBody("application/json", dataBytes),
-		option.WithResponseBodyInto(&res),
 		option.WithMiddleware(logging.Middleware(ctx)),
 	)
 	if err != nil {
 		resp.Diagnostics.AddError("failed to make http request", err.Error())
+		return
+	}
+
+	// PATCH returns 204 No Content — read back the full domain state
+	res := new(http.Response)
+	_, err = r.client.Waap.Domains.Get(
+		ctx,
+		data.DomainID.ValueInt64(),
+		option.WithResponseBodyInto(&res),
+		option.WithMiddleware(logging.Middleware(ctx)),
+	)
+	if err != nil {
+		resp.Diagnostics.AddError("failed to read domain after update", err.Error())
 		return
 	}
 	bytes, _ := io.ReadAll(res.Body)
@@ -171,6 +196,37 @@ func (r *WaapDomainResource) Read(ctx context.Context, req resource.ReadRequest,
 
 func (r *WaapDomainResource) Delete(ctx context.Context, req resource.DeleteRequest, resp *resource.DeleteResponse) {
 
+}
+
+func (r *WaapDomainResource) ImportState(ctx context.Context, req resource.ImportStateRequest, resp *resource.ImportStateResponse) {
+	domainID, err := strconv.ParseInt(req.ID, 10, 64)
+	if err != nil {
+		resp.Diagnostics.AddError("invalid import ID", fmt.Sprintf("Expected numeric domain_id, got: %s", req.ID))
+		return
+	}
+
+	var data WaapDomainModel
+	data.DomainID = types.Int64Value(domainID)
+
+	res := new(http.Response)
+	_, err = r.client.Waap.Domains.Get(
+		ctx,
+		domainID,
+		option.WithResponseBodyInto(&res),
+		option.WithMiddleware(logging.Middleware(ctx)),
+	)
+	if err != nil {
+		resp.Diagnostics.AddError("failed to read domain during import", err.Error())
+		return
+	}
+	bytes, _ := io.ReadAll(res.Body)
+	err = apijson.Unmarshal(bytes, &data)
+	if err != nil {
+		resp.Diagnostics.AddError("failed to deserialize http request", err.Error())
+		return
+	}
+
+	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
 }
 
 func (r *WaapDomainResource) ModifyPlan(_ context.Context, _ resource.ModifyPlanRequest, _ *resource.ModifyPlanResponse) {
