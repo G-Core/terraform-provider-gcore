@@ -70,7 +70,7 @@ func (r *StorageObjectStorageResource) Create(ctx context.Context, req resource.
 		return
 	}
 	res := new(http.Response)
-	_, err = r.client.Storage.ObjectStorages.New(
+	_, err = r.client.Storage.ObjectStorages.NewAndPoll(
 		ctx,
 		storage.ObjectStorageNewParams{},
 		option.WithRequestBody("application/json", dataBytes),
@@ -139,7 +139,7 @@ func (r *StorageObjectStorageResource) Delete(ctx context.Context, req resource.
 		return
 	}
 
-	err := r.client.Storage.ObjectStorages.Delete(
+	err := r.client.Storage.ObjectStorages.DeleteAndPoll(
 		ctx,
 		data.ID.ValueInt64(),
 		option.WithMiddleware(logging.Middleware(ctx)),
