@@ -24,7 +24,7 @@ type StorageSftpModel struct {
 	CreatedAt           timetypes.RFC3339             `tfsdk:"created_at" json:"created_at,computed" format:"date-time"`
 	FullName            types.String                  `tfsdk:"full_name" json:"full_name,computed"`
 	HasPassword         types.Bool                    `tfsdk:"has_password" json:"has_password,computed"`
-	Password            types.String                  `tfsdk:"password" json:"password,computed"`
+	Password            types.String                  `tfsdk:"password" json:"password,computed,no_refresh"`
 	ProvisioningStatus  types.String                  `tfsdk:"provisioning_status" json:"provisioning_status,computed"`
 }
 

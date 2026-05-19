@@ -70,7 +70,7 @@ func (r *StorageSftpResource) Create(ctx context.Context, req resource.CreateReq
 		return
 	}
 	res := new(http.Response)
-	_, err = r.client.Storage.SftpStorages.New(
+	_, err = r.client.Storage.SftpStorages.NewAndPoll(
 		ctx,
 		storage.SftpStorageNewParams{},
 		option.WithRequestBody("application/json", dataBytes),
@@ -114,7 +114,7 @@ func (r *StorageSftpResource) Update(ctx context.Context, req resource.UpdateReq
 		return
 	}
 	res := new(http.Response)
-	_, err = r.client.Storage.SftpStorages.Update(
+	_, err = r.client.Storage.SftpStorages.UpdateAndPoll(
 		ctx,
 		data.ID.ValueInt64(),
 		storage.SftpStorageUpdateParams{},
@@ -127,10 +127,14 @@ func (r *StorageSftpResource) Update(ctx context.Context, req resource.UpdateReq
 		return
 	}
 	bytes, _ := io.ReadAll(res.Body)
+	priorPassword := data.Password
 	err = apijson.UnmarshalComputed(bytes, &data)
 	if err != nil {
 		resp.Diagnostics.AddError("failed to deserialize http request", err.Error())
 		return
+	}
+	if data.Password.IsNull() || data.Password.IsUnknown() {
+		data.Password = priorPassword
 	}
 
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
@@ -180,7 +184,7 @@ func (r *StorageSftpResource) Delete(ctx context.Context, req resource.DeleteReq
 		return
 	}
 
-	err := r.client.Storage.SftpStorages.Delete(
+	err := r.client.Storage.SftpStorages.DeleteAndPoll(
 		ctx,
 		data.ID.ValueInt64(),
 		option.WithMiddleware(logging.Middleware(ctx)),
