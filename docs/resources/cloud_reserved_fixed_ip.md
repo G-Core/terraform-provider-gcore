@@ -198,3 +198,11 @@ Import is supported using the following syntax:
 $ terraform import gcore_cloud_reserved_fixed_ip.example '<project_id>/<region_id>/<port_id>'
 ```
 
+~> **Import behavior varies by `type`:**
+
+- **`external`** — Import produces a clean plan with no diffs.
+- **`subnet`** — Import produces a clean plan with no diffs.
+- **`any_subnet`** — The API cannot distinguish `subnet` from `any_subnet`, so the provider infers `type = "subnet"` during import. The first `terraform apply` after import reconciles the `type` value. No infrastructure changes occur and subsequent plans are clean.
+- **`ip_address`** — This type cannot be inferred from the API response. After import, run `terraform apply` to reconcile the state.
+- **`port`** — This type cannot be inferred from the API response. After import, run `terraform apply` to reconcile the state.
+

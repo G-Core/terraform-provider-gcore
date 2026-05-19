@@ -6,10 +6,12 @@ import (
 	"context"
 
 	"github.com/G-Core/terraform-provider-gcore/internal/customfield"
+	"github.com/G-Core/terraform-provider-gcore/internal/planmodifiers"
 	"github.com/hashicorp/terraform-plugin-framework-timetypes/timetypes"
 	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/boolplanmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/int64planmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringplanmodifier"
@@ -47,7 +49,7 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 						"port",
 					),
 				},
-				PlanModifiers: []planmodifier.String{stringplanmodifier.RequiresReplace()},
+				PlanModifiers: []planmodifier.String{reservedFixedIPTypeModifier()},
 			},
 			"ip_address": schema.StringAttribute{
 				Description:   "Reserved fixed IP will be allocated the given IP address",
@@ -67,10 +69,13 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 				PlanModifiers: []planmodifier.String{stringplanmodifier.RequiresReplace()},
 			},
 			"network_id": schema.StringAttribute{
-				Description:   "Reserved fixed IP will be allocated in a subnet of this network",
-				Computed:      true,
-				Optional:      true,
-				PlanModifiers: []planmodifier.String{stringplanmodifier.RequiresReplaceIfConfigured()},
+				Description: "Reserved fixed IP will be allocated in a subnet of this network",
+				Computed:    true,
+				Optional:    true,
+				PlanModifiers: []planmodifier.String{
+					stringplanmodifier.UseStateForUnknown(),
+					planmodifiers.StringRequiresReplaceIfConfiguredPreservingState(),
+				},
 			},
 			"port_id": schema.StringAttribute{
 				Description:   "Port ID to make a reserved fixed IP (for example, `vip_port_id` of the Load Balancer entity).",
@@ -79,15 +84,19 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 				PlanModifiers: []planmodifier.String{stringplanmodifier.RequiresReplaceIfConfigured()},
 			},
 			"subnet_id": schema.StringAttribute{
-				Description:   "Reserved fixed IP will be allocated in this subnet",
-				Computed:      true,
-				Optional:      true,
-				PlanModifiers: []planmodifier.String{stringplanmodifier.RequiresReplaceIfConfigured()},
-			},
-			"is_vip": schema.BoolAttribute{
-				Description: "If reserved fixed IP is a VIP",
+				Description: "Reserved fixed IP will be allocated in this subnet",
 				Computed:    true,
 				Optional:    true,
+				PlanModifiers: []planmodifier.String{
+					stringplanmodifier.UseStateForUnknown(),
+					planmodifiers.StringRequiresReplaceIfConfiguredPreservingState(),
+				},
+			},
+			"is_vip": schema.BoolAttribute{
+				Description:   "If reserved fixed IP is a VIP",
+				Computed:      true,
+				Optional:      true,
+				PlanModifiers: []planmodifier.Bool{boolplanmodifier.UseStateForUnknown()},
 			},
 			"created_at": schema.StringAttribute{
 				Description: "Datetime when the reserved fixed IP was created",
