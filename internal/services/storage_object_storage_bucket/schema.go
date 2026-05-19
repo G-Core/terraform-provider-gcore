@@ -34,6 +34,7 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 					"allowed_origins": schema.ListAttribute{
 						Description: "Web domains allowed to make direct browser requests. Send an empty array to remove CORS configuration.",
 						Optional:    true,
+						Computed:    true,
 						ElementType: types.StringType,
 					},
 				},
@@ -44,6 +45,7 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 					"is_public": schema.BoolAttribute{
 						Description: "Set to true to allow unauthenticated object downloads, false to require valid S3 credentials.",
 						Optional:    true,
+						Computed:    true,
 					},
 				},
 			},
@@ -53,6 +55,7 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 					"expiration_days": schema.Int64Attribute{
 						Description: "Days before objects are automatically deleted. Set to a positive number to enable, or null/0 to remove the rule.",
 						Optional:    true,
+						Computed:    true,
 					},
 				},
 			},
