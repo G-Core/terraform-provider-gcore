@@ -57,6 +57,7 @@ import (
 	"github.com/G-Core/terraform-provider-gcore/internal/services/storage_location"
 	"github.com/G-Core/terraform-provider-gcore/internal/services/storage_object_storage"
 	"github.com/G-Core/terraform-provider-gcore/internal/services/storage_object_storage_bucket"
+	"github.com/G-Core/terraform-provider-gcore/internal/services/storage_sftp"
 	"github.com/G-Core/terraform-provider-gcore/internal/services/storage_ssh_key"
 	"github.com/G-Core/terraform-provider-gcore/internal/services/waap_domain"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
@@ -247,6 +248,7 @@ func (p *GcoreProvider) Resources(ctx context.Context) []func() resource.Resourc
 		storage_object_storage.NewResource,
 		storage_access_key.NewResource,
 		storage_object_storage_bucket.NewResource,
+		storage_sftp.NewResource,
 		storage_ssh_key.NewResource,
 		cdn_resource.NewResource,
 		cdn_resource_rule.NewResource,
@@ -324,6 +326,8 @@ func (p *GcoreProvider) DataSources(ctx context.Context) []func() datasource.Dat
 		storage_object_storage.NewStorageObjectStoragesDataSource,
 		storage_object_storage_bucket.NewStorageObjectStorageBucketDataSource,
 		storage_object_storage_bucket.NewStorageObjectStorageBucketsDataSource,
+		storage_sftp.NewStorageSftpDataSource,
+		storage_sftp.NewStorageSftpsDataSource,
 		storage_ssh_key.NewStorageSSHKeyDataSource,
 		storage_ssh_key.NewStorageSSHKeysDataSource,
 		cdn_resource.NewCDNResourceDataSource,
