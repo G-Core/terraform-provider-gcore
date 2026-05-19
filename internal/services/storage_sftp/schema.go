@@ -98,8 +98,10 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 				Computed:    true,
 			},
 			"password": schema.StringAttribute{
-				Description: "SFTP password. Only returned when newly generated or set (create/patch). Omitted in GET/list responses.",
-				Computed:    true,
+				Description:   "SFTP password. Only returned when newly generated or set (create/patch). Omitted in GET/list responses.",
+				Computed:      true,
+				Sensitive:     true,
+				PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
 			},
 			"provisioning_status": schema.StringAttribute{
 				Description: "Lifecycle status of the storage. Use this to check readiness before operations.\nAvailable values: \"creating\", \"active\", \"updating\", \"deleting\", \"deleted\".",
