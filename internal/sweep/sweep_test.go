@@ -19,6 +19,7 @@ import (
 	_ "github.com/G-Core/terraform-provider-gcore/internal/services/dns_zone_rrset"
 
 	// Storage
+	_ "github.com/G-Core/terraform-provider-gcore/internal/services/storage_sftp"
 	_ "github.com/G-Core/terraform-provider-gcore/internal/services/storage_ssh_key"
 )
 
