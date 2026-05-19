@@ -4,6 +4,7 @@ package cloud_reserved_fixed_ip
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"io"
 	"net/http"
@@ -313,21 +314,31 @@ func (r *CloudReservedFixedIPResource) ImportState(ctx context.Context, req reso
 		data.ID = types.StringValue(data.PortID.ValueString())
 	}
 
-	// Infer the create-only Type field from API response fields, since the API does
-	// not return it after creation. Best-effort coverage:
-	//   external   → is_external == true
-	//   subnet     → is_external == false && subnet_id is set
-	//   any_subnet → is_external == false && network_id is set (no subnet_id)
-	// ip_address and port types cannot be distinguished from the API response;
-	// importing resources created with those types will produce a plan diff on the
-	// type field and require manual state fixup.
+	// Infer the create-only Type field from the raw API response.
+	// The API does not return "type" in GET responses, so we use
+	// is_external and subnet_id to determine the most likely type.
+	//
+	// subnet_id and network_id are now computed_optional, so
+	// UnmarshalComputed populates them automatically. We only need
+	// to extract is_external and subnet_id for type inference.
+	//
+	// For non-external IPs the API always returns both subnet_id and
+	// network_id regardless of whether the resource was created with
+	// type "subnet" or "any_subnet", making the two indistinguishable.
+	// We infer "subnet" as the default. The reservedFixedIPTypeModifier
+	// plan modifier handles "any_subnet" configs by silently adopting
+	// the config value without triggering replacement.
+	var rawFields struct {
+		IsExternal bool   `json:"is_external"`
+		SubnetID   string `json:"subnet_id"`
+	}
+	_ = json.Unmarshal(bytes, &rawFields)
+
 	if data.Type.IsNull() || data.Type.ValueString() == "" {
-		if !data.IsExternal.IsNull() && data.IsExternal.ValueBool() {
+		if rawFields.IsExternal {
 			data.Type = types.StringValue("external")
-		} else if !data.SubnetID.IsNull() && data.SubnetID.ValueString() != "" {
+		} else if rawFields.SubnetID != "" {
 			data.Type = types.StringValue("subnet")
-		} else if !data.NetworkID.IsNull() && data.NetworkID.ValueString() != "" {
-			data.Type = types.StringValue("any_subnet")
 		}
 	}
 
