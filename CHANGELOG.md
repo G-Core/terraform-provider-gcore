@@ -1,5 +1,41 @@
 # Changelog
 
+## 2.0.0-alpha.8 (2026-05-20)
+
+Full Changelog: [v2.0.0-alpha.7...v2.0.0-alpha.8](https://github.com/G-Core/terraform-provider-gcore/compare/v2.0.0-alpha.7...v2.0.0-alpha.8)
+
+### Features
+
+* **api:** aggregated API specs update ([8b7fe0f](https://github.com/G-Core/terraform-provider-gcore/commit/8b7fe0fabeab76ece247fa9b6213dd09e956609a))
+* **api:** aggregated API specs update ([1cadea6](https://github.com/G-Core/terraform-provider-gcore/commit/1cadea6ea20def44547491858223bf4241289f79))
+* **api:** feat(storage): support sftp storage in Terraform ([6826111](https://github.com/G-Core/terraform-provider-gcore/commit/6826111b8f69795380fcffe87c53c2a5baf3fb64))
+* **api:** feat(storage): support TF for object storages ([#267](https://github.com/G-Core/terraform-provider-gcore/issues/267)) ([b64bd33](https://github.com/G-Core/terraform-provider-gcore/commit/b64bd332e300b1e6c835879c84310e4b1105a5a2))
+* **storage:** support sftp storage in Terraform ([8357ced](https://github.com/G-Core/terraform-provider-gcore/commit/8357cedc7b0f802f7f7d92788a860d2f1f54864b))
+* **storage:** support TF for buckets ([2c2618d](https://github.com/G-Core/terraform-provider-gcore/commit/2c2618d30c3d361c75f4b1fc6b41632fd28e4655))
+* **storage:** support TF for object storages ([603c7f1](https://github.com/G-Core/terraform-provider-gcore/commit/603c7f1606fec8491c7be3aeff2bb5a5dd6de84f))
+* **storage:** use polling methods in sftp storage resource ([f43156b](https://github.com/G-Core/terraform-provider-gcore/commit/f43156b4ac58b939c9b05824a3f6ba6813973fc5))
+
+
+### Bug Fixes
+
+* **cloud:** eliminate import type drift for subnet for cloud_reserved_fixed_ip ([ebce7a4](https://github.com/G-Core/terraform-provider-gcore/commit/ebce7a48dde4a2571aac69dc66b6c40505a8bcaf))
+* **storage:** bucket null-clear + drift-free reads ([04108ac](https://github.com/G-Core/terraform-provider-gcore/commit/04108acd2c567cb127b6fa84e1d9e8ea8382725b))
+* **storage:** use NewAndPoll/DeleteAndPoll for gcore_storage_object_storage ([bd9f89c](https://github.com/G-Core/terraform-provider-gcore/commit/bd9f89c8b70aa87eed1f64886270ba51539279d1))
+* **waap:** read-after-write for PATCH 204, ImportState, UseStateForUnknown ([009a81d](https://github.com/G-Core/terraform-provider-gcore/commit/009a81dc2fe50ee9dd84d98c80db48f178b87c30))
+
+
+### Chores
+
+* bump version in index.md ([00bf9ed](https://github.com/G-Core/terraform-provider-gcore/commit/00bf9ed86ed8f0d63619c9c4e46b0775d3e2225e))
+* **deps:** bump terraform-plugin-sdk/v2 to v2.40.1 ([4702a38](https://github.com/G-Core/terraform-provider-gcore/commit/4702a38e5a89338a8db7b71657518c2f472dff15))
+* update terraform-plugin-framework to v1.19.0 ([2ba8f53](https://github.com/G-Core/terraform-provider-gcore/commit/2ba8f53e3d7103f975787d6354c3aedd4c389676))
+* update terraform-plugin-framework to v1.19.0 ([d55613a](https://github.com/G-Core/terraform-provider-gcore/commit/d55613a6d8010a2bbb251744ab4559270e85e459))
+
+
+### Documentation
+
+* fix line break in warning block of index page ([60a19dd](https://github.com/G-Core/terraform-provider-gcore/commit/60a19dd4cc299e9a854342017f2ed677711513ee))
+
 ## 2.0.0-alpha.7 (2026-05-13)
 
 Full Changelog: [v2.0.0-alpha.6...v2.0.0-alpha.7](https://github.com/G-Core/terraform-provider-gcore/compare/v2.0.0-alpha.6...v2.0.0-alpha.7)
