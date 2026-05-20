@@ -3,6 +3,6 @@
 set -euo pipefail
 
 # Mark the necessary Go modules as private to avoid Go's proxy
-export GOPRIVATE="${GOPRIVATE:+$GOPRIVATE,}github.com/G-Core/gcore-go,github.com/stainless-sdks/gcore-go"
+export GOPRIVATE="${GOPRIVATE:+$GOPRIVATE,}github.com/G-Core/gcore-go,github.com/G-Core/gcore-go-staging"
 
 go build -o terraform-provider-gcore

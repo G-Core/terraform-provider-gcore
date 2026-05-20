@@ -1,9 +1,6 @@
 name: Setup Go
-description: 'Sets up Go environment with private modules'
+description: 'Sets up Go environment'
 inputs:
-  stainless-api-key:
-    required: false
-    description: the value of the STAINLESS_API_KEY secret
   go-version:
     required: false
     description: version or version range of Go to use
@@ -13,17 +10,16 @@ inputs:
 runs:
   using: composite
   steps:
-    - uses: stainless-api/retrieve-github-access-token@1f03f929b746c5b03dcdafa2bebbb18ca5672e1a # v1.0.0
-      id: get_token
-      if: github.repository == 'stainless-sdks/gcore-terraform'
-      with:
-        repo: stainless-sdks/gcore-go
-        stainless-api-key: ${{ inputs.stainless-api-key }}
-
-    - name: Configure Git for to access Go SDK's staging repo
-      if: github.repository == 'stainless-sdks/gcore-terraform'
+    - name: Verify Go SDK module is accessible
       shell: bash
-      run: git config --global url."https://x-access-token:${{ steps.get_token.outputs.github_access_token }}@github.com/stainless-sdks/gcore-go".insteadOf "https://github.com/stainless-sdks/gcore-go"
+      env:
+        GO_MODULE_REPO: ${{ github.repository == 'G-Core/terraform-provider-gcore-staging' && 'G-Core/gcore-go-staging' || 'G-Core/gcore-go' }}
+      run: |
+        if ! git ls-remote --exit-code "https://github.com/${GO_MODULE_REPO}" >/dev/null 2>&1; then
+          echo "::error::Cannot access the Go SDK module at https://github.com/${GO_MODULE_REPO}."
+          echo "::error::If the repo is private, uncomment the 'Authenticate git for the private Go SDK repo' step in .github/workflows/ci.yml and add a GO_REPO_READ_TOKEN secret to this repo."
+          exit 1
+        fi
 
     - name: Setup go
       uses: actions/setup-go@40f1582b2485089dde7abd97c1529aa768e1baff # v5.6.0
