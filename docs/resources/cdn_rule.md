@@ -490,7 +490,7 @@ Optional:
 
 Required:
 
-- `value` (String) Key for caching. Should be a combination of the specified variables: $request_uri, $scheme, $uri.
+- `value` (String) Key for caching. Should be a combination of the specified variables: $http_x_cdn_real_host, $request_uri, $scheme, $uri.
 
 Optional:
 
