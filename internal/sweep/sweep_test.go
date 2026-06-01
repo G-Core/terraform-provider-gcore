@@ -10,6 +10,7 @@ import (
 	_ "github.com/G-Core/terraform-provider-gcore/internal/services/cdn_certificate"
 
 	// Cloud
+	_ "github.com/G-Core/terraform-provider-gcore/internal/services/cloud_instance_image"
 	_ "github.com/G-Core/terraform-provider-gcore/internal/services/cloud_placement_group"
 	_ "github.com/G-Core/terraform-provider-gcore/internal/services/cloud_ssh_key"
 
