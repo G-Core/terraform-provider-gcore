@@ -3,12 +3,12 @@
 page_title: "gcore_waap_domains Data Source - Gcore"
 subcategory: ""
 description: |-
-  WAAP domains enable Web Application and API Protection for monitoring and defending web applications against security threats
+  WAAP domains enable Web Application and API Protection for monitoring and defending web applications against security threats.
 ---
 
 # gcore_waap_domains (Data Source)
 
-WAAP domains enable Web Application and API Protection for monitoring and defending web applications against security threats
+WAAP domains enable Web Application and API Protection for monitoring and defending web applications against security threats.
 
 ## Example Usage
 
