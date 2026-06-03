@@ -58,7 +58,7 @@ Used by the SFTP backend as the login username. Clients should use this value wh
 but should continue to identify the storage by `name` in their own configuration.
 - `has_password` (Boolean) Whether password authentication is configured for this storage
 - `id` (Number) Unique identifier for the storage instance
-- `password` (String, Sensitive) SFTP password. Only returned when newly generated or set (create/patch). Omitted in GET/list responses.
+- `password` (String) SFTP password. Only returned when newly generated or set (create/patch). Omitted in GET/list responses.
 - `provisioning_status` (String) Lifecycle status of the storage. Use this to check readiness before operations.
 Available values: "creating", "active", "updating", "deleting", "deleted".
 
