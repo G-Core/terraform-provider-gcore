@@ -57,6 +57,7 @@ resource "gcore_cloud_network_router" "main" {
 - `id` (String) The ID of this resource.
 - `region` (String) Region name
 - `status` (String) Status of the router.
+- `updated_at` (String) Datetime when the router was last updated
 
 <a id="nestedatt--external_gateway_info"></a>
 ### Nested Schema for `external_gateway_info`
