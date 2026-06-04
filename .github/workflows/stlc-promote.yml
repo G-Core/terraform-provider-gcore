@@ -10,6 +10,8 @@ permissions:
 jobs:
   promote:
     runs-on: ubuntu-latest
+    # Canonical staging repo on the upstream only (never forks/prod).
+    if: github.repository == 'G-Core/terraform-provider-gcore-staging'
     env:
       PRODUCTION_REPO: G-Core/terraform-provider-gcore
       # Stainless-generated code lives on the v2 branch of the production repo
