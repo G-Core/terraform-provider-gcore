@@ -7,6 +7,7 @@ import (
 	"strconv"
 
 	"github.com/G-Core/gcorelabscdn-go/origingroups"
+	"github.com/hashicorp/go-cty/cty"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/validation"
@@ -212,6 +213,11 @@ func validateCDNOriginGroupConfig(ctx context.Context, diff *schema.ResourceDiff
 	}
 
 	if originExists {
+		// CustomizeDiff runs at plan time, where attributes sourced from other resources'
+		// computed ("known after apply") values are not yet known. The legacy diff surface
+		// collapses such values to their zero value, so required-field checks must consult
+		// the raw config to tell "the user left it empty" apart from "not yet known".
+		rawConfig := diff.GetRawConfig()
 		originList := diff.Get("origin").([]interface{})
 		for i, originRaw := range originList {
 			if originRaw == nil {
@@ -225,7 +231,7 @@ func validateCDNOriginGroupConfig(ctx context.Context, diff *schema.ResourceDiff
 
 			if originType == "host" {
 				source, _ := origin["source"].(string)
-				if source == "" {
+				if source == "" && !originAttrIsUnknown(rawConfig, i, "source") {
 					return fmt.Errorf("origin.%d: `source` is required for host origins", i)
 				}
 
@@ -251,7 +257,7 @@ func validateCDNOriginGroupConfig(ctx context.Context, diff *schema.ResourceDiff
 					return fmt.Errorf("origin.%d: `config` must be an object for s3 origins", i)
 				}
 
-				if err := validateS3ConfigFields(i, cfg); err != nil {
+				if err := validateS3ConfigFields(rawConfig, i, cfg); err != nil {
 					return err
 				}
 			}
@@ -261,22 +267,108 @@ func validateCDNOriginGroupConfig(ctx context.Context, diff *schema.ResourceDiff
 	return nil
 }
 
-func validateS3ConfigFields(index int, cfg map[string]interface{}) error {
+func validateS3ConfigFields(rawConfig cty.Value, index int, cfg map[string]interface{}) error {
 	s3Type, _ := cfg["s3_type"].(string)
 
 	if s3Type == "other" {
-		if val, ok := cfg["s3_storage_hostname"].(string); !ok || val == "" {
+		if val, _ := cfg["s3_storage_hostname"].(string); val == "" && !originConfigAttrIsUnknown(rawConfig, index, "s3_storage_hostname") {
 			return fmt.Errorf("origin.%d.config: `s3_storage_hostname` is required when `s3_type` is 'other'", index)
 		}
 	}
 
 	if s3Type == "amazon" {
-		if val, ok := cfg["s3_region"].(string); !ok || val == "" {
+		if val, _ := cfg["s3_region"].(string); val == "" && !originConfigAttrIsUnknown(rawConfig, index, "s3_region") {
 			return fmt.Errorf("origin.%d.config: `s3_region` is required when `s3_type` is 'amazon'", index)
 		}
 	}
 
 	return nil
+}
+
+// lookupRawOrigin locates origin[index] within the raw configuration. ok is false when the
+// value cannot be resolved (for example under the legacy unit-test diff path that does not
+// populate the raw config), in which case callers should validate normally. unknown is true
+// when the origin (or the whole origin list) is a "known after apply" value.
+func lookupRawOrigin(rawConfig cty.Value, index int) (origin cty.Value, ok, unknown bool) {
+	if rawConfig.IsNull() || !rawConfig.IsKnown() {
+		return cty.NilVal, false, false
+	}
+	t := rawConfig.Type()
+	if !t.IsObjectType() || !t.HasAttribute("origin") {
+		return cty.NilVal, false, false
+	}
+	origins := rawConfig.GetAttr("origin")
+	if origins.IsNull() {
+		return cty.NilVal, false, false
+	}
+	if !origins.IsKnown() {
+		return cty.NilVal, false, true
+	}
+	if !origins.CanIterateElements() {
+		return cty.NilVal, false, false
+	}
+	elements := origins.AsValueSlice()
+	if index < 0 || index >= len(elements) {
+		return cty.NilVal, false, false
+	}
+	origin = elements[index]
+	if origin.IsNull() {
+		return cty.NilVal, false, false
+	}
+	if !origin.IsKnown() {
+		return cty.NilVal, false, true
+	}
+	return origin, true, false
+}
+
+// originAttrIsUnknown reports whether the named attribute of origin[index] in the raw
+// configuration is a computed ("known after apply") value.
+func originAttrIsUnknown(rawConfig cty.Value, index int, attr string) bool {
+	origin, ok, unknown := lookupRawOrigin(rawConfig, index)
+	if unknown {
+		return true
+	}
+	if !ok || !origin.Type().HasAttribute(attr) {
+		return false
+	}
+	return !origin.GetAttr(attr).IsKnown()
+}
+
+// originConfigAttrIsUnknown reports whether the named attribute of the nested
+// origin[index].config block is a computed ("known after apply") value.
+func originConfigAttrIsUnknown(rawConfig cty.Value, index int, attr string) bool {
+	origin, ok, unknown := lookupRawOrigin(rawConfig, index)
+	if unknown {
+		return true
+	}
+	if !ok || !origin.Type().HasAttribute("config") {
+		return false
+	}
+	config := origin.GetAttr("config")
+	if config.IsNull() {
+		return false
+	}
+	if !config.IsKnown() {
+		return true
+	}
+	if !config.CanIterateElements() {
+		return false
+	}
+	elements := config.AsValueSlice()
+	if len(elements) == 0 {
+		return false
+	}
+	cfg := elements[0]
+	if cfg.IsNull() {
+		return false
+	}
+	if !cfg.IsKnown() {
+		return true
+	}
+	if !cfg.Type().IsObjectType() || !cfg.Type().HasAttribute(attr) {
+		return false
+	}
+	return !cfg.GetAttr(attr).IsKnown()
 }
 
 func resourceCDNOriginGroupCreate(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {

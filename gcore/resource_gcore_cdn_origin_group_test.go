@@ -10,6 +10,7 @@ import (
 	"testing"
 
 	"github.com/G-Core/gcorelabscdn-go/origingroups"
+	"github.com/hashicorp/go-cty/cty"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/terraform"
@@ -383,6 +384,130 @@ func TestValidateCDNOriginGroupConfig(t *testing.T) {
 				t.Fatalf("unexpected error: %v", err)
 			}
 		})
+	}
+}
+
+// TestValidateCDNOriginGroupConfigComputedSource guards against the regression in
+// https://github.com/G-Core/terraform-provider-gcore/issues/319: a host origin whose
+// `source` is sourced from another resource's computed ("known after apply") value must
+// not fail validation at plan time. The unknown value is detected via the raw config,
+// which the legacy diff surface collapses to an empty string.
+func TestValidateCDNOriginGroupConfigComputedSource(t *testing.T) {
+	tests := []struct {
+		name      string
+		rawConfig cty.Value
+		index     int
+		attr      string
+		want      bool
+	}{
+		{
+			name: "host source known after apply",
+			rawConfig: cty.ObjectVal(map[string]cty.Value{
+				"origin": cty.ListVal([]cty.Value{
+					cty.ObjectVal(map[string]cty.Value{
+						"source":      cty.UnknownVal(cty.String),
+						"origin_type": cty.StringVal("host"),
+					}),
+				}),
+			}),
+			index: 0,
+			attr:  "source",
+			want:  true,
+		},
+		{
+			name: "host source is a known literal",
+			rawConfig: cty.ObjectVal(map[string]cty.Value{
+				"origin": cty.ListVal([]cty.Value{
+					cty.ObjectVal(map[string]cty.Value{
+						"source":      cty.StringVal("example.com"),
+						"origin_type": cty.StringVal("host"),
+					}),
+				}),
+			}),
+			index: 0,
+			attr:  "source",
+			want:  false,
+		},
+		{
+			name: "whole origin list known after apply",
+			rawConfig: cty.ObjectVal(map[string]cty.Value{
+				"origin": cty.UnknownVal(cty.List(cty.Object(map[string]cty.Type{
+					"source": cty.String,
+				}))),
+			}),
+			index: 0,
+			attr:  "source",
+			want:  true,
+		},
+		{
+			name:      "nil raw config falls back to normal validation",
+			rawConfig: cty.NilVal,
+			index:     0,
+			attr:      "source",
+			want:      false,
+		},
+		{
+			name: "index out of range",
+			rawConfig: cty.ObjectVal(map[string]cty.Value{
+				"origin": cty.ListVal([]cty.Value{
+					cty.ObjectVal(map[string]cty.Value{
+						"source": cty.UnknownVal(cty.String),
+					}),
+				}),
+			}),
+			index: 5,
+			attr:  "source",
+			want:  false,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := originAttrIsUnknown(tt.rawConfig, tt.index, tt.attr); got != tt.want {
+				t.Fatalf("originAttrIsUnknown() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+// TestValidateCDNOriginGroupConfigComputedS3ConfigField verifies that S3 config fields
+// (s3_region, s3_storage_hostname) sourced from computed values are detected as unknown
+// so their "required" checks are skipped, matching the host `source` behaviour.
+func TestValidateCDNOriginGroupConfigComputedS3ConfigField(t *testing.T) {
+	rawConfig := cty.ObjectVal(map[string]cty.Value{
+		"origin": cty.ListVal([]cty.Value{
+			cty.ObjectVal(map[string]cty.Value{
+				"origin_type": cty.StringVal("s3"),
+				"config": cty.ListVal([]cty.Value{
+					cty.ObjectVal(map[string]cty.Value{
+						"s3_type":   cty.StringVal("amazon"),
+						"s3_region": cty.UnknownVal(cty.String),
+					}),
+				}),
+			}),
+		}),
+	})
+
+	if !originConfigAttrIsUnknown(rawConfig, 0, "s3_region") {
+		t.Fatal("expected computed s3_region to be reported as unknown")
+	}
+	if originConfigAttrIsUnknown(rawConfig, 0, "s3_type") {
+		t.Fatal("expected known s3_type not to be reported as unknown")
+	}
+
+	// validateS3ConfigFields must not error when the required region is computed: the
+	// legacy diff surface presents it as an empty string.
+	cfg := map[string]interface{}{
+		"s3_type":   "amazon",
+		"s3_region": "",
+	}
+	if err := validateS3ConfigFields(rawConfig, 0, cfg); err != nil {
+		t.Fatalf("unexpected error for computed s3_region: %v", err)
+	}
+
+	// With a nil raw config (the legacy unit-test diff path) the required check still fires.
+	if err := validateS3ConfigFields(cty.NilVal, 0, cfg); err == nil {
+		t.Fatal("expected error for missing s3_region when raw config is unavailable")
 	}
 }
 
