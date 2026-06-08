@@ -386,6 +386,109 @@ func TestValidateCDNOriginGroupConfig(t *testing.T) {
 	}
 }
 
+// unknownVariableValue mirrors the SDK's hcl2shim.UnknownVariableValue sentinel (which
+// lives in an internal package). Setting an attribute to this value makes the diff treat it
+// as a computed ("known after apply") value, as if it referenced another resource.
+const unknownVariableValue = "74D93920-ED26-11E3-AC10-0800200C9A66"
+
+// TestValidateCDNOriginGroupConfigComputed verifies that a required attribute which is
+// "known after apply" does not fail validation at plan time. The cases drive the real
+// Resource.Diff path, where the diff collapses such a value to an empty string but
+// NewValueKnown still reports it as unknown.
+func TestValidateCDNOriginGroupConfigComputed(t *testing.T) {
+	tests := []struct {
+		name    string
+		config  map[string]interface{}
+		wantErr string
+	}{
+		{
+			name: "computed host source does not error",
+			config: map[string]interface{}{
+				"name": "terraform_acctest_group",
+				"origin": []interface{}{
+					map[string]interface{}{
+						"origin_type": "host",
+						"source":      unknownVariableValue,
+					},
+				},
+			},
+		},
+		{
+			name: "empty host source still errors",
+			config: map[string]interface{}{
+				"name": "terraform_acctest_group",
+				"origin": []interface{}{
+					map[string]interface{}{
+						"origin_type": "host",
+						"source":      "",
+					},
+				},
+			},
+			wantErr: "origin.0: `source` is required for host origins",
+		},
+		{
+			name: "computed amazon s3_region does not error",
+			config: map[string]interface{}{
+				"name": "terraform_acctest_group",
+				"origin": []interface{}{
+					map[string]interface{}{
+						"origin_type": "s3",
+						"config": []interface{}{
+							map[string]interface{}{
+								"s3_type":              "amazon",
+								"s3_bucket_name":       "bucket",
+								"s3_access_key_id":     "dummy-access-key",
+								"s3_secret_access_key": "dummy-secret-key",
+								"s3_region":            unknownVariableValue,
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			name: "computed other s3_storage_hostname does not error",
+			config: map[string]interface{}{
+				"name": "terraform_acctest_group",
+				"origin": []interface{}{
+					map[string]interface{}{
+						"origin_type": "s3",
+						"config": []interface{}{
+							map[string]interface{}{
+								"s3_type":              "other",
+								"s3_bucket_name":       "bucket",
+								"s3_access_key_id":     "dummy-access-key",
+								"s3_secret_access_key": "dummy-secret-key",
+								"s3_storage_hostname":  unknownVariableValue,
+							},
+						},
+					},
+				},
+			},
+		},
+	}
+
+	originGroupResource := resourceCDNOriginGroup()
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			_, err := originGroupResource.Diff(context.Background(), nil, terraform.NewResourceConfigRaw(tt.config), nil)
+			if tt.wantErr == "" {
+				if err != nil {
+					t.Fatalf("unexpected error: %v", err)
+				}
+				return
+			}
+			if err == nil {
+				t.Fatalf("expected error containing %q", tt.wantErr)
+			}
+			if !strings.Contains(err.Error(), tt.wantErr) {
+				t.Fatalf("unexpected error: %v", err)
+			}
+		})
+	}
+}
+
 func TestPreserveRestoreS3OriginCredentialsByIndex(t *testing.T) {
 	originGroupResource := resourceCDNOriginGroup()
 	state := schema.TestResourceDataRaw(t, originGroupResource.Schema, map[string]interface{}{

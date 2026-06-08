@@ -224,8 +224,10 @@ func validateCDNOriginGroupConfig(ctx context.Context, diff *schema.ResourceDiff
 			}
 
 			if originType == "host" {
+				// Skip the check when source is "known after apply" (sourced from another
+				// resource's computed attribute), which the diff collapses to an empty string.
 				source, _ := origin["source"].(string)
-				if source == "" {
+				if source == "" && diff.NewValueKnown(fmt.Sprintf("origin.%d.source", i)) {
 					return fmt.Errorf("origin.%d: `source` is required for host origins", i)
 				}
 
@@ -251,7 +253,7 @@ func validateCDNOriginGroupConfig(ctx context.Context, diff *schema.ResourceDiff
 					return fmt.Errorf("origin.%d: `config` must be an object for s3 origins", i)
 				}
 
-				if err := validateS3ConfigFields(i, cfg); err != nil {
+				if err := validateS3ConfigFields(diff, i, cfg); err != nil {
 					return err
 				}
 			}
@@ -261,17 +263,21 @@ func validateCDNOriginGroupConfig(ctx context.Context, diff *schema.ResourceDiff
 	return nil
 }
 
-func validateS3ConfigFields(index int, cfg map[string]interface{}) error {
+// validateS3ConfigFields checks required S3 config fields, skipping any field that is
+// "known after apply" (NewValueKnown), which the diff collapses to an empty string.
+func validateS3ConfigFields(diff *schema.ResourceDiff, index int, cfg map[string]interface{}) error {
 	s3Type, _ := cfg["s3_type"].(string)
 
 	if s3Type == "other" {
-		if val, ok := cfg["s3_storage_hostname"].(string); !ok || val == "" {
+		val, _ := cfg["s3_storage_hostname"].(string)
+		if val == "" && diff.NewValueKnown(fmt.Sprintf("origin.%d.config.0.s3_storage_hostname", index)) {
 			return fmt.Errorf("origin.%d.config: `s3_storage_hostname` is required when `s3_type` is 'other'", index)
 		}
 	}
 
 	if s3Type == "amazon" {
-		if val, ok := cfg["s3_region"].(string); !ok || val == "" {
+		val, _ := cfg["s3_region"].(string)
+		if val == "" && diff.NewValueKnown(fmt.Sprintf("origin.%d.config.0.s3_region", index)) {
 			return fmt.Errorf("origin.%d.config: `s3_region` is required when `s3_type` is 'amazon'", index)
 		}
 	}
