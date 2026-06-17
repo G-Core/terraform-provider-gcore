@@ -15,8 +15,8 @@ github.com/G-Core/gcore-waap-sdk-go v0.5.0 h1:1MPMvFc+xCMx2uX5LEaIJ1XVz1PdDW5GXJ
 github.com/G-Core/gcore-waap-sdk-go v0.5.0/go.mod h1:qV2GDMxG6Q1clkupBG07h7iZFsRChj0Nhx8hWzs+tfc=
 github.com/G-Core/gcorelabscdn-go v1.0.36 h1:yo0u2fmfAO6hIK0bBuvOZx/MAOdvEANjP1lw3MEB9+M=
 github.com/G-Core/gcorelabscdn-go v1.0.36/go.mod h1:iSGXaTvZBzDHQW+rKFS918BgFVpONcyLEijwh8WsXpE=
-github.com/G-Core/gcorelabscloud-go v0.30.1-0.20260617071203-2bd9c82a4955 h1:fAInBrx1JHMXPUb0eGBVntcWmJU25Fah/NovJXpCqeo=
-github.com/G-Core/gcorelabscloud-go v0.30.1-0.20260617071203-2bd9c82a4955/go.mod h1:KBE/kVQLfGzzo6dtSbcsfoOFZFVAEzspzFZe/TtZwlU=
+github.com/G-Core/gcorelabscloud-go v0.30.1-0.20260617073614-054dd2166d46 h1:Yf9iIkdae7xlMXKpTPiO/rWSNu87723Au1Y07PJopOM=
+github.com/G-Core/gcorelabscloud-go v0.30.1-0.20260617073614-054dd2166d46/go.mod h1:KBE/kVQLfGzzo6dtSbcsfoOFZFVAEzspzFZe/TtZwlU=
 github.com/Kunde21/markdownfmt/v3 v3.1.0 h1:KiZu9LKs+wFFBQKhrZJrFZwtLnCCWJahL+S+E/3VnM0=
 github.com/Kunde21/markdownfmt/v3 v3.1.0/go.mod h1:tPXN1RTyOzJwhfHoon9wUr4HGYmWgVxSQN6VBJDkrVc=
 github.com/Masterminds/goutils v1.1.1 h1:5nUrii3FMTL5diU80unEVvNevw1nH4+ZV4DSLVJLSYI=

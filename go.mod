@@ -11,7 +11,7 @@ require (
 	github.com/G-Core/gcore-storage-sdk-go v0.1.34
 	github.com/G-Core/gcore-waap-sdk-go v0.5.0
 	github.com/G-Core/gcorelabscdn-go v1.0.36
-	github.com/G-Core/gcorelabscloud-go v0.30.1-0.20260617071203-2bd9c82a4955
+	github.com/G-Core/gcorelabscloud-go v0.30.1-0.20260617073614-054dd2166d46
 	github.com/google/go-cmp v0.7.0
 	github.com/google/uuid v1.6.0
 	github.com/hashicorp/go-cty v1.4.1-0.20200414143053-d3edf31b6320

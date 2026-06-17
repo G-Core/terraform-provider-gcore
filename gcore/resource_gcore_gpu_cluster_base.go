@@ -38,9 +38,35 @@ func resourceGPUCluster(gpuNodeType GPUNodeType) *schema.Resource {
 		DeleteContext: func(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 			return resourceGPUClusterDelete(ctx, d, m, gpuNodeType)
 		},
-		Description: fmt.Sprintf("Manages a %s GPU cluster", gpuNodeType),
-		Schema:      resourceGPUClusterSchema(),
+		Description:   fmt.Sprintf("Manages a %s GPU cluster", gpuNodeType),
+		Schema:        resourceGPUClusterSchema(),
+		CustomizeDiff: resourceGPUClusterCustomizeDiff,
 	}
+}
+
+// resourceGPUClusterCustomizeDiff fails the plan early when the deprecated
+// cluster-wide security_groups is combined with per-interface security_groups,
+// which the API rejects.
+func resourceGPUClusterCustomizeDiff(_ context.Context, d *schema.ResourceDiff, _ interface{}) error {
+	v, ok := d.GetOk("servers_settings")
+	if !ok {
+		return nil
+	}
+	settingsList, ok := v.([]interface{})
+	if !ok || len(settingsList) == 0 || settingsList[0] == nil {
+		return nil
+	}
+	settingsMap := settingsList[0].(map[string]interface{})
+
+	clusterWide := 0
+	if sg, ok := settingsMap["security_groups"].([]interface{}); ok {
+		clusterWide = len(sg)
+	}
+	if clusterWide > 0 && interfacesHaveSecurityGroups(settingsMap["interface"]) {
+		return fmt.Errorf("servers_settings.security_groups (cluster-wide, deprecated) cannot be combined with " +
+			"per-interface interface.security_groups; set security groups in only one place")
+	}
+	return nil
 }
 
 func getGPUServicePath(gpuNodeType GPUNodeType) string {
@@ -180,11 +206,11 @@ func resourceGPUClusterSchema() map[string]*schema.Schema {
 									},
 								},
 								"security_groups": {
-									Type:     schema.TypeList,
+									Type:     schema.TypeSet,
 									Optional: true,
 									Computed: true,
 									ForceNew: true,
-									Description: "List of security group IDs applied to this interface. " +
+									Description: "Set of security group IDs applied to this interface. " +
 										"If omitted, the cluster-wide security_groups apply; if both are " +
 										"omitted, the project's default security group is applied. Cannot be " +
 										"combined with the deprecated cluster-wide security_groups.",
@@ -742,6 +768,13 @@ func extractServerSettings(d *schema.ResourceData) (clusters.ServerSettingsOpts,
 		if secGroups, ok := settingsMap["security_groups"]; ok {
 			serverSettings.SecurityGroups = extractSecurityGroups(secGroups.([]interface{}))
 		}
+		// The API rejects combining the deprecated cluster-wide security_groups
+		// with per-interface security_groups; fail fast with a clear message.
+		if len(serverSettings.SecurityGroups) > 0 && interfacesHaveSecurityGroups(settingsMap["interface"]) {
+			return serverSettings, fmt.Errorf(
+				"servers_settings.security_groups (cluster-wide, deprecated) cannot be combined with " +
+					"per-interface interface.security_groups; set security groups in only one place")
+		}
 		if userData, ok := settingsMap["user_data"].(string); ok {
 			serverSettings.UserData = utils.StringToPointer(userData)
 		}
@@ -865,13 +898,33 @@ func extractSecurityGroups(securityGroups []interface{}) []gcorecloud.ItemID {
 	return result
 }
 
-// extractInterfaceSecurityGroups reads the per-interface security_groups list
+// extractInterfaceSecurityGroups reads the per-interface security_groups set
 // from a single interface schema block.
 func extractInterfaceSecurityGroups(ifaceMap map[string]interface{}) []gcorecloud.ItemID {
-	if sg, ok := ifaceMap["security_groups"]; ok && sg != nil {
-		return extractSecurityGroups(sg.([]interface{}))
+	sg, ok := ifaceMap["security_groups"]
+	if !ok || sg == nil {
+		return nil
+	}
+	if set, ok := sg.(*schema.Set); ok {
+		return extractSecurityGroups(set.List())
 	}
 	return nil
+}
+
+// interfacesHaveSecurityGroups reports whether any interface block sets
+// per-interface security_groups.
+func interfacesHaveSecurityGroups(interfaces any) bool {
+	set, ok := interfaces.(*schema.Set)
+	if !ok {
+		return false
+	}
+	for _, item := range set.List() {
+		ifaceMap := item.(map[string]interface{})
+		if len(extractInterfaceSecurityGroups(ifaceMap)) > 0 {
+			return true
+		}
+	}
+	return false
 }
 
 // securityGroupIDsFromItems flattens resolved per-interface security groups
