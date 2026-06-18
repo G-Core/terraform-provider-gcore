@@ -1,5 +1,14 @@
 # Changelog
 
+## 2.0.0-alpha.9 (2026-06-18)
+
+Full Changelog: [v2.0.0-alpha.8...v2.0.0-alpha.9](https://github.com/G-Core/terraform-provider-gcore/compare/v2.0.0-alpha.8...v2.0.0-alpha.9)
+
+### Bug Fixes
+
+* **scripts:** export GOPRIVATE and use `go mod tidy -e` in scripts/generate-docs ([ec22b1f](https://github.com/G-Core/terraform-provider-gcore/commit/ec22b1fa1ed2059af6731a399e262370ead1e7c6))
+* **terraform:** fix nil pointer dereference when comparing null or unknown numbers ([ad84376](https://github.com/G-Core/terraform-provider-gcore/commit/ad84376f73d6a25005678d81f35243bad25e8116))
+
 ## 2.0.0-alpha.8 (2026-05-20)
 
 Full Changelog: [v2.0.0-alpha.7...v2.0.0-alpha.8](https://github.com/G-Core/terraform-provider-gcore/compare/v2.0.0-alpha.7...v2.0.0-alpha.8)
