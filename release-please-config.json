@@ -62,6 +62,7 @@
   "release-type": "simple",
   "extra-files": [
     "internal/version.go",
-    "README.md"
+    "README.md",
+    "examples/provider/provider.tf"
   ]
 }
