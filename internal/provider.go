@@ -10,6 +10,7 @@ import (
 	"github.com/G-Core/gcore-go"
 	"github.com/G-Core/gcore-go/option"
 	"github.com/G-Core/terraform-provider-gcore/internal/services/cdn_certificate"
+	"github.com/G-Core/terraform-provider-gcore/internal/services/cdn_logs_uploader_policy"
 	"github.com/G-Core/terraform-provider-gcore/internal/services/cdn_origin_group"
 	"github.com/G-Core/terraform-provider-gcore/internal/services/cdn_resource"
 	"github.com/G-Core/terraform-provider-gcore/internal/services/cdn_resource_rule"
@@ -256,6 +257,7 @@ func (p *GcoreProvider) Resources(ctx context.Context) []func() resource.Resourc
 		cdn_rule_template.NewResource,
 		cdn_certificate.NewResource,
 		cdn_trusted_ca_certificate.NewResource,
+		cdn_logs_uploader_policy.NewResource,
 	}
 }
 
@@ -335,6 +337,7 @@ func (p *GcoreProvider) DataSources(ctx context.Context) []func() datasource.Dat
 		cdn_rule_template.NewCDNRuleTemplateDataSource,
 		cdn_certificate.NewCDNCertificateDataSource,
 		cdn_trusted_ca_certificate.NewCDNTrustedCaCertificateDataSource,
+		cdn_logs_uploader_policy.NewCDNLogsUploaderPolicyDataSource,
 	}
 }
 
