@@ -18,3 +18,9 @@ jobs:
         id: release
         with:
           token: ${{ secrets.RELEASE_PLEASE_TOKEN }}
+          # Generated code lives on the v2 branch (not the repo default branch
+          # `master`); release-please-action defaults target-branch to the default
+          # branch, so it must be set explicitly or it looks for config/manifest
+          # on master and fails. Custom code — stlc's publish.release{branch: v2}
+          # sets the `on:` trigger but not this input.
+          target-branch: v2
