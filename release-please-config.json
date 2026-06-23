@@ -63,6 +63,7 @@
   "extra-files": [
     "internal/version.go",
     "README.md",
-    "examples/provider/provider.tf"
+    "examples/provider/provider.tf",
+    "docs/index.md"
   ]
 }
