@@ -8,6 +8,7 @@ import (
 	// Import sweeper registrations
 	// CDN
 	_ "github.com/G-Core/terraform-provider-gcore/internal/services/cdn_certificate"
+	_ "github.com/G-Core/terraform-provider-gcore/internal/services/cdn_logs_uploader_policy"
 
 	// Cloud
 	_ "github.com/G-Core/terraform-provider-gcore/internal/services/cloud_gpu_baremetal_cluster"

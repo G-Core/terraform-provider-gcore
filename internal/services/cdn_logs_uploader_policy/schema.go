@@ -7,6 +7,7 @@ import (
 
 	"github.com/G-Core/terraform-provider-gcore/internal/customfield"
 	"github.com/hashicorp/terraform-plugin-framework-timetypes/timetypes"
+	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework-validators/float64validator"
 	"github.com/hashicorp/terraform-plugin-framework-validators/int64validator"
 	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
@@ -16,8 +17,11 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/float64default"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/int64default"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/int64planmodifier"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/listplanmodifier"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/mapdefault"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringdefault"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringplanmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 )
@@ -34,15 +38,21 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 			},
 			"date_format": schema.StringAttribute{
 				Description: "Date format for logs.",
+				Computed:    true,
 				Optional:    true,
+				Default:     stringdefault.StaticString(""),
 			},
 			"description": schema.StringAttribute{
 				Description: "Description of the policy.",
+				Computed:    true,
 				Optional:    true,
+				Default:     stringdefault.StaticString(""),
 			},
 			"format_type": schema.StringAttribute{
 				Description: "Format type for logs.\n\nPossible values:\n- **\"\"** - empty, it means it will apply the format configurations from the policy.\n- **\"json\"** - output the logs as json lines.\nAvailable values: \"json\", \"\".",
+				Computed:    true,
 				Optional:    true,
+				Default:     stringdefault.StaticString(""),
 				Validators: []validator.String{
 					stringvalidator.OneOfCaseInsensitive("json", ""),
 				},
@@ -56,8 +66,10 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 			},
 			"tags": schema.MapAttribute{
 				Description: "Tags allow for dynamic decoration of logs by adding predefined fields to the log format. These tags serve as customizable key-value pairs that can be included in log entries to enhance context and readability.",
+				Computed:    true,
 				Optional:    true,
 				ElementType: types.StringType,
+				Default:     mapdefault.StaticValue(types.MapValueMust(types.StringType, map[string]attr.Value{})),
 			},
 			"escape_special_characters": schema.BoolAttribute{
 				Description: "When set to true, the service sanitizes string values by escaping characters that may be unsafe for transport, logging, or downstream processing.\n\nThe following categories of characters are escaped:\n- Control and non-printable characters\n- Quotation marks and escape characters\n- Characters outside the standard ASCII range\n\nThe resulting output contains only printable ASCII characters.",
@@ -138,20 +150,23 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 				Default: int64default.StaticInt64(0),
 			},
 			"fields": schema.ListAttribute{
-				Description: "List of fields to include in logs.",
-				Computed:    true,
-				Optional:    true,
-				CustomType:  customfield.NewListType[types.String](ctx),
-				ElementType: types.StringType,
+				Description:   "List of fields to include in logs.",
+				Computed:      true,
+				Optional:      true,
+				CustomType:    customfield.NewListType[types.String](ctx),
+				ElementType:   types.StringType,
+				PlanModifiers: []planmodifier.List{listplanmodifier.UseStateForUnknown()},
 			},
 			"client_id": schema.Int64Attribute{
-				Description: "Client that owns the policy.",
-				Computed:    true,
+				Description:   "Client that owns the policy.",
+				Computed:      true,
+				PlanModifiers: []planmodifier.Int64{int64planmodifier.UseStateForUnknown()},
 			},
 			"created": schema.StringAttribute{
-				Description: "Time when logs uploader policy was created.",
-				Computed:    true,
-				CustomType:  timetypes.RFC3339Type{},
+				Description:   "Time when logs uploader policy was created.",
+				Computed:      true,
+				CustomType:    timetypes.RFC3339Type{},
+				PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
 			},
 			"updated": schema.StringAttribute{
 				Description: "Time when logs uploader policy was updated.",
@@ -159,10 +174,11 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 				CustomType:  timetypes.RFC3339Type{},
 			},
 			"related_uploader_configs": schema.ListAttribute{
-				Description: "List of logs uploader configs that use this policy.",
-				Computed:    true,
-				CustomType:  customfield.NewListType[types.Int64](ctx),
-				ElementType: types.Int64Type,
+				Description:   "List of logs uploader configs that use this policy.",
+				Computed:      true,
+				CustomType:    customfield.NewListType[types.Int64](ctx),
+				ElementType:   types.Int64Type,
+				PlanModifiers: []planmodifier.List{listplanmodifier.UseStateForUnknown()},
 			},
 		},
 	}

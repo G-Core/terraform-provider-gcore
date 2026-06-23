@@ -3,19 +3,23 @@
 package cdn_logs_uploader_policy
 
 import (
+	"encoding/json"
+	"reflect"
+
 	"github.com/G-Core/terraform-provider-gcore/internal/apijson"
 	"github.com/G-Core/terraform-provider-gcore/internal/customfield"
 	"github.com/hashicorp/terraform-plugin-framework-timetypes/timetypes"
 	"github.com/hashicorp/terraform-plugin-framework/types"
+	"github.com/tidwall/sjson"
 )
 
 type CDNLogsUploaderPolicyModel struct {
 	ID                      types.Int64                    `tfsdk:"id" json:"id,computed"`
-	DateFormat              types.String                   `tfsdk:"date_format" json:"date_format,optional"`
-	Description             types.String                   `tfsdk:"description" json:"description,optional"`
-	FormatType              types.String                   `tfsdk:"format_type" json:"format_type,optional"`
+	DateFormat              types.String                   `tfsdk:"date_format" json:"date_format,computed_optional"`
+	Description             types.String                   `tfsdk:"description" json:"description,computed_optional"`
+	FormatType              types.String                   `tfsdk:"format_type" json:"format_type,computed_optional"`
 	RotateThresholdMB       types.Int64                    `tfsdk:"rotate_threshold_mb" json:"rotate_threshold_mb,optional"`
-	Tags                    *map[string]types.String       `tfsdk:"tags" json:"tags,optional"`
+	Tags                    *map[string]types.String       `tfsdk:"tags" json:"tags,computed_optional"`
 	EscapeSpecialCharacters types.Bool                     `tfsdk:"escape_special_characters" json:"escape_special_characters,computed_optional"`
 	FieldDelimiter          types.String                   `tfsdk:"field_delimiter" json:"field_delimiter,computed_optional"`
 	FieldSeparator          types.String                   `tfsdk:"field_separator" json:"field_separator,computed_optional"`
@@ -39,5 +43,23 @@ func (m CDNLogsUploaderPolicyModel) MarshalJSON() (data []byte, err error) {
 }
 
 func (m CDNLogsUploaderPolicyModel) MarshalJSONForUpdate(state CDNLogsUploaderPolicyModel) (data []byte, err error) {
-	return apijson.MarshalForPatch(m, state)
+	planTags := m.Tags
+	// Prevent MarshalForPatch from patching tags key-by-key (which sends null
+	// for removed keys). We'll inject the full tags value below instead.
+	m.Tags = state.Tags
+	result, err := apijson.MarshalForPatch(m, state)
+	if err != nil {
+		return nil, err
+	}
+	if !reflect.DeepEqual(planTags, state.Tags) {
+		tags := map[string]string{}
+		if planTags != nil {
+			for k, v := range *planTags {
+				tags[k] = v.ValueString()
+			}
+		}
+		tagsJSON, _ := json.Marshal(tags)
+		result, _ = sjson.SetRawBytes(result, "tags", tagsJSON)
+	}
+	return result, nil
 }
