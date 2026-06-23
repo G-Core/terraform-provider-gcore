@@ -1,5 +1,42 @@
 # Changelog
 
+## [2.0.0-alpha.9](https://github.com/G-Core/terraform-provider-gcore/compare/v2.0.0-alpha.8...v2.0.0-alpha.9) (2026-06-23)
+
+
+### Features
+
+* initial stlc build ([bde9f8d](https://github.com/G-Core/terraform-provider-gcore/commit/bde9f8d5ffb79712bd7c97ae49c361af32a58426))
+
+
+### Bug Fixes
+
+* drop generated scripts/mock from custom-code seal ([d455c47](https://github.com/G-Core/terraform-provider-gcore/commit/d455c473cd93c13367230cf37454955345ad24ba))
+* drop generated scripts/mock from custom-code seal ([663416e](https://github.com/G-Core/terraform-provider-gcore/commit/663416e6b53911b3796280c0940e9a30c0a6dee4))
+
+
+### Reverts
+
+* "chore: change description" ([13d3d8c](https://github.com/G-Core/terraform-provider-gcore/commit/13d3d8c5e30480aab004e3281d601af409dea32d))
+* "chore: change description" ([108a62d](https://github.com/G-Core/terraform-provider-gcore/commit/108a62d7c8c3f273fbf731bbf19ee4aad97cc51b))
+
+
+### Chores
+
+* change description ([7193383](https://github.com/G-Core/terraform-provider-gcore/commit/7193383647c331c5121c941ac008b4b5bb00fac7))
+* change description ([3367faa](https://github.com/G-Core/terraform-provider-gcore/commit/3367faa54d7e974bf98008121242d45decc56ed7))
+* **release:** seed release-please manifest to 2.0.0-alpha.8 ([91a951d](https://github.com/G-Core/terraform-provider-gcore/commit/91a951d211e22c4498e414ab14b1f5e7d23b7fa2))
+* reseal custom code from G-Core/terraform-provider-gcore-staging@91a951d211e22c4498e414ab14b1f5e7d23b7fa2 ([aa578fa](https://github.com/G-Core/terraform-provider-gcore/commit/aa578fa4cbaa168348467eb23f342159cf5050fe))
+
+
+### Documentation
+
+* **terraform:** regenerate from custom templates ([ac368bb](https://github.com/G-Core/terraform-provider-gcore/commit/ac368bb3860faca471a01fa84ad357db5fcceedc))
+* **terraform:** regenerate from custom templates ([ca66193](https://github.com/G-Core/terraform-provider-gcore/commit/ca66193b8915ee00f57019b28eb169de5cb335ca))
+* **terraform:** regenerate from custom templates ([f0aeaf3](https://github.com/G-Core/terraform-provider-gcore/commit/f0aeaf3bc1a6eb8ec3a9880903ca9b2d50f44e63))
+* **terraform:** regenerate from custom templates ([bb6fd42](https://github.com/G-Core/terraform-provider-gcore/commit/bb6fd42c1f002fc42b8ae2966956c783a2a041cd))
+* **terraform:** regenerate from custom templates ([41329b0](https://github.com/G-Core/terraform-provider-gcore/commit/41329b074904bba6b7d2f9f20c92ef02c650c3d8))
+* **terraform:** regenerate from custom templates ([d0f52ad](https://github.com/G-Core/terraform-provider-gcore/commit/d0f52ad5fc57735d9ff30fc920fe0e4f1cec7406))
+
 ## 2.0.0-alpha.8 (2026-05-20)
 
 Full Changelog: [v2.0.0-alpha.7...v2.0.0-alpha.8](https://github.com/G-Core/terraform-provider-gcore/compare/v2.0.0-alpha.7...v2.0.0-alpha.8)
