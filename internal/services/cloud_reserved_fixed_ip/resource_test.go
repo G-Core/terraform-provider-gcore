@@ -75,6 +75,10 @@ func TestAccCloudReservedFixedIP_basic(t *testing.T) {
 						tfjsonpath.New("fixed_ip_address"), knownvalue.NotNull()),
 					statecheck.ExpectKnownValue("gcore_cloud_reserved_fixed_ip.test",
 						tfjsonpath.New("name"), knownvalue.NotNull()),
+					statecheck.ExpectKnownValue("gcore_cloud_reserved_fixed_ip.test",
+						tfjsonpath.New("type"), knownvalue.StringExact("external")),
+					statecheck.ExpectKnownValue("gcore_cloud_reserved_fixed_ip.test",
+						tfjsonpath.New("is_vip"), knownvalue.Bool(false)),
 				},
 			},
 		},
@@ -380,4 +384,206 @@ resource "gcore_cloud_reserved_fixed_ip" "test" {
   type       = "external"
   is_vip     = %[3]t
 }`, acctest.ProjectID(), acctest.RegionID(), isVIP)
+}
+
+func TestAccCloudReservedFixedIP_subnet(t *testing.T) {
+	rName := acctest.RandomName()
+	comparePortIDSame := statecheck.CompareValue(compare.ValuesSame())
+
+	resource.ParallelTest(t, resource.TestCase{
+		PreCheck:                 func() { acctest.PreCheck(t) },
+		ProtoV6ProviderFactories: acctest.ProtoV6ProviderFactories,
+		CheckDestroy:             testAccCheckCloudReservedFixedIPDestroy,
+		Steps: []resource.TestStep{
+			{
+				Config: testAccCloudReservedFixedIPConfigSubnetIsVip(rName, false),
+				ConfigStateChecks: []statecheck.StateCheck{
+					statecheck.ExpectKnownValue("gcore_cloud_reserved_fixed_ip.test",
+						tfjsonpath.New("type"), knownvalue.StringExact("subnet")),
+					statecheck.ExpectKnownValue("gcore_cloud_reserved_fixed_ip.test",
+						tfjsonpath.New("is_vip"), knownvalue.Bool(false)),
+					statecheck.ExpectKnownValue("gcore_cloud_reserved_fixed_ip.test",
+						tfjsonpath.New("is_external"), knownvalue.Bool(false)),
+					statecheck.ExpectKnownValue("gcore_cloud_reserved_fixed_ip.test",
+						tfjsonpath.New("port_id"), knownvalue.NotNull()),
+					statecheck.ExpectKnownValue("gcore_cloud_reserved_fixed_ip.test",
+						tfjsonpath.New("subnet_id"), knownvalue.NotNull()),
+					statecheck.ExpectKnownValue("gcore_cloud_reserved_fixed_ip.test",
+						tfjsonpath.New("network_id"), knownvalue.NotNull()),
+					statecheck.ExpectKnownValue("gcore_cloud_reserved_fixed_ip.test",
+						tfjsonpath.New("fixed_ip_address"), knownvalue.NotNull()),
+					comparePortIDSame.AddStateValue(
+						"gcore_cloud_reserved_fixed_ip.test",
+						tfjsonpath.New("port_id"),
+					),
+				},
+			},
+			{
+				Config: testAccCloudReservedFixedIPConfigSubnetIsVip(rName, true),
+				ConfigStateChecks: []statecheck.StateCheck{
+					statecheck.ExpectKnownValue("gcore_cloud_reserved_fixed_ip.test",
+						tfjsonpath.New("is_vip"), knownvalue.Bool(true)),
+					comparePortIDSame.AddStateValue(
+						"gcore_cloud_reserved_fixed_ip.test",
+						tfjsonpath.New("port_id"),
+					),
+				},
+			},
+			{
+				Config: testAccCloudReservedFixedIPConfigSubnetIsVip(rName, false),
+				ConfigStateChecks: []statecheck.StateCheck{
+					statecheck.ExpectKnownValue("gcore_cloud_reserved_fixed_ip.test",
+						tfjsonpath.New("is_vip"), knownvalue.Bool(false)),
+					comparePortIDSame.AddStateValue(
+						"gcore_cloud_reserved_fixed_ip.test",
+						tfjsonpath.New("port_id"),
+					),
+				},
+			},
+		},
+	})
+}
+
+func TestAccCloudReservedFixedIP_anySubnet(t *testing.T) {
+	rName := acctest.RandomName()
+	comparePortIDSame := statecheck.CompareValue(compare.ValuesSame())
+
+	resource.ParallelTest(t, resource.TestCase{
+		PreCheck:                 func() { acctest.PreCheck(t) },
+		ProtoV6ProviderFactories: acctest.ProtoV6ProviderFactories,
+		CheckDestroy:             testAccCheckCloudReservedFixedIPDestroy,
+		Steps: []resource.TestStep{
+			{
+				Config: testAccCloudReservedFixedIPConfigAnySubnetIsVip(rName, false),
+				ConfigStateChecks: []statecheck.StateCheck{
+					statecheck.ExpectKnownValue("gcore_cloud_reserved_fixed_ip.test",
+						tfjsonpath.New("type"), knownvalue.StringExact("any_subnet")),
+					statecheck.ExpectKnownValue("gcore_cloud_reserved_fixed_ip.test",
+						tfjsonpath.New("is_vip"), knownvalue.Bool(false)),
+					statecheck.ExpectKnownValue("gcore_cloud_reserved_fixed_ip.test",
+						tfjsonpath.New("is_external"), knownvalue.Bool(false)),
+					statecheck.ExpectKnownValue("gcore_cloud_reserved_fixed_ip.test",
+						tfjsonpath.New("port_id"), knownvalue.NotNull()),
+					statecheck.ExpectKnownValue("gcore_cloud_reserved_fixed_ip.test",
+						tfjsonpath.New("subnet_id"), knownvalue.NotNull()),
+					statecheck.ExpectKnownValue("gcore_cloud_reserved_fixed_ip.test",
+						tfjsonpath.New("network_id"), knownvalue.NotNull()),
+					statecheck.ExpectKnownValue("gcore_cloud_reserved_fixed_ip.test",
+						tfjsonpath.New("fixed_ip_address"), knownvalue.NotNull()),
+					comparePortIDSame.AddStateValue(
+						"gcore_cloud_reserved_fixed_ip.test",
+						tfjsonpath.New("port_id"),
+					),
+				},
+			},
+			{
+				Config: testAccCloudReservedFixedIPConfigAnySubnetIsVip(rName, true),
+				ConfigStateChecks: []statecheck.StateCheck{
+					statecheck.ExpectKnownValue("gcore_cloud_reserved_fixed_ip.test",
+						tfjsonpath.New("is_vip"), knownvalue.Bool(true)),
+					comparePortIDSame.AddStateValue(
+						"gcore_cloud_reserved_fixed_ip.test",
+						tfjsonpath.New("port_id"),
+					),
+				},
+			},
+			{
+				Config: testAccCloudReservedFixedIPConfigAnySubnetIsVip(rName, false),
+				ConfigStateChecks: []statecheck.StateCheck{
+					statecheck.ExpectKnownValue("gcore_cloud_reserved_fixed_ip.test",
+						tfjsonpath.New("is_vip"), knownvalue.Bool(false)),
+					comparePortIDSame.AddStateValue(
+						"gcore_cloud_reserved_fixed_ip.test",
+						tfjsonpath.New("port_id"),
+					),
+				},
+			},
+		},
+	})
+}
+
+func testAccCloudReservedFixedIPConfigAnySubnetIsVip(name string, isVip bool) string {
+	return fmt.Sprintf(`
+resource "gcore_cloud_network" "test" {
+  project_id = %[1]s
+  region_id  = %[2]s
+  name       = "tf-test-net-%[3]s"
+  type       = "vxlan"
+}
+
+resource "gcore_cloud_network_subnet" "test" {
+  project_id  = %[1]s
+  region_id   = %[2]s
+  name        = "tf-test-subnet-%[3]s"
+  network_id  = gcore_cloud_network.test.id
+  cidr        = "10.0.0.0/24"
+  enable_dhcp = true
+}
+
+resource "gcore_cloud_reserved_fixed_ip" "test" {
+  project_id = %[1]s
+  region_id  = %[2]s
+  type       = "any_subnet"
+  network_id = gcore_cloud_network.test.id
+  is_vip     = %[4]t
+
+  depends_on = [gcore_cloud_network_subnet.test]
+}`, acctest.ProjectID(), acctest.RegionID(), name, isVip)
+}
+
+func TestAccCloudReservedFixedIP_ipAddress(t *testing.T) {
+	rName := acctest.RandomName()
+
+	resource.ParallelTest(t, resource.TestCase{
+		PreCheck:                 func() { acctest.PreCheck(t) },
+		ProtoV6ProviderFactories: acctest.ProtoV6ProviderFactories,
+		CheckDestroy:             testAccCheckCloudReservedFixedIPDestroy,
+		Steps: []resource.TestStep{
+			{
+				Config: testAccCloudReservedFixedIPConfigIPAddress(rName, "10.0.0.100"),
+				ConfigStateChecks: []statecheck.StateCheck{
+					statecheck.ExpectKnownValue("gcore_cloud_reserved_fixed_ip.test",
+						tfjsonpath.New("type"), knownvalue.StringExact("ip_address")),
+					statecheck.ExpectKnownValue("gcore_cloud_reserved_fixed_ip.test",
+						tfjsonpath.New("is_external"), knownvalue.Bool(false)),
+					statecheck.ExpectKnownValue("gcore_cloud_reserved_fixed_ip.test",
+						tfjsonpath.New("fixed_ip_address"), knownvalue.StringExact("10.0.0.100")),
+					statecheck.ExpectKnownValue("gcore_cloud_reserved_fixed_ip.test",
+						tfjsonpath.New("port_id"), knownvalue.NotNull()),
+					statecheck.ExpectKnownValue("gcore_cloud_reserved_fixed_ip.test",
+						tfjsonpath.New("subnet_id"), knownvalue.NotNull()),
+					statecheck.ExpectKnownValue("gcore_cloud_reserved_fixed_ip.test",
+						tfjsonpath.New("network_id"), knownvalue.NotNull()),
+				},
+			},
+		},
+	})
+}
+
+func testAccCloudReservedFixedIPConfigIPAddress(name string, ipAddress string) string {
+	return fmt.Sprintf(`
+resource "gcore_cloud_network" "test" {
+  project_id = %[1]s
+  region_id  = %[2]s
+  name       = "tf-test-net-%[3]s"
+  type       = "vxlan"
+}
+
+resource "gcore_cloud_network_subnet" "test" {
+  project_id  = %[1]s
+  region_id   = %[2]s
+  name        = "tf-test-subnet-%[3]s"
+  network_id  = gcore_cloud_network.test.id
+  cidr        = "10.0.0.0/24"
+  enable_dhcp = true
+}
+
+resource "gcore_cloud_reserved_fixed_ip" "test" {
+  project_id = %[1]s
+  region_id  = %[2]s
+  type       = "ip_address"
+  network_id = gcore_cloud_network.test.id
+  subnet_id  = gcore_cloud_network_subnet.test.id
+  ip_address = %[4]q
+}`, acctest.ProjectID(), acctest.RegionID(), name, ipAddress)
 }
