@@ -7,19 +7,18 @@ inputs:
   cache-dependency-path:
     required: false
     description: path to dependency files for caching
+  go-repo-read-token:
+    required: false
+    description: fine-grained GitHub PAT with Contents:Read on the Go SDK repo (needed when the SDK repo is private)
 runs:
   using: composite
   steps:
-    - name: Verify Go SDK module is accessible
+    - name: Authenticate git for the private Go SDK repo
+      if: inputs.go-repo-read-token != ''
       shell: bash
       env:
         GO_MODULE_REPO: ${{ github.repository == 'G-Core/terraform-provider-gcore-staging' && 'G-Core/gcore-go-staging' || 'G-Core/gcore-go' }}
-      run: |
-        if ! git ls-remote --exit-code "https://github.com/${GO_MODULE_REPO}" >/dev/null 2>&1; then
-          echo "::error::Cannot access the Go SDK module at https://github.com/${GO_MODULE_REPO}."
-          echo "::error::If the repo is private, uncomment the 'Authenticate git for the private Go SDK repo' step in .github/workflows/ci.yml and add a GO_REPO_READ_TOKEN secret to this repo."
-          exit 1
-        fi
+      run: git config --global url."https://x-access-token:${{ inputs.go-repo-read-token }}@github.com/${GO_MODULE_REPO}".insteadOf "https://github.com/${GO_MODULE_REPO}"
 
     - name: Setup go
       uses: actions/setup-go@40f1582b2485089dde7abd97c1529aa768e1baff # v5.6.0
