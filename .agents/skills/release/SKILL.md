@@ -28,8 +28,12 @@ allowed-tools: >
   `Read`
 - **Never**: modify source code, force-push, delete branches, or merge without
   explicit user confirmation
-- **Release PRs** are created by `stainless-app[bot]` with title
-  `release: {version}`
+- **Release PRs** are created by `release-please` (the stock
+  `googleapis/release-please-action` in `.github/workflows/release-please.yml`,
+  authenticated with `RELEASE_PLEASE_TOKEN`), from a head branch starting with
+  `release-please--branches--v2`, with title `release: {version}`. The author is
+  the token's user, not `stainless-app[bot]` (the legacy Stainless App is no
+  longer used).
 
 ## Workflow
 
@@ -39,10 +43,12 @@ Execute steps 1-6 in order. Present findings at each step before proceeding.
 
 ```bash
 gh pr list --repo G-Core/terraform-provider-gcore --state open \
-  --app stainless-app --json number,title,author,url,createdAt
+  --json number,title,author,url,createdAt,headRefName
 ```
 
-Find the PR whose title starts with `release: `.
+Find the open PR whose title starts with `release: ` and whose head branch starts
+with `release-please--branches--v2` (release-please opens it against the v2 branch;
+do not rely on the author being `stainless-app`).
 
 - If **no open release PR** exists, inform the user and stop.
 - If found, display: PR number, title (contains version), URL, creation date.
@@ -234,7 +240,7 @@ If merge fails, report the error and stop.
 
 ### Step 6 — Update the GitHub Release
 
-After merge, `stainless-app[bot]` auto-creates a GitHub Release. GoReleaser
+After merge, `release-please` (the stock action) auto-creates the tag and GitHub Release. GoReleaser
 then builds and attaches provider binaries for all platforms (this is handled
 by CI, not this skill).
 
