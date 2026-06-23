@@ -22,7 +22,7 @@ terraform {
     gcore = {
       source = "G-Core/gcore"
       # Change the version to the one you want to test
-      version = "2.0.0-alpha.8"
+      version = "2.0.0-alpha.8" # x-release-please-version
     }
   }
 }
