@@ -1,5 +1,25 @@
 # Changelog
 
+## [2.0.0-alpha.10](https://github.com/G-Core/terraform-provider-gcore/compare/v2.0.0-alpha.9...v2.0.0-alpha.10) (2026-06-24)
+
+
+### Features
+
+* **cdn:** support gcore_cdn_client_config data source ([492b067](https://github.com/G-Core/terraform-provider-gcore/commit/492b067828efc50a747192a604cfb5cbcdd9199f))
+* **cdn:** support logs uploader configs in Terraform ([4a5dafb](https://github.com/G-Core/terraform-provider-gcore/commit/4a5dafbcb7faef5851fb799845f4f72c8d597864))
+* **cdn:** support logs uploader policies in Terraform ([8464408](https://github.com/G-Core/terraform-provider-gcore/commit/846440832de7bba1bb7215be2785d3675c798fb2))
+
+
+### Bug Fixes
+
+* **cdn:** drift fixes + acceptance tests for logs uploader config ([6ed291b](https://github.com/G-Core/terraform-provider-gcore/commit/6ed291bf09446bc77b05786c183f4bfce2e5071b))
+* **cdn:** drift/patch fixes + acceptance tests for logs uploader policy ([25c23f5](https://github.com/G-Core/terraform-provider-gcore/commit/25c23f5e4f5c94513fd827c46fc54e82402c055f))
+
+
+### Documentation
+
+* **terraform:** regenerate from custom templates ([d6e4e28](https://github.com/G-Core/terraform-provider-gcore/commit/d6e4e28b9f223b93abca59f547469979f897649f))
+
 ## [2.0.0-alpha.9](https://github.com/G-Core/terraform-provider-gcore/compare/v2.0.0-alpha.8...v2.0.0-alpha.9) (2026-06-23)
 
 
