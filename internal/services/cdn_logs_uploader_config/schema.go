@@ -5,6 +5,7 @@ package cdn_logs_uploader_config
 import (
 	"context"
 
+	"github.com/G-Core/terraform-provider-gcore/internal/customfield"
 	"github.com/hashicorp/terraform-plugin-framework-jsontypes/jsontypes"
 	"github.com/hashicorp/terraform-plugin-framework-timetypes/timetypes"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
@@ -12,6 +13,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/booldefault"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/int64planmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringplanmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 )
 
@@ -40,6 +42,8 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 			"resources": schema.ListAttribute{
 				Description: "List of resource IDs to which the config should be applied.",
 				Optional:    true,
+				Computed:    true,
+				CustomType:  customfield.NewListType[types.Int64](ctx),
 				ElementType: types.Int64Type,
 			},
 			"enabled": schema.BoolAttribute{
@@ -55,13 +59,15 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 				Default:     booldefault.StaticBool(false),
 			},
 			"client_id": schema.Int64Attribute{
-				Description: "Client that owns the config.",
-				Computed:    true,
+				Description:   "Client that owns the config.",
+				Computed:      true,
+				PlanModifiers: []planmodifier.Int64{int64planmodifier.UseStateForUnknown()},
 			},
 			"created": schema.StringAttribute{
-				Description: "Time when the config was created.",
-				Computed:    true,
-				CustomType:  timetypes.RFC3339Type{},
+				Description:   "Time when the config was created.",
+				Computed:      true,
+				CustomType:    timetypes.RFC3339Type{},
+				PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
 			},
 			"updated": schema.StringAttribute{
 				Description: "Time when the config was updated.",
