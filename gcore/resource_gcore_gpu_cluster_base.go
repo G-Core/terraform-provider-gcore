@@ -38,9 +38,35 @@ func resourceGPUCluster(gpuNodeType GPUNodeType) *schema.Resource {
 		DeleteContext: func(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 			return resourceGPUClusterDelete(ctx, d, m, gpuNodeType)
 		},
-		Description: fmt.Sprintf("Manages a %s GPU cluster", gpuNodeType),
-		Schema:      resourceGPUClusterSchema(),
+		Description:   fmt.Sprintf("Manages a %s GPU cluster", gpuNodeType),
+		Schema:        resourceGPUClusterSchema(),
+		CustomizeDiff: resourceGPUClusterCustomizeDiff,
 	}
+}
+
+// resourceGPUClusterCustomizeDiff fails the plan early when the deprecated
+// cluster-wide security_groups is combined with per-interface security_groups,
+// which the API rejects.
+func resourceGPUClusterCustomizeDiff(_ context.Context, d *schema.ResourceDiff, _ interface{}) error {
+	v, ok := d.GetOk("servers_settings")
+	if !ok {
+		return nil
+	}
+	settingsList, ok := v.([]interface{})
+	if !ok || len(settingsList) == 0 || settingsList[0] == nil {
+		return nil
+	}
+	settingsMap := settingsList[0].(map[string]interface{})
+
+	clusterWide := 0
+	if sg, ok := settingsMap["security_groups"].([]interface{}); ok {
+		clusterWide = len(sg)
+	}
+	if clusterWide > 0 && interfacesHaveSecurityGroups(settingsMap["interface"]) {
+		return fmt.Errorf("servers_settings.security_groups (cluster-wide, deprecated) cannot be combined with " +
+			"per-interface interface.security_groups; set security groups in only one place")
+	}
+	return nil
 }
 
 func getGPUServicePath(gpuNodeType GPUNodeType) string {
@@ -179,15 +205,28 @@ func resourceGPUClusterSchema() map[string]*schema.Schema {
 										},
 									},
 								},
+								"security_groups": {
+									Type:     schema.TypeSet,
+									Optional: true,
+									Computed: true,
+									ForceNew: true,
+									Description: "Set of security group IDs applied to this interface. " +
+										"If omitted, the cluster-wide security_groups apply; if both are " +
+										"omitted, the project's default security group is applied. Cannot be " +
+										"combined with the deprecated cluster-wide security_groups.",
+									Elem: &schema.Schema{Type: schema.TypeString},
+								},
 							},
 						},
 					},
 					"security_groups": {
-						Type:        schema.TypeList,
-						Optional:    true,
-						ForceNew:    true,
-						Description: "List of security group IDs to associate with the cluster",
-						Elem:        &schema.Schema{Type: schema.TypeString},
+						Type:       schema.TypeList,
+						Optional:   true,
+						ForceNew:   true,
+						Deprecated: "Use per-interface security_groups inside the interface block instead. The cluster-wide field cannot be combined with per-interface security_groups; if omitted everywhere, the project's default security group is applied.",
+						Description: "Deprecated. List of security group IDs to associate with the cluster. " +
+							"Use per-interface security_groups inside the interface block instead.",
+						Elem: &schema.Schema{Type: schema.TypeString},
 					},
 					"volume": {
 						Type:        schema.TypeList,
@@ -640,10 +679,12 @@ func extractServerSettingsFromCluster(cluster *clusters.Cluster) (map[string]int
 			case clusters.External:
 				ifaceMap["name"] = iface.ExternalInterface.Name
 				ifaceMap["ip_family"] = string(iface.ExternalInterface.IPFamily)
+				ifaceMap["security_groups"] = securityGroupIDsFromItems(iface.ExternalInterface.SecurityGroups)
 			case clusters.Subnet:
 				ifaceMap["name"] = iface.SubnetInterface.Name
 				ifaceMap["network_id"] = iface.SubnetInterface.NetworkID
 				ifaceMap["subnet_id"] = iface.SubnetInterface.SubnetID
+				ifaceMap["security_groups"] = securityGroupIDsFromItems(iface.SubnetInterface.SecurityGroups)
 				if iface.SubnetInterface.FloatingIP != nil {
 					ifaceMap["floating_ip"] = map[string]string{"source": iface.SubnetInterface.FloatingIP.Source}
 				}
@@ -652,6 +693,7 @@ func extractServerSettingsFromCluster(cluster *clusters.Cluster) (map[string]int
 				ifaceMap["network_id"] = iface.AnySubnetInterface.NetworkID
 				ifaceMap["ip_address"] = iface.AnySubnetInterface.IPAddress
 				ifaceMap["ip_family"] = string(iface.AnySubnetInterface.IPFamily)
+				ifaceMap["security_groups"] = securityGroupIDsFromItems(iface.AnySubnetInterface.SecurityGroups)
 				if iface.AnySubnetInterface.FloatingIP != nil {
 					ifaceMap["floating_ip"] = map[string]string{"source": iface.AnySubnetInterface.FloatingIP.Source}
 				}
@@ -726,6 +768,13 @@ func extractServerSettings(d *schema.ResourceData) (clusters.ServerSettingsOpts,
 		if secGroups, ok := settingsMap["security_groups"]; ok {
 			serverSettings.SecurityGroups = extractSecurityGroups(secGroups.([]interface{}))
 		}
+		// The API rejects combining the deprecated cluster-wide security_groups
+		// with per-interface security_groups; fail fast with a clear message.
+		if len(serverSettings.SecurityGroups) > 0 && interfacesHaveSecurityGroups(settingsMap["interface"]) {
+			return serverSettings, fmt.Errorf(
+				"servers_settings.security_groups (cluster-wide, deprecated) cannot be combined with " +
+					"per-interface interface.security_groups; set security groups in only one place")
+		}
 		if userData, ok := settingsMap["user_data"].(string); ok {
 			serverSettings.UserData = utils.StringToPointer(userData)
 		}
@@ -747,31 +796,36 @@ func extractInterfaces(interfaces any) []clusters.InterfaceOpts {
 		ifaceType := ifaceMap["type"].(string)
 		var iface clusters.InterfaceOpts
 
+		ifaceSecurityGroups := extractInterfaceSecurityGroups(ifaceMap)
+
 		switch clusters.InterfaceType(ifaceType) {
 		case clusters.External:
 			iface = clusters.ExternalInterfaceOpts{
-				Name:     utils.StringToPointer(ifaceMap["name"].(string)),
-				Type:     ifaceType,
-				IPFamily: clusters.IPFamilyType(ifaceMap["ip_family"].(string)),
+				Name:           utils.StringToPointer(ifaceMap["name"].(string)),
+				Type:           ifaceType,
+				IPFamily:       clusters.IPFamilyType(ifaceMap["ip_family"].(string)),
+				SecurityGroups: ifaceSecurityGroups,
 			}
 		case clusters.Subnet:
 			floatingIPOpts := extractFloatingIP(ifaceMap)
 			iface = clusters.SubnetInterfaceOpts{
-				NetworkID:  ifaceMap["network_id"].(string),
-				Name:       utils.StringToPointer(ifaceMap["name"].(string)),
-				Type:       ifaceType,
-				SubnetID:   ifaceMap["subnet_id"].(string),
-				FloatingIP: floatingIPOpts,
+				NetworkID:      ifaceMap["network_id"].(string),
+				Name:           utils.StringToPointer(ifaceMap["name"].(string)),
+				Type:           ifaceType,
+				SubnetID:       ifaceMap["subnet_id"].(string),
+				FloatingIP:     floatingIPOpts,
+				SecurityGroups: ifaceSecurityGroups,
 			}
 		case clusters.AnySubnet:
 			floatingIPOpts := extractFloatingIP(ifaceMap)
 			iface = clusters.AnySubnetInterfaceOpts{
-				NetworkID:  ifaceMap["network_id"].(string),
-				Name:       utils.StringToPointer(ifaceMap["name"].(string)),
-				Type:       ifaceType,
-				IPFamily:   clusters.IPFamilyType(ifaceMap["ip_family"].(string)),
-				IPAddress:  utils.StringToPointer(ifaceMap["ip_address"].(string)),
-				FloatingIP: floatingIPOpts,
+				NetworkID:      ifaceMap["network_id"].(string),
+				Name:           utils.StringToPointer(ifaceMap["name"].(string)),
+				Type:           ifaceType,
+				IPFamily:       clusters.IPFamilyType(ifaceMap["ip_family"].(string)),
+				IPAddress:      utils.StringToPointer(ifaceMap["ip_address"].(string)),
+				FloatingIP:     floatingIPOpts,
+				SecurityGroups: ifaceSecurityGroups,
 			}
 		}
 		result = append(result, iface)
@@ -842,6 +896,48 @@ func extractSecurityGroups(securityGroups []interface{}) []gcorecloud.ItemID {
 		}
 	}
 	return result
+}
+
+// extractInterfaceSecurityGroups reads the per-interface security_groups set
+// from a single interface schema block.
+func extractInterfaceSecurityGroups(ifaceMap map[string]interface{}) []gcorecloud.ItemID {
+	sg, ok := ifaceMap["security_groups"]
+	if !ok || sg == nil {
+		return nil
+	}
+	if set, ok := sg.(*schema.Set); ok {
+		return extractSecurityGroups(set.List())
+	}
+	return nil
+}
+
+// interfacesHaveSecurityGroups reports whether any interface block sets
+// per-interface security_groups.
+func interfacesHaveSecurityGroups(interfaces any) bool {
+	set, ok := interfaces.(*schema.Set)
+	if !ok {
+		return false
+	}
+	for _, item := range set.List() {
+		ifaceMap := item.(map[string]interface{})
+		if len(extractInterfaceSecurityGroups(ifaceMap)) > 0 {
+			return true
+		}
+	}
+	return false
+}
+
+// securityGroupIDsFromItems flattens resolved per-interface security groups
+// (returned by the API as {id,name}) into a list of IDs for the TF state.
+func securityGroupIDsFromItems(sgs []gcorecloud.ItemIDName) []string {
+	if len(sgs) == 0 {
+		return nil
+	}
+	ids := make([]string, 0, len(sgs))
+	for _, sg := range sgs {
+		ids = append(ids, sg.ID)
+	}
+	return ids
 }
 
 func extractCredentials(credentials []interface{}) *clusters.ServerCredentialsOpts {
