@@ -2,7 +2,7 @@ Terraform Gcore Provider
 ------------------------------
 - Terraform provider page: https://registry.terraform.io/providers/G-Core/gcore
 
-<img src="https://gcore.com/img/logo.svg" data-src="https://gcore.com/img/logo.svg" alt="Gcore" width="500px" width="500px"> 
+<img src="https://assets.gcore.pro/site-media/uploads/gcore_logo_orange_b7ea43b38e.svg" data-src="https://assets.gcore.pro/site-media/uploads/gcore_logo_orange_b7ea43b38e.svg" alt="Gcore" width="500px" width="500px"> 
 ====================================================================================
 
 - [![Gitter chat](https://badges.gitter.im/hashicorp-terraform/Lobby.png)](https://gitter.im/hashicorp-terraform/Lobby)
