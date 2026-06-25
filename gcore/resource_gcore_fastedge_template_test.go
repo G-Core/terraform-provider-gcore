@@ -16,9 +16,16 @@ var baseTemplateJson string = `
 	"params": [
 		{
 			"name": "param1",
-			"data_type": "string",
+			"data_type": "enum",
 			"mandatory": true,
-			"descr": "param1 description"
+			"descr": "param1 description",
+			"metadata": "{\"allowed\":[\"a\",\"b\"]}"
+		},
+		{
+			"name": "param2",
+			"data_type": "bool",
+			"mandatory": false,
+			"descr": "param2 description"
 		}
 	]
 }
@@ -31,10 +38,17 @@ var baseTemplate sdk.Template = sdk.Template{
 	LongDescr:  ptr("long description"),
 	Params: []sdk.TemplateParam{
 		{
+			Name:      "param2",
+			DataType:  "bool",
+			Mandatory: false,
+			Descr:     ptr("param2 description"),
+		},
+		{
 			Name:      "param1",
-			DataType:  "string",
+			DataType:  "enum",
 			Mandatory: true,
 			Descr:     ptr("param1 description"),
+			Metadata:  ptr(`{"allowed":["a","b"]}`),
 		},
 	},
 }
@@ -44,9 +58,15 @@ var baseTfFastEdgeTemplConfig string = `resource "gcore_fastedge_template" "test
 	long_descr = "long description"
 	param {
 		name = "param1"
-		type = "string"
+		type = "enum"
 		mandatory = true
 		descr = "param1 description"
+		metadata = "{\"allowed\":[\"a\",\"b\"]}"
+	}
+	param {
+		name = "param2"
+		type = "bool"
+		descr = "param2 description"
 	}
 `
 
@@ -120,10 +140,19 @@ func TestFastEdgeTemplate_basic(t *testing.T) {
 					resource.TestCheckResourceAttr("gcore_fastedge_template.test", "binary", "314"),
 					resource.TestCheckResourceAttr("gcore_fastedge_template.test", "short_descr", "short description"),
 					resource.TestCheckResourceAttr("gcore_fastedge_template.test", "long_descr", "long description"),
-					resource.TestCheckResourceAttr("gcore_fastedge_template.test", "param.0.name", "param1"),
-					resource.TestCheckResourceAttr("gcore_fastedge_template.test", "param.0.type", "string"),
-					resource.TestCheckResourceAttr("gcore_fastedge_template.test", "param.0.mandatory", "true"),
-					resource.TestCheckResourceAttr("gcore_fastedge_template.test", "param.0.descr", "param1 description"),
+					resource.TestCheckTypeSetElemNestedAttrs("gcore_fastedge_template.test", "param.*", map[string]string{
+						"name":      "param1",
+						"type":      "enum",
+						"mandatory": "true",
+						"descr":     "param1 description",
+						"metadata":  `{"allowed":["a","b"]}`,
+					}),
+					resource.TestCheckTypeSetElemNestedAttrs("gcore_fastedge_template.test", "param.*", map[string]string{
+						"name":      "param2",
+						"type":      "bool",
+						"mandatory": "false",
+						"descr":     "param2 description",
+					}),
 				),
 			},
 			{ // update resource
@@ -136,10 +165,19 @@ func TestFastEdgeTemplate_basic(t *testing.T) {
 					resource.TestCheckResourceAttr("gcore_fastedge_template.test", "binary", "314"),
 					resource.TestCheckResourceAttr("gcore_fastedge_template.test", "short_descr", "short description"),
 					resource.TestCheckResourceAttr("gcore_fastedge_template.test", "long_descr", "long description"),
-					resource.TestCheckResourceAttr("gcore_fastedge_template.test", "param.0.name", "param1"),
-					resource.TestCheckResourceAttr("gcore_fastedge_template.test", "param.0.type", "string"),
-					resource.TestCheckResourceAttr("gcore_fastedge_template.test", "param.0.mandatory", "true"),
-					resource.TestCheckResourceAttr("gcore_fastedge_template.test", "param.0.descr", "param1 description"),
+					resource.TestCheckTypeSetElemNestedAttrs("gcore_fastedge_template.test", "param.*", map[string]string{
+						"name":      "param1",
+						"type":      "enum",
+						"mandatory": "true",
+						"descr":     "param1 description",
+						"metadata":  `{"allowed":["a","b"]}`,
+					}),
+					resource.TestCheckTypeSetElemNestedAttrs("gcore_fastedge_template.test", "param.*", map[string]string{
+						"name":      "param2",
+						"type":      "bool",
+						"mandatory": "false",
+						"descr":     "param2 description",
+					}),
 				),
 			},
 		},
@@ -212,10 +250,19 @@ func TestFastEdgeTemplate_disappear(t *testing.T) {
 					resource.TestCheckResourceAttr("gcore_fastedge_template.test", "binary", "314"),
 					resource.TestCheckResourceAttr("gcore_fastedge_template.test", "short_descr", "short description"),
 					resource.TestCheckResourceAttr("gcore_fastedge_template.test", "long_descr", "long description"),
-					resource.TestCheckResourceAttr("gcore_fastedge_template.test", "param.0.name", "param1"),
-					resource.TestCheckResourceAttr("gcore_fastedge_template.test", "param.0.type", "string"),
-					resource.TestCheckResourceAttr("gcore_fastedge_template.test", "param.0.mandatory", "true"),
-					resource.TestCheckResourceAttr("gcore_fastedge_template.test", "param.0.descr", "param1 description"),
+					resource.TestCheckTypeSetElemNestedAttrs("gcore_fastedge_template.test", "param.*", map[string]string{
+						"name":      "param1",
+						"type":      "enum",
+						"mandatory": "true",
+						"descr":     "param1 description",
+						"metadata":  `{"allowed":["a","b"]}`,
+					}),
+					resource.TestCheckTypeSetElemNestedAttrs("gcore_fastedge_template.test", "param.*", map[string]string{
+						"name":      "param2",
+						"type":      "bool",
+						"mandatory": "false",
+						"descr":     "param2 description",
+					}),
 				),
 			},
 			{ // resource disappeared - re-create
@@ -228,10 +275,19 @@ func TestFastEdgeTemplate_disappear(t *testing.T) {
 					resource.TestCheckResourceAttr("gcore_fastedge_template.test", "binary", "314"),
 					resource.TestCheckResourceAttr("gcore_fastedge_template.test", "short_descr", "short description"),
 					resource.TestCheckResourceAttr("gcore_fastedge_template.test", "long_descr", "long description"),
-					resource.TestCheckResourceAttr("gcore_fastedge_template.test", "param.0.name", "param1"),
-					resource.TestCheckResourceAttr("gcore_fastedge_template.test", "param.0.type", "string"),
-					resource.TestCheckResourceAttr("gcore_fastedge_template.test", "param.0.mandatory", "true"),
-					resource.TestCheckResourceAttr("gcore_fastedge_template.test", "param.0.descr", "param1 description"),
+					resource.TestCheckTypeSetElemNestedAttrs("gcore_fastedge_template.test", "param.*", map[string]string{
+						"name":      "param1",
+						"type":      "enum",
+						"mandatory": "true",
+						"descr":     "param1 description",
+						"metadata":  `{"allowed":["a","b"]}`,
+					}),
+					resource.TestCheckTypeSetElemNestedAttrs("gcore_fastedge_template.test", "param.*", map[string]string{
+						"name":      "param2",
+						"type":      "bool",
+						"mandatory": "false",
+						"descr":     "param2 description",
+					}),
 				),
 			},
 		},
@@ -273,10 +329,19 @@ func TestFastEdgeTemplate_import(t *testing.T) {
 					resource.TestCheckResourceAttr("gcore_fastedge_template.test", "binary", "314"),
 					resource.TestCheckResourceAttr("gcore_fastedge_template.test", "short_descr", "short description"),
 					resource.TestCheckResourceAttr("gcore_fastedge_template.test", "long_descr", "long description"),
-					resource.TestCheckResourceAttr("gcore_fastedge_template.test", "param.0.name", "param1"),
-					resource.TestCheckResourceAttr("gcore_fastedge_template.test", "param.0.type", "string"),
-					resource.TestCheckResourceAttr("gcore_fastedge_template.test", "param.0.mandatory", "true"),
-					resource.TestCheckResourceAttr("gcore_fastedge_template.test", "param.0.descr", "param1 description"),
+					resource.TestCheckTypeSetElemNestedAttrs("gcore_fastedge_template.test", "param.*", map[string]string{
+						"name":      "param1",
+						"type":      "enum",
+						"mandatory": "true",
+						"descr":     "param1 description",
+						"metadata":  `{"allowed":["a","b"]}`,
+					}),
+					resource.TestCheckTypeSetElemNestedAttrs("gcore_fastedge_template.test", "param.*", map[string]string{
+						"name":      "param2",
+						"type":      "bool",
+						"mandatory": "false",
+						"descr":     "param2 description",
+					}),
 				),
 			},
 		},
