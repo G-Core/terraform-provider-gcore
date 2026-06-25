@@ -60,9 +60,10 @@ resource "gcore_fastedge_template" "test_template" {
 Required:
 
 - `name` (String) Parameter name.
-- `type` (String) Parameter type. Possible values are: string, number, date, time, secret.
+- `type` (String) Parameter type. Possible values are: string, number, date, time, secret, store, bool, json, enum.
 
 Optional:
 
 - `descr` (String) Parameter description.
 - `mandatory` (Boolean) Is parameter mandatory, true/false (false by default).
+- `metadata` (String) Parameter metadata.

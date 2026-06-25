@@ -15,7 +15,7 @@ import (
 	sdk "github.com/G-Core/FastEdge-client-sdk-go"
 )
 
-var paramTypes = []string{"string", "number", "date", "time", "secret"}
+var paramTypes = []string{"string", "number", "date", "time", "secret", "store", "bool", "json", "enum"}
 
 func resourceFastEdgeTemplate() *schema.Resource {
 	return &schema.Resource{
@@ -69,6 +69,11 @@ func resourceFastEdgeTemplate() *schema.Resource {
 						},
 						"descr": {
 							Description: "Parameter description.",
+							Type:        schema.TypeString,
+							Optional:    true,
+						},
+						"metadata": {
+							Description: "Parameter metadata.",
 							Type:        schema.TypeString,
 							Optional:    true,
 						},
@@ -150,6 +155,7 @@ func resourceFastEdgeTemplateRead(ctx context.Context, d *schema.ResourceData, m
 				"type":      param.DataType,
 				"mandatory": param.Mandatory,
 				"descr":     param.Descr,
+				"metadata":  param.Metadata,
 			}
 		}
 		d.Set("param", params)
@@ -230,18 +236,23 @@ func procParams(d *schema.ResourceData) []sdk.TemplateParam {
 		res := make([]sdk.TemplateParam, len(list))
 		for i, v := range list {
 			p := v.(map[string]any)
-			var descr *string
-			if tmp, ok := p["descr"].(string); ok {
-				descr = &tmp
-			}
 			res[i] = sdk.TemplateParam{
 				Name:      p["name"].(string),
 				DataType:  sdk.TemplateParamDataType(p["type"].(string)),
 				Mandatory: p["mandatory"].(bool),
-				Descr:     descr,
+				Descr:     getField[string](p, "descr"),
+				Metadata:  getField[string](p, "metadata"),
 			}
 		}
 		return res
 	}
 	return []sdk.TemplateParam{}
+}
+
+func getField[T comparable](p map[string]any, name string) *T {
+	var zero T
+	if v, ok := p[name].(T); ok && v != zero {
+		return &v
+	}
+	return nil
 }
