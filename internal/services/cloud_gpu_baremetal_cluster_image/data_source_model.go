@@ -14,27 +14,31 @@ import (
 )
 
 type CloudGPUBaremetalClusterImageDataSourceModel struct {
-	ID               types.String                                                                   `tfsdk:"id" path:"image_id,computed"`
-	ImageID          types.String                                                                   `tfsdk:"image_id" path:"image_id,required"`
-	ProjectID        types.Int64                                                                    `tfsdk:"project_id" path:"project_id,optional"`
-	RegionID         types.Int64                                                                    `tfsdk:"region_id" path:"region_id,optional"`
-	Architecture     types.String                                                                   `tfsdk:"architecture" json:"architecture,computed"`
-	CreatedAt        timetypes.RFC3339                                                              `tfsdk:"created_at" json:"created_at,computed" format:"date-time"`
-	GPUDriver        types.String                                                                   `tfsdk:"gpu_driver" json:"gpu_driver,computed"`
-	GPUDriverType    types.String                                                                   `tfsdk:"gpu_driver_type" json:"gpu_driver_type,computed"`
-	GPUDriverVersion types.String                                                                   `tfsdk:"gpu_driver_version" json:"gpu_driver_version,computed"`
-	MinDisk          types.Int64                                                                    `tfsdk:"min_disk" json:"min_disk,computed"`
-	MinRam           types.Int64                                                                    `tfsdk:"min_ram" json:"min_ram,computed"`
-	Name             types.String                                                                   `tfsdk:"name" json:"name,computed"`
-	OsDistro         types.String                                                                   `tfsdk:"os_distro" json:"os_distro,computed"`
-	OsType           types.String                                                                   `tfsdk:"os_type" json:"os_type,computed"`
-	OsVersion        types.String                                                                   `tfsdk:"os_version" json:"os_version,computed"`
-	Size             types.Int64                                                                    `tfsdk:"size" json:"size,computed"`
-	SSHKey           types.String                                                                   `tfsdk:"ssh_key" json:"ssh_key,computed"`
-	Status           types.String                                                                   `tfsdk:"status" json:"status,computed"`
-	UpdatedAt        timetypes.RFC3339                                                              `tfsdk:"updated_at" json:"updated_at,computed" format:"date-time"`
-	Visibility       types.String                                                                   `tfsdk:"visibility" json:"visibility,computed"`
-	Tags             customfield.NestedObjectList[CloudGPUBaremetalClusterImageTagsDataSourceModel] `tfsdk:"tags" json:"tags,computed"`
+	ID                 types.String                                                                   `tfsdk:"id" path:"image_id,computed"`
+	ImageID            types.String                                                                   `tfsdk:"image_id" path:"image_id,required"`
+	ProjectID          types.Int64                                                                    `tfsdk:"project_id" path:"project_id,optional"`
+	RegionID           types.Int64                                                                    `tfsdk:"region_id" path:"region_id,optional"`
+	Architecture       types.String                                                                   `tfsdk:"architecture" json:"architecture,computed"`
+	CreatedAt          timetypes.RFC3339                                                              `tfsdk:"created_at" json:"created_at,computed" format:"date-time"`
+	CudaToolkitVersion types.String                                                                   `tfsdk:"cuda_toolkit_version" json:"cuda_toolkit_version,computed"`
+	DiskFormat         types.String                                                                   `tfsdk:"disk_format" json:"disk_format,computed"`
+	GPUDriver          types.String                                                                   `tfsdk:"gpu_driver" json:"gpu_driver,computed"`
+	GPUDriverType      types.String                                                                   `tfsdk:"gpu_driver_type" json:"gpu_driver_type,computed"`
+	GPUDriverVersion   types.String                                                                   `tfsdk:"gpu_driver_version" json:"gpu_driver_version,computed"`
+	HwFirmwareType     types.String                                                                   `tfsdk:"hw_firmware_type" json:"hw_firmware_type,computed"`
+	MinDisk            types.Int64                                                                    `tfsdk:"min_disk" json:"min_disk,computed"`
+	MinRam             types.Int64                                                                    `tfsdk:"min_ram" json:"min_ram,computed"`
+	Name               types.String                                                                   `tfsdk:"name" json:"name,computed"`
+	OsDistro           types.String                                                                   `tfsdk:"os_distro" json:"os_distro,computed"`
+	OsType             types.String                                                                   `tfsdk:"os_type" json:"os_type,computed"`
+	OsVersion          types.String                                                                   `tfsdk:"os_version" json:"os_version,computed"`
+	Size               types.Int64                                                                    `tfsdk:"size" json:"size,computed"`
+	SSHKey             types.String                                                                   `tfsdk:"ssh_key" json:"ssh_key,computed"`
+	Status             types.String                                                                   `tfsdk:"status" json:"status,computed"`
+	TaskID             types.String                                                                   `tfsdk:"task_id" json:"task_id,computed"`
+	UpdatedAt          timetypes.RFC3339                                                              `tfsdk:"updated_at" json:"updated_at,computed" format:"date-time"`
+	Visibility         types.String                                                                   `tfsdk:"visibility" json:"visibility,computed"`
+	Tags               customfield.NestedObjectList[CloudGPUBaremetalClusterImageTagsDataSourceModel] `tfsdk:"tags" json:"tags,computed"`
 }
 
 func (m *CloudGPUBaremetalClusterImageDataSourceModel) toReadParams(_ context.Context) (params cloud.GPUBaremetalClusterImageGetParams, diags diag.Diagnostics) {

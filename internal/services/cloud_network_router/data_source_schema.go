@@ -20,16 +20,20 @@ func DataSourceSchema(ctx context.Context) schema.Schema {
 		MarkdownDescription: "Routers interconnect subnets and manage network routing, including external gateway connectivity and static routes.",
 		Attributes: map[string]schema.Attribute{
 			"id": schema.StringAttribute{
-				Computed: true,
+				Description: "Router ID",
+				Computed:    true,
 			},
 			"router_id": schema.StringAttribute{
-				Optional: true,
+				Description: "Router ID",
+				Optional:    true,
 			},
 			"project_id": schema.Int64Attribute{
-				Optional: true,
+				Description: "Project ID",
+				Optional:    true,
 			},
 			"region_id": schema.Int64Attribute{
-				Optional: true,
+				Description: "Region ID",
+				Optional:    true,
 			},
 			"created_at": schema.StringAttribute{
 				Description: "Datetime when the router was created",

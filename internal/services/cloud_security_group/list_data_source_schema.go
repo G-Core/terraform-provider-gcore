@@ -64,6 +64,10 @@ func ListDataSourceSchema(ctx context.Context) schema.Schema {
 							Computed:    true,
 							CustomType:  timetypes.RFC3339Type{},
 						},
+						"description": schema.StringAttribute{
+							Description: "Security group description",
+							Computed:    true,
+						},
 						"name": schema.StringAttribute{
 							Description: "Security group name",
 							Computed:    true,
@@ -109,10 +113,6 @@ func ListDataSourceSchema(ctx context.Context) schema.Schema {
 							Description: "Datetime when the security group was last updated",
 							Computed:    true,
 							CustomType:  timetypes.RFC3339Type{},
-						},
-						"description": schema.StringAttribute{
-							Description: "Security group description",
-							Computed:    true,
 						},
 						"security_group_rules": schema.ListNestedAttribute{
 							Description: "Security group rules",

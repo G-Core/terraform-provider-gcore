@@ -157,6 +157,11 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 								int64validator.Between(1, 200),
 							},
 						},
+						"security_group_ids": schema.ListAttribute{
+							Description: "Security group IDs applied to the cluster pool nodes",
+							Optional:    true,
+							ElementType: types.StringType,
+						},
 						"servergroup_policy": schema.StringAttribute{
 							Description: "Server group policy: anti-affinity, soft-anti-affinity or affinity\nAvailable values: \"affinity\", \"anti-affinity\", \"soft-anti-affinity\".",
 							Optional:    true,
@@ -397,6 +402,12 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 						Optional:    true,
 						CustomType:  customfield.NewNestedObjectType[CloudK8SClusterCniCiliumModel](ctx),
 						Attributes: map[string]schema.Attribute{
+							"cni_exclusive": schema.BoolAttribute{
+								Description: "Whether Cilium manages networking exclusively. Set to `false` to allow other CNI components to coexist with Cilium.",
+								Computed:    true,
+								Optional:    true,
+								Default:     booldefault.StaticBool(true),
+							},
 							"encryption": schema.BoolAttribute{
 								Description: "Wireguard encryption",
 								Computed:    true,

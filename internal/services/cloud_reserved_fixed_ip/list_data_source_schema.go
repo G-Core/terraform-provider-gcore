@@ -8,6 +8,7 @@ import (
 	"github.com/G-Core/terraform-provider-gcore/internal/customfield"
 	"github.com/hashicorp/terraform-plugin-framework-timetypes/timetypes"
 	"github.com/hashicorp/terraform-plugin-framework-validators/int64validator"
+	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/datasource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
@@ -21,37 +22,58 @@ func ListDataSourceSchema(ctx context.Context) schema.Schema {
 		MarkdownDescription: "Reserved fixed IPs are static IP addresses that persist independently of instances and can be used as virtual IPs (VIPs) for high availability.",
 		Attributes: map[string]schema.Attribute{
 			"project_id": schema.Int64Attribute{
-				Optional: true,
+				Description: "Project ID",
+				Optional:    true,
 			},
 			"region_id": schema.Int64Attribute{
-				Optional: true,
-			},
-			"available_only": schema.BoolAttribute{
-				Description: "Set to true if the response should only list IP addresses that are not attached to any instance",
+				Description: "Region ID",
 				Optional:    true,
 			},
 			"device_id": schema.StringAttribute{
 				Description: "Filter IPs by device ID it is attached to",
 				Optional:    true,
 			},
+			"ip_address": schema.StringAttribute{
+				Description: "Optional. An IPv4 address to filter results by. Regular expression allowed",
+				Optional:    true,
+			},
+			"available_only": schema.BoolAttribute{
+				Description: "Set True if response should only list IP addresses that are not attached to any instance",
+				Computed:    true,
+				Optional:    true,
+			},
 			"external_only": schema.BoolAttribute{
 				Description: "Set to true if the response should only list public IP addresses",
+				Computed:    true,
 				Optional:    true,
 			},
 			"internal_only": schema.BoolAttribute{
 				Description: "Set to true if the response should only list private IP addresses",
-				Optional:    true,
-			},
-			"ip_address": schema.StringAttribute{
-				Description: "An IPv4 address to filter results by. Regular expression allowed",
+				Computed:    true,
 				Optional:    true,
 			},
 			"order_by": schema.StringAttribute{
-				Description: "Ordering reserved fixed IP list result by name, status, `updated_at`, `created_at` or `fixed_ip_address` fields and directions (status.asc), default is \"fixed_ip_address.asc\"",
+				Description: "Optional. Ordering reserved fixed IP list result by name, status, `updated_at`, `fixed_ip_address` or `created_at` fields of the reserved fixed IP and directions (status.asc).\nAvailable values: \"created_at.asc\", \"created_at.desc\", \"fixed_ip_address.asc\", \"fixed_ip_address.desc\", \"name.asc\", \"name.desc\", \"status.asc\", \"status.desc\", \"updated_at.asc\", \"updated_at.desc\".",
+				Computed:    true,
 				Optional:    true,
+				Validators: []validator.String{
+					stringvalidator.OneOfCaseInsensitive(
+						"created_at.asc",
+						"created_at.desc",
+						"fixed_ip_address.asc",
+						"fixed_ip_address.desc",
+						"name.asc",
+						"name.desc",
+						"status.asc",
+						"status.desc",
+						"updated_at.asc",
+						"updated_at.desc",
+					),
+				},
 			},
 			"vip_only": schema.BoolAttribute{
 				Description: "Set to true if the response should only list VIPs",
+				Computed:    true,
 				Optional:    true,
 			},
 			"max_items": schema.Int64Attribute{

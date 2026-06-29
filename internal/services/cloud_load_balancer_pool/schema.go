@@ -12,6 +12,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/booldefault"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/int64default"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/int64planmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/listplanmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
@@ -108,8 +109,38 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 					int64validator.Between(0, 86400000),
 				},
 			},
+			"session_persistence": schema.SingleNestedAttribute{
+				Description: "Session persistence details",
+				Optional:    true,
+				Attributes: map[string]schema.Attribute{
+					"type": schema.StringAttribute{
+						Description: "Session persistence type\nAvailable values: \"APP_COOKIE\", \"HTTP_COOKIE\", \"SOURCE_IP\".",
+						Required:    true,
+						Validators: []validator.String{
+							stringvalidator.OneOfCaseInsensitive(
+								"APP_COOKIE",
+								"HTTP_COOKIE",
+								"SOURCE_IP",
+							),
+						},
+					},
+					"cookie_name": schema.StringAttribute{
+						Description: "Should be set if app cookie or http cookie is used",
+						Optional:    true,
+					},
+					"persistence_granularity": schema.StringAttribute{
+						Description: "Subnet mask if `source_ip` is used. For UDP ports only",
+						Optional:    true,
+					},
+					"persistence_timeout": schema.Int64Attribute{
+						Description: "Session persistence timeout. For UDP ports only",
+						Optional:    true,
+					},
+				},
+			},
 			"healthmonitor": schema.SingleNestedAttribute{
 				Description: "Health monitor details",
+				Computed:    true,
 				Optional:    true,
 				Attributes: map[string]schema.Attribute{
 					"delay": schema.Int64Attribute{
@@ -150,7 +181,9 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 					},
 					"admin_state_up": schema.BoolAttribute{
 						Description: "Administrative state of the resource. When set to true, the resource is enabled and operational. When set to false, the resource is disabled and will not process traffic. Defaults to true.",
+						Computed:    true,
 						Optional:    true,
+						Default:     booldefault.StaticBool(true),
 					},
 					"domain_name": schema.StringAttribute{
 						Description: "Domain name for HTTP host header. Can only be used together with `HTTP` or `HTTPS` health monitor type.",
@@ -192,38 +225,10 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 						Validators: []validator.Int64{
 							int64validator.Between(1, 10),
 						},
+						Default: int64default.StaticInt64(3),
 					},
 					"url_path": schema.StringAttribute{
 						Description: "The HTTP path the health monitor requests on each member. Defaults to `/` if not set. Can only be used with `HTTP` or `HTTPS` health monitor type.\n\nMust start with `/` and contain only plain path segments. Query strings (`?`), fragments (`#`), percent-encoding (`%`), and consecutive slashes (`//`) are not allowed.\n\nExamples of valid paths:\n- `/` — check the root (most common, default)\n- `/healthz` — a dedicated health endpoint",
-						Optional:    true,
-					},
-				},
-			},
-			"session_persistence": schema.SingleNestedAttribute{
-				Description: "Session persistence details",
-				Optional:    true,
-				Attributes: map[string]schema.Attribute{
-					"type": schema.StringAttribute{
-						Description: "Session persistence type\nAvailable values: \"APP_COOKIE\", \"HTTP_COOKIE\", \"SOURCE_IP\".",
-						Required:    true,
-						Validators: []validator.String{
-							stringvalidator.OneOfCaseInsensitive(
-								"APP_COOKIE",
-								"HTTP_COOKIE",
-								"SOURCE_IP",
-							),
-						},
-					},
-					"cookie_name": schema.StringAttribute{
-						Description: "Should be set if app cookie or http cookie is used",
-						Optional:    true,
-					},
-					"persistence_granularity": schema.StringAttribute{
-						Description: "Subnet mask if `source_ip` is used. For UDP ports only",
-						Optional:    true,
-					},
-					"persistence_timeout": schema.Int64Attribute{
-						Description: "Session persistence timeout. For UDP ports only",
 						Optional:    true,
 					},
 				},

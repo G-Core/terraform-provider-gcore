@@ -64,6 +64,7 @@ func (m *CloudNetworkSubnetsDataSourceModel) toListParams(_ context.Context) (pa
 }
 
 type CloudNetworkSubnetsItemsDataSourceModel struct {
+	ID             types.String                                                               `tfsdk:"id" json:"id,computed"`
 	Cidr           types.String                                                               `tfsdk:"cidr" json:"cidr,computed"`
 	CreatedAt      timetypes.RFC3339                                                          `tfsdk:"created_at" json:"created_at,computed" format:"date-time"`
 	EnableDhcp     types.Bool                                                                 `tfsdk:"enable_dhcp" json:"enable_dhcp,computed"`
@@ -75,7 +76,6 @@ type CloudNetworkSubnetsItemsDataSourceModel struct {
 	RegionID       types.Int64                                                                `tfsdk:"region_id" json:"region_id,computed"`
 	Tags           customfield.NestedObjectList[CloudNetworkSubnetsTagsDataSourceModel]       `tfsdk:"tags" json:"tags,computed"`
 	UpdatedAt      timetypes.RFC3339                                                          `tfsdk:"updated_at" json:"updated_at,computed" format:"date-time"`
-	ID             types.String                                                               `tfsdk:"id" json:"id,computed"`
 	AvailableIPs   types.Int64                                                                `tfsdk:"available_ips" json:"available_ips,computed"`
 	CreatorTaskID  types.String                                                               `tfsdk:"creator_task_id" json:"creator_task_id,computed"`
 	DNSNameservers customfield.List[types.String]                                             `tfsdk:"dns_nameservers" json:"dns_nameservers,computed"`

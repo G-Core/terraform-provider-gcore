@@ -58,6 +58,7 @@ func (m *CloudSecurityGroupsDataSourceModel) toListParams(_ context.Context) (pa
 type CloudSecurityGroupsItemsDataSourceModel struct {
 	ID                 types.String                                                                       `tfsdk:"id" json:"id,computed"`
 	CreatedAt          timetypes.RFC3339                                                                  `tfsdk:"created_at" json:"created_at,computed" format:"date-time"`
+	Description        types.String                                                                       `tfsdk:"description" json:"description,computed"`
 	Name               types.String                                                                       `tfsdk:"name" json:"name,computed"`
 	ProjectID          types.Int64                                                                        `tfsdk:"project_id" json:"project_id,computed"`
 	Region             types.String                                                                       `tfsdk:"region" json:"region,computed"`
@@ -65,7 +66,6 @@ type CloudSecurityGroupsItemsDataSourceModel struct {
 	RevisionNumber     types.Int64                                                                        `tfsdk:"revision_number" json:"revision_number,computed"`
 	TagsV2             customfield.NestedObjectList[CloudSecurityGroupsTagsV2DataSourceModel]             `tfsdk:"tags_v2" json:"tags_v2,computed"`
 	UpdatedAt          timetypes.RFC3339                                                                  `tfsdk:"updated_at" json:"updated_at,computed" format:"date-time"`
-	Description        types.String                                                                       `tfsdk:"description" json:"description,computed"`
 	SecurityGroupRules customfield.NestedObjectList[CloudSecurityGroupsSecurityGroupRulesDataSourceModel] `tfsdk:"security_group_rules" json:"security_group_rules,computed"`
 }
 

@@ -7,8 +7,10 @@ import (
 
 	"github.com/G-Core/terraform-provider-gcore/internal/customfield"
 	"github.com/hashicorp/terraform-plugin-framework-timetypes/timetypes"
+	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/datasource/schema"
+	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
 )
 
 var _ datasource.DataSourceWithConfigValidators = (*CloudGPUVirtualClusterImageDataSource)(nil)
@@ -42,6 +44,14 @@ func DataSourceSchema(ctx context.Context) schema.Schema {
 				Computed:    true,
 				CustomType:  timetypes.RFC3339Type{},
 			},
+			"cuda_toolkit_version": schema.StringAttribute{
+				Description: "Version of the installed CUDA toolkit",
+				Computed:    true,
+			},
+			"disk_format": schema.StringAttribute{
+				Description: "Disk format of the stored image (e.g. `raw`, `qcow2`). `cow_format=true` -> `raw`, `cow_format=false` -> `qcow2`.",
+				Computed:    true,
+			},
 			"gpu_driver": schema.StringAttribute{
 				Description: "Name of the GPU driver vendor",
 				Computed:    true,
@@ -53,6 +63,13 @@ func DataSourceSchema(ctx context.Context) schema.Schema {
 			"gpu_driver_version": schema.StringAttribute{
 				Description: "Version of the installed GPU driver",
 				Computed:    true,
+			},
+			"hw_firmware_type": schema.StringAttribute{
+				Description: "Specifies the type of firmware with which to boot the guest.\nAvailable values: \"bios\", \"uefi\".",
+				Computed:    true,
+				Validators: []validator.String{
+					stringvalidator.OneOfCaseInsensitive("bios", "uefi"),
+				},
 			},
 			"min_disk": schema.Int64Attribute{
 				Description: "Minimal boot volume required",

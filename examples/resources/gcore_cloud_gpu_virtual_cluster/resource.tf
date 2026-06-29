@@ -9,6 +9,10 @@ resource "gcore_cloud_gpu_virtual_cluster" "example_cloud_gpu_virtual_cluster" {
       type = "external"
       ip_family = "ipv4"
       name = "eth0"
+      port_security_enabled = true
+      security_groups = [{
+        id = "b4849ffa-89f2-45a1-951f-0ae5b7809d98"
+      }]
     }]
     volumes = [{
       boot_index = 1

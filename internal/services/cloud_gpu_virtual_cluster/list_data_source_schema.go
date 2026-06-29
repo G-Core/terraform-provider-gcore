@@ -29,6 +29,206 @@ func ListDataSourceSchema(ctx context.Context) schema.Schema {
 				Description: "Region ID",
 				Optional:    true,
 			},
+			"ids": schema.ListAttribute{
+				Description: "Return only clusters with these IDs, e.g. `ids=<id1>&ids=<id2>`.",
+				Optional:    true,
+				ElementType: types.StringType,
+			},
+			"tags": schema.MapAttribute{
+				Description: "Filter by exact tag key-value pairs, e.g. `tags[env]=prod&tags[team]=core`. Pairs are ANDed; values match case-insensitively.",
+				Optional:    true,
+				ElementType: types.StringType,
+			},
+			"created_at": schema.SingleNestedAttribute{
+				Description: "Filter by creation time (UTC), e.g. `created_at[gte]=2026-01-01T00:00:00Z`.",
+				Optional:    true,
+				Attributes: map[string]schema.Attribute{
+					"gt": schema.StringAttribute{
+						Description: "Strictly after this timestamp, e.g. `[gt]=2026-01-01T00:00:00Z`.",
+						Optional:    true,
+						CustomType:  timetypes.RFC3339Type{},
+					},
+					"gte": schema.StringAttribute{
+						Description: "At or after this timestamp (inclusive), e.g. `[gte]=2026-01-01T00:00:00Z`.",
+						Optional:    true,
+						CustomType:  timetypes.RFC3339Type{},
+					},
+					"lt": schema.StringAttribute{
+						Description: "Strictly before this timestamp, e.g. `[lt]=2026-02-01T00:00:00Z`.",
+						Optional:    true,
+						CustomType:  timetypes.RFC3339Type{},
+					},
+					"lte": schema.StringAttribute{
+						Description: "At or before this timestamp (inclusive), e.g. `[lte]=2026-02-01T00:00:00Z`.",
+						Optional:    true,
+						CustomType:  timetypes.RFC3339Type{},
+					},
+				},
+			},
+			"flavor": schema.SingleNestedAttribute{
+				Description: "Filter by flavor (case-insensitive), e.g. `flavor[prefix]=g3-`, `flavor[exact]=g3-ai-32-192-1500-l40s-48-1`.",
+				Optional:    true,
+				Attributes: map[string]schema.Attribute{
+					"contains": schema.ListAttribute{
+						Description: "Case-insensitive substring, e.g. `[contains]=web`. Repeat the key to match any substring.",
+						Optional:    true,
+						ElementType: types.StringType,
+					},
+					"exact": schema.ListAttribute{
+						Description: "Case-insensitive exact match, e.g. `[exact]=web-1`. Repeat the key to match any of several.",
+						Optional:    true,
+						ElementType: types.StringType,
+					},
+					"prefix": schema.ListAttribute{
+						Description: "Case-insensitive starts-with, e.g. `[prefix]=prod-`. Repeat the key to match any prefix.",
+						Optional:    true,
+						ElementType: types.StringType,
+					},
+					"suffix": schema.ListAttribute{
+						Description: "Case-insensitive ends-with, e.g. `[suffix]=-db`. Repeat the key to match any suffix.",
+						Optional:    true,
+						ElementType: types.StringType,
+					},
+				},
+			},
+			"name": schema.SingleNestedAttribute{
+				Description: "Filter by name (case-insensitive), e.g. `name[contains]=gpu`, `name[prefix]=prod-`.",
+				Optional:    true,
+				Attributes: map[string]schema.Attribute{
+					"contains": schema.ListAttribute{
+						Description: "Case-insensitive substring, e.g. `[contains]=web`. Repeat the key to match any substring.",
+						Optional:    true,
+						ElementType: types.StringType,
+					},
+					"exact": schema.ListAttribute{
+						Description: "Case-insensitive exact match, e.g. `[exact]=web-1`. Repeat the key to match any of several.",
+						Optional:    true,
+						ElementType: types.StringType,
+					},
+					"prefix": schema.ListAttribute{
+						Description: "Case-insensitive starts-with, e.g. `[prefix]=prod-`. Repeat the key to match any prefix.",
+						Optional:    true,
+						ElementType: types.StringType,
+					},
+					"suffix": schema.ListAttribute{
+						Description: "Case-insensitive ends-with, e.g. `[suffix]=-db`. Repeat the key to match any suffix.",
+						Optional:    true,
+						ElementType: types.StringType,
+					},
+				},
+			},
+			"servers_count": schema.SingleNestedAttribute{
+				Description: "Filter by node count, e.g. `servers_count[gte]=2`, `servers_count[gte]=2&servers_count[lt]=8`.",
+				Optional:    true,
+				Attributes: map[string]schema.Attribute{
+					"gt": schema.Int64Attribute{
+						Description: "Strictly greater than, e.g. `[gt]=1`.",
+						Optional:    true,
+						Validators: []validator.Int64{
+							int64validator.AtLeast(0),
+						},
+					},
+					"gte": schema.Int64Attribute{
+						Description: "Greater than or equal, e.g. `[gte]=2`.",
+						Optional:    true,
+						Validators: []validator.Int64{
+							int64validator.AtLeast(0),
+						},
+					},
+					"lt": schema.Int64Attribute{
+						Description: "Strictly less than, e.g. `[lt]=8`.",
+						Optional:    true,
+						Validators: []validator.Int64{
+							int64validator.AtLeast(0),
+						},
+					},
+					"lte": schema.Int64Attribute{
+						Description: "Less than or equal, e.g. `[lte]=4`.",
+						Optional:    true,
+						Validators: []validator.Int64{
+							int64validator.AtLeast(0),
+						},
+					},
+				},
+			},
+			"tag_key": schema.SingleNestedAttribute{
+				Description: "Filter by tag key regardless of value, e.g. `tag_key[contains]=team`.",
+				Optional:    true,
+				Attributes: map[string]schema.Attribute{
+					"contains": schema.ListAttribute{
+						Description: "Case-insensitive substring, e.g. `[contains]=web`. Repeat the key to match any substring.",
+						Optional:    true,
+						ElementType: types.StringType,
+					},
+					"exact": schema.ListAttribute{
+						Description: "Case-insensitive exact match, e.g. `[exact]=web-1`. Repeat the key to match any of several.",
+						Optional:    true,
+						ElementType: types.StringType,
+					},
+					"prefix": schema.ListAttribute{
+						Description: "Case-insensitive starts-with, e.g. `[prefix]=prod-`. Repeat the key to match any prefix.",
+						Optional:    true,
+						ElementType: types.StringType,
+					},
+					"suffix": schema.ListAttribute{
+						Description: "Case-insensitive ends-with, e.g. `[suffix]=-db`. Repeat the key to match any suffix.",
+						Optional:    true,
+						ElementType: types.StringType,
+					},
+				},
+			},
+			"tag_value": schema.SingleNestedAttribute{
+				Description: "Filter by tag value regardless of key, e.g. `tag_value[prefix]=prod`.",
+				Optional:    true,
+				Attributes: map[string]schema.Attribute{
+					"contains": schema.ListAttribute{
+						Description: "Case-insensitive substring, e.g. `[contains]=web`. Repeat the key to match any substring.",
+						Optional:    true,
+						ElementType: types.StringType,
+					},
+					"exact": schema.ListAttribute{
+						Description: "Case-insensitive exact match, e.g. `[exact]=web-1`. Repeat the key to match any of several.",
+						Optional:    true,
+						ElementType: types.StringType,
+					},
+					"prefix": schema.ListAttribute{
+						Description: "Case-insensitive starts-with, e.g. `[prefix]=prod-`. Repeat the key to match any prefix.",
+						Optional:    true,
+						ElementType: types.StringType,
+					},
+					"suffix": schema.ListAttribute{
+						Description: "Case-insensitive ends-with, e.g. `[suffix]=-db`. Repeat the key to match any suffix.",
+						Optional:    true,
+						ElementType: types.StringType,
+					},
+				},
+			},
+			"updated_at": schema.SingleNestedAttribute{
+				Description: "Filter by last-change time (UTC), e.g. `updated_at[gte]=2026-06-01T00:00:00Z`.",
+				Optional:    true,
+				Attributes: map[string]schema.Attribute{
+					"gt": schema.StringAttribute{
+						Description: "Strictly after this timestamp, e.g. `[gt]=2026-01-01T00:00:00Z`.",
+						Optional:    true,
+						CustomType:  timetypes.RFC3339Type{},
+					},
+					"gte": schema.StringAttribute{
+						Description: "At or after this timestamp (inclusive), e.g. `[gte]=2026-01-01T00:00:00Z`.",
+						Optional:    true,
+						CustomType:  timetypes.RFC3339Type{},
+					},
+					"lt": schema.StringAttribute{
+						Description: "Strictly before this timestamp, e.g. `[lt]=2026-02-01T00:00:00Z`.",
+						Optional:    true,
+						CustomType:  timetypes.RFC3339Type{},
+					},
+					"lte": schema.StringAttribute{
+						Description: "At or before this timestamp (inclusive), e.g. `[lte]=2026-02-01T00:00:00Z`.",
+						Optional:    true,
+						CustomType:  timetypes.RFC3339Type{},
+					},
+				},
+			},
 			"max_items": schema.Int64Attribute{
 				Description: "Max items to fetch, default: 1000",
 				Optional:    true,
@@ -114,6 +314,23 @@ func ListDataSourceSchema(ctx context.Context) schema.Schema {
 												Description: "Interface name",
 												Computed:    true,
 											},
+											"security_groups": schema.ListNestedAttribute{
+												Description: "Resolved security groups applied to this interface.",
+												Computed:    true,
+												CustomType:  customfield.NewNestedObjectListType[CloudGPUVirtualClustersServersSettingsInterfacesSecurityGroupsDataSourceModel](ctx),
+												NestedObject: schema.NestedAttributeObject{
+													Attributes: map[string]schema.Attribute{
+														"id": schema.StringAttribute{
+															Description: "Security group ID",
+															Computed:    true,
+														},
+														"name": schema.StringAttribute{
+															Description: "Security group name",
+															Computed:    true,
+														},
+													},
+												},
+											},
 											"type": schema.StringAttribute{
 												Description: `Available values: "external", "subnet", "any_subnet".`,
 												Computed:    true,
@@ -155,9 +372,10 @@ func ListDataSourceSchema(ctx context.Context) schema.Schema {
 									},
 								},
 								"security_groups": schema.ListNestedAttribute{
-									Description: "Security groups",
-									Computed:    true,
-									CustomType:  customfield.NewNestedObjectListType[CloudGPUVirtualClustersServersSettingsSecurityGroupsDataSourceModel](ctx),
+									Description:        "Deprecated. Deduplicated union of security groups across all interfaces; the actual assignment may differ per interface. Use `interfaces[].security_groups` for the authoritative per-interface list.",
+									Computed:           true,
+									DeprecationMessage: "This attribute is deprecated.",
+									CustomType:         customfield.NewNestedObjectListType[CloudGPUVirtualClustersServersSettingsSecurityGroupsDataSourceModel](ctx),
 									NestedObject: schema.NestedAttributeObject{
 										Attributes: map[string]schema.Attribute{
 											"id": schema.StringAttribute{

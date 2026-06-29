@@ -74,6 +74,7 @@ type CloudK8SClusterPoolsModel struct {
 	KubeletConfig      customfield.Map[types.String] `tfsdk:"kubelet_config" json:"kubelet_config,computed_optional"`
 	Labels             customfield.Map[types.String] `tfsdk:"labels" json:"labels,computed_optional"`
 	MaxNodeCount       types.Int64                   `tfsdk:"max_node_count" json:"max_node_count,computed_optional"`
+	SecurityGroupIDs   *[]types.String               `tfsdk:"security_group_ids" json:"security_group_ids,optional"`
 	ServergroupPolicy  types.String                  `tfsdk:"servergroup_policy" json:"servergroup_policy,optional"`
 	Taints             customfield.Map[types.String] `tfsdk:"taints" json:"taints,computed_optional"`
 }
@@ -118,6 +119,7 @@ type CloudK8SClusterCniModel struct {
 }
 
 type CloudK8SClusterCniCiliumModel struct {
+	CniExclusive   types.Bool   `tfsdk:"cni_exclusive" json:"cni_exclusive,computed_optional"`
 	Encryption     types.Bool   `tfsdk:"encryption" json:"encryption,computed_optional"`
 	HubbleRelay    types.Bool   `tfsdk:"hubble_relay" json:"hubble_relay,computed_optional"`
 	HubbleUi       types.Bool   `tfsdk:"hubble_ui" json:"hubble_ui,computed_optional"`

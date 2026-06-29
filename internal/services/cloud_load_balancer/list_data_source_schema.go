@@ -41,6 +41,34 @@ func ListDataSourceSchema(ctx context.Context) schema.Schema {
 				Description: "Filter by name",
 				Optional:    true,
 			},
+			"operating_status": schema.StringAttribute{
+				Description: "Filter by operating status\nAvailable values: \"DEGRADED\", \"DRAINING\", \"ERROR\", \"NO_MONITOR\", \"OFFLINE\", \"ONLINE\".",
+				Optional:    true,
+				Validators: []validator.String{
+					stringvalidator.OneOfCaseInsensitive(
+						"DEGRADED",
+						"DRAINING",
+						"ERROR",
+						"NO_MONITOR",
+						"OFFLINE",
+						"ONLINE",
+					),
+				},
+			},
+			"provisioning_status": schema.StringAttribute{
+				Description: "Filter by provisioning (lifecycle) status\nAvailable values: \"ACTIVE\", \"DELETED\", \"ERROR\", \"PENDING_CREATE\", \"PENDING_DELETE\", \"PENDING_UPDATE\".",
+				Optional:    true,
+				Validators: []validator.String{
+					stringvalidator.OneOfCaseInsensitive(
+						"ACTIVE",
+						"DELETED",
+						"ERROR",
+						"PENDING_CREATE",
+						"PENDING_DELETE",
+						"PENDING_UPDATE",
+					),
+				},
+			},
 			"tag_key_value": schema.StringAttribute{
 				Description: "Optional. Filter by tag key-value pairs.",
 				Optional:    true,

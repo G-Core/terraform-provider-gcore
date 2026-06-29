@@ -90,8 +90,14 @@ func (m *CloudLoadBalancerDataSourceModel) toListParams(_ context.Context) (para
 	if !m.FindOneBy.Name.IsNull() {
 		params.Name = param.NewOpt(m.FindOneBy.Name.ValueString())
 	}
+	if !m.FindOneBy.OperatingStatus.IsNull() {
+		params.OperatingStatus = cloud.LoadBalancerOperatingStatus(m.FindOneBy.OperatingStatus.ValueString())
+	}
 	if !m.FindOneBy.OrderBy.IsNull() {
 		params.OrderBy = cloud.LoadBalancerListParamsOrderBy(m.FindOneBy.OrderBy.ValueString())
+	}
+	if !m.FindOneBy.ProvisioningStatus.IsNull() {
+		params.ProvisioningStatus = cloud.ProvisioningStatus(m.FindOneBy.ProvisioningStatus.ValueString())
 	}
 	if !m.ShowStats.IsNull() {
 		params.ShowStats = param.NewOpt(m.ShowStats.ValueBool())
@@ -176,10 +182,12 @@ type CloudLoadBalancerVrrpIPsDataSourceModel struct {
 }
 
 type CloudLoadBalancerFindOneByDataSourceModel struct {
-	AssignedFloating types.Bool      `tfsdk:"assigned_floating" query:"assigned_floating,optional"`
-	LoggingEnabled   types.Bool      `tfsdk:"logging_enabled" query:"logging_enabled,optional"`
-	Name             types.String    `tfsdk:"name" query:"name,optional"`
-	OrderBy          types.String    `tfsdk:"order_by" query:"order_by,computed_optional"`
-	TagKey           *[]types.String `tfsdk:"tag_key" query:"tag_key,optional"`
-	TagKeyValue      types.String    `tfsdk:"tag_key_value" query:"tag_key_value,optional"`
+	AssignedFloating   types.Bool      `tfsdk:"assigned_floating" query:"assigned_floating,optional"`
+	LoggingEnabled     types.Bool      `tfsdk:"logging_enabled" query:"logging_enabled,optional"`
+	Name               types.String    `tfsdk:"name" query:"name,optional"`
+	OperatingStatus    types.String    `tfsdk:"operating_status" query:"operating_status,optional"`
+	OrderBy            types.String    `tfsdk:"order_by" query:"order_by,computed_optional"`
+	ProvisioningStatus types.String    `tfsdk:"provisioning_status" query:"provisioning_status,optional"`
+	TagKey             *[]types.String `tfsdk:"tag_key" query:"tag_key,optional"`
+	TagKeyValue        types.String    `tfsdk:"tag_key_value" query:"tag_key_value,optional"`
 }

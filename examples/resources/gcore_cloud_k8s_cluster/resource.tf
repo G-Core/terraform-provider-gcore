@@ -21,6 +21,7 @@ resource "gcore_cloud_k8s_cluster" "example_cloud_k8s_cluster" {
       my-label = "foo"
     }
     max_node_count = 5
+    security_group_ids = ["e6ea8f35-82ce-4fb2-b51c-6a24a3a23bce"]
     servergroup_policy = "affinity"
     taints = {
       my-taint = "bar:NoSchedule"
@@ -54,6 +55,7 @@ resource "gcore_cloud_k8s_cluster" "example_cloud_k8s_cluster" {
   }
   cni = {
     cilium = {
+      cni_exclusive = true
       encryption = true
       hubble_relay = true
       hubble_ui = true

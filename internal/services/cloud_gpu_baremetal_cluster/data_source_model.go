@@ -15,7 +15,7 @@ import (
 
 type CloudGPUBaremetalClusterDataSourceModel struct {
 	ID                types.String                                                                     `tfsdk:"id" path:"cluster_id,computed"`
-	ClusterID         types.String                                                                     `tfsdk:"cluster_id" path:"cluster_id,optional"`
+	ClusterID         types.String                                                                     `tfsdk:"cluster_id" path:"cluster_id,required"`
 	ProjectID         types.Int64                                                                      `tfsdk:"project_id" path:"project_id,optional"`
 	RegionID          types.Int64                                                                      `tfsdk:"region_id" path:"region_id,optional"`
 	CreatedAt         timetypes.RFC3339                                                                `tfsdk:"created_at" json:"created_at,computed" format:"date-time"`
@@ -30,32 +30,10 @@ type CloudGPUBaremetalClusterDataSourceModel struct {
 	ServersIDs        customfield.List[types.String]                                                   `tfsdk:"servers_ids" json:"servers_ids,computed"`
 	ServersSettings   customfield.NestedObject[CloudGPUBaremetalClusterServersSettingsDataSourceModel] `tfsdk:"servers_settings" json:"servers_settings,computed"`
 	Tags              customfield.NestedObjectList[CloudGPUBaremetalClusterTagsDataSourceModel]        `tfsdk:"tags" json:"tags,computed"`
-	FindOneBy         *CloudGPUBaremetalClusterFindOneByDataSourceModel                                `tfsdk:"find_one_by"`
 }
 
 func (m *CloudGPUBaremetalClusterDataSourceModel) toReadParams(_ context.Context) (params cloud.GPUBaremetalClusterGetParams, diags diag.Diagnostics) {
 	params = cloud.GPUBaremetalClusterGetParams{}
-
-	if !m.ProjectID.IsNull() {
-		params.ProjectID = param.NewOpt(m.ProjectID.ValueInt64())
-	}
-	if !m.RegionID.IsNull() {
-		params.RegionID = param.NewOpt(m.RegionID.ValueInt64())
-	}
-
-	return
-}
-
-func (m *CloudGPUBaremetalClusterDataSourceModel) toListParams(ctx context.Context) (params cloud.GPUBaremetalClusterListParams, diags diag.Diagnostics) {
-	mFindOneByManagedBy := []string{}
-	diags.Append(m.FindOneBy.ManagedBy.ElementsAs(ctx, &mFindOneByManagedBy, true)...)
-	if diags.HasError() {
-		return
-	}
-
-	params = cloud.GPUBaremetalClusterListParams{
-		ManagedBy: mFindOneByManagedBy,
-	}
 
 	if !m.ProjectID.IsNull() {
 		params.ProjectID = param.NewOpt(m.ProjectID.ValueInt64())
@@ -81,13 +59,19 @@ type CloudGPUBaremetalClusterServersSettingsFileSharesDataSourceModel struct {
 }
 
 type CloudGPUBaremetalClusterServersSettingsInterfacesDataSourceModel struct {
-	IPFamily   types.String                                                                                         `tfsdk:"ip_family" json:"ip_family,computed"`
-	Name       types.String                                                                                         `tfsdk:"name" json:"name,computed"`
-	Type       types.String                                                                                         `tfsdk:"type" json:"type,computed"`
-	FloatingIP customfield.NestedObject[CloudGPUBaremetalClusterServersSettingsInterfacesFloatingIPDataSourceModel] `tfsdk:"floating_ip" json:"floating_ip,computed"`
-	NetworkID  types.String                                                                                         `tfsdk:"network_id" json:"network_id,computed"`
-	SubnetID   types.String                                                                                         `tfsdk:"subnet_id" json:"subnet_id,computed"`
-	IPAddress  types.String                                                                                         `tfsdk:"ip_address" json:"ip_address,computed"`
+	IPFamily       types.String                                                                                                 `tfsdk:"ip_family" json:"ip_family,computed"`
+	Name           types.String                                                                                                 `tfsdk:"name" json:"name,computed"`
+	SecurityGroups customfield.NestedObjectList[CloudGPUBaremetalClusterServersSettingsInterfacesSecurityGroupsDataSourceModel] `tfsdk:"security_groups" json:"security_groups,computed"`
+	Type           types.String                                                                                                 `tfsdk:"type" json:"type,computed"`
+	FloatingIP     customfield.NestedObject[CloudGPUBaremetalClusterServersSettingsInterfacesFloatingIPDataSourceModel]         `tfsdk:"floating_ip" json:"floating_ip,computed"`
+	NetworkID      types.String                                                                                                 `tfsdk:"network_id" json:"network_id,computed"`
+	SubnetID       types.String                                                                                                 `tfsdk:"subnet_id" json:"subnet_id,computed"`
+	IPAddress      types.String                                                                                                 `tfsdk:"ip_address" json:"ip_address,computed"`
+}
+
+type CloudGPUBaremetalClusterServersSettingsInterfacesSecurityGroupsDataSourceModel struct {
+	ID   types.String `tfsdk:"id" json:"id,computed"`
+	Name types.String `tfsdk:"name" json:"name,computed"`
 }
 
 type CloudGPUBaremetalClusterServersSettingsInterfacesFloatingIPDataSourceModel struct {
@@ -103,8 +87,4 @@ type CloudGPUBaremetalClusterTagsDataSourceModel struct {
 	Key      types.String `tfsdk:"key" json:"key,computed"`
 	ReadOnly types.Bool   `tfsdk:"read_only" json:"read_only,computed"`
 	Value    types.String `tfsdk:"value" json:"value,computed"`
-}
-
-type CloudGPUBaremetalClusterFindOneByDataSourceModel struct {
-	ManagedBy customfield.List[types.String] `tfsdk:"managed_by" query:"managed_by,computed_optional"`
 }

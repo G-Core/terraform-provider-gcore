@@ -39,7 +39,7 @@ func DataSourceSchema(ctx context.Context) schema.Schema {
 				Computed: true,
 			},
 			"type": schema.StringAttribute{
-				Description: "RRSet type\nAvailable values: \"A\", \"AAAA\", \"NS\", \"CNAME\", \"MX\", \"TXT\", \"SRV\", \"SOA\", \"PTR\", \"SVCB\", \"HTTPS\", \"CAA\", \"DS\".",
+				Description: "RRSet type\nAvailable values: \"A\", \"AAAA\", \"NS\", \"CNAME\", \"MX\", \"TXT\", \"SRV\", \"SOA\".",
 				Computed:    true,
 				Validators: []validator.String{
 					stringvalidator.OneOfCaseInsensitive(
@@ -51,11 +51,6 @@ func DataSourceSchema(ctx context.Context) schema.Schema {
 						"TXT",
 						"SRV",
 						"SOA",
-						"PTR",
-						"SVCB",
-						"HTTPS",
-						"CAA",
-						"DS",
 					),
 				},
 			},

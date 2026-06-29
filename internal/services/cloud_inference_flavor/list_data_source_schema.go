@@ -56,8 +56,9 @@ func ListDataSourceSchema(ctx context.Context) schema.Schema {
 							Computed:    true,
 						},
 						"is_gpu_shared": schema.BoolAttribute{
-							Description: "Inference flavor is gpu shared.",
-							Computed:    true,
+							Description:        "Inference flavor is gpu shared (always false, deprecated).",
+							Computed:           true,
+							DeprecationMessage: "This attribute is deprecated.",
 						},
 						"memory": schema.Float64Attribute{
 							Description: "Inference flavor memory in Gi.",

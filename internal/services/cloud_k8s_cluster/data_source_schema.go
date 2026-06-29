@@ -224,6 +224,10 @@ func DataSourceSchema(ctx context.Context) schema.Schema {
 						Computed:    true,
 						CustomType:  customfield.NewNestedObjectType[CloudK8SClusterCniCiliumDataSourceModel](ctx),
 						Attributes: map[string]schema.Attribute{
+							"cni_exclusive": schema.BoolAttribute{
+								Description: "Whether Cilium manages networking exclusively. Set to `false` to allow other CNI components to coexist with Cilium.",
+								Computed:    true,
+							},
 							"encryption": schema.BoolAttribute{
 								Description: "Wireguard encryption",
 								Computed:    true,
@@ -406,6 +410,12 @@ func DataSourceSchema(ctx context.Context) schema.Schema {
 						"node_count": schema.Int64Attribute{
 							Description: "Node count in the cluster pool",
 							Computed:    true,
+						},
+						"security_group_ids": schema.ListAttribute{
+							Description: "Security group IDs applied to the cluster pool nodes",
+							Computed:    true,
+							CustomType:  customfield.NewListType[types.String](ctx),
+							ElementType: types.StringType,
 						},
 						"status": schema.StringAttribute{
 							Description: "Status of the cluster pool",

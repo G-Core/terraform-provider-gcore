@@ -82,7 +82,7 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 							},
 						},
 						"security_groups": schema.ListNestedAttribute{
-							Description: "Specifies security group UUIDs to be applied to the instance network interface.",
+							Description: "Security group UUIDs applied to this interface. If omitted (or empty), the top-level `security_groups` value applies; if both are omitted, the project's default security group is applied.",
 							Optional:    true,
 							NestedObject: schema.NestedAttributeObject{
 								Attributes: map[string]schema.Attribute{
@@ -201,8 +201,9 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 				PlanModifiers: []planmodifier.Map{mapplanmodifier.RequiresReplace()},
 			},
 			"security_groups": schema.ListNestedAttribute{
-				Description: "Specifies security group UUIDs to be applied to all instance network interfaces.",
-				Optional:    true,
+				Description:        "Deprecated. Use per-interface `security_groups` inside `interfaces[]` instead. Cannot be combined with per-interface `security_groups`. If omitted everywhere, the project's default security group is applied.",
+				Optional:           true,
+				DeprecationMessage: "This attribute is deprecated.",
 				NestedObject: schema.NestedAttributeObject{
 					Attributes: map[string]schema.Attribute{
 						"id": schema.StringAttribute{
@@ -334,24 +335,29 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 							CustomType:  timetypes.RFC3339Type{},
 						},
 						"alarm_state": schema.StringAttribute{
-							Description: "Current state of alarm\nAvailable values: \"ACK_REQ\", \"ALARM\", \"ARCHIVED\", \"CLEAR\", \"CLEARING\", \"CLEARING_FAIL\", \"END_GRACE\", \"END_WAIT\", \"MANUAL_CLEAR\", \"MANUAL_CLEARING\", \"MANUAL_CLEARING_FAIL\", \"MANUAL_MITIGATING\", \"MANUAL_STARTING\", \"MANUAL_STARTING_FAIL\", \"MITIGATING\", \"STARTING\", \"STARTING_FAIL\", \"START_WAIT\", \"ack_req\", \"alarm\", \"archived\", \"clear\", \"clearing\", \"clearing_fail\", \"end_grace\", \"end_wait\", \"manual_clear\", \"manual_clearing\", \"manual_clearing_fail\", \"manual_mitigating\", \"manual_starting\", \"manual_starting_fail\", \"mitigating\", \"start_wait\", \"starting\", \"starting_fail\".",
+							Description: "Current state of alarm\nAvailable values: \"ACK_REQ\", \"ALARM\", \"ALARM_FAIL\", \"ARCHIVED\", \"CLEAR\", \"CLEARING\", \"CLEARING_FAIL\", \"CLEAR_FAIL\", \"END_GRACE\", \"END_WAIT\", \"MANUAL_CLEAR\", \"MANUAL_CLEARING\", \"MANUAL_CLEARING_FAIL\", \"MANUAL_CLEAR_FAIL\", \"MANUAL_MITIGATING\", \"MANUAL_START\", \"MANUAL_STARTING\", \"MANUAL_STARTING_FAIL\", \"MANUAL_START_FAIL\", \"MITIGATING\", \"STARTING\", \"STARTING_FAIL\", \"START_WAIT\", \"ack_req\", \"alarm\", \"archived\", \"clear\", \"clearing\", \"clearing_fail\", \"end_grace\", \"end_wait\", \"manual_clear\", \"manual_clearing\", \"manual_clearing_fail\", \"manual_mitigating\", \"manual_starting\", \"manual_starting_fail\", \"mitigating\", \"start_wait\", \"starting\", \"starting_fail\".",
 							Computed:    true,
 							Validators: []validator.String{
 								stringvalidator.OneOfCaseInsensitive(
 									"ACK_REQ",
 									"ALARM",
+									"ALARM_FAIL",
 									"ARCHIVED",
 									"CLEAR",
 									"CLEARING",
 									"CLEARING_FAIL",
+									"CLEAR_FAIL",
 									"END_GRACE",
 									"END_WAIT",
 									"MANUAL_CLEAR",
 									"MANUAL_CLEARING",
 									"MANUAL_CLEARING_FAIL",
+									"MANUAL_CLEAR_FAIL",
 									"MANUAL_MITIGATING",
+									"MANUAL_START",
 									"MANUAL_STARTING",
 									"MANUAL_STARTING_FAIL",
+									"MANUAL_START_FAIL",
 									"MITIGATING",
 									"STARTING",
 									"STARTING_FAIL",

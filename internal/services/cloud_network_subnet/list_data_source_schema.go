@@ -84,6 +84,10 @@ func ListDataSourceSchema(ctx context.Context) schema.Schema {
 				CustomType:  customfield.NewNestedObjectListType[CloudNetworkSubnetsItemsDataSourceModel](ctx),
 				NestedObject: schema.NestedAttributeObject{
 					Attributes: map[string]schema.Attribute{
+						"id": schema.StringAttribute{
+							Description: "Subnet id.",
+							Computed:    true,
+						},
 						"cidr": schema.StringAttribute{
 							Description: "CIDR",
 							Computed:    true,
@@ -149,10 +153,6 @@ func ListDataSourceSchema(ctx context.Context) schema.Schema {
 							Description: "Datetime when the subnet was last updated",
 							Computed:    true,
 							CustomType:  timetypes.RFC3339Type{},
-						},
-						"id": schema.StringAttribute{
-							Description: "Subnet id.",
-							Computed:    true,
 						},
 						"available_ips": schema.Int64Attribute{
 							Description: "Number of available ips in subnet",

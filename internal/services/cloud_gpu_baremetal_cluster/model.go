@@ -14,10 +14,10 @@ type CloudGPUBaremetalClusterModel struct {
 	ProjectID         types.Int64                                   `tfsdk:"project_id" path:"project_id,optional"`
 	RegionID          types.Int64                                   `tfsdk:"region_id" path:"region_id,optional"`
 	Flavor            types.String                                  `tfsdk:"flavor" json:"flavor,required"`
-	ImageID           types.String                                  `tfsdk:"image_id" json:"image_id,required"`
 	ServersCount      types.Int64                                   `tfsdk:"servers_count" json:"servers_count,required"`
-	ServersSettings   *CloudGPUBaremetalClusterServersSettingsModel `tfsdk:"servers_settings" json:"servers_settings,required"`
+	ImageID           types.String                                  `tfsdk:"image_id" json:"image_id,required"`
 	Name              types.String                                  `tfsdk:"name" json:"name,required"`
+	ServersSettings   *CloudGPUBaremetalClusterServersSettingsModel `tfsdk:"servers_settings" json:"servers_settings,required"`
 	Tags              customfield.Map[types.String]                 `tfsdk:"tags" json:"tags,computed_optional,no_refresh"`
 	CreatedAt         timetypes.RFC3339                             `tfsdk:"created_at" json:"created_at,computed" format:"date-time"`
 	HasPendingChanges types.Bool                                    `tfsdk:"has_pending_changes" json:"has_pending_changes,computed"`
@@ -45,12 +45,18 @@ type CloudGPUBaremetalClusterServersSettingsModel struct {
 }
 
 type CloudGPUBaremetalClusterServersSettingsInterfacesModel struct {
-	Type       types.String                                                      `tfsdk:"type" json:"type,required"`
-	IPFamily   types.String                                                      `tfsdk:"ip_family" json:"ip_family,computed_optional"`
-	Name       types.String                                                      `tfsdk:"name" json:"name,computed_optional"`
-	NetworkID  types.String                                                      `tfsdk:"network_id" json:"network_id,optional"`
-	SubnetID   types.String                                                      `tfsdk:"subnet_id" json:"subnet_id,optional"`
-	FloatingIP *CloudGPUBaremetalClusterServersSettingsInterfacesFloatingIPModel `tfsdk:"floating_ip" json:"floating_ip,optional"`
+	Type                types.String                                                             `tfsdk:"type" json:"type,required"`
+	IPFamily            types.String                                                             `tfsdk:"ip_family" json:"ip_family,computed_optional"`
+	Name                types.String                                                             `tfsdk:"name" json:"name,computed_optional"`
+	PortSecurityEnabled types.Bool                                                               `tfsdk:"port_security_enabled" json:"port_security_enabled,optional,no_refresh"`
+	SecurityGroups      *[]*CloudGPUBaremetalClusterServersSettingsInterfacesSecurityGroupsModel `tfsdk:"security_groups" json:"security_groups,optional"`
+	NetworkID           types.String                                                             `tfsdk:"network_id" json:"network_id,optional"`
+	SubnetID            types.String                                                             `tfsdk:"subnet_id" json:"subnet_id,optional"`
+	FloatingIP          *CloudGPUBaremetalClusterServersSettingsInterfacesFloatingIPModel        `tfsdk:"floating_ip" json:"floating_ip,optional"`
+}
+
+type CloudGPUBaremetalClusterServersSettingsInterfacesSecurityGroupsModel struct {
+	ID types.String `tfsdk:"id" json:"id,required"`
 }
 
 type CloudGPUBaremetalClusterServersSettingsInterfacesFloatingIPModel struct {

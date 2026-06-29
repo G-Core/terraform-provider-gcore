@@ -9,23 +9,21 @@ import (
 )
 
 type DNSZoneDataSourceModel struct {
-	Name                   types.String                                                 `tfsdk:"name" path:"name,required"`
-	Contact                types.String                                                 `tfsdk:"contact" json:"contact,computed"`
-	DnssecEnabled          types.Bool                                                   `tfsdk:"dnssec_enabled" json:"dnssec_enabled,computed"`
-	DnssecStatus           types.String                                                 `tfsdk:"dnssec_status" json:"dnssec_status,computed"`
-	DnssecStatusModifiedOn types.String                                                 `tfsdk:"dnssec_status_modified_on" json:"dnssec_status_modified_on,computed"`
-	Enabled                types.Bool                                                   `tfsdk:"enabled" json:"enabled,computed"`
-	Expiry                 types.Int64                                                  `tfsdk:"expiry" json:"expiry,computed"`
-	ID                     types.Int64                                                  `tfsdk:"id" json:"id,computed"`
-	NxTtl                  types.Int64                                                  `tfsdk:"nx_ttl" json:"nx_ttl,computed"`
-	PrimaryServer          types.String                                                 `tfsdk:"primary_server" json:"primary_server,computed"`
-	Refresh                types.Int64                                                  `tfsdk:"refresh" json:"refresh,computed"`
-	Retry                  types.Int64                                                  `tfsdk:"retry" json:"retry,computed"`
-	Serial                 types.Int64                                                  `tfsdk:"serial" json:"serial,computed"`
-	Status                 types.String                                                 `tfsdk:"status" json:"status,computed"`
-	Meta                   customfield.Map[jsontypes.Normalized]                        `tfsdk:"meta" json:"meta,computed"`
-	Records                customfield.NestedObjectList[DNSZoneRecordsDataSourceModel]  `tfsdk:"records" json:"records,computed"`
-	RrsetsAmount           customfield.NestedObject[DNSZoneRrsetsAmountDataSourceModel] `tfsdk:"rrsets_amount" json:"rrsets_amount,computed"`
+	Name          types.String                                                 `tfsdk:"name" path:"name,required"`
+	Contact       types.String                                                 `tfsdk:"contact" json:"contact,computed"`
+	DnssecEnabled types.Bool                                                   `tfsdk:"dnssec_enabled" json:"dnssec_enabled,computed"`
+	Enabled       types.Bool                                                   `tfsdk:"enabled" json:"enabled,computed"`
+	Expiry        types.Int64                                                  `tfsdk:"expiry" json:"expiry,computed"`
+	ID            types.Int64                                                  `tfsdk:"id" json:"id,computed"`
+	NxTtl         types.Int64                                                  `tfsdk:"nx_ttl" json:"nx_ttl,computed"`
+	PrimaryServer types.String                                                 `tfsdk:"primary_server" json:"primary_server,computed"`
+	Refresh       types.Int64                                                  `tfsdk:"refresh" json:"refresh,computed"`
+	Retry         types.Int64                                                  `tfsdk:"retry" json:"retry,computed"`
+	Serial        types.Int64                                                  `tfsdk:"serial" json:"serial,computed"`
+	Status        types.String                                                 `tfsdk:"status" json:"status,computed"`
+	Meta          customfield.Map[jsontypes.Normalized]                        `tfsdk:"meta" json:"meta,computed"`
+	Records       customfield.NestedObjectList[DNSZoneRecordsDataSourceModel]  `tfsdk:"records" json:"records,computed"`
+	RrsetsAmount  customfield.NestedObject[DNSZoneRrsetsAmountDataSourceModel] `tfsdk:"rrsets_amount" json:"rrsets_amount,computed"`
 }
 
 type DNSZoneRecordsDataSourceModel struct {

@@ -397,6 +397,20 @@ func DataSourceSchema(ctx context.Context) schema.Schema {
 						Description: "Filter by name",
 						Optional:    true,
 					},
+					"operating_status": schema.StringAttribute{
+						Description: "Filter by operating status\nAvailable values: \"DEGRADED\", \"DRAINING\", \"ERROR\", \"NO_MONITOR\", \"OFFLINE\", \"ONLINE\".",
+						Optional:    true,
+						Validators: []validator.String{
+							stringvalidator.OneOfCaseInsensitive(
+								"DEGRADED",
+								"DRAINING",
+								"ERROR",
+								"NO_MONITOR",
+								"OFFLINE",
+								"ONLINE",
+							),
+						},
+					},
 					"order_by": schema.StringAttribute{
 						Description: "Order by field and direction.\nAvailable values: \"created_at.asc\", \"created_at.desc\", \"flavor.asc\", \"flavor.desc\", \"name.asc\", \"name.desc\", \"operating_status.asc\", \"operating_status.desc\", \"provisioning_status.asc\", \"provisioning_status.desc\", \"updated_at.asc\", \"updated_at.desc\", \"vip_address.asc\", \"vip_address.desc\", \"vip_ip_family.asc\", \"vip_ip_family.desc\".",
 						Computed:    true,
@@ -419,6 +433,20 @@ func DataSourceSchema(ctx context.Context) schema.Schema {
 								"vip_address.desc",
 								"vip_ip_family.asc",
 								"vip_ip_family.desc",
+							),
+						},
+					},
+					"provisioning_status": schema.StringAttribute{
+						Description: "Filter by provisioning (lifecycle) status\nAvailable values: \"ACTIVE\", \"DELETED\", \"ERROR\", \"PENDING_CREATE\", \"PENDING_DELETE\", \"PENDING_UPDATE\".",
+						Optional:    true,
+						Validators: []validator.String{
+							stringvalidator.OneOfCaseInsensitive(
+								"ACTIVE",
+								"DELETED",
+								"ERROR",
+								"PENDING_CREATE",
+								"PENDING_DELETE",
+								"PENDING_UPDATE",
 							),
 						},
 					},

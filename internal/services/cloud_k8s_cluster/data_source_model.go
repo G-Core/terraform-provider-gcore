@@ -88,6 +88,7 @@ type CloudK8SClusterCniDataSourceModel struct {
 }
 
 type CloudK8SClusterCniCiliumDataSourceModel struct {
+	CniExclusive   types.Bool   `tfsdk:"cni_exclusive" json:"cni_exclusive,computed"`
 	Encryption     types.Bool   `tfsdk:"encryption" json:"encryption,computed"`
 	HubbleRelay    types.Bool   `tfsdk:"hubble_relay" json:"hubble_relay,computed"`
 	HubbleUi       types.Bool   `tfsdk:"hubble_ui" json:"hubble_ui,computed"`
@@ -119,23 +120,24 @@ type CloudK8SClusterLoggingRetentionPolicyDataSourceModel struct {
 }
 
 type CloudK8SClusterPoolsDataSourceModel struct {
-	ID                 types.String                  `tfsdk:"id" json:"id,computed"`
-	AutoHealingEnabled types.Bool                    `tfsdk:"auto_healing_enabled" json:"auto_healing_enabled,computed"`
-	BootVolumeSize     types.Int64                   `tfsdk:"boot_volume_size" json:"boot_volume_size,computed"`
-	BootVolumeType     types.String                  `tfsdk:"boot_volume_type" json:"boot_volume_type,computed"`
-	CreatedAt          types.String                  `tfsdk:"created_at" json:"created_at,computed"`
-	CrioConfig         customfield.Map[types.String] `tfsdk:"crio_config" json:"crio_config,computed"`
-	FlavorID           types.String                  `tfsdk:"flavor_id" json:"flavor_id,computed"`
-	IsPublicIpv4       types.Bool                    `tfsdk:"is_public_ipv4" json:"is_public_ipv4,computed"`
-	KubeletConfig      customfield.Map[types.String] `tfsdk:"kubelet_config" json:"kubelet_config,computed"`
-	Labels             customfield.Map[types.String] `tfsdk:"labels" json:"labels,computed"`
-	MaxNodeCount       types.Int64                   `tfsdk:"max_node_count" json:"max_node_count,computed"`
-	MinNodeCount       types.Int64                   `tfsdk:"min_node_count" json:"min_node_count,computed"`
-	Name               types.String                  `tfsdk:"name" json:"name,computed"`
-	NodeCount          types.Int64                   `tfsdk:"node_count" json:"node_count,computed"`
-	Status             types.String                  `tfsdk:"status" json:"status,computed"`
-	Taints             customfield.Map[types.String] `tfsdk:"taints" json:"taints,computed"`
-	ServergroupID      types.String                  `tfsdk:"servergroup_id" json:"servergroup_id,computed"`
-	ServergroupName    types.String                  `tfsdk:"servergroup_name" json:"servergroup_name,computed"`
-	ServergroupPolicy  types.String                  `tfsdk:"servergroup_policy" json:"servergroup_policy,computed"`
+	ID                 types.String                   `tfsdk:"id" json:"id,computed"`
+	AutoHealingEnabled types.Bool                     `tfsdk:"auto_healing_enabled" json:"auto_healing_enabled,computed"`
+	BootVolumeSize     types.Int64                    `tfsdk:"boot_volume_size" json:"boot_volume_size,computed"`
+	BootVolumeType     types.String                   `tfsdk:"boot_volume_type" json:"boot_volume_type,computed"`
+	CreatedAt          types.String                   `tfsdk:"created_at" json:"created_at,computed"`
+	CrioConfig         customfield.Map[types.String]  `tfsdk:"crio_config" json:"crio_config,computed"`
+	FlavorID           types.String                   `tfsdk:"flavor_id" json:"flavor_id,computed"`
+	IsPublicIpv4       types.Bool                     `tfsdk:"is_public_ipv4" json:"is_public_ipv4,computed"`
+	KubeletConfig      customfield.Map[types.String]  `tfsdk:"kubelet_config" json:"kubelet_config,computed"`
+	Labels             customfield.Map[types.String]  `tfsdk:"labels" json:"labels,computed"`
+	MaxNodeCount       types.Int64                    `tfsdk:"max_node_count" json:"max_node_count,computed"`
+	MinNodeCount       types.Int64                    `tfsdk:"min_node_count" json:"min_node_count,computed"`
+	Name               types.String                   `tfsdk:"name" json:"name,computed"`
+	NodeCount          types.Int64                    `tfsdk:"node_count" json:"node_count,computed"`
+	SecurityGroupIDs   customfield.List[types.String] `tfsdk:"security_group_ids" json:"security_group_ids,computed"`
+	Status             types.String                   `tfsdk:"status" json:"status,computed"`
+	Taints             customfield.Map[types.String]  `tfsdk:"taints" json:"taints,computed"`
+	ServergroupID      types.String                   `tfsdk:"servergroup_id" json:"servergroup_id,computed"`
+	ServergroupName    types.String                   `tfsdk:"servergroup_name" json:"servergroup_name,computed"`
+	ServergroupPolicy  types.String                   `tfsdk:"servergroup_policy" json:"servergroup_policy,computed"`
 }

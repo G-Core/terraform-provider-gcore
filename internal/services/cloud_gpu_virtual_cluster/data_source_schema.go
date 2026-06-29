@@ -127,6 +127,23 @@ func DataSourceSchema(ctx context.Context) schema.Schema {
 									Description: "Interface name",
 									Computed:    true,
 								},
+								"security_groups": schema.ListNestedAttribute{
+									Description: "Resolved security groups applied to this interface.",
+									Computed:    true,
+									CustomType:  customfield.NewNestedObjectListType[CloudGPUVirtualClusterServersSettingsInterfacesSecurityGroupsDataSourceModel](ctx),
+									NestedObject: schema.NestedAttributeObject{
+										Attributes: map[string]schema.Attribute{
+											"id": schema.StringAttribute{
+												Description: "Security group ID",
+												Computed:    true,
+											},
+											"name": schema.StringAttribute{
+												Description: "Security group name",
+												Computed:    true,
+											},
+										},
+									},
+								},
 								"type": schema.StringAttribute{
 									Description: `Available values: "external", "subnet", "any_subnet".`,
 									Computed:    true,
@@ -168,9 +185,10 @@ func DataSourceSchema(ctx context.Context) schema.Schema {
 						},
 					},
 					"security_groups": schema.ListNestedAttribute{
-						Description: "Security groups",
-						Computed:    true,
-						CustomType:  customfield.NewNestedObjectListType[CloudGPUVirtualClusterServersSettingsSecurityGroupsDataSourceModel](ctx),
+						Description:        "Deprecated. Deduplicated union of security groups across all interfaces; the actual assignment may differ per interface. Use `interfaces[].security_groups` for the authoritative per-interface list.",
+						Computed:           true,
+						DeprecationMessage: "This attribute is deprecated.",
+						CustomType:         customfield.NewNestedObjectListType[CloudGPUVirtualClusterServersSettingsSecurityGroupsDataSourceModel](ctx),
 						NestedObject: schema.NestedAttributeObject{
 							Attributes: map[string]schema.Attribute{
 								"id": schema.StringAttribute{

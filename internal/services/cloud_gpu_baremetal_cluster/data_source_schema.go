@@ -7,12 +7,9 @@ import (
 
 	"github.com/G-Core/terraform-provider-gcore/internal/customfield"
 	"github.com/hashicorp/terraform-plugin-framework-timetypes/timetypes"
-	"github.com/hashicorp/terraform-plugin-framework-validators/datasourcevalidator"
-	"github.com/hashicorp/terraform-plugin-framework-validators/listvalidator"
 	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/datasource/schema"
-	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 )
@@ -28,7 +25,7 @@ func DataSourceSchema(ctx context.Context) schema.Schema {
 			},
 			"cluster_id": schema.StringAttribute{
 				Description: "Cluster unique identifier",
-				Optional:    true,
+				Required:    true,
 			},
 			"project_id": schema.Int64Attribute{
 				Description: "Project ID",
@@ -139,6 +136,23 @@ func DataSourceSchema(ctx context.Context) schema.Schema {
 									Description: "Interface name",
 									Computed:    true,
 								},
+								"security_groups": schema.ListNestedAttribute{
+									Description: "Resolved security groups applied to this interface.",
+									Computed:    true,
+									CustomType:  customfield.NewNestedObjectListType[CloudGPUBaremetalClusterServersSettingsInterfacesSecurityGroupsDataSourceModel](ctx),
+									NestedObject: schema.NestedAttributeObject{
+										Attributes: map[string]schema.Attribute{
+											"id": schema.StringAttribute{
+												Description: "Security group ID",
+												Computed:    true,
+											},
+											"name": schema.StringAttribute{
+												Description: "Security group name",
+												Computed:    true,
+											},
+										},
+									},
+								},
 								"type": schema.StringAttribute{
 									Description: `Available values: "external", "subnet", "any_subnet".`,
 									Computed:    true,
@@ -180,9 +194,10 @@ func DataSourceSchema(ctx context.Context) schema.Schema {
 						},
 					},
 					"security_groups": schema.ListNestedAttribute{
-						Description: "Security groups",
-						Computed:    true,
-						CustomType:  customfield.NewNestedObjectListType[CloudGPUBaremetalClusterServersSettingsSecurityGroupsDataSourceModel](ctx),
+						Description:        "Deprecated. Deduplicated union of security groups across all interfaces; the actual assignment may differ per interface. Use `interfaces[].security_groups` for the authoritative per-interface list.",
+						Computed:           true,
+						DeprecationMessage: "This attribute is deprecated.",
+						CustomType:         customfield.NewNestedObjectListType[CloudGPUBaremetalClusterServersSettingsSecurityGroupsDataSourceModel](ctx),
 						NestedObject: schema.NestedAttributeObject{
 							Attributes: map[string]schema.Attribute{
 								"id": schema.StringAttribute{
@@ -227,23 +242,6 @@ func DataSourceSchema(ctx context.Context) schema.Schema {
 					},
 				},
 			},
-			"find_one_by": schema.SingleNestedAttribute{
-				Optional: true,
-				Attributes: map[string]schema.Attribute{
-					"managed_by": schema.ListAttribute{
-						Description: "Specifies the entity responsible for managing the resource.\n- `user`: The resource (cluster) is created and maintained directly by the user.\n- `k8s`: The resource is created and maintained automatically by Managed Kubernetes service",
-						Computed:    true,
-						Optional:    true,
-						Validators: []validator.List{
-							listvalidator.ValueStringsAre(
-								stringvalidator.OneOfCaseInsensitive("k8s", "user"),
-							),
-						},
-						CustomType:  customfield.NewListType[types.String](ctx),
-						ElementType: types.StringType,
-					},
-				},
-			},
 		},
 	}
 }
@@ -253,7 +251,5 @@ func (d *CloudGPUBaremetalClusterDataSource) Schema(ctx context.Context, req dat
 }
 
 func (d *CloudGPUBaremetalClusterDataSource) ConfigValidators(_ context.Context) []datasource.ConfigValidator {
-	return []datasource.ConfigValidator{
-		datasourcevalidator.ExactlyOneOf(path.MatchRoot("cluster_id"), path.MatchRoot("find_one_by")),
-	}
+	return []datasource.ConfigValidator{}
 }

@@ -96,7 +96,7 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 				},
 			},
 			"allowed_cidrs": schema.ListAttribute{
-				Description: "Network CIDRs from which service will be accessible",
+				Description: "Network CIDRs from which service will be accessible. Order-insensitive.",
 				Optional:    true,
 				ElementType: types.StringType,
 			},

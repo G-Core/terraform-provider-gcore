@@ -44,12 +44,16 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 				Required:      true,
 				PlanModifiers: []planmodifier.String{stringplanmodifier.RequiresReplace()},
 			},
+			"servers_count": schema.Int64Attribute{
+				Description: "Number of servers in the cluster",
+				Required:    true,
+			},
 			"image_id": schema.StringAttribute{
 				Description: "System image ID",
 				Required:    true,
 			},
-			"servers_count": schema.Int64Attribute{
-				Description: "Number of servers in the cluster",
+			"name": schema.StringAttribute{
+				Description: "Cluster name",
 				Required:    true,
 			},
 			"servers_settings": schema.SingleNestedAttribute{
@@ -90,6 +94,22 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 									Computed:      true,
 									Optional:      true,
 									PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
+								},
+								"port_security_enabled": schema.BoolAttribute{
+									Description: "Controls port security for this interface. When omitted, the default applies (port security enabled, default security group attached). When false, the port is created with port security off and no security group attached; `security_groups` must not be set in that case. Not allowed for interfaces on a public network, nor for bare metal servers without a DPU (their ports cannot enforce port security).",
+									Optional:    true,
+								},
+								"security_groups": schema.ListNestedAttribute{
+									Description: "Security group UUIDs applied to this interface. If omitted (or empty), the top-level `security_groups` value applies; if both are omitted, the project's default security group is applied.",
+									Optional:    true,
+									NestedObject: schema.NestedAttributeObject{
+										Attributes: map[string]schema.Attribute{
+											"id": schema.StringAttribute{
+												Description: "Resource ID",
+												Required:    true,
+											},
+										},
+									},
 								},
 								"network_id": schema.StringAttribute{
 									Description: "Network ID the subnet belongs to. Port will be plugged in this network",
@@ -161,11 +181,12 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 						},
 					},
 					"security_groups": schema.ListNestedAttribute{
-						Description:   "List of security group UUIDs. If omitted or an empty list, the default security group will be used.",
-						Computed:      true,
-						Optional:      true,
-						CustomType:    customfield.NewNestedObjectListType[CloudGPUBaremetalClusterServersSettingsSecurityGroupsModel](ctx),
-						PlanModifiers: []planmodifier.List{listplanmodifier.UseStateForUnknown()},
+						Description:        "Deprecated. Use per-interface `security_groups` inside `interfaces[]` instead. Cannot be combined with per-interface `security_groups`. If omitted everywhere, the project's default security group is applied.",
+						Computed:           true,
+						Optional:           true,
+						DeprecationMessage: "This attribute is deprecated.",
+						CustomType:         customfield.NewNestedObjectListType[CloudGPUBaremetalClusterServersSettingsSecurityGroupsModel](ctx),
+						PlanModifiers:      []planmodifier.List{listplanmodifier.UseStateForUnknown()},
 						NestedObject: schema.NestedAttributeObject{
 							Attributes: map[string]schema.Attribute{
 								"id": schema.StringAttribute{
@@ -183,10 +204,6 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 					},
 				},
 				PlanModifiers: []planmodifier.Object{planmodifiers.RequiresReplaceOnConfigChange("credentials", "user_data")},
-			},
-			"name": schema.StringAttribute{
-				Description: "Cluster name",
-				Required:    true,
 			},
 			"tags": schema.MapAttribute{
 				Description: "Key-value tags to associate with the resource. A tag is a key-value pair that can be associated with a resource, enabling efficient filtering and grouping for better organization and management. Both tag keys and values have a maximum length of 255 characters. Some tags are read-only and cannot be modified by the user. Tags are also integrated with cost reports, allowing cost data to be filtered based on tag keys or values.",

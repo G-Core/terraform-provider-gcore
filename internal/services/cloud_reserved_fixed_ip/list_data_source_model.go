@@ -20,13 +20,13 @@ type CloudReservedFixedIPsResultsListDataSourceEnvelope struct {
 type CloudReservedFixedIPsDataSourceModel struct {
 	ProjectID     types.Int64                                                             `tfsdk:"project_id" path:"project_id,optional"`
 	RegionID      types.Int64                                                             `tfsdk:"region_id" path:"region_id,optional"`
-	AvailableOnly types.Bool                                                              `tfsdk:"available_only" query:"available_only,optional"`
 	DeviceID      types.String                                                            `tfsdk:"device_id" query:"device_id,optional"`
-	ExternalOnly  types.Bool                                                              `tfsdk:"external_only" query:"external_only,optional"`
-	InternalOnly  types.Bool                                                              `tfsdk:"internal_only" query:"internal_only,optional"`
 	IPAddress     types.String                                                            `tfsdk:"ip_address" query:"ip_address,optional"`
-	OrderBy       types.String                                                            `tfsdk:"order_by" query:"order_by,optional"`
-	VipOnly       types.Bool                                                              `tfsdk:"vip_only" query:"vip_only,optional"`
+	AvailableOnly types.Bool                                                              `tfsdk:"available_only" query:"available_only,computed_optional"`
+	ExternalOnly  types.Bool                                                              `tfsdk:"external_only" query:"external_only,computed_optional"`
+	InternalOnly  types.Bool                                                              `tfsdk:"internal_only" query:"internal_only,computed_optional"`
+	OrderBy       types.String                                                            `tfsdk:"order_by" query:"order_by,computed_optional"`
+	VipOnly       types.Bool                                                              `tfsdk:"vip_only" query:"vip_only,computed_optional"`
 	MaxItems      types.Int64                                                             `tfsdk:"max_items"`
 	Items         customfield.NestedObjectList[CloudReservedFixedIPsItemsDataSourceModel] `tfsdk:"items"`
 }
@@ -56,7 +56,7 @@ func (m *CloudReservedFixedIPsDataSourceModel) toListParams(_ context.Context) (
 		params.IPAddress = param.NewOpt(m.IPAddress.ValueString())
 	}
 	if !m.OrderBy.IsNull() {
-		params.OrderBy = param.NewOpt(m.OrderBy.ValueString())
+		params.OrderBy = cloud.ReservedFixedIPListParamsOrderBy(m.OrderBy.ValueString())
 	}
 	if !m.VipOnly.IsNull() {
 		params.VipOnly = param.NewOpt(m.VipOnly.ValueBool())

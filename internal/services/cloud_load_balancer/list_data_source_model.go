@@ -18,18 +18,20 @@ type CloudLoadBalancersResultsListDataSourceEnvelope struct {
 }
 
 type CloudLoadBalancersDataSourceModel struct {
-	ProjectID        types.Int64                                                          `tfsdk:"project_id" path:"project_id,optional"`
-	RegionID         types.Int64                                                          `tfsdk:"region_id" path:"region_id,optional"`
-	AssignedFloating types.Bool                                                           `tfsdk:"assigned_floating" query:"assigned_floating,optional"`
-	LoggingEnabled   types.Bool                                                           `tfsdk:"logging_enabled" query:"logging_enabled,optional"`
-	Name             types.String                                                         `tfsdk:"name" query:"name,optional"`
-	TagKeyValue      types.String                                                         `tfsdk:"tag_key_value" query:"tag_key_value,optional"`
-	TagKey           *[]types.String                                                      `tfsdk:"tag_key" query:"tag_key,optional"`
-	OrderBy          types.String                                                         `tfsdk:"order_by" query:"order_by,computed_optional"`
-	ShowStats        types.Bool                                                           `tfsdk:"show_stats" query:"show_stats,computed_optional"`
-	WithDDOS         types.Bool                                                           `tfsdk:"with_ddos" query:"with_ddos,computed_optional"`
-	MaxItems         types.Int64                                                          `tfsdk:"max_items"`
-	Items            customfield.NestedObjectList[CloudLoadBalancersItemsDataSourceModel] `tfsdk:"items"`
+	ProjectID          types.Int64                                                          `tfsdk:"project_id" path:"project_id,optional"`
+	RegionID           types.Int64                                                          `tfsdk:"region_id" path:"region_id,optional"`
+	AssignedFloating   types.Bool                                                           `tfsdk:"assigned_floating" query:"assigned_floating,optional"`
+	LoggingEnabled     types.Bool                                                           `tfsdk:"logging_enabled" query:"logging_enabled,optional"`
+	Name               types.String                                                         `tfsdk:"name" query:"name,optional"`
+	OperatingStatus    types.String                                                         `tfsdk:"operating_status" query:"operating_status,optional"`
+	ProvisioningStatus types.String                                                         `tfsdk:"provisioning_status" query:"provisioning_status,optional"`
+	TagKeyValue        types.String                                                         `tfsdk:"tag_key_value" query:"tag_key_value,optional"`
+	TagKey             *[]types.String                                                      `tfsdk:"tag_key" query:"tag_key,optional"`
+	OrderBy            types.String                                                         `tfsdk:"order_by" query:"order_by,computed_optional"`
+	ShowStats          types.Bool                                                           `tfsdk:"show_stats" query:"show_stats,computed_optional"`
+	WithDDOS           types.Bool                                                           `tfsdk:"with_ddos" query:"with_ddos,computed_optional"`
+	MaxItems           types.Int64                                                          `tfsdk:"max_items"`
+	Items              customfield.NestedObjectList[CloudLoadBalancersItemsDataSourceModel] `tfsdk:"items"`
 }
 
 func (m *CloudLoadBalancersDataSourceModel) toListParams(_ context.Context) (params cloud.LoadBalancerListParams, diags diag.Diagnostics) {
@@ -59,8 +61,14 @@ func (m *CloudLoadBalancersDataSourceModel) toListParams(_ context.Context) (par
 	if !m.Name.IsNull() {
 		params.Name = param.NewOpt(m.Name.ValueString())
 	}
+	if !m.OperatingStatus.IsNull() {
+		params.OperatingStatus = cloud.LoadBalancerOperatingStatus(m.OperatingStatus.ValueString())
+	}
 	if !m.OrderBy.IsNull() {
 		params.OrderBy = cloud.LoadBalancerListParamsOrderBy(m.OrderBy.ValueString())
+	}
+	if !m.ProvisioningStatus.IsNull() {
+		params.ProvisioningStatus = cloud.ProvisioningStatus(m.ProvisioningStatus.ValueString())
 	}
 	if !m.ShowStats.IsNull() {
 		params.ShowStats = param.NewOpt(m.ShowStats.ValueBool())

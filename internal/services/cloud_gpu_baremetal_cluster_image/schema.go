@@ -123,6 +123,14 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 				Computed:    true,
 				CustomType:  timetypes.RFC3339Type{},
 			},
+			"cuda_toolkit_version": schema.StringAttribute{
+				Description: "Version of the installed CUDA toolkit",
+				Computed:    true,
+			},
+			"disk_format": schema.StringAttribute{
+				Description: "Disk format of the stored image (e.g. `raw`, `qcow2`). `cow_format=true` -> `raw`, `cow_format=false` -> `qcow2`.",
+				Computed:    true,
+			},
 			"gpu_driver": schema.StringAttribute{
 				Description: "Name of the GPU driver vendor",
 				Computed:    true,
