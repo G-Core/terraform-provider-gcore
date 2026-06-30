@@ -192,7 +192,7 @@ Allows the complete disabling of content caching. (see [below for nested schema]
 `value` and `default` fields cannot be used simultaneously. (see [below for nested schema](#nestedatt--options--edge_cache_settings))
 - `fastedge` (Attributes) Allows to configure FastEdge app to be called on different request/response phases.
 
-Note: At least one of `on_request_headers`, `on_request_body`, `on_response_headers`, or `on_response_body` must be specified. (see [below for nested schema](#nestedatt--options--fastedge))
+Note: At least one of `on_request_headers`, `on_request_headers_after_cache`, `on_request_body`, `on_response_headers`, or `on_response_body` must be specified. (see [below for nested schema](#nestedatt--options--fastedge))
 - `fetch_compressed` (Attributes) Makes the CDN request compressed content from the origin.
 
 The origin server should support compression. CDN servers will not decompress your content even if a user browser does not accept compression.
@@ -236,12 +236,18 @@ If you want to use IPs from our CDN servers IP list for IP ACL configuration, yo
 
 We recommend you use a script for automatically update IP ACL. [Read more.](/docs/api-reference/cdn/ip-addresses-list/get-cdn-servers-ip-addresses) (see [below for nested schema](#nestedatt--options--ip_address_acl))
 - `limit_bandwidth` (Attributes) Allows to control the download speed per connection. (see [below for nested schema](#nestedatt--options--limit_bandwidth))
+- `network_error_logging` (Attributes) Enables Network Error Logging (NEL) for the resource.
+
+When enabled, the edge instructs browsers to collect and report network
+errors (via the `Report-To` and `NEL` response headers), improving
+observability of connectivity issues for the resource. (see [below for nested schema](#nestedatt--options--network_error_logging))
 - `proxy_cache_key` (Attributes) Allows you to modify your cache key. If omitted, the default value is `$request_uri`.
 
 Combine the specified variables to create a key for caching.
-- **$`request_uri`**
-- **$scheme**
-- **$uri**
+- **$`http_x_cdn_real_host`** — the original `Host` header sent by the client. Useful for splitting cache across multiple aliases served by a single CDN resource.
+- **$`request_uri`** — the full original request URI including the query string (e.g., `/path?id=1`).
+- **$scheme** — the request scheme, either `http` or `https`.
+- **$uri** — the normalized request URI without the query string (e.g., `/path`).
 
 **Warning**: Enabling and changing this option can invalidate your current cache and affect the cache hit ratio. Furthermore, the "Purge by pattern" option will not work. (see [below for nested schema](#nestedatt--options--proxy_cache_key))
 - `proxy_cache_methods_set` (Attributes) Caching for POST requests along with default GET and HEAD. (see [below for nested schema](#nestedatt--options--proxy_cache_methods_set))
@@ -486,6 +492,7 @@ Possible values:
 - **false** - Option is disabled.
 - `on_request_body` (Attributes) Allows to configure FastEdge application that will be called to handle request body as soon as CDN receives incoming HTTP request. (see [below for nested schema](#nestedatt--options--fastedge--on_request_body))
 - `on_request_headers` (Attributes) Allows to configure FastEdge application that will be called to handle request headers as soon as CDN receives incoming HTTP request, **before cache**. (see [below for nested schema](#nestedatt--options--fastedge--on_request_headers))
+- `on_request_headers_after_cache` (Attributes) Allows to configure FastEdge application that will be called to handle request headers as soon as CDN receives incoming HTTP request, **after cache**. (see [below for nested schema](#nestedatt--options--fastedge--on_request_headers_after_cache))
 - `on_response_body` (Attributes) Allows to configure FastEdge application that will be called to handle response body before CDN sends the HTTP response. (see [below for nested schema](#nestedatt--options--fastedge--on_response_body))
 - `on_response_headers` (Attributes) Allows to configure FastEdge application that will be called to handle response headers before CDN sends the HTTP response. (see [below for nested schema](#nestedatt--options--fastedge--on_response_headers))
 
@@ -503,6 +510,18 @@ Read-Only:
 
 <a id="nestedatt--options--fastedge--on_request_headers"></a>
 ### Nested Schema for `options.fastedge.on_request_headers`
+
+Read-Only:
+
+- `app_id` (String) The ID of the application in FastEdge.
+- `enabled` (Boolean) Determines if the FastEdge application should be called whenever HTTP request headers are received.
+- `execute_on_edge` (Boolean) Determines if the request should be executed at the edge nodes.
+- `execute_on_shield` (Boolean) Determines if the request should be executed at the shield nodes.
+- `interrupt_on_error` (Boolean) Determines if the request execution should be interrupted when an error occurs.
+
+
+<a id="nestedatt--options--fastedge--on_request_headers_after_cache"></a>
+### Nested Schema for `options.fastedge.on_request_headers_after_cache`
 
 Read-Only:
 
@@ -765,6 +784,21 @@ http://cdn.example.com/video.mp4?speed=50k&buffer=500k
 the download speed will be limited to 50kB/s after 500 kB.
 Available values: "static", "dynamic".
 - `speed` (Number) Maximum download speed per connection.
+
+
+<a id="nestedatt--options--network_error_logging"></a>
+### Nested Schema for `options.network_error_logging`
+
+Read-Only:
+
+- `enabled` (Boolean) Controls the option state.
+
+Possible values:
+- **true** - Option is enabled.
+- **false** - Option is disabled.
+- `value` (Boolean) Possible values:
+- **true** - Option is enabled.
+- **false** - Option is disabled.
 
 
 <a id="nestedatt--options--proxy_cache_key"></a>

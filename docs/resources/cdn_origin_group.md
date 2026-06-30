@@ -196,7 +196,6 @@ Possible values:
 - **fastedge** - A FastEdge application served directly from the local FastEdge runtime on the edge node, identified by `app_id`.
 Available values: "host", "s3", "fastedge".
 - `source` (String) IP address or domain name of the origin and the port, if custom port is used.
-- `tag` (String) Tag for the origin source.
 
 <a id="nestedatt--sources--config"></a>
 ### Nested Schema for `sources.config`
