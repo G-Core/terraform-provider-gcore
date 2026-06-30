@@ -99,7 +99,7 @@ resource "gcore_dns_zone_rrset" "txt_record" {
 - `filter_set_id` (Number)
 - `name` (String)
 - `type` (String) RRSet type
-Available values: "A", "AAAA", "NS", "CNAME", "MX", "TXT", "SRV", "SOA".
+Available values: "A", "AAAA", "NS", "CNAME", "MX", "TXT", "SRV", "SOA", "PTR", "SVCB", "HTTPS", "CAA", "DS".
 - `warning` (String) Warning about some possible side effects without strictly disallowing operations on rrset
 readonly
 Deprecated: use Warnings instead

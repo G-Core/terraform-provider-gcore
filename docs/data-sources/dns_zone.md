@@ -31,6 +31,10 @@ data "gcore_dns_zone" "example_dns_zone" {
 - `dnssec_enabled` (Boolean) describe dnssec status
 true means dnssec is enabled for the zone
 false means dnssec is disabled for the zone
+- `dnssec_status` (String) `dnssec_status` is the four-state lifecycle status of DNSSEC for the zone, driven by the
+parent-DS scan against the registrar. One of: pending, active, pending-disabled, disabled.
+Empty when DNSSEC has never been enabled for the zone.
+- `dnssec_status_modified_on` (String) `dnssec_status_modified_on` is the RFC3339 timestamp of the last `dnssec_status` change.
 - `enabled` (Boolean)
 - `expiry` (Number) number of seconds after which secondary name servers should stop answering request for this zone
 - `id` (Number) ID of zone.

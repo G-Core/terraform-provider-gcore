@@ -52,7 +52,7 @@ CDN integration will be removed for this RRSet
 - `resource_records` (Attributes List) List of resource record from rrset (see [below for nested schema](#nestedatt--resource_records))
 - `ttl` (Number)
 - `type` (String) RRSet type
-Available values: "A", "AAAA", "NS", "CNAME", "MX", "TXT", "SRV", "SOA".
+Available values: "A", "AAAA", "NS", "CNAME", "MX", "TXT", "SRV", "SOA", "PTR", "SVCB", "HTTPS", "CAA", "DS".
 - `updated_at` (String) Timestamp marshals/unmarshals date and time as timestamp in json
 - `warning` (String) Warning about some possible side effects without strictly disallowing operations on rrset
 readonly

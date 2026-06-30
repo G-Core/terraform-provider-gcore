@@ -66,10 +66,16 @@ webhook will get a map with three arrays: for created, updated and deleted rrset
 
 ### Read-Only
 
+- `dnssec_status` (String) `dnssec_status` is the four-state lifecycle status of DNSSEC for the zone, driven by the
+parent-DS scan against the registrar. One of: pending, active, pending-disabled, disabled.
+Empty when DNSSEC has never been enabled for the zone.
+- `dnssec_status_modified_on` (String) `dnssec_status_modified_on` is the RFC3339 timestamp of the last `dnssec_status` change.
 - `id` (String) name of DNS zone
 - `records` (Attributes List) (see [below for nested schema](#nestedatt--records))
 - `rrsets_amount` (Attributes) (see [below for nested schema](#nestedatt--rrsets_amount))
-- `serial` (Number) Serial number for this zone. Server-managed: always derived from the zone's last modification timestamp.
+- `serial` (Number) Serial number for this zone or Timestamp of zone modification moment.
+If a secondary name server slaved to this one observes an increase in this number,
+the slave will assume that the zone has been updated and initiate a zone transfer.
 - `status` (String)
 - `warnings` (List of String)
 
