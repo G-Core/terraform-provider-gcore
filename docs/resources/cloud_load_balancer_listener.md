@@ -76,7 +76,7 @@ Available values: "HTTP", "HTTPS", "PROMETHEUS", "TCP", "TERMINATED_HTTPS", "UDP
 ### Optional
 
 - `admin_state_up` (Boolean) Administrative state of the resource. When set to true, the resource is enabled and operational. When set to false, the resource is disabled and will not process traffic. Defaults to true.
-- `allowed_cidrs` (List of String) Network CIDRs from which service will be accessible
+- `allowed_cidrs` (List of String) Network CIDRs from which service will be accessible. Order-insensitive.
 - `connection_limit` (Number) Limit of the simultaneous connections. If -1 is provided, it is translated to the default value 100000.
 - `default_pool_id` (String) ID of already existent Load Balancer Pool to attach listener to.
 - `insert_x_forwarded` (Boolean) Add headers X-Forwarded-For, X-Forwarded-Port, X-Forwarded-Proto to requests. Only used with HTTP or `TERMINATED_HTTPS` protocols.

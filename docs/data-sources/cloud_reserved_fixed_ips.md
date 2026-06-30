@@ -14,15 +14,10 @@ Reserved fixed IPs are static IP addresses that persist independently of instanc
 
 ```terraform
 data "gcore_cloud_reserved_fixed_ips" "example_cloud_reserved_fixed_ips" {
-  project_id = 0
-  region_id = 0
-  available_only = true
+  project_id = 1
+  region_id = 4
   device_id = "device_id"
-  external_only = true
-  internal_only = true
   ip_address = "ip_address"
-  order_by = "order_by"
-  vip_only = true
 }
 ```
 
@@ -31,15 +26,16 @@ data "gcore_cloud_reserved_fixed_ips" "example_cloud_reserved_fixed_ips" {
 
 ### Optional
 
-- `available_only` (Boolean) Set to true if the response should only list IP addresses that are not attached to any instance
+- `available_only` (Boolean) Set True if response should only list IP addresses that are not attached to any instance
 - `device_id` (String) Filter IPs by device ID it is attached to
 - `external_only` (Boolean) Set to true if the response should only list public IP addresses
 - `internal_only` (Boolean) Set to true if the response should only list private IP addresses
-- `ip_address` (String) An IPv4 address to filter results by. Regular expression allowed
+- `ip_address` (String) Optional. An IPv4 address to filter results by. Regular expression allowed
 - `max_items` (Number) Max items to fetch, default: 1000
-- `order_by` (String) Ordering reserved fixed IP list result by name, status, `updated_at`, `created_at` or `fixed_ip_address` fields and directions (status.asc), default is "fixed_ip_address.asc"
-- `project_id` (Number)
-- `region_id` (Number)
+- `order_by` (String) Optional. Ordering reserved fixed IP list result by name, status, `updated_at`, `fixed_ip_address` or `created_at` fields of the reserved fixed IP and directions (status.asc).
+Available values: "created_at.asc", "created_at.desc", "fixed_ip_address.asc", "fixed_ip_address.desc", "name.asc", "name.desc", "status.asc", "status.desc", "updated_at.asc", "updated_at.desc".
+- `project_id` (Number) Project ID
+- `region_id` (Number) Region ID
 - `vip_only` (Boolean) Set to true if the response should only list VIPs
 
 ### Read-Only

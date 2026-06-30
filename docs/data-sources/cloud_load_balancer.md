@@ -71,8 +71,12 @@ Optional:
 - `assigned_floating` (Boolean) With or without assigned floating IP
 - `logging_enabled` (Boolean) With or without logging enabled
 - `name` (String) Filter by name
+- `operating_status` (String) Filter by operating status
+Available values: "DEGRADED", "DRAINING", "ERROR", "NO_MONITOR", "OFFLINE", "ONLINE".
 - `order_by` (String) Order by field and direction.
 Available values: "created_at.asc", "created_at.desc", "flavor.asc", "flavor.desc", "name.asc", "name.desc", "operating_status.asc", "operating_status.desc", "provisioning_status.asc", "provisioning_status.desc", "updated_at.asc", "updated_at.desc", "vip_address.asc", "vip_address.desc", "vip_ip_family.asc", "vip_ip_family.desc".
+- `provisioning_status` (String) Filter by provisioning (lifecycle) status
+Available values: "ACTIVE", "DELETED", "ERROR", "PENDING_CREATE", "PENDING_DELETE", "PENDING_UPDATE".
 - `tag_key` (List of String) Optional. Filter by tag keys. ?`tag_key`=key1&`tag_key`=key2
 - `tag_key_value` (String) Optional. Filter by tag key-value pairs.
 

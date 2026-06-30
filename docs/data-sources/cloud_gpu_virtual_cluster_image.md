@@ -36,9 +36,13 @@ data "gcore_cloud_gpu_virtual_cluster_image" "example_cloud_gpu_virtual_cluster_
 
 - `architecture` (String) Image architecture type
 - `created_at` (String) Datetime when the image was created
+- `cuda_toolkit_version` (String) Version of the installed CUDA toolkit
+- `disk_format` (String) Disk format of the stored image (e.g. `raw`, `qcow2`). `cow_format=true` -> `raw`, `cow_format=false` -> `qcow2`.
 - `gpu_driver` (String) Name of the GPU driver vendor
 - `gpu_driver_type` (String) Type of the GPU driver
 - `gpu_driver_version` (String) Version of the installed GPU driver
+- `hw_firmware_type` (String) Specifies the type of firmware with which to boot the guest.
+Available values: "bios", "uefi".
 - `id` (String) Image ID
 - `min_disk` (Number) Minimal boot volume required
 - `min_ram` (Number) Minimal VM RAM required

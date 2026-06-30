@@ -201,6 +201,7 @@ Available values: "cold", "ssd_hiiops", "ssd_local", "ssd_lowlatency", "standard
 - `labels` (Map of String) Labels applied to the cluster pool
 - `max_node_count` (Number) Maximum node count
 - `min_node_count` (Number) Minimum node count
+- `security_group_ids` (List of String) Security group IDs applied to the cluster pool nodes
 - `servergroup_policy` (String) Server group policy: anti-affinity, soft-anti-affinity or affinity
 Available values: "affinity", "anti-affinity", "soft-anti-affinity".
 - `taints` (Map of String) Taints applied to the cluster pool
@@ -272,6 +273,7 @@ Available values: "calico", "cilium".
 
 Optional:
 
+- `cni_exclusive` (Boolean) Whether Cilium manages networking exclusively. Set to `false` to allow other CNI components to coexist with Cilium.
 - `encryption` (Boolean) Wireguard encryption
 - `hubble_relay` (Boolean) Hubble Relay
 - `hubble_ui` (Boolean) Hubble UI

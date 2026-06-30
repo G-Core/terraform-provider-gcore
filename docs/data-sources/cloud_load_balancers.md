@@ -19,6 +19,8 @@ data "gcore_cloud_load_balancers" "example_cloud_load_balancers" {
   assigned_floating = true
   logging_enabled = true
   name = "lb_name"
+  operating_status = "DEGRADED"
+  provisioning_status = "ACTIVE"
   tag_key = ["key1", "key2"]
   tag_key_value = "tag_key_value"
 }
@@ -33,9 +35,13 @@ data "gcore_cloud_load_balancers" "example_cloud_load_balancers" {
 - `logging_enabled` (Boolean) With or without logging enabled
 - `max_items` (Number) Max items to fetch, default: 1000
 - `name` (String) Filter by name
+- `operating_status` (String) Filter by operating status
+Available values: "DEGRADED", "DRAINING", "ERROR", "NO_MONITOR", "OFFLINE", "ONLINE".
 - `order_by` (String) Order by field and direction.
 Available values: "created_at.asc", "created_at.desc", "flavor.asc", "flavor.desc", "name.asc", "name.desc", "operating_status.asc", "operating_status.desc", "provisioning_status.asc", "provisioning_status.desc", "updated_at.asc", "updated_at.desc", "vip_address.asc", "vip_address.desc", "vip_ip_family.asc", "vip_ip_family.desc".
 - `project_id` (Number) Project ID
+- `provisioning_status` (String) Filter by provisioning (lifecycle) status
+Available values: "ACTIVE", "DELETED", "ERROR", "PENDING_CREATE", "PENDING_DELETE", "PENDING_UPDATE".
 - `region_id` (Number) Region ID
 - `show_stats` (Boolean) Show statistics
 - `tag_key` (List of String) Optional. Filter by tag keys. ?`tag_key`=key1&`tag_key`=key2

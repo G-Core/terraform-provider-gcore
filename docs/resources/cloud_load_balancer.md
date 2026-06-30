@@ -172,6 +172,7 @@ output "private_lb_fip" {
 
 - `flavor` (String) Load balancer flavor name
 - `floating_ip` (Attributes) Floating IP configuration for assignment (see [below for nested schema](#nestedatt--floating_ip))
+- `listeners` (Attributes List) Load balancer listeners. Maximum 50 per LB (excluding Prometheus endpoint listener). (see [below for nested schema](#nestedatt--listeners))
 - `logging` (Attributes) Logging configuration (see [below for nested schema](#nestedatt--logging))
 - `preferred_connectivity` (String) Preferred option to establish connectivity between load balancer and its pools members. L2 provides best performance, L3 provides less IPs usage. It is taking effect only if `instance_id` + `ip_address` is provided, not `subnet_id` + `ip_address`, because we're considering this as intentional `subnet_id` specification.
 Available values: "L2", "L3".
@@ -190,6 +191,7 @@ Available values: "dual", "ipv4", "ipv6".
 - `admin_state_up` (Boolean) Administrative state of the resource. When set to true, the resource is enabled and operational. When set to false, the resource is disabled and will not process traffic. Defaults to true.
 - `created_at` (String) Datetime when the load balancer was created
 - `creator_task_id` (String) Task that created this entity
+- `ddos_profile` (Attributes) Loadbalancer advanced DDoS protection profile. (see [below for nested schema](#nestedatt--ddos_profile))
 - `floating_ips` (Attributes List) List of assigned floating IPs (see [below for nested schema](#nestedatt--floating_ips))
 - `id` (String) The ID of this resource.
 - `operating_status` (String) Load balancer operating status
@@ -199,6 +201,10 @@ Available values: "ACTIVE", "DELETED", "ERROR", "PENDING_CREATE", "PENDING_DELET
 - `region` (String) Region name
 - `stats` (Attributes) Statistics of load balancer. (see [below for nested schema](#nestedatt--stats))
 - `tags_v2` (Attributes List) List of key-value tags associated with the resource. A tag is a key-value pair that can be associated with a resource, enabling efficient filtering and grouping for better organization and management. Some tags are read-only and cannot be modified by the user. Tags are also integrated with cost reports, allowing cost data to be filtered based on tag keys or values. (see [below for nested schema](#nestedatt--tags_v2))
+- `task_id` (String) The UUID of the active task that currently holds a lock on the resource. This lock prevents concurrent modifications to ensure consistency. If `null`, the resource is not locked.
+- `tasks` (List of String) List of task IDs representing asynchronous operations. Use these IDs to monitor operation progress:
+- `GET /v1/tasks/{task_id}` - Check individual task status and details
+Poll task status until completion (`FINISHED`/`ERROR`) before proceeding with dependent operations.
 - `updated_at` (String) Datetime when the load balancer was last updated
 - `vip_address` (String) Load balancer IP address
 - `vip_fqdn` (String) Fully qualified domain name for the load balancer VIP
@@ -215,6 +221,131 @@ Available values: "new", "existing".
 Optional:
 
 - `existing_floating_id` (String) An existing available floating IP id must be specified if the source is set to `existing`
+
+
+<a id="nestedatt--listeners"></a>
+### Nested Schema for `listeners`
+
+Required:
+
+- `name` (String) Load balancer listener name
+- `protocol` (String) Load balancer listener protocol
+Available values: "HTTP", "HTTPS", "PROMETHEUS", "TCP", "TERMINATED_HTTPS", "UDP".
+- `protocol_port` (Number) Protocol port
+
+Optional:
+
+- `allowed_cidrs` (List of String) Network CIDRs from which service will be accessible. Order-insensitive.
+- `connection_limit` (Number) Limit of the simultaneous connections. If -1 is provided, it is translated to the default value 100000.
+- `insert_x_forwarded` (Boolean) Add headers X-Forwarded-For, X-Forwarded-Port, X-Forwarded-Proto to requests. Only used with HTTP or `TERMINATED_HTTPS` protocols.
+- `pools` (Attributes List) Member pools (see [below for nested schema](#nestedatt--listeners--pools))
+- `secret_id` (String) ID of the secret where PKCS12 file is stored for `TERMINATED_HTTPS` or PROMETHEUS listener
+Available values: "".
+- `sni_secret_id` (List of String) List of secrets IDs containing PKCS12 format certificate/key bundles for `TERMINATED_HTTPS` or PROMETHEUS listeners
+- `timeout_client_data` (Number) Frontend client inactivity timeout in milliseconds
+- `timeout_member_connect` (Number, Deprecated) Backend member connection timeout in milliseconds. We are recommending to use `pool.timeout_member_connect` instead.
+- `timeout_member_data` (Number, Deprecated) Backend member inactivity timeout in milliseconds. We are recommending to use `pool.timeout_member_data` instead.
+- `user_list` (Attributes List) Load balancer listener list of username and encrypted password items (see [below for nested schema](#nestedatt--listeners--user_list))
+
+<a id="nestedatt--listeners--pools"></a>
+### Nested Schema for `listeners.pools`
+
+Required:
+
+- `lb_algorithm` (String) Load balancer algorithm
+Available values: "LEAST_CONNECTIONS", "ROUND_ROBIN", "SOURCE_IP".
+- `name` (String) Pool name
+- `protocol` (String) Protocol
+Available values: "HTTP", "HTTPS", "PROXY", "PROXYV2", "TCP", "UDP".
+
+Optional:
+
+- `ca_secret_id` (String) Secret ID of CA certificate bundle
+- `crl_secret_id` (String) Secret ID of CA revocation list file
+- `healthmonitor` (Attributes) Health monitor details (see [below for nested schema](#nestedatt--listeners--pools--healthmonitor))
+- `members` (Attributes List) Pool members (see [below for nested schema](#nestedatt--listeners--pools--members))
+- `secret_id` (String) Secret ID for TLS client authentication to the member servers
+- `session_persistence` (Attributes) Session persistence details (see [below for nested schema](#nestedatt--listeners--pools--session_persistence))
+- `timeout_client_data` (Number, Deprecated) Frontend client inactivity timeout in milliseconds. We are recommending to use `listener.timeout_client_data` instead.
+- `timeout_member_connect` (Number) Backend member connection timeout in milliseconds
+- `timeout_member_data` (Number) Backend member inactivity timeout in milliseconds
+
+<a id="nestedatt--listeners--pools--healthmonitor"></a>
+### Nested Schema for `listeners.pools.healthmonitor`
+
+Required:
+
+- `delay` (Number) The time, in seconds, between sending probes to members
+- `max_retries` (Number) Number of successes before the member is switched to ONLINE state
+- `timeout` (Number) The maximum time to connect. Must be less than the delay value
+- `type` (String) Health monitor type. Once health monitor is created, cannot be changed.
+Available values: "HTTP", "HTTPS", "K8S", "PING", "TCP", "TLS-HELLO", "UDP-CONNECT".
+
+Optional:
+
+- `admin_state_up` (Boolean) Administrative state of the resource. When set to true, the resource is enabled and operational. When set to false, the resource is disabled and will not process traffic. Defaults to true.
+- `domain_name` (String) Domain name for HTTP host header. Can only be used together with `HTTP` or `HTTPS` health monitor type.
+- `expected_codes` (String) Expected HTTP response codes. Can be a single code or a range of codes. Can only be used together with `HTTP` or `HTTPS` health monitor type. For example, 200,202,300-302,401,403,404,500-504. If not specified, the default is 200.
+- `http_method` (String) HTTP method. Can only be used together with `HTTP` or `HTTPS` health monitor type.
+Available values: "CONNECT", "DELETE", "GET", "HEAD", "OPTIONS", "PATCH", "POST", "PUT", "TRACE".
+- `http_version` (String) HTTP version. Can only be used together with `HTTP` or `HTTPS` health monitor type. Supported values: 1.0, 1.1.
+Available values: "1.0", "1.1".
+- `max_retries_down` (Number) Number of failures before the member is switched to ERROR state.
+- `url_path` (String) The HTTP path the health monitor requests on each member. Defaults to `/` if not set. Can only be used with `HTTP` or `HTTPS` health monitor type.
+
+Must start with `/` and contain only plain path segments. Query strings (`?`), fragments (`#`), percent-encoding (`%`), and consecutive slashes (`//`) are not allowed.
+
+Examples of valid paths:
+- `/` — check the root (most common, default)
+- `/healthz` — a dedicated health endpoint
+
+
+<a id="nestedatt--listeners--pools--members"></a>
+### Nested Schema for `listeners.pools.members`
+
+Required:
+
+- `address` (String) Member IP address
+- `protocol_port` (Number) Member IP port
+
+Optional:
+
+- `admin_state_up` (Boolean) Administrative state of the resource. When set to true, the resource is enabled and operational. When set to false, the resource is disabled and will not process traffic. Defaults to true.
+- `backup` (Boolean) Set to true if the member is a backup member, to which traffic will be sent exclusively when all non-backup members will be unreachable. It allows to realize ACTIVE-BACKUP load balancing without thinking about VRRP and VIP configuration. Default is false.
+- `instance_id` (String) Either `subnet_id` or `instance_id` should be provided
+- `monitor_address` (String) An alternate IP address used for health monitoring of a backend member. Default is null which monitors the member address.
+- `monitor_port` (Number) An alternate protocol port used for health monitoring of a backend member. Default is null which monitors the member `protocol_port`.
+- `subnet_id` (String) `subnet_id` in which `address` is present. Either `subnet_id` or `instance_id` should be provided
+- `weight` (Number) Member weight. Valid values are 0 < `weight` <= 256, defaults to 1. Controls traffic distribution based on the pool's load balancing algorithm:
+- `ROUND_ROBIN`: Distributes connections to each member in turn according to weights. Higher weight = more turns in the cycle. Example: weights 3 vs 1 = ~75% vs ~25% of requests.
+- `LEAST_CONNECTIONS`: Sends new connections to the member with fewest active connections, performing round-robin within groups of the same normalized load. Higher weight = allowed to hold more simultaneous connections before being considered 'more loaded'. Example: weights 2 vs 1 means 20 vs 10 active connections is treated as balanced.
+- `SOURCE_IP`: Routes clients consistently to the same member by hashing client source IP; hash result is modulo total weight of running members. Higher weight = more hash buckets, so more client IPs map to that member. Example: weights 2 vs 1 = roughly two-thirds of distinct client IPs map to the higher-weight member.
+
+
+<a id="nestedatt--listeners--pools--session_persistence"></a>
+### Nested Schema for `listeners.pools.session_persistence`
+
+Required:
+
+- `type` (String) Session persistence type
+Available values: "APP_COOKIE", "HTTP_COOKIE", "SOURCE_IP".
+
+Optional:
+
+- `cookie_name` (String) Should be set if app cookie or http cookie is used
+- `persistence_granularity` (String) Subnet mask if `source_ip` is used. For UDP ports only
+- `persistence_timeout` (Number) Session persistence timeout. For UDP ports only
+
+
+
+<a id="nestedatt--listeners--user_list"></a>
+### Nested Schema for `listeners.user_list`
+
+Required:
+
+- `encrypted_password` (String) Encrypted password to auth via Basic Authentication
+- `username` (String) Username to auth via Basic Authentication
+
 
 
 <a id="nestedatt--logging"></a>
@@ -245,6 +376,89 @@ Read-Only:
 - `subnet_id` (String) Subnet UUID
 
 
+<a id="nestedatt--ddos_profile"></a>
+### Nested Schema for `ddos_profile`
+
+Read-Only:
+
+- `fields` (Attributes List) List of configured field values for the protection profile (see [below for nested schema](#nestedatt--ddos_profile--fields))
+- `id` (Number) Unique identifier for the DDoS protection profile
+- `options` (Attributes) Configuration options controlling profile activation and BGP routing (see [below for nested schema](#nestedatt--ddos_profile--options))
+- `profile_template` (Attributes) Complete template configuration data used for this profile (see [below for nested schema](#nestedatt--ddos_profile--profile_template))
+- `profile_template_description` (String) Detailed description of the protection template used for this profile
+- `protocols` (Attributes List) List of network protocols and ports configured for protection (see [below for nested schema](#nestedatt--ddos_profile--protocols))
+- `site` (String) Geographic site identifier where the protection is deployed
+- `status` (Attributes) Current operational status and any error information for the profile (see [below for nested schema](#nestedatt--ddos_profile--status))
+
+<a id="nestedatt--ddos_profile--fields"></a>
+### Nested Schema for `ddos_profile.fields`
+
+Read-Only:
+
+- `base_field` (Number) ID of DDoS profile field
+- `default` (String) Predefined default value for the field if not specified
+- `description` (String) Detailed description explaining the field's purpose and usage guidelines
+- `field_type` (String) Data type classification of the field (e.g., string, integer, array)
+- `field_value` (String) Complex value for the DDoS profile field
+- `id` (Number) Unique identifier for the DDoS protection field
+- `name` (String) Human-readable name of the protection field
+- `required` (Boolean) Indicates whether this field must be provided when creating a protection profile
+- `validation_schema` (String) JSON schema defining validation rules and constraints for the field value
+
+
+<a id="nestedatt--ddos_profile--options"></a>
+### Nested Schema for `ddos_profile.options`
+
+Read-Only:
+
+- `active` (Boolean) Controls whether the DDoS protection profile is enabled and actively protecting the resource
+- `bgp` (Boolean) Enables Border Gateway Protocol (BGP) routing for DDoS protection traffic
+
+
+<a id="nestedatt--ddos_profile--profile_template"></a>
+### Nested Schema for `ddos_profile.profile_template`
+
+Read-Only:
+
+- `description` (String) Detailed description explaining the template's purpose and use cases
+- `fields` (Attributes List) List of configurable fields that define the template's protection parameters (see [below for nested schema](#nestedatt--ddos_profile--profile_template--fields))
+- `id` (Number) Unique identifier for the DDoS protection template
+- `name` (String) Human-readable name of the protection template
+
+<a id="nestedatt--ddos_profile--profile_template--fields"></a>
+### Nested Schema for `ddos_profile.profile_template.fields`
+
+Read-Only:
+
+- `default` (String) Predefined default value for the field if not specified
+- `description` (String) Detailed description explaining the field's purpose and usage guidelines
+- `field_type` (String) Data type classification of the field (e.g., string, integer, array)
+- `id` (Number) Unique identifier for the DDoS protection field
+- `name` (String) Human-readable name of the protection field
+- `required` (Boolean) Indicates whether this field must be provided when creating a protection profile
+- `validation_schema` (String) JSON schema defining validation rules and constraints for the field value
+
+
+
+<a id="nestedatt--ddos_profile--protocols"></a>
+### Nested Schema for `ddos_profile.protocols`
+
+Read-Only:
+
+- `port` (String) Network port number for which protocols are configured
+- `protocols` (List of String) List of network protocols enabled on the specified port
+
+
+<a id="nestedatt--ddos_profile--status"></a>
+### Nested Schema for `ddos_profile.status`
+
+Read-Only:
+
+- `error_description` (String) Detailed error message describing any issues with the profile operation
+- `status` (String) Current operational status of the DDoS protection profile
+
+
+
 <a id="nestedatt--floating_ips"></a>
 ### Nested Schema for `floating_ips`
 
@@ -263,6 +477,7 @@ Read-Only:
 - `status` (String) Floating IP status. DOWN - unassigned (available). ACTIVE - attached to a port (in use). ERROR - error state.
 Available values: "ACTIVE", "DOWN", "ERROR".
 - `tags` (Attributes List) List of key-value tags associated with the resource. A tag is a key-value pair that can be associated with a resource, enabling efficient filtering and grouping for better organization and management. Some tags are read-only and cannot be modified by the user. Tags are also integrated with cost reports, allowing cost data to be filtered based on tag keys or values. (see [below for nested schema](#nestedatt--floating_ips--tags))
+- `task_id` (String) The UUID of the active task that currently holds a lock on the resource. This lock prevents concurrent modifications to ensure consistency. If `null`, the resource is not locked.
 - `updated_at` (String) Datetime when the floating IP was last updated
 
 <a id="nestedatt--floating_ips--tags"></a>

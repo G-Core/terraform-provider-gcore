@@ -214,7 +214,7 @@ Optional:
 
 - `credentials` (Attributes) Optional server access credentials (see [below for nested schema](#nestedatt--servers_settings--credentials))
 - `file_shares` (Attributes List) List of file shares to be mounted across the cluster. (see [below for nested schema](#nestedatt--servers_settings--file_shares))
-- `security_groups` (Attributes List) List of security group UUIDs. If omitted or an empty list, the default security group will be used. (see [below for nested schema](#nestedatt--servers_settings--security_groups))
+- `security_groups` (Attributes List, Deprecated) Deprecated. Use per-interface `security_groups` inside `interfaces[]` instead. Cannot be combined with per-interface `security_groups`. If omitted everywhere, the project's default security group is applied. (see [below for nested schema](#nestedatt--servers_settings--security_groups))
 - `user_data` (String) Optional custom user data (Base64-encoded)
 
 <a id="nestedatt--servers_settings--interfaces"></a>
@@ -231,6 +231,8 @@ Optional:
 Available values: "dual", "ipv4", "ipv6".
 - `name` (String) Interface name
 - `network_id` (String) Network ID the subnet belongs to. Port will be plugged in this network
+- `port_security_enabled` (Boolean) Controls port security for this interface. When omitted, the default applies (port security enabled, default security group attached). When false, the port is created with port security off and no security group attached; `security_groups` must not be set in that case. Not allowed for interfaces on a public network, nor for bare metal servers without a DPU (their ports cannot enforce port security).
+- `security_groups` (Attributes List) Security group UUIDs applied to this interface. If omitted (or empty), the top-level `security_groups` value applies; if both are omitted, the project's default security group is applied. (see [below for nested schema](#nestedatt--servers_settings--interfaces--security_groups))
 - `subnet_id` (String) Port is assigned an IP address from this subnet
 
 <a id="nestedatt--servers_settings--interfaces--floating_ip"></a>
@@ -239,6 +241,14 @@ Available values: "dual", "ipv4", "ipv6".
 Required:
 
 - `source` (String) Available values: "new".
+
+
+<a id="nestedatt--servers_settings--interfaces--security_groups"></a>
+### Nested Schema for `servers_settings.interfaces.security_groups`
+
+Required:
+
+- `id` (String) Resource ID
 
 
 

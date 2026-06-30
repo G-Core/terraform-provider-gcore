@@ -118,8 +118,8 @@ Available values: "dual", "ipv4", "ipv6".
 - `is_vip` (Boolean) If reserved fixed IP is a VIP
 - `network_id` (String) Reserved fixed IP will be allocated in a subnet of this network
 - `port_id` (String) Port ID to make a reserved fixed IP (for example, `vip_port_id` of the Load Balancer entity).
-- `project_id` (Number)
-- `region_id` (Number)
+- `project_id` (Number) Project ID
+- `region_id` (Number) Region ID
 - `subnet_id` (String) Reserved fixed IP will be allocated in this subnet
 
 ### Read-Only

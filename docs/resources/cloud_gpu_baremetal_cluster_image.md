@@ -56,6 +56,8 @@ Available values: "allow", "deny", "required".
 ### Read-Only
 
 - `created_at` (String) Datetime when the image was created
+- `cuda_toolkit_version` (String) Version of the installed CUDA toolkit
+- `disk_format` (String) Disk format of the stored image (e.g. `raw`, `qcow2`). `cow_format=true` -> `raw`, `cow_format=false` -> `qcow2`.
 - `gpu_driver` (String) Name of the GPU driver vendor
 - `gpu_driver_type` (String) Type of the GPU driver
 - `gpu_driver_version` (String) Version of the installed GPU driver

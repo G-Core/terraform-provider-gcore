@@ -499,7 +499,7 @@ resource "gcore_cloud_instance" "windows_with_userdata" {
 - `password_wo_version` (Number) Instance password write-only version. Used to trigger updates of the write-only password field.
 - `project_id` (Number) Project ID
 - `region_id` (Number) Region ID
-- `security_groups` (Attributes List) Specifies security group UUIDs to be applied to all instance network interfaces. (see [below for nested schema](#nestedatt--security_groups))
+- `security_groups` (Attributes List, Deprecated) Deprecated. Use per-interface `security_groups` inside `interfaces[]` instead. Cannot be combined with per-interface `security_groups`. If omitted everywhere, the project's default security group is applied. (see [below for nested schema](#nestedatt--security_groups))
 - `servergroup_id` (String) Placement group ID for instance placement policy.
 
 Supported group types:
@@ -547,7 +547,7 @@ Optional:
 Available values: "dual", "ipv4", "ipv6".
 - `network_id` (String) The network where the instance will be connected.
 - `port_id` (String) Port ID for the interface. Required for reserved_fixed_ip type, computed for other types.
-- `security_groups` (Attributes List) Specifies security group UUIDs to be applied to the instance network interface. (see [below for nested schema](#nestedatt--interfaces--security_groups))
+- `security_groups` (Attributes List) Security group UUIDs applied to this interface. If omitted (or empty), the top-level `security_groups` value applies; if both are omitted, the project's default security group is applied. (see [below for nested schema](#nestedatt--interfaces--security_groups))
 - `subnet_id` (String) The instance will get an IP address from this subnet.
 
 <a id="nestedatt--interfaces--floating_ip"></a>
@@ -601,7 +601,7 @@ Read-Only:
 - `alarm_end` (String) A date-time string giving the time that the alarm ended. If not yet ended, time will be given as 0001-01-01T00:00:00Z
 - `alarm_start` (String) A date-time string giving the time that the alarm started
 - `alarm_state` (String) Current state of alarm
-Available values: "ACK_REQ", "ALARM", "ARCHIVED", "CLEAR", "CLEARING", "CLEARING_FAIL", "END_GRACE", "END_WAIT", "MANUAL_CLEAR", "MANUAL_CLEARING", "MANUAL_CLEARING_FAIL", "MANUAL_MITIGATING", "MANUAL_STARTING", "MANUAL_STARTING_FAIL", "MITIGATING", "STARTING", "STARTING_FAIL", "START_WAIT", "ack_req", "alarm", "archived", "clear", "clearing", "clearing_fail", "end_grace", "end_wait", "manual_clear", "manual_clearing", "manual_clearing_fail", "manual_mitigating", "manual_starting", "manual_starting_fail", "mitigating", "start_wait", "starting", "starting_fail".
+Available values: "ACK_REQ", "ALARM", "ALARM_FAIL", "ARCHIVED", "CLEAR", "CLEARING", "CLEARING_FAIL", "CLEAR_FAIL", "END_GRACE", "END_WAIT", "MANUAL_CLEAR", "MANUAL_CLEARING", "MANUAL_CLEARING_FAIL", "MANUAL_CLEAR_FAIL", "MANUAL_MITIGATING", "MANUAL_START", "MANUAL_STARTING", "MANUAL_STARTING_FAIL", "MANUAL_START_FAIL", "MITIGATING", "STARTING", "STARTING_FAIL", "START_WAIT", "ack_req", "alarm", "archived", "clear", "clearing", "clearing_fail", "end_grace", "end_wait", "manual_clear", "manual_clearing", "manual_clearing_fail", "manual_mitigating", "manual_starting", "manual_starting_fail", "mitigating", "start_wait", "starting", "starting_fail".
 - `alert_duration` (String) Total alert duration
 - `destination_ip` (String) Notification destination IP address
 - `id` (Number)

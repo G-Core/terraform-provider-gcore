@@ -14,9 +14,9 @@ Reserved fixed IPs are static IP addresses that persist independently of instanc
 
 ```terraform
 data "gcore_cloud_reserved_fixed_ip" "example_cloud_reserved_fixed_ip" {
-  project_id = 0
-  region_id = 0
-  port_id = "port_id"
+  project_id = 1
+  region_id = 4
+  port_id = "ac177f1f-eb04-42c4-9864-e7d6486813af"
 }
 ```
 
@@ -25,12 +25,12 @@ data "gcore_cloud_reserved_fixed_ip" "example_cloud_reserved_fixed_ip" {
 
 ### Required
 
-- `port_id` (String)
+- `port_id` (String) Port ID
 
 ### Optional
 
-- `project_id` (Number)
-- `region_id` (Number)
+- `project_id` (Number) Project ID
+- `region_id` (Number) Region ID
 
 ### Read-Only
 

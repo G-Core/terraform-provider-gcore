@@ -14,9 +14,9 @@ Routers interconnect subnets and manage network routing, including external gate
 
 ```terraform
 data "gcore_cloud_network_router" "example_cloud_network_router" {
-  project_id = 0
-  region_id = 0
-  router_id = "router_id"
+  project_id = 1
+  region_id = 1
+  router_id = "ccd5b925-e35c-4611-a511-67ab503104c8"
 }
 ```
 
@@ -26,9 +26,9 @@ data "gcore_cloud_network_router" "example_cloud_network_router" {
 ### Optional
 
 - `find_one_by` (Attributes) (see [below for nested schema](#nestedatt--find_one_by))
-- `project_id` (Number)
-- `region_id` (Number)
-- `router_id` (String)
+- `project_id` (Number) Project ID
+- `region_id` (Number) Region ID
+- `router_id` (String) Router ID
 
 ### Read-Only
 
@@ -36,7 +36,7 @@ data "gcore_cloud_network_router" "example_cloud_network_router" {
 - `creator_task_id` (String) Task that created this entity
 - `distributed` (Boolean) Whether the router is distributed or centralized.
 - `external_gateway_info` (Attributes) State of this router's external gateway. (see [below for nested schema](#nestedatt--external_gateway_info))
-- `id` (String) The ID of this resource.
+- `id` (String) Router ID
 - `interfaces` (Attributes List) List of router interfaces. (see [below for nested schema](#nestedatt--interfaces))
 - `name` (String) Router name
 - `region` (String) Region name

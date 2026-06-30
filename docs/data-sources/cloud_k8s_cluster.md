@@ -126,6 +126,7 @@ Available values: "calico", "cilium".
 
 Read-Only:
 
+- `cni_exclusive` (Boolean) Whether Cilium manages networking exclusively. Set to `false` to allow other CNI components to coexist with Cilium.
 - `encryption` (Boolean) Wireguard encryption
 - `hubble_relay` (Boolean) Hubble Relay
 - `hubble_ui` (Boolean) Hubble UI
@@ -195,6 +196,7 @@ Read-Only:
 - `min_node_count` (Number) Minimum node count in the cluster pool
 - `name` (String) Name of the cluster pool
 - `node_count` (Number) Node count in the cluster pool
+- `security_group_ids` (List of String) Security group IDs applied to the cluster pool nodes
 - `servergroup_id` (String) Server group ID
 - `servergroup_name` (String) Server group name
 - `servergroup_policy` (String) Anti-affinity, affinity or soft-anti-affinity server group policy
