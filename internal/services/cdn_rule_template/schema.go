@@ -248,7 +248,7 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 						},
 					},
 					"fastedge": schema.SingleNestedAttribute{
-						Description: "Allows to configure FastEdge app to be called on different request/response phases.\n\nNote: At least one of `on_request_headers`, `on_request_body`, `on_response_headers`, or `on_response_body` must be specified.",
+						Description: "Allows to configure FastEdge app to be called on different request/response phases.\n\nNote: At least one of `on_request_headers`, `on_request_headers_after_cache`, `on_request_body`, `on_response_headers`, or `on_response_body` must be specified.",
 						Computed:    true,
 						Optional:    true,
 						CustomType:  customfield.NewNestedObjectType[CDNRuleTemplateOptionsFastedgeModel](ctx),
@@ -298,6 +298,42 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 								Computed:    true,
 								Optional:    true,
 								CustomType:  customfield.NewNestedObjectType[CDNRuleTemplateOptionsFastedgeOnRequestHeadersModel](ctx),
+								Attributes: map[string]schema.Attribute{
+									"app_id": schema.StringAttribute{
+										Description: "The ID of the application in FastEdge.",
+										Required:    true,
+									},
+									"enabled": schema.BoolAttribute{
+										Description: "Determines if the FastEdge application should be called whenever HTTP request headers are received.",
+										Computed:    true,
+										Optional:    true,
+										Default:     booldefault.StaticBool(true),
+									},
+									"execute_on_edge": schema.BoolAttribute{
+										Description: "Determines if the request should be executed at the edge nodes.",
+										Computed:    true,
+										Optional:    true,
+										Default:     booldefault.StaticBool(true),
+									},
+									"execute_on_shield": schema.BoolAttribute{
+										Description: "Determines if the request should be executed at the shield nodes.",
+										Computed:    true,
+										Optional:    true,
+										Default:     booldefault.StaticBool(false),
+									},
+									"interrupt_on_error": schema.BoolAttribute{
+										Description: "Determines if the request execution should be interrupted when an error occurs.",
+										Computed:    true,
+										Optional:    true,
+										Default:     booldefault.StaticBool(true),
+									},
+								},
+							},
+							"on_request_headers_after_cache": schema.SingleNestedAttribute{
+								Description: "Allows to configure FastEdge application that will be called to handle request headers as soon as CDN receives incoming HTTP request, **after cache**.",
+								Computed:    true,
+								Optional:    true,
+								CustomType:  customfield.NewNestedObjectType[CDNRuleTemplateOptionsFastedgeOnRequestHeadersAfterCacheModel](ctx),
 								Attributes: map[string]schema.Attribute{
 									"app_id": schema.StringAttribute{
 										Description: "The ID of the application in FastEdge.",
@@ -660,7 +696,7 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 						},
 					},
 					"proxy_cache_key": schema.SingleNestedAttribute{
-						Description: "Allows you to modify your cache key. If omitted, the default value is `$request_uri`.\n\nCombine the specified variables to create a key for caching.\n- **$`request_uri`**\n- **$scheme**\n- **$uri**\n\n**Warning**: Enabling and changing this option can invalidate your current cache and affect the cache hit ratio. Furthermore, the \"Purge by pattern\" option will not work.",
+						Description: "Allows you to modify your cache key. If omitted, the default value is `$request_uri`.\n\nCombine the specified variables to create a key for caching.\n- **$`http_x_cdn_real_host`** — the original `Host` header sent by the client. Useful for splitting cache across multiple aliases served by a single CDN resource.\n- **$`request_uri`** — the full original request URI including the query string (e.g., `/path?id=1`).\n- **$scheme** — the request scheme, either `http` or `https`.\n- **$uri** — the normalized request URI without the query string (e.g., `/path`).\n\n**Warning**: Enabling and changing this option can invalidate your current cache and affect the cache hit ratio. Furthermore, the \"Purge by pattern\" option will not work.",
 						Computed:    true,
 						Optional:    true,
 						CustomType:  customfield.NewNestedObjectType[CDNRuleTemplateOptionsProxyCacheKeyModel](ctx),

@@ -71,6 +71,7 @@ type CDNResourceOptionsDataSourceModel struct {
 	ImageStack                  customfield.NestedObject[CDNResourceOptionsImageStackDataSourceModel]                  `tfsdk:"image_stack" json:"image_stack,computed"`
 	IPAddressACL                customfield.NestedObject[CDNResourceOptionsIPAddressACLDataSourceModel]                `tfsdk:"ip_address_acl" json:"ip_address_acl,computed"`
 	LimitBandwidth              customfield.NestedObject[CDNResourceOptionsLimitBandwidthDataSourceModel]              `tfsdk:"limit_bandwidth" json:"limit_bandwidth,computed"`
+	NetworkErrorLogging         customfield.NestedObject[CDNResourceOptionsNetworkErrorLoggingDataSourceModel]         `tfsdk:"network_error_logging" json:"network_error_logging,computed"`
 	ProxyCacheKey               customfield.NestedObject[CDNResourceOptionsProxyCacheKeyDataSourceModel]               `tfsdk:"proxy_cache_key" json:"proxy_cache_key,computed"`
 	ProxyCacheMethodsSet        customfield.NestedObject[CDNResourceOptionsProxyCacheMethodsSetDataSourceModel]        `tfsdk:"proxy_cache_methods_set" json:"proxy_cache_methods_set,computed"`
 	ProxyConnectTimeout         customfield.NestedObject[CDNResourceOptionsProxyConnectTimeoutDataSourceModel]         `tfsdk:"proxy_connect_timeout" json:"proxy_connect_timeout,computed"`
@@ -149,11 +150,12 @@ type CDNResourceOptionsEdgeCacheSettingsDataSourceModel struct {
 }
 
 type CDNResourceOptionsFastedgeDataSourceModel struct {
-	Enabled           types.Bool                                                                           `tfsdk:"enabled" json:"enabled,computed"`
-	OnRequestBody     customfield.NestedObject[CDNResourceOptionsFastedgeOnRequestBodyDataSourceModel]     `tfsdk:"on_request_body" json:"on_request_body,computed"`
-	OnRequestHeaders  customfield.NestedObject[CDNResourceOptionsFastedgeOnRequestHeadersDataSourceModel]  `tfsdk:"on_request_headers" json:"on_request_headers,computed"`
-	OnResponseBody    customfield.NestedObject[CDNResourceOptionsFastedgeOnResponseBodyDataSourceModel]    `tfsdk:"on_response_body" json:"on_response_body,computed"`
-	OnResponseHeaders customfield.NestedObject[CDNResourceOptionsFastedgeOnResponseHeadersDataSourceModel] `tfsdk:"on_response_headers" json:"on_response_headers,computed"`
+	Enabled                    types.Bool                                                                                    `tfsdk:"enabled" json:"enabled,computed"`
+	OnRequestBody              customfield.NestedObject[CDNResourceOptionsFastedgeOnRequestBodyDataSourceModel]              `tfsdk:"on_request_body" json:"on_request_body,computed"`
+	OnRequestHeaders           customfield.NestedObject[CDNResourceOptionsFastedgeOnRequestHeadersDataSourceModel]           `tfsdk:"on_request_headers" json:"on_request_headers,computed"`
+	OnRequestHeadersAfterCache customfield.NestedObject[CDNResourceOptionsFastedgeOnRequestHeadersAfterCacheDataSourceModel] `tfsdk:"on_request_headers_after_cache" json:"on_request_headers_after_cache,computed"`
+	OnResponseBody             customfield.NestedObject[CDNResourceOptionsFastedgeOnResponseBodyDataSourceModel]             `tfsdk:"on_response_body" json:"on_response_body,computed"`
+	OnResponseHeaders          customfield.NestedObject[CDNResourceOptionsFastedgeOnResponseHeadersDataSourceModel]          `tfsdk:"on_response_headers" json:"on_response_headers,computed"`
 }
 
 type CDNResourceOptionsFastedgeOnRequestBodyDataSourceModel struct {
@@ -165,6 +167,14 @@ type CDNResourceOptionsFastedgeOnRequestBodyDataSourceModel struct {
 }
 
 type CDNResourceOptionsFastedgeOnRequestHeadersDataSourceModel struct {
+	AppID            types.String `tfsdk:"app_id" json:"app_id,computed"`
+	Enabled          types.Bool   `tfsdk:"enabled" json:"enabled,computed"`
+	ExecuteOnEdge    types.Bool   `tfsdk:"execute_on_edge" json:"execute_on_edge,computed"`
+	ExecuteOnShield  types.Bool   `tfsdk:"execute_on_shield" json:"execute_on_shield,computed"`
+	InterruptOnError types.Bool   `tfsdk:"interrupt_on_error" json:"interrupt_on_error,computed"`
+}
+
+type CDNResourceOptionsFastedgeOnRequestHeadersAfterCacheDataSourceModel struct {
 	AppID            types.String `tfsdk:"app_id" json:"app_id,computed"`
 	Enabled          types.Bool   `tfsdk:"enabled" json:"enabled,computed"`
 	ExecuteOnEdge    types.Bool   `tfsdk:"execute_on_edge" json:"execute_on_edge,computed"`
@@ -265,6 +275,11 @@ type CDNResourceOptionsLimitBandwidthDataSourceModel struct {
 	LimitType types.String `tfsdk:"limit_type" json:"limit_type,computed"`
 	Buffer    types.Int64  `tfsdk:"buffer" json:"buffer,computed"`
 	Speed     types.Int64  `tfsdk:"speed" json:"speed,computed"`
+}
+
+type CDNResourceOptionsNetworkErrorLoggingDataSourceModel struct {
+	Enabled types.Bool `tfsdk:"enabled" json:"enabled,computed"`
+	Value   types.Bool `tfsdk:"value" json:"value,computed"`
 }
 
 type CDNResourceOptionsProxyCacheKeyDataSourceModel struct {

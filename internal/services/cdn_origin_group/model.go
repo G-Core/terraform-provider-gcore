@@ -31,7 +31,6 @@ type CDNOriginGroupSourcesModel struct {
 	Backup             types.Bool                                                 `tfsdk:"backup" json:"backup,computed_optional"`
 	Enabled            types.Bool                                                 `tfsdk:"enabled" json:"enabled,computed_optional"`
 	HostHeaderOverride types.String                                               `tfsdk:"host_header_override" json:"host_header_override,optional"`
-	Tag                types.String                                               `tfsdk:"tag" json:"tag,computed_optional"`
 	OriginType         types.String                                               `tfsdk:"origin_type" json:"origin_type,optional"`
 	Config             customfield.NestedObject[CDNOriginGroupSourcesConfigModel] `tfsdk:"config" json:"config,optional"`
 }

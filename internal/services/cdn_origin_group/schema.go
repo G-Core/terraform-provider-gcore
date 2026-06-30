@@ -12,7 +12,6 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/booldefault"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/int64planmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
-	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringdefault"
 	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 )
@@ -73,12 +72,6 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 						"host_header_override": schema.StringAttribute{
 							Description: "Per-origin Host header override. When set, the CDN sends this value as the Host header when\nrequesting content from this origin instead of the default.",
 							Optional:    true,
-						},
-						"tag": schema.StringAttribute{
-							Description: "Tag for the origin source.",
-							Computed:    true,
-							Optional:    true,
-							Default:     stringdefault.StaticString("default"),
 						},
 						"config": schema.SingleNestedAttribute{
 							Description: "S3 storage configuration. Required when `origin_type` is `s3`.",

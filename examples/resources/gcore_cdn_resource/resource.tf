@@ -54,6 +54,13 @@ resource "gcore_cdn_resource" "example_cdn_resource" {
         execute_on_shield = false
         interrupt_on_error = true
       }
+      on_request_headers_after_cache = {
+        app_id = "1001"
+        enabled = true
+        execute_on_edge = true
+        execute_on_shield = false
+        interrupt_on_error = true
+      }
       on_response_body = {
         app_id = "1001"
         enabled = true
@@ -132,6 +139,10 @@ resource "gcore_cdn_resource" "example_cdn_resource" {
       limit_type = "static"
       buffer = 200
       speed = 100
+    }
+    network_error_logging = {
+      enabled = true
+      value = true
     }
     proxy_cache_key = {
       enabled = true

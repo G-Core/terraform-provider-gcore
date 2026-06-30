@@ -63,6 +63,13 @@ resource "gcore_cdn_resource_rule" "example_cdn_resource_rule" {
         execute_on_shield = false
         interrupt_on_error = true
       }
+      on_request_headers_after_cache = {
+        app_id = "1001"
+        enabled = true
+        execute_on_edge = true
+        execute_on_shield = false
+        interrupt_on_error = true
+      }
       on_response_body = {
         app_id = "1001"
         enabled = true

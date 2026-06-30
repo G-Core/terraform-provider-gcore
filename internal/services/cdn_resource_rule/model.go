@@ -129,11 +129,12 @@ type CDNResourceRuleOptionsEdgeCacheSettingsModel struct {
 }
 
 type CDNResourceRuleOptionsFastedgeModel struct {
-	Enabled           types.Bool                                                                     `tfsdk:"enabled" json:"enabled,required"`
-	OnRequestBody     customfield.NestedObject[CDNResourceRuleOptionsFastedgeOnRequestBodyModel]     `tfsdk:"on_request_body" json:"on_request_body,computed_optional"`
-	OnRequestHeaders  customfield.NestedObject[CDNResourceRuleOptionsFastedgeOnRequestHeadersModel]  `tfsdk:"on_request_headers" json:"on_request_headers,computed_optional"`
-	OnResponseBody    customfield.NestedObject[CDNResourceRuleOptionsFastedgeOnResponseBodyModel]    `tfsdk:"on_response_body" json:"on_response_body,computed_optional"`
-	OnResponseHeaders customfield.NestedObject[CDNResourceRuleOptionsFastedgeOnResponseHeadersModel] `tfsdk:"on_response_headers" json:"on_response_headers,computed_optional"`
+	Enabled                    types.Bool                                                                              `tfsdk:"enabled" json:"enabled,required"`
+	OnRequestBody              customfield.NestedObject[CDNResourceRuleOptionsFastedgeOnRequestBodyModel]              `tfsdk:"on_request_body" json:"on_request_body,computed_optional"`
+	OnRequestHeaders           customfield.NestedObject[CDNResourceRuleOptionsFastedgeOnRequestHeadersModel]           `tfsdk:"on_request_headers" json:"on_request_headers,computed_optional"`
+	OnRequestHeadersAfterCache customfield.NestedObject[CDNResourceRuleOptionsFastedgeOnRequestHeadersAfterCacheModel] `tfsdk:"on_request_headers_after_cache" json:"on_request_headers_after_cache,computed_optional"`
+	OnResponseBody             customfield.NestedObject[CDNResourceRuleOptionsFastedgeOnResponseBodyModel]             `tfsdk:"on_response_body" json:"on_response_body,computed_optional"`
+	OnResponseHeaders          customfield.NestedObject[CDNResourceRuleOptionsFastedgeOnResponseHeadersModel]          `tfsdk:"on_response_headers" json:"on_response_headers,computed_optional"`
 }
 
 type CDNResourceRuleOptionsFastedgeOnRequestBodyModel struct {
@@ -145,6 +146,14 @@ type CDNResourceRuleOptionsFastedgeOnRequestBodyModel struct {
 }
 
 type CDNResourceRuleOptionsFastedgeOnRequestHeadersModel struct {
+	AppID            types.String `tfsdk:"app_id" json:"app_id,required"`
+	Enabled          types.Bool   `tfsdk:"enabled" json:"enabled,computed_optional"`
+	ExecuteOnEdge    types.Bool   `tfsdk:"execute_on_edge" json:"execute_on_edge,computed_optional"`
+	ExecuteOnShield  types.Bool   `tfsdk:"execute_on_shield" json:"execute_on_shield,computed_optional"`
+	InterruptOnError types.Bool   `tfsdk:"interrupt_on_error" json:"interrupt_on_error,computed_optional"`
+}
+
+type CDNResourceRuleOptionsFastedgeOnRequestHeadersAfterCacheModel struct {
 	AppID            types.String `tfsdk:"app_id" json:"app_id,required"`
 	Enabled          types.Bool   `tfsdk:"enabled" json:"enabled,computed_optional"`
 	ExecuteOnEdge    types.Bool   `tfsdk:"execute_on_edge" json:"execute_on_edge,computed_optional"`

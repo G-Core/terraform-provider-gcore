@@ -107,10 +107,6 @@ func DataSourceSchema(ctx context.Context) schema.Schema {
 							Description: "Per-origin Host header override. When set, the CDN sends this value as the Host header when\nrequesting content from this origin instead of the default.",
 							Computed:    true,
 						},
-						"tag": schema.StringAttribute{
-							Description: "Tag for the origin source.",
-							Computed:    true,
-						},
 						"config": schema.SingleNestedAttribute{
 							Description: "S3 storage configuration. Required when `origin_type` is `s3`.",
 							Computed:    true,
