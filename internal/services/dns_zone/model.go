@@ -9,22 +9,24 @@ import (
 )
 
 type DNSZoneModel struct {
-	ID            types.String                                       `tfsdk:"id" json:"-,computed"`
-	Name          types.String                                       `tfsdk:"name" json:"name,required"`
-	Contact       types.String                                       `tfsdk:"contact" json:"contact,computed_optional"`
-	Expiry        types.Int64                                        `tfsdk:"expiry" json:"expiry,computed_optional"`
-	NxTtl         types.Int64                                        `tfsdk:"nx_ttl" json:"nx_ttl,computed_optional"`
-	PrimaryServer types.String                                       `tfsdk:"primary_server" json:"primary_server,computed_optional"`
-	Refresh       types.Int64                                        `tfsdk:"refresh" json:"refresh,computed_optional"`
-	Retry         types.Int64                                        `tfsdk:"retry" json:"retry,computed_optional"`
-	Serial        types.Int64                                        `tfsdk:"serial" json:"serial,computed"`
-	Meta          *map[string]customfield.MetaStringValue            `tfsdk:"meta" json:"meta,optional"`
-	Enabled       types.Bool                                         `tfsdk:"enabled" json:"enabled,computed_optional"`
-	DnssecEnabled types.Bool                                         `tfsdk:"dnssec_enabled" json:"dnssec_enabled,computed_optional"`
-	Status        types.String                                       `tfsdk:"status" json:"status,computed"`
-	Warnings      customfield.List[types.String]                     `tfsdk:"warnings" json:"warnings,computed"`
-	Records       customfield.NestedObjectList[DNSZoneRecordsModel]  `tfsdk:"records" json:"records,computed"`
-	RrsetsAmount  customfield.NestedObject[DNSZoneRrsetsAmountModel] `tfsdk:"rrsets_amount" json:"rrsets_amount,computed"`
+	ID                     types.String                                       `tfsdk:"id" json:"-,computed"`
+	Name                   types.String                                       `tfsdk:"name" json:"name,required"`
+	Contact                types.String                                       `tfsdk:"contact" json:"contact,computed_optional"`
+	Expiry                 types.Int64                                        `tfsdk:"expiry" json:"expiry,computed_optional"`
+	NxTtl                  types.Int64                                        `tfsdk:"nx_ttl" json:"nx_ttl,computed_optional"`
+	PrimaryServer          types.String                                       `tfsdk:"primary_server" json:"primary_server,computed_optional"`
+	Refresh                types.Int64                                        `tfsdk:"refresh" json:"refresh,computed_optional"`
+	Retry                  types.Int64                                        `tfsdk:"retry" json:"retry,computed_optional"`
+	Serial                 types.Int64                                        `tfsdk:"serial" json:"serial,computed"`
+	Meta                   *map[string]customfield.MetaStringValue            `tfsdk:"meta" json:"meta,optional"`
+	Enabled                types.Bool                                         `tfsdk:"enabled" json:"enabled,computed_optional"`
+	DnssecEnabled          types.Bool                                         `tfsdk:"dnssec_enabled" json:"dnssec_enabled,computed_optional"`
+	DnssecStatus           types.String                                       `tfsdk:"dnssec_status" json:"dnssec_status,computed"`
+	DnssecStatusModifiedOn types.String                                       `tfsdk:"dnssec_status_modified_on" json:"dnssec_status_modified_on,computed"`
+	Status                 types.String                                       `tfsdk:"status" json:"status,computed"`
+	Warnings               customfield.List[types.String]                     `tfsdk:"warnings" json:"warnings,computed"`
+	Records                customfield.NestedObjectList[DNSZoneRecordsModel]  `tfsdk:"records" json:"records,computed"`
+	RrsetsAmount           customfield.NestedObject[DNSZoneRrsetsAmountModel] `tfsdk:"rrsets_amount" json:"rrsets_amount,computed"`
 }
 
 func (m DNSZoneModel) MarshalJSON() (data []byte, err error) {

@@ -29,6 +29,14 @@ func DataSourceSchema(ctx context.Context) schema.Schema {
 				Description: "describe dnssec status\ntrue means dnssec is enabled for the zone\nfalse means dnssec is disabled for the zone",
 				Computed:    true,
 			},
+			"dnssec_status": schema.StringAttribute{
+				Description: "`dnssec_status` is the four-state lifecycle status of DNSSEC for the zone, driven by the\nparent-DS scan against the registrar. One of: pending, active, pending-disabled, disabled.\nEmpty when DNSSEC has never been enabled for the zone.",
+				Computed:    true,
+			},
+			"dnssec_status_modified_on": schema.StringAttribute{
+				Description: "`dnssec_status_modified_on` is the RFC3339 timestamp of the last `dnssec_status` change.",
+				Computed:    true,
+			},
 			"enabled": schema.BoolAttribute{
 				Computed: true,
 			},

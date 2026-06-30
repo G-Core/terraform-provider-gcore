@@ -112,7 +112,7 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 				PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
 			},
 			"type": schema.StringAttribute{
-				Description:   "RRSet type\nAvailable values: \"A\", \"AAAA\", \"NS\", \"CNAME\", \"MX\", \"TXT\", \"SRV\", \"SOA\".",
+				Description:   "RRSet type\nAvailable values: \"A\", \"AAAA\", \"NS\", \"CNAME\", \"MX\", \"TXT\", \"SRV\", \"SOA\", \"PTR\", \"SVCB\", \"HTTPS\", \"CAA\", \"DS\".",
 				Computed:      true,
 				PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
 				Validators: []validator.String{
@@ -125,6 +125,11 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 						"TXT",
 						"SRV",
 						"SOA",
+						"PTR",
+						"SVCB",
+						"HTTPS",
+						"CAA",
+						"DS",
 					),
 				},
 			},

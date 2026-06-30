@@ -69,10 +69,6 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 				Optional:      true,
 				PlanModifiers: []planmodifier.Int64{int64planmodifier.UseStateForUnknown()},
 			},
-			"serial": schema.Int64Attribute{
-				Description: "Serial number for this zone. Server-managed: always derived from the zone's last modification timestamp.",
-				Computed:    true,
-			},
 			"meta": schema.MapAttribute{
 				Description: "arbitrarily data of zone in json format\nyou can specify `webhook` url and `webhook_method` here\nwebhook will get a map with three arrays: for created, updated and deleted rrsets\n`webhook_method` can be omitted, POST will be used by default",
 				Optional:    true,
@@ -89,6 +85,20 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 				Computed:      true,
 				Optional:      true,
 				PlanModifiers: []planmodifier.Bool{boolplanmodifier.UseStateForUnknown()},
+			},
+			"dnssec_status": schema.StringAttribute{
+				Description:   "`dnssec_status` is the four-state lifecycle status of DNSSEC for the zone, driven by the\nparent-DS scan against the registrar. One of: pending, active, pending-disabled, disabled.\nEmpty when DNSSEC has never been enabled for the zone.",
+				Computed:      true,
+				PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
+			},
+			"dnssec_status_modified_on": schema.StringAttribute{
+				Description:   "`dnssec_status_modified_on` is the RFC3339 timestamp of the last `dnssec_status` change.",
+				Computed:      true,
+				PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
+			},
+			"serial": schema.Int64Attribute{
+				Description: "Serial number for this zone or Timestamp of zone modification moment.\nIf a secondary name server slaved to this one observes an increase in this number,\nthe slave will assume that the zone has been updated and initiate a zone transfer.",
+				Computed:    true,
 			},
 			"status": schema.StringAttribute{
 				Computed:      true,
