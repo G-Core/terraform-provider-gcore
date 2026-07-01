@@ -3,7 +3,7 @@ terraform {
     gcore = {
       source = "G-Core/gcore"
       # Change the version to the one you want to test
-      version = "2.0.0-alpha.10" # x-release-please-version
+      version = "2.0.0-alpha.11" # x-release-please-version
     }
   }
 }

@@ -1,5 +1,33 @@
 # Changelog
 
+## [2.0.0-alpha.11](https://github.com/G-Core/terraform-provider-gcore/compare/v2.0.0-alpha.10...v2.0.0-alpha.11) (2026-07-01)
+
+
+### ⚠ BREAKING CHANGES
+
+* **waap:** JA4 support, multi-value analytics filters, exclusion filters
+* **cloud:** refresh cloud OpenAPI spec to latest upstream
+
+### Features
+
+* **cloud:** refresh cloud OpenAPI spec to latest upstream ([36093c7](https://github.com/G-Core/terraform-provider-gcore/commit/36093c77f1c1fd9683efce10a79cecfb20141f94))
+* **streaming:** add srt_passphrase for encrypted SRT PUSH ingest ([07658b9](https://github.com/G-Core/terraform-provider-gcore/commit/07658b9f578fcc67fb3c99c71868c3ba3322d0ca))
+* **waap:** JA4 support, multi-value analytics filters, exclusion filters ([c83878b](https://github.com/G-Core/terraform-provider-gcore/commit/c83878b9d84dbedbb70da90b3089463657a5ad82))
+
+
+### Chores
+
+* bootstrap product specs and reformat openapi.yml ([e684121](https://github.com/G-Core/terraform-provider-gcore/commit/e684121a627076a08d977f48884c82737020628c))
+* gitignore and untrack .idea/ ([cb4e763](https://github.com/G-Core/terraform-provider-gcore/commit/cb4e7636e530f4da8eef89f9dcac71bdc7d85798))
+* remove replace directive in go.mod and bump gcore-go to v0.50.0 ([0f1c441](https://github.com/G-Core/terraform-provider-gcore/commit/0f1c4418f80287b3a0f76e721d1dace8131e0271))
+
+
+### Documentation
+
+* **terraform:** regenerate from custom templates ([a2bb3ef](https://github.com/G-Core/terraform-provider-gcore/commit/a2bb3efc247ab31481ecf8434820d5b3b5a4d544))
+* **terraform:** regenerate from custom templates ([5ef4952](https://github.com/G-Core/terraform-provider-gcore/commit/5ef4952f2c52594b474069f8912309eca8fbc98f))
+* **terraform:** regenerate from custom templates ([3b5bb5c](https://github.com/G-Core/terraform-provider-gcore/commit/3b5bb5cdc97764724d8d45e496a013736b9acebb))
+
 ## [2.0.0-alpha.10](https://github.com/G-Core/terraform-provider-gcore/compare/v2.0.0-alpha.9...v2.0.0-alpha.10) (2026-06-24)
 
 
