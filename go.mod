@@ -3,7 +3,7 @@ module github.com/G-Core/terraform-provider-gcore
 go 1.25.8
 
 require (
-	github.com/G-Core/gcore-go v0.49.1
+	github.com/G-Core/gcore-go v0.50.0
 	github.com/davecgh/go-spew v1.1.2-0.20180830191138-d8f796af33cc
 	github.com/hashicorp/terraform-plugin-docs v0.24.0
 	github.com/hashicorp/terraform-plugin-framework v1.19.0
@@ -92,5 +92,3 @@ require (
 	gopkg.in/yaml.v2 v2.3.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
-
-replace github.com/G-Core/gcore-go => ../gcore-go-staging
