@@ -16,6 +16,7 @@ import (
 	"github.com/G-Core/terraform-provider-gcore/internal/custom"
 	"github.com/G-Core/terraform-provider-gcore/internal/importpath"
 	"github.com/G-Core/terraform-provider-gcore/internal/logging"
+	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 )
@@ -62,6 +63,12 @@ func (r *CloudGPUVirtualClusterImageResource) Create(ctx context.Context, req re
 
 	resp.Diagnostics.Append(req.Plan.Get(ctx, &data)...)
 
+	if resp.Diagnostics.HasError() {
+		return
+	}
+
+	// url is write-only: it is null in the plan, so read it from the config.
+	resp.Diagnostics.Append(req.Config.GetAttribute(ctx, path.Root("url_wo"), &data.URL)...)
 	if resp.Diagnostics.HasError() {
 		return
 	}

@@ -46,10 +46,12 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 				Required:      true,
 				PlanModifiers: []planmodifier.String{stringplanmodifier.RequiresReplace()},
 			},
-			"url": schema.StringAttribute{
-				Description:   "Image URL",
-				Required:      true,
-				PlanModifiers: []planmodifier.String{stringplanmodifier.RequiresReplace()},
+			"url_wo": schema.StringAttribute{
+				Description: "Source URL the image is uploaded from. Write-only: it is sent to the API on " +
+					"create but never stored in state (the API does not return it on read, and the URL may " +
+					"contain credentials). To upload a different image, taint or replace the resource.",
+				Required:  true,
+				WriteOnly: true,
 			},
 			"hw_firmware_type": schema.StringAttribute{
 				Description: "Specifies the type of firmware with which to boot the guest.\nAvailable values: \"bios\", \"uefi\".",
