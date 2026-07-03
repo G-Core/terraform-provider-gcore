@@ -14,6 +14,7 @@ import (
 	"github.com/G-Core/terraform-provider-gcore/internal/services/cdn_logs_uploader_config"
 	"github.com/G-Core/terraform-provider-gcore/internal/services/cdn_logs_uploader_policy"
 	"github.com/G-Core/terraform-provider-gcore/internal/services/cdn_origin_group"
+	"github.com/G-Core/terraform-provider-gcore/internal/services/cdn_origin_shielding"
 	"github.com/G-Core/terraform-provider-gcore/internal/services/cdn_resource"
 	"github.com/G-Core/terraform-provider-gcore/internal/services/cdn_resource_rule"
 	"github.com/G-Core/terraform-provider-gcore/internal/services/cdn_rule_template"
@@ -336,6 +337,7 @@ func (p *GcoreProvider) DataSources(ctx context.Context) []func() datasource.Dat
 		storage_ssh_key.NewStorageSSHKeyDataSource,
 		storage_ssh_key.NewStorageSSHKeysDataSource,
 		cdn_resource.NewCDNResourceDataSource,
+		cdn_origin_shielding.NewCDNOriginShieldingDataSource,
 		cdn_resource_rule.NewCDNResourceRuleDataSource,
 		cdn_rule_template.NewCDNRuleTemplateDataSource,
 		cdn_certificate.NewCDNCertificateDataSource,
