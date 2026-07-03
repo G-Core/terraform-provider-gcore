@@ -262,6 +262,7 @@ func (p *GcoreProvider) Resources(ctx context.Context) []func() resource.Resourc
 		cdn_trusted_ca_certificate.NewResource,
 		cdn_logs_uploader_policy.NewResource,
 		cdn_logs_uploader_config.NewResource,
+		cdn_origin_shielding.NewResource,
 	}
 }
 
