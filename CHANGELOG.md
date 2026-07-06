@@ -1,5 +1,23 @@
 # Changelog
 
+## [2.0.0-alpha.12](https://github.com/G-Core/terraform-provider-gcore/compare/v2.0.0-alpha.11...v2.0.0-alpha.12) (2026-07-06)
+
+
+### ⚠ BREAKING CHANGES
+
+* **cloud:** make url write-only in gpu virtual image
+
+### Features
+
+* **cdn:** add gcore_cdn_origin_shielding resource + tests + docs (GCLOUD2-22622) ([#26](https://github.com/G-Core/terraform-provider-gcore/issues/26)) ([dd44ac7](https://github.com/G-Core/terraform-provider-gcore/commit/dd44ac74b122a65b14937acadc3a97db86f395b0))
+* **cloud:** support gcore_cloud_quota data source ([69295b1](https://github.com/G-Core/terraform-provider-gcore/commit/69295b120869d672dc3285944cf85ad989393118))
+* **terraform:** expose gcore_cdn_origin_shielding ([5d56043](https://github.com/G-Core/terraform-provider-gcore/commit/5d560435d012200a7106a0f68397e0b65c1f8219))
+
+
+### Bug Fixes
+
+* **cloud:** make url write-only in gpu virtual image ([0e1f9ea](https://github.com/G-Core/terraform-provider-gcore/commit/0e1f9ea58d0ac767f87fcd5e6c851773bba61a5e))
+
 ## [2.0.0-alpha.11](https://github.com/G-Core/terraform-provider-gcore/compare/v2.0.0-alpha.10...v2.0.0-alpha.11) (2026-07-01)
 
 
