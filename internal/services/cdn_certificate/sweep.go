@@ -40,7 +40,7 @@ func sweepCDNCertificates(_ string) error {
 		return fmt.Errorf("error listing CDN certificates: %w", err)
 	}
 
-	for _, cert := range certs.OfPlainList {
+	for _, cert := range certs.Results {
 		if !sweep.ShouldSweep("gcore_cdn_certificate", cert.Name) {
 			continue
 		}

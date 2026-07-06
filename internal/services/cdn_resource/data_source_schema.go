@@ -7,10 +7,12 @@ import (
 
 	"github.com/G-Core/terraform-provider-gcore/internal/customfield"
 	"github.com/hashicorp/terraform-plugin-framework-jsontypes/jsontypes"
+	"github.com/hashicorp/terraform-plugin-framework-validators/datasourcevalidator"
 	"github.com/hashicorp/terraform-plugin-framework-validators/int64validator"
 	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/datasource/schema"
+	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 )
@@ -24,7 +26,7 @@ func DataSourceSchema(ctx context.Context) schema.Schema {
 				Computed: true,
 			},
 			"resource_id": schema.Int64Attribute{
-				Required: true,
+				Optional: true,
 			},
 			"active": schema.BoolAttribute{
 				Description: "Enables or disables a CDN resource.\n\nPossible values:\n- **true** - CDN resource is active. Content is being delivered.\n- **false** - CDN resource is deactivated. Content is not being delivered.",
@@ -1268,6 +1270,118 @@ func DataSourceSchema(ctx context.Context) schema.Schema {
 					},
 				},
 			},
+			"find_one_by": schema.SingleNestedAttribute{
+				Optional: true,
+				Attributes: map[string]schema.Attribute{
+					"active": schema.BoolAttribute{
+						Description: "Defines whether a CDN resource is activated.\n\nPossible values:\n- **true** - CDN resource is activated.\n- **false** - CDN resource is deactivated.",
+						Optional:    true,
+					},
+					"cname": schema.StringAttribute{
+						Description: "Delivery domain (CNAME) of the CDN resource.",
+						Optional:    true,
+					},
+					"deleted": schema.BoolAttribute{
+						Description: "Defines whether a CDN resource has been deleted.\n\nPossible values:\n- **true** - CDN resource has been deleted.\n- **false** - CDN resource has not been deleted.",
+						Optional:    true,
+					},
+					"enabled": schema.BoolAttribute{
+						Description: "Enables or disables a CDN resource change by a user.\n\nPossible values:\n- **true** - CDN resource is enabled.\n- **false** - CDN resource is disabled.",
+						Optional:    true,
+					},
+					"is_primary": schema.BoolAttribute{
+						Description: "Filters CDN resources by their primary/alternate relationship. Standalone\nresources — those not linked to another resource, which is the default —\nmatch neither value and are returned by neither `true` nor `false`.\n\nPossible values:\n- **true** - CDN resource is a primary resource for one or more alternate resources.\n- **false** - CDN resource is an alternate resource linked to a primary resource.",
+						Optional:    true,
+					},
+					"max_created": schema.StringAttribute{
+						Description: "Most recent date of CDN resource creation for which CDN resources should be returned (ISO 8601/RFC 3339 format, UTC.)",
+						Optional:    true,
+					},
+					"max_updated": schema.StringAttribute{
+						Description: "Most recent date of CDN resource update for which CDN resources should be returned (ISO 8601/RFC 3339 format, UTC.)",
+						Optional:    true,
+					},
+					"min_created": schema.StringAttribute{
+						Description: "Earliest date of CDN resource creation for which CDN resources should be returned (ISO 8601/RFC 3339 format, UTC.)",
+						Optional:    true,
+					},
+					"min_updated": schema.StringAttribute{
+						Description: "Earliest date of CDN resource update for which CDN resources should be returned (ISO 8601/RFC 3339 format, UTC.)",
+						Optional:    true,
+					},
+					"name": schema.StringAttribute{
+						Description: "Name of the CDN resource. Matches partially and is case-insensitive.",
+						Optional:    true,
+					},
+					"origin_group": schema.Int64Attribute{
+						Description: "Origin group ID.",
+						Optional:    true,
+					},
+					"origin_protocol": schema.StringAttribute{
+						Description: "Protocol used by CDN servers to request content from an origin source.\nAvailable values: \"HTTP\", \"HTTPS\", \"MATCH\".",
+						Optional:    true,
+						Validators: []validator.String{
+							stringvalidator.OneOfCaseInsensitive(
+								"HTTP",
+								"HTTPS",
+								"MATCH",
+							),
+						},
+					},
+					"rules": schema.StringAttribute{
+						Description: "Rule name or pattern.",
+						Optional:    true,
+					},
+					"secondary_hostnames": schema.StringAttribute{
+						Description: "Additional delivery domains (CNAMEs) of the CDN resource.",
+						Optional:    true,
+					},
+					"shield_dc": schema.StringAttribute{
+						Description: "Name of the origin shielding data center location.",
+						Optional:    true,
+					},
+					"shielded": schema.BoolAttribute{
+						Description: "Defines whether origin shielding is enabled for the CDN resource.\n\nPossible values:\n- **true** - Origin shielding is enabled for the CDN resource.\n- **false** - Origin shielding is disabled for the CDN resource.",
+						Optional:    true,
+					},
+					"ssl_data": schema.Int64Attribute{
+						Description: "SSL certificate ID.",
+						Optional:    true,
+					},
+					"ssl_data_in": schema.Int64Attribute{
+						Description: "SSL certificates IDs.\n\nExample:\n- ?`sslData_in`=1643,1644,1652",
+						Optional:    true,
+					},
+					"ssl_enabled": schema.BoolAttribute{
+						Description: "Defines whether the HTTPS protocol is enabled for content delivery.\n\nPossible values:\n- **true** - HTTPS protocol is enabled for CDN resource.\n- **false** - HTTPS protocol is disabled for CDN resource.",
+						Optional:    true,
+					},
+					"status": schema.StringAttribute{
+						Description: "CDN resource status.\nAvailable values: \"active\", \"processed\", \"suspended\", \"deleted\".",
+						Optional:    true,
+						Validators: []validator.String{
+							stringvalidator.OneOfCaseInsensitive(
+								"active",
+								"processed",
+								"suspended",
+								"deleted",
+							),
+						},
+					},
+					"suspend": schema.BoolAttribute{
+						Description: "Defines whether the CDN resource was automatically suspended by the system.\n\nPossible values:\n- **true** - CDN resource is selected for automatic suspension in the next 7 days.\n- **false** - CDN resource is not selected for automatic suspension.",
+						Optional:    true,
+					},
+					"suspended": schema.BoolAttribute{
+						Description: "Defines whether a CDN resource is currently suspended. This reflects the\nresource's suspended state, unlike the `suspend` parameter, which selects\nresources that have a scheduled automatic suspension date.\n\nPossible values:\n- **true** - CDN resource is currently suspended.\n- **false** - CDN resource is not suspended.",
+						Optional:    true,
+					},
+					"vp_enabled": schema.BoolAttribute{
+						Description: "Defines whether the CDN resource is integrated with the Streaming platform.\n\nPossible values:\n- **true** - CDN resource is used for Streaming platform.\n- **false** - CDN resource is not used for Streaming platform.",
+						Optional:    true,
+					},
+				},
+			},
 		},
 	}
 }
@@ -1277,5 +1391,7 @@ func (d *CDNResourceDataSource) Schema(ctx context.Context, req datasource.Schem
 }
 
 func (d *CDNResourceDataSource) ConfigValidators(_ context.Context) []datasource.ConfigValidator {
-	return []datasource.ConfigValidator{}
+	return []datasource.ConfigValidator{
+		datasourcevalidator.ExactlyOneOf(path.MatchRoot("resource_id"), path.MatchRoot("find_one_by")),
+	}
 }

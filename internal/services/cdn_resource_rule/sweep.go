@@ -55,7 +55,7 @@ func sweepCDNResourceRules(_ string) error {
 		return nil
 	}
 
-	for _, cdnRes := range cdnResources.OfPlainList {
+	for _, cdnRes := range cdnResources.Results {
 		if !isTestCDNResource(cdnRes) {
 			continue
 		}
@@ -111,7 +111,7 @@ func sweepCDNResources(_ string) error {
 		return nil
 	}
 
-	for _, cdnRes := range cdnResources.OfPlainList {
+	for _, cdnRes := range cdnResources.Results {
 		if !isTestCDNResource(cdnRes) {
 			continue
 		}

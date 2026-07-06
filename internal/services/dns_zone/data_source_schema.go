@@ -7,8 +7,13 @@ import (
 
 	"github.com/G-Core/terraform-provider-gcore/internal/customfield"
 	"github.com/hashicorp/terraform-plugin-framework-jsontypes/jsontypes"
+	"github.com/hashicorp/terraform-plugin-framework-timetypes/timetypes"
+	"github.com/hashicorp/terraform-plugin-framework-validators/datasourcevalidator"
+	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/datasource/schema"
+	"github.com/hashicorp/terraform-plugin-framework/path"
+	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 )
 
@@ -18,8 +23,12 @@ func DataSourceSchema(ctx context.Context) schema.Schema {
 	return schema.Schema{
 		MarkdownDescription: "DNS zones are authoritative containers for domain name records, with support for DNSSEC and SOA configuration.",
 		Attributes: map[string]schema.Attribute{
+			"id": schema.StringAttribute{
+				Computed: true,
+			},
 			"name": schema.StringAttribute{
-				Required: true,
+				Computed: true,
+				Optional: true,
 			},
 			"contact": schema.StringAttribute{
 				Description: "email address of the administrator responsible for this zone",
@@ -42,10 +51,6 @@ func DataSourceSchema(ctx context.Context) schema.Schema {
 			},
 			"expiry": schema.Int64Attribute{
 				Description: "number of seconds after which secondary name servers should stop answering request for this zone",
-				Computed:    true,
-			},
-			"id": schema.Int64Attribute{
-				Description: "ID of zone.\nThis field usually is omitted in response and available only in\ncase of getting deleted zones by admin.",
 				Computed:    true,
 			},
 			"nx_ttl": schema.Int64Attribute{
@@ -128,6 +133,73 @@ func DataSourceSchema(ctx context.Context) schema.Schema {
 					},
 				},
 			},
+			"find_one_by": schema.SingleNestedAttribute{
+				Optional: true,
+				Attributes: map[string]schema.Attribute{
+					"id": schema.ListAttribute{
+						Description: "to pass several ids `id=1&id=3&id=5...`",
+						Optional:    true,
+						ElementType: types.Int64Type,
+					},
+					"case_sensitive": schema.BoolAttribute{
+						Optional: true,
+					},
+					"client_id": schema.ListAttribute{
+						Description: "to pass several `client_ids` `client_id=1&client_id=3&client_id=5...`",
+						Optional:    true,
+						ElementType: types.Int64Type,
+					},
+					"dynamic": schema.BoolAttribute{
+						Description: "Zones with dynamic RRsets",
+						Optional:    true,
+					},
+					"enabled": schema.BoolAttribute{
+						Optional: true,
+					},
+					"exact_match": schema.BoolAttribute{
+						Optional: true,
+					},
+					"healthcheck": schema.BoolAttribute{
+						Description: "Zones with RRsets that have healthchecks",
+						Optional:    true,
+					},
+					"iam_reseller_id": schema.ListAttribute{
+						Optional:    true,
+						ElementType: types.Int64Type,
+					},
+					"name": schema.ListAttribute{
+						Description: "to pass several names `name=first&name=second...`",
+						Optional:    true,
+						ElementType: types.StringType,
+					},
+					"order_by": schema.StringAttribute{
+						Description: "Field name to sort by",
+						Optional:    true,
+					},
+					"order_direction": schema.StringAttribute{
+						Description: "Ascending or descending order\nAvailable values: \"asc\", \"desc\".",
+						Optional:    true,
+						Validators: []validator.String{
+							stringvalidator.OneOfCaseInsensitive("asc", "desc"),
+						},
+					},
+					"reseller_id": schema.ListAttribute{
+						Optional:    true,
+						ElementType: types.Int64Type,
+					},
+					"status": schema.StringAttribute{
+						Optional: true,
+					},
+					"updated_at_from": schema.StringAttribute{
+						Optional:   true,
+						CustomType: timetypes.RFC3339Type{},
+					},
+					"updated_at_to": schema.StringAttribute{
+						Optional:   true,
+						CustomType: timetypes.RFC3339Type{},
+					},
+				},
+			},
 		},
 	}
 }
@@ -137,5 +209,7 @@ func (d *DNSZoneDataSource) Schema(ctx context.Context, req datasource.SchemaReq
 }
 
 func (d *DNSZoneDataSource) ConfigValidators(_ context.Context) []datasource.ConfigValidator {
-	return []datasource.ConfigValidator{}
+	return []datasource.ConfigValidator{
+		datasourcevalidator.ExactlyOneOf(path.MatchRoot("name"), path.MatchRoot("find_one_by")),
+	}
 }

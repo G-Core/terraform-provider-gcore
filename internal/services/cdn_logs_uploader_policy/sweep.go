@@ -40,7 +40,7 @@ func sweepCDNLogsUploaderPolicies(_ string) error {
 		return fmt.Errorf("error listing CDN logs uploader policies: %w", err)
 	}
 
-	allPolicies := policies.OfPlainList
+	allPolicies := policies.Results
 	if len(allPolicies) == 0 {
 		allPolicies = policies.Results
 	}

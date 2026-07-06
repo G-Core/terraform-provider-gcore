@@ -30,6 +30,7 @@ data "gcore_cloud_load_balancer_listener" "example_cloud_load_balancer_listener"
 
 ### Optional
 
+- `find_one_by` (Attributes) (see [below for nested schema](#nestedatt--find_one_by))
 - `project_id` (Number) Project ID
 - `region_id` (Number) Region ID
 - `show_stats` (Boolean) Show stats
@@ -57,6 +58,15 @@ Available values: "ACTIVE", "DELETED", "ERROR", "PENDING_CREATE", "PENDING_DELET
 - `stats` (Attributes) Statistics of the load balancer. It is available only in get functions by a flag. (see [below for nested schema](#nestedatt--stats))
 - `timeout_client_data` (Number) Frontend client inactivity timeout in milliseconds
 - `user_list` (Attributes List) Load balancer listener users list (see [below for nested schema](#nestedatt--user_list))
+
+<a id="nestedatt--find_one_by"></a>
+### Nested Schema for `find_one_by`
+
+Optional:
+
+- `load_balancer_id` (String) Load Balancer ID
+- `name` (String) Filter by name
+
 
 <a id="nestedatt--stats"></a>
 ### Nested Schema for `stats`

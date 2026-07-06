@@ -119,7 +119,7 @@ func shieldingLocationIDs(t *testing.T) []int64 {
 		t.Fatalf("failed to list origin shielding locations: %s", err)
 	}
 	var ids []int64
-	for _, item := range res.AsPlainList() {
+	for _, item := range res.Results {
 		ids = append(ids, item.ID)
 	}
 	if len(ids) == 0 {

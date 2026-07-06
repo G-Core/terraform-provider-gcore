@@ -6,9 +6,11 @@ import (
 	"context"
 
 	"github.com/G-Core/terraform-provider-gcore/internal/customfield"
+	"github.com/hashicorp/terraform-plugin-framework-validators/datasourcevalidator"
 	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/datasource/schema"
+	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 )
@@ -23,7 +25,7 @@ func DataSourceSchema(ctx context.Context) schema.Schema {
 				Computed: true,
 			},
 			"origin_group_id": schema.Int64Attribute{
-				Required: true,
+				Optional: true,
 			},
 			"auth_type": schema.StringAttribute{
 				Description:        "**Deprecated.** No longer necessary. Defaults to `none`.\n\nOrigin authentication type.\n\nPossible values:\n- **none** - Used for public origins.\n- **awsSignatureV4** - Used for S3 storage.",
@@ -163,6 +165,23 @@ func DataSourceSchema(ctx context.Context) schema.Schema {
 					},
 				},
 			},
+			"find_one_by": schema.SingleNestedAttribute{
+				Optional: true,
+				Attributes: map[string]schema.Attribute{
+					"has_related_resources": schema.BoolAttribute{
+						Description: "Defines whether the origin group has related CDN resources.\n\nPossible values:\n- **true** – Origin group has related CDN resources.\n- **false** – Origin group does not have related CDN resources.",
+						Optional:    true,
+					},
+					"name": schema.StringAttribute{
+						Description: "Origin group name.",
+						Optional:    true,
+					},
+					"sources": schema.StringAttribute{
+						Description: "Origin sources (IP addresses or domains) in the origin group.",
+						Optional:    true,
+					},
+				},
+			},
 		},
 	}
 }
@@ -172,5 +191,7 @@ func (d *CDNOriginGroupDataSource) Schema(ctx context.Context, req datasource.Sc
 }
 
 func (d *CDNOriginGroupDataSource) ConfigValidators(_ context.Context) []datasource.ConfigValidator {
-	return []datasource.ConfigValidator{}
+	return []datasource.ConfigValidator{
+		datasourcevalidator.ExactlyOneOf(path.MatchRoot("origin_group_id"), path.MatchRoot("find_one_by")),
+	}
 }

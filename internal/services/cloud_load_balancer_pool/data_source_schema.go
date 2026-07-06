@@ -6,10 +6,12 @@ import (
 	"context"
 
 	"github.com/G-Core/terraform-provider-gcore/internal/customfield"
+	"github.com/hashicorp/terraform-plugin-framework-validators/datasourcevalidator"
 	"github.com/hashicorp/terraform-plugin-framework-validators/int64validator"
 	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/datasource/schema"
+	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
 )
 
@@ -25,7 +27,7 @@ func DataSourceSchema(ctx context.Context) schema.Schema {
 			},
 			"pool_id": schema.StringAttribute{
 				Description: "Pool ID",
-				Required:    true,
+				Optional:    true,
 			},
 			"project_id": schema.Int64Attribute{
 				Description: "Project ID",
@@ -386,6 +388,28 @@ func DataSourceSchema(ctx context.Context) schema.Schema {
 					},
 				},
 			},
+			"find_one_by": schema.SingleNestedAttribute{
+				Optional: true,
+				Attributes: map[string]schema.Attribute{
+					"details": schema.BoolAttribute{
+						Description: "Show members and Health Monitor details",
+						Computed:    true,
+						Optional:    true,
+					},
+					"listener_id": schema.StringAttribute{
+						Description: "Listener ID",
+						Optional:    true,
+					},
+					"load_balancer_id": schema.StringAttribute{
+						Description: "Load Balancer ID",
+						Optional:    true,
+					},
+					"name": schema.StringAttribute{
+						Description: "Filter by name",
+						Optional:    true,
+					},
+				},
+			},
 		},
 	}
 }
@@ -395,5 +419,7 @@ func (d *CloudLoadBalancerPoolDataSource) Schema(ctx context.Context, req dataso
 }
 
 func (d *CloudLoadBalancerPoolDataSource) ConfigValidators(_ context.Context) []datasource.ConfigValidator {
-	return []datasource.ConfigValidator{}
+	return []datasource.ConfigValidator{
+		datasourcevalidator.ExactlyOneOf(path.MatchRoot("pool_id"), path.MatchRoot("find_one_by")),
+	}
 }

@@ -7,10 +7,12 @@ import (
 
 	"github.com/G-Core/terraform-provider-gcore/internal/customfield"
 	"github.com/hashicorp/terraform-plugin-framework-jsontypes/jsontypes"
+	"github.com/hashicorp/terraform-plugin-framework-validators/datasourcevalidator"
 	"github.com/hashicorp/terraform-plugin-framework-validators/int64validator"
 	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/datasource/schema"
+	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 )
@@ -191,6 +193,19 @@ func DataSourceSchema(ctx context.Context) schema.Schema {
 					},
 				},
 			},
+			"find_one_by": schema.SingleNestedAttribute{
+				Optional: true,
+				Attributes: map[string]schema.Attribute{
+					"load_balancer_id": schema.StringAttribute{
+						Description: "Load Balancer ID",
+						Optional:    true,
+					},
+					"name": schema.StringAttribute{
+						Description: "Filter by name",
+						Optional:    true,
+					},
+				},
+			},
 		},
 	}
 }
@@ -200,5 +215,7 @@ func (d *CloudLoadBalancerListenerDataSource) Schema(ctx context.Context, req da
 }
 
 func (d *CloudLoadBalancerListenerDataSource) ConfigValidators(_ context.Context) []datasource.ConfigValidator {
-	return []datasource.ConfigValidator{}
+	return []datasource.ConfigValidator{
+		datasourcevalidator.ExactlyOneOf(path.MatchRoot("listener_id"), path.MatchRoot("find_one_by")),
+	}
 }

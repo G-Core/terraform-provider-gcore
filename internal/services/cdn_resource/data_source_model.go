@@ -3,14 +3,19 @@
 package cdn_resource
 
 import (
+	"context"
+
+	"github.com/G-Core/gcore-go/cdn"
+	"github.com/G-Core/gcore-go/packages/param"
 	"github.com/G-Core/terraform-provider-gcore/internal/customfield"
 	"github.com/hashicorp/terraform-plugin-framework-jsontypes/jsontypes"
+	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 )
 
 type CDNResourceDataSourceModel struct {
 	ID                 types.Int64                                                 `tfsdk:"id" path:"resource_id,computed"`
-	ResourceID         types.Int64                                                 `tfsdk:"resource_id" path:"resource_id,required"`
+	ResourceID         types.Int64                                                 `tfsdk:"resource_id" path:"resource_id,optional"`
 	Active             types.Bool                                                  `tfsdk:"active" json:"active,computed"`
 	CanPurgeByURLs     types.Bool                                                  `tfsdk:"can_purge_by_urls" json:"can_purge_by_urls,computed"`
 	Client             types.Int64                                                 `tfsdk:"client" json:"client,computed"`
@@ -45,6 +50,83 @@ type CDNResourceDataSourceModel struct {
 	Rules              customfield.List[jsontypes.Normalized]                      `tfsdk:"rules" json:"rules,computed"`
 	SecondaryHostnames customfield.List[types.String]                              `tfsdk:"secondary_hostnames" json:"secondaryHostnames,computed"`
 	Options            customfield.NestedObject[CDNResourceOptionsDataSourceModel] `tfsdk:"options" json:"options,computed"`
+	FindOneBy          *CDNResourceFindOneByDataSourceModel                        `tfsdk:"find_one_by"`
+}
+
+func (m *CDNResourceDataSourceModel) toListParams(_ context.Context) (params cdn.CDNResourceListParams, diags diag.Diagnostics) {
+	params = cdn.CDNResourceListParams{}
+
+	if !m.FindOneBy.Active.IsNull() {
+		params.Active = param.NewOpt(m.FindOneBy.Active.ValueBool())
+	}
+	if !m.FindOneBy.Cname.IsNull() {
+		params.Cname = param.NewOpt(m.FindOneBy.Cname.ValueString())
+	}
+	if !m.FindOneBy.Deleted.IsNull() {
+		params.Deleted = param.NewOpt(m.FindOneBy.Deleted.ValueBool())
+	}
+	if !m.FindOneBy.Enabled.IsNull() {
+		params.Enabled = param.NewOpt(m.FindOneBy.Enabled.ValueBool())
+	}
+	if !m.FindOneBy.IsPrimary.IsNull() {
+		params.IsPrimary = param.NewOpt(m.FindOneBy.IsPrimary.ValueBool())
+	}
+	if !m.FindOneBy.MaxCreated.IsNull() {
+		params.MaxCreated = param.NewOpt(m.FindOneBy.MaxCreated.ValueString())
+	}
+	if !m.FindOneBy.MaxUpdated.IsNull() {
+		params.MaxUpdated = param.NewOpt(m.FindOneBy.MaxUpdated.ValueString())
+	}
+	if !m.FindOneBy.MinCreated.IsNull() {
+		params.MinCreated = param.NewOpt(m.FindOneBy.MinCreated.ValueString())
+	}
+	if !m.FindOneBy.MinUpdated.IsNull() {
+		params.MinUpdated = param.NewOpt(m.FindOneBy.MinUpdated.ValueString())
+	}
+	if !m.FindOneBy.Name.IsNull() {
+		params.Name = param.NewOpt(m.FindOneBy.Name.ValueString())
+	}
+	if !m.FindOneBy.OriginGroup.IsNull() {
+		params.OriginGroup = param.NewOpt(m.FindOneBy.OriginGroup.ValueInt64())
+	}
+	if !m.FindOneBy.OriginProtocol.IsNull() {
+		params.OriginProtocol = cdn.CDNResourceListParamsOriginProtocol(m.FindOneBy.OriginProtocol.ValueString())
+	}
+	if !m.FindOneBy.Rules.IsNull() {
+		params.Rules = param.NewOpt(m.FindOneBy.Rules.ValueString())
+	}
+	if !m.FindOneBy.SecondaryHostnames.IsNull() {
+		params.SecondaryHostnames = param.NewOpt(m.FindOneBy.SecondaryHostnames.ValueString())
+	}
+	if !m.FindOneBy.ShieldDc.IsNull() {
+		params.ShieldDc = param.NewOpt(m.FindOneBy.ShieldDc.ValueString())
+	}
+	if !m.FindOneBy.Shielded.IsNull() {
+		params.Shielded = param.NewOpt(m.FindOneBy.Shielded.ValueBool())
+	}
+	if !m.FindOneBy.SslData.IsNull() {
+		params.SslData = param.NewOpt(m.FindOneBy.SslData.ValueInt64())
+	}
+	if !m.FindOneBy.SslDataIn.IsNull() {
+		params.SslDataIn = param.NewOpt(m.FindOneBy.SslDataIn.ValueInt64())
+	}
+	if !m.FindOneBy.SslEnabled.IsNull() {
+		params.SslEnabled = param.NewOpt(m.FindOneBy.SslEnabled.ValueBool())
+	}
+	if !m.FindOneBy.Status.IsNull() {
+		params.Status = cdn.CDNResourceListParamsStatus(m.FindOneBy.Status.ValueString())
+	}
+	if !m.FindOneBy.Suspend.IsNull() {
+		params.Suspend = param.NewOpt(m.FindOneBy.Suspend.ValueBool())
+	}
+	if !m.FindOneBy.Suspended.IsNull() {
+		params.Suspended = param.NewOpt(m.FindOneBy.Suspended.ValueBool())
+	}
+	if !m.FindOneBy.VpEnabled.IsNull() {
+		params.VpEnabled = param.NewOpt(m.FindOneBy.VpEnabled.ValueBool())
+	}
+
+	return
 }
 
 type CDNResourceOptionsDataSourceModel struct {
@@ -425,4 +507,30 @@ type CDNResourceOptionsWaapDataSourceModel struct {
 type CDNResourceOptionsWebsocketsDataSourceModel struct {
 	Enabled types.Bool `tfsdk:"enabled" json:"enabled,computed"`
 	Value   types.Bool `tfsdk:"value" json:"value,computed"`
+}
+
+type CDNResourceFindOneByDataSourceModel struct {
+	Active             types.Bool   `tfsdk:"active" query:"active,optional"`
+	Cname              types.String `tfsdk:"cname" query:"cname,optional"`
+	Deleted            types.Bool   `tfsdk:"deleted" query:"deleted,optional"`
+	Enabled            types.Bool   `tfsdk:"enabled" query:"enabled,optional"`
+	IsPrimary          types.Bool   `tfsdk:"is_primary" query:"is_primary,optional"`
+	MaxCreated         types.String `tfsdk:"max_created" query:"max_created,optional"`
+	MaxUpdated         types.String `tfsdk:"max_updated" query:"max_updated,optional"`
+	MinCreated         types.String `tfsdk:"min_created" query:"min_created,optional"`
+	MinUpdated         types.String `tfsdk:"min_updated" query:"min_updated,optional"`
+	Name               types.String `tfsdk:"name" query:"name,optional"`
+	OriginGroup        types.Int64  `tfsdk:"origin_group" query:"originGroup,optional"`
+	OriginProtocol     types.String `tfsdk:"origin_protocol" query:"originProtocol,optional"`
+	Rules              types.String `tfsdk:"rules" query:"rules,optional"`
+	SecondaryHostnames types.String `tfsdk:"secondary_hostnames" query:"secondaryHostnames,optional"`
+	ShieldDc           types.String `tfsdk:"shield_dc" query:"shield_dc,optional"`
+	Shielded           types.Bool   `tfsdk:"shielded" query:"shielded,optional"`
+	SslData            types.Int64  `tfsdk:"ssl_data" query:"sslData,optional"`
+	SslDataIn          types.Int64  `tfsdk:"ssl_data_in" query:"sslData_in,optional"`
+	SslEnabled         types.Bool   `tfsdk:"ssl_enabled" query:"sslEnabled,optional"`
+	Status             types.String `tfsdk:"status" query:"status,optional"`
+	Suspend            types.Bool   `tfsdk:"suspend" query:"suspend,optional"`
+	Suspended          types.Bool   `tfsdk:"suspended" query:"suspended,optional"`
+	VpEnabled          types.Bool   `tfsdk:"vp_enabled" query:"vp_enabled,optional"`
 }

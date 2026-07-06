@@ -36,6 +36,7 @@ type CloudLoadBalancerListenerDataSourceModel struct {
 	SniSecretID        customfield.List[types.String]                                                 `tfsdk:"sni_secret_id" json:"sni_secret_id,computed"`
 	Stats              customfield.NestedObject[CloudLoadBalancerListenerStatsDataSourceModel]        `tfsdk:"stats" json:"stats,computed"`
 	UserList           customfield.NestedObjectList[CloudLoadBalancerListenerUserListDataSourceModel] `tfsdk:"user_list" json:"user_list,computed"`
+	FindOneBy          *CloudLoadBalancerListenerFindOneByDataSourceModel                             `tfsdk:"find_one_by"`
 }
 
 func (m *CloudLoadBalancerListenerDataSourceModel) toReadParams(_ context.Context) (params cloud.LoadBalancerListenerGetParams, diags diag.Diagnostics) {
@@ -46,6 +47,28 @@ func (m *CloudLoadBalancerListenerDataSourceModel) toReadParams(_ context.Contex
 	}
 	if !m.RegionID.IsNull() {
 		params.RegionID = param.NewOpt(m.RegionID.ValueInt64())
+	}
+	if !m.ShowStats.IsNull() {
+		params.ShowStats = param.NewOpt(m.ShowStats.ValueBool())
+	}
+
+	return
+}
+
+func (m *CloudLoadBalancerListenerDataSourceModel) toListParams(_ context.Context) (params cloud.LoadBalancerListenerListParams, diags diag.Diagnostics) {
+	params = cloud.LoadBalancerListenerListParams{}
+
+	if !m.ProjectID.IsNull() {
+		params.ProjectID = param.NewOpt(m.ProjectID.ValueInt64())
+	}
+	if !m.RegionID.IsNull() {
+		params.RegionID = param.NewOpt(m.RegionID.ValueInt64())
+	}
+	if !m.FindOneBy.LoadBalancerID.IsNull() {
+		params.LoadBalancerID = param.NewOpt(m.FindOneBy.LoadBalancerID.ValueString())
+	}
+	if !m.FindOneBy.Name.IsNull() {
+		params.Name = param.NewOpt(m.FindOneBy.Name.ValueString())
 	}
 	if !m.ShowStats.IsNull() {
 		params.ShowStats = param.NewOpt(m.ShowStats.ValueBool())
@@ -65,4 +88,9 @@ type CloudLoadBalancerListenerStatsDataSourceModel struct {
 type CloudLoadBalancerListenerUserListDataSourceModel struct {
 	EncryptedPassword types.String `tfsdk:"encrypted_password" json:"encrypted_password,computed"`
 	Username          types.String `tfsdk:"username" json:"username,computed"`
+}
+
+type CloudLoadBalancerListenerFindOneByDataSourceModel struct {
+	LoadBalancerID types.String `tfsdk:"load_balancer_id" query:"load_balancer_id,optional"`
+	Name           types.String `tfsdk:"name" query:"name,optional"`
 }

@@ -5,8 +5,10 @@ package cdn_trusted_ca_certificate
 import (
 	"context"
 
+	"github.com/hashicorp/terraform-plugin-framework-validators/datasourcevalidator"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/datasource/schema"
+	"github.com/hashicorp/terraform-plugin-framework/path"
 )
 
 var _ datasource.DataSourceWithConfigValidators = (*CDNTrustedCaCertificateDataSource)(nil)
@@ -16,7 +18,8 @@ func DataSourceSchema(ctx context.Context) schema.Schema {
 		Description: "Trusted CA certificates verify the authenticity of CDN origin servers during HTTPS connections.",
 		Attributes: map[string]schema.Attribute{
 			"id": schema.Int64Attribute{
-				Required: true,
+				Computed: true,
+				Optional: true,
 			},
 			"cert_issuer": schema.StringAttribute{
 				Description: "Name of the certification center that issued the CA certificate.",
@@ -54,6 +57,23 @@ func DataSourceSchema(ctx context.Context) schema.Schema {
 				Description: "Date when the CA certificate become valid (ISO 8601/RFC 3339 format, UTC.)",
 				Computed:    true,
 			},
+			"find_one_by": schema.SingleNestedAttribute{
+				Optional: true,
+				Attributes: map[string]schema.Attribute{
+					"automated": schema.BoolAttribute{
+						Description: "How the certificate was issued.\n\nPossible values:\n- **true** – Certificate was issued automatically.\n- **false** – Certificate was added by a user.",
+						Optional:    true,
+					},
+					"resource_id": schema.Int64Attribute{
+						Description: "CDN resource ID for which the certificates are requested.",
+						Optional:    true,
+					},
+					"validity_not_after_lte": schema.StringAttribute{
+						Description: "Date and time when the certificate become untrusted (ISO 8601/RFC 3339 format, UTC.)\n\nResponse will contain certificates valid until the specified time.",
+						Optional:    true,
+					},
+				},
+			},
 		},
 	}
 }
@@ -63,5 +83,7 @@ func (d *CDNTrustedCaCertificateDataSource) Schema(ctx context.Context, req data
 }
 
 func (d *CDNTrustedCaCertificateDataSource) ConfigValidators(_ context.Context) []datasource.ConfigValidator {
-	return []datasource.ConfigValidator{}
+	return []datasource.ConfigValidator{
+		datasourcevalidator.ExactlyOneOf(path.MatchRoot("id"), path.MatchRoot("find_one_by")),
+	}
 }

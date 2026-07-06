@@ -7,11 +7,13 @@ import (
 
 	"github.com/G-Core/terraform-provider-gcore/internal/customfield"
 	"github.com/hashicorp/terraform-plugin-framework-timetypes/timetypes"
+	"github.com/hashicorp/terraform-plugin-framework-validators/datasourcevalidator"
 	"github.com/hashicorp/terraform-plugin-framework-validators/float64validator"
 	"github.com/hashicorp/terraform-plugin-framework-validators/int64validator"
 	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/datasource/schema"
+	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 )
@@ -23,7 +25,8 @@ func DataSourceSchema(ctx context.Context) schema.Schema {
 		MarkdownDescription: "Logs uploader policies define how CDN logs are formatted and delivered, including field selection, field ordering, delimiters, delivery frequency, and file size limits.",
 		Attributes: map[string]schema.Attribute{
 			"id": schema.Int64Attribute{
-				Required: true,
+				Computed: true,
+				Optional: true,
 			},
 			"client_id": schema.Int64Attribute{
 				Description: "Client that owns the policy.",
@@ -135,6 +138,20 @@ func DataSourceSchema(ctx context.Context) schema.Schema {
 				CustomType:  customfield.NewMapType[types.String](ctx),
 				ElementType: types.StringType,
 			},
+			"find_one_by": schema.SingleNestedAttribute{
+				Optional: true,
+				Attributes: map[string]schema.Attribute{
+					"config_ids": schema.ListAttribute{
+						Description: "Filter by ids of related logs uploader configs that use given policy.",
+						Optional:    true,
+						ElementType: types.Int64Type,
+					},
+					"search": schema.StringAttribute{
+						Description: "Search by policy name or id.",
+						Optional:    true,
+					},
+				},
+			},
 		},
 	}
 }
@@ -144,5 +161,7 @@ func (d *CDNLogsUploaderPolicyDataSource) Schema(ctx context.Context, req dataso
 }
 
 func (d *CDNLogsUploaderPolicyDataSource) ConfigValidators(_ context.Context) []datasource.ConfigValidator {
-	return []datasource.ConfigValidator{}
+	return []datasource.ConfigValidator{
+		datasourcevalidator.ExactlyOneOf(path.MatchRoot("id"), path.MatchRoot("find_one_by")),
+	}
 }

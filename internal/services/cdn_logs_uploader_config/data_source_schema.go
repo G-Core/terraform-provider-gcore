@@ -8,8 +8,10 @@ import (
 	"github.com/G-Core/terraform-provider-gcore/internal/customfield"
 	"github.com/hashicorp/terraform-plugin-framework-jsontypes/jsontypes"
 	"github.com/hashicorp/terraform-plugin-framework-timetypes/timetypes"
+	"github.com/hashicorp/terraform-plugin-framework-validators/datasourcevalidator"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/datasource/schema"
+	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 )
 
@@ -20,7 +22,8 @@ func DataSourceSchema(ctx context.Context) schema.Schema {
 		MarkdownDescription: "Logs uploader configs tie a logs uploader policy to one or more targets and a set of CDN resources, controlling which access logs are uploaded and where they are delivered.",
 		Attributes: map[string]schema.Attribute{
 			"id": schema.Int64Attribute{
-				Required: true,
+				Computed: true,
+				Optional: true,
 			},
 			"client_id": schema.Int64Attribute{
 				Description: "Client that owns the config.",
@@ -67,6 +70,20 @@ func DataSourceSchema(ctx context.Context) schema.Schema {
 				Computed:    true,
 				CustomType:  jsontypes.NormalizedType{},
 			},
+			"find_one_by": schema.SingleNestedAttribute{
+				Optional: true,
+				Attributes: map[string]schema.Attribute{
+					"resource_ids": schema.ListAttribute{
+						Description: "Filter by ids of CDN resources that are assigned to given config.",
+						Optional:    true,
+						ElementType: types.Int64Type,
+					},
+					"search": schema.StringAttribute{
+						Description: "Search by config name or id.",
+						Optional:    true,
+					},
+				},
+			},
 		},
 	}
 }
@@ -76,5 +93,7 @@ func (d *CDNLogsUploaderConfigDataSource) Schema(ctx context.Context, req dataso
 }
 
 func (d *CDNLogsUploaderConfigDataSource) ConfigValidators(_ context.Context) []datasource.ConfigValidator {
-	return []datasource.ConfigValidator{}
+	return []datasource.ConfigValidator{
+		datasourcevalidator.ExactlyOneOf(path.MatchRoot("id"), path.MatchRoot("find_one_by")),
+	}
 }

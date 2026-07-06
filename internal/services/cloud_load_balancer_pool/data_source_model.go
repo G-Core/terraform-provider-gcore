@@ -14,7 +14,7 @@ import (
 
 type CloudLoadBalancerPoolDataSourceModel struct {
 	ID                   types.String                                                                     `tfsdk:"id" path:"pool_id,computed"`
-	PoolID               types.String                                                                     `tfsdk:"pool_id" path:"pool_id,required"`
+	PoolID               types.String                                                                     `tfsdk:"pool_id" path:"pool_id,optional"`
 	ProjectID            types.Int64                                                                      `tfsdk:"project_id" path:"project_id,optional"`
 	RegionID             types.Int64                                                                      `tfsdk:"region_id" path:"region_id,optional"`
 	AdminStateUp         types.Bool                                                                       `tfsdk:"admin_state_up" json:"admin_state_up,computed"`
@@ -34,6 +34,7 @@ type CloudLoadBalancerPoolDataSourceModel struct {
 	Loadbalancers        customfield.NestedObjectList[CloudLoadBalancerPoolLoadbalancersDataSourceModel]  `tfsdk:"loadbalancers" json:"loadbalancers,computed"`
 	Members              customfield.NestedObjectList[CloudLoadBalancerPoolMembersDataSourceModel]        `tfsdk:"members" json:"members,computed"`
 	SessionPersistence   customfield.NestedObject[CloudLoadBalancerPoolSessionPersistenceDataSourceModel] `tfsdk:"session_persistence" json:"session_persistence,computed"`
+	FindOneBy            *CloudLoadBalancerPoolFindOneByDataSourceModel                                   `tfsdk:"find_one_by"`
 }
 
 func (m *CloudLoadBalancerPoolDataSourceModel) toReadParams(_ context.Context) (params cloud.LoadBalancerPoolGetParams, diags diag.Diagnostics) {
@@ -44,6 +45,31 @@ func (m *CloudLoadBalancerPoolDataSourceModel) toReadParams(_ context.Context) (
 	}
 	if !m.RegionID.IsNull() {
 		params.RegionID = param.NewOpt(m.RegionID.ValueInt64())
+	}
+
+	return
+}
+
+func (m *CloudLoadBalancerPoolDataSourceModel) toListParams(_ context.Context) (params cloud.LoadBalancerPoolListParams, diags diag.Diagnostics) {
+	params = cloud.LoadBalancerPoolListParams{}
+
+	if !m.ProjectID.IsNull() {
+		params.ProjectID = param.NewOpt(m.ProjectID.ValueInt64())
+	}
+	if !m.RegionID.IsNull() {
+		params.RegionID = param.NewOpt(m.RegionID.ValueInt64())
+	}
+	if !m.FindOneBy.Details.IsNull() {
+		params.Details = param.NewOpt(m.FindOneBy.Details.ValueBool())
+	}
+	if !m.FindOneBy.ListenerID.IsNull() {
+		params.ListenerID = param.NewOpt(m.FindOneBy.ListenerID.ValueString())
+	}
+	if !m.FindOneBy.LoadBalancerID.IsNull() {
+		params.LoadBalancerID = param.NewOpt(m.FindOneBy.LoadBalancerID.ValueString())
+	}
+	if !m.FindOneBy.Name.IsNull() {
+		params.Name = param.NewOpt(m.FindOneBy.Name.ValueString())
 	}
 
 	return
@@ -93,4 +119,11 @@ type CloudLoadBalancerPoolSessionPersistenceDataSourceModel struct {
 	CookieName             types.String `tfsdk:"cookie_name" json:"cookie_name,computed"`
 	PersistenceGranularity types.String `tfsdk:"persistence_granularity" json:"persistence_granularity,computed"`
 	PersistenceTimeout     types.Int64  `tfsdk:"persistence_timeout" json:"persistence_timeout,computed"`
+}
+
+type CloudLoadBalancerPoolFindOneByDataSourceModel struct {
+	Details        types.Bool   `tfsdk:"details" query:"details,computed_optional"`
+	ListenerID     types.String `tfsdk:"listener_id" query:"listener_id,optional"`
+	LoadBalancerID types.String `tfsdk:"load_balancer_id" query:"load_balancer_id,optional"`
+	Name           types.String `tfsdk:"name" query:"name,optional"`
 }
