@@ -43,6 +43,7 @@ import (
 	"github.com/G-Core/terraform-provider-gcore/internal/services/cloud_network_subnet"
 	"github.com/G-Core/terraform-provider-gcore/internal/services/cloud_placement_group"
 	"github.com/G-Core/terraform-provider-gcore/internal/services/cloud_project"
+	"github.com/G-Core/terraform-provider-gcore/internal/services/cloud_quota"
 	"github.com/G-Core/terraform-provider-gcore/internal/services/cloud_region"
 	"github.com/G-Core/terraform-provider-gcore/internal/services/cloud_reserved_fixed_ip"
 	"github.com/G-Core/terraform-provider-gcore/internal/services/cloud_secret"
@@ -272,6 +273,7 @@ func (p *GcoreProvider) DataSources(ctx context.Context) []func() datasource.Dat
 		cloud_project.NewCloudProjectsDataSource,
 		cloud_region.NewCloudRegionDataSource,
 		cloud_region.NewCloudRegionsDataSource,
+		cloud_quota.NewCloudQuotaDataSource,
 		cloud_secret.NewCloudSecretDataSource,
 		cloud_secret.NewCloudSecretsDataSource,
 		cloud_ssh_key.NewCloudSSHKeyDataSource,
