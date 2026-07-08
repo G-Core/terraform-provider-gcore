@@ -25,6 +25,7 @@ data "gcore_cdn_resources" "example_cdn_resources" {
   min_updated = "min_updated"
   name = "name"
   origin_group = 0
+  origin_group_in = "originGroup__in"
   origin_protocol = "HTTP"
   rules = "rules"
   secondary_hostnames = "secondaryHostnames"
@@ -75,6 +76,10 @@ Possible values:
 - `min_updated` (String) Earliest date of CDN resource update for which CDN resources should be returned (ISO 8601/RFC 3339 format, UTC.)
 - `name` (String) Name of the CDN resource. Matches partially and is case-insensitive.
 - `origin_group` (Number) Origin group ID.
+- `origin_group_in` (String) Origin group IDs. Values should be separated by a comma.
+
+Example:
+- ?`originGroup__in`=1,2,3
 - `origin_protocol` (String) Protocol used by CDN servers to request content from an origin source.
 Available values: "HTTP", "HTTPS", "MATCH".
 - `rules` (String) Rule name or pattern.
