@@ -40,11 +40,9 @@ func sweepCDNLogsUploaderPolicies(_ string) error {
 		return fmt.Errorf("error listing CDN logs uploader policies: %w", err)
 	}
 
-	allPolicies := policies.Results
-	if len(allPolicies) == 0 {
-		allPolicies = policies.Results
-	}
-	for _, policy := range allPolicies {
+	// CDN list endpoints are now offset pagers; the result exposes .Results
+	// (the {count,results} envelope), not the plain-array union.
+	for _, policy := range policies.Results {
 		if !sweep.ShouldSweep("gcore_cdn_logs_uploader_policy", policy.Name) {
 			continue
 		}
