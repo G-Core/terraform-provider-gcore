@@ -10,6 +10,7 @@ data "gcore_cdn_resources" "example_cdn_resources" {
   min_updated = "min_updated"
   name = "name"
   origin_group = 0
+  origin_group_in = "originGroup__in"
   origin_protocol = "HTTP"
   rules = "rules"
   secondary_hostnames = "secondaryHostnames"

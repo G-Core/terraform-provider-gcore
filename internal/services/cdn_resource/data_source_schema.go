@@ -1317,6 +1317,10 @@ func DataSourceSchema(ctx context.Context) schema.Schema {
 						Description: "Origin group ID.",
 						Optional:    true,
 					},
+					"origin_group_in": schema.StringAttribute{
+						Description: "Origin group IDs. Values should be separated by a comma.\n\nExample:\n- ?`originGroup__in`=1,2,3",
+						Optional:    true,
+					},
 					"origin_protocol": schema.StringAttribute{
 						Description: "Protocol used by CDN servers to request content from an origin source.\nAvailable values: \"HTTP\", \"HTTPS\", \"MATCH\".",
 						Optional:    true,

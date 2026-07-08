@@ -29,6 +29,7 @@ type CDNResourcesDataSourceModel struct {
 	MinUpdated         types.String                                                   `tfsdk:"min_updated" query:"min_updated,optional"`
 	Name               types.String                                                   `tfsdk:"name" query:"name,optional"`
 	OriginGroup        types.Int64                                                    `tfsdk:"origin_group" query:"originGroup,optional"`
+	OriginGroupIn      types.String                                                   `tfsdk:"origin_group_in" query:"originGroup__in,optional"`
 	OriginProtocol     types.String                                                   `tfsdk:"origin_protocol" query:"originProtocol,optional"`
 	Rules              types.String                                                   `tfsdk:"rules" query:"rules,optional"`
 	SecondaryHostnames types.String                                                   `tfsdk:"secondary_hostnames" query:"secondaryHostnames,optional"`
@@ -80,6 +81,9 @@ func (m *CDNResourcesDataSourceModel) toListParams(_ context.Context) (params cd
 	}
 	if !m.OriginGroup.IsNull() {
 		params.OriginGroup = param.NewOpt(m.OriginGroup.ValueInt64())
+	}
+	if !m.OriginGroupIn.IsNull() {
+		params.OriginGroupIn = param.NewOpt(m.OriginGroupIn.ValueString())
 	}
 	if !m.OriginProtocol.IsNull() {
 		params.OriginProtocol = cdn.CDNResourceListParamsOriginProtocol(m.OriginProtocol.ValueString())

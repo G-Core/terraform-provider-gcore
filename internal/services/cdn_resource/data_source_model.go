@@ -89,6 +89,9 @@ func (m *CDNResourceDataSourceModel) toListParams(_ context.Context) (params cdn
 	if !m.FindOneBy.OriginGroup.IsNull() {
 		params.OriginGroup = param.NewOpt(m.FindOneBy.OriginGroup.ValueInt64())
 	}
+	if !m.FindOneBy.OriginGroupIn.IsNull() {
+		params.OriginGroupIn = param.NewOpt(m.FindOneBy.OriginGroupIn.ValueString())
+	}
 	if !m.FindOneBy.OriginProtocol.IsNull() {
 		params.OriginProtocol = cdn.CDNResourceListParamsOriginProtocol(m.FindOneBy.OriginProtocol.ValueString())
 	}
@@ -521,6 +524,7 @@ type CDNResourceFindOneByDataSourceModel struct {
 	MinUpdated         types.String `tfsdk:"min_updated" query:"min_updated,optional"`
 	Name               types.String `tfsdk:"name" query:"name,optional"`
 	OriginGroup        types.Int64  `tfsdk:"origin_group" query:"originGroup,optional"`
+	OriginGroupIn      types.String `tfsdk:"origin_group_in" query:"originGroup__in,optional"`
 	OriginProtocol     types.String `tfsdk:"origin_protocol" query:"originProtocol,optional"`
 	Rules              types.String `tfsdk:"rules" query:"rules,optional"`
 	SecondaryHostnames types.String `tfsdk:"secondary_hostnames" query:"secondaryHostnames,optional"`
