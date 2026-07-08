@@ -28,11 +28,20 @@ jobs:
         with:
           go-repo-read-token: ${{ secrets.GO_REPO_READ_TOKEN }}
 
-      # TODO: GCLOUD2-24419 - remove workaround when Stainless fixes scripts/link to handle missing SDK branches
+      # GCLOUD2-24419: link co-generated go SDK — gcore-go-staging@<branch> → @main → pinned release (staging-only).
       - name: Link staging branch
         if: github.repository == 'G-Core/terraform-provider-gcore-staging'
+        env:
+          GH_REF: ${{ github.ref_name }}
         run: |
-          ./scripts/link 'github.com/G-Core/gcore-go-staging@${{ github.ref_name }}' || true
+          for ref in "$GH_REF" main; do
+            if go list -m "github.com/G-Core/gcore-go-staging@$ref" >/dev/null 2>&1; then
+              echo "Linking to gcore-go-staging@$ref"
+              ./scripts/link "github.com/G-Core/gcore-go-staging@$ref"
+              exit 0
+            fi
+          done
+          echo "No linkable gcore-go-staging branch (@$GH_REF or @main); building against pinned release."
 
       - name: Bootstrap
         run: ./scripts/bootstrap
@@ -50,11 +59,20 @@ jobs:
         with:
           go-repo-read-token: ${{ secrets.GO_REPO_READ_TOKEN }}
 
-      # TODO: GCLOUD2-24419 - remove workaround when Stainless fixes scripts/link to handle missing SDK branches
+      # GCLOUD2-24419: link co-generated go SDK — gcore-go-staging@<branch> → @main → pinned release (staging-only).
       - name: Link staging branch
         if: github.repository == 'G-Core/terraform-provider-gcore-staging'
+        env:
+          GH_REF: ${{ github.ref_name }}
         run: |
-          ./scripts/link 'github.com/G-Core/gcore-go-staging@${{ github.ref_name }}' || true
+          for ref in "$GH_REF" main; do
+            if go list -m "github.com/G-Core/gcore-go-staging@$ref" >/dev/null 2>&1; then
+              echo "Linking to gcore-go-staging@$ref"
+              ./scripts/link "github.com/G-Core/gcore-go-staging@$ref"
+              exit 0
+            fi
+          done
+          echo "No linkable gcore-go-staging branch (@$GH_REF or @main); building against pinned release."
 
       - name: Bootstrap
         run: ./scripts/bootstrap
