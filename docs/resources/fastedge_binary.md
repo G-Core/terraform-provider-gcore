@@ -30,21 +30,8 @@ resource "gcore_fastedge_binary" "example" {
 
 ### Read-Only
 
-- `api_type` (String) Wasm API type
 - `checksum` (String) MD5 hash of the binary. Computed from the local file and verified against the API response.
 - `id` (Number) Binary ID
-- `source` (Number) Source language:  
-0 - unknown  
-1 - Rust  
-2 - JavaScript
-- `status` (Number) Status code:  
-0 - pending  
-1 - compiled  
-2 - compilation failed (errors available)  
-3 - compilation failed (errors not available)  
-4 - resulting binary exceeded the limit  
-5 - unsupported source language
-- `unref_since` (String) Not used since (UTC)
 
 
 ## Import

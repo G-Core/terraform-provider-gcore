@@ -63,7 +63,6 @@ resource "gcore_fastedge_app" "api_gateway" {
 - `comment` (String) Optional human-readable description of the application's purpose
 - `debug` (Boolean) Enable verbose debug logging for 30 minutes. Automatically expires to prevent performance impact.
 - `env` (Map of String) Environment variables
-- `log` (String, Deprecated) Available values: "kafka", "none".
 - `name` (String) Unique application name (alphanumeric, hyphens allowed)
 - `rsp_headers` (Map of String) Extra headers to add to the response
 - `secrets` (Attributes Map) Application secrets (see [below for nested schema](#nestedatt--secrets))
@@ -72,20 +71,11 @@ resource "gcore_fastedge_app" "api_gateway" {
 1 - enabled  
 2 - disabled  
 5 - suspended
-- `stores` (Attributes Map) Application edge stores (see [below for nested schema](#nestedatt--stores))
 - `template` (Number) Template ID
 
 ### Read-Only
 
-- `api_type` (String) Wasm API type
-- `debug_until` (String) When debugging finishes
 - `id` (Number) App ID
-- `networks` (List of String) Networks
-- `plan` (String) Plan name
-- `plan_id` (Number) Plan ID
-- `template_name` (String) Template name
-- `upgradeable_to` (Number) ID of the binary the app can be upgraded to
-- `url` (String) Auto-generated URL where the application is accessible
 
 <a id="nestedatt--secrets"></a>
 ### Nested Schema for `secrets`
@@ -93,24 +83,6 @@ resource "gcore_fastedge_app" "api_gateway" {
 Required:
 
 - `id` (Number) The unique identifier of the secret.
-
-Read-Only:
-
-- `comment` (String) A description or comment about the secret.
-- `name` (String) The unique name of the secret.
-
-
-<a id="nestedatt--stores"></a>
-### Nested Schema for `stores`
-
-Required:
-
-- `id` (Number) The identifier of the store
-
-Read-Only:
-
-- `comment` (String) A description of the store
-- `name` (String) The name of the store
 
 
 ## Import

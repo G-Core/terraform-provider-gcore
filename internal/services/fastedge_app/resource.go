@@ -89,8 +89,7 @@ func (r *FastedgeAppResource) Create(ctx context.Context, req resource.CreateReq
 		return
 	}
 
-	// Read the app back via GET to populate all computed fields that the
-	// Create response does not include (e.g. log, networks, template_name).
+	// Read the app back via GET to populate computed fields the Create response omits.
 	res = new(http.Response)
 	_, err = r.client.Fastedge.Apps.Get(
 		ctx,
@@ -164,8 +163,7 @@ func (r *FastedgeAppResource) Update(ctx context.Context, req resource.UpdateReq
 		return
 	}
 
-	// Read the app back via GET to populate all computed fields that the
-	// Update response does not include (e.g. log, networks, template_name).
+	// Read the app back via GET to populate computed fields the Update response omits.
 	res = new(http.Response)
 	_, err = r.client.Fastedge.Apps.Get(
 		ctx,

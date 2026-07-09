@@ -16,7 +16,6 @@ FastEdge templates encapsulate reusable configurations for FastEdge applications
 resource "gcore_fastedge_template" "example_fastedge_template" {
   binary_id = 12345
   name = "api-gateway-template"
-  owned = true
   params = [{
     data_type = "string"
     mandatory = true
@@ -41,12 +40,10 @@ resource "gcore_fastedge_template" "example_fastedge_template" {
 ### Optional
 
 - `long_descr` (String) Detailed markdown description explaining template features and usage
-- `owned` (Boolean) Is the template owned by user?
 - `short_descr` (String) Brief one-line description displayed in template listings
 
 ### Read-Only
 
-- `api_type` (String) Wasm API type
 - `id` (Number) Template ID
 
 <a id="nestedatt--params"></a>

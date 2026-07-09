@@ -32,11 +32,6 @@ func TestAccFastedgeBinaryDataSource_basic(t *testing.T) {
 						"data.gcore_fastedge_binary.test", tfjsonpath.New("checksum"),
 						compare.ValuesSame(),
 					),
-					statecheck.CompareValuePairs(
-						"gcore_fastedge_binary.test", tfjsonpath.New("status"),
-						"data.gcore_fastedge_binary.test", tfjsonpath.New("status"),
-						compare.ValuesSame(),
-					),
 				},
 			},
 		},

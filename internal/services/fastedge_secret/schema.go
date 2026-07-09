@@ -54,11 +54,6 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 					},
 				},
 			},
-			"app_count": schema.Int64Attribute{
-				Description:   "The number of applications that use this secret.",
-				Computed:      true,
-				PlanModifiers: []planmodifier.Int64{int64planmodifier.UseStateForUnknown()},
-			},
 		},
 	}
 }

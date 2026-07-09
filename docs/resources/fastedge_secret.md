@@ -48,7 +48,6 @@ resource "gcore_fastedge_secret" "example" {
 
 ### Read-Only
 
-- `app_count` (Number) The number of applications that use this secret.
 - `id` (Number) The unique identifier of the secret.
 
 <a id="nestedatt--secret_slots"></a>

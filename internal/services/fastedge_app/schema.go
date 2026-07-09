@@ -6,9 +6,7 @@ import (
 	"context"
 
 	"github.com/G-Core/terraform-provider-gcore/internal/customfield"
-	"github.com/hashicorp/terraform-plugin-framework-timetypes/timetypes"
 	"github.com/hashicorp/terraform-plugin-framework-validators/int64validator"
-	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/booldefault"
@@ -55,15 +53,6 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 				Optional:    true,
 				Default:     booldefault.StaticBool(false),
 			},
-			"log": schema.StringAttribute{
-				Description:        `Available values: "kafka", "none".`,
-				Computed:           true,
-				Optional:           true,
-				DeprecationMessage: "This attribute is deprecated.",
-				Validators: []validator.String{
-					stringvalidator.OneOfCaseInsensitive("kafka", "none"),
-				},
-			},
 			"name": schema.StringAttribute{
 				Description: "Unique application name (alphanumeric, hyphens allowed)",
 				Computed:    true,
@@ -102,73 +91,8 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 							Description: "The unique identifier of the secret.",
 							Required:    true,
 						},
-						"comment": schema.StringAttribute{
-							Description: "A description or comment about the secret.",
-							Computed:    true,
-						},
-						"name": schema.StringAttribute{
-							Description: "The unique name of the secret.",
-							Computed:    true,
-						},
 					},
 				},
-			},
-			"stores": schema.MapNestedAttribute{
-				Description: "Application edge stores",
-				Computed:    true,
-				Optional:    true,
-				CustomType:  customfield.NewNestedObjectMapType[FastedgeAppStoresModel](ctx),
-				NestedObject: schema.NestedAttributeObject{
-					Attributes: map[string]schema.Attribute{
-						"id": schema.Int64Attribute{
-							Description: "The identifier of the store",
-							Required:    true,
-						},
-						"comment": schema.StringAttribute{
-							Description: "A description of the store",
-							Computed:    true,
-						},
-						"name": schema.StringAttribute{
-							Description: "The name of the store",
-							Computed:    true,
-						},
-					},
-				},
-			},
-			"api_type": schema.StringAttribute{
-				Description: "Wasm API type",
-				Computed:    true,
-			},
-			"debug_until": schema.StringAttribute{
-				Description: "When debugging finishes",
-				Computed:    true,
-				CustomType:  timetypes.RFC3339Type{},
-			},
-			"plan": schema.StringAttribute{
-				Description: "Plan name",
-				Computed:    true,
-			},
-			"plan_id": schema.Int64Attribute{
-				Description: "Plan ID",
-				Computed:    true,
-			},
-			"template_name": schema.StringAttribute{
-				Description: "Template name",
-				Computed:    true,
-			},
-			"upgradeable_to": schema.Int64Attribute{
-				Description: "ID of the binary the app can be upgraded to",
-				Computed:    true,
-			},
-			"url": schema.StringAttribute{
-				Description: "Auto-generated URL where the application is accessible",
-				Computed:    true,
-			},
-			"networks": schema.ListAttribute{
-				Description: "Networks",
-				Computed:    true,
-				CustomType:  customfield.NewListType[types.String](ctx),
-				ElementType: types.StringType,
 			},
 		},
 	}

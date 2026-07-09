@@ -47,8 +47,6 @@ func TestAccFastedgeBinary_basic(t *testing.T) {
 					statecheck.ExpectKnownValue("gcore_fastedge_binary.test",
 						tfjsonpath.New("checksum"), knownvalue.NotNull()),
 					statecheck.ExpectKnownValue("gcore_fastedge_binary.test",
-						tfjsonpath.New("status"), knownvalue.NotNull()),
-					statecheck.ExpectKnownValue("gcore_fastedge_binary.test",
 						tfjsonpath.New("filename"), knownvalue.StringExact(wasmPath)),
 				},
 			},

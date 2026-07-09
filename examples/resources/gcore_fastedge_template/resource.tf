@@ -1,7 +1,6 @@
 resource "gcore_fastedge_template" "example_fastedge_template" {
   binary_id = 12345
   name = "api-gateway-template"
-  owned = true
   params = [{
     data_type = "string"
     mandatory = true

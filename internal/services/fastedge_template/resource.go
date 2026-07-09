@@ -82,14 +82,11 @@ func (r *FastedgeTemplateResource) Create(ctx context.Context, req resource.Crea
 		return
 	}
 	bytes, _ := io.ReadAll(res.Body)
-	// Save owned before unmarshal - API always returns false regardless of input
-	savedOwned := data.Owned
 	err = apijson.UnmarshalComputed(bytes, &data)
 	if err != nil {
 		resp.Diagnostics.AddError("failed to deserialize http request", err.Error())
 		return
 	}
-	data.Owned = savedOwned
 
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
 }
@@ -159,20 +156,15 @@ func (r *FastedgeTemplateResource) Read(ctx context.Context, req resource.ReadRe
 		return
 	}
 	bytes, _ := io.ReadAll(res.Body)
-	// Save fields not correctly represented in GET response:
-	// - id: not included in GET response
-	// - owned: API returns false regardless of actual ownership context
+	// Save id since the GET response does not include it.
 	savedID := data.ID
-	savedOwned := data.Owned
 	// Use UnmarshalComputed to preserve required/optional fields from state
 	err = apijson.UnmarshalComputed(bytes, &data)
 	if err != nil {
 		resp.Diagnostics.AddError("failed to deserialize http request", err.Error())
 		return
 	}
-	// Restore fields not correctly represented in GET response
 	data.ID = savedID
-	data.Owned = savedOwned
 
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
 }
@@ -235,9 +227,6 @@ func (r *FastedgeTemplateResource) ImportState(ctx context.Context, req resource
 	}
 	// Restore ID since the GET response does not include it
 	data.ID = types.Int64Value(path)
-	// The API always returns owned=false; set to true to match the schema default
-	// and avoid unnecessary update plans after import
-	data.Owned = types.BoolValue(true)
 	// Normalize API response values to match Terraform conventions:
 	// - The API returns "" for unset optional strings (metadata, descr),
 	//   but Terraform configs use null when these are not specified.

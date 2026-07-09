@@ -33,12 +33,6 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 				Description: "Unique name for the template (used for identification and searching)",
 				Required:    true,
 			},
-			"owned": schema.BoolAttribute{
-				Description: "Is the template owned by user?",
-				Computed:    true,
-				Optional:    true,
-				Default:     booldefault.StaticBool(true),
-			},
 			"params": schema.ListNestedAttribute{
 				Description: "Parameters",
 				Required:    true,
@@ -89,10 +83,6 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 			"short_descr": schema.StringAttribute{
 				Description: "Brief one-line description displayed in template listings",
 				Optional:    true,
-			},
-			"api_type": schema.StringAttribute{
-				Description: "Wasm API type",
-				Computed:    true,
 			},
 		},
 	}

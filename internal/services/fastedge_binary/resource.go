@@ -100,8 +100,7 @@ func (r *FastedgeBinaryResource) Create(ctx context.Context, req resource.Create
 		return
 	}
 
-	// The Create response (BinaryShort) lacks the source field.
-	// Read the full binary to populate all computed fields.
+	// Read the full binary to populate computed fields.
 	fullResult, err := r.client.Fastedge.Binaries.Get(
 		ctx,
 		result.ID,

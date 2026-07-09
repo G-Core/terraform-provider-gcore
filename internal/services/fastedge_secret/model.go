@@ -13,7 +13,6 @@ type FastedgeSecretModel struct {
 	Name        types.String                                                `tfsdk:"name" json:"name,required"`
 	Comment     types.String                                                `tfsdk:"comment" json:"comment,optional"`
 	SecretSlots customfield.NestedObjectSet[FastedgeSecretSecretSlotsModel] `tfsdk:"secret_slots" json:"secret_slots,computed_optional"`
-	AppCount    types.Int64                                                 `tfsdk:"app_count" json:"app_count,computed"`
 }
 
 func (m FastedgeSecretModel) MarshalJSON() (data []byte, err error) {

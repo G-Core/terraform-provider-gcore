@@ -11,11 +11,9 @@ type FastedgeTemplateModel struct {
 	ID         types.Int64                     `tfsdk:"id" json:"id,computed"`
 	BinaryID   types.Int64                     `tfsdk:"binary_id" json:"binary_id,required"`
 	Name       types.String                    `tfsdk:"name" json:"name,required"`
-	Owned      types.Bool                      `tfsdk:"owned" json:"owned,computed_optional"`
 	Params     *[]*FastedgeTemplateParamsModel `tfsdk:"params" json:"params,required"`
 	LongDescr  types.String                    `tfsdk:"long_descr" json:"long_descr,optional"`
 	ShortDescr types.String                    `tfsdk:"short_descr" json:"short_descr,optional"`
-	APIType    types.String                    `tfsdk:"api_type" json:"api_type,computed"`
 }
 
 func (m FastedgeTemplateModel) MarshalJSON() (data []byte, err error) {

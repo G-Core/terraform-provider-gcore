@@ -200,7 +200,6 @@ func (r *FastedgeSecretResource) Update(ctx context.Context, req resource.Update
 	// UnmarshalComputed skips them. Only use apiData for computed fields.
 	data.ID = id
 	// data.Name and data.Comment already have the correct plan values.
-	data.AppCount = apiData.AppCount
 
 	// Build API checksum map.
 	apiChecksumBySlot := map[int64]string{}
