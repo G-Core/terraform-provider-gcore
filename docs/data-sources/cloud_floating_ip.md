@@ -50,6 +50,7 @@ Available values: "ACTIVE", "DOWN", "ERROR".
 
 Optional:
 
+- `port_ids` (List of String) Optional. Filter by the port ID the floating IP is attached to. Repeat the parameter to filter by multiple ports (`?port_ids=id1&port_ids=id2`).
 - `status` (String) Filter by floating IP status. DOWN - unassigned (available). ACTIVE - attached to a port (in use). ERROR - error state.
 Available values: "ACTIVE", "DOWN", "ERROR".
 - `tag_key` (List of String) Optional. Filter by tag keys. ?`tag_key`=key1&`tag_key`=key2

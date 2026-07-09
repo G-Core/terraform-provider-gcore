@@ -23,12 +23,19 @@ type CloudFloatingIPsDataSourceModel struct {
 	RegionID    types.Int64                                                        `tfsdk:"region_id" path:"region_id,optional"`
 	Status      types.String                                                       `tfsdk:"status" query:"status,optional"`
 	TagKeyValue types.String                                                       `tfsdk:"tag_key_value" query:"tag_key_value,optional"`
+	PortIDs     *[]types.String                                                    `tfsdk:"port_ids" query:"port_ids,optional"`
 	TagKey      *[]types.String                                                    `tfsdk:"tag_key" query:"tag_key,optional"`
 	MaxItems    types.Int64                                                        `tfsdk:"max_items"`
 	Items       customfield.NestedObjectList[CloudFloatingIPsItemsDataSourceModel] `tfsdk:"items"`
 }
 
 func (m *CloudFloatingIPsDataSourceModel) toListParams(_ context.Context) (params cloud.FloatingIPListParams, diags diag.Diagnostics) {
+	mPortIDs := []string{}
+	if m.PortIDs != nil {
+		for _, item := range *m.PortIDs {
+			mPortIDs = append(mPortIDs, item.ValueString())
+		}
+	}
 	mTagKey := []string{}
 	if m.TagKey != nil {
 		for _, item := range *m.TagKey {
@@ -37,7 +44,8 @@ func (m *CloudFloatingIPsDataSourceModel) toListParams(_ context.Context) (param
 	}
 
 	params = cloud.FloatingIPListParams{
-		TagKey: mTagKey,
+		PortIDs: mPortIDs,
+		TagKey:  mTagKey,
 	}
 
 	if !m.ProjectID.IsNull() {

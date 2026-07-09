@@ -16,6 +16,7 @@ A floating IP is a static IP address that points to one of your Instances. It al
 data "gcore_cloud_floating_ips" "example_cloud_floating_ips" {
   project_id = 1
   region_id = 1
+  port_ids = ["ee2402d0-f0cd-4503-9b75-69be1d11c5f1"]
   status = "ACTIVE"
   tag_key = ["key1", "key2"]
   tag_key_value = "tag_key_value"
@@ -28,6 +29,7 @@ data "gcore_cloud_floating_ips" "example_cloud_floating_ips" {
 ### Optional
 
 - `max_items` (Number) Max items to fetch, default: 1000
+- `port_ids` (List of String) Optional. Filter by the port ID the floating IP is attached to. Repeat the parameter to filter by multiple ports (`?port_ids=id1&port_ids=id2`).
 - `project_id` (Number) Project ID
 - `region_id` (Number) Region ID
 - `status` (String) Filter by floating IP status. DOWN - unassigned (available). ACTIVE - attached to a port (in use). ERROR - error state.

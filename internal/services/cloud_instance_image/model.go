@@ -14,10 +14,10 @@ type CloudInstanceImageModel struct {
 	ProjectID        types.Int64                                                 `tfsdk:"project_id" path:"project_id,optional"`
 	RegionID         types.Int64                                                 `tfsdk:"region_id" path:"region_id,optional"`
 	URL              types.String                                                `tfsdk:"url" json:"url,required,no_refresh"`
-	OsDistro         types.String                                                `tfsdk:"os_distro" json:"os_distro,optional"`
-	OsVersion        types.String                                                `tfsdk:"os_version" json:"os_version,optional"`
 	Architecture     types.String                                                `tfsdk:"architecture" json:"architecture,computed_optional"`
 	CowFormat        types.Bool                                                  `tfsdk:"cow_format" json:"cow_format,computed_optional,no_refresh"`
+	OsDistro         types.String                                                `tfsdk:"os_distro" json:"os_distro,computed_optional"`
+	OsVersion        types.String                                                `tfsdk:"os_version" json:"os_version,computed_optional"`
 	Name             types.String                                                `tfsdk:"name" json:"name,required"`
 	HwFirmwareType   types.String                                                `tfsdk:"hw_firmware_type" json:"hw_firmware_type,optional"`
 	HwMachineType    types.String                                                `tfsdk:"hw_machine_type" json:"hw_machine_type,optional"`

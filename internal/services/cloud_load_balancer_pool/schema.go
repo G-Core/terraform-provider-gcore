@@ -228,7 +228,7 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 						Default: int64default.StaticInt64(3),
 					},
 					"url_path": schema.StringAttribute{
-						Description: "The HTTP path the health monitor requests on each member. Defaults to `/` if not set. Can only be used with `HTTP` or `HTTPS` health monitor type.\n\nMust start with `/` and contain only plain path segments. Query strings (`?`), fragments (`#`), percent-encoding (`%`), and consecutive slashes (`//`) are not allowed.\n\nExamples of valid paths:\n- `/` — check the root (most common, default)\n- `/healthz` — a dedicated health endpoint",
+						Description: "The HTTP path the health monitor requests on each member. Defaults to `/` if not set. Can only be used with `HTTP` or `HTTPS` health monitor type.\n\n Must start with `/` and contain only plain path segments. Query strings (`?`), fragments (`#`), percent-encoding (`%`), and consecutive slashes (`//`) are not allowed.\n\n Examples of valid paths:\n- `/` — check the root (most common, default)\n- `/healthz` — a dedicated health endpoint",
 						Optional:    true,
 					},
 				},

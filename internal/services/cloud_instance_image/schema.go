@@ -45,16 +45,6 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 				Required:      true,
 				PlanModifiers: []planmodifier.String{stringplanmodifier.RequiresReplace()},
 			},
-			"os_distro": schema.StringAttribute{
-				Description:   "OS Distribution, i.e. Debian, CentOS, Ubuntu, CoreOS etc.",
-				Optional:      true,
-				PlanModifiers: []planmodifier.String{stringplanmodifier.RequiresReplace()},
-			},
-			"os_version": schema.StringAttribute{
-				Description:   "OS version, i.e. 22.04 (for Ubuntu) or 9.4 for Debian",
-				Optional:      true,
-				PlanModifiers: []planmodifier.String{stringplanmodifier.RequiresReplace()},
-			},
 			"architecture": schema.StringAttribute{
 				Description: "Image CPU architecture type: `aarch64`, `x86_64`\nAvailable values: \"aarch64\", \"x86_64\".",
 				Computed:    true,
@@ -71,6 +61,18 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 				Optional:      true,
 				PlanModifiers: []planmodifier.Bool{boolplanmodifier.RequiresReplaceIfConfigured()},
 				Default:       booldefault.StaticBool(false),
+			},
+			"os_distro": schema.StringAttribute{
+				Description:   "OS Distribution, i.e. Debian, CentOS, Ubuntu, CoreOS etc.",
+				Computed:      true,
+				Optional:      true,
+				PlanModifiers: []planmodifier.String{stringplanmodifier.RequiresReplaceIfConfigured()},
+			},
+			"os_version": schema.StringAttribute{
+				Description:   "OS version, i.e. 22.04 (for Ubuntu) or 9.4 for Debian",
+				Computed:      true,
+				Optional:      true,
+				PlanModifiers: []planmodifier.String{stringplanmodifier.RequiresReplaceIfConfigured()},
 			},
 			"name": schema.StringAttribute{
 				Description: "Image name",

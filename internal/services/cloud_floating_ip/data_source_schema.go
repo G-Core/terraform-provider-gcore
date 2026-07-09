@@ -107,6 +107,11 @@ func DataSourceSchema(ctx context.Context) schema.Schema {
 			"find_one_by": schema.SingleNestedAttribute{
 				Optional: true,
 				Attributes: map[string]schema.Attribute{
+					"port_ids": schema.ListAttribute{
+						Description: "Optional. Filter by the port ID the floating IP is attached to. Repeat the parameter to filter by multiple ports (`?port_ids=id1&port_ids=id2`).",
+						Optional:    true,
+						ElementType: types.StringType,
+					},
 					"status": schema.StringAttribute{
 						Description: "Filter by floating IP status. DOWN - unassigned (available). ACTIVE - attached to a port (in use). ERROR - error state.\nAvailable values: \"ACTIVE\", \"DOWN\", \"ERROR\".",
 						Optional:    true,

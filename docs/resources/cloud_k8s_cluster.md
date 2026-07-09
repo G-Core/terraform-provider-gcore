@@ -135,9 +135,9 @@ resource "gcore_cloud_k8s_cluster" "cluster" {
 - `authentication` (Attributes) Authentication settings (see [below for nested schema](#nestedatt--authentication))
 - `autoscaler_config` (Map of String) Cluster autoscaler configuration.
 
-It allows you to override the default cluster-autoscaler parameters provided by the platform with your preferred values.
+ It allows you to override the default cluster-autoscaler parameters provided by the platform with your preferred values.
 
-Supported parameters (in alphabetical order):
+ Supported parameters (in alphabetical order):
 - balance-similar-node-groups (boolean: true/false) - Detect similar node groups and balance the number of nodes between them.
 - expander (string: random, most-pods, least-waste, price, priority, grpc) - Type of node group expander to be used in scale up. Specifying multiple values separated by commas will call the expanders in succession until there is only one option remaining.
 - expendable-pods-priority-cutoff (float) - Pods with priority below cutoff will be expendable. They can be killed without any consideration during scale down and they don't cause scale up. Pods with null priority (PodPriority disabled) are non expendable.
@@ -221,12 +221,12 @@ Optional:
 
 - `enabled` (Boolean) The Slurm add-on will be enabled in the cluster.
 
-This add-on is only supported in clusters running Kubernetes v1.31 and v1.32 with at least 1 GPU cluster pool and VAST NFS support enabled.
+ This add-on is only supported in clusters running Kubernetes v1.31 and v1.32 with at least 1 GPU cluster pool and VAST NFS support enabled.
 - `file_share_id` (String) ID of a VAST file share to be used as Slurm storage.
 
-The Slurm add-on will create separate Persistent Volume Claims for different purposes (controller spool, worker spool, jail) on that file share.
+ The Slurm add-on will create separate Persistent Volume Claims for different purposes (controller spool, worker spool, jail) on that file share.
 
-The file share must have `root_squash` disabled, while `path_length` and `allowed_characters` settings must be set to `NPL`.
+ The file share must have `root_squash` disabled, while `path_length` and `allowed_characters` settings must be set to `NPL`.
 - `ssh_key_ids` (List of String) IDs of SSH keys to authorize for SSH connection to Slurm login nodes.
 - `worker_count` (Number) Size of the worker pool, i.e. the number of Slurm worker nodes.
 

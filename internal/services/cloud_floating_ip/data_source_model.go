@@ -45,6 +45,12 @@ func (m *CloudFloatingIPDataSourceModel) toReadParams(_ context.Context) (params
 }
 
 func (m *CloudFloatingIPDataSourceModel) toListParams(_ context.Context) (params cloud.FloatingIPListParams, diags diag.Diagnostics) {
+	mFindOneByPortIDs := []string{}
+	if m.FindOneBy.PortIDs != nil {
+		for _, item := range *m.FindOneBy.PortIDs {
+			mFindOneByPortIDs = append(mFindOneByPortIDs, item.ValueString())
+		}
+	}
 	mFindOneByTagKey := []string{}
 	if m.FindOneBy.TagKey != nil {
 		for _, item := range *m.FindOneBy.TagKey {
@@ -53,7 +59,8 @@ func (m *CloudFloatingIPDataSourceModel) toListParams(_ context.Context) (params
 	}
 
 	params = cloud.FloatingIPListParams{
-		TagKey: mFindOneByTagKey,
+		PortIDs: mFindOneByPortIDs,
+		TagKey:  mFindOneByTagKey,
 	}
 
 	if !m.ProjectID.IsNull() {
@@ -79,6 +86,7 @@ type CloudFloatingIPTagsDataSourceModel struct {
 }
 
 type CloudFloatingIPFindOneByDataSourceModel struct {
+	PortIDs     *[]types.String `tfsdk:"port_ids" query:"port_ids,optional"`
 	Status      types.String    `tfsdk:"status" query:"status,optional"`
 	TagKey      *[]types.String `tfsdk:"tag_key" query:"tag_key,optional"`
 	TagKeyValue types.String    `tfsdk:"tag_key_value" query:"tag_key_value,optional"`

@@ -46,6 +46,11 @@ func ListDataSourceSchema(ctx context.Context) schema.Schema {
 				Description: "Optional. Filter by tag key-value pairs.",
 				Optional:    true,
 			},
+			"port_ids": schema.ListAttribute{
+				Description: "Optional. Filter by the port ID the floating IP is attached to. Repeat the parameter to filter by multiple ports (`?port_ids=id1&port_ids=id2`).",
+				Optional:    true,
+				ElementType: types.StringType,
+			},
 			"tag_key": schema.ListAttribute{
 				Description: "Optional. Filter by tag keys. ?`tag_key`=key1&`tag_key`=key2",
 				Optional:    true,
