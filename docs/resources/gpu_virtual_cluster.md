@@ -37,6 +37,9 @@ resource "gcore_gpu_virtual_cluster" "example" {
       name      = "pub_net"
       type      = "external"
       ip_family = "ipv4"
+
+      # Cannot be combined with the deprecated cluster-wide servers_settings.security_groups.
+      security_groups = ["d75db0b2-58f1-4a11-88c6-a932bb897310"]
     }
     volume {
       name       = "root-volume"
@@ -46,8 +49,6 @@ resource "gcore_gpu_virtual_cluster" "example" {
       image_id   = "4536337d-17c7-48f4-8ac5-01a41dc06f58"
       boot_index = 0
     }
-
-    security_groups = []
 
     credentials {
       ssh_key_name = "my-ssh-key"
@@ -89,7 +90,7 @@ Required:
 Optional:
 
 - `credentials` (Block List, Max: 1) Credentials for accessing the instances (see [below for nested schema](#nestedblock--servers_settings--credentials))
-- `security_groups` (List of String) List of security group IDs to associate with the cluster
+- `security_groups` (List of String, Deprecated) Deprecated. List of security group IDs to associate with the cluster. Use per-interface security_groups inside the interface block instead.
 - `user_data` (String) User data to provide to the instance for cloud-init
 
 <a id="nestedblock--servers_settings--interface"></a>
@@ -106,6 +107,7 @@ Optional:
 - `ip_address` (String) IP address for the interface
 - `ip_family` (String) IP family for the interface (dual, ipv4, ipv6)
 - `network_id` (String) Required if type is 'subnet' or 'any_subnet'
+- `security_groups` (Set of String) Set of security group IDs applied to this interface. If omitted, the cluster-wide security_groups apply; if both are omitted, the project's default security group is applied. Cannot be combined with the deprecated cluster-wide security_groups.
 - `subnet_id` (String) Required if type is 'subnet'
 
 <a id="nestedblock--servers_settings--interface--floating_ip"></a>

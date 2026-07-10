@@ -22,6 +22,9 @@ resource "gcore_gpu_virtual_cluster" "example" {
       name      = "pub_net"
       type      = "external"
       ip_family = "ipv4"
+
+      # Cannot be combined with the deprecated cluster-wide servers_settings.security_groups.
+      security_groups = ["d75db0b2-58f1-4a11-88c6-a932bb897310"]
     }
     volume {
       name       = "root-volume"
@@ -31,8 +34,6 @@ resource "gcore_gpu_virtual_cluster" "example" {
       image_id   = "4536337d-17c7-48f4-8ac5-01a41dc06f58"
       boot_index = 0
     }
-
-    security_groups = []
 
     credentials {
       ssh_key_name = "my-ssh-key"
