@@ -502,10 +502,10 @@ resource "gcore_cloud_instance" "windows_with_userdata" {
 - `security_groups` (Attributes List, Deprecated) Deprecated. Use per-interface `security_groups` inside `interfaces[]` instead. Cannot be combined with per-interface `security_groups`. If omitted everywhere, the project's default security group is applied. (see [below for nested schema](#nestedatt--security_groups))
 - `servergroup_id` (String) Placement group ID for instance placement policy.
 
-Supported group types:
-- `anti-affinity`: Ensures instances are placed on different hosts for high availability.
-- `affinity`: Places instances on the same host for low-latency communication.
-- `soft-anti-affinity`: Tries to place instances on different hosts but allows sharing if needed.
+  Supported group types:
+  - `anti-affinity`: Ensures instances are placed on different hosts for high availability.
+  - `affinity`: Places instances on the same host for low-latency communication.
+  - `soft-anti-affinity`: Tries to place instances on different hosts but allows sharing if needed.
 - `ssh_key_name` (String) Specifies the name of the SSH keypair, created via the
 [/v1/`ssh_keys` endpoint](/docs/api-reference/cloud/ssh-keys/add-or-generate-ssh-key).
 - `tags` (Map of String) Key-value tags to associate with the resource. A tag is a key-value pair that can be associated with a resource, enabling efficient filtering and grouping for better organization and management. Both tag keys and values have a maximum length of 255 characters. Some tags are read-only and cannot be modified by the user. Tags are also integrated with cost reports, allowing cost data to be filtered based on tag keys or values.

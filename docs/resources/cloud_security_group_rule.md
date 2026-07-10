@@ -58,8 +58,8 @@ Available values: "ah", "dccp", "egp", "esp", "gre", "icmp", "igmp", "ipencap", 
 
 - `id` (String) The ID of this resource.
 - `tasks` (List of String) List of task IDs representing asynchronous operations. Use these IDs to monitor operation progress:
-- `GET /v1/tasks/{task_id}` - Check individual task status and details
-Poll task status until completion (`FINISHED`/`ERROR`) before proceeding with dependent operations.
+  - `GET /v1/tasks/{task_id}` - Check individual task status and details
+  Poll task status until completion (`FINISHED`/`ERROR`) before proceeding with dependent operations.
 
 
 ## Import

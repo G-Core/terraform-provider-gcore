@@ -1012,7 +1012,7 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 								Required:    true,
 							},
 							"sni_type": schema.StringAttribute{
-								Description: "SNI (Server Name Indication) type.\n\nPossible values:\n- **dynamic** - SNI hostname depends on `hostHeader` and `forward_host_header` options.\nIt has several possible combinations:\n- If the `hostHeader` option is enabled and specified, SNI hostname matches the Host header.\n- If the `forward_host_header` option is enabled and has true value, SNI hostname matches the Host header used in the request made to a CDN.\n- If the `hostHeader` and `forward_host_header` options are disabled, SNI hostname matches the primary CNAME.\n- **custom** - custom SNI hostname is in use.\nAvailable values: \"dynamic\", \"custom\".",
+								Description: "SNI (Server Name Indication) type.\n\nPossible values:\n- **dynamic** - SNI hostname depends on `hostHeader` and `forward_host_header` options.\nIt has several possible combinations:\n  - If the `hostHeader` option is enabled and specified, SNI hostname matches the Host header.\n  - If the `forward_host_header` option is enabled and has true value, SNI hostname matches the Host header used in the request made to a CDN.\n  - If the `hostHeader` and `forward_host_header` options are disabled, SNI hostname matches the primary CNAME.\n- **custom** - custom SNI hostname is in use.\nAvailable values: \"dynamic\", \"custom\".",
 								Computed:    true,
 								Optional:    true,
 								Validators: []validator.String{

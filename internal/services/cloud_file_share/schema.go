@@ -102,7 +102,7 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 				CustomType:  customfield.NewNestedObjectType[CloudFileShareShareSettingsModel](ctx),
 				Attributes: map[string]schema.Attribute{
 					"allowed_characters": schema.StringAttribute{
-						Description: "Determines which characters are allowed in file names. Choose between:\n- Lowest Common Denominator (LCD), allows only characters allowed by all VAST Cluster-supported protocols\n- Native Protocol Limit (NPL), imposes no limitation beyond that of the client protocol.\nAvailable values: \"LCD\", \"NPL\".",
+						Description: "Determines which characters are allowed in file names. Choose between:\n  - Lowest Common Denominator (LCD), allows only characters allowed by all VAST Cluster-supported protocols\n  - Native Protocol Limit (NPL), imposes no limitation beyond that of the client protocol.\nAvailable values: \"LCD\", \"NPL\".",
 						Computed:    true,
 						Optional:    true,
 						Validators: []validator.String{
@@ -110,7 +110,7 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 						},
 					},
 					"path_length": schema.StringAttribute{
-						Description: "Affects the maximum limit of file path component name length. Choose between:\n- Lowest Common Denominator (LCD), imposes the lowest common denominator file length limit of all VAST Cluster-supported protocols. With this (default) option, the limitation on the length of a single component of the path is 255 characters\n- Native Protocol Limit (NPL), imposes no limitation beyond that of the client protocol.\nAvailable values: \"LCD\", \"NPL\".",
+						Description: "Affects the maximum limit of file path component name length. Choose between:\n  - Lowest Common Denominator (LCD), imposes the lowest common denominator file length limit of all VAST Cluster-supported protocols. With this (default) option, the limitation on the length of a single component of the path is 255 characters\n  - Native Protocol Limit (NPL), imposes no limitation beyond that of the client protocol.\nAvailable values: \"LCD\", \"NPL\".",
 						Computed:    true,
 						Optional:    true,
 						Validators: []validator.String{
@@ -118,7 +118,7 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 						},
 					},
 					"root_squash": schema.BoolAttribute{
-						Description: "Enables or disables root squash for NFS clients.\n- If `true` (default), root squash is enabled: the root user is mapped to nobody for all file and folder management operations on the export.\n- If `false`, root squash is disabled: the NFS client `root` user retains root privileges. Use this option if you trust the root user not to perform operations that will corrupt data.",
+						Description: "Enables or disables root squash for NFS clients.\n  - If `true` (default), root squash is enabled: the root user is mapped to nobody for all file and folder management operations on the export.\n  - If `false`, root squash is disabled: the NFS client `root` user retains root privileges. Use this option if you trust the root user not to perform operations that will corrupt data.",
 						Computed:    true,
 						Optional:    true,
 					},

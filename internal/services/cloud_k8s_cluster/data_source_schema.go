@@ -102,7 +102,7 @@ func DataSourceSchema(ctx context.Context) schema.Schema {
 				Computed:    true,
 			},
 			"autoscaler_config": schema.MapAttribute{
-				Description: "Cluster autoscaler configuration.\n\n It contains overrides to the default cluster-autoscaler parameters provided by the platform.",
+				Description: "Cluster autoscaler configuration.\n\n  It contains overrides to the default cluster-autoscaler parameters provided by the platform.",
 				Computed:    true,
 				CustomType:  customfield.NewMapType[types.String](ctx),
 				ElementType: types.StringType,

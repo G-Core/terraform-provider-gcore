@@ -176,7 +176,7 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 				PlanModifiers: []planmodifier.Int64{int64planmodifier.RequiresReplace()},
 			},
 			"servergroup_id": schema.StringAttribute{
-				Description:   "Placement group ID for instance placement policy.\n\nSupported group types:\n- `anti-affinity`: Ensures instances are placed on different hosts for high availability.\n- `affinity`: Places instances on the same host for low-latency communication.\n- `soft-anti-affinity`: Tries to place instances on different hosts but allows sharing if needed.",
+				Description:   "Placement group ID for instance placement policy.\n\n  Supported group types:\n  - `anti-affinity`: Ensures instances are placed on different hosts for high availability.\n  - `affinity`: Places instances on the same host for low-latency communication.\n  - `soft-anti-affinity`: Tries to place instances on different hosts but allows sharing if needed.",
 				Optional:      true,
 				PlanModifiers: []planmodifier.String{stringplanmodifier.RequiresReplace()},
 			},

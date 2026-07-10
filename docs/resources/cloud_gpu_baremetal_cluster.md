@@ -199,8 +199,8 @@ Available values: "k8s", "user".
 - `status` (String) Cluster status
 Available values: "active", "creating", "degraded", "deleting", "error", "rebooting", "rebuilding", "resizing", "shutoff".
 - `tasks` (List of String) List of task IDs representing asynchronous operations. Use these IDs to monitor operation progress:
-- `GET /v1/tasks/{task_id}` - Check individual task status and details
-Poll task status until completion (`FINISHED`/`ERROR`) before proceeding with dependent operations.
+  - `GET /v1/tasks/{task_id}` - Check individual task status and details
+  Poll task status until completion (`FINISHED`/`ERROR`) before proceeding with dependent operations.
 - `updated_at` (String) Cluster update date time
 
 <a id="nestedatt--servers_settings"></a>

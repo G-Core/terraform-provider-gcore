@@ -72,8 +72,8 @@ Read-Only:
 - `allowed_characters` (String) Available values: "LCD", "NPL".
 - `path_length` (String) Available values: "LCD", "NPL".
 - `root_squash` (Boolean) Enables or disables root squash for NFS clients.
-- If `true`, root squash is enabled: the root user is mapped to nobody for all file and folder management operations on the export.
-- If `false`, root squash is disabled: the NFS client `root` user retains root privileges.
+  - If `true`, root squash is enabled: the root user is mapped to nobody for all file and folder management operations on the export.
+  - If `false`, root squash is disabled: the NFS client `root` user retains root privileges.
 - `type_name` (String) Standard file share type
 Available values: "standard", "vast".
 

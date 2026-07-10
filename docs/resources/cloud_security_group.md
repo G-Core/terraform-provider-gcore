@@ -87,8 +87,8 @@ resource "gcore_cloud_security_group_rule" "allow_egress_tcp" {
 - `security_group_rules` (Attributes List) Security group rules (see [below for nested schema](#nestedatt--security_group_rules))
 - `tags_v2` (Attributes List) List of key-value tags associated with the resource. A tag is a key-value pair that can be associated with a resource, enabling efficient filtering and grouping for better organization and management. Some tags are read-only and cannot be modified by the user. Tags are also integrated with cost reports, allowing cost data to be filtered based on tag keys or values. (see [below for nested schema](#nestedatt--tags_v2))
 - `tasks` (List of String) List of task IDs representing asynchronous operations. Use these IDs to monitor operation progress:
-- `GET /v1/tasks/{task_id}` - Check individual task status and details
-Poll task status until completion (`FINISHED`/`ERROR`) before proceeding with dependent operations.
+  - `GET /v1/tasks/{task_id}` - Check individual task status and details
+  Poll task status until completion (`FINISHED`/`ERROR`) before proceeding with dependent operations.
 - `updated_at` (String) Datetime when the security group was last updated
 
 <a id="nestedatt--rules"></a>

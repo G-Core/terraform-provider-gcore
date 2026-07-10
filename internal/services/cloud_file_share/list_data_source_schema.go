@@ -126,7 +126,7 @@ func ListDataSourceSchema(ctx context.Context) schema.Schema {
 									},
 								},
 								"root_squash": schema.BoolAttribute{
-									Description: "Enables or disables root squash for NFS clients.\n- If `true`, root squash is enabled: the root user is mapped to nobody for all file and folder management operations on the export.\n- If `false`, root squash is disabled: the NFS client `root` user retains root privileges.",
+									Description: "Enables or disables root squash for NFS clients.\n  - If `true`, root squash is enabled: the root user is mapped to nobody for all file and folder management operations on the export.\n  - If `false`, root squash is disabled: the NFS client `root` user retains root privileges.",
 									Computed:    true,
 								},
 							},

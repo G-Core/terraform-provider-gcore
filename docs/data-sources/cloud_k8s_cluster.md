@@ -38,7 +38,7 @@ data "gcore_cloud_k8s_cluster" "example_cloud_k8s_cluster" {
 - `authentication` (Attributes) Cluster authentication settings (see [below for nested schema](#nestedatt--authentication))
 - `autoscaler_config` (Map of String) Cluster autoscaler configuration.
 
- It contains overrides to the default cluster-autoscaler parameters provided by the platform.
+  It contains overrides to the default cluster-autoscaler parameters provided by the platform.
 - `cni` (Attributes) Cluster CNI settings (see [below for nested schema](#nestedatt--cni))
 - `created_at` (String) Function creation date
 - `creator_task_id` (String) Task that created this entity

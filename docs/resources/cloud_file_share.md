@@ -107,16 +107,16 @@ Optional:
 Optional:
 
 - `allowed_characters` (String) Determines which characters are allowed in file names. Choose between:
-- Lowest Common Denominator (LCD), allows only characters allowed by all VAST Cluster-supported protocols
-- Native Protocol Limit (NPL), imposes no limitation beyond that of the client protocol.
+  - Lowest Common Denominator (LCD), allows only characters allowed by all VAST Cluster-supported protocols
+  - Native Protocol Limit (NPL), imposes no limitation beyond that of the client protocol.
 Available values: "LCD", "NPL".
 - `path_length` (String) Affects the maximum limit of file path component name length. Choose between:
-- Lowest Common Denominator (LCD), imposes the lowest common denominator file length limit of all VAST Cluster-supported protocols. With this (default) option, the limitation on the length of a single component of the path is 255 characters
-- Native Protocol Limit (NPL), imposes no limitation beyond that of the client protocol.
+  - Lowest Common Denominator (LCD), imposes the lowest common denominator file length limit of all VAST Cluster-supported protocols. With this (default) option, the limitation on the length of a single component of the path is 255 characters
+  - Native Protocol Limit (NPL), imposes no limitation beyond that of the client protocol.
 Available values: "LCD", "NPL".
 - `root_squash` (Boolean) Enables or disables root squash for NFS clients.
-- If `true` (default), root squash is enabled: the root user is mapped to nobody for all file and folder management operations on the export.
-- If `false`, root squash is disabled: the NFS client `root` user retains root privileges. Use this option if you trust the root user not to perform operations that will corrupt data.
+  - If `true` (default), root squash is enabled: the root user is mapped to nobody for all file and folder management operations on the export.
+  - If `false`, root squash is disabled: the NFS client `root` user retains root privileges. Use this option if you trust the root user not to perform operations that will corrupt data.
 
 
 ## Import

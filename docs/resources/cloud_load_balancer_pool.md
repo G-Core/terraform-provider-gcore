@@ -142,11 +142,11 @@ Available values: "1.0", "1.1".
 - `max_retries_down` (Number) Number of failures before the member is switched to ERROR state.
 - `url_path` (String) The HTTP path the health monitor requests on each member. Defaults to `/` if not set. Can only be used with `HTTP` or `HTTPS` health monitor type.
 
- Must start with `/` and contain only plain path segments. Query strings (`?`), fragments (`#`), percent-encoding (`%`), and consecutive slashes (`//`) are not allowed.
+  Must start with `/` and contain only plain path segments. Query strings (`?`), fragments (`#`), percent-encoding (`%`), and consecutive slashes (`//`) are not allowed.
 
- Examples of valid paths:
-- `/` — check the root (most common, default)
-- `/healthz` — a dedicated health endpoint
+  Examples of valid paths:
+  - `/` — check the root (most common, default)
+  - `/healthz` — a dedicated health endpoint
 
 
 <a id="nestedatt--members"></a>
@@ -166,9 +166,9 @@ Optional:
 - `monitor_port` (Number) An alternate protocol port used for health monitoring of a backend member. Default is null which monitors the member `protocol_port`.
 - `subnet_id` (String) `subnet_id` in which `address` is present. Either `subnet_id` or `instance_id` should be provided
 - `weight` (Number) Member weight. Valid values are 0 < `weight` <= 256, defaults to 1. Controls traffic distribution based on the pool's load balancing algorithm:
-- `ROUND_ROBIN`: Distributes connections to each member in turn according to weights. Higher weight = more turns in the cycle. Example: weights 3 vs 1 = ~75% vs ~25% of requests.
-- `LEAST_CONNECTIONS`: Sends new connections to the member with fewest active connections, performing round-robin within groups of the same normalized load. Higher weight = allowed to hold more simultaneous connections before being considered 'more loaded'. Example: weights 2 vs 1 means 20 vs 10 active connections is treated as balanced.
-- `SOURCE_IP`: Routes clients consistently to the same member by hashing client source IP; hash result is modulo total weight of running members. Higher weight = more hash buckets, so more client IPs map to that member. Example: weights 2 vs 1 = roughly two-thirds of distinct client IPs map to the higher-weight member.
+  - `ROUND_ROBIN`: Distributes connections to each member in turn according to weights. Higher weight = more turns in the cycle. Example: weights 3 vs 1 = ~75% vs ~25% of requests.
+  - `LEAST_CONNECTIONS`: Sends new connections to the member with fewest active connections, performing round-robin within groups of the same normalized load. Higher weight = allowed to hold more simultaneous connections before being considered 'more loaded'. Example: weights 2 vs 1 means 20 vs 10 active connections is treated as balanced.
+  - `SOURCE_IP`: Routes clients consistently to the same member by hashing client source IP; hash result is modulo total weight of running members. Higher weight = more hash buckets, so more client IPs map to that member. Example: weights 2 vs 1 = roughly two-thirds of distinct client IPs map to the higher-weight member.
 
 
 <a id="nestedatt--session_persistence"></a>
