@@ -14,9 +14,9 @@ Placement groups enforce affinity or anti-affinity policies that control whether
 
 ```terraform
 data "gcore_cloud_placement_group" "example_cloud_placement_group" {
-  project_id = 0
-  region_id = 0
-  group_id = "group_id"
+  project_id = 1
+  region_id = 1
+  group_id = "47003067-550a-6f17-93b6-81ee16ba061e"
 }
 ```
 
@@ -25,12 +25,12 @@ data "gcore_cloud_placement_group" "example_cloud_placement_group" {
 
 ### Required
 
-- `group_id` (String)
+- `group_id` (String) The ID of the server group.
 
 ### Optional
 
-- `project_id` (Number)
-- `region_id` (Number)
+- `project_id` (Number) Project ID
+- `region_id` (Number) Region ID
 
 ### Read-Only
 

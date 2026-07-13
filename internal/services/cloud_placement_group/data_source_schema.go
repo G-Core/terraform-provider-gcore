@@ -20,13 +20,16 @@ func DataSourceSchema(ctx context.Context) schema.Schema {
 				Computed: true,
 			},
 			"group_id": schema.StringAttribute{
-				Required: true,
+				Description: "The ID of the server group.",
+				Required:    true,
 			},
 			"project_id": schema.Int64Attribute{
-				Optional: true,
+				Description: "Project ID",
+				Optional:    true,
 			},
 			"region_id": schema.Int64Attribute{
-				Optional: true,
+				Description: "Region ID",
+				Optional:    true,
 			},
 			"name": schema.StringAttribute{
 				Description: "The name of the server group.",

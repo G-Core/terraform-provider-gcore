@@ -112,8 +112,8 @@ Available values: "affinity", "anti-affinity", "soft-anti-affinity".
 ### Optional
 
 - `instances` (Attributes Set) The list of instances in this server group. (see [below for nested schema](#nestedatt--instances))
-- `project_id` (Number)
-- `region_id` (Number)
+- `project_id` (Number) Project ID
+- `region_id` (Number) Region ID
 
 ### Read-Only
 
