@@ -13,6 +13,7 @@ import (
 	"github.com/G-Core/terraform-provider-gcore/internal/services/cdn_client_config"
 	"github.com/G-Core/terraform-provider-gcore/internal/services/cdn_logs_uploader_config"
 	"github.com/G-Core/terraform-provider-gcore/internal/services/cdn_logs_uploader_policy"
+	"github.com/G-Core/terraform-provider-gcore/internal/services/cdn_logs_uploader_target"
 	"github.com/G-Core/terraform-provider-gcore/internal/services/cdn_origin_group"
 	"github.com/G-Core/terraform-provider-gcore/internal/services/cdn_origin_shielding"
 	"github.com/G-Core/terraform-provider-gcore/internal/services/cdn_resource"
@@ -262,6 +263,7 @@ func (p *GcoreProvider) Resources(ctx context.Context) []func() resource.Resourc
 		cdn_certificate.NewResource,
 		cdn_trusted_ca_certificate.NewResource,
 		cdn_logs_uploader_policy.NewResource,
+		cdn_logs_uploader_target.NewResource,
 		cdn_logs_uploader_config.NewResource,
 		cdn_origin_shielding.NewResource,
 	}
@@ -358,6 +360,8 @@ func (p *GcoreProvider) DataSources(ctx context.Context) []func() datasource.Dat
 		cdn_trusted_ca_certificate.NewCDNTrustedCaCertificatesDataSource,
 		cdn_logs_uploader_policy.NewCDNLogsUploaderPolicyDataSource,
 		cdn_logs_uploader_policy.NewCDNLogsUploaderPoliciesDataSource,
+		cdn_logs_uploader_target.NewCDNLogsUploaderTargetDataSource,
+		cdn_logs_uploader_target.NewCDNLogsUploaderTargetsDataSource,
 		cdn_logs_uploader_config.NewCDNLogsUploaderConfigDataSource,
 		cdn_logs_uploader_config.NewCDNLogsUploaderConfigsDataSource,
 		cdn_client_config.NewCDNClientConfigDataSource,
