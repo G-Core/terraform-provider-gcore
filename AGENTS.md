@@ -8,9 +8,11 @@ This is a **Stainless-generated** Terraform provider for Gcore cloud services. T
 automatically generated from an OpenAPI specification via Stainless codegen.
 
 **Important**: Custom changes should be kept to a minimum. Prefer modifying the OpenAPI spec
-or Stainless config to have changes generated rather than maintaining custom code. Custom
-code creates merge conflict risk during regeneration. See the Stainless docs on adding
-custom code: https://www.stainless.com/docs/guides/add-custom-code
+(`api-schemas`) or the codegen config (`stlc-config`) to have changes generated rather than
+maintaining custom code. Durable custom code is tracked as a sealed base→integrated diff in
+`stlc-config` (`stainless/custom-code/terraform`) and re-applied on every regeneration;
+ad-hoc edits merged here are absorbed into that seal by CI. Keep custom code isolated in
+separate files so the seal stays reviewable.
 
 ## Build Commands
 
@@ -293,6 +295,21 @@ GCORE_BASE_URL             # optional - override API base URL
 
 Agents should only make code changes and leave version control to the user.
 
+When git operations are explicitly requested, follow these rules:
+
+- **Always branch from fresh `origin/main`, never local `main`.** Regeneration CI rewrites
+  this repo's `main` history (non-fast-forward), so a branch cut from a stale local `main`
+  drags in old generated commits and bloats the PR. Use
+  `git fetch origin && git checkout -B <branch> origin/main`, and re-check open PRs after a
+  regeneration (`gh pr view <n> --json changedFiles`).
+- **No internal ticket keys or PR numbers in commit messages or PR descriptions.** Commits on
+  this trunk are promoted verbatim to the public production repository. Keep ticket
+  references in branch names only.
+- **Regenerate docs before requesting review.** Run `./scripts/generate-docs` on the branch,
+  commit any resulting `docs/` changes (stage exact paths), then run it again and confirm the
+  tree is clean. The CI doc-sealing step misbehaves when it has to create the doc commit
+  itself; a branch that already carries final docs passes cleanly.
+
 ## Working with Stainless-Generated Code
 
 ### Do
@@ -309,7 +326,7 @@ Agents should only make code changes and leave version control to the user.
 - Remove the "File generated from our OpenAPI spec" header
 - Change import organization style in generated files
 - Rename generated types or packages
-- Force push to integrated branches (`main`, `next`)
+- Force push to the integrated branch (`main`)
 
 ### Custom Code Guidelines
 
@@ -317,7 +334,7 @@ If custom code is absolutely necessary:
 1. Prefer creating new files over modifying generated ones
 2. Use conventional commit messages (e.g., `feat(client): add helper method`)
 3. Document why custom code was needed vs fixing the OpenAPI spec
-4. Be prepared to resolve merge conflicts on regeneration
+4. Merged custom code is resealed into `stlc-config` by CI and re-applied on regeneration
 
 ## Plan Modifiers
 
@@ -330,9 +347,11 @@ See the `plan-modifiers` skill (`.agents/skills/plan-modifiers/SKILL.md`) for co
    ```hcl
    provider_installation {
      dev_overrides {
-       "stainless-sdks/gcore" = "/path/to/this/repo"
+       "registry.terraform.io/G-Core/gcore" = "/path/to/this/repo"
      }
      direct {}
    }
    ```
+   The override key must match the `source` used in your `.tf` files (`G-Core/gcore`) — with
+   a mismatched key terraform silently falls back to the registry provider.
 3. Test with your `.tf` files using `terraform apply`
