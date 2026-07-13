@@ -4,23 +4,18 @@ package cdn_logs_uploader_target
 
 import (
 	"github.com/G-Core/terraform-provider-gcore/internal/apijson"
-	"github.com/G-Core/terraform-provider-gcore/internal/customfield"
-	"github.com/hashicorp/terraform-plugin-framework-jsontypes/jsontypes"
 	"github.com/hashicorp/terraform-plugin-framework-timetypes/timetypes"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 )
 
 type CDNLogsUploaderTargetModel struct {
-	ID                     types.Int64                       `tfsdk:"id" json:"id,computed"`
-	StorageType            types.String                      `tfsdk:"storage_type" json:"storage_type,required"`
-	Config                 *CDNLogsUploaderTargetConfigModel `tfsdk:"config" json:"config,required"`
-	Description            types.String                      `tfsdk:"description" json:"description,optional"`
-	Name                   types.String                      `tfsdk:"name" json:"name,computed_optional"`
-	ClientID               types.Int64                       `tfsdk:"client_id" json:"client_id,computed"`
-	Created                timetypes.RFC3339                 `tfsdk:"created" json:"created,computed" format:"date-time"`
-	Updated                timetypes.RFC3339                 `tfsdk:"updated" json:"updated,computed" format:"date-time"`
-	RelatedUploaderConfigs customfield.List[types.Int64]     `tfsdk:"related_uploader_configs" json:"related_uploader_configs,computed"`
-	Status                 jsontypes.Normalized              `tfsdk:"status" json:"status,computed"`
+	ID          types.Int64                       `tfsdk:"id" json:"id,computed"`
+	StorageType types.String                      `tfsdk:"storage_type" json:"storage_type,required"`
+	Config      *CDNLogsUploaderTargetConfigModel `tfsdk:"config" json:"config,required"`
+	Description types.String                      `tfsdk:"description" json:"description,computed_optional"`
+	Name        types.String                      `tfsdk:"name" json:"name,computed_optional"`
+	ClientID    types.Int64                       `tfsdk:"client_id" json:"client_id,computed"`
+	Created     timetypes.RFC3339                 `tfsdk:"created" json:"created,computed" format:"date-time"`
 }
 
 func (m CDNLogsUploaderTargetModel) MarshalJSON() (data []byte, err error) {
@@ -40,11 +35,11 @@ type CDNLogsUploaderTargetConfigModel struct {
 	SecretAccessKey types.String                            `tfsdk:"secret_access_key" json:"secret_access_key,optional,no_refresh"`
 	UsePathStyle    types.Bool                              `tfsdk:"use_path_style" json:"use_path_style,computed_optional"`
 	Hostname        types.String                            `tfsdk:"hostname" json:"hostname,optional"`
-	Password        types.String                            `tfsdk:"password" json:"password,optional"`
+	Password        types.String                            `tfsdk:"password" json:"password,optional,no_refresh"`
 	TimeoutSeconds  types.Int64                             `tfsdk:"timeout_seconds" json:"timeout_seconds,optional"`
 	User            types.String                            `tfsdk:"user" json:"user,optional"`
-	KeyPassphrase   types.String                            `tfsdk:"key_passphrase" json:"key_passphrase,optional"`
-	PrivateKey      types.String                            `tfsdk:"private_key" json:"private_key,optional"`
+	KeyPassphrase   types.String                            `tfsdk:"key_passphrase" json:"key_passphrase,optional,no_refresh"`
+	PrivateKey      types.String                            `tfsdk:"private_key" json:"private_key,optional,no_refresh"`
 	Upload          *CDNLogsUploaderTargetConfigUploadModel `tfsdk:"upload" json:"upload,optional"`
 	Append          *CDNLogsUploaderTargetConfigAppendModel `tfsdk:"append" json:"append,optional"`
 	Auth            *CDNLogsUploaderTargetConfigAuthModel   `tfsdk:"auth" json:"auth,optional"`
@@ -61,7 +56,7 @@ type CDNLogsUploaderTargetConfigUploadModel struct {
 	URL             types.String                                              `tfsdk:"url" json:"url,required"`
 	Headers         *map[string]types.String                                  `tfsdk:"headers" json:"headers,optional"`
 	Method          types.String                                              `tfsdk:"method" json:"method,computed_optional"`
-	ResponseActions *[]*CDNLogsUploaderTargetConfigUploadResponseActionsModel `tfsdk:"response_actions" json:"response_actions,optional"`
+	ResponseActions *[]*CDNLogsUploaderTargetConfigUploadResponseActionsModel `tfsdk:"response_actions" json:"response_actions,computed_optional"`
 	TimeoutSeconds  types.Int64                                               `tfsdk:"timeout_seconds" json:"timeout_seconds,computed_optional"`
 	UseCompression  types.Bool                                                `tfsdk:"use_compression" json:"use_compression,computed_optional"`
 }
@@ -77,7 +72,7 @@ type CDNLogsUploaderTargetConfigAppendModel struct {
 	URL             types.String                                              `tfsdk:"url" json:"url,required"`
 	Headers         *map[string]types.String                                  `tfsdk:"headers" json:"headers,optional"`
 	Method          types.String                                              `tfsdk:"method" json:"method,computed_optional"`
-	ResponseActions *[]*CDNLogsUploaderTargetConfigAppendResponseActionsModel `tfsdk:"response_actions" json:"response_actions,optional"`
+	ResponseActions *[]*CDNLogsUploaderTargetConfigAppendResponseActionsModel `tfsdk:"response_actions" json:"response_actions,computed_optional"`
 	TimeoutSeconds  types.Int64                                               `tfsdk:"timeout_seconds" json:"timeout_seconds,computed_optional"`
 	UseCompression  types.Bool                                                `tfsdk:"use_compression" json:"use_compression,computed_optional"`
 }
@@ -95,18 +90,18 @@ type CDNLogsUploaderTargetConfigAuthModel struct {
 }
 
 type CDNLogsUploaderTargetConfigAuthConfigModel struct {
-	Token           types.String `tfsdk:"token" json:"token,optional"`
+	Token           types.String `tfsdk:"token" json:"token,optional,no_refresh"`
 	HeaderName      types.String `tfsdk:"header_name" json:"header_name,optional"`
-	AccountKey      types.String `tfsdk:"account_key" json:"account_key,optional"`
+	AccountKey      types.String `tfsdk:"account_key" json:"account_key,optional,no_refresh"`
 	AccessKeyID     types.String `tfsdk:"access_key_id" json:"access_key_id,optional"`
-	SecretAccessKey types.String `tfsdk:"secret_access_key" json:"secret_access_key,optional"`
+	SecretAccessKey types.String `tfsdk:"secret_access_key" json:"secret_access_key,optional,no_refresh"`
 }
 
 type CDNLogsUploaderTargetConfigRetryModel struct {
 	URL             types.String                                             `tfsdk:"url" json:"url,required"`
 	Headers         *map[string]types.String                                 `tfsdk:"headers" json:"headers,optional"`
 	Method          types.String                                             `tfsdk:"method" json:"method,computed_optional"`
-	ResponseActions *[]*CDNLogsUploaderTargetConfigRetryResponseActionsModel `tfsdk:"response_actions" json:"response_actions,optional"`
+	ResponseActions *[]*CDNLogsUploaderTargetConfigRetryResponseActionsModel `tfsdk:"response_actions" json:"response_actions,computed_optional"`
 	TimeoutSeconds  types.Int64                                              `tfsdk:"timeout_seconds" json:"timeout_seconds,computed_optional"`
 	UseCompression  types.Bool                                               `tfsdk:"use_compression" json:"use_compression,computed_optional"`
 }
