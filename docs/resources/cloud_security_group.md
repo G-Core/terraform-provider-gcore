@@ -75,7 +75,7 @@ resource "gcore_cloud_security_group_rule" "allow_egress_tcp" {
 - `description` (String) Security group description
 - `project_id` (Number) Project ID
 - `region_id` (Number) Region ID
-- `rules` (Attributes List) Security group rules (see [below for nested schema](#nestedatt--rules))
+- `rules` (Attributes List) Security group rules. Omit to apply the default template (ingress + egress); send [] to create no rules. (see [below for nested schema](#nestedatt--rules))
 - `tags` (Map of String) Key-value tags to associate with the resource. A tag is a key-value pair that can be associated with a resource, enabling efficient filtering and grouping for better organization and management. Both tag keys and values have a maximum length of 255 characters. Some tags are read-only and cannot be modified by the user. Tags are also integrated with cost reports, allowing cost data to be filtered based on tag keys or values.
 
 ### Read-Only
