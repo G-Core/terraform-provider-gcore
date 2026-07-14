@@ -9,6 +9,7 @@ import (
 
 	"github.com/G-Core/gcore-go"
 	"github.com/G-Core/gcore-go/option"
+	"github.com/G-Core/terraform-provider-gcore/internal/custom"
 	"github.com/G-Core/terraform-provider-gcore/internal/services/cdn_certificate"
 	"github.com/G-Core/terraform-provider-gcore/internal/services/cdn_client_config"
 	"github.com/G-Core/terraform-provider-gcore/internal/services/cdn_logs_uploader_config"
@@ -200,6 +201,10 @@ func (p *GcoreProvider) Configure(ctx context.Context, req provider.ConfigureReq
 	// Override Go SDK max retries to 4 from 2 which is the default.
 	// The max delay is capped at 8 secs, so the maximum value for max retries is 4.
 	opts = append(opts, option.WithMaxRetries(4))
+
+	// Set a Gcore-convention User-Agent so Terraform-originated traffic is
+	// identifiable in audit logs and telemetry.
+	opts = append(opts, custom.UserAgentOption(p.version))
 
 	client := gcore.NewClient(
 		opts...,
