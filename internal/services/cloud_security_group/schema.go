@@ -59,7 +59,7 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 				PlanModifiers: []planmodifier.Map{mapplanmodifier.UseStateForUnknown()},
 			},
 			"rules": schema.ListNestedAttribute{
-				Description: "Security group rules",
+				Description: "Security group rules. Omit to apply the default template (ingress + egress); send [] to create no rules.",
 				Computed:    true,
 				Optional:    true,
 				CustomType:  customfield.NewNestedObjectListType[CloudSecurityGroupRulesModel](ctx),
