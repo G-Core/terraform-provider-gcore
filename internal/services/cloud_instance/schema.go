@@ -631,28 +631,44 @@ func (v *interfaceTypeValidator) MarkdownDescription(ctx context.Context) string
 }
 
 func (v *interfaceTypeValidator) ValidateResource(ctx context.Context, req resource.ValidateConfigRequest, resp *resource.ValidateConfigResponse) {
-	var config CloudInstanceModel
-
-	resp.Diagnostics.Append(req.Config.Get(ctx, &config)...)
+	// Fetch only the interfaces attribute as a framework List instead of
+	// decoding the whole config into CloudInstanceModel: the model uses plain
+	// Go slices, which cannot represent a wholly-unknown collection (e.g.
+	// interfaces built with a for expression over a for_each resource that
+	// does not exist in state yet).
+	var interfaces types.List
+	resp.Diagnostics.Append(req.Config.GetAttribute(ctx, path.Root("interfaces"), &interfaces)...)
 	if resp.Diagnostics.HasError() {
 		return
 	}
 
-	if config.Interfaces == nil {
+	// Unknown means the list shape is not decided until apply; there is
+	// nothing to validate yet.
+	if interfaces.IsNull() || interfaces.IsUnknown() {
 		return
 	}
 
-	for i, iface := range *config.Interfaces {
-		if iface == nil {
+	for i, elem := range interfaces.Elements() {
+		iface, ok := elem.(types.Object)
+		if !ok || iface.IsNull() || iface.IsUnknown() {
+			continue
+		}
+		attrs := iface.Attributes()
+
+		ifaceType, ok := attrs["type"].(types.String)
+		if !ok || ifaceType.IsNull() || ifaceType.IsUnknown() {
 			continue
 		}
 
-		ifaceType := iface.Type.ValueString()
+		isNull := func(name string) bool {
+			val, ok := attrs[name]
+			return ok && val.IsNull()
+		}
 
-		switch ifaceType {
+		switch ifaceType.ValueString() {
 		case "subnet":
 			// Only check IsNull - IsUnknown is valid during planning (e.g., referencing another resource)
-			if iface.SubnetID.IsNull() {
+			if isNull("subnet_id") {
 				resp.Diagnostics.AddAttributeError(
 					path.Root("interfaces").AtListIndex(i).AtName("subnet_id"),
 					"Missing Required Attribute",
@@ -660,7 +676,7 @@ func (v *interfaceTypeValidator) ValidateResource(ctx context.Context, req resou
 				)
 			}
 		case "any_subnet":
-			if iface.NetworkID.IsNull() {
+			if isNull("network_id") {
 				resp.Diagnostics.AddAttributeError(
 					path.Root("interfaces").AtListIndex(i).AtName("network_id"),
 					"Missing Required Attribute",
@@ -668,7 +684,7 @@ func (v *interfaceTypeValidator) ValidateResource(ctx context.Context, req resou
 				)
 			}
 		case "reserved_fixed_ip":
-			if iface.PortID.IsNull() {
+			if isNull("port_id") {
 				resp.Diagnostics.AddAttributeError(
 					path.Root("interfaces").AtListIndex(i).AtName("port_id"),
 					"Missing Required Attribute",

@@ -18,6 +18,7 @@ import (
 	"github.com/G-Core/terraform-provider-gcore/internal/custom"
 	"github.com/G-Core/terraform-provider-gcore/internal/importpath"
 	"github.com/G-Core/terraform-provider-gcore/internal/logging"
+	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/types"
@@ -129,6 +130,26 @@ func (r *CloudGPUBaremetalClusterResource) Update(ctx context.Context, req resou
 		return
 	}
 
+	// Re-check the credential guard from ModifyPlan before any update call:
+	// when credentials are unknown at plan time the guard there is skipped,
+	// and by apply time the values are resolved. Rejecting here keeps an
+	// unsupported username/password change from being silently dropped
+	// (UpdateServersSettings only sends ssh_key_name) while state records it.
+	var planSettingsObj, stateSettingsObj types.Object
+	resp.Diagnostics.Append(req.Plan.GetAttribute(ctx, path.Root("servers_settings"), &planSettingsObj)...)
+	resp.Diagnostics.Append(req.State.GetAttribute(ctx, path.Root("servers_settings"), &stateSettingsObj)...)
+	if resp.Diagnostics.HasError() {
+		return
+	}
+	credentialsChanged := credentialsHaveChanged(planSettingsObj, stateSettingsObj)
+	if credentialsChanged && usernameOrPasswordChanged(planSettingsObj, stateSettingsObj) {
+		resp.Diagnostics.AddError(
+			"Unsupported credential update",
+			"Updating username or password is not supported. These credentials can only be set during resource creation. To change them, the resource must be recreated.",
+		)
+		return
+	}
+
 	stateHasChanged := false
 
 	// Check if name or tags have changed.
@@ -217,7 +238,6 @@ func (r *CloudGPUBaremetalClusterResource) Update(ctx context.Context, req resou
 	// Check if server settings that require UpdateServersSettings + Rebuild have changed
 	// (image_id, credentials, user_data)
 	imageChanged := !data.ImageID.IsNull() && data.ImageID.ValueString() != state.ImageID.ValueString()
-	credentialsChanged := credentialsHaveChanged(data.ServersSettings, state.ServersSettings)
 	userDataChanged := false
 	if data.ServersSettings != nil && state.ServersSettings != nil {
 		userDataChanged = !data.ServersSettings.UserData.Equal(state.ServersSettings.UserData)
@@ -454,23 +474,26 @@ func (r *CloudGPUBaremetalClusterResource) ImportState(ctx context.Context, req 
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
 }
 
-func (r *CloudGPUBaremetalClusterResource) ModifyPlan(_ context.Context, req resource.ModifyPlanRequest, resp *resource.ModifyPlanResponse) {
+func (r *CloudGPUBaremetalClusterResource) ModifyPlan(ctx context.Context, req resource.ModifyPlanRequest, resp *resource.ModifyPlanResponse) {
 	// No validation needed on create or destroy.
 	if req.State.Raw.IsNull() || req.Plan.Raw.IsNull() {
 		return
 	}
 
-	var plan, state CloudGPUBaremetalClusterModel
-	resp.Diagnostics.Append(req.Plan.Get(context.Background(), &plan)...)
-	resp.Diagnostics.Append(req.State.Get(context.Background(), &state)...)
+	// Fetch only servers_settings as framework Objects instead of decoding
+	// the whole model: the model uses plain Go slices (e.g. interfaces),
+	// which cannot represent wholly-unknown collections at plan time.
+	var planSettings, stateSettings types.Object
+	resp.Diagnostics.Append(req.Plan.GetAttribute(ctx, path.Root("servers_settings"), &planSettings)...)
+	resp.Diagnostics.Append(req.State.GetAttribute(ctx, path.Root("servers_settings"), &stateSettings)...)
 	if resp.Diagnostics.HasError() {
 		return
 	}
 
 	// The UpdateServersSettings API only supports updating ssh_key_name.
 	// Reject username/password changes at plan time with a clear error.
-	if credentialsHaveChanged(plan.ServersSettings, state.ServersSettings) &&
-		usernameOrPasswordChanged(plan.ServersSettings, state.ServersSettings) {
+	if credentialsHaveChanged(planSettings, stateSettings) &&
+		usernameOrPasswordChanged(planSettings, stateSettings) {
 		resp.Diagnostics.AddError(
 			"Unsupported credential update",
 			"Updating username or password is not supported. These credentials can only be set during resource creation. To change them, the resource must be recreated.",
@@ -478,35 +501,65 @@ func (r *CloudGPUBaremetalClusterResource) ModifyPlan(_ context.Context, req res
 	}
 }
 
+// credentialsObject extracts the credentials attribute from a servers_settings
+// object value. It returns a null Object when servers_settings is null or
+// unknown, or when credentials is not an object value.
+func credentialsObject(serversSettings types.Object) types.Object {
+	if serversSettings.IsNull() || serversSettings.IsUnknown() {
+		return types.ObjectNull(map[string]attr.Type{})
+	}
+	if creds, ok := serversSettings.Attributes()["credentials"].(types.Object); ok {
+		return creds
+	}
+	return types.ObjectNull(map[string]attr.Type{})
+}
+
+// credentialAttr returns the named attribute of a credentials object, or a
+// null value when the object is null/unknown or the attribute is missing.
+func credentialAttr(creds types.Object, name string) attr.Value {
+	if creds.IsNull() || creds.IsUnknown() {
+		return types.StringNull()
+	}
+	if val, ok := creds.Attributes()[name]; ok {
+		return val
+	}
+	return types.StringNull()
+}
+
 // credentialsHaveChanged returns true if any credential field has changed between plan and state.
 //
-// Compared fields: SSHKeyName, Username, PasswordWoVersion (which tracks password_wo changes).
-// If new credential fields are added to CloudGPUBaremetalClusterServersSettingsCredentialsModel,
-// this function must be updated to include them.
-func credentialsHaveChanged(plan, state *CloudGPUBaremetalClusterServersSettingsModel) bool {
-	if plan == nil || plan.Credentials == nil {
+// Compared fields: ssh_key_name, username, password_wo_version (which tracks password_wo changes).
+// If new credential fields are added to the credentials schema, this function
+// must be updated to include them.
+func credentialsHaveChanged(plan, state types.Object) bool {
+	planCreds := credentialsObject(plan)
+	stateCreds := credentialsObject(state)
+	// Unknown plan credentials cannot be compared until apply.
+	if planCreds.IsNull() || planCreds.IsUnknown() {
 		return false
 	}
-	if state == nil || state.Credentials == nil {
+	if stateCreds.IsNull() {
 		return true
 	}
-	return !plan.Credentials.SSHKeyName.Equal(state.Credentials.SSHKeyName) ||
-		!plan.Credentials.Username.Equal(state.Credentials.Username) ||
-		!plan.Credentials.PasswordWoVersion.Equal(state.Credentials.PasswordWoVersion)
+	return !credentialAttr(planCreds, "ssh_key_name").Equal(credentialAttr(stateCreds, "ssh_key_name")) ||
+		!credentialAttr(planCreds, "username").Equal(credentialAttr(stateCreds, "username")) ||
+		!credentialAttr(planCreds, "password_wo_version").Equal(credentialAttr(stateCreds, "password_wo_version"))
 }
 
 // usernameOrPasswordChanged returns true if specifically the username or password
 // credential fields have changed (as opposed to ssh_key_name).
 // The UpdateServersSettings API only supports updating ssh_key_name, so changes to
 // username or password must be rejected.
-func usernameOrPasswordChanged(plan, state *CloudGPUBaremetalClusterServersSettingsModel) bool {
-	if plan == nil || plan.Credentials == nil {
+func usernameOrPasswordChanged(plan, state types.Object) bool {
+	planCreds := credentialsObject(plan)
+	stateCreds := credentialsObject(state)
+	if planCreds.IsNull() || planCreds.IsUnknown() {
 		return false
 	}
-	if state == nil || state.Credentials == nil {
+	if stateCreds.IsNull() {
 		// New credentials being set — check if they include username/password
-		return !plan.Credentials.Username.IsNull() || !plan.Credentials.PasswordWoVersion.IsNull()
+		return !credentialAttr(planCreds, "username").IsNull() || !credentialAttr(planCreds, "password_wo_version").IsNull()
 	}
-	return !plan.Credentials.Username.Equal(state.Credentials.Username) ||
-		!plan.Credentials.PasswordWoVersion.Equal(state.Credentials.PasswordWoVersion)
+	return !credentialAttr(planCreds, "username").Equal(credentialAttr(stateCreds, "username")) ||
+		!credentialAttr(planCreds, "password_wo_version").Equal(credentialAttr(stateCreds, "password_wo_version"))
 }

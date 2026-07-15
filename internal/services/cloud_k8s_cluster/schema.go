@@ -582,19 +582,21 @@ func (v *addOnsValidator) MarkdownDescription(_ context.Context) string {
 }
 
 func (v *addOnsValidator) ValidateResource(ctx context.Context, req resource.ValidateConfigRequest, resp *resource.ValidateConfigResponse) {
-	var config CloudK8SClusterModel
-
-	resp.Diagnostics.Append(req.Config.Get(ctx, &config)...)
+	// Fetch only the add_ons attribute instead of decoding the whole config:
+	// the model contains plain Go slices (e.g. pools) that cannot represent
+	// wholly-unknown collections at plan time.
+	var addOnsAttr customfield.NestedObject[CloudK8SClusterAddOnsModel]
+	resp.Diagnostics.Append(req.Config.GetAttribute(ctx, path.Root("add_ons"), &addOnsAttr)...)
 	if resp.Diagnostics.HasError() {
 		return
 	}
 
 	// If add_ons is not provided or is null/unknown, allow API to fill in defaults
-	if config.AddOns.IsNull() || config.AddOns.IsUnknown() {
+	if addOnsAttr.IsNull() || addOnsAttr.IsUnknown() {
 		return
 	}
 
-	addOns, diags := config.AddOns.Value(ctx)
+	addOns, diags := addOnsAttr.Value(ctx)
 	resp.Diagnostics.Append(diags...)
 	if resp.Diagnostics.HasError() {
 		return
@@ -661,19 +663,21 @@ func (v *authenticationValidator) MarkdownDescription(_ context.Context) string 
 }
 
 func (v *authenticationValidator) ValidateResource(ctx context.Context, req resource.ValidateConfigRequest, resp *resource.ValidateConfigResponse) {
-	var config CloudK8SClusterModel
-
-	resp.Diagnostics.Append(req.Config.Get(ctx, &config)...)
+	// Fetch only the authentication attribute instead of decoding the whole
+	// config: the model contains plain Go slices (e.g. pools) that cannot
+	// represent wholly-unknown collections at plan time.
+	var authAttr customfield.NestedObject[CloudK8SClusterAuthenticationModel]
+	resp.Diagnostics.Append(req.Config.GetAttribute(ctx, path.Root("authentication"), &authAttr)...)
 	if resp.Diagnostics.HasError() {
 		return
 	}
 
 	// If authentication is not provided or is null/unknown, allow API to fill in defaults
-	if config.Authentication.IsNull() || config.Authentication.IsUnknown() {
+	if authAttr.IsNull() || authAttr.IsUnknown() {
 		return
 	}
 
-	authentication, diags := config.Authentication.Value(ctx)
+	authentication, diags := authAttr.Value(ctx)
 	resp.Diagnostics.Append(diags...)
 	if resp.Diagnostics.HasError() {
 		return
@@ -790,35 +794,47 @@ func isVMBasedFlavor(flavorID string) bool {
 }
 
 func (v *poolFlavorValidator) ValidateResource(ctx context.Context, req resource.ValidateConfigRequest, resp *resource.ValidateConfigResponse) {
-	var config CloudK8SClusterModel
-
-	resp.Diagnostics.Append(req.Config.Get(ctx, &config)...)
+	// Fetch only the pools attribute as a framework List instead of decoding
+	// the whole config into CloudK8SClusterModel: the model uses a plain Go
+	// slice for pools, which cannot represent a wholly-unknown collection
+	// (e.g. pools built with a for expression over a for_each resource that
+	// does not exist in state yet).
+	var pools types.List
+	resp.Diagnostics.Append(req.Config.GetAttribute(ctx, path.Root("pools"), &pools)...)
 	if resp.Diagnostics.HasError() {
 		return
 	}
 
-	// If pools is not provided, nothing to validate
-	if config.Pools == nil {
+	// If pools is not provided, nothing to validate. Unknown means the list
+	// shape is not decided until apply; there is nothing to validate yet.
+	if pools.IsNull() || pools.IsUnknown() {
 		return
 	}
 
-	for i, pool := range *config.Pools {
-		if pool == nil {
+	for _, elem := range pools.Elements() {
+		pool, ok := elem.(types.Object)
+		if !ok || pool.IsNull() || pool.IsUnknown() {
 			continue
 		}
+		attrs := pool.Attributes()
 
 		// Skip validation if flavor_id is unknown (e.g., from a variable)
-		if pool.FlavorID.IsUnknown() || pool.FlavorID.IsNull() {
+		flavorIDAttr, ok := attrs["flavor_id"].(types.String)
+		if !ok || flavorIDAttr.IsUnknown() || flavorIDAttr.IsNull() {
 			continue
 		}
 
-		flavorID := pool.FlavorID.ValueString()
-		poolPath := path.Root("pools").AtSetValue(pool.FlavorID)
-		_ = i // poolPath uses set value, not index
+		isNull := func(name string) bool {
+			val, ok := attrs[name]
+			return ok && val.IsNull()
+		}
+
+		flavorID := flavorIDAttr.ValueString()
+		poolPath := path.Root("pools").AtSetValue(flavorIDAttr)
 
 		if isVMBasedFlavor(flavorID) {
 			// VM-based flavor: servergroup_policy, boot_volume_size, boot_volume_type must NOT be null
-			if pool.ServergroupPolicy.IsNull() {
+			if isNull("servergroup_policy") {
 				resp.Diagnostics.AddAttributeError(
 					poolPath.AtName("servergroup_policy"),
 					"Missing required attribute for VM-based flavor",
@@ -826,7 +842,7 @@ func (v *poolFlavorValidator) ValidateResource(ctx context.Context, req resource
 				)
 			}
 
-			if pool.BootVolumeSize.IsNull() {
+			if isNull("boot_volume_size") {
 				resp.Diagnostics.AddAttributeError(
 					poolPath.AtName("boot_volume_size"),
 					"Missing required attribute for VM-based flavor",
@@ -834,7 +850,7 @@ func (v *poolFlavorValidator) ValidateResource(ctx context.Context, req resource
 				)
 			}
 
-			if pool.BootVolumeType.IsNull() {
+			if isNull("boot_volume_type") {
 				resp.Diagnostics.AddAttributeError(
 					poolPath.AtName("boot_volume_type"),
 					"Missing required attribute for VM-based flavor",
@@ -843,7 +859,7 @@ func (v *poolFlavorValidator) ValidateResource(ctx context.Context, req resource
 			}
 		} else {
 			// Baremetal flavor: servergroup_policy, boot_volume_size, boot_volume_type must be null
-			if !pool.ServergroupPolicy.IsNull() {
+			if !isNull("servergroup_policy") {
 				resp.Diagnostics.AddAttributeError(
 					poolPath.AtName("servergroup_policy"),
 					"Invalid attribute for baremetal flavor",
@@ -851,7 +867,7 @@ func (v *poolFlavorValidator) ValidateResource(ctx context.Context, req resource
 				)
 			}
 
-			if !pool.BootVolumeSize.IsNull() {
+			if !isNull("boot_volume_size") {
 				resp.Diagnostics.AddAttributeError(
 					poolPath.AtName("boot_volume_size"),
 					"Invalid attribute for baremetal flavor",
@@ -859,7 +875,7 @@ func (v *poolFlavorValidator) ValidateResource(ctx context.Context, req resource
 				)
 			}
 
-			if !pool.BootVolumeType.IsNull() {
+			if !isNull("boot_volume_type") {
 				resp.Diagnostics.AddAttributeError(
 					poolPath.AtName("boot_volume_type"),
 					"Invalid attribute for baremetal flavor",
