@@ -4,6 +4,7 @@ package cloud_load_balancer_pool
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"io"
 	"net/http"
@@ -103,8 +104,30 @@ func (r *CloudLoadBalancerPoolResource) Create(ctx context.Context, req resource
 		resp.Diagnostics.AddError("failed to deserialize http request", err.Error())
 		return
 	}
+	resolveHealthmonitorUnknowns(data)
 
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
+}
+
+// resolveHealthmonitorUnknowns nulls any healthmonitor computed attributes that
+// are still unknown after decoding an API response. apijson.UnmarshalComputed
+// skips the healthmonitor pointer entirely when it is already non-nil (IfUnset
+// behavior), so a plan-time unknown like http_method on a non-HTTP monitor
+// would otherwise survive into state and fail with "Provider returned invalid
+// result object after apply".
+func resolveHealthmonitorUnknowns(data *CloudLoadBalancerPoolModel) {
+	if data == nil || data.Healthmonitor == nil {
+		return
+	}
+	if data.Healthmonitor.HTTPMethod.IsUnknown() {
+		data.Healthmonitor.HTTPMethod = types.StringNull()
+	}
+	if data.Healthmonitor.AdminStateUp.IsUnknown() {
+		data.Healthmonitor.AdminStateUp = types.BoolNull()
+	}
+	if data.Healthmonitor.MaxRetriesDown.IsUnknown() {
+		data.Healthmonitor.MaxRetriesDown = types.Int64Null()
+	}
 }
 
 func (r *CloudLoadBalancerPoolResource) Update(ctx context.Context, req resource.UpdateRequest, resp *resource.UpdateResponse) {
@@ -187,6 +210,7 @@ func (r *CloudLoadBalancerPoolResource) Update(ctx context.Context, req resource
 			resp.Diagnostics.AddError("failed to deserialize response", err.Error())
 			return
 		}
+		resolveHealthmonitorUnknowns(data)
 		resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
 		return
 	}
@@ -201,15 +225,15 @@ func (r *CloudLoadBalancerPoolResource) Update(ctx context.Context, req resource
 	// that are plain int64 (not param.Opt), so partial patch JSON leaves them at zero values.
 	// If healthmonitor is being updated, we must ensure all required fields are populated.
 	if data.Healthmonitor != nil && state.Healthmonitor != nil {
-		// Check if any healthmonitor field was included in the patch (non-zero in params)
-		hmChanged := params.Healthmonitor.Delay != 0 ||
-			params.Healthmonitor.MaxRetries != 0 ||
-			params.Healthmonitor.Timeout != 0 ||
-			params.Healthmonitor.Type != "" ||
-			params.Healthmonitor.HTTPMethod != "" ||
-			params.Healthmonitor.URLPath.Valid() ||
-			params.Healthmonitor.ExpectedCodes.Valid() ||
-			params.Healthmonitor.MaxRetriesDown.Valid()
+		// Detect whether the patch payload contains a healthmonitor object by key
+		// presence rather than by sniffing individual fields: a patch carrying only
+		// fields with zero-value encodings (e.g. admin_state_up) would otherwise be
+		// missed, and the required ints would go out as 0 and fail API validation.
+		var patchFields map[string]json.RawMessage
+		hmChanged := false
+		if err := json.Unmarshal(dataBytes, &patchFields); err == nil {
+			_, hmChanged = patchFields["healthmonitor"]
+		}
 
 		if hmChanged {
 			// Fill in required fields from plan if they're still zero
@@ -254,6 +278,7 @@ func (r *CloudLoadBalancerPoolResource) Update(ctx context.Context, req resource
 		resp.Diagnostics.AddError("failed to deserialize http request", err.Error())
 		return
 	}
+	resolveHealthmonitorUnknowns(data)
 
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
 }
