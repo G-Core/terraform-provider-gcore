@@ -1,5 +1,58 @@
 # Changelog
 
+## [2.0.0-alpha.13](https://github.com/G-Core/terraform-provider-gcore/compare/v2.0.0-alpha.12...v2.0.0-alpha.13) (2026-07-16)
+
+
+### ⚠ BREAKING CHANGES
+
+* **fastedge:** remove unsupported resource fields
+* **cdn:** recursive metrics response; optional logs-uploader target configs
+* **streaming:** consolidate AI task creation and restructure video schemas
+
+### Features
+
+* **cdn:** add resource list filters and paginated list response models ([92751f2](https://github.com/G-Core/terraform-provider-gcore/commit/92751f28c84bed0b9a49d5f0161b78ab7b95ff11))
+* **cdn:** add support for CDN presets and applied presets ([01b4ca2](https://github.com/G-Core/terraform-provider-gcore/commit/01b4ca2bc1689fe7441a8eb042dc5caf75e17c25))
+* **cdn:** recursive metrics response; optional logs-uploader target configs ([f4a1219](https://github.com/G-Core/terraform-provider-gcore/commit/f4a12198ad7965d9e15da1020312529196d64261))
+* **cdn:** support logs uploader targets in Terraform ([f43bb5b](https://github.com/G-Core/terraform-provider-gcore/commit/f43bb5b28379571c38ea3d9d47994f2f34a97e2f))
+* **client:** set Gcore-convention User-Agent header ([cd3096d](https://github.com/G-Core/terraform-provider-gcore/commit/cd3096da27ea44fa9726a3f360e0dcf7bcb25421))
+* **cloud:** enable list method for volume_snapshots ([a10747c](https://github.com/G-Core/terraform-provider-gcore/commit/a10747cbc08842701a52e312e9cd16900b464197))
+* **security:** add event log detail endpoint ([cea87b1](https://github.com/G-Core/terraform-provider-gcore/commit/cea87b17b210e902d594cf3c7c1b2cdce9b8e027))
+* **streaming:** consolidate AI task creation and restructure video schemas ([482fb9d](https://github.com/G-Core/terraform-provider-gcore/commit/482fb9d61a5425139b4d57dcde53d38fd1269bed))
+* **waap:** add order_by to analytics stats and length limits to filter suggestions ([5838806](https://github.com/G-Core/terraform-provider-gcore/commit/58388062b19eac3881f5b1cfdc96981e11da27fb))
+
+
+### Bug Fixes
+
+* **cdn:** logs uploader target sensitive fields + acceptance tests ([b25f335](https://github.com/G-Core/terraform-provider-gcore/commit/b25f3356c0dc71b7657f12dcb10cc118f7b16b30))
+* **cloud_load_balancer:** resolve pool healthmonitor update failures and plan drift ([1f8043d](https://github.com/G-Core/terraform-provider-gcore/commit/1f8043d130280dc0199eb72fba12c552e38fa501))
+* **cloud:** handle unknown collections in plan-time validators and plan modifiers ([3432c3c](https://github.com/G-Core/terraform-provider-gcore/commit/3432c3c56393a086092c857353227ce59ce45469))
+* **cloud:** make load balancer inline listeners create-only in terraform ([ce62d6c](https://github.com/G-Core/terraform-provider-gcore/commit/ce62d6c12390efecd75b916bfacd472e43ea33e9))
+* **fastedge:** remove unsupported resource fields ([8e482c2](https://github.com/G-Core/terraform-provider-gcore/commit/8e482c2baeddfb0a87a4deeffc28e503c6a48590))
+
+
+### Chores
+
+* **cloud:** update cloud OpenAPI spec ([8c61892](https://github.com/G-Core/terraform-provider-gcore/commit/8c61892f62483ccce6e49d1e7910c9f2cae6d7ba))
+* **fastedge:** update fastedge OpenAPI spec ([6c8e8b0](https://github.com/G-Core/terraform-provider-gcore/commit/6c8e8b030c18faa22c90975959fe262622c89381))
+* reseal custom code from G-Core/terraform-provider-gcore-staging@3432c3c56393a086092c857353227ce59ce45469 ([4c2955d](https://github.com/G-Core/terraform-provider-gcore/commit/4c2955d1b6b1039332b105c48914c87344e05c68))
+* **storage:** add admin bucket search response schemas ([7b05091](https://github.com/G-Core/terraform-provider-gcore/commit/7b050914f0ad742f1c4dace877b95672bbfb29f8))
+* unlink gcore-go-staging ([b6453a1](https://github.com/G-Core/terraform-provider-gcore/commit/b6453a1c5c25c0daea1fffd4bdb6512ae7b7ddac))
+* **waap:** update waap OpenAPI spec ([95bd2fe](https://github.com/G-Core/terraform-provider-gcore/commit/95bd2fe5fc6f005245556c1eadda5c16269e3cb4))
+
+
+### Documentation
+
+* **agents:** update agent guidelines for current codegen flow ([d394273](https://github.com/G-Core/terraform-provider-gcore/commit/d394273635242d1003f0f31e057129aa548dd7cc))
+* **terraform:** regenerate from custom templates ([74f7a8e](https://github.com/G-Core/terraform-provider-gcore/commit/74f7a8e27568a3b387bc4a76ec0cd1fb638c678b))
+* **terraform:** regenerate from custom templates ([8c6ba6a](https://github.com/G-Core/terraform-provider-gcore/commit/8c6ba6a72d88b41e15e520e55f4ddd08557183d7))
+* **terraform:** regenerate from custom templates ([2dad31a](https://github.com/G-Core/terraform-provider-gcore/commit/2dad31a9ca1a8e9ec1c6922a627a82d7b5477180))
+
+
+### Refactors
+
+* **cdn:** remove redundant no-op check in logs uploader policy ([a9d0ba1](https://github.com/G-Core/terraform-provider-gcore/commit/a9d0ba10a3e0561b88fa618b08adae8f1311e935))
+
 ## [2.0.0-alpha.12](https://github.com/G-Core/terraform-provider-gcore/compare/v2.0.0-alpha.11...v2.0.0-alpha.12) (2026-07-06)
 
 
