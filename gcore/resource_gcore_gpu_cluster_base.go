@@ -10,6 +10,7 @@ import (
 	"github.com/G-Core/gcorelabscloud-go/client/utils"
 	"github.com/G-Core/gcorelabscloud-go/gcore/gpu/v3/clusters"
 	"github.com/G-Core/gcorelabscloud-go/gcore/task/v1/tasks"
+	"github.com/hashicorp/go-cty/cty"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/retry"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
@@ -46,27 +47,54 @@ func resourceGPUCluster(gpuNodeType GPUNodeType) *schema.Resource {
 
 // resourceGPUClusterCustomizeDiff fails the plan early when the deprecated
 // cluster-wide security_groups is combined with per-interface security_groups,
-// which the API rejects.
+// which the API rejects. It must inspect the raw config, not d.Get:
+// interface.security_groups is Computed, so after a refresh the state holds
+// API-resolved groups for every interface, and d.Get would report those as
+// if the user had configured them, making legacy cluster-wide configs
+// unplannable.
 func resourceGPUClusterCustomizeDiff(_ context.Context, d *schema.ResourceDiff, _ interface{}) error {
-	v, ok := d.GetOk("servers_settings")
-	if !ok {
+	rawConfig := d.GetRawConfig()
+	if rawConfig.IsNull() || !rawConfig.Type().HasAttribute("servers_settings") {
 		return nil
 	}
-	settingsList, ok := v.([]interface{})
-	if !ok || len(settingsList) == 0 || settingsList[0] == nil {
+	settingsList := rawConfig.GetAttr("servers_settings")
+	if settingsList.IsNull() || !settingsList.IsKnown() || settingsList.LengthInt() == 0 {
 		return nil
 	}
-	settingsMap := settingsList[0].(map[string]interface{})
-
-	clusterWide := 0
-	if sg, ok := settingsMap["security_groups"].([]interface{}); ok {
-		clusterWide = len(sg)
+	settings := settingsList.Index(cty.NumberIntVal(0))
+	if settings.IsNull() || !settings.IsKnown() {
+		return nil
 	}
-	if clusterWide > 0 && interfacesHaveSecurityGroups(settingsMap["interface"]) {
-		return fmt.Errorf("servers_settings.security_groups (cluster-wide, deprecated) cannot be combined with " +
-			"per-interface interface.security_groups; set security groups in only one place")
+	if !ctyCollectionConfigured(settings.GetAttr("security_groups")) {
+		return nil
+	}
+	ifaces := settings.GetAttr("interface")
+	if ifaces.IsNull() || !ifaces.IsKnown() {
+		return nil
+	}
+	for it := ifaces.ElementIterator(); it.Next(); {
+		_, iface := it.Element()
+		if iface.IsNull() || !iface.IsKnown() {
+			continue
+		}
+		if ctyCollectionConfigured(iface.GetAttr("security_groups")) {
+			return fmt.Errorf("servers_settings.security_groups (cluster-wide, deprecated) cannot be combined with " +
+				"per-interface interface.security_groups; set security groups in only one place")
+		}
 	}
 	return nil
+}
+
+// ctyCollectionConfigured reports whether a collection attribute from the raw
+// config was set by the user to a non-empty (possibly not-yet-known) value.
+func ctyCollectionConfigured(v cty.Value) bool {
+	if v.IsNull() {
+		return false
+	}
+	if !v.IsKnown() {
+		return true
+	}
+	return v.LengthInt() > 0
 }
 
 func getGPUServicePath(gpuNodeType GPUNodeType) string {
