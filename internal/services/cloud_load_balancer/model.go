@@ -20,7 +20,7 @@ type CloudLoadBalancerModel struct {
 	FloatingIP            *CloudLoadBalancerFloatingIPModel                                  `tfsdk:"floating_ip" json:"floating_ip,optional,no_refresh"`
 	VipIPFamily           types.String                                                       `tfsdk:"vip_ip_family" json:"vip_ip_family,computed_optional"`
 	VipPortID             types.String                                                       `tfsdk:"vip_port_id" json:"vip_port_id,computed_optional"`
-	Listeners             customfield.NestedObjectList[CloudLoadBalancerListenersModel]      `tfsdk:"listeners" json:"listeners,computed_optional"`
+	Listeners             customfield.NestedObjectList[CloudLoadBalancerListenersModel]      `tfsdk:"listeners" json:"listeners,computed_optional,no_refresh"`
 	Name                  types.String                                                       `tfsdk:"name" json:"name,required"`
 	PreferredConnectivity types.String                                                       `tfsdk:"preferred_connectivity" json:"preferred_connectivity,computed_optional"`
 	Tags                  customfield.Map[types.String]                                      `tfsdk:"tags" json:"tags,computed_optional,no_refresh"`
@@ -56,19 +56,19 @@ type CloudLoadBalancerFloatingIPModel struct {
 }
 
 type CloudLoadBalancerListenersModel struct {
-	Name                 types.String                                                       `tfsdk:"name" json:"name,required,no_refresh"`
-	Protocol             types.String                                                       `tfsdk:"protocol" json:"protocol,required,no_refresh"`
-	ProtocolPort         types.Int64                                                        `tfsdk:"protocol_port" json:"protocol_port,required,no_refresh"`
-	AllowedCidrs         *[]types.String                                                    `tfsdk:"allowed_cidrs" json:"allowed_cidrs,optional,no_refresh"`
-	ConnectionLimit      types.Int64                                                        `tfsdk:"connection_limit" json:"connection_limit,computed_optional,no_refresh"`
-	InsertXForwarded     types.Bool                                                         `tfsdk:"insert_x_forwarded" json:"insert_x_forwarded,optional,no_refresh"`
-	Pools                customfield.NestedObjectList[CloudLoadBalancerListenersPoolsModel] `tfsdk:"pools" json:"pools,computed_optional,no_refresh"`
-	SecretID             types.String                                                       `tfsdk:"secret_id" json:"secret_id,optional,no_refresh"`
-	SniSecretID          *[]types.String                                                    `tfsdk:"sni_secret_id" json:"sni_secret_id,optional,no_refresh"`
-	TimeoutClientData    types.Int64                                                        `tfsdk:"timeout_client_data" json:"timeout_client_data,optional,no_refresh"`
-	TimeoutMemberConnect types.Int64                                                        `tfsdk:"timeout_member_connect" json:"timeout_member_connect,optional,no_refresh"`
-	TimeoutMemberData    types.Int64                                                        `tfsdk:"timeout_member_data" json:"timeout_member_data,optional,no_refresh"`
-	UserList             *[]*CloudLoadBalancerListenersUserListModel                        `tfsdk:"user_list" json:"user_list,optional,no_refresh"`
+	Name                 types.String                                                       `tfsdk:"name" json:"name,required"`
+	Protocol             types.String                                                       `tfsdk:"protocol" json:"protocol,required"`
+	ProtocolPort         types.Int64                                                        `tfsdk:"protocol_port" json:"protocol_port,required"`
+	AllowedCidrs         *[]types.String                                                    `tfsdk:"allowed_cidrs" json:"allowed_cidrs,optional"`
+	ConnectionLimit      types.Int64                                                        `tfsdk:"connection_limit" json:"connection_limit,computed_optional"`
+	InsertXForwarded     types.Bool                                                         `tfsdk:"insert_x_forwarded" json:"insert_x_forwarded,optional"`
+	Pools                customfield.NestedObjectList[CloudLoadBalancerListenersPoolsModel] `tfsdk:"pools" json:"pools,computed_optional"`
+	SecretID             types.String                                                       `tfsdk:"secret_id" json:"secret_id,optional"`
+	SniSecretID          *[]types.String                                                    `tfsdk:"sni_secret_id" json:"sni_secret_id,optional"`
+	TimeoutClientData    types.Int64                                                        `tfsdk:"timeout_client_data" json:"timeout_client_data,optional"`
+	TimeoutMemberConnect types.Int64                                                        `tfsdk:"timeout_member_connect" json:"timeout_member_connect,optional"`
+	TimeoutMemberData    types.Int64                                                        `tfsdk:"timeout_member_data" json:"timeout_member_data,optional"`
+	UserList             *[]*CloudLoadBalancerListenersUserListModel                        `tfsdk:"user_list" json:"user_list,optional"`
 }
 
 type CloudLoadBalancerListenersPoolsModel struct {
