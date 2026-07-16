@@ -72,18 +72,18 @@ type CloudLoadBalancerListenersModel struct {
 }
 
 type CloudLoadBalancerListenersPoolsModel struct {
-	LbAlgorithm          types.String                                                                `tfsdk:"lb_algorithm" json:"lb_algorithm,required"`
-	Name                 types.String                                                                `tfsdk:"name" json:"name,required"`
-	Protocol             types.String                                                                `tfsdk:"protocol" json:"protocol,required"`
-	CaSecretID           types.String                                                                `tfsdk:"ca_secret_id" json:"ca_secret_id,optional"`
-	CrlSecretID          types.String                                                                `tfsdk:"crl_secret_id" json:"crl_secret_id,optional"`
-	Healthmonitor        customfield.NestedObject[CloudLoadBalancerListenersPoolsHealthmonitorModel] `tfsdk:"healthmonitor" json:"healthmonitor,computed_optional"`
-	Members              customfield.NestedObjectList[CloudLoadBalancerListenersPoolsMembersModel]   `tfsdk:"members" json:"members,computed_optional"`
-	SecretID             types.String                                                                `tfsdk:"secret_id" json:"secret_id,optional"`
-	SessionPersistence   *CloudLoadBalancerListenersPoolsSessionPersistenceModel                     `tfsdk:"session_persistence" json:"session_persistence,optional"`
-	TimeoutClientData    types.Int64                                                                 `tfsdk:"timeout_client_data" json:"timeout_client_data,optional"`
-	TimeoutMemberConnect types.Int64                                                                 `tfsdk:"timeout_member_connect" json:"timeout_member_connect,optional"`
-	TimeoutMemberData    types.Int64                                                                 `tfsdk:"timeout_member_data" json:"timeout_member_data,optional"`
+	LbAlgorithm          types.String                                                              `tfsdk:"lb_algorithm" json:"lb_algorithm,required"`
+	Name                 types.String                                                              `tfsdk:"name" json:"name,required"`
+	Protocol             types.String                                                              `tfsdk:"protocol" json:"protocol,required"`
+	CaSecretID           types.String                                                              `tfsdk:"ca_secret_id" json:"ca_secret_id,optional"`
+	CrlSecretID          types.String                                                              `tfsdk:"crl_secret_id" json:"crl_secret_id,optional"`
+	Healthmonitor        *CloudLoadBalancerListenersPoolsHealthmonitorModel                        `tfsdk:"healthmonitor" json:"healthmonitor,optional"`
+	Members              customfield.NestedObjectList[CloudLoadBalancerListenersPoolsMembersModel] `tfsdk:"members" json:"members,computed_optional"`
+	SecretID             types.String                                                              `tfsdk:"secret_id" json:"secret_id,optional"`
+	SessionPersistence   *CloudLoadBalancerListenersPoolsSessionPersistenceModel                   `tfsdk:"session_persistence" json:"session_persistence,optional"`
+	TimeoutClientData    types.Int64                                                               `tfsdk:"timeout_client_data" json:"timeout_client_data,optional"`
+	TimeoutMemberConnect types.Int64                                                               `tfsdk:"timeout_member_connect" json:"timeout_member_connect,optional"`
+	TimeoutMemberData    types.Int64                                                               `tfsdk:"timeout_member_data" json:"timeout_member_data,optional"`
 }
 
 type CloudLoadBalancerListenersPoolsHealthmonitorModel struct {
@@ -91,12 +91,12 @@ type CloudLoadBalancerListenersPoolsHealthmonitorModel struct {
 	MaxRetries     types.Int64  `tfsdk:"max_retries" json:"max_retries,required"`
 	Timeout        types.Int64  `tfsdk:"timeout" json:"timeout,required"`
 	Type           types.String `tfsdk:"type" json:"type,required"`
-	AdminStateUp   types.Bool   `tfsdk:"admin_state_up" json:"admin_state_up,computed_optional"`
+	AdminStateUp   types.Bool   `tfsdk:"admin_state_up" json:"admin_state_up,optional"`
 	DomainName     types.String `tfsdk:"domain_name" json:"domain_name,optional"`
 	ExpectedCodes  types.String `tfsdk:"expected_codes" json:"expected_codes,optional"`
 	HTTPMethod     types.String `tfsdk:"http_method" json:"http_method,optional"`
 	HTTPVersion    types.String `tfsdk:"http_version" json:"http_version,optional"`
-	MaxRetriesDown types.Int64  `tfsdk:"max_retries_down" json:"max_retries_down,computed_optional"`
+	MaxRetriesDown types.Int64  `tfsdk:"max_retries_down" json:"max_retries_down,optional"`
 	URLPath        types.String `tfsdk:"url_path" json:"url_path,optional"`
 }
 

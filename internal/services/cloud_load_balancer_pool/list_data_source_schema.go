@@ -154,7 +154,7 @@ func ListDataSourceSchema(ctx context.Context) schema.Schema {
 									Description: "The maximum time to connect. Must be less than the delay value",
 									Computed:    true,
 									Validators: []validator.Int64{
-										int64validator.AtMost(2147483),
+										int64validator.Between(0, 2147483),
 									},
 								},
 								"type": schema.StringAttribute{

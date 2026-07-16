@@ -193,9 +193,7 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 									},
 									"healthmonitor": schema.SingleNestedAttribute{
 										Description: "Health monitor details",
-										Computed:    true,
 										Optional:    true,
-										CustomType:  customfield.NewNestedObjectType[CloudLoadBalancerListenersPoolsHealthmonitorModel](ctx),
 										Attributes: map[string]schema.Attribute{
 											"delay": schema.Int64Attribute{
 												Description: "The time, in seconds, between sending probes to members",
@@ -215,7 +213,7 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 												Description: "The maximum time to connect. Must be less than the delay value",
 												Required:    true,
 												Validators: []validator.Int64{
-													int64validator.AtMost(2147483),
+													int64validator.Between(0, 2147483),
 												},
 											},
 											"type": schema.StringAttribute{
@@ -235,9 +233,7 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 											},
 											"admin_state_up": schema.BoolAttribute{
 												Description: "Administrative state of the resource. When set to true, the resource is enabled and operational. When set to false, the resource is disabled and will not process traffic. Defaults to true.",
-												Computed:    true,
 												Optional:    true,
-												Default:     booldefault.StaticBool(true),
 											},
 											"domain_name": schema.StringAttribute{
 												Description: "Domain name for HTTP host header. Can only be used together with `HTTP` or `HTTPS` health monitor type.",
@@ -273,12 +269,10 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 											},
 											"max_retries_down": schema.Int64Attribute{
 												Description: "Number of failures before the member is switched to ERROR state.",
-												Computed:    true,
 												Optional:    true,
 												Validators: []validator.Int64{
 													int64validator.Between(1, 10),
 												},
-												Default: int64default.StaticInt64(3),
 											},
 											"url_path": schema.StringAttribute{
 												Description: "The HTTP path the health monitor requests on each member. Defaults to `/` if not set. Can only be used with `HTTP` or `HTTPS` health monitor type.\n\n  Must start with `/` and contain only plain path segments. Query strings (`?`), fragments (`#`), percent-encoding (`%`), and consecutive slashes (`//`) are not allowed.\n\n  Examples of valid paths:\n  - `/` — check the root (most common, default)\n  - `/healthz` — a dedicated health endpoint",
