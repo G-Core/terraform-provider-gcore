@@ -452,7 +452,7 @@ func (r *CloudInstanceResource) Update(ctx context.Context, req resource.UpdateR
 					detachParams.RegionID = param.NewOpt(data.RegionID.ValueInt64())
 				}
 
-				_, err := r.client.Cloud.Instances.Interfaces.DetachAndPoll(
+				err := r.client.Cloud.Instances.Interfaces.DetachAndPoll(
 					ctx,
 					instanceID,
 					detachParams,
@@ -485,11 +485,11 @@ func (r *CloudInstanceResource) Update(ctx context.Context, req resource.UpdateR
 
 				switch ifaceType {
 				case "external":
-					attachParams.OfNewInterfaceExternalExtendSchemaWithDDOS = &cloud.InstanceInterfaceAttachParamsBodyNewInterfaceExternalExtendSchemaWithDDOS{
-						Type: param.NewOpt("external"),
+					attachParams.OfExternal = &cloud.InstanceInterfaceAttachParamsBodyExternal{
+						Type: "external",
 					}
 					if !planIface.IPFamily.IsNull() {
-						attachParams.OfNewInterfaceExternalExtendSchemaWithDDOS.IPFamily = planIface.IPFamily.ValueString()
+						attachParams.OfExternal.IPFamily = cloud.InterfaceIPFamily(planIface.IPFamily.ValueString())
 					}
 				case "subnet":
 					if planIface.SubnetID.IsNull() {
@@ -499,8 +499,8 @@ func (r *CloudInstanceResource) Update(ctx context.Context, req resource.UpdateR
 						)
 						return
 					}
-					attachParams.OfNewInterfaceSpecificSubnetSchema = &cloud.InstanceInterfaceAttachParamsBodyNewInterfaceSpecificSubnetSchema{
-						Type:     param.NewOpt("subnet"),
+					attachParams.OfSubnet = &cloud.InstanceInterfaceAttachParamsBodySubnet{
+						Type:     "subnet",
 						SubnetID: planIface.SubnetID.ValueString(),
 					}
 				case "any_subnet":
@@ -511,12 +511,12 @@ func (r *CloudInstanceResource) Update(ctx context.Context, req resource.UpdateR
 						)
 						return
 					}
-					attachParams.OfNewInterfaceAnySubnetSchema = &cloud.InstanceInterfaceAttachParamsBodyNewInterfaceAnySubnetSchema{
-						Type:      param.NewOpt("any_subnet"),
+					attachParams.OfAnySubnet = &cloud.InstanceInterfaceAttachParamsBodyAnySubnet{
+						Type:      "any_subnet",
 						NetworkID: planIface.NetworkID.ValueString(),
 					}
 					if !planIface.IPFamily.IsNull() {
-						attachParams.OfNewInterfaceAnySubnetSchema.IPFamily = planIface.IPFamily.ValueString()
+						attachParams.OfAnySubnet.IPFamily = cloud.InterfaceIPFamily(planIface.IPFamily.ValueString())
 					}
 				case "reserved_fixed_ip":
 					if planIface.PortID.IsNull() {
@@ -526,8 +526,8 @@ func (r *CloudInstanceResource) Update(ctx context.Context, req resource.UpdateR
 						)
 						return
 					}
-					attachParams.OfNewInterfaceReservedFixedIPSchema = &cloud.InstanceInterfaceAttachParamsBodyNewInterfaceReservedFixedIPSchema{
-						Type:   param.NewOpt("reserved_fixed_ip"),
+					attachParams.OfReservedFixedIP = &cloud.InstanceInterfaceAttachParamsBodyReservedFixedIP{
+						Type:   "reserved_fixed_ip",
 						PortID: planIface.PortID.ValueString(),
 					}
 				default:
@@ -538,7 +538,7 @@ func (r *CloudInstanceResource) Update(ctx context.Context, req resource.UpdateR
 					return
 				}
 
-				_, err := r.client.Cloud.Instances.Interfaces.AttachAndPoll(
+				err := r.client.Cloud.Instances.Interfaces.AttachAndPoll(
 					ctx,
 					instanceID,
 					attachParams,
@@ -1405,7 +1405,7 @@ func (r *CloudInstanceResource) ModifyPlan(_ context.Context, _ resource.ModifyP
 // mergeInterfaceComputedFields matches Terraform interfaces to API interfaces and copies
 // computed fields (port_id, ip_address). Uses port_id for stable matching when available,
 // falls back to index for new interfaces. Set updateFloatingIP=true to also sync floating IP state.
-func mergeInterfaceComputedFields(tfInterfaces *[]*CloudInstanceInterfacesModel, apiInterfaces []cloud.NetworkInterface, updateFloatingIP bool) {
+func mergeInterfaceComputedFields(tfInterfaces *[]*CloudInstanceInterfacesModel, apiInterfaces []cloud.NetworkInterfaceUnion, updateFloatingIP bool) {
 	if tfInterfaces == nil || len(*tfInterfaces) == 0 || len(apiInterfaces) == 0 {
 		return
 	}
