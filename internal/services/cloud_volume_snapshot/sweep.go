@@ -1,4 +1,4 @@
-package cloud_volume
+package cloud_volume_snapshot
 
 import (
 	"context"
@@ -17,16 +17,13 @@ import (
 )
 
 func init() {
-	resource.AddTestSweepers("gcore_cloud_volume", &resource.Sweeper{
-		Name: "gcore_cloud_volume",
-		F:    sweepCloudVolumes,
-		// Snapshots must be swept first: a volume cannot be deleted while
-		// snapshots created from it still exist.
-		Dependencies: []string{"gcore_cloud_volume_snapshot"},
+	resource.AddTestSweepers("gcore_cloud_volume_snapshot", &resource.Sweeper{
+		Name: "gcore_cloud_volume_snapshot",
+		F:    sweepCloudVolumeSnapshots,
 	})
 }
 
-func sweepCloudVolumes(_ string) error {
+func sweepCloudVolumeSnapshots(_ string) error {
 	if err := sweep.ValidateSweeperEnvironment(); err != nil {
 		return err
 	}
@@ -48,33 +45,33 @@ func sweepCloudVolumes(_ string) error {
 
 	ctx := context.Background()
 
-	page, err := client.Cloud.Volumes.List(ctx, cloud.VolumeListParams{
+	page, err := client.Cloud.VolumeSnapshots.List(ctx, cloud.VolumeSnapshotListParams{
 		ProjectID: param.NewOpt(projectID),
 		RegionID:  param.NewOpt(regionID),
 	})
 	if err != nil {
 		if sweep.SkipSweepError(err) {
-			log.Printf("[WARN] Skipping volume sweep: %s", err)
+			log.Printf("[WARN] Skipping volume snapshot sweep: %s", err)
 			return nil
 		}
-		return fmt.Errorf("error listing volumes: %w", err)
+		return fmt.Errorf("error listing volume snapshots: %w", err)
 	}
 
-	for _, volume := range page.Results {
-		name := volume.Name
-		id := volume.ID
+	for _, snapshot := range page.Results {
+		name := snapshot.Name
+		id := snapshot.ID
 
-		if !sweep.ShouldSweep("gcore_cloud_volume", name) {
+		if !sweep.ShouldSweep("gcore_cloud_volume_snapshot", name) {
 			continue
 		}
 
-		log.Printf("[INFO] Deleting volume: %s (%s)", name, id)
-		err := client.Cloud.Volumes.DeleteAndPoll(ctx, id, cloud.VolumeDeleteParams{
+		log.Printf("[INFO] Deleting volume snapshot: %s (%s)", name, id)
+		err := client.Cloud.VolumeSnapshots.DeleteAndPoll(ctx, id, cloud.VolumeSnapshotDeleteParams{
 			ProjectID: param.NewOpt(projectID),
 			RegionID:  param.NewOpt(regionID),
 		})
 		if err != nil {
-			log.Printf("[ERROR] Failed to delete volume %s: %s", name, err)
+			log.Printf("[ERROR] Failed to delete volume snapshot %s: %s", name, err)
 		}
 	}
 

@@ -13,6 +13,7 @@ import (
 	"github.com/G-Core/gcore-go/option"
 	"github.com/G-Core/gcore-go/packages/param"
 	"github.com/G-Core/terraform-provider-gcore/internal/apijson"
+	"github.com/G-Core/terraform-provider-gcore/internal/custom"
 	"github.com/G-Core/terraform-provider-gcore/internal/importpath"
 	"github.com/G-Core/terraform-provider-gcore/internal/logging"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
@@ -20,6 +21,11 @@ import (
 )
 
 // Ensure provider defined types fully satisfy framework interfaces.
+// snapshotSystemTagKeys are tags the API adds to every snapshot without marking them
+// read_only (bootable and the source volume's name). They are excluded from the
+// user-managed tags map so apply stays consistent when tags are set in configuration.
+var snapshotSystemTagKeys = []string{"bootable", "volume_name"}
+
 var _ resource.ResourceWithConfigure = (*CloudVolumeSnapshotResource)(nil)
 var _ resource.ResourceWithModifyPlan = (*CloudVolumeSnapshotResource)(nil)
 var _ resource.ResourceWithImportState = (*CloudVolumeSnapshotResource)(nil)
@@ -81,7 +87,9 @@ func (r *CloudVolumeSnapshotResource) Create(ctx context.Context, req resource.C
 		return
 	}
 	res := new(http.Response)
-	_, err = r.client.Cloud.VolumeSnapshots.New(
+	// Snapshot creation is asynchronous: POST returns a task ID list, so poll the task to
+	// completion and read back the created snapshot.
+	_, err = r.client.Cloud.VolumeSnapshots.NewAndPoll(
 		ctx,
 		params,
 		option.WithRequestBody("application/json", dataBytes),
@@ -92,11 +100,16 @@ func (r *CloudVolumeSnapshotResource) Create(ctx context.Context, req resource.C
 		resp.Diagnostics.AddError("failed to make http request", err.Error())
 		return
 	}
+	// Use raw JSON from the response to unmarshal the "computed" fields into the data model
 	bytes, _ := io.ReadAll(res.Body)
 	err = apijson.UnmarshalComputed(bytes, &data)
 	if err != nil {
 		resp.Diagnostics.AddError("failed to deserialize http request", err.Error())
 		return
+	}
+
+	if tags, ok := custom.ConvertAPITagsToCustomfieldMapExcluding(ctx, bytes, snapshotSystemTagKeys...); ok {
+		data.Tags = tags
 	}
 
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
@@ -154,6 +167,10 @@ func (r *CloudVolumeSnapshotResource) Update(ctx context.Context, req resource.U
 		return
 	}
 
+	if tags, ok := custom.ConvertAPITagsToCustomfieldMapExcluding(ctx, bytes, snapshotSystemTagKeys...); ok {
+		data.Tags = tags
+	}
+
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
 }
 
@@ -200,6 +217,10 @@ func (r *CloudVolumeSnapshotResource) Read(ctx context.Context, req resource.Rea
 		return
 	}
 
+	if tags, ok := custom.ConvertAPITagsToCustomfieldMapExcluding(ctx, bytes, snapshotSystemTagKeys...); ok {
+		data.Tags = tags
+	}
+
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
 }
 
@@ -222,7 +243,8 @@ func (r *CloudVolumeSnapshotResource) Delete(ctx context.Context, req resource.D
 		params.RegionID = param.NewOpt(data.RegionID.ValueInt64())
 	}
 
-	_, err := r.client.Cloud.VolumeSnapshots.Delete(
+	// Deletion is asynchronous: DELETE returns a task ID list, so poll until the snapshot is gone.
+	err := r.client.Cloud.VolumeSnapshots.DeleteAndPoll(
 		ctx,
 		data.ID.ValueString(),
 		params,
@@ -278,6 +300,10 @@ func (r *CloudVolumeSnapshotResource) ImportState(ctx context.Context, req resou
 	if err != nil {
 		resp.Diagnostics.AddError("failed to deserialize http request", err.Error())
 		return
+	}
+
+	if tags, ok := custom.ConvertAPITagsToCustomfieldMapExcluding(ctx, bytes, snapshotSystemTagKeys...); ok {
+		data.Tags = tags
 	}
 
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)

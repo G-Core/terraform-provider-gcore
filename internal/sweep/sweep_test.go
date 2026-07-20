@@ -16,6 +16,8 @@ import (
 	_ "github.com/G-Core/terraform-provider-gcore/internal/services/cloud_instance_image"
 	_ "github.com/G-Core/terraform-provider-gcore/internal/services/cloud_placement_group"
 	_ "github.com/G-Core/terraform-provider-gcore/internal/services/cloud_ssh_key"
+	_ "github.com/G-Core/terraform-provider-gcore/internal/services/cloud_volume"
+	_ "github.com/G-Core/terraform-provider-gcore/internal/services/cloud_volume_snapshot"
 
 	// DNS
 	_ "github.com/G-Core/terraform-provider-gcore/internal/services/dns_network_mapping"

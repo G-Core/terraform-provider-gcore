@@ -85,3 +85,19 @@ func ConvertAPITagsToCustomfieldMap(ctx context.Context, jsonBytes []byte) (cust
 	}
 	return customfield.NewMapMust(ctx, *tags), true
 }
+
+// ConvertAPITagsToCustomfieldMapExcluding is ConvertAPITagsToCustomfieldMap with an
+// extra key filter. Some resources return system-managed tags without the read_only
+// flag — volume snapshots get bootable and volume_name added by the API — and those
+// must not surface in the user-managed tags map, or apply fails with an inconsistent
+// result when tags are set in configuration.
+func ConvertAPITagsToCustomfieldMapExcluding(ctx context.Context, jsonBytes []byte, excludeKeys ...string) (customfield.Map[types.String], bool) {
+	tags := parseTagsFromJSON(jsonBytes)
+	if tags == nil {
+		return customfield.Map[types.String]{}, false
+	}
+	for _, key := range excludeKeys {
+		delete(*tags, key)
+	}
+	return customfield.NewMapMust(ctx, *tags), true
+}
