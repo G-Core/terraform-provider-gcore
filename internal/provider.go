@@ -53,6 +53,7 @@ import (
 	"github.com/G-Core/terraform-provider-gcore/internal/services/cloud_security_group_rule"
 	"github.com/G-Core/terraform-provider-gcore/internal/services/cloud_ssh_key"
 	"github.com/G-Core/terraform-provider-gcore/internal/services/cloud_volume"
+	"github.com/G-Core/terraform-provider-gcore/internal/services/cloud_volume_snapshot"
 	"github.com/G-Core/terraform-provider-gcore/internal/services/dns_network_mapping"
 	"github.com/G-Core/terraform-provider-gcore/internal/services/dns_zone"
 	"github.com/G-Core/terraform-provider-gcore/internal/services/dns_zone_rrset"
@@ -248,6 +249,7 @@ func (p *GcoreProvider) Resources(ctx context.Context) []func() resource.Resourc
 		cloud_instance.NewResource,
 		cloud_instance_image.NewResource,
 		cloud_k8s_cluster.NewResource,
+		cloud_volume_snapshot.NewResource,
 		waap_domain.NewResource,
 		fastedge_template.NewResource,
 		fastedge_secret.NewResource,
@@ -327,6 +329,8 @@ func (p *GcoreProvider) DataSources(ctx context.Context) []func() datasource.Dat
 		cloud_instance_image.NewCloudInstanceImageDataSource,
 		cloud_k8s_cluster.NewCloudK8SClusterDataSource,
 		cloud_k8s_cluster_kubeconfig.NewCloudK8SClusterKubeconfigDataSource,
+		cloud_volume_snapshot.NewCloudVolumeSnapshotDataSource,
+		cloud_volume_snapshot.NewCloudVolumeSnapshotsDataSource,
 		waap_domain.NewWaapDomainDataSource,
 		waap_domain.NewWaapDomainsDataSource,
 		fastedge_template.NewFastedgeTemplateDataSource,
