@@ -114,7 +114,7 @@ func shieldingLocationIDs(t *testing.T) []int64 {
 	if err != nil {
 		t.Fatal(err)
 	}
-	res, err := client.CDN.Shields.List(context.Background(), cdn.ShieldListParams{})
+	res, err := client.CDN.ShieldingLocation.List(context.Background(), cdn.ShieldingLocationListParams{})
 	if err != nil {
 		t.Fatalf("failed to list origin shielding locations: %s", err)
 	}
