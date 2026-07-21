@@ -98,6 +98,7 @@ type CloudLoadBalancersItemsDataSourceModel struct {
 	CreatorTaskID         types.String                                                                  `tfsdk:"creator_task_id" json:"creator_task_id,computed"`
 	Flavor                customfield.NestedObject[CloudLoadBalancersFlavorDataSourceModel]             `tfsdk:"flavor" json:"flavor,computed"`
 	FloatingIPs           customfield.NestedObjectList[CloudLoadBalancersFloatingIPsDataSourceModel]    `tfsdk:"floating_ips" json:"floating_ips,computed"`
+	Listeners             customfield.NestedObjectList[CloudLoadBalancersListenersDataSourceModel]      `tfsdk:"listeners" json:"listeners,computed"`
 	Logging               customfield.NestedObject[CloudLoadBalancersLoggingDataSourceModel]            `tfsdk:"logging" json:"logging,computed"`
 	PreferredConnectivity types.String                                                                  `tfsdk:"preferred_connectivity" json:"preferred_connectivity,computed"`
 	Stats                 customfield.NestedObject[CloudLoadBalancersStatsDataSourceModel]              `tfsdk:"stats" json:"stats,computed"`
@@ -147,6 +148,10 @@ type CloudLoadBalancersFloatingIPsTagsDataSourceModel struct {
 	Key      types.String `tfsdk:"key" json:"key,computed"`
 	ReadOnly types.Bool   `tfsdk:"read_only" json:"read_only,computed"`
 	Value    types.String `tfsdk:"value" json:"value,computed"`
+}
+
+type CloudLoadBalancersListenersDataSourceModel struct {
+	ID types.String `tfsdk:"id" json:"id,computed"`
 }
 
 type CloudLoadBalancersLoggingDataSourceModel struct {

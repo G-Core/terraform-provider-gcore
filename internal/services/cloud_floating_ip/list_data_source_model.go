@@ -148,6 +148,7 @@ type CloudFloatingIPsLoadbalancerDataSourceModel struct {
 	DDOSProfile           customfield.NestedObject[CloudFloatingIPsLoadbalancerDDOSProfileDataSourceModel]        `tfsdk:"ddos_profile" json:"ddos_profile,computed"`
 	Flavor                customfield.NestedObject[CloudFloatingIPsLoadbalancerFlavorDataSourceModel]             `tfsdk:"flavor" json:"flavor,computed"`
 	FloatingIPs           customfield.NestedObjectList[CloudFloatingIPsLoadbalancerFloatingIPsDataSourceModel]    `tfsdk:"floating_ips" json:"floating_ips,computed"`
+	Listeners             customfield.NestedObjectList[CloudFloatingIPsLoadbalancerListenersDataSourceModel]      `tfsdk:"listeners" json:"listeners,computed"`
 	Logging               customfield.NestedObject[CloudFloatingIPsLoadbalancerLoggingDataSourceModel]            `tfsdk:"logging" json:"logging,computed"`
 	PreferredConnectivity types.String                                                                            `tfsdk:"preferred_connectivity" json:"preferred_connectivity,computed"`
 	Stats                 customfield.NestedObject[CloudFloatingIPsLoadbalancerStatsDataSourceModel]              `tfsdk:"stats" json:"stats,computed"`
@@ -252,6 +253,10 @@ type CloudFloatingIPsLoadbalancerFloatingIPsTagsDataSourceModel struct {
 	Key      types.String `tfsdk:"key" json:"key,computed"`
 	ReadOnly types.Bool   `tfsdk:"read_only" json:"read_only,computed"`
 	Value    types.String `tfsdk:"value" json:"value,computed"`
+}
+
+type CloudFloatingIPsLoadbalancerListenersDataSourceModel struct {
+	ID types.String `tfsdk:"id" json:"id,computed"`
 }
 
 type CloudFloatingIPsLoadbalancerLoggingDataSourceModel struct {

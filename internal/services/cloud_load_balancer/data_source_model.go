@@ -36,6 +36,7 @@ type CloudLoadBalancerDataSourceModel struct {
 	AdditionalVips        customfield.NestedObjectList[CloudLoadBalancerAdditionalVipsDataSourceModel] `tfsdk:"additional_vips" json:"additional_vips,computed"`
 	Flavor                customfield.NestedObject[CloudLoadBalancerFlavorDataSourceModel]             `tfsdk:"flavor" json:"flavor,computed"`
 	FloatingIPs           customfield.NestedObjectList[CloudLoadBalancerFloatingIPsDataSourceModel]    `tfsdk:"floating_ips" json:"floating_ips,computed"`
+	Listeners             customfield.NestedObjectList[CloudLoadBalancerListenersDataSourceModel]      `tfsdk:"listeners" json:"listeners,computed"`
 	Logging               customfield.NestedObject[CloudLoadBalancerLoggingDataSourceModel]            `tfsdk:"logging" json:"logging,computed"`
 	Stats                 customfield.NestedObject[CloudLoadBalancerStatsDataSourceModel]              `tfsdk:"stats" json:"stats,computed"`
 	TagsV2                customfield.NestedObjectList[CloudLoadBalancerTagsV2DataSourceModel]         `tfsdk:"tags_v2" json:"tags_v2,computed"`
@@ -143,6 +144,10 @@ type CloudLoadBalancerFloatingIPsTagsDataSourceModel struct {
 	Key      types.String `tfsdk:"key" json:"key,computed"`
 	ReadOnly types.Bool   `tfsdk:"read_only" json:"read_only,computed"`
 	Value    types.String `tfsdk:"value" json:"value,computed"`
+}
+
+type CloudLoadBalancerListenersDataSourceModel struct {
+	ID types.String `tfsdk:"id" json:"id,computed"`
 }
 
 type CloudLoadBalancerLoggingDataSourceModel struct {

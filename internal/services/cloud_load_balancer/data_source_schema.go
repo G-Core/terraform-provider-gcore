@@ -260,6 +260,19 @@ func DataSourceSchema(ctx context.Context) schema.Schema {
 					},
 				},
 			},
+			"listeners": schema.ListNestedAttribute{
+				Description: "Load balancer listeners",
+				Computed:    true,
+				CustomType:  customfield.NewNestedObjectListType[CloudLoadBalancerListenersDataSourceModel](ctx),
+				NestedObject: schema.NestedAttributeObject{
+					Attributes: map[string]schema.Attribute{
+						"id": schema.StringAttribute{
+							Description: "Listener ID",
+							Computed:    true,
+						},
+					},
+				},
+			},
 			"logging": schema.SingleNestedAttribute{
 				Description: "Logging configuration",
 				Computed:    true,
