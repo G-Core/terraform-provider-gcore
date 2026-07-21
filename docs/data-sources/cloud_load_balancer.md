@@ -43,6 +43,7 @@ data "gcore_cloud_load_balancer" "example_cloud_load_balancer" {
 - `flavor` (Attributes) Load balancer flavor (if not default) (see [below for nested schema](#nestedatt--flavor))
 - `floating_ips` (Attributes List) List of assigned floating IPs (see [below for nested schema](#nestedatt--floating_ips))
 - `id` (String) Load-Balancer ID
+- `listeners` (Attributes List) Load balancer listeners (see [below for nested schema](#nestedatt--listeners))
 - `logging` (Attributes) Logging configuration (see [below for nested schema](#nestedatt--logging))
 - `name` (String) Load balancer name
 - `operating_status` (String) Load balancer operating status
@@ -129,6 +130,14 @@ Read-Only:
 - `read_only` (Boolean) If true, the tag is read-only and cannot be modified by the user
 - `value` (String) Tag value. Maximum 255 characters. Cannot contain spaces, tabs, newlines, empty string or '=' character.
 
+
+
+<a id="nestedatt--listeners"></a>
+### Nested Schema for `listeners`
+
+Read-Only:
+
+- `id` (String) Listener ID
 
 
 <a id="nestedatt--logging"></a>

@@ -140,6 +140,7 @@ Read-Only:
 - `flavor` (Attributes) Load balancer flavor (if not default) (see [below for nested schema](#nestedatt--items--loadbalancer--flavor))
 - `floating_ips` (Attributes List) List of assigned floating IPs (see [below for nested schema](#nestedatt--items--loadbalancer--floating_ips))
 - `id` (String) Load balancer ID
+- `listeners` (Attributes List) Load balancer listeners (see [below for nested schema](#nestedatt--items--loadbalancer--listeners))
 - `logging` (Attributes) Logging configuration (see [below for nested schema](#nestedatt--items--loadbalancer--logging))
 - `name` (String) Load balancer name
 - `operating_status` (String) Load balancer operating status
@@ -293,6 +294,14 @@ Read-Only:
 - `read_only` (Boolean) If true, the tag is read-only and cannot be modified by the user
 - `value` (String) Tag value. Maximum 255 characters. Cannot contain spaces, tabs, newlines, empty string or '=' character.
 
+
+
+<a id="nestedatt--items--loadbalancer--listeners"></a>
+### Nested Schema for `items.loadbalancer.listeners`
+
+Read-Only:
+
+- `id` (String) Listener ID
 
 
 <a id="nestedatt--items--loadbalancer--logging"></a>
