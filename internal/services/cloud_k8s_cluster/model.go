@@ -63,20 +63,20 @@ func (m CloudK8SClusterModel) MarshalJSONForUpdate(state CloudK8SClusterModel) (
 }
 
 type CloudK8SClusterPoolsModel struct {
-	FlavorID           types.String                  `tfsdk:"flavor_id" json:"flavor_id,required"`
-	MinNodeCount       types.Int64                   `tfsdk:"min_node_count" json:"min_node_count,computed_optional"`
-	Name               types.String                  `tfsdk:"name" json:"name,required"`
-	AutoHealingEnabled types.Bool                    `tfsdk:"auto_healing_enabled" json:"auto_healing_enabled,computed_optional"`
-	BootVolumeSize     types.Int64                   `tfsdk:"boot_volume_size" json:"boot_volume_size,computed_optional"`
-	BootVolumeType     types.String                  `tfsdk:"boot_volume_type" json:"boot_volume_type,computed_optional"`
-	CrioConfig         customfield.Map[types.String] `tfsdk:"crio_config" json:"crio_config,computed_optional"`
-	IsPublicIpv4       types.Bool                    `tfsdk:"is_public_ipv4" json:"is_public_ipv4,computed_optional"`
-	KubeletConfig      customfield.Map[types.String] `tfsdk:"kubelet_config" json:"kubelet_config,computed_optional"`
-	Labels             customfield.Map[types.String] `tfsdk:"labels" json:"labels,computed_optional"`
-	MaxNodeCount       types.Int64                   `tfsdk:"max_node_count" json:"max_node_count,computed_optional"`
-	SecurityGroupIDs   *[]types.String               `tfsdk:"security_group_ids" json:"security_group_ids,optional"`
-	ServergroupPolicy  types.String                  `tfsdk:"servergroup_policy" json:"servergroup_policy,optional"`
-	Taints             customfield.Map[types.String] `tfsdk:"taints" json:"taints,computed_optional"`
+	FlavorID           types.String                   `tfsdk:"flavor_id" json:"flavor_id,required"`
+	MinNodeCount       types.Int64                    `tfsdk:"min_node_count" json:"min_node_count,computed_optional"`
+	Name               types.String                   `tfsdk:"name" json:"name,required"`
+	AutoHealingEnabled types.Bool                     `tfsdk:"auto_healing_enabled" json:"auto_healing_enabled,computed_optional"`
+	BootVolumeSize     types.Int64                    `tfsdk:"boot_volume_size" json:"boot_volume_size,computed_optional"`
+	BootVolumeType     types.String                   `tfsdk:"boot_volume_type" json:"boot_volume_type,computed_optional"`
+	CrioConfig         customfield.Map[types.String]  `tfsdk:"crio_config" json:"crio_config,computed_optional"`
+	IsPublicIpv4       types.Bool                     `tfsdk:"is_public_ipv4" json:"is_public_ipv4,computed_optional"`
+	KubeletConfig      customfield.Map[types.String]  `tfsdk:"kubelet_config" json:"kubelet_config,computed_optional"`
+	Labels             customfield.Map[types.String]  `tfsdk:"labels" json:"labels,computed_optional"`
+	MaxNodeCount       types.Int64                    `tfsdk:"max_node_count" json:"max_node_count,computed_optional"`
+	SecurityGroupIDs   customfield.List[types.String] `tfsdk:"security_group_ids" json:"security_group_ids,computed_optional"`
+	ServergroupPolicy  types.String                   `tfsdk:"servergroup_policy" json:"servergroup_policy,optional"`
+	Taints             customfield.Map[types.String]  `tfsdk:"taints" json:"taints,computed_optional"`
 }
 
 type CloudK8SClusterCsiModel struct {

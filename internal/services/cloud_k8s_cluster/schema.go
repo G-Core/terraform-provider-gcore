@@ -159,7 +159,9 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 						},
 						"security_group_ids": schema.ListAttribute{
 							Description: "Security group IDs applied to the cluster pool nodes",
+							Computed:    true,
 							Optional:    true,
+							CustomType:  customfield.NewListType[types.String](ctx),
 							ElementType: types.StringType,
 						},
 						"servergroup_policy": schema.StringAttribute{
