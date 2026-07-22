@@ -1,5 +1,32 @@
 # Changelog
 
+## [2.0.0-alpha.14](https://github.com/G-Core/terraform-provider-gcore/compare/v2.0.0-alpha.13...v2.0.0-alpha.14) (2026-07-22)
+
+
+### Features
+
+* **cdn:** add origin shielding locations terraform data source ([9e13dbe](https://github.com/G-Core/terraform-provider-gcore/commit/9e13dbe1c62460f759e1f501703777c6729982c6))
+* **cloud:** add gcore_cloud_volume_snapshot resource and data sources ([ebf7814](https://github.com/G-Core/terraform-provider-gcore/commit/ebf7814d78606df227a845713a61424de32d815c))
+* **cloud:** enable terraform target for volume_snapshots ([08f9d8f](https://github.com/G-Core/terraform-provider-gcore/commit/08f9d8f5deebc411972534d26d304aeb0ced1dd8))
+* **cloud:** expose bare metal images as a terraform data source ([ef602e3](https://github.com/G-Core/terraform-provider-gcore/commit/ef602e3f1bdcdd7b903b6a367f76774808fd3c69))
+
+
+### Bug Fixes
+
+* **cdn:** use renamed ShieldingLocation service in origin shielding test ([ab8d7d3](https://github.com/G-Core/terraform-provider-gcore/commit/ab8d7d379ebdb70ee41abb8fd232b8fe3e5313fd))
+* **cloud:** remove inline listeners from the load balancer resource ([5f56d62](https://github.com/G-Core/terraform-provider-gcore/commit/5f56d6288ba703f8b9c92caedec9725418c4ab68))
+* **cloud:** revert non-target-scoped listeners removeProperties transform ([8b7fc49](https://github.com/G-Core/terraform-provider-gcore/commit/8b7fc494bffd22adc798eb9f618a32e0241530f7))
+
+
+### Documentation
+
+* **terraform:** regenerate from custom templates ([7408bb3](https://github.com/G-Core/terraform-provider-gcore/commit/7408bb3bb42bb38d9174ca291a246b680eeabdb9))
+* **terraform:** regenerate from custom templates ([719b5f4](https://github.com/G-Core/terraform-provider-gcore/commit/719b5f4ad415b28a4235b9bc0b448875520e2858))
+* **terraform:** regenerate from custom templates ([a4e5e45](https://github.com/G-Core/terraform-provider-gcore/commit/a4e5e45bd389ac9df027f7c1dd8f2892640e268e))
+* **terraform:** regenerate from custom templates ([0a5eef2](https://github.com/G-Core/terraform-provider-gcore/commit/0a5eef24f36c77e09fb1a9c602de388bb73bf3c0))
+* **terraform:** regenerate from custom templates ([cfc2317](https://github.com/G-Core/terraform-provider-gcore/commit/cfc231749b10b68b3410818c808cc4e18ca1450a))
+* **terraform:** regenerate from custom templates ([30e08e7](https://github.com/G-Core/terraform-provider-gcore/commit/30e08e70ea91cf19ed2538283f11c2bb6f15b8b9))
+
 ## [2.0.0-alpha.13](https://github.com/G-Core/terraform-provider-gcore/compare/v2.0.0-alpha.12...v2.0.0-alpha.13) (2026-07-16)
 
 
