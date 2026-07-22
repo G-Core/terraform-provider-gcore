@@ -20,6 +20,7 @@ import (
 	"github.com/G-Core/terraform-provider-gcore/internal/services/cdn_resource"
 	"github.com/G-Core/terraform-provider-gcore/internal/services/cdn_resource_rule"
 	"github.com/G-Core/terraform-provider-gcore/internal/services/cdn_rule_template"
+	"github.com/G-Core/terraform-provider-gcore/internal/services/cdn_shielding_location"
 	"github.com/G-Core/terraform-provider-gcore/internal/services/cdn_trusted_ca_certificate"
 	"github.com/G-Core/terraform-provider-gcore/internal/services/cloud_baremetal_image"
 	"github.com/G-Core/terraform-provider-gcore/internal/services/cloud_baremetal_server"
@@ -361,6 +362,7 @@ func (p *GcoreProvider) DataSources(ctx context.Context) []func() datasource.Dat
 		cdn_origin_shielding.NewCDNOriginShieldingDataSource,
 		cdn_resource_rule.NewCDNResourceRuleDataSource,
 		cdn_resource_rule.NewCDNResourceRulesDataSource,
+		cdn_shielding_location.NewCDNShieldingLocationsDataSource,
 		cdn_origin_group.NewCDNOriginGroupDataSource,
 		cdn_origin_group.NewCDNOriginGroupsDataSource,
 		cdn_rule_template.NewCDNRuleTemplateDataSource,
