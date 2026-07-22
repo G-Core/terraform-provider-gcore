@@ -14,8 +14,6 @@ on:
   repository_dispatch:
     types: [prod-released]
   workflow_dispatch: {}
-  schedule:
-    - cron: '*/30 * * * *'
 
 permissions:
   contents: read
