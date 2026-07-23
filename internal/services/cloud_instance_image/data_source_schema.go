@@ -7,10 +7,13 @@ import (
 
 	"github.com/G-Core/terraform-provider-gcore/internal/customfield"
 	"github.com/hashicorp/terraform-plugin-framework-timetypes/timetypes"
+	"github.com/hashicorp/terraform-plugin-framework-validators/datasourcevalidator"
 	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/datasource/schema"
+	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
+	"github.com/hashicorp/terraform-plugin-framework/types"
 )
 
 var _ datasource.DataSourceWithConfigValidators = (*CloudInstanceImageDataSource)(nil)
@@ -25,7 +28,7 @@ func DataSourceSchema(ctx context.Context) schema.Schema {
 			},
 			"image_id": schema.StringAttribute{
 				Description: "Image ID",
-				Required:    true,
+				Optional:    true,
 			},
 			"project_id": schema.Int64Attribute{
 				Description: "Project ID",
@@ -200,6 +203,54 @@ func DataSourceSchema(ctx context.Context) schema.Schema {
 					},
 				},
 			},
+			"find_one_by": schema.SingleNestedAttribute{
+				Optional: true,
+				Attributes: map[string]schema.Attribute{
+					"architecture": schema.StringAttribute{
+						Description: "Filter by image architecture.\nAvailable values: \"aarch64\", \"x86_64\".",
+						Optional:    true,
+						Validators: []validator.String{
+							stringvalidator.OneOfCaseInsensitive("aarch64", "x86_64"),
+						},
+					},
+					"name": schema.StringAttribute{
+						Description: "Filter by image name (case-insensitive substring match)",
+						Optional:    true,
+					},
+					"os_distro": schema.StringAttribute{
+						Description: "Filter by OS distribution (case-insensitive). E.g. `ubuntu`, `centos`, `debian`",
+						Optional:    true,
+					},
+					"os_version": schema.StringAttribute{
+						Description: "Filter by OS version (case-insensitive). E.g. `22.04`",
+						Optional:    true,
+					},
+					"private": schema.StringAttribute{
+						Description: "Any value to show private images",
+						Optional:    true,
+					},
+					"tag_key": schema.ListAttribute{
+						Description: "Optional. Filter by tag keys. ?`tag_key`=key1&`tag_key`=key2",
+						Optional:    true,
+						ElementType: types.StringType,
+					},
+					"tag_key_value": schema.StringAttribute{
+						Description: "Optional. Filter by tag key-value pairs.",
+						Optional:    true,
+					},
+					"visibility": schema.StringAttribute{
+						Description: "Image visibility. Globally visible images are public\nAvailable values: \"private\", \"public\", \"shared\".",
+						Optional:    true,
+						Validators: []validator.String{
+							stringvalidator.OneOfCaseInsensitive(
+								"private",
+								"public",
+								"shared",
+							),
+						},
+					},
+				},
+			},
 		},
 	}
 }
@@ -209,5 +260,7 @@ func (d *CloudInstanceImageDataSource) Schema(ctx context.Context, req datasourc
 }
 
 func (d *CloudInstanceImageDataSource) ConfigValidators(_ context.Context) []datasource.ConfigValidator {
-	return []datasource.ConfigValidator{}
+	return []datasource.ConfigValidator{
+		datasourcevalidator.ExactlyOneOf(path.MatchRoot("image_id"), path.MatchRoot("find_one_by")),
+	}
 }

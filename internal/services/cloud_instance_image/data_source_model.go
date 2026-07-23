@@ -15,7 +15,7 @@ import (
 
 type CloudInstanceImageDataSourceModel struct {
 	ID               types.String                                                          `tfsdk:"id" path:"image_id,computed"`
-	ImageID          types.String                                                          `tfsdk:"image_id" path:"image_id,required"`
+	ImageID          types.String                                                          `tfsdk:"image_id" path:"image_id,optional"`
 	ProjectID        types.Int64                                                           `tfsdk:"project_id" path:"project_id,optional"`
 	RegionID         types.Int64                                                           `tfsdk:"region_id" path:"region_id,optional"`
 	IncludePrices    types.Bool                                                            `tfsdk:"include_prices" query:"include_prices,computed_optional"`
@@ -49,6 +49,7 @@ type CloudInstanceImageDataSourceModel struct {
 	UpdatedAt        timetypes.RFC3339                                                     `tfsdk:"updated_at" json:"updated_at,computed" format:"date-time"`
 	Visibility       types.String                                                          `tfsdk:"visibility" json:"visibility,computed"`
 	TagsV2           customfield.NestedObjectList[CloudInstanceImageTagsV2DataSourceModel] `tfsdk:"tags_v2" json:"tags_v2,computed"`
+	FindOneBy        *CloudInstanceImageFindOneByDataSourceModel                           `tfsdk:"find_one_by"`
 }
 
 func (m *CloudInstanceImageDataSourceModel) toReadParams(_ context.Context) (params cloud.InstanceImageGetParams, diags diag.Diagnostics) {
@@ -67,8 +68,65 @@ func (m *CloudInstanceImageDataSourceModel) toReadParams(_ context.Context) (par
 	return
 }
 
+func (m *CloudInstanceImageDataSourceModel) toListParams(_ context.Context) (params cloud.InstanceImageListParams, diags diag.Diagnostics) {
+	mFindOneByTagKey := []string{}
+	if m.FindOneBy.TagKey != nil {
+		for _, item := range *m.FindOneBy.TagKey {
+			mFindOneByTagKey = append(mFindOneByTagKey, item.ValueString())
+		}
+	}
+
+	params = cloud.InstanceImageListParams{
+		TagKey: mFindOneByTagKey,
+	}
+
+	if !m.ProjectID.IsNull() {
+		params.ProjectID = param.NewOpt(m.ProjectID.ValueInt64())
+	}
+	if !m.RegionID.IsNull() {
+		params.RegionID = param.NewOpt(m.RegionID.ValueInt64())
+	}
+	if !m.FindOneBy.Architecture.IsNull() {
+		params.Architecture = cloud.InstanceImageListParamsArchitecture(m.FindOneBy.Architecture.ValueString())
+	}
+	if !m.IncludePrices.IsNull() {
+		params.IncludePrices = param.NewOpt(m.IncludePrices.ValueBool())
+	}
+	if !m.FindOneBy.Name.IsNull() {
+		params.Name = param.NewOpt(m.FindOneBy.Name.ValueString())
+	}
+	if !m.FindOneBy.OsDistro.IsNull() {
+		params.OsDistro = param.NewOpt(m.FindOneBy.OsDistro.ValueString())
+	}
+	if !m.FindOneBy.OsVersion.IsNull() {
+		params.OsVersion = param.NewOpt(m.FindOneBy.OsVersion.ValueString())
+	}
+	if !m.FindOneBy.Private.IsNull() {
+		params.Private = param.NewOpt(m.FindOneBy.Private.ValueString())
+	}
+	if !m.FindOneBy.TagKeyValue.IsNull() {
+		params.TagKeyValue = param.NewOpt(m.FindOneBy.TagKeyValue.ValueString())
+	}
+	if !m.FindOneBy.Visibility.IsNull() {
+		params.Visibility = cloud.InstanceImageListParamsVisibility(m.FindOneBy.Visibility.ValueString())
+	}
+
+	return
+}
+
 type CloudInstanceImageTagsV2DataSourceModel struct {
 	Key      types.String `tfsdk:"key" json:"key,computed"`
 	ReadOnly types.Bool   `tfsdk:"read_only" json:"read_only,computed"`
 	Value    types.String `tfsdk:"value" json:"value,computed"`
+}
+
+type CloudInstanceImageFindOneByDataSourceModel struct {
+	Architecture types.String    `tfsdk:"architecture" query:"architecture,optional"`
+	Name         types.String    `tfsdk:"name" query:"name,optional"`
+	OsDistro     types.String    `tfsdk:"os_distro" query:"os_distro,optional"`
+	OsVersion    types.String    `tfsdk:"os_version" query:"os_version,optional"`
+	Private      types.String    `tfsdk:"private" query:"private,optional"`
+	TagKey       *[]types.String `tfsdk:"tag_key" query:"tag_key,optional"`
+	TagKeyValue  types.String    `tfsdk:"tag_key_value" query:"tag_key_value,optional"`
+	Visibility   types.String    `tfsdk:"visibility" query:"visibility,optional"`
 }

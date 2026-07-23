@@ -35,6 +35,7 @@ import (
 	"github.com/G-Core/terraform-provider-gcore/internal/services/cloud_inference_registry_credential"
 	"github.com/G-Core/terraform-provider-gcore/internal/services/cloud_inference_secret"
 	"github.com/G-Core/terraform-provider-gcore/internal/services/cloud_instance"
+	"github.com/G-Core/terraform-provider-gcore/internal/services/cloud_instance_flavor"
 	"github.com/G-Core/terraform-provider-gcore/internal/services/cloud_instance_image"
 	"github.com/G-Core/terraform-provider-gcore/internal/services/cloud_k8s_cluster"
 	"github.com/G-Core/terraform-provider-gcore/internal/services/cloud_k8s_cluster_kubeconfig"
@@ -316,21 +317,28 @@ func (p *GcoreProvider) DataSources(ctx context.Context) []func() datasource.Dat
 		cloud_inference_secret.NewCloudInferenceSecretDataSource,
 		cloud_inference_secret.NewCloudInferenceSecretsDataSource,
 		cloud_placement_group.NewCloudPlacementGroupDataSource,
+		cloud_placement_group.NewCloudPlacementGroupsDataSource,
 		cloud_baremetal_image.NewCloudBaremetalImagesDataSource,
 		cloud_baremetal_server.NewCloudBaremetalServerDataSource,
 		cloud_baremetal_server.NewCloudBaremetalServersDataSource,
 		cloud_file_share.NewCloudFileShareDataSource,
 		cloud_file_share.NewCloudFileSharesDataSource,
+		cloud_file_share_access_rule.NewCloudFileShareAccessRulesDataSource,
 		cloud_gpu_baremetal_cluster.NewCloudGPUBaremetalClusterDataSource,
 		cloud_gpu_baremetal_cluster.NewCloudGPUBaremetalClustersDataSource,
 		cloud_gpu_baremetal_cluster_image.NewCloudGPUBaremetalClusterImageDataSource,
+		cloud_gpu_baremetal_cluster_image.NewCloudGPUBaremetalClusterImagesDataSource,
 		cloud_gpu_virtual_cluster.NewCloudGPUVirtualClusterDataSource,
 		cloud_gpu_virtual_cluster.NewCloudGPUVirtualClustersDataSource,
 		cloud_gpu_virtual_cluster_image.NewCloudGPUVirtualClusterImageDataSource,
+		cloud_gpu_virtual_cluster_image.NewCloudGPUVirtualClusterImagesDataSource,
 		cloud_instance.NewCloudInstanceDataSource,
 		cloud_instance.NewCloudInstancesDataSource,
+		cloud_instance_flavor.NewCloudInstanceFlavorsDataSource,
 		cloud_instance_image.NewCloudInstanceImageDataSource,
+		cloud_instance_image.NewCloudInstanceImagesDataSource,
 		cloud_k8s_cluster.NewCloudK8SClusterDataSource,
+		cloud_k8s_cluster.NewCloudK8SClustersDataSource,
 		cloud_k8s_cluster_kubeconfig.NewCloudK8SClusterKubeconfigDataSource,
 		cloud_volume_snapshot.NewCloudVolumeSnapshotDataSource,
 		cloud_volume_snapshot.NewCloudVolumeSnapshotsDataSource,

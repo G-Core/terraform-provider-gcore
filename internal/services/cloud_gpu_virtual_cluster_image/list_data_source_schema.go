@@ -1,0 +1,167 @@
+// File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
+
+package cloud_gpu_virtual_cluster_image
+
+import (
+	"context"
+
+	"github.com/G-Core/terraform-provider-gcore/internal/customfield"
+	"github.com/hashicorp/terraform-plugin-framework-timetypes/timetypes"
+	"github.com/hashicorp/terraform-plugin-framework-validators/int64validator"
+	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
+	"github.com/hashicorp/terraform-plugin-framework/datasource"
+	"github.com/hashicorp/terraform-plugin-framework/datasource/schema"
+	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
+)
+
+var _ datasource.DataSourceWithConfigValidators = (*CloudGPUVirtualClusterImagesDataSource)(nil)
+
+func ListDataSourceSchema(ctx context.Context) schema.Schema {
+	return schema.Schema{
+		MarkdownDescription: "GPU virtual images are custom boot images for virtual GPU cluster instances.",
+		Attributes: map[string]schema.Attribute{
+			"project_id": schema.Int64Attribute{
+				Description: "Project ID",
+				Optional:    true,
+			},
+			"region_id": schema.Int64Attribute{
+				Description: "Region ID",
+				Optional:    true,
+			},
+			"max_items": schema.Int64Attribute{
+				Description: "Max items to fetch, default: 1000",
+				Optional:    true,
+				Validators: []validator.Int64{
+					int64validator.AtLeast(0),
+				},
+			},
+			"items": schema.ListNestedAttribute{
+				Description: "The items returned by the data source",
+				Computed:    true,
+				CustomType:  customfield.NewNestedObjectListType[CloudGPUVirtualClusterImagesItemsDataSourceModel](ctx),
+				NestedObject: schema.NestedAttributeObject{
+					Attributes: map[string]schema.Attribute{
+						"id": schema.StringAttribute{
+							Description: "Image ID",
+							Computed:    true,
+						},
+						"created_at": schema.StringAttribute{
+							Description: "Datetime when the image was created",
+							Computed:    true,
+							CustomType:  timetypes.RFC3339Type{},
+						},
+						"cuda_toolkit_version": schema.StringAttribute{
+							Description: "Version of the installed CUDA toolkit",
+							Computed:    true,
+						},
+						"disk_format": schema.StringAttribute{
+							Description: "Disk format of the stored image (e.g. `raw`, `qcow2`). `cow_format=true` -> `raw`, `cow_format=false` -> `qcow2`.",
+							Computed:    true,
+						},
+						"min_disk": schema.Int64Attribute{
+							Description: "Minimal boot volume required",
+							Computed:    true,
+						},
+						"min_ram": schema.Int64Attribute{
+							Description: "Minimal VM RAM required",
+							Computed:    true,
+						},
+						"name": schema.StringAttribute{
+							Description: "Image name",
+							Computed:    true,
+						},
+						"status": schema.StringAttribute{
+							Description: "Image status",
+							Computed:    true,
+						},
+						"tags": schema.ListNestedAttribute{
+							Description: "List of key-value tags associated with the resource. A tag is a key-value pair that can be associated with a resource, enabling efficient filtering and grouping for better organization and management. Some tags are read-only and cannot be modified by the user. Tags are also integrated with cost reports, allowing cost data to be filtered based on tag keys or values.",
+							Computed:    true,
+							CustomType:  customfield.NewNestedObjectListType[CloudGPUVirtualClusterImagesTagsDataSourceModel](ctx),
+							NestedObject: schema.NestedAttributeObject{
+								Attributes: map[string]schema.Attribute{
+									"key": schema.StringAttribute{
+										Description: "Tag key. Maximum 255 characters. Cannot contain spaces, tabs, newlines, empty string or '=' character.",
+										Computed:    true,
+									},
+									"read_only": schema.BoolAttribute{
+										Description: "If true, the tag is read-only and cannot be modified by the user",
+										Computed:    true,
+									},
+									"value": schema.StringAttribute{
+										Description: "Tag value. Maximum 255 characters. Cannot contain spaces, tabs, newlines, empty string or '=' character.",
+										Computed:    true,
+									},
+								},
+							},
+						},
+						"updated_at": schema.StringAttribute{
+							Description: "Datetime when the image was updated",
+							Computed:    true,
+							CustomType:  timetypes.RFC3339Type{},
+						},
+						"visibility": schema.StringAttribute{
+							Description: "Image visibility. Globally visible images are public",
+							Computed:    true,
+						},
+						"architecture": schema.StringAttribute{
+							Description: "Image architecture type",
+							Computed:    true,
+						},
+						"gpu_driver": schema.StringAttribute{
+							Description: "Name of the GPU driver vendor",
+							Computed:    true,
+						},
+						"gpu_driver_type": schema.StringAttribute{
+							Description: "Type of the GPU driver",
+							Computed:    true,
+						},
+						"gpu_driver_version": schema.StringAttribute{
+							Description: "Version of the installed GPU driver",
+							Computed:    true,
+						},
+						"hw_firmware_type": schema.StringAttribute{
+							Description: "Specifies the type of firmware with which to boot the guest.\nAvailable values: \"bios\", \"uefi\".",
+							Computed:    true,
+							Validators: []validator.String{
+								stringvalidator.OneOfCaseInsensitive("bios", "uefi"),
+							},
+						},
+						"os_distro": schema.StringAttribute{
+							Description: "OS Distribution",
+							Computed:    true,
+						},
+						"os_type": schema.StringAttribute{
+							Description: "The operating system installed on the image",
+							Computed:    true,
+						},
+						"os_version": schema.StringAttribute{
+							Description: "OS version, i.e. 19.04 (for Ubuntu) or 9.4 for Debian",
+							Computed:    true,
+						},
+						"size": schema.Int64Attribute{
+							Description: "Image size in bytes.",
+							Computed:    true,
+						},
+						"ssh_key": schema.StringAttribute{
+							Description: "Whether the image supports SSH key or not",
+							Computed:    true,
+						},
+						"task_id": schema.StringAttribute{
+							Description: "The UUID of the active task that currently holds a lock on the resource. This lock prevents concurrent modifications to ensure consistency. If `null`, the resource is not locked.",
+							Computed:    true,
+						},
+					},
+				},
+			},
+		},
+	}
+}
+
+func (d *CloudGPUVirtualClusterImagesDataSource) Schema(ctx context.Context, req datasource.SchemaRequest, resp *datasource.SchemaResponse) {
+	resp.Schema = ListDataSourceSchema(ctx)
+}
+
+func (d *CloudGPUVirtualClusterImagesDataSource) ConfigValidators(_ context.Context) []datasource.ConfigValidator {
+	return []datasource.ConfigValidator{}
+}
