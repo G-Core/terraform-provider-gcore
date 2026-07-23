@@ -158,11 +158,12 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 							},
 						},
 						"security_group_ids": schema.ListAttribute{
-							Description: "Security group IDs applied to the cluster pool nodes",
-							Computed:    true,
-							Optional:    true,
-							CustomType:  customfield.NewListType[types.String](ctx),
-							ElementType: types.StringType,
+							Description:   "Security group IDs applied to the cluster pool nodes",
+							Computed:      true,
+							Optional:      true,
+							CustomType:    customfield.NewListType[types.String](ctx),
+							ElementType:   types.StringType,
+							PlanModifiers: []planmodifier.List{listplanmodifier.UseStateForUnknown()},
 						},
 						"servergroup_policy": schema.StringAttribute{
 							Description: "Server group policy: anti-affinity, soft-anti-affinity or affinity\nAvailable values: \"affinity\", \"anti-affinity\", \"soft-anti-affinity\".",

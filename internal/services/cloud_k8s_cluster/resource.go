@@ -504,6 +504,9 @@ func createPool(ctx context.Context, client *gcore.Client, clusterName string, p
 	if !pool.ServergroupPolicy.IsNull() && !pool.ServergroupPolicy.IsUnknown() {
 		params.ServergroupPolicy = cloud.K8SClusterPoolNewParamsServergroupPolicy(pool.ServergroupPolicy.ValueString())
 	}
+	if !pool.SecurityGroupIDs.IsNull() && !pool.SecurityGroupIDs.IsUnknown() {
+		params.SecurityGroupIDs = securityGroupIDsToStrings(pool.SecurityGroupIDs)
+	}
 
 	// Handle map fields
 	if !pool.Labels.IsNull() && !pool.Labels.IsUnknown() {
@@ -564,6 +567,9 @@ func updatePool(ctx context.Context, client *gcore.Client, clusterName string, p
 	}
 	if !pool.AutoHealingEnabled.IsNull() && !pool.AutoHealingEnabled.IsUnknown() {
 		params.AutoHealingEnabled = param.NewOpt(pool.AutoHealingEnabled.ValueBool())
+	}
+	if !pool.SecurityGroupIDs.IsNull() && !pool.SecurityGroupIDs.IsUnknown() {
+		params.SecurityGroupIDs = securityGroupIDsToStrings(pool.SecurityGroupIDs)
 	}
 
 	// Handle map fields
@@ -693,6 +699,31 @@ func mapsEqualOrBothEmpty(a, b customfield.Map[types.String]) bool {
 	return a.Equal(b)
 }
 
+// listsEqualOrBothEmpty returns true if lists are equal, or if both are "empty"
+// (null, unknown, or zero-length). This handles the case where state has []
+// but plan has null for computed optional list fields.
+func listsEqualOrBothEmpty(a, b customfield.List[types.String]) bool {
+	aEmpty := a.IsNull() || a.IsUnknown() || len(a.Elements()) == 0
+	bEmpty := b.IsNull() || b.IsUnknown() || len(b.Elements()) == 0
+	if aEmpty && bEmpty {
+		return true
+	}
+	return a.Equal(b)
+}
+
+// securityGroupIDsToStrings converts a known security_group_ids list into a
+// plain string slice for SDK params.
+func securityGroupIDsToStrings(list customfield.List[types.String]) []string {
+	elems := list.Elements()
+	result := make([]string, 0, len(elems))
+	for _, e := range elems {
+		if s, ok := e.(types.String); ok {
+			result = append(result, s.ValueString())
+		}
+	}
+	return result
+}
+
 // poolNeedsUpdate checks if pool changes can be done in-place
 func poolNeedsUpdate(old, new *CloudK8SClusterPoolsModel) bool {
 	if old.MinNodeCount.ValueInt64() != new.MinNodeCount.ValueInt64() {
@@ -709,6 +740,11 @@ func poolNeedsUpdate(old, new *CloudK8SClusterPoolsModel) bool {
 		return true
 	}
 	if !mapsEqualOrBothEmpty(old.Taints, new.Taints) {
+		return true
+	}
+	// For the computed optional security_group_ids list, treat null/unknown as
+	// equivalent to empty list
+	if !listsEqualOrBothEmpty(old.SecurityGroupIDs, new.SecurityGroupIDs) {
 		return true
 	}
 	return false
