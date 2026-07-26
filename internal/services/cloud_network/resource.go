@@ -139,7 +139,7 @@ func (r *CloudNetworkResource) Update(ctx context.Context, req resource.UpdateRe
 		return
 	}
 	res := new(http.Response)
-	_, err = r.client.Cloud.Networks.Update(
+	_, err = r.client.Cloud.Networks.UpdateAndPoll(
 		ctx,
 		data.ID.ValueString(),
 		params,
