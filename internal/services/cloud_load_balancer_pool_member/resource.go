@@ -323,6 +323,12 @@ func (r *CloudLoadBalancerPoolMemberResource) Delete(ctx context.Context, req re
 		data.ID.ValueString(),
 		params,
 		option.WithMiddleware(logging.Middleware(ctx)),
+		// Concurrent member deletes contend on the pool's task lock (held
+		// ~20s per delete, 409 until released, no Retry-After hint). The
+		// client-wide retry budget gives up before the lock frees; extend it
+		// so parallel deletes of up to ~7 members self-serialize through the
+		// lock instead of failing the apply.
+		option.WithMaxRetries(20),
 	)
 	if err != nil {
 		resp.Diagnostics.AddError("failed to delete load balancer pool member", err.Error())
