@@ -101,7 +101,9 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 								},
 								"security_groups": schema.ListNestedAttribute{
 									Description: "Security group UUIDs applied to this interface. If omitted (or empty), the top-level `security_groups` value applies; if both are omitted, the project's default security group is applied.",
+									Computed:    true,
 									Optional:    true,
+									CustomType:  customfield.NewNestedObjectListType[CloudGPUVirtualClusterServersSettingsInterfacesSecurityGroupsModel](ctx),
 									NestedObject: schema.NestedAttributeObject{
 										Attributes: map[string]schema.Attribute{
 											"id": schema.StringAttribute{

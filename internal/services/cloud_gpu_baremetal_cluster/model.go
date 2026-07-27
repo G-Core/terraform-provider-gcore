@@ -45,14 +45,14 @@ type CloudGPUBaremetalClusterServersSettingsModel struct {
 }
 
 type CloudGPUBaremetalClusterServersSettingsInterfacesModel struct {
-	Type                types.String                                                             `tfsdk:"type" json:"type,required"`
-	IPFamily            types.String                                                             `tfsdk:"ip_family" json:"ip_family,computed_optional"`
-	Name                types.String                                                             `tfsdk:"name" json:"name,computed_optional"`
-	PortSecurityEnabled types.Bool                                                               `tfsdk:"port_security_enabled" json:"port_security_enabled,optional,no_refresh"`
-	SecurityGroups      *[]*CloudGPUBaremetalClusterServersSettingsInterfacesSecurityGroupsModel `tfsdk:"security_groups" json:"security_groups,optional"`
-	NetworkID           types.String                                                             `tfsdk:"network_id" json:"network_id,optional"`
-	SubnetID            types.String                                                             `tfsdk:"subnet_id" json:"subnet_id,optional"`
-	FloatingIP          *CloudGPUBaremetalClusterServersSettingsInterfacesFloatingIPModel        `tfsdk:"floating_ip" json:"floating_ip,optional"`
+	Type                types.String                                                                                       `tfsdk:"type" json:"type,required"`
+	IPFamily            types.String                                                                                       `tfsdk:"ip_family" json:"ip_family,computed_optional"`
+	Name                types.String                                                                                       `tfsdk:"name" json:"name,computed_optional"`
+	PortSecurityEnabled types.Bool                                                                                         `tfsdk:"port_security_enabled" json:"port_security_enabled,optional,no_refresh"`
+	SecurityGroups      customfield.NestedObjectList[CloudGPUBaremetalClusterServersSettingsInterfacesSecurityGroupsModel] `tfsdk:"security_groups" json:"security_groups,computed_optional"`
+	NetworkID           types.String                                                                                       `tfsdk:"network_id" json:"network_id,optional"`
+	SubnetID            types.String                                                                                       `tfsdk:"subnet_id" json:"subnet_id,optional"`
+	FloatingIP          *CloudGPUBaremetalClusterServersSettingsInterfacesFloatingIPModel                                  `tfsdk:"floating_ip" json:"floating_ip,optional"`
 }
 
 type CloudGPUBaremetalClusterServersSettingsInterfacesSecurityGroupsModel struct {
