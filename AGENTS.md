@@ -302,9 +302,12 @@ When git operations are explicitly requested, follow these rules:
   drags in old generated commits and bloats the PR. Use
   `git fetch origin && git checkout -B <branch> origin/main`, and re-check open PRs after a
   regeneration (`gh pr view <n> --json changedFiles`).
-- **No internal ticket keys or PR numbers in commit messages or PR descriptions.** Commits on
-  this trunk are promoted verbatim to the public production repository. Keep ticket
-  references in branch names only.
+- **No internal ticket keys or PR numbers in commit messages or PR titles.** Commits on this
+  trunk are promoted verbatim to the public production repository, and squash merge is
+  configured as `COMMIT_OR_PR_TITLE`, so the PR title can land in that history too. PR
+  *descriptions* are not promoted — put the ticket link there, opening with a `Fixes <ticket>`
+  line, and link any follow-up tickets you file. Branch names may carry the ticket key as
+  well. Do not write internal ticket URLs into files tracked in this repo.
 - **Regenerate docs before requesting review.** Run `./scripts/generate-docs` on the branch,
   commit any resulting `docs/` changes (stage exact paths), then run it again and confirm the
   tree is clean. The CI doc-sealing step misbehaves when it has to create the doc commit
