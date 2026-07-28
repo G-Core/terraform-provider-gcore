@@ -17,10 +17,10 @@ type CloudVolumeModel struct {
 	AttachmentTag        types.String                                              `tfsdk:"attachment_tag" json:"attachment_tag,optional,no_refresh"`
 	ImageID              types.String                                              `tfsdk:"image_id" json:"image_id,optional,no_refresh"`
 	InstanceIDToAttachTo types.String                                              `tfsdk:"instance_id_to_attach_to" json:"instance_id_to_attach_to,optional,no_refresh"`
-	Size                 types.Int64                                               `tfsdk:"size" json:"size,optional"`
 	SnapshotID           types.String                                              `tfsdk:"snapshot_id" json:"snapshot_id,optional,no_refresh"`
 	TypeName             types.String                                              `tfsdk:"type_name" json:"type_name,optional,no_refresh"`
 	LifecyclePolicyIDs   *[]types.Int64                                            `tfsdk:"lifecycle_policy_ids" json:"lifecycle_policy_ids,optional,no_refresh"`
+	Size                 types.Int64                                               `tfsdk:"size" json:"size,computed_optional"`
 	Name                 types.String                                              `tfsdk:"name" json:"name,required"`
 	Tags                 customfield.Map[types.String]                             `tfsdk:"tags" json:"tags,computed_optional,no_refresh"`
 	Bootable             types.Bool                                                `tfsdk:"bootable" json:"bootable,computed"`

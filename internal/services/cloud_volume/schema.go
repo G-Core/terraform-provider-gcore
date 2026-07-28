@@ -66,13 +66,6 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 				Optional:      true,
 				PlanModifiers: []planmodifier.String{stringplanmodifier.RequiresReplace()},
 			},
-			"size": schema.Int64Attribute{
-				Description: "Volume size in GiB",
-				Optional:    true,
-				Validators: []validator.Int64{
-					int64validator.AtLeast(1),
-				},
-			},
 			"snapshot_id": schema.StringAttribute{
 				Description:   "Snapshot ID",
 				Optional:      true,
@@ -98,6 +91,14 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 				Optional:      true,
 				ElementType:   types.Int64Type,
 				PlanModifiers: []planmodifier.List{listplanmodifier.RequiresReplace()},
+			},
+			"size": schema.Int64Attribute{
+				Description: "Volume size in GiB",
+				Computed:    true,
+				Optional:    true,
+				Validators: []validator.Int64{
+					int64validator.AtLeast(1),
+				},
 			},
 			"name": schema.StringAttribute{
 				Description: "Volume name",
