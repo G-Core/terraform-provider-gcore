@@ -22,15 +22,20 @@ import (
 	"github.com/G-Core/terraform-provider-gcore/internal/services/cdn_rule_template"
 	"github.com/G-Core/terraform-provider-gcore/internal/services/cdn_shielding_location"
 	"github.com/G-Core/terraform-provider-gcore/internal/services/cdn_trusted_ca_certificate"
+	"github.com/G-Core/terraform-provider-gcore/internal/services/cloud_baremetal_flavor"
 	"github.com/G-Core/terraform-provider-gcore/internal/services/cloud_baremetal_image"
 	"github.com/G-Core/terraform-provider-gcore/internal/services/cloud_baremetal_server"
 	"github.com/G-Core/terraform-provider-gcore/internal/services/cloud_file_share"
 	"github.com/G-Core/terraform-provider-gcore/internal/services/cloud_file_share_access_rule"
 	"github.com/G-Core/terraform-provider-gcore/internal/services/cloud_floating_ip"
 	"github.com/G-Core/terraform-provider-gcore/internal/services/cloud_gpu_baremetal_cluster"
+	"github.com/G-Core/terraform-provider-gcore/internal/services/cloud_gpu_baremetal_cluster_flavor"
 	"github.com/G-Core/terraform-provider-gcore/internal/services/cloud_gpu_baremetal_cluster_image"
 	"github.com/G-Core/terraform-provider-gcore/internal/services/cloud_gpu_virtual_cluster"
+	"github.com/G-Core/terraform-provider-gcore/internal/services/cloud_gpu_virtual_cluster_flavor"
 	"github.com/G-Core/terraform-provider-gcore/internal/services/cloud_gpu_virtual_cluster_image"
+	"github.com/G-Core/terraform-provider-gcore/internal/services/cloud_gpu_virtual_cluster_interface"
+	"github.com/G-Core/terraform-provider-gcore/internal/services/cloud_gpu_virtual_cluster_volume"
 	"github.com/G-Core/terraform-provider-gcore/internal/services/cloud_inference_flavor"
 	"github.com/G-Core/terraform-provider-gcore/internal/services/cloud_inference_registry_credential"
 	"github.com/G-Core/terraform-provider-gcore/internal/services/cloud_inference_secret"
@@ -39,6 +44,8 @@ import (
 	"github.com/G-Core/terraform-provider-gcore/internal/services/cloud_instance_image"
 	"github.com/G-Core/terraform-provider-gcore/internal/services/cloud_k8s_cluster"
 	"github.com/G-Core/terraform-provider-gcore/internal/services/cloud_k8s_cluster_kubeconfig"
+	"github.com/G-Core/terraform-provider-gcore/internal/services/cloud_k8s_cluster_pool"
+	"github.com/G-Core/terraform-provider-gcore/internal/services/cloud_k8s_flavor"
 	"github.com/G-Core/terraform-provider-gcore/internal/services/cloud_load_balancer"
 	"github.com/G-Core/terraform-provider-gcore/internal/services/cloud_load_balancer_listener"
 	"github.com/G-Core/terraform-provider-gcore/internal/services/cloud_load_balancer_pool"
@@ -50,6 +57,10 @@ import (
 	"github.com/G-Core/terraform-provider-gcore/internal/services/cloud_project"
 	"github.com/G-Core/terraform-provider-gcore/internal/services/cloud_quota"
 	"github.com/G-Core/terraform-provider-gcore/internal/services/cloud_region"
+	"github.com/G-Core/terraform-provider-gcore/internal/services/cloud_registry"
+	"github.com/G-Core/terraform-provider-gcore/internal/services/cloud_registry_artifact"
+	"github.com/G-Core/terraform-provider-gcore/internal/services/cloud_registry_repository"
+	"github.com/G-Core/terraform-provider-gcore/internal/services/cloud_registry_user"
 	"github.com/G-Core/terraform-provider-gcore/internal/services/cloud_reserved_fixed_ip"
 	"github.com/G-Core/terraform-provider-gcore/internal/services/cloud_secret"
 	"github.com/G-Core/terraform-provider-gcore/internal/services/cloud_security_group"
@@ -319,17 +330,27 @@ func (p *GcoreProvider) DataSources(ctx context.Context) []func() datasource.Dat
 		cloud_placement_group.NewCloudPlacementGroupDataSource,
 		cloud_placement_group.NewCloudPlacementGroupsDataSource,
 		cloud_baremetal_image.NewCloudBaremetalImagesDataSource,
+		cloud_baremetal_flavor.NewCloudBaremetalFlavorsDataSource,
 		cloud_baremetal_server.NewCloudBaremetalServerDataSource,
 		cloud_baremetal_server.NewCloudBaremetalServersDataSource,
+		cloud_registry.NewCloudRegistryDataSource,
+		cloud_registry.NewCloudRegistriesDataSource,
+		cloud_registry_repository.NewCloudRegistryRepositoriesDataSource,
+		cloud_registry_artifact.NewCloudRegistryArtifactsDataSource,
+		cloud_registry_user.NewCloudRegistryUsersDataSource,
 		cloud_file_share.NewCloudFileShareDataSource,
 		cloud_file_share.NewCloudFileSharesDataSource,
 		cloud_file_share_access_rule.NewCloudFileShareAccessRulesDataSource,
 		cloud_gpu_baremetal_cluster.NewCloudGPUBaremetalClusterDataSource,
 		cloud_gpu_baremetal_cluster.NewCloudGPUBaremetalClustersDataSource,
+		cloud_gpu_baremetal_cluster_flavor.NewCloudGPUBaremetalClusterFlavorsDataSource,
 		cloud_gpu_baremetal_cluster_image.NewCloudGPUBaremetalClusterImageDataSource,
 		cloud_gpu_baremetal_cluster_image.NewCloudGPUBaremetalClusterImagesDataSource,
 		cloud_gpu_virtual_cluster.NewCloudGPUVirtualClusterDataSource,
 		cloud_gpu_virtual_cluster.NewCloudGPUVirtualClustersDataSource,
+		cloud_gpu_virtual_cluster_volume.NewCloudGPUVirtualClusterVolumesDataSource,
+		cloud_gpu_virtual_cluster_interface.NewCloudGPUVirtualClusterInterfacesDataSource,
+		cloud_gpu_virtual_cluster_flavor.NewCloudGPUVirtualClusterFlavorsDataSource,
 		cloud_gpu_virtual_cluster_image.NewCloudGPUVirtualClusterImageDataSource,
 		cloud_gpu_virtual_cluster_image.NewCloudGPUVirtualClusterImagesDataSource,
 		cloud_instance.NewCloudInstanceDataSource,
@@ -337,9 +358,12 @@ func (p *GcoreProvider) DataSources(ctx context.Context) []func() datasource.Dat
 		cloud_instance_flavor.NewCloudInstanceFlavorsDataSource,
 		cloud_instance_image.NewCloudInstanceImageDataSource,
 		cloud_instance_image.NewCloudInstanceImagesDataSource,
+		cloud_k8s_flavor.NewCloudK8SFlavorsDataSource,
 		cloud_k8s_cluster.NewCloudK8SClusterDataSource,
 		cloud_k8s_cluster.NewCloudK8SClustersDataSource,
 		cloud_k8s_cluster_kubeconfig.NewCloudK8SClusterKubeconfigDataSource,
+		cloud_k8s_cluster_pool.NewCloudK8SClusterPoolDataSource,
+		cloud_k8s_cluster_pool.NewCloudK8SClusterPoolsDataSource,
 		cloud_volume_snapshot.NewCloudVolumeSnapshotDataSource,
 		cloud_volume_snapshot.NewCloudVolumeSnapshotsDataSource,
 		waap_domain.NewWaapDomainDataSource,
