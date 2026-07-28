@@ -17,6 +17,7 @@ import (
 	"github.com/G-Core/gcore-go/shared/constant"
 	"github.com/G-Core/terraform-provider-gcore/internal/apijson"
 	"github.com/G-Core/terraform-provider-gcore/internal/custom"
+	"github.com/G-Core/terraform-provider-gcore/internal/customfield"
 	"github.com/G-Core/terraform-provider-gcore/internal/importpath"
 	"github.com/G-Core/terraform-provider-gcore/internal/logging"
 	"github.com/hashicorp/terraform-plugin-framework/path"
@@ -142,6 +143,15 @@ func (r *CloudInstanceResource) Create(ctx context.Context, req resource.CreateR
 		if err == nil && interfaces != nil {
 			mergeInterfaceComputedFields(data.Interfaces, interfaces.Results, false)
 		}
+	}
+
+	resolveUnknownInterfaceComputedFields(data.Interfaces)
+
+	// tags is computed+optional and no_refresh: when the API response carries no
+	// parseable tags the planned unknown would otherwise reach state, which is a
+	// hard framework error. Resolve it to null, matching an empty tag set.
+	if data.Tags.IsUnknown() {
+		data.Tags = customfield.NullMap[types.String](ctx)
 	}
 
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
@@ -1014,6 +1024,14 @@ func (r *CloudInstanceResource) Update(ctx context.Context, req resource.UpdateR
 	// This runs AFTER specialized endpoints, allowing combined updates like:
 	//   name = "new-name" (PATCH) + flavor = "g1-standard-2" (specialized /changeflavor)
 	// The PATCH endpoint handles: name, tags (and potentially other simple fields in the future).
+
+	// tags is computed+optional: with no tags in config the planned value is unknown
+	// unless an earlier update path refreshed it. Unknown means "unchanged", not a diff,
+	// and must never reach the PATCH comparison or the final state.
+	if data.Tags.IsUnknown() {
+		data.Tags = state.Tags
+	}
+
 	nameChanged := !data.Name.Equal(state.Name)
 	tagsChanged := !data.Tags.Equal(state.Tags)
 
@@ -1111,6 +1129,8 @@ func (r *CloudInstanceResource) Update(ctx context.Context, req resource.UpdateR
 			}
 		}
 	}
+
+	resolveUnknownInterfaceComputedFields(data.Interfaces)
 
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
 }
@@ -1416,23 +1436,42 @@ func mergeInterfaceComputedFields(tfInterfaces *[]*CloudInstanceInterfacesModel,
 		apiIfaceByPort[iface.PortID] = idx
 	}
 
+	// First pass: match by port_id when available and record which API interfaces
+	// are taken, so the positional fallback below never binds a new interface to
+	// an API interface that is already claimed (the List order is not guaranteed
+	// to follow attach order).
+	matches := make([]int, len(*tfInterfaces))
+	claimed := make([]bool, len(apiInterfaces))
 	for i := range *tfInterfaces {
+		matches[i] = -1
 		tfIface := (*tfInterfaces)[i]
-		apiIdx := -1
-
-		// Match by port_id when available
 		if !tfIface.PortID.IsNull() && !tfIface.PortID.IsUnknown() {
 			if idx, ok := apiIfaceByPort[tfIface.PortID.ValueString()]; ok {
-				apiIdx = idx
+				matches[i] = idx
+				claimed[idx] = true
 			}
 		}
+	}
 
-		// Fall back to index for new interfaces without port_id yet
-		if apiIdx < 0 && i < len(apiInterfaces) {
-			apiIdx = i
+	// Second pass: fall back to the first unclaimed API interface, in order, for
+	// new interfaces without a port_id yet.
+	nextUnclaimed := 0
+	for i := range *tfInterfaces {
+		if matches[i] >= 0 {
+			continue
 		}
+		for nextUnclaimed < len(apiInterfaces) && claimed[nextUnclaimed] {
+			nextUnclaimed++
+		}
+		if nextUnclaimed < len(apiInterfaces) {
+			matches[i] = nextUnclaimed
+			claimed[nextUnclaimed] = true
+		}
+	}
 
-		if apiIdx < 0 || apiIdx >= len(apiInterfaces) {
+	for i := range *tfInterfaces {
+		apiIdx := matches[i]
+		if apiIdx < 0 {
 			continue
 		}
 
@@ -1464,6 +1503,29 @@ func mergeInterfaceComputedFields(tfInterfaces *[]*CloudInstanceInterfacesModel,
 			} else {
 				(*tfInterfaces)[i].FloatingIP = nil
 			}
+		}
+	}
+}
+
+// resolveUnknownInterfaceComputedFields resolves any still-unknown computed interface
+// fields to null before state is persisted. Null is a legal apply-time resolution of an
+// unknown planned value; leaving unknown in state is a hard framework error. This matters
+// when the interfaces List refresh fails and the merge is skipped.
+func resolveUnknownInterfaceComputedFields(tfInterfaces *[]*CloudInstanceInterfacesModel) {
+	if tfInterfaces == nil || len(*tfInterfaces) == 0 {
+		return
+	}
+
+	for i := range *tfInterfaces {
+		tfIface := (*tfInterfaces)[i]
+		if tfIface == nil {
+			continue
+		}
+		if tfIface.PortID.IsUnknown() {
+			tfIface.PortID = types.StringNull()
+		}
+		if tfIface.IPAddress.IsUnknown() {
+			tfIface.IPAddress = types.StringNull()
 		}
 	}
 }

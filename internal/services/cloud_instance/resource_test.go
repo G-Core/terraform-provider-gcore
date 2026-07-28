@@ -10,6 +10,7 @@ import (
 	"github.com/G-Core/gcore-go/packages/param"
 	"github.com/hashicorp/terraform-plugin-testing/helper/resource"
 	"github.com/hashicorp/terraform-plugin-testing/knownvalue"
+	"github.com/hashicorp/terraform-plugin-testing/plancheck"
 	"github.com/hashicorp/terraform-plugin-testing/statecheck"
 	"github.com/hashicorp/terraform-plugin-testing/terraform"
 	"github.com/hashicorp/terraform-plugin-testing/tfjsonpath"
@@ -249,4 +250,234 @@ resource "gcore_cloud_instance" "test" {
   tags = {
 %[5]s  }
 }`, acctest.ProjectID(), acctest.RegionID(), name, imageID, tagLines)
+}
+
+// TestAccCloudInstance_addInterfaceOnly appends a second subnet interface to an existing
+// instance without changing the name or tags. The appended interface's computed port_id
+// and ip_address must be planned as unknown ("known after apply"), then resolve to real
+// values post-apply, and a re-plan of the identical config must be empty.
+func TestAccCloudInstance_addInterfaceOnly(t *testing.T) {
+	rName := acctest.RandomName()
+	imageID := latestUbuntuImageID(t)
+
+	resource.ParallelTest(t, resource.TestCase{
+		PreCheck:                 func() { acctest.PreCheck(t) },
+		ProtoV6ProviderFactories: acctest.ProtoV6ProviderFactories,
+		CheckDestroy:             testAccCheckCloudInstanceDestroy,
+		Steps: []resource.TestStep{
+			// Step 1: single subnet interface.
+			{
+				Config: testAccCloudInstanceConfigInterfaces(rName, rName, imageID, false),
+				ConfigStateChecks: []statecheck.StateCheck{
+					statecheck.ExpectKnownValue("gcore_cloud_instance.test",
+						tfjsonpath.New("name"), knownvalue.StringExact(rName)),
+				},
+				Check: testAccCheckInstanceInterfaceCount("gcore_cloud_instance.test", 1),
+			},
+			// Step 2: same name, append a second subnet interface.
+			{
+				Config: testAccCloudInstanceConfigInterfaces(rName, rName, imageID, true),
+				ConfigPlanChecks: resource.ConfigPlanChecks{
+					PreApply: []plancheck.PlanCheck{
+						plancheck.ExpectUnknownValue("gcore_cloud_instance.test",
+							tfjsonpath.New("interfaces").AtSliceIndex(1).AtMapKey("port_id")),
+						plancheck.ExpectUnknownValue("gcore_cloud_instance.test",
+							tfjsonpath.New("interfaces").AtSliceIndex(1).AtMapKey("ip_address")),
+					},
+				},
+				Check: resource.ComposeAggregateTestCheckFunc(
+					resource.TestCheckResourceAttr("gcore_cloud_instance.test", "name", rName),
+					resource.TestCheckResourceAttrSet("gcore_cloud_instance.test", "interfaces.1.port_id"),
+					resource.TestCheckResourceAttrSet("gcore_cloud_instance.test", "interfaces.1.ip_address"),
+					testAccCheckInstanceInterfaceCount("gcore_cloud_instance.test", 2),
+				),
+			},
+			// Step 3: identical config must produce an empty plan.
+			{
+				Config: testAccCloudInstanceConfigInterfaces(rName, rName, imageID, true),
+				ConfigPlanChecks: resource.ConfigPlanChecks{
+					PostApplyPostRefresh: []plancheck.PlanCheck{
+						plancheck.ExpectEmptyPlan(),
+					},
+				},
+			},
+		},
+	})
+}
+
+// TestAccCloudInstance_addInterfaceWithNameChange appends a second subnet interface while
+// also renaming the instance in the same step. The rename exercises the PATCH path while
+// the appended interface's computed fields must still plan as unknown and resolve cleanly.
+func TestAccCloudInstance_addInterfaceWithNameChange(t *testing.T) {
+	rName := acctest.RandomName()
+	rNameUpdated := rName + "-upd"
+	imageID := latestUbuntuImageID(t)
+
+	resource.ParallelTest(t, resource.TestCase{
+		PreCheck:                 func() { acctest.PreCheck(t) },
+		ProtoV6ProviderFactories: acctest.ProtoV6ProviderFactories,
+		CheckDestroy:             testAccCheckCloudInstanceDestroy,
+		Steps: []resource.TestStep{
+			// Step 1: single subnet interface.
+			{
+				Config: testAccCloudInstanceConfigInterfaces(rName, rName, imageID, false),
+				ConfigStateChecks: []statecheck.StateCheck{
+					statecheck.ExpectKnownValue("gcore_cloud_instance.test",
+						tfjsonpath.New("name"), knownvalue.StringExact(rName)),
+				},
+				Check: testAccCheckInstanceInterfaceCount("gcore_cloud_instance.test", 1),
+			},
+			// Step 2: rename AND append a second subnet interface.
+			{
+				Config: testAccCloudInstanceConfigInterfaces(rName, rNameUpdated, imageID, true),
+				ConfigPlanChecks: resource.ConfigPlanChecks{
+					PreApply: []plancheck.PlanCheck{
+						plancheck.ExpectUnknownValue("gcore_cloud_instance.test",
+							tfjsonpath.New("interfaces").AtSliceIndex(1).AtMapKey("port_id")),
+						plancheck.ExpectUnknownValue("gcore_cloud_instance.test",
+							tfjsonpath.New("interfaces").AtSliceIndex(1).AtMapKey("ip_address")),
+					},
+				},
+				Check: resource.ComposeAggregateTestCheckFunc(
+					resource.TestCheckResourceAttr("gcore_cloud_instance.test", "name", rNameUpdated),
+					resource.TestCheckResourceAttrSet("gcore_cloud_instance.test", "interfaces.1.port_id"),
+					resource.TestCheckResourceAttrSet("gcore_cloud_instance.test", "interfaces.1.ip_address"),
+					testAccCheckInstanceInterfaceCount("gcore_cloud_instance.test", 2),
+				),
+			},
+			// Step 3: identical config must produce an empty plan.
+			{
+				Config: testAccCloudInstanceConfigInterfaces(rName, rNameUpdated, imageID, true),
+				ConfigPlanChecks: resource.ConfigPlanChecks{
+					PostApplyPostRefresh: []plancheck.PlanCheck{
+						plancheck.ExpectEmptyPlan(),
+					},
+				},
+			},
+		},
+	})
+}
+
+// testAccCheckInstanceInterfaceCount asserts, via the API, that the instance has exactly
+// the expected number of interfaces. This guards against a silent duplicate-attach where
+// the state looks right but the API attached more (or fewer) interfaces than intended.
+func testAccCheckInstanceInterfaceCount(resourceName string, expected int) resource.TestCheckFunc {
+	return func(s *terraform.State) error {
+		rs, ok := s.RootModule().Resources[resourceName]
+		if !ok {
+			return fmt.Errorf("resource not found: %s", resourceName)
+		}
+
+		client, err := acctest.NewGcoreClient()
+		if err != nil {
+			return err
+		}
+
+		projectID, err := strconv.ParseInt(rs.Primary.Attributes["project_id"], 10, 64)
+		if err != nil {
+			return fmt.Errorf("error parsing project_id: %w", err)
+		}
+		regionID, err := strconv.ParseInt(rs.Primary.Attributes["region_id"], 10, 64)
+		if err != nil {
+			return fmt.Errorf("error parsing region_id: %w", err)
+		}
+
+		page, err := client.Cloud.Instances.Interfaces.List(
+			context.Background(),
+			rs.Primary.ID,
+			cloud.InstanceInterfaceListParams{
+				ProjectID: param.NewOpt(projectID),
+				RegionID:  param.NewOpt(regionID),
+			},
+		)
+		if err != nil {
+			return fmt.Errorf("listing instance interfaces: %w", err)
+		}
+
+		if got := len(page.Results); got != expected {
+			return fmt.Errorf("expected %d interfaces on instance %s, got %d", expected, rs.Primary.ID, got)
+		}
+		return nil
+	}
+}
+
+// testAccCloudInstanceConfigInterfaces builds an instance backed by a boot volume and two
+// networks with one subnet each. The instance always has a subnet interface on network 1;
+// when secondInterface is true a second subnet interface on network 2 is appended. The
+// second interface deliberately lives on a SEPARATE network: attaching an interface to a
+// subnet of a network the instance is already connected to silently no-ops on the API side
+// (the attach task finishes without error and without creating a port). prefix names the
+// supporting resources (kept stable across steps) while instanceName sets the instance
+// name (varied to exercise renames).
+func testAccCloudInstanceConfigInterfaces(prefix, instanceName, imageID string, secondInterface bool) string {
+	secondIfaceBlock := ""
+	if secondInterface {
+		secondIfaceBlock = `,
+    {
+      type       = "subnet"
+      network_id = gcore_cloud_network.test2.id
+      subnet_id  = gcore_cloud_network_subnet.test2.id
+    }`
+	}
+
+	return fmt.Sprintf(`
+resource "gcore_cloud_network" "test" {
+  project_id = %[1]s
+  region_id  = %[2]s
+  name       = "%[3]s-net"
+}
+
+resource "gcore_cloud_network" "test2" {
+  project_id = %[1]s
+  region_id  = %[2]s
+  name       = "%[3]s-net2"
+}
+
+resource "gcore_cloud_network_subnet" "test1" {
+  project_id = %[1]s
+  region_id  = %[2]s
+  name       = "%[3]s-subnet1"
+  network_id = gcore_cloud_network.test.id
+  cidr       = "192.168.10.0/24"
+}
+
+resource "gcore_cloud_network_subnet" "test2" {
+  project_id = %[1]s
+  region_id  = %[2]s
+  name       = "%[3]s-subnet2"
+  network_id = gcore_cloud_network.test2.id
+  cidr       = "192.168.20.0/24"
+}
+
+resource "gcore_cloud_volume" "boot" {
+  project_id = %[1]s
+  region_id  = %[2]s
+  name       = "%[3]s-vol"
+  size       = 10
+  type_name  = "ssd_hiiops"
+  source     = "image"
+  image_id   = %[5]q
+}
+
+resource "gcore_cloud_instance" "test" {
+  project_id = %[1]s
+  region_id  = %[2]s
+  name       = %[4]q
+  flavor     = "g1-standard-1-2"
+
+  volumes = [
+    {
+      volume_id  = gcore_cloud_volume.boot.id
+      boot_index = 0
+    }
+  ]
+
+  interfaces = [
+    {
+      type       = "subnet"
+      network_id = gcore_cloud_network.test.id
+      subnet_id  = gcore_cloud_network_subnet.test1.id
+    }%[6]s
+  ]
+}`, acctest.ProjectID(), acctest.RegionID(), prefix, instanceName, imageID, secondIfaceBlock)
 }
