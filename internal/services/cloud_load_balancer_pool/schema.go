@@ -42,12 +42,12 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 			"listener_id": schema.StringAttribute{
 				Description:   "Listener ID",
 				Optional:      true,
-				PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown(), stringplanmodifier.RequiresReplace()},
+				PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown(), planmodifiers.StringRequiresReplaceIfConfiguredPreservingState()},
 			},
 			"load_balancer_id": schema.StringAttribute{
 				Description:   "Loadbalancer ID",
 				Optional:      true,
-				PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown(), stringplanmodifier.RequiresReplace()},
+				PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown(), planmodifiers.StringRequiresReplaceIfConfiguredPreservingState()},
 			},
 			"lb_algorithm": schema.StringAttribute{
 				Description: "Load balancer algorithm\nAvailable values: \"LEAST_CONNECTIONS\", \"ROUND_ROBIN\", \"SOURCE_IP\".",
