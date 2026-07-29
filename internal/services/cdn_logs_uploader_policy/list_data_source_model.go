@@ -51,6 +51,7 @@ type CDNLogsUploaderPoliciesItemsDataSourceModel struct {
 	Description             types.String                   `tfsdk:"description" json:"description,computed"`
 	EscapeSpecialCharacters types.Bool                     `tfsdk:"escape_special_characters" json:"escape_special_characters,computed"`
 	FieldDelimiter          types.String                   `tfsdk:"field_delimiter" json:"field_delimiter,computed"`
+	FieldRemap              customfield.Map[types.String]  `tfsdk:"field_remap" json:"field_remap,computed"`
 	FieldSeparator          types.String                   `tfsdk:"field_separator" json:"field_separator,computed"`
 	Fields                  customfield.List[types.String] `tfsdk:"fields" json:"fields,computed"`
 	FileNameTemplate        types.String                   `tfsdk:"file_name_template" json:"file_name_template,computed"`

@@ -64,6 +64,11 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 					int64validator.Between(100, 2147483647),
 				},
 			},
+			"field_remap": schema.MapAttribute{
+				Description: "Per-field output-name remap for exported logs. Maps a canonical Gcore field name (from `/cdn/logs_uploader/policies/fields`, and must be present in `fields`) to the field name it should have in the exported logs. Unmapped fields keep their canonical name. Output names (after remapping) must be unique.",
+				Optional:    true,
+				ElementType: types.StringType,
+			},
 			"tags": schema.MapAttribute{
 				Description: "Tags allow for dynamic decoration of logs by adding predefined fields to the log format. These tags serve as customizable key-value pairs that can be included in log entries to enhance context and readability.",
 				Computed:    true,
@@ -150,7 +155,7 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 				Default: int64default.StaticInt64(0),
 			},
 			"fields": schema.ListAttribute{
-				Description:   "List of fields to include in logs.",
+				Description: "List of fields to include in logs. Duplicate names are allowed for plain text output, but rejected when `format_type` is `json` or a `field_remap` is set (each field becomes a distinct output key).",
 				Computed:      true,
 				Optional:      true,
 				CustomType:    customfield.NewListType[types.String](ctx),

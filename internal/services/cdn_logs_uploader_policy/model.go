@@ -19,6 +19,7 @@ type CDNLogsUploaderPolicyModel struct {
 	Description             types.String                   `tfsdk:"description" json:"description,computed_optional"`
 	FormatType              types.String                   `tfsdk:"format_type" json:"format_type,computed_optional"`
 	RotateThresholdMB       types.Int64                    `tfsdk:"rotate_threshold_mb" json:"rotate_threshold_mb,optional"`
+	FieldRemap              *map[string]types.String       `tfsdk:"field_remap" json:"field_remap,optional"`
 	Tags                    *map[string]types.String       `tfsdk:"tags" json:"tags,computed_optional"`
 	EscapeSpecialCharacters types.Bool                     `tfsdk:"escape_special_characters" json:"escape_special_characters,computed_optional"`
 	FieldDelimiter          types.String                   `tfsdk:"field_delimiter" json:"field_delimiter,computed_optional"`

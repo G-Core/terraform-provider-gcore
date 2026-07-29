@@ -72,12 +72,18 @@ func ListDataSourceSchema(ctx context.Context) schema.Schema {
 							Description: "Field delimiter for logs.",
 							Computed:    true,
 						},
+						"field_remap": schema.MapAttribute{
+							Description: "Per-field output-name remap for exported logs. Maps a canonical Gcore field name (from `/cdn/logs_uploader/policies/fields`, and must be present in `fields`) to the field name it should have in the exported logs. Unmapped fields keep their canonical name. Output names (after remapping) must be unique.",
+							Computed:    true,
+							CustomType:  customfield.NewMapType[types.String](ctx),
+							ElementType: types.StringType,
+						},
 						"field_separator": schema.StringAttribute{
 							Description: "Field separator for logs.",
 							Computed:    true,
 						},
 						"fields": schema.ListAttribute{
-							Description: "List of fields to include in logs.",
+							Description: "List of fields to include in logs. Duplicate names are allowed for plain text output, but rejected when `format_type` is `json` or a `field_remap` is set (each field becomes a distinct output key).",
 							Computed:    true,
 							CustomType:  customfield.NewListType[types.String](ctx),
 							ElementType: types.StringType,

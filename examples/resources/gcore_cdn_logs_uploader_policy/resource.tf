@@ -3,6 +3,9 @@ resource "gcore_cdn_logs_uploader_policy" "example_cdn_logs_uploader_policy" {
   description = "New policy"
   escape_special_characters = true
   field_delimiter = ","
+  field_remap = {
+
+  }
   field_separator = ";"
   fields = ["remote_addr", "status"]
   file_name_template = "{{YYYY}}_{{MM}}_{{DD}}_{{HH}}_{{mm}}_{{ss}}_access.log.gz"

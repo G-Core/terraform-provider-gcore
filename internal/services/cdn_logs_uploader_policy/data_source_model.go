@@ -33,6 +33,7 @@ type CDNLogsUploaderPolicyDataSourceModel struct {
 	RotateThresholdLines    types.Int64                                    `tfsdk:"rotate_threshold_lines" json:"rotate_threshold_lines,computed"`
 	RotateThresholdMB       types.Int64                                    `tfsdk:"rotate_threshold_mb" json:"rotate_threshold_mb,computed"`
 	Updated                 timetypes.RFC3339                              `tfsdk:"updated" json:"updated,computed" format:"date-time"`
+	FieldRemap              customfield.Map[types.String]                  `tfsdk:"field_remap" json:"field_remap,computed"`
 	Fields                  customfield.List[types.String]                 `tfsdk:"fields" json:"fields,computed"`
 	RelatedUploaderConfigs  customfield.List[types.Int64]                  `tfsdk:"related_uploader_configs" json:"related_uploader_configs,computed"`
 	Tags                    customfield.Map[types.String]                  `tfsdk:"tags" json:"tags,computed"`
