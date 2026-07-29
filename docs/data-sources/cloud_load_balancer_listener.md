@@ -17,7 +17,6 @@ data "gcore_cloud_load_balancer_listener" "example_cloud_load_balancer_listener"
   project_id = 1
   region_id = 1
   listener_id = "00000000-0000-4000-8000-000000000000"
-  show_stats = true
 }
 ```
 
@@ -33,7 +32,6 @@ data "gcore_cloud_load_balancer_listener" "example_cloud_load_balancer_listener"
 - `find_one_by` (Attributes) (see [below for nested schema](#nestedatt--find_one_by))
 - `project_id` (Number) Project ID
 - `region_id` (Number) Region ID
-- `show_stats` (Boolean) Show stats
 
 ### Read-Only
 
@@ -55,7 +53,6 @@ Available values: "HTTP", "HTTPS", "PROMETHEUS", "TCP", "TERMINATED_HTTPS", "UDP
 Available values: "ACTIVE", "DELETED", "ERROR", "PENDING_CREATE", "PENDING_DELETE", "PENDING_UPDATE".
 - `secret_id` (String) ID of the secret where PKCS12 file is stored for `TERMINATED_HTTPS` or PROMETHEUS load balancer
 - `sni_secret_id` (List of String) List of secret's ID containing PKCS12 format certificate/key bundles for `TERMINATED_HTTPS` or PROMETHEUS listeners
-- `stats` (Attributes) Statistics of the load balancer. It is available only in get functions by a flag. (see [below for nested schema](#nestedatt--stats))
 - `timeout_client_data` (Number) Frontend client inactivity timeout in milliseconds
 - `user_list` (Attributes List) Load balancer listener users list (see [below for nested schema](#nestedatt--user_list))
 
@@ -66,18 +63,6 @@ Optional:
 
 - `load_balancer_id` (String) Load Balancer ID
 - `name` (String) Filter by name
-
-
-<a id="nestedatt--stats"></a>
-### Nested Schema for `stats`
-
-Read-Only:
-
-- `active_connections` (Number) Currently active connections
-- `bytes_in` (Number) Total bytes received
-- `bytes_out` (Number) Total bytes sent
-- `request_errors` (Number) Total requests that were unable to be fulfilled
-- `total_connections` (Number) Total connections handled
 
 
 <a id="nestedatt--user_list"></a>

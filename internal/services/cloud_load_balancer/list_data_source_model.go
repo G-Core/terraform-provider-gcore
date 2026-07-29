@@ -28,7 +28,6 @@ type CloudLoadBalancersDataSourceModel struct {
 	TagKeyValue        types.String                                                         `tfsdk:"tag_key_value" query:"tag_key_value,optional"`
 	TagKey             *[]types.String                                                      `tfsdk:"tag_key" query:"tag_key,optional"`
 	OrderBy            types.String                                                         `tfsdk:"order_by" query:"order_by,computed_optional"`
-	ShowStats          types.Bool                                                           `tfsdk:"show_stats" query:"show_stats,computed_optional"`
 	WithDDOS           types.Bool                                                           `tfsdk:"with_ddos" query:"with_ddos,computed_optional"`
 	MaxItems           types.Int64                                                          `tfsdk:"max_items"`
 	Items              customfield.NestedObjectList[CloudLoadBalancersItemsDataSourceModel] `tfsdk:"items"`
@@ -70,9 +69,6 @@ func (m *CloudLoadBalancersDataSourceModel) toListParams(_ context.Context) (par
 	if !m.ProvisioningStatus.IsNull() {
 		params.ProvisioningStatus = cloud.ProvisioningStatus(m.ProvisioningStatus.ValueString())
 	}
-	if !m.ShowStats.IsNull() {
-		params.ShowStats = param.NewOpt(m.ShowStats.ValueBool())
-	}
 	if !m.TagKeyValue.IsNull() {
 		params.TagKeyValue = param.NewOpt(m.TagKeyValue.ValueString())
 	}
@@ -101,7 +97,6 @@ type CloudLoadBalancersItemsDataSourceModel struct {
 	Listeners             customfield.NestedObjectList[CloudLoadBalancersListenersDataSourceModel]      `tfsdk:"listeners" json:"listeners,computed"`
 	Logging               customfield.NestedObject[CloudLoadBalancersLoggingDataSourceModel]            `tfsdk:"logging" json:"logging,computed"`
 	PreferredConnectivity types.String                                                                  `tfsdk:"preferred_connectivity" json:"preferred_connectivity,computed"`
-	Stats                 customfield.NestedObject[CloudLoadBalancersStatsDataSourceModel]              `tfsdk:"stats" json:"stats,computed"`
 	UpdatedAt             timetypes.RFC3339                                                             `tfsdk:"updated_at" json:"updated_at,computed" format:"date-time"`
 	VipAddress            types.String                                                                  `tfsdk:"vip_address" json:"vip_address,computed"`
 	VipFqdn               types.String                                                                  `tfsdk:"vip_fqdn" json:"vip_fqdn,computed"`
@@ -163,14 +158,6 @@ type CloudLoadBalancersLoggingDataSourceModel struct {
 
 type CloudLoadBalancersLoggingRetentionPolicyDataSourceModel struct {
 	Period types.Int64 `tfsdk:"period" json:"period,computed"`
-}
-
-type CloudLoadBalancersStatsDataSourceModel struct {
-	ActiveConnections types.Int64 `tfsdk:"active_connections" json:"active_connections,computed"`
-	BytesIn           types.Int64 `tfsdk:"bytes_in" json:"bytes_in,computed"`
-	BytesOut          types.Int64 `tfsdk:"bytes_out" json:"bytes_out,computed"`
-	RequestErrors     types.Int64 `tfsdk:"request_errors" json:"request_errors,computed"`
-	TotalConnections  types.Int64 `tfsdk:"total_connections" json:"total_connections,computed"`
 }
 
 type CloudLoadBalancersVrrpIPsDataSourceModel struct {

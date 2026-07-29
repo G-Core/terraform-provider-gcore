@@ -18,7 +18,6 @@ type CloudLoadBalancerListenerDataSourceModel struct {
 	ListenerID         types.String                                                                   `tfsdk:"listener_id" path:"listener_id,required"`
 	ProjectID          types.Int64                                                                    `tfsdk:"project_id" path:"project_id,optional"`
 	RegionID           types.Int64                                                                    `tfsdk:"region_id" path:"region_id,optional"`
-	ShowStats          types.Bool                                                                     `tfsdk:"show_stats" query:"show_stats,computed_optional"`
 	AdminStateUp       types.Bool                                                                     `tfsdk:"admin_state_up" json:"admin_state_up,computed"`
 	ConnectionLimit    types.Int64                                                                    `tfsdk:"connection_limit" json:"connection_limit,computed"`
 	CreatorTaskID      types.String                                                                   `tfsdk:"creator_task_id" json:"creator_task_id,computed"`
@@ -34,7 +33,6 @@ type CloudLoadBalancerListenerDataSourceModel struct {
 	AllowedCidrs       customfield.List[types.String]                                                 `tfsdk:"allowed_cidrs" json:"allowed_cidrs,computed"`
 	InsertHeaders      customfield.Map[jsontypes.Normalized]                                          `tfsdk:"insert_headers" json:"insert_headers,computed"`
 	SniSecretID        customfield.List[types.String]                                                 `tfsdk:"sni_secret_id" json:"sni_secret_id,computed"`
-	Stats              customfield.NestedObject[CloudLoadBalancerListenerStatsDataSourceModel]        `tfsdk:"stats" json:"stats,computed"`
 	UserList           customfield.NestedObjectList[CloudLoadBalancerListenerUserListDataSourceModel] `tfsdk:"user_list" json:"user_list,computed"`
 	FindOneBy          *CloudLoadBalancerListenerFindOneByDataSourceModel                             `tfsdk:"find_one_by"`
 }
@@ -47,9 +45,6 @@ func (m *CloudLoadBalancerListenerDataSourceModel) toReadParams(_ context.Contex
 	}
 	if !m.RegionID.IsNull() {
 		params.RegionID = param.NewOpt(m.RegionID.ValueInt64())
-	}
-	if !m.ShowStats.IsNull() {
-		params.ShowStats = param.NewOpt(m.ShowStats.ValueBool())
 	}
 
 	return
@@ -70,19 +65,8 @@ func (m *CloudLoadBalancerListenerDataSourceModel) toListParams(_ context.Contex
 	if !m.FindOneBy.Name.IsNull() {
 		params.Name = param.NewOpt(m.FindOneBy.Name.ValueString())
 	}
-	if !m.ShowStats.IsNull() {
-		params.ShowStats = param.NewOpt(m.ShowStats.ValueBool())
-	}
 
 	return
-}
-
-type CloudLoadBalancerListenerStatsDataSourceModel struct {
-	ActiveConnections types.Int64 `tfsdk:"active_connections" json:"active_connections,computed"`
-	BytesIn           types.Int64 `tfsdk:"bytes_in" json:"bytes_in,computed"`
-	BytesOut          types.Int64 `tfsdk:"bytes_out" json:"bytes_out,computed"`
-	RequestErrors     types.Int64 `tfsdk:"request_errors" json:"request_errors,computed"`
-	TotalConnections  types.Int64 `tfsdk:"total_connections" json:"total_connections,computed"`
 }
 
 type CloudLoadBalancerListenerUserListDataSourceModel struct {

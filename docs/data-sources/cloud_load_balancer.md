@@ -17,7 +17,6 @@ data "gcore_cloud_load_balancer" "example_cloud_load_balancer" {
   project_id = 1
   region_id = 7
   load_balancer_id = "ac307687-31a4-4a11-a949-6bea1b2878f5"
-  show_stats = true
   with_ddos = true
 }
 ```
@@ -31,7 +30,6 @@ data "gcore_cloud_load_balancer" "example_cloud_load_balancer" {
 - `load_balancer_id` (String) Load-Balancer ID
 - `project_id` (Number) Project ID
 - `region_id` (Number) Region ID
-- `show_stats` (Boolean) Show statistics
 - `with_ddos` (Boolean) Show Advanced DDoS protection profile, if exists
 
 ### Read-Only
@@ -53,7 +51,6 @@ Available values: "L2", "L3".
 - `provisioning_status` (String) Load balancer lifecycle status
 Available values: "ACTIVE", "DELETED", "ERROR", "PENDING_CREATE", "PENDING_DELETE", "PENDING_UPDATE".
 - `region` (String) Region name
-- `stats` (Attributes) Statistics of load balancer. (see [below for nested schema](#nestedatt--stats))
 - `tags_v2` (Attributes List) List of key-value tags associated with the resource. A tag is a key-value pair that can be associated with a resource, enabling efficient filtering and grouping for better organization and management. Some tags are read-only and cannot be modified by the user. Tags are also integrated with cost reports, allowing cost data to be filtered based on tag keys or values. (see [below for nested schema](#nestedatt--tags_v2))
 - `updated_at` (String) Datetime when the load balancer was last updated
 - `vip_address` (String) Load balancer IP address
@@ -157,18 +154,6 @@ Read-Only:
 
 - `period` (Number) Duration of days for which logs must be kept.
 
-
-
-<a id="nestedatt--stats"></a>
-### Nested Schema for `stats`
-
-Read-Only:
-
-- `active_connections` (Number) Currently active connections
-- `bytes_in` (Number) Total bytes received
-- `bytes_out` (Number) Total bytes sent
-- `request_errors` (Number) Total requests that were unable to be fulfilled
-- `total_connections` (Number) Total connections handled
 
 
 <a id="nestedatt--tags_v2"></a>

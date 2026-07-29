@@ -98,7 +98,6 @@ Available values: "DEGRADED", "DRAINING", "ERROR", "NO_MONITOR", "OFFLINE", "ONL
 - `pool_count` (Number) Number of pools (for UI)
 - `provisioning_status` (String) Listener lifecycle status
 Available values: "ACTIVE", "DELETED", "ERROR", "PENDING_CREATE", "PENDING_DELETE", "PENDING_UPDATE".
-- `stats` (Attributes) Statistics of the load balancer. It is available only in get functions by a flag. (see [below for nested schema](#nestedatt--stats))
 
 <a id="nestedatt--user_list"></a>
 ### Nested Schema for `user_list`
@@ -107,18 +106,6 @@ Required:
 
 - `encrypted_password` (String) Encrypted password to auth via Basic Authentication
 - `username` (String) Username to auth via Basic Authentication
-
-
-<a id="nestedatt--stats"></a>
-### Nested Schema for `stats`
-
-Read-Only:
-
-- `active_connections` (Number) Currently active connections
-- `bytes_in` (Number) Total bytes received
-- `bytes_out` (Number) Total bytes sent
-- `request_errors` (Number) Total requests that were unable to be fulfilled
-- `total_connections` (Number) Total connections handled
 
 
 ## Import

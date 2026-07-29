@@ -37,11 +37,6 @@ func ListDataSourceSchema(ctx context.Context) schema.Schema {
 				Description: "Filter by name",
 				Optional:    true,
 			},
-			"show_stats": schema.BoolAttribute{
-				Description: "Show stats",
-				Computed:    true,
-				Optional:    true,
-			},
 			"max_items": schema.Int64Attribute{
 				Description: "Max items to fetch, default: 1000",
 				Optional:    true,
@@ -156,33 +151,6 @@ func ListDataSourceSchema(ctx context.Context) schema.Schema {
 							Computed:    true,
 							CustomType:  customfield.NewListType[types.String](ctx),
 							ElementType: types.StringType,
-						},
-						"stats": schema.SingleNestedAttribute{
-							Description: "Statistics of the load balancer. It is available only in get functions by a flag.",
-							Computed:    true,
-							CustomType:  customfield.NewNestedObjectType[CloudLoadBalancerListenersStatsDataSourceModel](ctx),
-							Attributes: map[string]schema.Attribute{
-								"active_connections": schema.Int64Attribute{
-									Description: "Currently active connections",
-									Computed:    true,
-								},
-								"bytes_in": schema.Int64Attribute{
-									Description: "Total bytes received",
-									Computed:    true,
-								},
-								"bytes_out": schema.Int64Attribute{
-									Description: "Total bytes sent",
-									Computed:    true,
-								},
-								"request_errors": schema.Int64Attribute{
-									Description: "Total requests that were unable to be fulfilled",
-									Computed:    true,
-								},
-								"total_connections": schema.Int64Attribute{
-									Description: "Total connections handled",
-									Computed:    true,
-								},
-							},
 						},
 						"task_id": schema.StringAttribute{
 							Description: "The UUID of the active task that currently holds a lock on the resource. This lock prevents concurrent modifications to ensure consistency. If `null`, the resource is not locked.",

@@ -39,11 +39,6 @@ func DataSourceSchema(ctx context.Context) schema.Schema {
 				Description: "Region ID",
 				Optional:    true,
 			},
-			"show_stats": schema.BoolAttribute{
-				Description: "Show stats",
-				Computed:    true,
-				Optional:    true,
-			},
 			"admin_state_up": schema.BoolAttribute{
 				Description: "Administrative state of the resource. When set to true, the resource is enabled and operational. When set to false, the resource is disabled and will not process traffic. Defaults to true.",
 				Computed:    true,
@@ -148,33 +143,6 @@ func DataSourceSchema(ctx context.Context) schema.Schema {
 				Computed:    true,
 				CustomType:  customfield.NewListType[types.String](ctx),
 				ElementType: types.StringType,
-			},
-			"stats": schema.SingleNestedAttribute{
-				Description: "Statistics of the load balancer. It is available only in get functions by a flag.",
-				Computed:    true,
-				CustomType:  customfield.NewNestedObjectType[CloudLoadBalancerListenerStatsDataSourceModel](ctx),
-				Attributes: map[string]schema.Attribute{
-					"active_connections": schema.Int64Attribute{
-						Description: "Currently active connections",
-						Computed:    true,
-					},
-					"bytes_in": schema.Int64Attribute{
-						Description: "Total bytes received",
-						Computed:    true,
-					},
-					"bytes_out": schema.Int64Attribute{
-						Description: "Total bytes sent",
-						Computed:    true,
-					},
-					"request_errors": schema.Int64Attribute{
-						Description: "Total requests that were unable to be fulfilled",
-						Computed:    true,
-					},
-					"total_connections": schema.Int64Attribute{
-						Description: "Total connections handled",
-						Computed:    true,
-					},
-				},
 			},
 			"user_list": schema.ListNestedAttribute{
 				Description: "Load balancer listener users list",

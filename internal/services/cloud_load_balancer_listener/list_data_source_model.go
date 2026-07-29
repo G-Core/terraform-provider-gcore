@@ -22,7 +22,6 @@ type CloudLoadBalancerListenersDataSourceModel struct {
 	RegionID       types.Int64                                                                  `tfsdk:"region_id" path:"region_id,optional"`
 	LoadBalancerID types.String                                                                 `tfsdk:"load_balancer_id" query:"load_balancer_id,optional"`
 	Name           types.String                                                                 `tfsdk:"name" query:"name,optional"`
-	ShowStats      types.Bool                                                                   `tfsdk:"show_stats" query:"show_stats,computed_optional"`
 	MaxItems       types.Int64                                                                  `tfsdk:"max_items"`
 	Items          customfield.NestedObjectList[CloudLoadBalancerListenersItemsDataSourceModel] `tfsdk:"items"`
 }
@@ -41,9 +40,6 @@ func (m *CloudLoadBalancerListenersDataSourceModel) toListParams(_ context.Conte
 	}
 	if !m.Name.IsNull() {
 		params.Name = param.NewOpt(m.Name.ValueString())
-	}
-	if !m.ShowStats.IsNull() {
-		params.ShowStats = param.NewOpt(m.ShowStats.ValueBool())
 	}
 
 	return
@@ -65,20 +61,11 @@ type CloudLoadBalancerListenersItemsDataSourceModel struct {
 	ProvisioningStatus   types.String                                                                    `tfsdk:"provisioning_status" json:"provisioning_status,computed"`
 	SecretID             types.String                                                                    `tfsdk:"secret_id" json:"secret_id,computed"`
 	SniSecretID          customfield.List[types.String]                                                  `tfsdk:"sni_secret_id" json:"sni_secret_id,computed"`
-	Stats                customfield.NestedObject[CloudLoadBalancerListenersStatsDataSourceModel]        `tfsdk:"stats" json:"stats,computed"`
 	TaskID               types.String                                                                    `tfsdk:"task_id" json:"task_id,computed"`
 	TimeoutClientData    types.Int64                                                                     `tfsdk:"timeout_client_data" json:"timeout_client_data,computed"`
 	TimeoutMemberConnect types.Int64                                                                     `tfsdk:"timeout_member_connect" json:"timeout_member_connect,computed"`
 	TimeoutMemberData    types.Int64                                                                     `tfsdk:"timeout_member_data" json:"timeout_member_data,computed"`
 	UserList             customfield.NestedObjectList[CloudLoadBalancerListenersUserListDataSourceModel] `tfsdk:"user_list" json:"user_list,computed"`
-}
-
-type CloudLoadBalancerListenersStatsDataSourceModel struct {
-	ActiveConnections types.Int64 `tfsdk:"active_connections" json:"active_connections,computed"`
-	BytesIn           types.Int64 `tfsdk:"bytes_in" json:"bytes_in,computed"`
-	BytesOut          types.Int64 `tfsdk:"bytes_out" json:"bytes_out,computed"`
-	RequestErrors     types.Int64 `tfsdk:"request_errors" json:"request_errors,computed"`
-	TotalConnections  types.Int64 `tfsdk:"total_connections" json:"total_connections,computed"`
 }
 
 type CloudLoadBalancerListenersUserListDataSourceModel struct {

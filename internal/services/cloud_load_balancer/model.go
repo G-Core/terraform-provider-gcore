@@ -36,7 +36,6 @@ type CloudLoadBalancerModel struct {
 	AdditionalVips        customfield.NestedObjectList[CloudLoadBalancerAdditionalVipsModel] `tfsdk:"additional_vips" json:"additional_vips,computed"`
 	DDOSProfile           customfield.NestedObject[CloudLoadBalancerDDOSProfileModel]        `tfsdk:"ddos_profile" json:"ddos_profile,computed"`
 	FloatingIPs           customfield.NestedObjectList[CloudLoadBalancerFloatingIPsModel]    `tfsdk:"floating_ips" json:"floating_ips,computed"`
-	Stats                 customfield.NestedObject[CloudLoadBalancerStatsModel]              `tfsdk:"stats" json:"stats,computed"`
 	TagsV2                customfield.NestedObjectList[CloudLoadBalancerTagsV2Model]         `tfsdk:"tags_v2" json:"tags_v2,computed"`
 	VrrpIPs               customfield.NestedObjectList[CloudLoadBalancerVrrpIPsModel]        `tfsdk:"vrrp_ips" json:"vrrp_ips,computed"`
 }
@@ -145,14 +144,6 @@ type CloudLoadBalancerFloatingIPsTagsModel struct {
 	Key      types.String `tfsdk:"key" json:"key,computed"`
 	ReadOnly types.Bool   `tfsdk:"read_only" json:"read_only,computed"`
 	Value    types.String `tfsdk:"value" json:"value,computed"`
-}
-
-type CloudLoadBalancerStatsModel struct {
-	ActiveConnections types.Int64 `tfsdk:"active_connections" json:"active_connections,computed"`
-	BytesIn           types.Int64 `tfsdk:"bytes_in" json:"bytes_in,computed"`
-	BytesOut          types.Int64 `tfsdk:"bytes_out" json:"bytes_out,computed"`
-	RequestErrors     types.Int64 `tfsdk:"request_errors" json:"request_errors,computed"`
-	TotalConnections  types.Int64 `tfsdk:"total_connections" json:"total_connections,computed"`
 }
 
 type CloudLoadBalancerTagsV2Model struct {

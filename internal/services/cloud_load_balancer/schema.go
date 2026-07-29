@@ -493,34 +493,6 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 				},
 				PlanModifiers: []planmodifier.List{listplanmodifier.UseStateForUnknown()},
 			},
-			"stats": schema.SingleNestedAttribute{
-				Description: "Statistics of load balancer.",
-				Computed:    true,
-				CustomType:  customfield.NewNestedObjectType[CloudLoadBalancerStatsModel](ctx),
-				Attributes: map[string]schema.Attribute{
-					"active_connections": schema.Int64Attribute{
-						Description: "Currently active connections",
-						Computed:    true,
-					},
-					"bytes_in": schema.Int64Attribute{
-						Description: "Total bytes received",
-						Computed:    true,
-					},
-					"bytes_out": schema.Int64Attribute{
-						Description: "Total bytes sent",
-						Computed:    true,
-					},
-					"request_errors": schema.Int64Attribute{
-						Description: "Total requests that were unable to be fulfilled",
-						Computed:    true,
-					},
-					"total_connections": schema.Int64Attribute{
-						Description: "Total connections handled",
-						Computed:    true,
-					},
-				},
-				PlanModifiers: []planmodifier.Object{objectplanmodifier.UseStateForUnknown()},
-			},
 			"tags_v2": schema.ListNestedAttribute{
 				Description: "List of key-value tags associated with the resource. A tag is a key-value pair that can be associated with a resource, enabling efficient filtering and grouping for better organization and management. Some tags are read-only and cannot be modified by the user. Tags are also integrated with cost reports, allowing cost data to be filtered based on tag keys or values.",
 				Computed:    true,

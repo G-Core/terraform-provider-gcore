@@ -15,7 +15,6 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/int64default"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/int64planmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/listplanmodifier"
-	"github.com/hashicorp/terraform-plugin-framework/resource/schema/objectplanmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringplanmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
@@ -203,36 +202,6 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 				CustomType:  jsontypes.NormalizedType{},
 				PlanModifiers: []planmodifier.String{
 					stringplanmodifier.UseStateForUnknown(),
-				},
-			},
-			"stats": schema.SingleNestedAttribute{
-				Description: "Statistics of the load balancer. It is available only in get functions by a flag.",
-				Computed:    true,
-				CustomType:  customfield.NewNestedObjectType[CloudLoadBalancerListenerStatsModel](ctx),
-				PlanModifiers: []planmodifier.Object{
-					objectplanmodifier.UseStateForUnknown(),
-				},
-				Attributes: map[string]schema.Attribute{
-					"active_connections": schema.Int64Attribute{
-						Description: "Currently active connections",
-						Computed:    true,
-					},
-					"bytes_in": schema.Int64Attribute{
-						Description: "Total bytes received",
-						Computed:    true,
-					},
-					"bytes_out": schema.Int64Attribute{
-						Description: "Total bytes sent",
-						Computed:    true,
-					},
-					"request_errors": schema.Int64Attribute{
-						Description: "Total requests that were unable to be fulfilled",
-						Computed:    true,
-					},
-					"total_connections": schema.Int64Attribute{
-						Description: "Total connections handled",
-						Computed:    true,
-					},
 				},
 			},
 		},

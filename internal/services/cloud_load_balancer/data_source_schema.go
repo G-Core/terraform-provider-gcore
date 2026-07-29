@@ -39,11 +39,6 @@ func DataSourceSchema(ctx context.Context) schema.Schema {
 				Description: "Region ID",
 				Optional:    true,
 			},
-			"show_stats": schema.BoolAttribute{
-				Description: "Show statistics",
-				Computed:    true,
-				Optional:    true,
-			},
 			"with_ddos": schema.BoolAttribute{
 				Description: "Show Advanced DDoS protection profile, if exists",
 				Computed:    true,
@@ -303,33 +298,6 @@ func DataSourceSchema(ctx context.Context) schema.Schema {
 								},
 							},
 						},
-					},
-				},
-			},
-			"stats": schema.SingleNestedAttribute{
-				Description: "Statistics of load balancer.",
-				Computed:    true,
-				CustomType:  customfield.NewNestedObjectType[CloudLoadBalancerStatsDataSourceModel](ctx),
-				Attributes: map[string]schema.Attribute{
-					"active_connections": schema.Int64Attribute{
-						Description: "Currently active connections",
-						Computed:    true,
-					},
-					"bytes_in": schema.Int64Attribute{
-						Description: "Total bytes received",
-						Computed:    true,
-					},
-					"bytes_out": schema.Int64Attribute{
-						Description: "Total bytes sent",
-						Computed:    true,
-					},
-					"request_errors": schema.Int64Attribute{
-						Description: "Total requests that were unable to be fulfilled",
-						Computed:    true,
-					},
-					"total_connections": schema.Int64Attribute{
-						Description: "Total connections handled",
-						Computed:    true,
 					},
 				},
 			},

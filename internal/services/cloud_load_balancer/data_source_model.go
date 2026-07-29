@@ -18,7 +18,6 @@ type CloudLoadBalancerDataSourceModel struct {
 	LoadBalancerID        types.String                                                                 `tfsdk:"load_balancer_id" path:"load_balancer_id,optional"`
 	ProjectID             types.Int64                                                                  `tfsdk:"project_id" path:"project_id,optional"`
 	RegionID              types.Int64                                                                  `tfsdk:"region_id" path:"region_id,optional"`
-	ShowStats             types.Bool                                                                   `tfsdk:"show_stats" query:"show_stats,computed_optional"`
 	WithDDOS              types.Bool                                                                   `tfsdk:"with_ddos" query:"with_ddos,computed_optional"`
 	AdminStateUp          types.Bool                                                                   `tfsdk:"admin_state_up" json:"admin_state_up,computed"`
 	CreatedAt             timetypes.RFC3339                                                            `tfsdk:"created_at" json:"created_at,computed" format:"date-time"`
@@ -38,7 +37,6 @@ type CloudLoadBalancerDataSourceModel struct {
 	FloatingIPs           customfield.NestedObjectList[CloudLoadBalancerFloatingIPsDataSourceModel]    `tfsdk:"floating_ips" json:"floating_ips,computed"`
 	Listeners             customfield.NestedObjectList[CloudLoadBalancerListenersDataSourceModel]      `tfsdk:"listeners" json:"listeners,computed"`
 	Logging               customfield.NestedObject[CloudLoadBalancerLoggingDataSourceModel]            `tfsdk:"logging" json:"logging,computed"`
-	Stats                 customfield.NestedObject[CloudLoadBalancerStatsDataSourceModel]              `tfsdk:"stats" json:"stats,computed"`
 	TagsV2                customfield.NestedObjectList[CloudLoadBalancerTagsV2DataSourceModel]         `tfsdk:"tags_v2" json:"tags_v2,computed"`
 	VrrpIPs               customfield.NestedObjectList[CloudLoadBalancerVrrpIPsDataSourceModel]        `tfsdk:"vrrp_ips" json:"vrrp_ips,computed"`
 	FindOneBy             *CloudLoadBalancerFindOneByDataSourceModel                                   `tfsdk:"find_one_by"`
@@ -52,9 +50,6 @@ func (m *CloudLoadBalancerDataSourceModel) toReadParams(_ context.Context) (para
 	}
 	if !m.RegionID.IsNull() {
 		params.RegionID = param.NewOpt(m.RegionID.ValueInt64())
-	}
-	if !m.ShowStats.IsNull() {
-		params.ShowStats = param.NewOpt(m.ShowStats.ValueBool())
 	}
 	if !m.WithDDOS.IsNull() {
 		params.WithDDOS = param.NewOpt(m.WithDDOS.ValueBool())
@@ -98,9 +93,6 @@ func (m *CloudLoadBalancerDataSourceModel) toListParams(_ context.Context) (para
 	}
 	if !m.FindOneBy.ProvisioningStatus.IsNull() {
 		params.ProvisioningStatus = cloud.ProvisioningStatus(m.FindOneBy.ProvisioningStatus.ValueString())
-	}
-	if !m.ShowStats.IsNull() {
-		params.ShowStats = param.NewOpt(m.ShowStats.ValueBool())
 	}
 	if !m.FindOneBy.TagKeyValue.IsNull() {
 		params.TagKeyValue = param.NewOpt(m.FindOneBy.TagKeyValue.ValueString())
@@ -159,14 +151,6 @@ type CloudLoadBalancerLoggingDataSourceModel struct {
 
 type CloudLoadBalancerLoggingRetentionPolicyDataSourceModel struct {
 	Period types.Int64 `tfsdk:"period" json:"period,computed"`
-}
-
-type CloudLoadBalancerStatsDataSourceModel struct {
-	ActiveConnections types.Int64 `tfsdk:"active_connections" json:"active_connections,computed"`
-	BytesIn           types.Int64 `tfsdk:"bytes_in" json:"bytes_in,computed"`
-	BytesOut          types.Int64 `tfsdk:"bytes_out" json:"bytes_out,computed"`
-	RequestErrors     types.Int64 `tfsdk:"request_errors" json:"request_errors,computed"`
-	TotalConnections  types.Int64 `tfsdk:"total_connections" json:"total_connections,computed"`
 }
 
 type CloudLoadBalancerTagsV2DataSourceModel struct {
