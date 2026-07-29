@@ -118,6 +118,11 @@ func TestAccCDNLogsUploaderPolicy_full(t *testing.T) {
 							knownvalue.StringExact("status"),
 						})),
 					statecheck.ExpectKnownValue("gcore_cdn_logs_uploader_policy.test",
+						tfjsonpath.New("field_remap"), knownvalue.MapExact(map[string]knownvalue.Check{
+							"remote_addr": knownvalue.StringExact("client_ip"),
+							"status":      knownvalue.StringExact("status_code"),
+						})),
+					statecheck.ExpectKnownValue("gcore_cdn_logs_uploader_policy.test",
 						tfjsonpath.New("tags"), knownvalue.MapExact(map[string]knownvalue.Check{
 							"env": knownvalue.StringExact("test"),
 						})),
@@ -171,6 +176,11 @@ func TestAccCDNLogsUploaderPolicy_update(t *testing.T) {
 						tfjsonpath.New("tags"), knownvalue.MapExact(map[string]knownvalue.Check{
 							"env": knownvalue.StringExact("test"),
 						})),
+					statecheck.ExpectKnownValue("gcore_cdn_logs_uploader_policy.test",
+						tfjsonpath.New("field_remap"), knownvalue.MapExact(map[string]knownvalue.Check{
+							"remote_addr": knownvalue.StringExact("client_ip"),
+							"status":      knownvalue.StringExact("status_code"),
+						})),
 					compareIDSame.AddStateValue(
 						"gcore_cdn_logs_uploader_policy.test",
 						tfjsonpath.New("id"),
@@ -202,6 +212,10 @@ func TestAccCDNLogsUploaderPolicy_update(t *testing.T) {
 							knownvalue.StringExact("status"),
 							knownvalue.StringExact("request_uri"),
 						})),
+					statecheck.ExpectKnownValue("gcore_cdn_logs_uploader_policy.test",
+						tfjsonpath.New("field_remap"), knownvalue.MapExact(map[string]knownvalue.Check{
+							"request_uri": knownvalue.StringExact("path"),
+						})),
 					// ID should not change — in-place update
 					compareIDSame.AddStateValue(
 						"gcore_cdn_logs_uploader_policy.test",
@@ -232,6 +246,8 @@ func TestAccCDNLogsUploaderPolicy_update(t *testing.T) {
 						tfjsonpath.New("log_sample_rate"), knownvalue.Float64Exact(1)),
 					statecheck.ExpectKnownValue("gcore_cdn_logs_uploader_policy.test",
 						tfjsonpath.New("rotate_threshold_mb"), knownvalue.Null()),
+					statecheck.ExpectKnownValue("gcore_cdn_logs_uploader_policy.test",
+						tfjsonpath.New("field_remap"), knownvalue.Null()),
 					// ID should not change
 					compareIDSame.AddStateValue(
 						"gcore_cdn_logs_uploader_policy.test",
@@ -304,6 +320,10 @@ resource "gcore_cdn_logs_uploader_policy" "test" {
   description              = "acctest policy"
   format_type              = "json"
   fields                   = ["remote_addr", "status"]
+  field_remap = {
+    remote_addr = "client_ip"
+    status      = "status_code"
+  }
   field_delimiter          = ","
   field_separator          = "|"
   include_shield_logs      = true
@@ -328,6 +348,9 @@ resource "gcore_cdn_logs_uploader_policy" "test" {
   name                     = %[1]q
   description              = "updated description"
   fields                   = ["remote_addr", "status", "request_uri"]
+  field_remap = {
+    request_uri = "path"
+  }
   field_delimiter          = ";"
   field_separator          = "|"
   include_shield_logs      = true

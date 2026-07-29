@@ -45,22 +45,34 @@ func (m CDNLogsUploaderPolicyModel) MarshalJSON() (data []byte, err error) {
 
 func (m CDNLogsUploaderPolicyModel) MarshalJSONForUpdate(state CDNLogsUploaderPolicyModel) (data []byte, err error) {
 	planTags := m.Tags
-	// Prevent MarshalForPatch from patching tags key-by-key (which sends null
-	// for removed keys). We'll inject the full tags value below instead.
+	planFieldRemap := m.FieldRemap
+	// Prevent MarshalForPatch from patching maps key-by-key (which sends null
+	// for removed keys). We'll inject the full map values below instead.
 	m.Tags = state.Tags
+	m.FieldRemap = state.FieldRemap
 	result, err := apijson.MarshalForPatch(m, state)
 	if err != nil {
 		return nil, err
 	}
 	if !reflect.DeepEqual(planTags, state.Tags) {
-		tags := map[string]string{}
-		if planTags != nil {
-			for k, v := range *planTags {
-				tags[k] = v.ValueString()
-			}
-		}
-		tagsJSON, _ := json.Marshal(tags)
-		result, _ = sjson.SetRawBytes(result, "tags", tagsJSON)
+		result = setFullMap(result, "tags", planTags)
+	}
+	if !reflect.DeepEqual(planFieldRemap, state.FieldRemap) {
+		result = setFullMap(result, "field_remap", planFieldRemap)
 	}
 	return result, nil
+}
+
+// setFullMap injects a complete map into a patch because the CDN API rejects
+// null map values from key-by-key diffs and expects full-map replacement.
+func setFullMap(result []byte, key string, plan *map[string]types.String) []byte {
+	full := map[string]string{}
+	if plan != nil {
+		for k, v := range *plan {
+			full[k] = v.ValueString()
+		}
+	}
+	raw, _ := json.Marshal(full)
+	result, _ = sjson.SetRawBytes(result, key, raw)
+	return result
 }
