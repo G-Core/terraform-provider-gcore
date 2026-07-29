@@ -18,9 +18,6 @@ resource "gcore_cdn_logs_uploader_policy" "example_cdn_logs_uploader_policy" {
   description = "New policy"
   escape_special_characters = true
   field_delimiter = ","
-  field_remap = {
-
-  }
   field_separator = ";"
   fields = ["remote_addr", "status"]
   file_name_template = "{{YYYY}}_{{MM}}_{{DD}}_{{HH}}_{{mm}}_{{ss}}_access.log.gz"
@@ -55,9 +52,8 @@ The following categories of characters are escaped:
 
 The resulting output contains only printable ASCII characters.
 - `field_delimiter` (String) Field delimiter for logs.
-- `field_remap` (Map of String) Per-field output-name remap for exported logs. Maps a canonical Gcore field name (from `/cdn/logs_uploader/policies/fields`, and must be present in `fields`) to the field name it should have in the exported logs. Unmapped fields keep their canonical name. Output names (after remapping) must be unique.
 - `field_separator` (String) Field separator for logs.
-- `fields` (List of String) List of fields to include in logs. Duplicate names are allowed for plain text output, but rejected when `format_type` is `json` or a `field_remap` is set (each field becomes a distinct output key).
+- `fields` (List of String) List of fields to include in logs.
 - `file_name_template` (String) Template for log file name.
 - `format_type` (String) Format type for logs.
 
