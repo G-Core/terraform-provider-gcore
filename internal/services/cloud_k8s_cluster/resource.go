@@ -157,11 +157,18 @@ func (r *CloudK8SClusterResource) Update(ctx context.Context, req resource.Updat
 			return
 		}
 		bytes, _ := io.ReadAll(res.Body)
+		// Preserve the planned pools across this decode: UnmarshalComputed
+		// fills unknown computed values by list index, so an API response
+		// with a different pool order would leak values across pools and
+		// corrupt the pool operations below. Pools are authoritatively
+		// refreshed (order-safely) at the end of Update.
+		planPools := data.Pools
 		err = apijson.UnmarshalComputed(bytes, &data)
 		if err != nil {
 			resp.Diagnostics.AddError("failed to deserialize http request", err.Error())
 			return
 		}
+		data.Pools = planPools
 		data.ID = data.Name
 		data.FilterServerManagedLabels(ctx)
 		stateHasChanged = true
@@ -202,11 +209,15 @@ func (r *CloudK8SClusterResource) Update(ctx context.Context, req resource.Updat
 			return
 		}
 		bytes, _ := io.ReadAll(res.Body)
+		// Preserve planned pools across this decode (see comment in the
+		// upgrade block above).
+		planPools := data.Pools
 		err = apijson.UnmarshalComputed(bytes, &data)
 		if err != nil {
 			resp.Diagnostics.AddError("failed to deserialize http request", err.Error())
 			return
 		}
+		data.Pools = planPools
 		data.ID = data.Name
 		stateHasChanged = true
 	}
@@ -324,6 +335,13 @@ func (r *CloudK8SClusterResource) Update(ctx context.Context, req resource.Updat
 			return
 		}
 		bytes, _ := io.ReadAll(res.Body)
+		// Clear pools before decoding: apijson merges list elements by index
+		// against the existing (plan) values, so if the API returns pools in
+		// a different order than the plan, values from one pool would leak
+		// into another (e.g. leftover taints/labels map keys). Decoding into
+		// an empty list takes the pools verbatim from the API response; the
+		// name-based reorder below restores the planned order.
+		data.Pools = nil
 		err = apijson.Unmarshal(bytes, &data)
 		if err != nil {
 			resp.Diagnostics.AddError("failed to deserialize cluster state", err.Error())
@@ -378,11 +396,18 @@ func (r *CloudK8SClusterResource) Read(ctx context.Context, req resource.ReadReq
 		return
 	}
 	bytes, _ := io.ReadAll(res.Body)
+	// Clear pools before decoding to avoid index-based merging of pool
+	// values when the API returns pools in a different order than state
+	// (see the same handling in Update). The prior state order is restored
+	// by name afterwards so refresh doesn't produce spurious order drift.
+	statePoolOrder := getPoolOrder(data.Pools)
+	data.Pools = nil
 	err = apijson.Unmarshal(bytes, &data)
 	if err != nil {
 		resp.Diagnostics.AddError("failed to deserialize http request", err.Error())
 		return
 	}
+	data.Pools = reorderPoolsToMatch(data.Pools, statePoolOrder)
 	data.ID = data.Name
 	data.FilterServerManagedLabels(ctx)
 
@@ -476,6 +501,17 @@ func (r *CloudK8SClusterResource) ModifyPlan(_ context.Context, _ resource.Modif
 
 }
 
+// poolMinNodeCount returns the pool's min_node_count, defaulting to 1 when
+// the value is null or unknown. min_node_count is computed_optional: when
+// omitted in config it is unknown in the plan, and ValueInt64() would yield
+// 0, which violates the API minimum of 1.
+func poolMinNodeCount(pool *CloudK8SClusterPoolsModel) int64 {
+	if !pool.MinNodeCount.IsNull() && !pool.MinNodeCount.IsUnknown() {
+		return pool.MinNodeCount.ValueInt64()
+	}
+	return 1
+}
+
 // createPool creates a new pool in the cluster and waits for completion
 func createPool(ctx context.Context, client *gcore.Client, clusterName string, projectID, regionID param.Opt[int64], pool *CloudK8SClusterPoolsModel) error {
 	params := cloud.K8SClusterPoolNewParams{
@@ -483,7 +519,7 @@ func createPool(ctx context.Context, client *gcore.Client, clusterName string, p
 		RegionID:     regionID,
 		Name:         pool.Name.ValueString(),
 		FlavorID:     pool.FlavorID.ValueString(),
-		MinNodeCount: pool.MinNodeCount.ValueInt64(),
+		MinNodeCount: poolMinNodeCount(pool),
 	}
 
 	if !pool.MaxNodeCount.IsNull() && !pool.MaxNodeCount.IsUnknown() {
@@ -760,13 +796,19 @@ func checkPoolQuotaLimits(ctx context.Context, client *gcore.Client, projectID, 
 		if !exists || poolNeedsReplace(oldPool, newPool) {
 			// New pool or pool replacement - check full quota
 			params = cloud.K8SClusterPoolCheckQuotaParams{
-				ProjectID:      projectID,
-				RegionID:       regionID,
-				FlavorID:       newPool.FlavorID.ValueString(),
-				Name:           param.NewOpt(newPool.Name.ValueString()),
-				MinNodeCount:   param.NewOpt(newPool.MinNodeCount.ValueInt64()),
-				MaxNodeCount:   param.NewOpt(newPool.MaxNodeCount.ValueInt64()),
-				BootVolumeSize: param.NewOpt(newPool.BootVolumeSize.ValueInt64()),
+				ProjectID:    projectID,
+				RegionID:     regionID,
+				FlavorID:     newPool.FlavorID.ValueString(),
+				Name:         param.NewOpt(newPool.Name.ValueString()),
+				MinNodeCount: param.NewOpt(poolMinNodeCount(newPool)),
+			}
+			// Computed_optional attributes may be unknown for new pools when
+			// omitted from config; only send them when known.
+			if !newPool.MaxNodeCount.IsNull() && !newPool.MaxNodeCount.IsUnknown() {
+				params.MaxNodeCount = param.NewOpt(newPool.MaxNodeCount.ValueInt64())
+			}
+			if !newPool.BootVolumeSize.IsNull() && !newPool.BootVolumeSize.IsUnknown() {
+				params.BootVolumeSize = param.NewOpt(newPool.BootVolumeSize.ValueInt64())
 			}
 			if !newPool.ServergroupPolicy.IsNull() && !newPool.ServergroupPolicy.IsUnknown() {
 				params.ServergroupPolicy = cloud.K8SClusterPoolCheckQuotaParamsServergroupPolicy(newPool.ServergroupPolicy.ValueString())

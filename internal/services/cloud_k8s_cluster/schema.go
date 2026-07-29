@@ -12,6 +12,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework-validators/listvalidator"
 	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
 	"github.com/hashicorp/terraform-plugin-framework/attr"
+	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
@@ -28,6 +29,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-framework/types/basetypes"
+	"github.com/hashicorp/terraform-plugin-go/tftypes"
 )
 
 var _ resource.ResourceWithConfigValidators = (*CloudK8SClusterResource)(nil)
@@ -120,12 +122,11 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 							},
 						},
 						"crio_config": schema.MapAttribute{
-							Description:   "Cri-o configuration for pool nodes",
-							Computed:      true,
-							Optional:      true,
-							CustomType:    customfield.NewMapType[types.String](ctx),
-							ElementType:   types.StringType,
-							PlanModifiers: []planmodifier.Map{mapplanmodifier.UseStateForUnknown()},
+							Description: "Cri-o configuration for pool nodes",
+							Computed:    true,
+							Optional:    true,
+							CustomType:  customfield.NewMapType[types.String](ctx),
+							ElementType: types.StringType,
 						},
 						"is_public_ipv4": schema.BoolAttribute{
 							Description: "Enable public v4 address",
@@ -134,20 +135,18 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 							Default:     booldefault.StaticBool(false),
 						},
 						"kubelet_config": schema.MapAttribute{
-							Description:   "Kubelet configuration for pool nodes",
-							Computed:      true,
-							Optional:      true,
-							CustomType:    customfield.NewMapType[types.String](ctx),
-							ElementType:   types.StringType,
-							PlanModifiers: []planmodifier.Map{mapplanmodifier.UseStateForUnknown()},
+							Description: "Kubelet configuration for pool nodes",
+							Computed:    true,
+							Optional:    true,
+							CustomType:  customfield.NewMapType[types.String](ctx),
+							ElementType: types.StringType,
 						},
 						"labels": schema.MapAttribute{
-							Description:   "Labels applied to the cluster pool",
-							Computed:      true,
-							Optional:      true,
-							CustomType:    customfield.NewMapType[types.String](ctx),
-							ElementType:   types.StringType,
-							PlanModifiers: []planmodifier.Map{mapplanmodifier.UseStateForUnknown()},
+							Description: "Labels applied to the cluster pool",
+							Computed:    true,
+							Optional:    true,
+							CustomType:  customfield.NewMapType[types.String](ctx),
+							ElementType: types.StringType,
 						},
 						"max_node_count": schema.Int64Attribute{
 							Description: "Maximum node count",
@@ -158,12 +157,11 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 							},
 						},
 						"security_group_ids": schema.ListAttribute{
-							Description:   "Security group IDs applied to the cluster pool nodes",
-							Computed:      true,
-							Optional:      true,
-							CustomType:    customfield.NewListType[types.String](ctx),
-							ElementType:   types.StringType,
-							PlanModifiers: []planmodifier.List{listplanmodifier.UseStateForUnknown()},
+							Description: "Security group IDs applied to the cluster pool nodes",
+							Computed:    true,
+							Optional:    true,
+							CustomType:  customfield.NewListType[types.String](ctx),
+							ElementType: types.StringType,
 						},
 						"servergroup_policy": schema.StringAttribute{
 							Description: "Server group policy: anti-affinity, soft-anti-affinity or affinity\nAvailable values: \"affinity\", \"anti-affinity\", \"soft-anti-affinity\".",
@@ -177,12 +175,11 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 							},
 						},
 						"taints": schema.MapAttribute{
-							Description:   "Taints applied to the cluster pool",
-							Computed:      true,
-							Optional:      true,
-							CustomType:    customfield.NewMapType[types.String](ctx),
-							ElementType:   types.StringType,
-							PlanModifiers: []planmodifier.Map{mapplanmodifier.UseStateForUnknown()},
+							Description: "Taints applied to the cluster pool",
+							Computed:    true,
+							Optional:    true,
+							CustomType:  customfield.NewMapType[types.String](ctx),
+							ElementType: types.StringType,
 						},
 					},
 				},
@@ -889,9 +886,10 @@ func (v *poolFlavorValidator) ValidateResource(ctx context.Context, req resource
 	}
 }
 
-// poolsNormalizeOrderPlanModifier reorders plan pools to match state order
-// (correlating by name) so that list index correlation works correctly.
-// New pools are appended at the end.
+// poolsNormalizeOrderPlanModifier normalizes the planned pools list: config
+// order is always preserved, and computed_optional pool attributes are
+// correlated by pool NAME (not list index) — copied from the matching state
+// pool when unset in config, or marked unknown for brand-new pools.
 func poolsNormalizeOrderPlanModifier() planmodifier.List {
 	return poolsNormalizeOrderModifier{}
 }
@@ -899,15 +897,36 @@ func poolsNormalizeOrderPlanModifier() planmodifier.List {
 type poolsNormalizeOrderModifier struct{}
 
 func (m poolsNormalizeOrderModifier) Description(_ context.Context) string {
-	return "Reorders plan pools to match state order (by name) for stable diffs"
+	return "Correlates pool computed attributes by name (preserving config order) for stable diffs"
 }
 
 func (m poolsNormalizeOrderModifier) MarkdownDescription(_ context.Context) string {
-	return "Reorders plan pools to match state order (by name) for stable diffs"
+	return "Correlates pool computed attributes by name (preserving config order) for stable diffs"
+}
+
+// poolComputedOptionalAttrs lists pool attributes that are Computed+Optional.
+// For these, when the practitioner leaves them unset in config, the planned
+// value must be correlated by pool NAME (not list index): copied from the
+// matching state pool, or marked unknown for brand-new pools. Without this,
+// inserting a pool mid-list shifts indices and the framework's index-based
+// correlation produces plan values that don't match the post-apply API state
+// (e.g. null vs empty map), causing "inconsistent result after apply" errors.
+var poolComputedOptionalAttrs = []string{
+	"auto_healing_enabled",
+	"boot_volume_size",
+	"boot_volume_type",
+	"crio_config",
+	"is_public_ipv4",
+	"kubelet_config",
+	"labels",
+	"max_node_count",
+	"min_node_count",
+	"security_group_ids",
+	"taints",
 }
 
 func (m poolsNormalizeOrderModifier) PlanModifyList(ctx context.Context, req planmodifier.ListRequest, resp *planmodifier.ListResponse) {
-	// If there's no state (new resource), nothing to reorder
+	// If there's no state (new resource), nothing to normalize
 	if req.StateValue.IsNull() || req.StateValue.IsUnknown() {
 		return
 	}
@@ -917,9 +936,8 @@ func (m poolsNormalizeOrderModifier) PlanModifyList(ctx context.Context, req pla
 		return
 	}
 
-	// Build ordered list of state pool names and a set for quick lookup
-	var stateOrder []string
-	stateNames := make(map[string]bool)
+	// Index state pools by name
+	statePoolsByName := make(map[string]types.Object)
 	for _, elem := range req.StateValue.Elements() {
 		obj, ok := elem.(types.Object)
 		if !ok {
@@ -927,65 +945,125 @@ func (m poolsNormalizeOrderModifier) PlanModifyList(ctx context.Context, req pla
 		}
 		name := getPoolName(obj)
 		if name != "" {
-			stateOrder = append(stateOrder, name)
-			stateNames[name] = true
+			statePoolsByName[name] = obj
 		}
 	}
 
-	// Index plan pools by name and build ordered list
-	planPoolsByName := make(map[string]types.Object)
-	planNamesSet := make(map[string]bool)
+	// Index config pools by name (to know which attributes the user actually set)
+	configPoolsByName := make(map[string]types.Object)
+	if !req.ConfigValue.IsNull() && !req.ConfigValue.IsUnknown() {
+		for _, elem := range req.ConfigValue.Elements() {
+			obj, ok := elem.(types.Object)
+			if !ok {
+				continue
+			}
+			if name := getPoolName(obj); name != "" {
+				configPoolsByName[name] = obj
+			}
+		}
+	}
+
+	// Normalize computed_optional attributes on each plan pool, correlating
+	// by pool name instead of list index.
+	planElements := make([]attr.Value, 0, len(req.PlanValue.Elements()))
 	for _, elem := range req.PlanValue.Elements() {
 		obj, ok := elem.(types.Object)
 		if !ok {
+			planElements = append(planElements, elem)
 			continue
 		}
 		name := getPoolName(obj)
-		if name != "" {
-			planPoolsByName[name] = obj
-			planNamesSet[name] = true
+		if name == "" {
+			planElements = append(planElements, elem)
+			continue
 		}
+
+		normalized, diags := normalizePoolComputedAttrs(ctx, obj, statePoolsByName[name], configPoolsByName[name])
+		resp.Diagnostics.Append(diags...)
+		if resp.Diagnostics.HasError() {
+			return
+		}
+
+		planElements = append(planElements, normalized)
 	}
 
-	// Check if there are any additions or deletions
-	// If so, don't reorder - preserve config order to avoid plan validation errors
-	hasAdditions := false
-	hasDeletions := false
-	for name := range planNamesSet {
-		if !stateNames[name] {
-			hasAdditions = true
-			break
-		}
-	}
-	for name := range stateNames {
-		if !planNamesSet[name] {
-			hasDeletions = true
-			break
-		}
-	}
-
-	// Only reorder if we're just reordering existing pools (no additions/deletions)
-	// This prevents plan validation errors when adding pools "in the middle"
-	if hasAdditions || hasDeletions {
-		return
-	}
-
-	// Build new list: pools in state order (since all pools exist in both)
-	var reorderedElements []attr.Value
-	for _, name := range stateOrder {
-		if pool, exists := planPoolsByName[name]; exists {
-			reorderedElements = append(reorderedElements, pool)
-		}
-	}
-
-	// Create new list with reordered elements
-	newList, diags := types.ListValue(req.PlanValue.ElementType(ctx), reorderedElements)
+	// Always preserve config order. Terraform's plan validation requires
+	// planned values of non-computed attributes (e.g. the required "name") to
+	// match config per list index, so reordering the plan to state order is
+	// never valid when the config order actually differs: it produces
+	// "Provider produced invalid plan" errors (e.g. when pool names are
+	// swapped in config). Order differences are handled downstream by the
+	// name-based Update logic (in-place updates per pool name, no pool
+	// recreation) and the post-apply state is saved in planned (config) order.
+	newList, diags := types.ListValue(req.PlanValue.ElementType(ctx), planElements)
 	resp.Diagnostics.Append(diags...)
 	if resp.Diagnostics.HasError() {
 		return
 	}
 
 	resp.PlanValue = newList
+}
+
+// normalizePoolComputedAttrs returns a copy of the planned pool object where
+// every computed_optional attribute that is not set in config is correlated
+// by pool name: copied from the matching state pool when present, or set to
+// unknown for pools that don't exist yet.
+func normalizePoolComputedAttrs(ctx context.Context, planObj, stateObj, configObj types.Object) (types.Object, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	planAttrs := planObj.Attributes()
+	attrTypes := planObj.AttributeTypes(ctx)
+
+	var stateAttrs map[string]attr.Value
+	hasState := !stateObj.IsNull() && !stateObj.IsUnknown()
+	if hasState {
+		stateAttrs = stateObj.Attributes()
+	}
+
+	var configAttrs map[string]attr.Value
+	if !configObj.IsNull() && !configObj.IsUnknown() {
+		configAttrs = configObj.Attributes()
+	}
+
+	newAttrs := make(map[string]attr.Value, len(planAttrs))
+	for key, value := range planAttrs {
+		newAttrs[key] = value
+	}
+
+	for _, key := range poolComputedOptionalAttrs {
+		attrType, ok := attrTypes[key]
+		if !ok {
+			continue
+		}
+
+		// If the user set this attribute in config, keep the planned value.
+		if cfgVal, ok := configAttrs[key]; ok && !cfgVal.IsNull() {
+			continue
+		}
+
+		if hasState {
+			if stateVal, ok := stateAttrs[key]; ok && !stateVal.IsNull() && !stateVal.IsUnknown() {
+				newAttrs[key] = stateVal
+				continue
+			}
+		}
+
+		// New pool (or attribute absent in state): the API will decide the
+		// value, so it must be unknown in the plan.
+		unknownVal, err := attrType.ValueFromTerraform(ctx, tftypes.NewValue(attrType.TerraformType(ctx), tftypes.UnknownValue))
+		if err != nil {
+			diags.AddError("failed to build unknown value for pool attribute "+key, err.Error())
+			return planObj, diags
+		}
+		newAttrs[key] = unknownVal
+	}
+
+	newObj, d := types.ObjectValue(attrTypes, newAttrs)
+	diags.Append(d...)
+	if diags.HasError() {
+		return planObj, diags
+	}
+	return newObj, diags
 }
 
 // getPoolName extracts the "name" attribute from a pool object
