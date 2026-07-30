@@ -11,6 +11,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-testing/compare"
 	"github.com/hashicorp/terraform-plugin-testing/helper/resource"
 	"github.com/hashicorp/terraform-plugin-testing/knownvalue"
+	"github.com/hashicorp/terraform-plugin-testing/plancheck"
 	"github.com/hashicorp/terraform-plugin-testing/statecheck"
 	"github.com/hashicorp/terraform-plugin-testing/terraform"
 	"github.com/hashicorp/terraform-plugin-testing/tfjsonpath"
@@ -51,11 +52,31 @@ func TestAccCloudLoadBalancer_basic(t *testing.T) {
 	})
 }
 
+// TestAccCloudLoadBalancer_update renames a load balancer in place and changes
+// nothing else.
+//
+// The rename step also carries the regression assertion for the computed-field
+// drift: a rename is a genuine in-place update, so the framework re-marks every
+// computed attribute that has no plan modifier as "(known after apply)" — the
+// drift users still saw after the inline listeners attribute was removed. Every
+// computed attribute except provisioning_status must therefore plan as known.
+// The expected-known set is derived from the resource schema itself, see
+// stableComputedAttributeNames in schema_guard_test.go.
 func TestAccCloudLoadBalancer_update(t *testing.T) {
 	rName := acctest.RandomName()
 	rNameUpdated := acctest.RandomName()
 
 	compareIDSame := statecheck.CompareValue(compare.ValuesSame())
+
+	renamePlanChecks := []plancheck.PlanCheck{
+		plancheck.ExpectResourceAction("gcore_cloud_load_balancer.test", plancheck.ResourceActionUpdate),
+		plancheck.ExpectKnownValue("gcore_cloud_load_balancer.test",
+			tfjsonpath.New("name"), knownvalue.StringExact(rNameUpdated)),
+	}
+	for _, attribute := range stableComputedAttributeNames() {
+		renamePlanChecks = append(renamePlanChecks,
+			acctest.ExpectNotUnknownValue("gcore_cloud_load_balancer.test", tfjsonpath.New(attribute)))
+	}
 
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:                 func() { acctest.PreCheck(t) },
@@ -67,6 +88,8 @@ func TestAccCloudLoadBalancer_update(t *testing.T) {
 				ConfigStateChecks: []statecheck.StateCheck{
 					statecheck.ExpectKnownValue("gcore_cloud_load_balancer.test",
 						tfjsonpath.New("name"), knownvalue.StringExact(rName)),
+					statecheck.ExpectKnownValue("gcore_cloud_load_balancer.test",
+						tfjsonpath.New("vip_ip_family"), knownvalue.NotNull()),
 					compareIDSame.AddStateValue(
 						"gcore_cloud_load_balancer.test",
 						tfjsonpath.New("id"),
@@ -75,6 +98,12 @@ func TestAccCloudLoadBalancer_update(t *testing.T) {
 			},
 			{
 				Config: testAccCloudLoadBalancerConfig(rNameUpdated),
+				ConfigPlanChecks: resource.ConfigPlanChecks{
+					PreApply: renamePlanChecks,
+					// The framework already fails the step on a non-empty plan
+					// after apply; asserting it here names the drift explicitly.
+					PostApplyPostRefresh: []plancheck.PlanCheck{plancheck.ExpectEmptyPlan()},
+				},
 				ConfigStateChecks: []statecheck.StateCheck{
 					statecheck.ExpectKnownValue("gcore_cloud_load_balancer.test",
 						tfjsonpath.New("name"), knownvalue.StringExact(rNameUpdated)),
