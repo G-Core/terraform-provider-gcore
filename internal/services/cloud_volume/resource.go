@@ -125,7 +125,7 @@ func (r *CloudVolumeResource) Update(ctx context.Context, req resource.UpdateReq
 	}
 
 	// Handle volume size changes (resize) separately before other updates
-	sizeChanged := !data.Size.Equal(state.Size)
+	sizeChanged := !data.Size.IsUnknown() && !data.Size.Equal(state.Size)
 
 	if sizeChanged {
 		resizeParams := cloud.VolumeResizeParams{
@@ -165,7 +165,7 @@ func (r *CloudVolumeResource) Update(ctx context.Context, req resource.UpdateReq
 
 	// Check if name or tags have changed before sending update request
 	nameChanged := !data.Name.Equal(state.Name)
-	tagsChanged := !data.Tags.Equal(state.Tags)
+	tagsChanged := !data.Tags.IsUnknown() && !data.Tags.Equal(state.Tags)
 
 	// Only send update request if name or tags changed
 	if nameChanged || tagsChanged {
@@ -206,6 +206,42 @@ func (r *CloudVolumeResource) Update(ctx context.Context, req resource.UpdateReq
 		if tags, ok := custom.ConvertAPITagsToCustomfieldMap(ctx, bytes); ok {
 			data.Tags = tags
 		}
+	}
+
+	// Any change entering Update marks computed plan values as unknown, and
+	// state-only reconciliations (e.g. create-only fields restored after
+	// import) never receive an API response to resolve them. Always refresh
+	// from the API so every computed field is known before saving state.
+	getParams := cloud.VolumeGetParams{}
+
+	if !data.ProjectID.IsNull() {
+		getParams.ProjectID = param.NewOpt(data.ProjectID.ValueInt64())
+	}
+
+	if !data.RegionID.IsNull() {
+		getParams.RegionID = param.NewOpt(data.RegionID.ValueInt64())
+	}
+
+	res := new(http.Response)
+	_, err := r.client.Cloud.Volumes.Get(
+		ctx,
+		data.ID.ValueString(),
+		getParams,
+		option.WithResponseBodyInto(&res),
+		option.WithMiddleware(logging.Middleware(ctx)),
+	)
+	if err != nil {
+		resp.Diagnostics.AddError("failed to make http request", err.Error())
+		return
+	}
+	bytes, _ := io.ReadAll(res.Body)
+	err = apijson.UnmarshalComputed(bytes, &data)
+	if err != nil {
+		resp.Diagnostics.AddError("failed to deserialize http request", err.Error())
+		return
+	}
+	if tags, ok := custom.ConvertAPITagsToCustomfieldMap(ctx, bytes); ok {
+		data.Tags = tags
 	}
 
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)

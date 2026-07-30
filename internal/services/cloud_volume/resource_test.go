@@ -84,6 +84,97 @@ func TestAccCloudVolume_update(t *testing.T) {
 	})
 }
 
+// TestAccCloudVolume_updateCreateOnlyField verifies that reconciling a
+// create-only field missing from state completes without returning unknown
+// computed values after apply.
+func TestAccCloudVolume_updateCreateOnlyField(t *testing.T) {
+	rName := acctest.RandomName()
+
+	compareIDSame := statecheck.CompareValue(compare.ValuesSame())
+
+	resource.ParallelTest(t, resource.TestCase{
+		PreCheck:                 func() { acctest.PreCheck(t) },
+		ProtoV6ProviderFactories: acctest.ProtoV6ProviderFactories,
+		CheckDestroy:             testAccCheckCloudVolumeDestroy,
+		Steps: []resource.TestStep{
+			{
+				Config: testAccCloudVolumeConfig(rName),
+				ConfigStateChecks: []statecheck.StateCheck{
+					compareIDSame.AddStateValue(
+						"gcore_cloud_volume.test",
+						tfjsonpath.New("id"),
+					),
+				},
+			},
+			{
+				Config: testAccCloudVolumeConfigTypedWithTags(rName),
+				ConfigPlanChecks: resource.ConfigPlanChecks{
+					PreApply: []plancheck.PlanCheck{
+						plancheck.ExpectResourceAction("gcore_cloud_volume.test", plancheck.ResourceActionUpdate),
+					},
+				},
+				ConfigStateChecks: []statecheck.StateCheck{
+					compareIDSame.AddStateValue(
+						"gcore_cloud_volume.test",
+						tfjsonpath.New("id"),
+					),
+					statecheck.ExpectKnownValue("gcore_cloud_volume.test",
+						tfjsonpath.New("type_name"), knownvalue.StringExact("standard")),
+					statecheck.ExpectKnownValue("gcore_cloud_volume.test",
+						tfjsonpath.New("status"), knownvalue.StringExact("available")),
+					statecheck.ExpectKnownValue("gcore_cloud_volume.test",
+						tfjsonpath.New("bootable"), knownvalue.Bool(false)),
+				},
+			},
+		},
+	})
+}
+
+// TestAccCloudVolume_updateCreateOnlyFieldWithUnknownTags verifies that an
+// unconfigured computed-optional tags value is not treated as a tag change
+// during a state-only reconciliation update.
+func TestAccCloudVolume_updateCreateOnlyFieldWithUnknownTags(t *testing.T) {
+	rName := acctest.RandomName()
+
+	compareIDSame := statecheck.CompareValue(compare.ValuesSame())
+
+	resource.ParallelTest(t, resource.TestCase{
+		PreCheck:                 func() { acctest.PreCheck(t) },
+		ProtoV6ProviderFactories: acctest.ProtoV6ProviderFactories,
+		CheckDestroy:             testAccCheckCloudVolumeDestroy,
+		Steps: []resource.TestStep{
+			{
+				Config: testAccCloudVolumeConfig(rName),
+				ConfigStateChecks: []statecheck.StateCheck{
+					compareIDSame.AddStateValue(
+						"gcore_cloud_volume.test",
+						tfjsonpath.New("id"),
+					),
+				},
+			},
+			{
+				Config: testAccCloudVolumeConfigTyped(rName),
+				ConfigPlanChecks: resource.ConfigPlanChecks{
+					PreApply: []plancheck.PlanCheck{
+						plancheck.ExpectResourceAction("gcore_cloud_volume.test", plancheck.ResourceActionUpdate),
+						plancheck.ExpectUnknownValue("gcore_cloud_volume.test", tfjsonpath.New("tags")),
+					},
+				},
+				ConfigStateChecks: []statecheck.StateCheck{
+					compareIDSame.AddStateValue(
+						"gcore_cloud_volume.test",
+						tfjsonpath.New("id"),
+					),
+					statecheck.ExpectKnownValue("gcore_cloud_volume.test",
+						tfjsonpath.New("type_name"), knownvalue.StringExact("standard")),
+					statecheck.ExpectKnownValue("gcore_cloud_volume.test",
+						tfjsonpath.New("tags"), knownvalue.MapExact(map[string]knownvalue.Check{})),
+				},
+			},
+		},
+	})
+}
+
 func TestAccCloudVolume_import(t *testing.T) {
 	rName := acctest.RandomName()
 
@@ -454,6 +545,19 @@ resource "gcore_cloud_volume" "test" {
 
 func testAccCloudVolumeConfigTyped(name string) string {
 	return testAccCloudVolumeConfigTypeName(name, "standard")
+}
+
+func testAccCloudVolumeConfigTypedWithTags(name string) string {
+	return fmt.Sprintf(`
+resource "gcore_cloud_volume" "test" {
+  project_id = %[1]s
+  region_id  = %[2]s
+  source     = "new-volume"
+  name       = %[3]q
+  size       = 1
+  tags       = {}
+  type_name  = "standard"
+}`, acctest.ProjectID(), acctest.RegionID(), name)
 }
 
 func testAccCloudVolumeConfigTypeName(name, typeName string) string {
