@@ -23,6 +23,19 @@ Creates a blank data volume for additional storage.
 
 {{tffile "examples/resources/gcore_cloud_volume/data-volume.tf"}}
 
+### Volume restored from a snapshot
+
+Restores a volume from a snapshot. The size comes from the snapshot, so it does
+not have to be declared.
+
+{{tffile "examples/resources/gcore_cloud_volume/from-snapshot.tf"}}
+
+-> **`size` is required for every source except `snapshot`.** A volume created
+with `source = "new-volume"` or `source = "image"` must declare a `size`; only a
+snapshot restore derives it. Once the volume exists the size is tracked in state,
+so removing `size` from the configuration is a no-op — set a larger value to
+resize.
+
 {{ .SchemaMarkdown | trimspace }}
 
 {{ if .HasImport }}

@@ -99,6 +99,7 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 				Validators: []validator.Int64{
 					int64validator.AtLeast(1),
 				},
+				PlanModifiers: []planmodifier.Int64{RequireSizeUnlessDerived()},
 			},
 			"name": schema.StringAttribute{
 				Description: "Volume name",
