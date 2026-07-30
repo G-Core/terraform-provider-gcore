@@ -6,13 +6,13 @@ import (
 	"context"
 
 	"github.com/G-Core/terraform-provider-gcore/internal/customfield"
+	"github.com/G-Core/terraform-provider-gcore/internal/planmodifiers"
 	"github.com/hashicorp/terraform-plugin-framework-timetypes/timetypes"
 	"github.com/hashicorp/terraform-plugin-framework-validators/int64validator"
 	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/int64planmodifier"
-	"github.com/hashicorp/terraform-plugin-framework/resource/schema/listplanmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringplanmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
@@ -49,27 +49,27 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 						"new-volume",
 					),
 				},
-				PlanModifiers: []planmodifier.String{stringplanmodifier.RequiresReplace()},
+				PlanModifiers: []planmodifier.String{planmodifiers.StringRequiresReplaceIfConfiguredPreservingState()},
 			},
 			"attachment_tag": schema.StringAttribute{
 				Description:   "Block device attachment tag (not exposed in the user tags). Only used in conjunction with `instance_id_to_attach_to`",
 				Optional:      true,
-				PlanModifiers: []planmodifier.String{stringplanmodifier.RequiresReplace()},
+				PlanModifiers: []planmodifier.String{planmodifiers.StringRequiresReplaceIfConfiguredPreservingState()},
 			},
 			"image_id": schema.StringAttribute{
 				Description:   "Image ID",
 				Optional:      true,
-				PlanModifiers: []planmodifier.String{stringplanmodifier.RequiresReplace()},
+				PlanModifiers: []planmodifier.String{planmodifiers.StringRequiresReplaceIfConfiguredPreservingState()},
 			},
 			"instance_id_to_attach_to": schema.StringAttribute{
 				Description:   "`instance_id` to attach newly-created volume to",
 				Optional:      true,
-				PlanModifiers: []planmodifier.String{stringplanmodifier.RequiresReplace()},
+				PlanModifiers: []planmodifier.String{planmodifiers.StringRequiresReplaceIfConfiguredPreservingState()},
 			},
 			"snapshot_id": schema.StringAttribute{
 				Description:   "Snapshot ID",
 				Optional:      true,
-				PlanModifiers: []planmodifier.String{stringplanmodifier.RequiresReplace()},
+				PlanModifiers: []planmodifier.String{planmodifiers.StringRequiresReplaceIfConfiguredPreservingState()},
 			},
 			"type_name": schema.StringAttribute{
 				Description: "Volume type. Defaults to `standard`. If not specified for source `snapshot`, volume type will be derived from the snapshot volume.\nAvailable values: \"cold\", \"ssd_hiiops\", \"ssd_local\", \"ssd_lowlatency\", \"standard\", \"ultra\".",
@@ -84,13 +84,13 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 						"ultra",
 					),
 				},
-				PlanModifiers: []planmodifier.String{stringplanmodifier.RequiresReplace()},
+				PlanModifiers: []planmodifier.String{planmodifiers.StringRequiresReplaceIfConfiguredPreservingState()},
 			},
 			"lifecycle_policy_ids": schema.ListAttribute{
 				Description:   "List of lifecycle policy IDs (snapshot creation schedules) to associate with the volume",
 				Optional:      true,
 				ElementType:   types.Int64Type,
-				PlanModifiers: []planmodifier.List{listplanmodifier.RequiresReplace()},
+				PlanModifiers: []planmodifier.List{planmodifiers.ListRequiresReplaceIfNotNull()},
 			},
 			"size": schema.Int64Attribute{
 				Description: "Volume size in GiB",

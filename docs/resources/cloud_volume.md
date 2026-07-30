@@ -120,3 +120,11 @@ Import is supported using the following syntax:
 $ terraform import gcore_cloud_volume.example '<project_id>/<region_id>/<volume_id>'
 ```
 
+~> **One reconciliation apply is needed after import.** The API does not return
+the create-only fields `source`, `type_name`, `image_id`, `snapshot_id`,
+`attachment_tag`, `instance_id_to_attach_to` or `lifecycle_policy_ids` in `GET`
+responses, so they are absent from state immediately after import. The first
+`terraform plan` therefore shows an update-in-place that copies these values
+from your configuration into state. The volume is **not** replaced and no
+infrastructure changes occur; subsequent plans are clean.
+
