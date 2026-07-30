@@ -155,7 +155,7 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 				Default: int64default.StaticInt64(0),
 			},
 			"fields": schema.ListAttribute{
-				Description: "List of fields to include in logs. Duplicate names are allowed for plain text output, but rejected when `format_type` is `json` or a `field_remap` is set (each field becomes a distinct output key).",
+				Description:   "List of fields to include in logs. Duplicate names are allowed for plain text output, but rejected when `format_type` is `json` or a `field_remap` is set (each field becomes a distinct output key).",
 				Computed:      true,
 				Optional:      true,
 				CustomType:    customfield.NewListType[types.String](ctx),

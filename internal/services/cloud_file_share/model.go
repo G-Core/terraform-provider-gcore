@@ -46,6 +46,8 @@ type CloudFileShareNetworkModel struct {
 }
 
 type CloudFileShareShareSettingsModel struct {
+	Gid               types.Int64  `tfsdk:"gid" json:"gid,optional"`
+	Uid               types.Int64  `tfsdk:"uid" json:"uid,optional"`
 	AllowedCharacters types.String `tfsdk:"allowed_characters" json:"allowed_characters,computed_optional"`
 	PathLength        types.String `tfsdk:"path_length" json:"path_length,computed_optional"`
 	RootSquash        types.Bool   `tfsdk:"root_squash" json:"root_squash,computed_optional"`

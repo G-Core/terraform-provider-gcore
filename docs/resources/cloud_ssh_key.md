@@ -32,7 +32,9 @@ resource "gcore_cloud_ssh_key" "deployer" {
 ### Required
 
 - `name` (String) SSH key name
-- `public_key` (String) The public part of an SSH key is the shareable portion of an SSH key pair. It can be safely sent to servers or services to grant access. It does not contain sensitive information. You must provide your own public key (usually found in a file like `id_ed25519.pub` or `id_rsa.pub`). Generate your SSH keypair locally using `ssh-keygen` before providing it here.
+- `public_key` (String) The public part of an SSH key is the shareable portion of an SSH key pair. It can be safely sent to servers or services to grant access. It does not contain sensitive information.
+- If you're uploading your own key, provide the public part here (usually found in a file like `id_ed25519.pub`).
+- If you want the platform to generate an Ed25519 key pair for you, leave this field empty — the system will return the private key in the response **once only**.
 
 ### Optional
 

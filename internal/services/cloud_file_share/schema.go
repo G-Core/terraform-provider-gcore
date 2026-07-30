@@ -40,10 +40,10 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 				PlanModifiers: []planmodifier.Int64{int64planmodifier.RequiresReplaceIfConfigured()},
 			},
 			"protocol": schema.StringAttribute{
-				Description: "File share protocol\nAvailable values: \"NFS\".",
+				Description: "File share protocol\nAvailable values: \"NFS\", \"LUSTRE\".",
 				Required:    true,
 				Validators: []validator.String{
-					stringvalidator.OneOfCaseInsensitive("NFS"),
+					stringvalidator.OneOfCaseInsensitive("NFS", "LUSTRE"),
 				},
 				PlanModifiers: []planmodifier.String{stringplanmodifier.RequiresReplace()},
 			},
@@ -70,11 +70,15 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 				PlanModifiers: []planmodifier.Object{objectplanmodifier.RequiresReplace()},
 			},
 			"type_name": schema.StringAttribute{
-				Description: "Standard file share type\nAvailable values: \"standard\", \"vast\".",
+				Description: "Standard file share type\nAvailable values: \"standard\", \"ddn\", \"vast\".",
 				Computed:    true,
 				Optional:    true,
 				Validators: []validator.String{
-					stringvalidator.OneOfCaseInsensitive("standard", "vast"),
+					stringvalidator.OneOfCaseInsensitive(
+						"standard",
+						"ddn",
+						"vast",
+					),
 				},
 				PlanModifiers: []planmodifier.String{stringplanmodifier.RequiresReplaceIfConfigured()},
 			},
@@ -101,6 +105,20 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 				Optional:    true,
 				CustomType:  customfield.NewNestedObjectType[CloudFileShareShareSettingsModel](ctx),
 				Attributes: map[string]schema.Attribute{
+					"gid": schema.Int64Attribute{
+						Description: "When set created file share will be owned by user with given GID",
+						Optional:    true,
+						Validators: []validator.Int64{
+							int64validator.Between(0, 2147483647),
+						},
+					},
+					"uid": schema.Int64Attribute{
+						Description: "When set created file share will be owned by group with given UID",
+						Optional:    true,
+						Validators: []validator.Int64{
+							int64validator.Between(0, 2147483647),
+						},
+					},
 					"allowed_characters": schema.StringAttribute{
 						Description: "Determines which characters are allowed in file names. Choose between:\n  - Lowest Common Denominator (LCD), allows only characters allowed by all VAST Cluster-supported protocols\n  - Native Protocol Limit (NPL), imposes no limitation beyond that of the client protocol.\nAvailable values: \"LCD\", \"NPL\".",
 						Computed:    true,

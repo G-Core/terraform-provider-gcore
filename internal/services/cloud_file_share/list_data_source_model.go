@@ -68,6 +68,9 @@ type CloudFileSharesItemsDataSourceModel struct {
 
 type CloudFileSharesShareSettingsDataSourceModel struct {
 	TypeName          types.String `tfsdk:"type_name" json:"type_name,computed"`
+	Gid               types.Int64  `tfsdk:"gid" json:"gid,computed"`
+	Projid            types.Int64  `tfsdk:"projid" json:"projid,computed"`
+	Uid               types.Int64  `tfsdk:"uid" json:"uid,computed"`
 	AllowedCharacters types.String `tfsdk:"allowed_characters" json:"allowed_characters,computed"`
 	PathLength        types.String `tfsdk:"path_length" json:"path_length,computed"`
 	RootSquash        types.Bool   `tfsdk:"root_squash" json:"root_squash,computed"`

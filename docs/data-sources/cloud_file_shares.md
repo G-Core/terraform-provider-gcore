@@ -31,7 +31,7 @@ data "gcore_cloud_file_shares" "example_cloud_file_shares" {
 - `project_id` (Number) Project ID
 - `region_id` (Number) Region ID
 - `type_name` (String) File share type name
-Available values: "standard", "vast".
+Available values: "ddn", "standard", "vast".
 
 ### Read-Only
 
@@ -62,7 +62,7 @@ Available values: "available", "awaiting_transfer", "backup_creating", "backup_r
 - `subnet_name` (String) Subnet name.
 - `tags` (Attributes List) List of key-value tags associated with the resource. A tag is a key-value pair that can be associated with a resource, enabling efficient filtering and grouping for better organization and management. Some tags are read-only and cannot be modified by the user. Tags are also integrated with cost reports, allowing cost data to be filtered based on tag keys or values. (see [below for nested schema](#nestedatt--items--tags))
 - `type_name` (String) File share type name
-Available values: "standard", "vast".
+Available values: "ddn", "standard", "vast".
 
 <a id="nestedatt--items--share_settings"></a>
 ### Nested Schema for `items.share_settings`
@@ -70,12 +70,15 @@ Available values: "standard", "vast".
 Read-Only:
 
 - `allowed_characters` (String) Available values: "LCD", "NPL".
+- `gid` (Number) Group ID being owner of the share
 - `path_length` (String) Available values: "LCD", "NPL".
+- `projid` (Number) Exascaler project ID
 - `root_squash` (Boolean) Enables or disables root squash for NFS clients.
   - If `true`, root squash is enabled: the root user is mapped to nobody for all file and folder management operations on the export.
   - If `false`, root squash is disabled: the NFS client `root` user retains root privileges.
 - `type_name` (String) Standard file share type
-Available values: "standard", "vast".
+Available values: "standard", "ddn", "vast".
+- `uid` (Number) User ID being owner of the share
 
 
 <a id="nestedatt--items--tags"></a>

@@ -38,7 +38,7 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 				PlanModifiers: []planmodifier.String{stringplanmodifier.RequiresReplace()},
 			},
 			"public_key": schema.StringAttribute{
-				Description:   "The public part of an SSH key is the shareable portion of an SSH key pair. It can be safely sent to servers or services to grant access. It does not contain sensitive information. You must provide your own public key (usually found in a file like `id_ed25519.pub` or `id_rsa.pub`). Generate your SSH keypair locally using `ssh-keygen` before providing it here.",
+				Description:   "The public part of an SSH key is the shareable portion of an SSH key pair. It can be safely sent to servers or services to grant access. It does not contain sensitive information.\n- If you're uploading your own key, provide the public part here (usually found in a file like `id_ed25519.pub`).\n- If you want the platform to generate an Ed25519 key pair for you, leave this field empty — the system will return the private key in the response **once only**.",
 				Required:      true,
 				PlanModifiers: []planmodifier.String{stringplanmodifier.RequiresReplace()},
 			},

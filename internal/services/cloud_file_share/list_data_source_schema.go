@@ -32,10 +32,14 @@ func ListDataSourceSchema(ctx context.Context) schema.Schema {
 				Optional:    true,
 			},
 			"type_name": schema.StringAttribute{
-				Description: "File share type name\nAvailable values: \"standard\", \"vast\".",
+				Description: "File share type name\nAvailable values: \"ddn\", \"standard\", \"vast\".",
 				Optional:    true,
 				Validators: []validator.String{
-					stringvalidator.OneOfCaseInsensitive("standard", "vast"),
+					stringvalidator.OneOfCaseInsensitive(
+						"ddn",
+						"standard",
+						"vast",
+					),
 				},
 			},
 			"max_items": schema.Int64Attribute{
@@ -105,11 +109,27 @@ func ListDataSourceSchema(ctx context.Context) schema.Schema {
 							CustomType:  customfield.NewNestedObjectType[CloudFileSharesShareSettingsDataSourceModel](ctx),
 							Attributes: map[string]schema.Attribute{
 								"type_name": schema.StringAttribute{
-									Description: "Standard file share type\nAvailable values: \"standard\", \"vast\".",
+									Description: "Standard file share type\nAvailable values: \"standard\", \"ddn\", \"vast\".",
 									Computed:    true,
 									Validators: []validator.String{
-										stringvalidator.OneOfCaseInsensitive("standard", "vast"),
+										stringvalidator.OneOfCaseInsensitive(
+											"standard",
+											"ddn",
+											"vast",
+										),
 									},
+								},
+								"gid": schema.Int64Attribute{
+									Description: "Group ID being owner of the share",
+									Computed:    true,
+								},
+								"projid": schema.Int64Attribute{
+									Description: "Exascaler project ID",
+									Computed:    true,
+								},
+								"uid": schema.Int64Attribute{
+									Description: "User ID being owner of the share",
+									Computed:    true,
 								},
 								"allowed_characters": schema.StringAttribute{
 									Description: `Available values: "LCD", "NPL".`,
@@ -204,10 +224,14 @@ func ListDataSourceSchema(ctx context.Context) schema.Schema {
 							},
 						},
 						"type_name": schema.StringAttribute{
-							Description: "File share type name\nAvailable values: \"standard\", \"vast\".",
+							Description: "File share type name\nAvailable values: \"ddn\", \"standard\", \"vast\".",
 							Computed:    true,
 							Validators: []validator.String{
-								stringvalidator.OneOfCaseInsensitive("standard", "vast"),
+								stringvalidator.OneOfCaseInsensitive(
+									"ddn",
+									"standard",
+									"vast",
+								),
 							},
 						},
 					},

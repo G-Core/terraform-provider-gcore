@@ -60,7 +60,7 @@ resource "gcore_cloud_file_share" "file_share_vast" {
 
 - `name` (String) File share name
 - `protocol` (String) File share protocol
-Available values: "NFS".
+Available values: "NFS", "LUSTRE".
 - `size` (Number) File share size in GiB
 
 ### Optional
@@ -71,7 +71,7 @@ Available values: "NFS".
 - `share_settings` (Attributes) Configuration settings for the share (see [below for nested schema](#nestedatt--share_settings))
 - `tags` (Map of String) Key-value tags to associate with the resource. A tag is a key-value pair that can be associated with a resource, enabling efficient filtering and grouping for better organization and management. Both tag keys and values have a maximum length of 255 characters. Some tags are read-only and cannot be modified by the user. Tags are also integrated with cost reports, allowing cost data to be filtered based on tag keys or values.
 - `type_name` (String) Standard file share type
-Available values: "standard", "vast".
+Available values: "standard", "ddn", "vast".
 
 ### Read-Only
 
@@ -110,6 +110,7 @@ Optional:
   - Lowest Common Denominator (LCD), allows only characters allowed by all VAST Cluster-supported protocols
   - Native Protocol Limit (NPL), imposes no limitation beyond that of the client protocol.
 Available values: "LCD", "NPL".
+- `gid` (Number) When set created file share will be owned by user with given GID
 - `path_length` (String) Affects the maximum limit of file path component name length. Choose between:
   - Lowest Common Denominator (LCD), imposes the lowest common denominator file length limit of all VAST Cluster-supported protocols. With this (default) option, the limitation on the length of a single component of the path is 255 characters
   - Native Protocol Limit (NPL), imposes no limitation beyond that of the client protocol.
@@ -117,6 +118,7 @@ Available values: "LCD", "NPL".
 - `root_squash` (Boolean) Enables or disables root squash for NFS clients.
   - If `true` (default), root squash is enabled: the root user is mapped to nobody for all file and folder management operations on the export.
   - If `false`, root squash is disabled: the NFS client `root` user retains root privileges. Use this option if you trust the root user not to perform operations that will corrupt data.
+- `uid` (Number) When set created file share will be owned by group with given UID
 
 
 ## Import
