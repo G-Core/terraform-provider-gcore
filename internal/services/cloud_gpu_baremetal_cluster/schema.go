@@ -63,6 +63,9 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 					"interfaces": schema.ListNestedAttribute{
 						Description: "Subnet IPs and floating IPs",
 						Required:    true,
+						Validators: []validator.List{
+							customvalidator.GPUClusterInterfaceVariantValidator{},
+						},
 						NestedObject: schema.NestedAttributeObject{
 							Attributes: map[string]schema.Attribute{
 								"type": schema.StringAttribute{
@@ -77,7 +80,7 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 									},
 								},
 								"ip_family": schema.StringAttribute{
-									Description: "Which subnets should be selected: IPv4, IPv6, or use dual stack.\nAvailable values: \"dual\", \"ipv4\", \"ipv6\".",
+									Description: "Which subnets should be selected: IPv4, IPv6, or use dual stack.\nOnly applies when `type` is \"external\" or \"any_subnet\". Must not be set when `type` is \"subnet\", where the IP family is determined by the referenced subnet.\nAvailable values: \"dual\", \"ipv4\", \"ipv6\".",
 									Computed:    true,
 									Optional:    true,
 									Validators: []validator.String{
@@ -87,7 +90,10 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 											"ipv6",
 										),
 									},
-									PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
+									// The API does not return ip_family for "subnet" interfaces, so state
+									// is null there. The built-in UseStateForUnknown bails out on a null
+									// state, leaving the plan permanently unknown; this preserves null.
+									PlanModifiers: []planmodifier.String{planmodifiers.StringUseStateForUnknownInclNull()},
 								},
 								"name": schema.StringAttribute{
 									Description:   "Interface name",
@@ -118,15 +124,15 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 									},
 								},
 								"network_id": schema.StringAttribute{
-									Description: "Network ID the subnet belongs to. Port will be plugged in this network",
+									Description: "Network ID the subnet belongs to. Port will be plugged in this network. Required when `type` is \"subnet\" or \"any_subnet\"; must not be set when `type` is \"external\".",
 									Optional:    true,
 								},
 								"subnet_id": schema.StringAttribute{
-									Description: "Port is assigned an IP address from this subnet",
+									Description: "Port is assigned an IP address from this subnet. Required when `type` is \"subnet\"; must not be set for any other interface type.",
 									Optional:    true,
 								},
 								"floating_ip": schema.SingleNestedAttribute{
-									Description: "Floating IP config for this subnet attachment",
+									Description: "Floating IP config for this subnet attachment. Only applies when `type` is \"subnet\" or \"any_subnet\".",
 									Optional:    true,
 									Attributes: map[string]schema.Attribute{
 										"source": schema.StringAttribute{

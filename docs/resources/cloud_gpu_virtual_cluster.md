@@ -99,14 +99,15 @@ Required:
 
 Optional:
 
-- `floating_ip` (Attributes) Floating IP config for this subnet attachment (see [below for nested schema](#nestedatt--servers_settings--interfaces--floating_ip))
+- `floating_ip` (Attributes) Floating IP config for this subnet attachment. Only applies when `type` is "subnet" or "any_subnet". (see [below for nested schema](#nestedatt--servers_settings--interfaces--floating_ip))
 - `ip_family` (String) Which subnets should be selected: IPv4, IPv6, or use dual stack.
+Only applies when `type` is "external" or "any_subnet". Must not be set when `type` is "subnet", where the IP family is determined by the referenced subnet.
 Available values: "dual", "ipv4", "ipv6".
 - `name` (String) Interface name
-- `network_id` (String) Network ID the subnet belongs to. Port will be plugged in this network
+- `network_id` (String) Network ID the subnet belongs to. Port will be plugged in this network. Required when `type` is "subnet" or "any_subnet"; must not be set when `type` is "external".
 - `port_security_enabled` (Boolean) Controls port security for this interface. When omitted, the default applies (port security enabled, default security group attached). When false, the port is created with port security off and no security group attached; `security_groups` must not be set in that case. Not allowed for interfaces on a public network, nor for bare metal servers without a DPU (their ports cannot enforce port security).
 - `security_groups` (Attributes List) Security group UUIDs applied to this interface. If omitted (or empty), the top-level `security_groups` value applies; if both are omitted, the project's default security group is applied. (see [below for nested schema](#nestedatt--servers_settings--interfaces--security_groups))
-- `subnet_id` (String) Port is assigned an IP address from this subnet
+- `subnet_id` (String) Port is assigned an IP address from this subnet. Required when `type` is "subnet"; must not be set for any other interface type.
 
 <a id="nestedatt--servers_settings--interfaces--floating_ip"></a>
 ### Nested Schema for `servers_settings.interfaces.floating_ip`

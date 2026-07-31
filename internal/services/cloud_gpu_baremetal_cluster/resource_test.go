@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"os"
+	"regexp"
 	"strconv"
 	"testing"
 
@@ -251,4 +252,138 @@ resource "gcore_cloud_gpu_baremetal_cluster" "test" {
     %[7]s = %[8]q
   }
 }`, acctest.ProjectID(), acctest.RegionID(), name, gpuBmFlavor(), gpuBmImageID(), gpuBmSSHKey(), tagKey, tagValue)
+}
+
+// Synthetic IDs for the plan-only validation cases. These must be literals, not
+// references to real resources: an unresolved reference is unknown at plan time, and
+// the validator deliberately does not judge unknown values.
+const (
+	fakeNetworkID = "11111111-1111-1111-1111-111111111111"
+	fakeSubnetID  = "22222222-2222-2222-2222-222222222222"
+	fakeImageID   = "33333333-3333-3333-3333-333333333333"
+)
+
+// TestAccCloudGPUBaremetalCluster_interfaceVariantValidation exercises the per-variant
+// field contract through a real provider binary. Every case fails during plan, so no
+// infrastructure is created and no GPU bare-metal quota is consumed - which is what
+// makes this affordable for a resource that has no positive lifecycle coverage of the
+// subnet-interface path.
+//
+// This resource shares the interface contract with cloud_gpu_virtual_cluster; see
+// GCLOUD2-28207 for why the contract has to be enforced provider-side.
+func TestAccCloudGPUBaremetalCluster_interfaceVariantValidation(t *testing.T) {
+	testCases := map[string]struct {
+		iface     string
+		wantError string
+	}{
+		"ip_family on subnet": {
+			iface: `{
+        type       = "subnet"
+        network_id = "` + fakeNetworkID + `"
+        subnet_id  = "` + fakeSubnetID + `"
+        ip_family  = "ipv4"
+      }`,
+			wantError: `'ip_family' is not supported when type = "subnet"`,
+		},
+		// Same rule, uppercase discriminator: the schema validates `type`
+		// case-insensitively, so the validator must normalize before matching.
+		"ip_family on uppercase SUBNET": {
+			iface: `{
+        type       = "SUBNET"
+        network_id = "` + fakeNetworkID + `"
+        subnet_id  = "` + fakeSubnetID + `"
+        ip_family  = "ipv4"
+      }`,
+			wantError: `'ip_family' is not supported when type = "subnet"`,
+		},
+		"network_id on external": {
+			iface: `{
+        type       = "external"
+        network_id = "` + fakeNetworkID + `"
+      }`,
+			wantError: `'network_id' is not supported when type = "external"`,
+		},
+		"subnet_id on external": {
+			iface: `{
+        type      = "external"
+        subnet_id = "` + fakeSubnetID + `"
+      }`,
+			wantError: `'subnet_id' is not supported when type = "external"`,
+		},
+		"floating_ip on external": {
+			iface: `{
+        type        = "external"
+        floating_ip = { source = "new" }
+      }`,
+			wantError: `'floating_ip' is not supported when type = "external"`,
+		},
+		"subnet_id on any_subnet": {
+			iface: `{
+        type       = "any_subnet"
+        network_id = "` + fakeNetworkID + `"
+        subnet_id  = "` + fakeSubnetID + `"
+      }`,
+			wantError: `'subnet_id' is not supported when type = "any_subnet"`,
+		},
+		"subnet missing network_id": {
+			iface: `{
+        type      = "subnet"
+        subnet_id = "` + fakeSubnetID + `"
+      }`,
+			wantError: `'network_id' is required when type = "subnet"`,
+		},
+		"subnet missing subnet_id": {
+			iface: `{
+        type       = "subnet"
+        network_id = "` + fakeNetworkID + `"
+      }`,
+			wantError: `'subnet_id' is required when type = "subnet"`,
+		},
+		"any_subnet missing network_id": {
+			iface: `{
+        type = "any_subnet"
+      }`,
+			wantError: `'network_id' is required when type = "any_subnet"`,
+		},
+	}
+
+	for name, tc := range testCases {
+		t.Run(name, func(t *testing.T) {
+			resource.ParallelTest(t, resource.TestCase{
+				PreCheck:                 func() { acctest.PreCheck(t) },
+				ProtoV6ProviderFactories: acctest.ProtoV6ProviderFactories,
+				Steps: []resource.TestStep{
+					{
+						Config:      testAccCloudGPUBaremetalClusterConfigWithInterface(tc.iface),
+						PlanOnly:    true,
+						ExpectError: regexp.MustCompile(regexp.QuoteMeta(tc.wantError)),
+					},
+				},
+			})
+		})
+	}
+}
+
+// testAccCloudGPUBaremetalClusterConfigWithInterface builds a fully synthetic cluster
+// carrying a single interface block. It never gets applied, so the flavor, image and
+// key values only need to satisfy the other schema validators.
+func testAccCloudGPUBaremetalClusterConfigWithInterface(ifaceBlock string) string {
+	return fmt.Sprintf(`
+resource "gcore_cloud_gpu_baremetal_cluster" "test" {
+  project_id    = %[1]s
+  region_id     = %[2]s
+  name          = "tf-test-variant-validation"
+  flavor        = "tf-test-placeholder-flavor"
+  image_id      = %[4]q
+  servers_count = 1
+
+  servers_settings = {
+    interfaces = [
+      %[3]s
+    ]
+    credentials = {
+      ssh_key_name = "tf-test-placeholder-key"
+    }
+  }
+}`, acctest.ProjectID(), acctest.RegionID(), ifaceBlock, fakeImageID)
 }
