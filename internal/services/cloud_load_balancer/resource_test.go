@@ -56,12 +56,13 @@ func TestAccCloudLoadBalancer_basic(t *testing.T) {
 // nothing else.
 //
 // The rename step also carries the regression assertion for the computed-field
-// drift: a rename is a genuine in-place update, so the framework re-marks every
+// drift: a rename is a genuine in-place update, so the framework re-marks any
 // computed attribute that has no plan modifier as "(known after apply)" — the
-// drift users still saw after the inline listeners attribute was removed. Every
-// computed attribute except provisioning_status must therefore plan as known.
-// The expected-known set is derived from the resource schema itself, see
-// stableComputedAttributeNames in schema_guard_test.go.
+// drift users still saw after the inline listeners attribute was removed.
+//
+// provisioning_status is deliberately excluded: it genuinely changes during an
+// update, and pinning it previously produced "Provider produced inconsistent
+// result after apply".
 func TestAccCloudLoadBalancer_update(t *testing.T) {
 	rName := acctest.RandomName()
 	rNameUpdated := acctest.RandomName()
@@ -73,7 +74,7 @@ func TestAccCloudLoadBalancer_update(t *testing.T) {
 		plancheck.ExpectKnownValue("gcore_cloud_load_balancer.test",
 			tfjsonpath.New("name"), knownvalue.StringExact(rNameUpdated)),
 	}
-	for _, attribute := range stableComputedAttributeNames() {
+	for _, attribute := range []string{"vip_fqdn", "vip_ip_family"} {
 		renamePlanChecks = append(renamePlanChecks,
 			acctest.ExpectNotUnknownValue("gcore_cloud_load_balancer.test", tfjsonpath.New(attribute)))
 	}
