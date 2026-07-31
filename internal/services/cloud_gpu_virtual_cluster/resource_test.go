@@ -118,6 +118,13 @@ func TestAccCloudGPUVirtualCluster_update(t *testing.T) {
 					),
 				},
 			},
+			// Step 3: Re-plan same config - guards against perpetual diffs on
+			// volatile computed attributes (updated_at/status/has_pending_changes)
+			// after an in-place update (GCLOUD2-28055).
+			{
+				Config:   testAccCloudGPUVirtualClusterConfig(newName, 1),
+				PlanOnly: true,
+			},
 		},
 	})
 }
@@ -160,6 +167,13 @@ func TestAccCloudGPUVirtualCluster_resize(t *testing.T) {
 						tfjsonpath.New("id"),
 					),
 				},
+			},
+			// Step 3: Re-plan same config - guards against perpetual diffs on
+			// servers_ids and volatile computed attributes after a resize
+			// (GCLOUD2-28055).
+			{
+				Config:   testAccCloudGPUVirtualClusterConfig(rName, 2),
+				PlanOnly: true,
 			},
 		},
 	})
@@ -218,6 +232,43 @@ func TestAccCloudGPUVirtualCluster_import(t *testing.T) {
 					"servers_settings.credentials",
 					"servers_settings.user_data",
 					"servers_settings.volumes.0.source",
+				},
+			},
+		},
+	})
+}
+
+// TestAccCloudGPUVirtualCluster_dependentDataSourceNoDrift is a regression test
+// for GCLOUD2-28055: a data source referencing the cluster via depends_on forces
+// Terraform to re-plan the resource even though its config is unchanged. Computed
+// attributes without state-preserving plan modifiers (created_at, updated_at,
+// status, has_pending_changes, servers_ids) then reverted to "(known after
+// apply)", leaving a non-empty post-apply plan. Each test step implicitly
+// asserts the post-apply plan is empty.
+func TestAccCloudGPUVirtualCluster_dependentDataSourceNoDrift(t *testing.T) {
+	rName := acctest.RandomName()
+
+	resource.ParallelTest(t, resource.TestCase{
+		PreCheck:                 func() { gpuClusterPreCheck(t) },
+		ProtoV6ProviderFactories: acctest.ProtoV6ProviderFactories,
+		CheckDestroy:             testAccCheckCloudGPUVirtualClusterDestroy,
+		Steps: []resource.TestStep{
+			// Step 1: Create the cluster alone
+			{
+				Config: testAccCloudGPUVirtualClusterConfig(rName, 1),
+				ConfigStateChecks: []statecheck.StateCheck{
+					statecheck.ExpectKnownValue("gcore_cloud_gpu_virtual_cluster.test",
+						tfjsonpath.New("status"), knownvalue.StringExact("active")),
+				},
+			},
+			// Step 2: Same resource config plus a dependent data source. The
+			// implicit post-apply empty-plan check fails if any computed
+			// attribute reverts to unknown.
+			{
+				Config: testAccCloudGPUVirtualClusterConfigWithDataSource(rName, 1),
+				ConfigStateChecks: []statecheck.StateCheck{
+					statecheck.ExpectKnownValue("data.gcore_cloud_gpu_virtual_cluster.test",
+						tfjsonpath.New("name"), knownvalue.StringExact(rName)),
 				},
 			},
 		},
@@ -287,6 +338,18 @@ resource "gcore_cloud_gpu_virtual_cluster" "test" {
     }
   }
 }`, acctest.ProjectID(), acctest.RegionID(), name, gpuFlavor(), serversCount, gpuImageID(), gpuSSHKey())
+}
+
+func testAccCloudGPUVirtualClusterConfigWithDataSource(name string, serversCount int) string {
+	return testAccCloudGPUVirtualClusterConfig(name, serversCount) + fmt.Sprintf(`
+
+data "gcore_cloud_gpu_virtual_cluster" "test" {
+  project_id = %[1]s
+  region_id  = %[2]s
+  cluster_id = gcore_cloud_gpu_virtual_cluster.test.id
+
+  depends_on = [gcore_cloud_gpu_virtual_cluster.test]
+}`, acctest.ProjectID(), acctest.RegionID())
 }
 
 func testAccCloudGPUVirtualClusterConfigWithTags(name, tagKey, tagValue string) string {

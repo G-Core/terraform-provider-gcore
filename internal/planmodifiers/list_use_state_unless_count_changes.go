@@ -10,8 +10,8 @@ import (
 
 // UseStateUnlessCountChanges returns a plan modifier that preserves the state value
 // for a list attribute unless:
-//   - The resource is being created (no prior state)
-//   - The resource is being replaced (id becomes unknown)
+//   - The resource is being created or replaced (no prior state; Terraform core
+//     re-plans a replacement create with null prior state)
 //   - The specified count attribute is changing (which affects the list)
 //
 // This is useful for computed list attributes like servers_ids that change when
@@ -33,7 +33,9 @@ func (m useStateUnlessCountChangesModifier) MarkdownDescription(_ context.Contex
 }
 
 func (m useStateUnlessCountChangesModifier) PlanModifyList(ctx context.Context, req planmodifier.ListRequest, resp *planmodifier.ListResponse) {
-	// If there's no state (new resource), nothing to preserve
+	// If there's no state (new resource, or the create half of a replace —
+	// Terraform core re-plans replacement creates with null prior state),
+	// there is nothing to preserve.
 	if req.State.Raw.IsNull() {
 		return
 	}
@@ -43,16 +45,10 @@ func (m useStateUnlessCountChangesModifier) PlanModifyList(ctx context.Context, 
 		return
 	}
 
-	// Check if the resource is being replaced by checking if id is becoming unknown
-	var planID types.String
-	resp.Diagnostics.Append(req.Plan.GetAttribute(ctx, path.Root("id"), &planID)...)
-	if resp.Diagnostics.HasError() {
-		return
-	}
-	if planID.IsUnknown() {
-		// Resource is being replaced, don't preserve state
-		return
-	}
+	// Note: replacement is intentionally NOT detected via plan.id being
+	// unknown. Attribute plan modifiers run in nondeterministic order, so
+	// this modifier may observe id before its own UseStateForUnknown-style
+	// modifier restores it, wrongly treating a no-op plan as a replace.
 
 	// Check if the count attribute is changing
 	var stateCount, planCount types.Int64

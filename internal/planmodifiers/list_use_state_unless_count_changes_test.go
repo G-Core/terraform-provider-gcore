@@ -147,7 +147,13 @@ func TestUseStateUnlessCountChanges(t *testing.T) {
 		}
 	})
 
-	t.Run("resource being replaced - don't preserve state", func(t *testing.T) {
+	t.Run("plan id unknown but count unchanged - preserve state", func(t *testing.T) {
+		// Attribute plan modifiers run in nondeterministic order: on a no-op
+		// re-plan, id may still be unknown (marked by the framework, not yet
+		// restored by its own UseStateForUnknown-style modifier) when this
+		// modifier runs. It must NOT treat that as a replacement. Actual
+		// replacement is covered by the null-prior-state case: Terraform core
+		// re-plans replacement creates with null prior state.
 		t.Parallel()
 		resp := &planmodifier.ListResponse{PlanValue: types.ListUnknown(types.StringType)}
 		planmodifiers.UseStateUnlessCountChanges("servers_count").PlanModifyList(
@@ -156,7 +162,7 @@ func TestUseStateUnlessCountChanges(t *testing.T) {
 				StateValue: stateValue,
 				PlanValue:  types.ListUnknown(types.StringType),
 				State:      makeState("cluster-1", 2, []string{"server-1", "server-2"}),
-				Plan:       makePlan(nil, 2), // id unknown = being replaced
+				Plan:       makePlan(nil, 2), // id unknown, count unchanged
 				Path:       path.Root("servers_ids"),
 			},
 			resp,
@@ -164,8 +170,8 @@ func TestUseStateUnlessCountChanges(t *testing.T) {
 		if resp.Diagnostics.HasError() {
 			t.Fatalf("unexpected error: %s", resp.Diagnostics.Errors())
 		}
-		if !resp.PlanValue.IsUnknown() {
-			t.Errorf("expected unknown, got %v", resp.PlanValue)
+		if !resp.PlanValue.Equal(stateValue) {
+			t.Errorf("expected state to be preserved, got %v", resp.PlanValue)
 		}
 	})
 

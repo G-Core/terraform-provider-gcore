@@ -100,10 +100,11 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 									Optional:    true,
 								},
 								"security_groups": schema.ListNestedAttribute{
-									Description: "Security group UUIDs applied to this interface. If omitted (or empty), the top-level `security_groups` value applies; if both are omitted, the project's default security group is applied.",
-									Computed:    true,
-									Optional:    true,
-									CustomType:  customfield.NewNestedObjectListType[CloudGPUVirtualClusterServersSettingsInterfacesSecurityGroupsModel](ctx),
+									Description:   "Security group UUIDs applied to this interface. If omitted (or empty), the top-level `security_groups` value applies; if both are omitted, the project's default security group is applied.",
+									Computed:      true,
+									Optional:      true,
+									CustomType:    customfield.NewNestedObjectListType[CloudGPUVirtualClusterServersSettingsInterfacesSecurityGroupsModel](ctx),
+									PlanModifiers: []planmodifier.List{listplanmodifier.UseStateForUnknown()},
 									NestedObject: schema.NestedAttributeObject{
 										Attributes: map[string]schema.Attribute{
 											"id": schema.StringAttribute{
@@ -278,13 +279,15 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 				PlanModifiers: []planmodifier.Map{mapplanmodifier.UseStateForUnknown()},
 			},
 			"created_at": schema.StringAttribute{
-				Description: "Cluster creation date time",
-				Computed:    true,
-				CustomType:  timetypes.RFC3339Type{},
+				Description:   "Cluster creation date time",
+				Computed:      true,
+				CustomType:    timetypes.RFC3339Type{},
+				PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
 			},
 			"has_pending_changes": schema.BoolAttribute{
-				Description: "True if any server in the cluster has pending (not yet applied) settings changes",
-				Computed:    true,
+				Description:   "True if any server in the cluster has pending (not yet applied) settings changes",
+				Computed:      true,
+				PlanModifiers: []planmodifier.Bool{planmodifiers.BoolUseStateUnlessAttributesChange("name", "tags", "servers_count")},
 			},
 			"status": schema.StringAttribute{
 				Description: "Cluster status\nAvailable values: \"active\", \"creating\", \"degraded\", \"deleting\", \"error\", \"rebooting\", \"rebuilding\", \"resizing\", \"shutoff\".",
@@ -302,11 +305,13 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 						"shutoff",
 					),
 				},
+				PlanModifiers: []planmodifier.String{planmodifiers.StringUseStateUnlessAttributesChange("name", "tags", "servers_count")},
 			},
 			"updated_at": schema.StringAttribute{
-				Description: "Cluster update date time",
-				Computed:    true,
-				CustomType:  timetypes.RFC3339Type{},
+				Description:   "Cluster update date time",
+				Computed:      true,
+				CustomType:    timetypes.RFC3339Type{},
+				PlanModifiers: []planmodifier.String{planmodifiers.StringUseStateUnlessAttributesChange("name", "tags", "servers_count")},
 			},
 			"servers_ids": schema.ListAttribute{
 				Description:   "List of cluster nodes",

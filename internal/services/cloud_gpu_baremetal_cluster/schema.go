@@ -104,6 +104,10 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 									Computed:    true,
 									Optional:    true,
 									CustomType:  customfield.NewNestedObjectListType[CloudGPUBaremetalClusterServersSettingsInterfacesSecurityGroupsModel](ctx),
+									// Preventive parity with gcore_cloud_gpu_virtual_cluster (same API
+									// interface serializers): once the API returns resolved security
+									// groups on this interface, the plan drifts without this modifier.
+									PlanModifiers: []planmodifier.List{listplanmodifier.UseStateForUnknown()},
 									NestedObject: schema.NestedAttributeObject{
 										Attributes: map[string]schema.Attribute{
 											"id": schema.StringAttribute{
