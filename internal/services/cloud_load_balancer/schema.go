@@ -6,7 +6,6 @@ import (
 	"context"
 
 	"github.com/G-Core/terraform-provider-gcore/internal/customfield"
-	"github.com/G-Core/terraform-provider-gcore/internal/planmodifiers"
 	"github.com/hashicorp/terraform-plugin-framework-timetypes/timetypes"
 	"github.com/hashicorp/terraform-plugin-framework-validators/int64validator"
 	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
@@ -87,7 +86,7 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 						"ipv6",
 					),
 				},
-				PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown(), planmodifiers.StringRequiresReplaceIfConfiguredPreservingState()},
+				PlanModifiers: []planmodifier.String{stringplanmodifier.RequiresReplaceIfConfigured(), stringplanmodifier.UseStateForUnknown()},
 			},
 			"vip_port_id": schema.StringAttribute{
 				Description:   "Existing Reserved Fixed IP port ID for load balancer. Mutually exclusive with `vip_network_id`",
