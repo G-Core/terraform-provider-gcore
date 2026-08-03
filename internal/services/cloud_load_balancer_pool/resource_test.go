@@ -49,9 +49,16 @@ func TestAccCloudLoadBalancerPool_noHealthmonitor(t *testing.T) {
 				),
 			},
 			{
-				// Step 4: remove the block again. Documents current semantics:
-				// Computed retention keeps the monitor; the plan must be empty
-				// (removal-by-omission is a pre-existing no-op, tracked separately).
+				// Step 4: remove the block again. Omitting it plans null, so Update
+				// dispatches to the health monitor DELETE endpoint and the monitor
+				// is actually gone rather than silently retained.
+				Config: testAccCloudLoadBalancerPoolConfigNoHealthmonitor(rName),
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckNoResourceAttr("gcore_cloud_load_balancer_pool.test", "healthmonitor.type"),
+				),
+			},
+			{
+				// Step 5: the removal must settle — no perpetual diff afterwards.
 				Config:   testAccCloudLoadBalancerPoolConfigNoHealthmonitor(rName),
 				PlanOnly: true,
 			},

@@ -109,10 +109,14 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 				},
 			},
 			"healthmonitor": schema.SingleNestedAttribute{
-				Description:   "Health monitor details",
-				Computed:      true,
-				Optional:      true,
-				PlanModifiers: []planmodifier.Object{planmodifiers.ObjectUseStateForUnknownWhenConfigNull()},
+				Description: "Health monitor details",
+				Computed:    true,
+				Optional:    true,
+				// Computed+Optional with no default, but the model stores this as a
+				// plain pointer, which cannot hold unknown. Plan null when the block
+				// is omitted so Plan.Get can decode it, and so removal-by-omission
+				// reaches the dedicated health monitor DELETE endpoint in Update.
+				PlanModifiers: []planmodifier.Object{planmodifiers.ObjectUseNullForRemoval()},
 				Attributes: map[string]schema.Attribute{
 					"delay": schema.Int64Attribute{
 						Description: "The time, in seconds, between sending probes to members",
