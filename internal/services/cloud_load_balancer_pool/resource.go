@@ -67,6 +67,13 @@ func (r *CloudLoadBalancerPoolResource) Create(ctx context.Context, req resource
 		return
 	}
 
+	// The plan modifier on healthmonitor resolves an omitted block to null at
+	// plan time (see ObjectUseStateForUnknownWhenConfigNull). Remember that so
+	// an unexpected server-created monitor in the create response can be
+	// deferred to the next Refresh instead of failing Terraform's post-apply
+	// consistency check.
+	plannedNoHealthmonitor := data.Healthmonitor == nil
+
 	dataBytes, err := data.MarshalJSON()
 	if err != nil {
 		resp.Diagnostics.AddError("failed to serialize http request", err.Error())
@@ -105,6 +112,12 @@ func (r *CloudLoadBalancerPoolResource) Create(ctx context.Context, req resource
 		return
 	}
 	resolveHealthmonitorUnknowns(data)
+	// The plan promised a null healthmonitor (block omitted); the API is not
+	// expected to create one implicitly. If it ever does, surface it on the
+	// next Refresh instead of failing the apply consistency check here.
+	if plannedNoHealthmonitor {
+		data.Healthmonitor = nil
+	}
 
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
 }

@@ -109,9 +109,10 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 				},
 			},
 			"healthmonitor": schema.SingleNestedAttribute{
-				Description: "Health monitor details",
-				Computed:    true,
-				Optional:    true,
+				Description:   "Health monitor details",
+				Computed:      true,
+				Optional:      true,
+				PlanModifiers: []planmodifier.Object{planmodifiers.ObjectUseStateForUnknownWhenConfigNull()},
 				Attributes: map[string]schema.Attribute{
 					"delay": schema.Int64Attribute{
 						Description: "The time, in seconds, between sending probes to members",
