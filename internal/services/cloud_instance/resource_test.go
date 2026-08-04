@@ -29,11 +29,22 @@ func testAccCheckCloudInstanceDestroy(s *terraform.State) error {
 			continue
 		}
 
-		projectID, err := strconv.ParseInt(rs.Primary.Attributes["project_id"], 10, 64)
+		// project_id/region_id are optional path params: a config that omits
+		// them leaves the attributes null in state and the provider falls back
+		// to GCORE_CLOUD_PROJECT_ID/GCORE_CLOUD_REGION_ID. Do the same here.
+		projectAttr := rs.Primary.Attributes["project_id"]
+		if projectAttr == "" {
+			projectAttr = acctest.ProjectID()
+		}
+		projectID, err := strconv.ParseInt(projectAttr, 10, 64)
 		if err != nil {
 			return fmt.Errorf("error parsing project_id: %w", err)
 		}
-		regionID, err := strconv.ParseInt(rs.Primary.Attributes["region_id"], 10, 64)
+		regionAttr := rs.Primary.Attributes["region_id"]
+		if regionAttr == "" {
+			regionAttr = acctest.RegionID()
+		}
+		regionID, err := strconv.ParseInt(regionAttr, 10, 64)
 		if err != nil {
 			return fmt.Errorf("error parsing region_id: %w", err)
 		}
@@ -138,6 +149,91 @@ resource "gcore_cloud_instance" "test" {
   region_id  = %[2]s
   name       = %[3]q
   flavor     = "g1-standard-1-2"
+
+  volumes = [
+    {
+      volume_id  = gcore_cloud_volume.boot.id
+      boot_index = 0
+    }
+  ]
+
+  interfaces = [
+    {
+      type = "external"
+    }
+  ]
+}`, acctest.ProjectID(), acctest.RegionID(), name, imageID)
+}
+
+// Reproduces the import-then-apply failure: importing sets concrete
+// project_id/region_id, the config omits them, so the next apply invokes
+// Update with a diff no handler tracks; every bare Computed attribute is
+// planned unknown and must be resolved by the unconditional refresh.
+func TestAccCloudInstance_importThenApply(t *testing.T) {
+	rName := acctest.RandomName()
+	imageID := latestUbuntuImageID(t)
+	config := testAccCloudInstanceConfigNoProjectRegion(rName, imageID)
+
+	resource.ParallelTest(t, resource.TestCase{
+		PreCheck:                 func() { acctest.PreCheck(t) },
+		ProtoV6ProviderFactories: acctest.ProtoV6ProviderFactories,
+		CheckDestroy:             testAccCheckCloudInstanceDestroy,
+		Steps: []resource.TestStep{
+			{Config: config},
+			{
+				ResourceName:       "gcore_cloud_instance.test",
+				ImportState:        true,
+				ImportStatePersist: true,
+				// The imported state deliberately differs from the config's
+				// state: project_id/region_id come back concrete, the config
+				// leaves them null. That difference is the point of the test.
+				ImportStateVerify: false,
+				ImportStateIdFunc: func(s *terraform.State) (string, error) {
+					rs, ok := s.RootModule().Resources["gcore_cloud_instance.test"]
+					if !ok {
+						return "", fmt.Errorf("resource not found in state")
+					}
+					return fmt.Sprintf("%s/%s/%s", acctest.ProjectID(), acctest.RegionID(), rs.Primary.ID), nil
+				},
+			},
+			{
+				Config: config,
+				ConfigPlanChecks: resource.ConfigPlanChecks{
+					PreApply: []plancheck.PlanCheck{
+						// Guards against this step going vacuous: the imported
+						// project_id/region_id must produce an in-place update.
+						plancheck.ExpectResourceAction("gcore_cloud_instance.test", plancheck.ResourceActionUpdate),
+					},
+				},
+				ConfigStateChecks: []statecheck.StateCheck{
+					statecheck.ExpectKnownValue("gcore_cloud_instance.test",
+						tfjsonpath.New("status"), knownvalue.NotNull()),
+					statecheck.ExpectKnownValue("gcore_cloud_instance.test",
+						tfjsonpath.New("addresses"), knownvalue.NotNull()),
+				},
+			},
+		},
+	})
+}
+
+// Same as testAccCloudInstanceConfig but the instance block omits
+// project_id/region_id so the provider falls back to the environment. The
+// volume keeps them so its own lifecycle is unaffected.
+func testAccCloudInstanceConfigNoProjectRegion(name, imageID string) string {
+	return fmt.Sprintf(`
+resource "gcore_cloud_volume" "boot" {
+  project_id = %[1]s
+  region_id  = %[2]s
+  name       = "%[3]s-vol"
+  size       = 10
+  type_name  = "ssd_hiiops"
+  source     = "image"
+  image_id   = %[4]q
+}
+
+resource "gcore_cloud_instance" "test" {
+  name   = %[3]q
+  flavor = "g1-standard-1-2"
 
   volumes = [
     {

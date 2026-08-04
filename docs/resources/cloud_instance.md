@@ -528,7 +528,6 @@ Available values: "active", "stopped".
 - `region` (String) Region name
 - `status` (String) Instance status
 Available values: "ACTIVE", "BUILD", "DELETED", "ERROR", "HARD_REBOOT", "MIGRATING", "PASSWORD", "PAUSED", "REBOOT", "REBUILD", "RESCUE", "RESIZE", "REVERT_RESIZE", "SHELVED", "SHELVED_OFFLOADED", "SHUTOFF", "SOFT_DELETED", "SUSPENDED", "UNKNOWN", "VERIFY_RESIZE".
-- `task_state` (String) Task state
 
 <a id="nestedatt--interfaces"></a>
 ### Nested Schema for `interfaces`

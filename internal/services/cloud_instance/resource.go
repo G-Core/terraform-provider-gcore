@@ -176,9 +176,6 @@ func (r *CloudInstanceResource) Update(ctx context.Context, req resource.UpdateR
 
 	instanceID := data.ID.ValueString()
 
-	// Track if we've handled updates via specialized endpoints that require a state refresh
-	stateHasChanged := false
-
 	// Preserve the user's desired vm_state before any operations that might overwrite data
 	// This is needed because UnmarshalComputed will overwrite data.VmState with API response
 	// which may contain transient states like "resized" during operations
@@ -285,8 +282,6 @@ func (r *CloudInstanceResource) Update(ctx context.Context, req resource.UpdateR
 			// Wait before next poll
 			time.Sleep(2 * time.Second)
 		}
-
-		stateHasChanged = true
 	}
 
 	// Note: Volume resizing is handled via gcore_cloud_volume resource, not through instance
@@ -348,7 +343,6 @@ func (r *CloudInstanceResource) Update(ctx context.Context, req resource.UpdateR
 		if tags, ok := custom.ConvertAPITagsToCustomfieldMap(ctx, bytesAction); ok {
 			data.Tags = tags
 		}
-		stateHasChanged = true
 	}
 
 	// Handle volume changes using attach/detach endpoints
@@ -395,7 +389,6 @@ func (r *CloudInstanceResource) Update(ctx context.Context, req resource.UpdateR
 					)
 					return
 				}
-				stateHasChanged = true
 			}
 		}
 
@@ -429,7 +422,6 @@ func (r *CloudInstanceResource) Update(ctx context.Context, req resource.UpdateR
 					)
 					return
 				}
-				stateHasChanged = true
 			}
 		}
 	}
@@ -475,7 +467,6 @@ func (r *CloudInstanceResource) Update(ctx context.Context, req resource.UpdateR
 					)
 					return
 				}
-				stateHasChanged = true
 			}
 		}
 
@@ -561,7 +552,6 @@ func (r *CloudInstanceResource) Update(ctx context.Context, req resource.UpdateR
 					)
 					return
 				}
-				stateHasChanged = true
 			}
 		}
 	}
@@ -671,7 +661,6 @@ func (r *CloudInstanceResource) Update(ctx context.Context, req resource.UpdateR
 					"interface":      i,
 				})
 
-				stateHasChanged = true
 				continue
 			}
 
@@ -746,7 +735,6 @@ func (r *CloudInstanceResource) Update(ctx context.Context, req resource.UpdateR
 						"port_id":        portID,
 						"interface":      i,
 					})
-					stateHasChanged = true
 				}
 				continue
 			}
@@ -781,7 +769,6 @@ func (r *CloudInstanceResource) Update(ctx context.Context, req resource.UpdateR
 					)
 					return
 				}
-				stateHasChanged = true
 			}
 
 			// Assign new floating IP if one is specified
@@ -809,7 +796,6 @@ func (r *CloudInstanceResource) Update(ctx context.Context, req resource.UpdateR
 					)
 					return
 				}
-				stateHasChanged = true
 			}
 		}
 	}
@@ -912,7 +898,6 @@ func (r *CloudInstanceResource) Update(ctx context.Context, req resource.UpdateR
 					)
 					return
 				}
-				stateHasChanged = true
 			}
 
 			// Assign new security groups
@@ -949,7 +934,6 @@ func (r *CloudInstanceResource) Update(ctx context.Context, req resource.UpdateR
 					)
 					return
 				}
-				stateHasChanged = true
 			}
 		}
 	}
@@ -988,7 +972,6 @@ func (r *CloudInstanceResource) Update(ctx context.Context, req resource.UpdateR
 				)
 				return
 			}
-			stateHasChanged = true
 		}
 
 		// Then, add to new servergroup if any
@@ -1016,7 +999,6 @@ func (r *CloudInstanceResource) Update(ctx context.Context, req resource.UpdateR
 				)
 				return
 			}
-			stateHasChanged = true
 		}
 	}
 
@@ -1063,70 +1045,81 @@ func (r *CloudInstanceResource) Update(ctx context.Context, req resource.UpdateR
 			resp.Diagnostics.AddError("failed to update instance", err.Error())
 			return
 		}
-		stateHasChanged = true
 	}
 
-	// If any changes were made (specialized endpoints or PATCH), refresh state from API
-	if stateHasChanged {
-		// Re-read instance to get latest state after all operations
-		readParams := cloud.InstanceGetParams{}
+	// Always re-read the instance before persisting state. Terraform can
+	// invoke Update for diffs none of the handlers above act on (for example
+	// path-only project_id/region_id changes after an import, or in-place
+	// volume boot_index/attachment_tag edits), and the planned state then
+	// still carries unknown values for bare Computed attributes such as
+	// status and addresses. Persisting an unknown fails Terraform's
+	// post-apply validation ("Provider returned invalid result object after
+	// apply"), so this refresh must not be gated on whether a handler ran.
+	readParams := cloud.InstanceGetParams{}
+	if !data.ProjectID.IsNull() {
+		readParams.ProjectID = param.NewOpt(data.ProjectID.ValueInt64())
+	}
+	if !data.RegionID.IsNull() {
+		readParams.RegionID = param.NewOpt(data.RegionID.ValueInt64())
+	}
+
+	instance, err := r.client.Cloud.Instances.Get(
+		ctx,
+		instanceID,
+		readParams,
+		option.WithMiddleware(logging.Middleware(ctx)),
+	)
+	if err != nil {
+		resp.Diagnostics.AddError("failed to read instance after update", err.Error())
+		return
+	}
+	err = apijson.UnmarshalComputed([]byte(instance.RawJSON()), &data)
+	if err != nil {
+		resp.Diagnostics.AddError("failed to deserialize instance after update", err.Error())
+		return
+	}
+	if tags, ok := custom.ConvertAPITagsToCustomfieldMap(ctx, []byte(instance.RawJSON())); ok {
+		data.Tags = tags
+	}
+
+	// Extract flavor_id from the flavor object in the API response
+	// API returns: {"flavor": {"flavor_id": "...", ...}}
+	// We need to extract just the flavor_id string
+	var rawResponse map[string]interface{}
+	if err := json.Unmarshal([]byte(instance.RawJSON()), &rawResponse); err == nil {
+		if flavorObj, ok := rawResponse["flavor"].(map[string]interface{}); ok {
+			if flavorID, ok := flavorObj["flavor_id"].(string); ok {
+				data.Flavor = types.StringValue(flavorID)
+			}
+		}
+	}
+
+	// Extract interface port_id and ip_address from the interfaces list
+	if data.Interfaces != nil && len(*data.Interfaces) > 0 {
+		listParams := cloud.InstanceInterfaceListParams{}
 		if !data.ProjectID.IsNull() {
-			readParams.ProjectID = param.NewOpt(data.ProjectID.ValueInt64())
+			listParams.ProjectID = param.NewOpt(data.ProjectID.ValueInt64())
 		}
 		if !data.RegionID.IsNull() {
-			readParams.RegionID = param.NewOpt(data.RegionID.ValueInt64())
+			listParams.RegionID = param.NewOpt(data.RegionID.ValueInt64())
 		}
 
-		instance, err := r.client.Cloud.Instances.Get(
+		interfaces, err := r.client.Cloud.Instances.Interfaces.List(
 			ctx,
 			instanceID,
-			readParams,
+			listParams,
 			option.WithMiddleware(logging.Middleware(ctx)),
 		)
+		// This list is the only source of port_id and ip_address, and the
+		// refresh above is now the guaranteed path for resolving their planned
+		// unknowns. Swallowing a failure here would let resolveUnknown... below
+		// null both fields and report the update as a success, so surface it.
 		if err != nil {
-			resp.Diagnostics.AddError("failed to read instance after update", err.Error())
+			resp.Diagnostics.AddError("failed to list instance interfaces after update", err.Error())
 			return
 		}
-		err = apijson.UnmarshalComputed([]byte(instance.RawJSON()), &data)
-		if err != nil {
-			resp.Diagnostics.AddError("failed to deserialize instance after update", err.Error())
-			return
-		}
-		if tags, ok := custom.ConvertAPITagsToCustomfieldMap(ctx, []byte(instance.RawJSON())); ok {
-			data.Tags = tags
-		}
-
-		// Extract flavor_id from the flavor object in the API response
-		// API returns: {"flavor": {"flavor_id": "...", ...}}
-		// We need to extract just the flavor_id string
-		var rawResponse map[string]interface{}
-		if err := json.Unmarshal([]byte(instance.RawJSON()), &rawResponse); err == nil {
-			if flavorObj, ok := rawResponse["flavor"].(map[string]interface{}); ok {
-				if flavorID, ok := flavorObj["flavor_id"].(string); ok {
-					data.Flavor = types.StringValue(flavorID)
-				}
-			}
-		}
-
-		// Extract interface port_id and ip_address from the interfaces list
-		if data.Interfaces != nil && len(*data.Interfaces) > 0 {
-			listParams := cloud.InstanceInterfaceListParams{}
-			if !data.ProjectID.IsNull() {
-				listParams.ProjectID = param.NewOpt(data.ProjectID.ValueInt64())
-			}
-			if !data.RegionID.IsNull() {
-				listParams.RegionID = param.NewOpt(data.RegionID.ValueInt64())
-			}
-
-			interfaces, err := r.client.Cloud.Instances.Interfaces.List(
-				ctx,
-				instanceID,
-				listParams,
-				option.WithMiddleware(logging.Middleware(ctx)),
-			)
-			if err == nil && interfaces != nil {
-				mergeInterfaceComputedFields(data.Interfaces, interfaces.Results, false)
-			}
+		if interfaces != nil {
+			mergeInterfaceComputedFields(data.Interfaces, interfaces.Results, false)
 		}
 	}
 
@@ -1445,6 +1438,11 @@ func mergeInterfaceComputedFields(tfInterfaces *[]*CloudInstanceInterfacesModel,
 	for i := range *tfInterfaces {
 		matches[i] = -1
 		tfIface := (*tfInterfaces)[i]
+		// A null element in the configured list decodes to a nil pointer and
+		// passes the interfaces validator, which skips null elements.
+		if tfIface == nil {
+			continue
+		}
 		if !tfIface.PortID.IsNull() && !tfIface.PortID.IsUnknown() {
 			if idx, ok := apiIfaceByPort[tfIface.PortID.ValueString()]; ok {
 				matches[i] = idx
@@ -1457,7 +1455,7 @@ func mergeInterfaceComputedFields(tfInterfaces *[]*CloudInstanceInterfacesModel,
 	// new interfaces without a port_id yet.
 	nextUnclaimed := 0
 	for i := range *tfInterfaces {
-		if matches[i] >= 0 {
+		if matches[i] >= 0 || (*tfInterfaces)[i] == nil {
 			continue
 		}
 		for nextUnclaimed < len(apiInterfaces) && claimed[nextUnclaimed] {
@@ -1471,7 +1469,7 @@ func mergeInterfaceComputedFields(tfInterfaces *[]*CloudInstanceInterfacesModel,
 
 	for i := range *tfInterfaces {
 		apiIdx := matches[i]
-		if apiIdx < 0 {
+		if apiIdx < 0 || (*tfInterfaces)[i] == nil {
 			continue
 		}
 
