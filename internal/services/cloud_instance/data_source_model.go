@@ -60,10 +60,6 @@ func (m *CloudInstanceDataSourceModel) toListParams(_ context.Context) (params c
 			mFindOneByTagValue = append(mFindOneByTagValue, item.ValueString())
 		}
 	}
-	mFindOneByChangesBefore, errs := m.FindOneBy.ChangesBefore.ValueRFC3339Time()
-	diags.Append(errs...)
-	mFindOneByChangesSince, errs := m.FindOneBy.ChangesSince.ValueRFC3339Time()
-	diags.Append(errs...)
 
 	params = cloud.InstanceListParams{
 		TagValue: mFindOneByTagValue,
@@ -79,9 +75,13 @@ func (m *CloudInstanceDataSourceModel) toListParams(_ context.Context) (params c
 		params.AvailableFloating = param.NewOpt(m.FindOneBy.AvailableFloating.ValueBool())
 	}
 	if !m.FindOneBy.ChangesBefore.IsNull() {
+		mFindOneByChangesBefore, errs := m.FindOneBy.ChangesBefore.ValueRFC3339Time()
+		diags.Append(errs...)
 		params.ChangesBefore = param.NewOpt(mFindOneByChangesBefore)
 	}
 	if !m.FindOneBy.ChangesSince.IsNull() {
+		mFindOneByChangesSince, errs := m.FindOneBy.ChangesSince.ValueRFC3339Time()
+		diags.Append(errs...)
 		params.ChangesSince = param.NewOpt(mFindOneByChangesSince)
 	}
 	if !m.FindOneBy.ExcludeFlavorPrefix.IsNull() {

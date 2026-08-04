@@ -66,10 +66,6 @@ func (m *DNSZoneDataSourceModel) toListParams(_ context.Context) (params dns.Zon
 			mFindOneByResellerID = append(mFindOneByResellerID, item.ValueInt64())
 		}
 	}
-	mFindOneByUpdatedAtFrom, errs := m.FindOneBy.UpdatedAtFrom.ValueRFC3339Time()
-	diags.Append(errs...)
-	mFindOneByUpdatedAtTo, errs := m.FindOneBy.UpdatedAtTo.ValueRFC3339Time()
-	diags.Append(errs...)
 
 	params = dns.ZoneListParams{
 		ID:            mFindOneByID,
@@ -104,9 +100,13 @@ func (m *DNSZoneDataSourceModel) toListParams(_ context.Context) (params dns.Zon
 		params.Status = param.NewOpt(m.FindOneBy.Status.ValueString())
 	}
 	if !m.FindOneBy.UpdatedAtFrom.IsNull() {
+		mFindOneByUpdatedAtFrom, errs := m.FindOneBy.UpdatedAtFrom.ValueRFC3339Time()
+		diags.Append(errs...)
 		params.UpdatedAtFrom = param.NewOpt(mFindOneByUpdatedAtFrom)
 	}
 	if !m.FindOneBy.UpdatedAtTo.IsNull() {
+		mFindOneByUpdatedAtTo, errs := m.FindOneBy.UpdatedAtTo.ValueRFC3339Time()
+		diags.Append(errs...)
 		params.UpdatedAtTo = param.NewOpt(mFindOneByUpdatedAtTo)
 	}
 

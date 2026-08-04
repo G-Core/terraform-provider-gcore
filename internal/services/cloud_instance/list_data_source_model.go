@@ -56,10 +56,6 @@ func (m *CloudInstancesDataSourceModel) toListParams(_ context.Context) (params 
 			mTagValue = append(mTagValue, item.ValueString())
 		}
 	}
-	mChangesBefore, errs := m.ChangesBefore.ValueRFC3339Time()
-	diags.Append(errs...)
-	mChangesSince, errs := m.ChangesSince.ValueRFC3339Time()
-	diags.Append(errs...)
 
 	params = cloud.InstanceListParams{
 		TagValue: mTagValue,
@@ -75,9 +71,13 @@ func (m *CloudInstancesDataSourceModel) toListParams(_ context.Context) (params 
 		params.AvailableFloating = param.NewOpt(m.AvailableFloating.ValueBool())
 	}
 	if !m.ChangesBefore.IsNull() {
+		mChangesBefore, errs := m.ChangesBefore.ValueRFC3339Time()
+		diags.Append(errs...)
 		params.ChangesBefore = param.NewOpt(mChangesBefore)
 	}
 	if !m.ChangesSince.IsNull() {
+		mChangesSince, errs := m.ChangesSince.ValueRFC3339Time()
+		diags.Append(errs...)
 		params.ChangesSince = param.NewOpt(mChangesSince)
 	}
 	if !m.ExcludeFlavorPrefix.IsNull() {

@@ -53,14 +53,6 @@ func (m *CloudGPUBaremetalClustersDataSourceModel) toListParams(ctx context.Cont
 	if diags.HasError() {
 		return
 	}
-	mCreatedAtGt, errs := m.CreatedAt.Gt.ValueRFC3339Time()
-	diags.Append(errs...)
-	mCreatedAtGte, errs := m.CreatedAt.Gte.ValueRFC3339Time()
-	diags.Append(errs...)
-	mCreatedAtLt, errs := m.CreatedAt.Lt.ValueRFC3339Time()
-	diags.Append(errs...)
-	mCreatedAtLte, errs := m.CreatedAt.Lte.ValueRFC3339Time()
-	diags.Append(errs...)
 	mFlavorContains := []string{}
 	if m.Flavor.Contains != nil {
 		for _, item := range *m.Flavor.Contains {
@@ -195,14 +187,6 @@ func (m *CloudGPUBaremetalClustersDataSourceModel) toListParams(ctx context.Cont
 			mTags[key] = value.ValueString()
 		}
 	}
-	mUpdatedAtGt, errs := m.UpdatedAt.Gt.ValueRFC3339Time()
-	diags.Append(errs...)
-	mUpdatedAtGte, errs := m.UpdatedAt.Gte.ValueRFC3339Time()
-	diags.Append(errs...)
-	mUpdatedAtLt, errs := m.UpdatedAt.Lt.ValueRFC3339Time()
-	diags.Append(errs...)
-	mUpdatedAtLte, errs := m.UpdatedAt.Lte.ValueRFC3339Time()
-	diags.Append(errs...)
 
 	params = cloud.GPUBaremetalClusterListParams{
 		IDs:       mIDs,
@@ -219,15 +203,23 @@ func (m *CloudGPUBaremetalClustersDataSourceModel) toListParams(ctx context.Cont
 	if m.CreatedAt != nil {
 		paramsCreatedAt := cloud.GPUBaremetalClusterListParamsCreatedAt{}
 		if !m.CreatedAt.Gt.IsNull() {
+			mCreatedAtGt, errs := m.CreatedAt.Gt.ValueRFC3339Time()
+			diags.Append(errs...)
 			paramsCreatedAt.Gt = param.NewOpt(mCreatedAtGt)
 		}
 		if !m.CreatedAt.Gte.IsNull() {
+			mCreatedAtGte, errs := m.CreatedAt.Gte.ValueRFC3339Time()
+			diags.Append(errs...)
 			paramsCreatedAt.Gte = param.NewOpt(mCreatedAtGte)
 		}
 		if !m.CreatedAt.Lt.IsNull() {
+			mCreatedAtLt, errs := m.CreatedAt.Lt.ValueRFC3339Time()
+			diags.Append(errs...)
 			paramsCreatedAt.Lt = param.NewOpt(mCreatedAtLt)
 		}
 		if !m.CreatedAt.Lte.IsNull() {
+			mCreatedAtLte, errs := m.CreatedAt.Lte.ValueRFC3339Time()
+			diags.Append(errs...)
 			paramsCreatedAt.Lte = param.NewOpt(mCreatedAtLte)
 		}
 		params.CreatedAt = paramsCreatedAt
@@ -283,15 +275,23 @@ func (m *CloudGPUBaremetalClustersDataSourceModel) toListParams(ctx context.Cont
 	if m.UpdatedAt != nil {
 		paramsUpdatedAt := cloud.GPUBaremetalClusterListParamsUpdatedAt{}
 		if !m.UpdatedAt.Gt.IsNull() {
+			mUpdatedAtGt, errs := m.UpdatedAt.Gt.ValueRFC3339Time()
+			diags.Append(errs...)
 			paramsUpdatedAt.Gt = param.NewOpt(mUpdatedAtGt)
 		}
 		if !m.UpdatedAt.Gte.IsNull() {
+			mUpdatedAtGte, errs := m.UpdatedAt.Gte.ValueRFC3339Time()
+			diags.Append(errs...)
 			paramsUpdatedAt.Gte = param.NewOpt(mUpdatedAtGte)
 		}
 		if !m.UpdatedAt.Lt.IsNull() {
+			mUpdatedAtLt, errs := m.UpdatedAt.Lt.ValueRFC3339Time()
+			diags.Append(errs...)
 			paramsUpdatedAt.Lt = param.NewOpt(mUpdatedAtLt)
 		}
 		if !m.UpdatedAt.Lte.IsNull() {
+			mUpdatedAtLte, errs := m.UpdatedAt.Lte.ValueRFC3339Time()
+			diags.Append(errs...)
 			paramsUpdatedAt.Lte = param.NewOpt(mUpdatedAtLte)
 		}
 		params.UpdatedAt = paramsUpdatedAt

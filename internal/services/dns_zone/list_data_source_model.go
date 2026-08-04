@@ -69,10 +69,6 @@ func (m *DNSZonesDataSourceModel) toListParams(_ context.Context) (params dns.Zo
 			mResellerID = append(mResellerID, item.ValueInt64())
 		}
 	}
-	mUpdatedAtFrom, errs := m.UpdatedAtFrom.ValueRFC3339Time()
-	diags.Append(errs...)
-	mUpdatedAtTo, errs := m.UpdatedAtTo.ValueRFC3339Time()
-	diags.Append(errs...)
 
 	params = dns.ZoneListParams{
 		ID:            mID,
@@ -107,9 +103,13 @@ func (m *DNSZonesDataSourceModel) toListParams(_ context.Context) (params dns.Zo
 		params.Status = param.NewOpt(m.Status.ValueString())
 	}
 	if !m.UpdatedAtFrom.IsNull() {
+		mUpdatedAtFrom, errs := m.UpdatedAtFrom.ValueRFC3339Time()
+		diags.Append(errs...)
 		params.UpdatedAtFrom = param.NewOpt(mUpdatedAtFrom)
 	}
 	if !m.UpdatedAtTo.IsNull() {
+		mUpdatedAtTo, errs := m.UpdatedAtTo.ValueRFC3339Time()
+		diags.Append(errs...)
 		params.UpdatedAtTo = param.NewOpt(mUpdatedAtTo)
 	}
 
