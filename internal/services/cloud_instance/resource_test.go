@@ -165,43 +165,39 @@ resource "gcore_cloud_instance" "test" {
 }`, acctest.ProjectID(), acctest.RegionID(), name, imageID)
 }
 
-// Reproduces the import-then-apply failure: importing sets concrete
-// project_id/region_id, the config omits them, so the next apply invokes
-// Update with a diff no handler tracks; every bare Computed attribute is
-// planned unknown and must be resolved by the unconditional refresh.
-func TestAccCloudInstance_importThenApply(t *testing.T) {
+// Reproduces the failure seen on the apply that follows a terraform import.
+//
+// project_id/region_id are Optional-only path params, so importing (which
+// writes both concretely from the import ID) and then applying a config that
+// omits them leaves state and config disagreeing on exactly those two
+// attributes. That is a plain in-place update that none of Update()'s
+// handlers act on, and the same diff is produced deterministically by moving
+// from a config that sets them to one that does not - no import step needed,
+// which keeps the test off ImportStatePersist's "resource already managed by
+// Terraform" path.
+//
+// On such a diff every bare Computed attribute is planned unknown, and the
+// unconditional post-update refresh is the only thing that resolves them.
+// Without it the apply fails with "Provider returned invalid result object
+// after apply".
+func TestAccCloudInstance_pathOnlyDiffResolvesComputed(t *testing.T) {
 	rName := acctest.RandomName()
 	imageID := latestUbuntuImageID(t)
-	config := testAccCloudInstanceConfigNoProjectRegion(rName, imageID)
 
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:                 func() { acctest.PreCheck(t) },
 		ProtoV6ProviderFactories: acctest.ProtoV6ProviderFactories,
 		CheckDestroy:             testAccCheckCloudInstanceDestroy,
 		Steps: []resource.TestStep{
-			{Config: config},
+			// State ends up with concrete project_id/region_id, as an import would leave it.
+			{Config: testAccCloudInstanceConfig(rName, imageID)},
 			{
-				ResourceName:       "gcore_cloud_instance.test",
-				ImportState:        true,
-				ImportStatePersist: true,
-				// The imported state deliberately differs from the config's
-				// state: project_id/region_id come back concrete, the config
-				// leaves them null. That difference is the point of the test.
-				ImportStateVerify: false,
-				ImportStateIdFunc: func(s *terraform.State) (string, error) {
-					rs, ok := s.RootModule().Resources["gcore_cloud_instance.test"]
-					if !ok {
-						return "", fmt.Errorf("resource not found in state")
-					}
-					return fmt.Sprintf("%s/%s/%s", acctest.ProjectID(), acctest.RegionID(), rs.Primary.ID), nil
-				},
-			},
-			{
-				Config: config,
+				Config: testAccCloudInstanceConfigNoProjectRegion(rName, imageID),
 				ConfigPlanChecks: resource.ConfigPlanChecks{
 					PreApply: []plancheck.PlanCheck{
-						// Guards against this step going vacuous: the imported
-						// project_id/region_id must produce an in-place update.
+						// Guards against this step going vacuous: dropping
+						// project_id/region_id must still produce an in-place
+						// update, not a no-op and not a replacement.
 						plancheck.ExpectResourceAction("gcore_cloud_instance.test", plancheck.ResourceActionUpdate),
 					},
 				},
