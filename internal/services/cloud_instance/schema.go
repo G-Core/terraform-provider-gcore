@@ -274,6 +274,10 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 					),
 				},
 			},
+			"task_state": schema.StringAttribute{
+				Description: "Task state",
+				Computed:    true,
+			},
 			"vm_state": schema.StringAttribute{
 				Description:   "Virtual machine state. Set to 'active' to start the instance or 'stopped' to stop it.\nAvailable values: \"active\", \"stopped\".",
 				Computed:      true,
