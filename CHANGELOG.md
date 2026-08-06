@@ -1,5 +1,68 @@
 # Changelog
 
+## [2.0.0-alpha.15](https://github.com/G-Core/terraform-provider-gcore/compare/v2.0.0-alpha.14...v2.0.0-alpha.15) (2026-08-06)
+
+
+### ⚠ BREAKING CHANGES
+
+* **cloud:** remove stats and show_stats from load balancer and listener
+
+### Features
+
+* **cdn:** add logs uploader field remapping ([d1e0c5a](https://github.com/G-Core/terraform-provider-gcore/commit/d1e0c5a1b2c27f2b7d696e303f0fafd4ded67f82))
+* **cloud:** add console_type parameter to GPU cluster server console endpoint ([8ac41a4](https://github.com/G-Core/terraform-provider-gcore/commit/8ac41a43f37fc94ff4adcc11d7559301abd0478c))
+* **cloud:** enable pagination for paginable cloud list endpoints ([e16260f](https://github.com/G-Core/terraform-provider-gcore/commit/e16260fa214aa5af1cacbad00b8e6979089b0b83))
+* **cloud:** enable Terraform list data sources for paginated cloud resources ([dbd2b93](https://github.com/G-Core/terraform-provider-gcore/commit/dbd2b9322968c18c0aea3f311e1924f36d71b112))
+* **cloud:** expose bare metal server action endpoint ([f396b0f](https://github.com/G-Core/terraform-provider-gcore/commit/f396b0faec87f5a7f62ac28fb647ab82bae8e79e))
+* **cloud:** remove stats and show_stats from load balancer and listener ([5d0ca74](https://github.com/G-Core/terraform-provider-gcore/commit/5d0ca74b9f9c6f1cfe1fc93fcd9d686c4be60e8a))
+
+
+### Bug Fixes
+
+* **cdn:** update logs uploader field remap safely ([d88105e](https://github.com/G-Core/terraform-provider-gcore/commit/d88105e36de3049d21a2cce988e9cac669ac038a))
+* **cloud_instance:** apply cleanly when attaching a new interface on update ([0f53b2f](https://github.com/G-Core/terraform-provider-gcore/commit/0f53b2fd76b31bb6daa908ee11cf99c1d8feba4d))
+* **cloud:** avoid volume replacement after import ([12ebfab](https://github.com/G-Core/terraform-provider-gcore/commit/12ebfab11ed049d5d76a46b3d386ac0ec40eadf4))
+* **cloud:** correlate k8s pool attributes by name instead of list index ([198a8ca](https://github.com/G-Core/terraform-provider-gcore/commit/198a8ca7fa76bfe02310e0ee16dada731797fa50))
+* **cloud:** create a load balancer pool without a healthmonitor block ([3ee51f0](https://github.com/G-Core/terraform-provider-gcore/commit/3ee51f05075f3308d2d23ec49be7bbccc204b7d7))
+* **cloud:** enforce the gpu cluster interface variant contract ([0e9e4e7](https://github.com/G-Core/terraform-provider-gcore/commit/0e9e4e7b691de8746fc483fc376f6cfc9147fe59))
+* **cloud:** extend retry budget on load balancer pool member delete ([4519e9b](https://github.com/G-Core/terraform-provider-gcore/commit/4519e9b1a65898f5d9b6060ad904db134e3a9ac0))
+* **cloud:** mark k8s pool security_group_ids computed_optional in Terraform ([c99fab7](https://github.com/G-Core/terraform-provider-gcore/commit/c99fab7acb3d454c3117e3403d720d34e0dd14dc))
+* **cloud:** prevent load balancer pool replacement after import ([226bb82](https://github.com/G-Core/terraform-provider-gcore/commit/226bb826d49ccb9f83480359cd76104e0cca8d6f))
+* **cloud:** refresh volume state after updates ([bc4cce8](https://github.com/G-Core/terraform-provider-gcore/commit/bc4cce8620d8481f96abed779da7bb43c3028621))
+* **cloud:** reuse ObjectUseNullForRemoval for the pool healthmonitor ([fc37728](https://github.com/G-Core/terraform-provider-gcore/commit/fc377289c2278648c6eb76fa438b32f22c39e854))
+* **cloud:** stop load balancer computed attributes re-planning as unknown ([9c14c1d](https://github.com/G-Core/terraform-provider-gcore/commit/9c14c1db8e215ce130c90e59d906297a460e9159))
+* **cloud:** support k8s pool security_group_ids updates and suppress drift ([9b6ed4b](https://github.com/G-Core/terraform-provider-gcore/commit/9b6ed4b7929044179e3694d928a8f366edc167f8))
+* **cloud:** suppress plan drift on gpu cluster computed attributes ([fcb296f](https://github.com/G-Core/terraform-provider-gcore/commit/fcb296f09b8cc2d1ce3bea940aca56ac64ed7d17))
+* **cloud:** use the stock replace modifier for vip_ip_family ([de24c93](https://github.com/G-Core/terraform-provider-gcore/commit/de24c93e9508e92867fb535829c18e3e4adf26e1))
+* **test:** register every sweeper so it can actually run ([a35c763](https://github.com/G-Core/terraform-provider-gcore/commit/a35c763b64b2457143b3851e91efa78491201a71))
+
+
+### Chores
+
+* **cdn:** update cdn OpenAPI spec ([7ed6630](https://github.com/G-Core/terraform-provider-gcore/commit/7ed66301e2c28e9dff8ec5781a79bbef8b41c707))
+* **cloud:** update cloud OpenAPI spec ([6cab77b](https://github.com/G-Core/terraform-provider-gcore/commit/6cab77bc060ec792d4bf1bd12421fea860ecd90d))
+* **dns:** update dns OpenAPI spec ([86dcb39](https://github.com/G-Core/terraform-provider-gcore/commit/86dcb39728120eada2887c17782cc5587069b7c8))
+* **dns:** update dns OpenAPI spec ([073679c](https://github.com/G-Core/terraform-provider-gcore/commit/073679c215ec29a682757c9571928bbc27a21ba2))
+* reseal custom code from G-Core/terraform-provider-gcore-staging@5d0ca74b9f9c6f1cfe1fc93fcd9d686c4be60e8a ([7342703](https://github.com/G-Core/terraform-provider-gcore/commit/73427039d4164f7e640c118154ffd2d218c454b9))
+* reseal custom code from G-Core/terraform-provider-gcore-staging@71efea43dcb2d0762281b147afe60255be9a745c ([9fd3c1d](https://github.com/G-Core/terraform-provider-gcore/commit/9fd3c1dec5ab08d3fbc9397ef08af7116042ee8e))
+* **terraform:** reseal custom code against current generated output ([ef09660](https://github.com/G-Core/terraform-provider-gcore/commit/ef096602a171d5ec6d16ce92d794fd65a18dd97b))
+* unlink gcore-go-staging ([71efea4](https://github.com/G-Core/terraform-provider-gcore/commit/71efea43dcb2d0762281b147afe60255be9a745c))
+* **waap:** update waap OpenAPI spec ([8e5816d](https://github.com/G-Core/terraform-provider-gcore/commit/8e5816d3d8d5c3ece08c2c78fc954a613ecba6cf))
+
+
+### Documentation
+
+* clarify where internal ticket references may appear ([df921f7](https://github.com/G-Core/terraform-provider-gcore/commit/df921f7944b8a71981eb789f6b213d4fab14853a))
+* **terraform:** regenerate from custom templates ([ffe1799](https://github.com/G-Core/terraform-provider-gcore/commit/ffe1799a00ccbed82cc57c7aba8e050c36695902))
+* **terraform:** regenerate from custom templates ([9d5f8e4](https://github.com/G-Core/terraform-provider-gcore/commit/9d5f8e44e53d0b5c1d5530f11b3b3f84ccc2b915))
+* **terraform:** regenerate from custom templates ([03257cc](https://github.com/G-Core/terraform-provider-gcore/commit/03257cc22510c5c9a8eae5efc0258070dff15318))
+* **terraform:** regenerate from custom templates ([6d3ad43](https://github.com/G-Core/terraform-provider-gcore/commit/6d3ad43e936fa3b0503fbee101c79764ef76b418))
+
+
+### Refactors
+
+* **cloud:** poll network update task in cloud_network resource ([dad1b50](https://github.com/G-Core/terraform-provider-gcore/commit/dad1b50e6e1bc1faed2b1005ce2bbb496ab01100))
+
 ## [2.0.0-alpha.14](https://github.com/G-Core/terraform-provider-gcore/compare/v2.0.0-alpha.13...v2.0.0-alpha.14) (2026-07-22)
 
 
