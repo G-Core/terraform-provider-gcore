@@ -57,24 +57,6 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 				Optional:      true,
 				PlanModifiers: []planmodifier.String{stringplanmodifier.RequiresReplace()},
 			},
-			"floating_ip": schema.SingleNestedAttribute{
-				Description: "Floating IP configuration for assignment",
-				Optional:    true,
-				Attributes: map[string]schema.Attribute{
-					"source": schema.StringAttribute{
-						Description: "A new floating IP will be created and attached to the instance. A floating IP is a public IP that makes the instance accessible from the internet, even if it only has a private IP. It works like SNAT, allowing outgoing and incoming traffic.\nAvailable values: \"new\", \"existing\".",
-						Required:    true,
-						Validators: []validator.String{
-							stringvalidator.OneOfCaseInsensitive("new", "existing"),
-						},
-					},
-					"existing_floating_id": schema.StringAttribute{
-						Description: "An existing available floating IP id must be specified if the source is set to `existing`",
-						Optional:    true,
-					},
-				},
-				PlanModifiers: []planmodifier.Object{objectplanmodifier.RequiresReplace()},
-			},
 			"vip_ip_family": schema.StringAttribute{
 				Description: "IP family for load balancer subnet auto-selection if `vip_network_id` is specified\nAvailable values: \"dual\", \"ipv4\", \"ipv6\".",
 				Computed:    true,

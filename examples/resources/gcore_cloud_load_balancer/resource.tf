@@ -1,12 +1,8 @@
 resource "gcore_cloud_load_balancer" "example_cloud_load_balancer" {
   project_id = 1
-  region_id  = 7
-  name                   = "new_load_balancer"
-  flavor     = "lb1-1-2"
-  floating_ip = {
-    existing_floating_id = "c64e5db1-5f1f-43ec-a8d9-5090df85b82d"
-    source               = "existing"
-  }
+  region_id = 7
+  name = "new_load_balancer"
+  flavor = "lb1-1-2"
   listeners = [{
     name               = "my_listener"
     protocol           = "HTTP"

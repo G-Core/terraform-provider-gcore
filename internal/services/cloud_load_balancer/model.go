@@ -16,7 +16,6 @@ type CloudLoadBalancerModel struct {
 	Flavor                types.String                                                       `tfsdk:"flavor" json:"flavor,optional,no_refresh"`
 	VipNetworkID          types.String                                                       `tfsdk:"vip_network_id" json:"vip_network_id,optional,no_refresh"`
 	VipSubnetID           types.String                                                       `tfsdk:"vip_subnet_id" json:"vip_subnet_id,optional,no_refresh"`
-	FloatingIP            *CloudLoadBalancerFloatingIPModel                                  `tfsdk:"floating_ip" json:"floating_ip,optional,no_refresh"`
 	VipIPFamily           types.String                                                       `tfsdk:"vip_ip_family" json:"vip_ip_family,computed_optional"`
 	VipPortID             types.String                                                       `tfsdk:"vip_port_id" json:"vip_port_id,computed_optional"`
 	Name                  types.String                                                       `tfsdk:"name" json:"name,required"`
@@ -43,11 +42,6 @@ func (m CloudLoadBalancerModel) MarshalJSON() (data []byte, err error) {
 
 func (m CloudLoadBalancerModel) MarshalJSONForUpdate(state CloudLoadBalancerModel) (data []byte, err error) {
 	return apijson.MarshalForPatch(m, state)
-}
-
-type CloudLoadBalancerFloatingIPModel struct {
-	Source             types.String `tfsdk:"source" json:"source,required"`
-	ExistingFloatingID types.String `tfsdk:"existing_floating_id" json:"existing_floating_id,optional"`
 }
 
 type CloudLoadBalancerLoggingModel struct {
