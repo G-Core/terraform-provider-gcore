@@ -171,7 +171,6 @@ output "private_lb_fip" {
 ### Optional
 
 - `flavor` (String) Load balancer flavor name
-- `floating_ip` (Attributes) Floating IP configuration for assignment (see [below for nested schema](#nestedatt--floating_ip))
 - `logging` (Attributes) Logging configuration (see [below for nested schema](#nestedatt--logging))
 - `preferred_connectivity` (String) Preferred option to establish connectivity between load balancer and its pools members. L2 provides best performance, L3 provides less IPs usage. It is taking effect only if `instance_id` + `ip_address` is provided, not `subnet_id` + `ip_address`, because we're considering this as intentional `subnet_id` specification.
 Available values: "L2", "L3".
@@ -201,19 +200,6 @@ Available values: "ACTIVE", "DELETED", "ERROR", "PENDING_CREATE", "PENDING_DELET
 - `vip_address` (String) Load balancer IP address
 - `vip_fqdn` (String) Fully qualified domain name for the load balancer VIP
 - `vrrp_ips` (Attributes List) List of VRRP IP addresses (see [below for nested schema](#nestedatt--vrrp_ips))
-
-<a id="nestedatt--floating_ip"></a>
-### Nested Schema for `floating_ip`
-
-Required:
-
-- `source` (String) A new floating IP will be created and attached to the instance. A floating IP is a public IP that makes the instance accessible from the internet, even if it only has a private IP. It works like SNAT, allowing outgoing and incoming traffic.
-Available values: "new", "existing".
-
-Optional:
-
-- `existing_floating_id` (String) An existing available floating IP id must be specified if the source is set to `existing`
-
 
 <a id="nestedatt--logging"></a>
 ### Nested Schema for `logging`
