@@ -5,9 +5,11 @@ package storage_object_storage_bucket
 import (
 	"context"
 
+	"github.com/G-Core/terraform-provider-gcore/internal/customfield"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/int64planmodifier"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/listplanmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringplanmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/types"
@@ -31,11 +33,25 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 			"cors": schema.SingleNestedAttribute{
 				Optional: true,
 				Attributes: map[string]schema.Attribute{
+					// Computed+Optional with no Default, so the framework plans this
+					// attribute as unknown whenever the cors block is present but
+					// allowed_origins is omitted. The model field must therefore be
+					// able to carry an unknown value; a plain *[]types.String cannot,
+					// and Plan.Get fails before the request is ever sent. customfield.List
+					// is what every other computed_optional list in this provider uses.
+					// UseStateForUnknown keeps the post-create plan empty by reusing the
+					// prior value; on create the state is null, so the attribute stays
+					// unknown, is omitted from the request body, and is resolved to null
+					// when the response is decoded.
 					"allowed_origins": schema.ListAttribute{
 						Description: "Web domains allowed to make direct browser requests. Send an empty array to remove CORS configuration.",
 						Optional:    true,
 						Computed:    true,
+						CustomType:  customfield.NewListType[types.String](ctx),
 						ElementType: types.StringType,
+						PlanModifiers: []planmodifier.List{
+							listplanmodifier.UseStateForUnknown(),
+						},
 					},
 				},
 			},

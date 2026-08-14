@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 
 	"github.com/G-Core/terraform-provider-gcore/internal/apijson"
+	"github.com/G-Core/terraform-provider-gcore/internal/customfield"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 )
 
@@ -57,7 +58,7 @@ func (m StorageObjectStorageBucketModel) MarshalJSONForUpdate(state StorageObjec
 }
 
 type StorageObjectStorageBucketCorsModel struct {
-	AllowedOrigins *[]types.String `tfsdk:"allowed_origins" json:"allowed_origins,computed_optional"`
+	AllowedOrigins customfield.List[types.String] `tfsdk:"allowed_origins" json:"allowed_origins,computed_optional"`
 }
 
 type StorageObjectStorageBucketPolicyModel struct {
