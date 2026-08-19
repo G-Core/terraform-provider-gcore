@@ -43,10 +43,26 @@ Cover at minimum:
 | `UseStateForUnknownIncludingNullObject()` | Object | Preserves state (including null) when plan unknown |
 | `{Bool,Int64,String,Set,Object}UseStateForUnknownInclNull()` | Various | Generic variants preserving state (including null) when plan unknown (in `use_state_for_unknown_incl_null.go`) |
 | `ObjectPreserveNullState()` | Object | Preserves null state when plan unknown; does not compute when neither config nor state specifies the object |
-| `StringRequiresReplaceIfConfiguredPreservingState()` | String | Import-safe replacement: requires replace only when both config and state have known values that differ. Skips replacement when state is null (e.g., after importing a resource with a write-only field like `origin` that the API doesn't return in GET responses) |
+| `StringRequiresReplaceIfConfiguredPreservingState()` | String | Import-safe replacement: requires replace only when both config and state have known values that differ. Skips replacement when state is null (e.g., after importing a resource with a write-only field like `origin` that the API doesn't return in GET responses). Also skips it when the config value is **removed or unknown** — only use it where the Update API can honour those cases in place |
+| `RequiresReplaceIfPriorValueKnown()` | String | Import-safe replacement: skips replacement only when the **prior state** is null/unknown (create or post-import for a `no_refresh` field); replaces on any other change, including removal from config and an unknown planned value. Prefer this one for create-only fields (`string_requires_replace_if_prior_value_known.go`) |
 | `SetSuppressServerAdditions()` | Set | Suppresses drift when the API enriches a user-provided set with server-managed elements. If every config element exists in state and state has more, uses state value |
 | `UseStateUnlessCountChanges(countAttr)` | List | Preserves list state unless resource replaced or specified count attr changes |
 | `RequiresReplaceOnConfigChange()` | Object | Requires replace only when user-specified config fields change (ignores computed) |
+| `ListRequiresReplaceIfNotNull()` | List | Import-safe replacement: requires replace when the value changes, but skips it when prior state is null (post-import for a `no_refresh` field) |
+| `StringRequiresReplaceUnlessAdopting(key)` | String | Import-safe replacement for create-only fields, keyed on an **explicit private-state marker** rather than on prior state being null. Skips replacement only during the one-time adoption that follows `terraform import`; every other transition keeps built-in semantics, including removal and an unknown planned value. The owning resource sets `key` in `ImportState` and clears it in `Update` (`requires_replace_unless_adopting.go`) |
+
+### Import-safe replacement: prefer the marker
+
+A create-only attribute the API cannot return (`no_refresh`) is null in state after
+`terraform import`, so an unconditional `RequiresReplace()` plans a destroy+recreate of live
+infrastructure. The tempting fix is to skip replacement whenever prior state is null — but
+**prior state is equally null for a resource created with the attribute omitted**. Adopting
+silently there records a value the infrastructure does not have, turning a loud, destructive
+behaviour into a silent, wrong one.
+
+`StringRequiresReplaceUnlessAdopting()` avoids that by keying on a marker written at import time.
+`RequiresReplaceIfPriorValueKnown()` and `ListRequiresReplaceIfNotNull()` implement the older
+null-prior-state heuristic and carry that caveat; prefer the marker for new work.
 
 ## Resource-Specific Modifier Inventory
 

@@ -18,6 +18,7 @@ import (
 	"github.com/G-Core/terraform-provider-gcore/internal/custom"
 	"github.com/G-Core/terraform-provider-gcore/internal/importpath"
 	"github.com/G-Core/terraform-provider-gcore/internal/logging"
+	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 )
@@ -129,6 +130,16 @@ func (r *CloudLoadBalancerResource) Update(ctx context.Context, req resource.Upd
 		return
 	}
 
+	// Read the adoption marker before the flavor short-circuit: every
+	// state-writing path below, including resize, must verify adopted values
+	// and close the adoption window, or a resize right after import would
+	// adopt silently and leave the marker set forever.
+	adopting, diags := importAdoptionPending(ctx, req.Private)
+	resp.Diagnostics.Append(diags...)
+	if resp.Diagnostics.HasError() {
+		return
+	}
+
 	// Handle flavor changes with ResizeAndPoll - if only flavor changed, skip regular update
 	flavorChanged := !data.Flavor.Equal(state.Flavor) && !data.Flavor.IsNull()
 
@@ -167,8 +178,22 @@ func (r *CloudLoadBalancerResource) Update(ctx context.Context, req resource.Upd
 			data.Tags = tags
 		}
 
-		// After resize, set state and return (don't call regular Update)
+		// After resize, set state and return (don't call regular Update).
+		// Verify before writing, clear only after writing: a mismatch must
+		// leave both state and the marker untouched so the next apply replays
+		// the same adoption decision, and a marker cleared before success
+		// would turn a transient failure into a destroy+recreate on retry.
+		// ResizeAndPoll finishes with a GET, so bytes carries the evidence.
+		if adopting {
+			resp.Diagnostics.Append(r.verifyImportAdoption(ctx, data, state, bytes)...)
+			if resp.Diagnostics.HasError() {
+				return
+			}
+		}
 		resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
+		if adopting && !resp.Diagnostics.HasError() {
+			resp.Diagnostics.Append(clearImportAdoptionPending(ctx, resp.Private)...)
+		}
 		return
 	}
 
@@ -185,6 +210,17 @@ func (r *CloudLoadBalancerResource) Update(ctx context.Context, req resource.Upd
 	dataBytes, err := data.MarshalJSONForUpdate(*state)
 	if err != nil {
 		resp.Diagnostics.AddError("failed to serialize http request", err.Error())
+		return
+	}
+
+	// vip_network_id and vip_subnet_id are create-only and null in
+	// state after an import; adopting the configured values into state must not
+	// send them to the PATCH endpoint, which does not accept them. Outside that
+	// adoption window the plan modifiers force replacement instead, so nothing
+	// is stripped and a stray field fails loudly against the API.
+	dataBytes, err = stripAdoptedCreateOnlyFields(dataBytes, *state, adopting)
+	if err != nil {
+		resp.Diagnostics.AddError("failed to filter update request body", err.Error())
 		return
 	}
 
@@ -217,7 +253,20 @@ func (r *CloudLoadBalancerResource) Update(ctx context.Context, req resource.Upd
 		if tags, ok := custom.ConvertAPITagsToCustomfieldMap(ctx, bytes); ok {
 			data.Tags = tags
 		}
+		// Verify before writing, clear only after writing: a mismatch must
+		// leave both state and the marker untouched so the next apply replays
+		// the same adoption decision, and a marker cleared before success
+		// would turn a transient failure into a destroy+recreate on retry.
+		if adopting {
+			resp.Diagnostics.Append(r.verifyImportAdoption(ctx, data, state, bytes)...)
+			if resp.Diagnostics.HasError() {
+				return
+			}
+		}
 		resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
+		if adopting && !resp.Diagnostics.HasError() {
+			resp.Diagnostics.Append(clearImportAdoptionPending(ctx, resp.Private)...)
+		}
 		return
 	}
 
@@ -262,7 +311,80 @@ func (r *CloudLoadBalancerResource) Update(ctx context.Context, req resource.Upd
 		data.Tags = tags
 	}
 
+	// Verify before writing, clear only after writing: a mismatch must leave
+	// both state and the marker untouched so the next apply replays the same
+	// adoption decision, and a marker cleared before success would turn a
+	// transient failure into a destroy+recreate on retry.
+	if adopting {
+		resp.Diagnostics.Append(r.verifyImportAdoption(ctx, data, state, bytes)...)
+		if resp.Diagnostics.HasError() {
+			return
+		}
+	}
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
+	if adopting && !resp.Diagnostics.HasError() {
+		resp.Diagnostics.Append(clearImportAdoptionPending(ctx, resp.Private)...)
+	}
+}
+
+// verifyImportAdoption checks every create-only value this apply adopts into
+// state against the load balancer the API just described, using the response
+// body already in hand plus at most a couple of subnet lookups. It must run on
+// every state-writing path of Update while the adoption marker is set, BEFORE
+// resp.State.Set and before the marker is cleared: a mismatch has to abort the
+// apply with the marker intact, so a retry replays the adoption decision
+// instead of degrading into a destroy+recreate of live infrastructure.
+func (r *CloudLoadBalancerResource) verifyImportAdoption(ctx context.Context, plan, state *CloudLoadBalancerModel, lbBytes []byte) diag.Diagnostics {
+	var diags diag.Diagnostics
+
+	evidence, err := parseAdoptionEvidence(lbBytes)
+	if err != nil {
+		diags.AddError("failed to inspect load balancer for import adoption", err.Error())
+		return diags
+	}
+
+	subnetNetwork := func(ctx context.Context, subnetID string) (string, error) {
+		params := cloud.NetworkSubnetGetParams{}
+		if !plan.ProjectID.IsNull() {
+			params.ProjectID = param.NewOpt(plan.ProjectID.ValueInt64())
+		}
+		if !plan.RegionID.IsNull() {
+			params.RegionID = param.NewOpt(plan.RegionID.ValueInt64())
+		}
+		subnet, err := r.client.Cloud.Networks.Subnets.Get(ctx, subnetID, params, option.WithMiddleware(logging.Middleware(ctx)))
+		if err != nil {
+			return "", err
+		}
+		return subnet.NetworkID, nil
+	}
+
+	findings, err := verifyAdoptedCreateOnlyFields(ctx, *plan, *state, evidence, subnetNetwork)
+	if err != nil {
+		diags.AddError("failed to verify adopted load balancer attributes", err.Error())
+		return diags
+	}
+
+	for _, finding := range findings {
+		switch finding.verdict {
+		case adoptionMismatch:
+			diags.AddError(
+				fmt.Sprintf("configured %s does not match the imported load balancer", finding.attribute),
+				finding.detail+"\n\nThe load balancer update API does not accept this attribute, so the "+
+					"value cannot be applied in place, and adopting it into state would record "+
+					"infrastructure that does not exist. Either set the attribute to the value the "+
+					"load balancer really has (or remove it), or recreate the load balancer with: "+
+					"terraform apply -replace=<resource address>",
+			)
+		case adoptionUnverifiable:
+			diags.AddWarning(
+				fmt.Sprintf("adopted %s without verification", finding.attribute),
+				finding.detail+" The configured value was recorded in state as-is; if it does not "+
+					"match the real load balancer, state will not reflect reality.",
+			)
+		}
+	}
+
+	return diags
 }
 
 func (r *CloudLoadBalancerResource) Read(ctx context.Context, req resource.ReadRequest, resp *resource.ReadResponse) {
@@ -413,9 +535,23 @@ func (r *CloudLoadBalancerResource) ImportState(ctx context.Context, req resourc
 		}
 	}
 
+	// vip_network_id and vip_subnet_id are create-only and tagged
+	// no_refresh, so the GET above cannot populate them and they stay null in
+	// state. Mark the adoption window so the plan modifiers on those attributes
+	// know this null came from an import rather than from a load balancer that
+	// was created without them - the first apply adopts the configured values
+	// into state and clears the marker.
+	resp.Diagnostics.Append(markImportAdoptionPending(ctx, resp.Private)...)
+
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
 }
 
 func (r *CloudLoadBalancerResource) ModifyPlan(_ context.Context, _ resource.ModifyPlanRequest, _ *resource.ModifyPlanResponse) {
-
+	// Deliberately empty. Clearing the import-adoption marker here looks
+	// attractive but cannot work: a plan whose only effect would be the clear
+	// is a no-op plan, and Terraform never persists PlannedPrivate for no-op
+	// plans (plain `terraform plan` writes no state at all, and a no-op apply
+	// short-circuits before writing resource state). Staleness of the marker
+	// is instead made harmless by verifying every adoption against the API in
+	// Update before anything reaches state.
 }

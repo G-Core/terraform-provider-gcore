@@ -74,6 +74,54 @@ func TestRequiresReplaceIfPriorValueKnown_SameValue_NoReplacement(t *testing.T) 
 	}
 }
 
+func TestRequiresReplaceIfPriorValueKnown_RemovedFromConfig_RequiresReplace(t *testing.T) {
+	t.Parallel()
+
+	// The attribute is create-only and the user deleted it from the config.
+	// The Update API cannot honour the removal, so the resource must be
+	// replaced rather than silently nulled out in state.
+	resp := &planmodifier.StringResponse{
+		PlanValue: types.StringNull(),
+	}
+
+	planmodifiers.RequiresReplaceIfPriorValueKnown().PlanModifyString(context.Background(), planmodifier.StringRequest{
+		ConfigValue: types.StringNull(),
+		PlanValue:   types.StringNull(),
+		StateValue:  types.StringValue("net-a"),
+	}, resp)
+
+	if resp.Diagnostics.HasError() {
+		t.Fatalf("unexpected error: %s", resp.Diagnostics.Errors())
+	}
+	if !resp.RequiresReplace {
+		t.Fatal("expected replacement when a configured value is removed from the config")
+	}
+}
+
+func TestRequiresReplaceIfPriorValueKnown_UnknownPlanValue_RequiresReplace(t *testing.T) {
+	t.Parallel()
+
+	// The config references an attribute of a resource that is created or
+	// replaced in the same apply, so the value is unknown at plan time. It is
+	// still a change away from the known prior value.
+	resp := &planmodifier.StringResponse{
+		PlanValue: types.StringUnknown(),
+	}
+
+	planmodifiers.RequiresReplaceIfPriorValueKnown().PlanModifyString(context.Background(), planmodifier.StringRequest{
+		ConfigValue: types.StringUnknown(),
+		PlanValue:   types.StringUnknown(),
+		StateValue:  types.StringValue("net-a"),
+	}, resp)
+
+	if resp.Diagnostics.HasError() {
+		t.Fatalf("unexpected error: %s", resp.Diagnostics.Errors())
+	}
+	if !resp.RequiresReplace {
+		t.Fatal("expected replacement when the planned value is unknown and prior state is known")
+	}
+}
+
 func TestRequiresReplaceIfPriorValueKnown_DifferentValue_RequiresReplace(t *testing.T) {
 	t.Parallel()
 

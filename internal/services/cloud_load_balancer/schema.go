@@ -6,6 +6,7 @@ import (
 	"context"
 
 	"github.com/G-Core/terraform-provider-gcore/internal/customfield"
+	"github.com/G-Core/terraform-provider-gcore/internal/planmodifiers"
 	"github.com/hashicorp/terraform-plugin-framework-timetypes/timetypes"
 	"github.com/hashicorp/terraform-plugin-framework-validators/int64validator"
 	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
@@ -50,12 +51,12 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 			"vip_network_id": schema.StringAttribute{
 				Description:   "Network ID for load balancer. If not specified, default external network will be used. Mutually exclusive with `vip_port_id`",
 				Optional:      true,
-				PlanModifiers: []planmodifier.String{stringplanmodifier.RequiresReplace()},
+				PlanModifiers: []planmodifier.String{planmodifiers.StringRequiresReplaceUnlessAdopting(importAdoptionPrivateKey)},
 			},
 			"vip_subnet_id": schema.StringAttribute{
 				Description:   "Subnet ID for load balancer. If not specified, any subnet from `vip_network_id` will be selected. Ignored when `vip_network_id` is not specified.",
 				Optional:      true,
-				PlanModifiers: []planmodifier.String{stringplanmodifier.RequiresReplace()},
+				PlanModifiers: []planmodifier.String{planmodifiers.StringRequiresReplaceUnlessAdopting(importAdoptionPrivateKey)},
 			},
 			"vip_ip_family": schema.StringAttribute{
 				Description: "IP family for load balancer subnet auto-selection if `vip_network_id` is specified\nAvailable values: \"dual\", \"ipv4\", \"ipv6\".",
