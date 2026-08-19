@@ -105,6 +105,7 @@ func (r *CloudLoadBalancerPoolResource) Create(ctx context.Context, req resource
 		return
 	}
 	resolveHealthmonitorUnknowns(data)
+	dropPhantomHealthmonitor(data)
 
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
 }
@@ -211,6 +212,7 @@ func (r *CloudLoadBalancerPoolResource) Update(ctx context.Context, req resource
 			return
 		}
 		resolveHealthmonitorUnknowns(data)
+		dropPhantomHealthmonitor(data)
 		resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
 		return
 	}
@@ -279,6 +281,7 @@ func (r *CloudLoadBalancerPoolResource) Update(ctx context.Context, req resource
 		return
 	}
 	resolveHealthmonitorUnknowns(data)
+	dropPhantomHealthmonitor(data)
 
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
 }
@@ -325,6 +328,7 @@ func (r *CloudLoadBalancerPoolResource) Read(ctx context.Context, req resource.R
 		resp.Diagnostics.AddError("failed to deserialize http request", err.Error())
 		return
 	}
+	refreshHealthmonitor(bytes, data)
 
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
 }

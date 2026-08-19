@@ -318,7 +318,14 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 						},
 					},
 				},
-				PlanModifiers: []planmodifier.List{listplanmodifier.UseStateForUnknown()},
+				// NOTE: deliberately no UseStateForUnknown. tags_v2 is derived
+				// server-side: it is the union of the user's tags and read-only
+				// system tags, and its element order is not guaranteed. Pinning it
+				// to prior state makes any in-place tags update fail with "Provider
+				// produced inconsistent result after apply". Leaving it unknown
+				// costs a "(known after apply)" line on updates that already show a
+				// diff, and nothing on a no-op plan. Same trade-off, and the same
+				// reasoning, as provisioning_status.
 			},
 			"vrrp_ips": schema.ListNestedAttribute{
 				Description: "List of VRRP IP addresses",

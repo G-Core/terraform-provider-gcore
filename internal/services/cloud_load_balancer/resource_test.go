@@ -211,6 +211,72 @@ func TestAccCloudLoadBalancer_resize(t *testing.T) {
 	})
 }
 
+// TestAccCloudLoadBalancer_tags covers in-place tag updates.
+//
+// The state checks assert `tags`, not `tags_v2`: tags_v2 also carries read-only
+// system tags in an order the API does not guarantee, so there is no stable
+// value to assert. It is still what the test exercises — pinning tags_v2 to
+// prior state fails step 2 during apply, before any state check runs, with
+// "Provider produced inconsistent result after apply".
+//
+// Each step's post-apply plan must come back empty (the test framework enforces
+// this unless ExpectNonEmptyPlan is set), which is what rules out the opposite
+// failure of leaving tags_v2 unpinned: a perpetual diff.
+func TestAccCloudLoadBalancer_tags(t *testing.T) {
+	rName := acctest.RandomName()
+	compareIDSame := statecheck.CompareValue(compare.ValuesSame())
+
+	resource.ParallelTest(t, resource.TestCase{
+		PreCheck:                 func() { acctest.PreCheck(t) },
+		ProtoV6ProviderFactories: acctest.ProtoV6ProviderFactories,
+		CheckDestroy:             testAccCheckCloudLoadBalancerDestroy,
+		Steps: []resource.TestStep{
+			{
+				Config: testAccCloudLoadBalancerConfigWithTags(rName, `
+    env = "test"
+`),
+				ConfigStateChecks: []statecheck.StateCheck{
+					statecheck.ExpectKnownValue("gcore_cloud_load_balancer.test",
+						tfjsonpath.New("tags"), knownvalue.MapExact(map[string]knownvalue.Check{
+							"env": knownvalue.StringExact("test"),
+						})),
+					compareIDSame.AddStateValue("gcore_cloud_load_balancer.test", tfjsonpath.New("id")),
+				},
+			},
+			// Adding a key grows tags_v2. This is the step that reproduces
+			// "new element N has appeared" when tags_v2 is pinned to prior state.
+			{
+				Config: testAccCloudLoadBalancerConfigWithTags(rName, `
+    env   = "test"
+    owner = "qa"
+`),
+				ConfigStateChecks: []statecheck.StateCheck{
+					statecheck.ExpectKnownValue("gcore_cloud_load_balancer.test",
+						tfjsonpath.New("tags"), knownvalue.MapExact(map[string]knownvalue.Check{
+							"env":   knownvalue.StringExact("test"),
+							"owner": knownvalue.StringExact("qa"),
+						})),
+					compareIDSame.AddStateValue("gcore_cloud_load_balancer.test", tfjsonpath.New("id")),
+				},
+			},
+			// Change a value and drop a key in one step: exercises merge-patch
+			// deletion as well as mutation.
+			{
+				Config: testAccCloudLoadBalancerConfigWithTags(rName, `
+    env = "prod"
+`),
+				ConfigStateChecks: []statecheck.StateCheck{
+					statecheck.ExpectKnownValue("gcore_cloud_load_balancer.test",
+						tfjsonpath.New("tags"), knownvalue.MapExact(map[string]knownvalue.Check{
+							"env": knownvalue.StringExact("prod"),
+						})),
+					compareIDSame.AddStateValue("gcore_cloud_load_balancer.test", tfjsonpath.New("id")),
+				},
+			},
+		},
+	})
+}
+
 func testAccCloudLoadBalancerConfig(name string) string {
 	return fmt.Sprintf(`
 resource "gcore_cloud_load_balancer" "test" {
@@ -229,4 +295,17 @@ resource "gcore_cloud_load_balancer" "test" {
   name       = %[3]q
   flavor     = %[4]q
 }`, acctest.ProjectID(), acctest.RegionID(), name, flavor)
+}
+
+func testAccCloudLoadBalancerConfigWithTags(name, tags string) string {
+	return fmt.Sprintf(`
+resource "gcore_cloud_load_balancer" "test" {
+  project_id = %[1]s
+  region_id  = %[2]s
+  name       = %[3]q
+  flavor     = "lb1-1-2"
+
+  tags = {
+%[4]s  }
+}`, acctest.ProjectID(), acctest.RegionID(), name, tags)
 }
