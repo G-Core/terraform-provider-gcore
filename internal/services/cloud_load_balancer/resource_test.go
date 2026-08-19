@@ -716,3 +716,166 @@ resource "gcore_cloud_load_balancer" "test" {
 %[4]s  }
 }`, acctest.ProjectID(), acctest.RegionID(), name, tags)
 }
+
+// TestAccCloudLoadBalancer_separateFloatingIP covers the only supported way to
+// give a load balancer a public IP: a standalone gcore_cloud_floating_ip
+// attached to the load balancer's VIP port.
+//
+// The inline `floating_ip` block used to do this in one resource, but the API
+// has no delete-time cleanup parameter on DELETE /cloud/v1/loadbalancers/...
+// (unlike instances and bare metal, which take `delete_floatings` /
+// `all_floating_ips`), so every destroy left the inline-created floating IP
+// allocated and billable with nothing in the plan to signal it. Modelling the
+// floating IP as its own resource puts it under Terraform's lifecycle instead,
+// which is what CheckDestroy asserts here.
+func TestAccCloudLoadBalancer_separateFloatingIP(t *testing.T) {
+	rName := acctest.RandomName()
+
+	comparePortID := statecheck.CompareValuePairs(
+		"gcore_cloud_load_balancer.test", tfjsonpath.New("vip_port_id"),
+		"gcore_cloud_floating_ip.test", tfjsonpath.New("port_id"),
+		compare.ValuesSame(),
+	)
+	compareFixedIP := statecheck.CompareValuePairs(
+		"gcore_cloud_load_balancer.test", tfjsonpath.New("vip_address"),
+		"gcore_cloud_floating_ip.test", tfjsonpath.New("fixed_ip_address"),
+		compare.ValuesSame(),
+	)
+
+	resource.ParallelTest(t, resource.TestCase{
+		PreCheck:                 func() { acctest.PreCheck(t) },
+		ProtoV6ProviderFactories: acctest.ProtoV6ProviderFactories,
+		CheckDestroy:             testAccCheckCloudLoadBalancerWithFloatingIPDestroy,
+		Steps: []resource.TestStep{
+			{
+				Config: testAccCloudLoadBalancerConfigSeparateFloatingIP(rName),
+				ConfigStateChecks: []statecheck.StateCheck{
+					statecheck.ExpectKnownValue("gcore_cloud_load_balancer.test",
+						tfjsonpath.New("vip_port_id"), knownvalue.NotNull()),
+					statecheck.ExpectKnownValue("gcore_cloud_floating_ip.test",
+						tfjsonpath.New("floating_ip_address"), knownvalue.NotNull()),
+					comparePortID,
+					compareFixedIP,
+				},
+				ConfigPlanChecks: resource.ConfigPlanChecks{
+					PostApplyPostRefresh: []plancheck.PlanCheck{plancheck.ExpectEmptyPlan()},
+				},
+			},
+			{
+				// Re-reading the load balancer after the floating IP is attached
+				// must surface it in the computed floating_ips list, which is how
+				// a user discovers the public address from the load balancer side.
+				//
+				// The floating IP's own status is asserted here rather than in the
+				// step above: the create task returns before Neutron flips the
+				// association to ACTIVE, so the value only settles on the next read.
+				Config: testAccCloudLoadBalancerConfigSeparateFloatingIP(rName),
+				ConfigStateChecks: []statecheck.StateCheck{
+					statecheck.ExpectKnownValue("gcore_cloud_floating_ip.test",
+						tfjsonpath.New("status"), knownvalue.StringExact("ACTIVE")),
+					statecheck.ExpectKnownValue("gcore_cloud_load_balancer.test",
+						tfjsonpath.New("floating_ips"), knownvalue.ListSizeExact(1)),
+					statecheck.CompareValuePairs(
+						"gcore_cloud_load_balancer.test",
+						tfjsonpath.New("floating_ips").AtSliceIndex(0).AtMapKey("floating_ip_address"),
+						"gcore_cloud_floating_ip.test", tfjsonpath.New("floating_ip_address"),
+						compare.ValuesSame(),
+					),
+				},
+			},
+			{
+				// Importing the attached floating IP must produce a no-op plan —
+				// an import that forced replacement would tear the public address
+				// away from a live load balancer.
+				Config:            testAccCloudLoadBalancerConfigSeparateFloatingIP(rName),
+				ResourceName:      "gcore_cloud_floating_ip.test",
+				ImportState:       true,
+				ImportStateKind:   resource.ImportBlockWithID,
+				ImportStateIdFunc: acctest.BuildImportID("gcore_cloud_floating_ip.test", "project_id", "region_id", "id"),
+			},
+		},
+	})
+}
+
+// testAccCheckCloudLoadBalancerWithFloatingIPDestroy asserts that neither the
+// load balancer nor the floating IP survives `terraform destroy`. The floating
+// IP half is the regression guard: an inline-created floating IP passed the
+// load-balancer-only check while staying allocated.
+func testAccCheckCloudLoadBalancerWithFloatingIPDestroy(s *terraform.State) error {
+	if err := testAccCheckCloudLoadBalancerDestroy(s); err != nil {
+		return err
+	}
+
+	client, err := acctest.NewGcoreClient()
+	if err != nil {
+		return err
+	}
+
+	for _, rs := range s.RootModule().Resources {
+		if rs.Type != "gcore_cloud_floating_ip" {
+			continue
+		}
+
+		projectID, err := strconv.ParseInt(rs.Primary.Attributes["project_id"], 10, 64)
+		if err != nil {
+			return fmt.Errorf("error parsing project_id: %w", err)
+		}
+		regionID, err := strconv.ParseInt(rs.Primary.Attributes["region_id"], 10, 64)
+		if err != nil {
+			return fmt.Errorf("error parsing region_id: %w", err)
+		}
+
+		_, err = client.Cloud.FloatingIPs.Get(context.Background(), rs.Primary.ID, cloud.FloatingIPGetParams{
+			ProjectID: param.NewOpt(projectID),
+			RegionID:  param.NewOpt(regionID),
+		})
+
+		if err == nil {
+			return fmt.Errorf("floating IP %s still exists", rs.Primary.ID)
+		}
+		if !acctest.IsNotFoundError(err) {
+			return fmt.Errorf("error checking floating IP deletion: %w", err)
+		}
+	}
+	return nil
+}
+
+// testAccCloudLoadBalancerConfigSeparateFloatingIP builds a load balancer whose
+// VIP sits on a private subnet. A load balancer created without vip_network_id
+// gets its VIP straight on the external network and the API then refuses to
+// associate a floating IP with that port, so the private-VIP shape is the one
+// that needs a floating IP at all.
+func testAccCloudLoadBalancerConfigSeparateFloatingIP(name string) string {
+	return fmt.Sprintf(`
+resource "gcore_cloud_network" "test" {
+  project_id = %[1]s
+  region_id  = %[2]s
+  name       = "%[3]s-net"
+  type       = "vxlan"
+}
+
+resource "gcore_cloud_network_subnet" "test" {
+  project_id  = %[1]s
+  region_id   = %[2]s
+  name        = "%[3]s-subnet"
+  network_id  = gcore_cloud_network.test.id
+  cidr        = "192.168.40.0/24"
+  enable_dhcp = true
+}
+
+resource "gcore_cloud_load_balancer" "test" {
+  project_id     = %[1]s
+  region_id      = %[2]s
+  name           = %[3]q
+  flavor         = "lb1-1-2"
+  vip_network_id = gcore_cloud_network.test.id
+  vip_subnet_id  = gcore_cloud_network_subnet.test.id
+}
+
+resource "gcore_cloud_floating_ip" "test" {
+  project_id       = %[1]s
+  region_id        = %[2]s
+  port_id          = gcore_cloud_load_balancer.test.vip_port_id
+  fixed_ip_address = gcore_cloud_load_balancer.test.vip_address
+}`, acctest.ProjectID(), acctest.RegionID(), name)
+}
