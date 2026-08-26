@@ -6,8 +6,12 @@ import (
 	"context"
 
 	"github.com/G-Core/terraform-provider-gcore/internal/customfield"
+	"github.com/hashicorp/terraform-plugin-framework-validators/datasourcevalidator"
+	"github.com/hashicorp/terraform-plugin-framework-validators/int64validator"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/datasource/schema"
+	"github.com/hashicorp/terraform-plugin-framework/path"
+	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
 )
 
 var _ datasource.DataSourceWithConfigValidators = (*FastedgeSecretDataSource)(nil)
@@ -20,7 +24,7 @@ func DataSourceSchema(ctx context.Context) schema.Schema {
 				Computed: true,
 			},
 			"secret_id": schema.Int64Attribute{
-				Required: true,
+				Optional: true,
 			},
 			"app_count": schema.Int64Attribute{
 				Description: "The number of applications that use this secret.",
@@ -55,6 +59,26 @@ func DataSourceSchema(ctx context.Context) schema.Schema {
 					},
 				},
 			},
+			"find_one_by": schema.SingleNestedAttribute{
+				Optional: true,
+				Attributes: map[string]schema.Attribute{
+					"app_id": schema.Int64Attribute{
+						Description: "App ID",
+						Optional:    true,
+						Validators: []validator.Int64{
+							int64validator.AtLeast(1),
+						},
+					},
+					"search": schema.StringAttribute{
+						Description: "Search term for secret names",
+						Optional:    true,
+					},
+					"secret_name": schema.StringAttribute{
+						Description: "Secret name",
+						Optional:    true,
+					},
+				},
+			},
 		},
 	}
 }
@@ -64,5 +88,7 @@ func (d *FastedgeSecretDataSource) Schema(ctx context.Context, req datasource.Sc
 }
 
 func (d *FastedgeSecretDataSource) ConfigValidators(_ context.Context) []datasource.ConfigValidator {
-	return []datasource.ConfigValidator{}
+	return []datasource.ConfigValidator{
+		datasourcevalidator.ExactlyOneOf(path.MatchRoot("secret_id"), path.MatchRoot("find_one_by")),
+	}
 }

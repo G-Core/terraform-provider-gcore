@@ -57,6 +57,36 @@ func (d *FastedgeSecretDataSource) Read(ctx context.Context, req datasource.Read
 		return
 	}
 
+	if data.FindOneBy != nil {
+		params, diags := data.toListParams(ctx)
+		resp.Diagnostics.Append(diags...)
+		if resp.Diagnostics.HasError() {
+			return
+		}
+
+		env := FastedgeSecretsSecretsListDataSourceEnvelope{}
+		page, err := d.client.Fastedge.Secrets.List(ctx, params)
+		if err != nil {
+			resp.Diagnostics.AddError("failed to make http request", err.Error())
+			return
+		}
+
+		bytes := []byte(page.RawJSON())
+		err = apijson.UnmarshalComputed(bytes, &env)
+		if err != nil {
+			resp.Diagnostics.AddError("failed to unmarshal http request", err.Error())
+			return
+		}
+
+		if count := len(env.Secrets.Elements()); count != 1 {
+			resp.Diagnostics.AddError("failed to find exactly one result", fmt.Sprint(count)+" found")
+			return
+		}
+		ts, diags := env.Secrets.AsStructSliceT(ctx)
+		resp.Diagnostics.Append(diags...)
+		data.SecretID = ts[0].ID
+	}
+
 	res := new(http.Response)
 	_, err := d.client.Fastedge.Secrets.Get(
 		ctx,

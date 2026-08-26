@@ -371,6 +371,7 @@ func (p *GcoreProvider) DataSources(ctx context.Context) []func() datasource.Dat
 		fastedge_template.NewFastedgeTemplateDataSource,
 		fastedge_template.NewFastedgeTemplatesDataSource,
 		fastedge_secret.NewFastedgeSecretDataSource,
+		fastedge_secret.NewFastedgeSecretsDataSource,
 		fastedge_binary.NewFastedgeBinaryDataSource,
 		fastedge_app.NewFastedgeAppDataSource,
 		fastedge_app.NewFastedgeAppsDataSource,
