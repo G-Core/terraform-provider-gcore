@@ -105,13 +105,13 @@ type CloudLoadBalancerPoolsMembersDataSourceModel struct {
 	Address            types.String `tfsdk:"address" json:"address,computed"`
 	AdminStateUp       types.Bool   `tfsdk:"admin_state_up" json:"admin_state_up,computed"`
 	Backup             types.Bool   `tfsdk:"backup" json:"backup,computed"`
+	MonitorAddress     types.String `tfsdk:"monitor_address" json:"monitor_address,computed"`
+	MonitorPort        types.Int64  `tfsdk:"monitor_port" json:"monitor_port,computed"`
 	OperatingStatus    types.String `tfsdk:"operating_status" json:"operating_status,computed"`
 	ProtocolPort       types.Int64  `tfsdk:"protocol_port" json:"protocol_port,computed"`
 	ProvisioningStatus types.String `tfsdk:"provisioning_status" json:"provisioning_status,computed"`
 	SubnetID           types.String `tfsdk:"subnet_id" json:"subnet_id,computed"`
 	Weight             types.Int64  `tfsdk:"weight" json:"weight,computed"`
-	MonitorAddress     types.String `tfsdk:"monitor_address" json:"monitor_address,computed"`
-	MonitorPort        types.Int64  `tfsdk:"monitor_port" json:"monitor_port,computed"`
 }
 
 type CloudLoadBalancerPoolsSessionPersistenceDataSourceModel struct {

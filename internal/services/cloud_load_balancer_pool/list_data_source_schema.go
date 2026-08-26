@@ -237,9 +237,10 @@ func ListDataSourceSchema(ctx context.Context) schema.Schema {
 							},
 						},
 						"members": schema.ListNestedAttribute{
-							Description: "Pool members",
-							Computed:    true,
-							CustomType:  customfield.NewNestedObjectListType[CloudLoadBalancerPoolsMembersDataSourceModel](ctx),
+							Description:        "Pool members. Deprecated. Use `GET /v1/loadbalancers/{project_id}/{region_id}/pools/{pool_id}/members` instead.",
+							Computed:           true,
+							DeprecationMessage: "This attribute is deprecated.",
+							CustomType:         customfield.NewNestedObjectListType[CloudLoadBalancerPoolsMembersDataSourceModel](ctx),
 							NestedObject: schema.NestedAttributeObject{
 								Attributes: map[string]schema.Attribute{
 									"id": schema.StringAttribute{
@@ -257,6 +258,17 @@ func ListDataSourceSchema(ctx context.Context) schema.Schema {
 									"backup": schema.BoolAttribute{
 										Description: "Set to true if the member is a backup member, to which traffic will be sent exclusively when all non-backup members will be unreachable. It allows to realize ACTIVE-BACKUP load balancing without thinking about VRRP and VIP configuration. Default is false",
 										Computed:    true,
+									},
+									"monitor_address": schema.StringAttribute{
+										Description: "An alternate IP address used for health monitoring of a backend member. Default is null which monitors the member address.",
+										Computed:    true,
+									},
+									"monitor_port": schema.Int64Attribute{
+										Description: "An alternate protocol port used for health monitoring of a backend member. Default is null which monitors the member `protocol_port`.",
+										Computed:    true,
+										Validators: []validator.Int64{
+											int64validator.Between(1, 65535),
+										},
 									},
 									"operating_status": schema.StringAttribute{
 										Description: "Member operating status of the entity\nAvailable values: \"DEGRADED\", \"DRAINING\", \"ERROR\", \"NO_MONITOR\", \"OFFLINE\", \"ONLINE\".",
@@ -302,17 +314,6 @@ func ListDataSourceSchema(ctx context.Context) schema.Schema {
 										Computed:    true,
 										Validators: []validator.Int64{
 											int64validator.AtMost(256),
-										},
-									},
-									"monitor_address": schema.StringAttribute{
-										Description: "An alternate IP address used for health monitoring of a backend member. Default is null which monitors the member address.",
-										Computed:    true,
-									},
-									"monitor_port": schema.Int64Attribute{
-										Description: "An alternate protocol port used for health monitoring of a backend member. Default is null which monitors the member `protocol_port`.",
-										Computed:    true,
-										Validators: []validator.Int64{
-											int64validator.Between(1, 65535),
 										},
 									},
 								},

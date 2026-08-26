@@ -24,11 +24,11 @@ func DataSourceSchema(ctx context.Context) schema.Schema {
 		MarkdownDescription: "Security groups act as virtual firewalls controlling inbound and outbound traffic for instances and other resources.",
 		Attributes: map[string]schema.Attribute{
 			"id": schema.StringAttribute{
-				Description: "Group ID",
+				Description: "Security group ID",
 				Computed:    true,
 			},
 			"group_id": schema.StringAttribute{
-				Description: "Group ID",
+				Description: "Security group ID",
 				Optional:    true,
 			},
 			"project_id": schema.Int64Attribute{
