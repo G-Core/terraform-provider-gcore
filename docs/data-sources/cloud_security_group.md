@@ -26,7 +26,7 @@ data "gcore_cloud_security_group" "example_cloud_security_group" {
 ### Optional
 
 - `find_one_by` (Attributes) (see [below for nested schema](#nestedatt--find_one_by))
-- `group_id` (String) Group ID
+- `group_id` (String) Security group ID
 - `project_id` (Number) Project ID
 - `region_id` (Number) Region ID
 
@@ -34,7 +34,7 @@ data "gcore_cloud_security_group" "example_cloud_security_group" {
 
 - `created_at` (String) Datetime when the security group was created
 - `description` (String) Security group description
-- `id` (String) Group ID
+- `id` (String) Security group ID
 - `name` (String) Security group name
 - `region` (String) Region name
 - `revision_number` (Number) The number of revisions

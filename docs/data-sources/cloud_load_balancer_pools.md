@@ -54,7 +54,7 @@ Read-Only:
 Available values: "LEAST_CONNECTIONS", "ROUND_ROBIN", "SOURCE_IP".
 - `listeners` (Attributes List) Listeners IDs (see [below for nested schema](#nestedatt--items--listeners))
 - `loadbalancers` (Attributes List) Load balancers IDs (see [below for nested schema](#nestedatt--items--loadbalancers))
-- `members` (Attributes List) Pool members (see [below for nested schema](#nestedatt--items--members))
+- `members` (Attributes List, Deprecated) Pool members. Deprecated. Use `GET /v1/loadbalancers/{project_id}/{region_id}/pools/{pool_id}/members` instead. (see [below for nested schema](#nestedatt--items--members))
 - `name` (String) Pool name
 - `operating_status` (String) Pool operating status
 Available values: "DEGRADED", "DRAINING", "ERROR", "NO_MONITOR", "OFFLINE", "ONLINE".

@@ -42,7 +42,7 @@ data "gcore_cloud_load_balancer_pool" "example_cloud_load_balancer_pool" {
 Available values: "LEAST_CONNECTIONS", "ROUND_ROBIN", "SOURCE_IP".
 - `listeners` (Attributes List) Listeners IDs (see [below for nested schema](#nestedatt--listeners))
 - `loadbalancers` (Attributes List) Load balancers IDs (see [below for nested schema](#nestedatt--loadbalancers))
-- `members` (Attributes List) Pool members (see [below for nested schema](#nestedatt--members))
+- `members` (Attributes List, Deprecated) Pool members. Deprecated. Use `GET /v1/loadbalancers/{project_id}/{region_id}/pools/{pool_id}/members` instead. (see [below for nested schema](#nestedatt--members))
 - `name` (String) Pool name
 - `operating_status` (String) Pool operating status
 Available values: "DEGRADED", "DRAINING", "ERROR", "NO_MONITOR", "OFFLINE", "ONLINE".

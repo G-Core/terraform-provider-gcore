@@ -14,9 +14,9 @@ Instances are cloud virtual machines with configurable CPU, memory, storage, and
 
 ```terraform
 data "gcore_cloud_instance" "example_cloud_instance" {
-  project_id = 0
-  region_id = 0
-  instance_id = "instance_id"
+  project_id = 1
+  region_id = 1
+  instance_id = "b5b4d65d-945f-4b98-ab6f-332319c724ef"
 }
 ```
 
@@ -97,7 +97,7 @@ Read-Only:
 - `alarm_end` (String) A date-time string giving the time that the alarm ended. If not yet ended, time will be given as 0001-01-01T00:00:00Z
 - `alarm_start` (String) A date-time string giving the time that the alarm started
 - `alarm_state` (String) Current state of alarm
-Available values: "ACK_REQ", "ALARM", "ALARM_FAIL", "ARCHIVED", "CLEAR", "CLEARING", "CLEARING_FAIL", "CLEAR_FAIL", "END_GRACE", "END_WAIT", "MANUAL_CLEAR", "MANUAL_CLEARING", "MANUAL_CLEARING_FAIL", "MANUAL_CLEAR_FAIL", "MANUAL_MITIGATING", "MANUAL_START", "MANUAL_STARTING", "MANUAL_STARTING_FAIL", "MANUAL_START_FAIL", "MITIGATING", "STARTING", "STARTING_FAIL", "START_WAIT", "ack_req", "alarm", "archived", "clear", "clearing", "clearing_fail", "end_grace", "end_wait", "manual_clear", "manual_clearing", "manual_clearing_fail", "manual_mitigating", "manual_starting", "manual_starting_fail", "mitigating", "start_wait", "starting", "starting_fail".
+Available values: "ALARM", "CLEAR", "MANUAL_CLEAR", "MANUAL_START".
 - `alert_duration` (String) Total alert duration
 - `destination_ip` (String) Notification destination IP address
 - `id` (Number)
