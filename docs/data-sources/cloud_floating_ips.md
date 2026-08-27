@@ -153,7 +153,7 @@ Available values: "ACTIVE", "DELETED", "ERROR", "PENDING_CREATE", "PENDING_DELET
 - `region` (String) Region name
 - `region_id` (Number) Region ID
 - `stats` (Attributes) Statistics of load balancer. (see [below for nested schema](#nestedatt--items--loadbalancer--stats))
-- `tags_v2` (Attributes List) List of key-value tags associated with the resource. A tag is a key-value pair that can be associated with a resource, enabling efficient filtering and grouping for better organization and management. Some tags are read-only and cannot be modified by the user. Tags are also integrated with cost reports, allowing cost data to be filtered based on tag keys or values. (see [below for nested schema](#nestedatt--items--loadbalancer--tags_v2))
+- `tags` (Attributes List) List of key-value tags associated with the resource. A tag is a key-value pair that can be associated with a resource, enabling efficient filtering and grouping for better organization and management. Some tags are read-only and cannot be modified by the user. Tags are also integrated with cost reports, allowing cost data to be filtered based on tag keys or values. (see [below for nested schema](#nestedatt--items--loadbalancer--tags))
 - `updated_at` (String) Datetime when the load balancer was last updated
 - `vip_address` (String) Load balancer IP address
 - `vip_fqdn` (String) Fully qualified domain name for the load balancer VIP
@@ -335,8 +335,8 @@ Read-Only:
 - `total_connections` (Number) Total connections handled
 
 
-<a id="nestedatt--items--loadbalancer--tags_v2"></a>
-### Nested Schema for `items.loadbalancer.tags_v2`
+<a id="nestedatt--items--loadbalancer--tags"></a>
+### Nested Schema for `items.loadbalancer.tags`
 
 Read-Only:
 
