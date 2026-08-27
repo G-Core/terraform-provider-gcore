@@ -49,11 +49,3 @@ Read-Only:
 - `current` (Number) The current number of this resource
 
 
-## Import
-
-Import is supported using the following syntax:
-
-```shell
-$ terraform import gcore_waap_domain.example '<domain_id>'
-```
-
