@@ -26,7 +26,7 @@ func ListDataSourceSchema(ctx context.Context) schema.Schema {
 				Optional:    true,
 			},
 			"ordering": schema.StringAttribute{
-				Description: "Sort the response by given field.\nAvailable values: \"id\", \"name\", \"status\", \"created_at\", \"-id\", \"-name\", \"-status\", \"-created_at\".",
+				Description: "Sort the response by given field.\nAvailable values: \"id\", \"name\", \"status\", \"created_at\", \"-id\", \"-name\", \"-status\", \"-created_at\", \"total_requests\", \"-total_requests\", \"attacks_detected\", \"-attacks_detected\".",
 				Optional:    true,
 				Validators: []validator.String{
 					stringvalidator.OneOfCaseInsensitive(
@@ -38,6 +38,10 @@ func ListDataSourceSchema(ctx context.Context) schema.Schema {
 						"-name",
 						"-status",
 						"-created_at",
+						"total_requests",
+						"-total_requests",
+						"attacks_detected",
+						"-attacks_detected",
 					),
 				},
 			},
@@ -105,6 +109,29 @@ func ListDataSourceSchema(ctx context.Context) schema.Schema {
 							Computed:    true,
 							CustomType:  customfield.NewListType[types.String](ctx),
 							ElementType: types.StringType,
+						},
+						"cdn_resource_id": schema.Int64Attribute{
+							Description: "The ID of the CDN resource this domain is bound to",
+							Computed:    true,
+						},
+						"stats": schema.SingleNestedAttribute{
+							Description: "Traffic statistics for a domain.",
+							Computed:    true,
+							CustomType:  customfield.NewNestedObjectType[WaapDomainsStatsDataSourceModel](ctx),
+							Attributes: map[string]schema.Attribute{
+								"attacks_blocked": schema.Int64Attribute{
+									Description: "Total number of blocked attacks for the last 30 days",
+									Computed:    true,
+								},
+								"attacks_detected": schema.Int64Attribute{
+									Description: "Total number of detected attacks for the last 30 days",
+									Computed:    true,
+								},
+								"total_requests": schema.Int64Attribute{
+									Description: "Total number of requests for the last 30 days",
+									Computed:    true,
+								},
+							},
 						},
 					},
 				},

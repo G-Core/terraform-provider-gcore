@@ -23,6 +23,11 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 	return schema.Schema{
 		MarkdownDescription: "WAAP domains enable Web Application and API Protection for monitoring and defending web applications against security threats.",
 		Attributes: map[string]schema.Attribute{
+			"id": schema.Int64Attribute{
+				Description:   "The domain ID",
+				Computed:      true,
+				PlanModifiers: []planmodifier.Int64{int64planmodifier.UseNonNullStateForUnknown()},
+			},
 			"domain_id": schema.Int64Attribute{
 				Description:   "The domain ID",
 				Required:      true,
@@ -43,11 +48,6 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 			},
 			"custom_page_set": schema.Int64Attribute{
 				Description:   "The ID of the custom page set",
-				Computed:      true,
-				PlanModifiers: []planmodifier.Int64{int64planmodifier.UseStateForUnknown()},
-			},
-			"id": schema.Int64Attribute{
-				Description:   "The domain ID",
 				Computed:      true,
 				PlanModifiers: []planmodifier.Int64{int64planmodifier.UseStateForUnknown()},
 			},

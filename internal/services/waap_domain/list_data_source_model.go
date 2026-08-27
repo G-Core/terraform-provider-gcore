@@ -52,10 +52,18 @@ func (m *WaapDomainsDataSourceModel) toListParams(_ context.Context) (params waa
 }
 
 type WaapDomainsItemsDataSourceModel struct {
-	ID            types.Int64                    `tfsdk:"id" json:"id,computed"`
-	CreatedAt     timetypes.RFC3339              `tfsdk:"created_at" json:"created_at,computed" format:"date-time"`
-	CustomPageSet types.Int64                    `tfsdk:"custom_page_set" json:"custom_page_set,computed"`
-	Name          types.String                   `tfsdk:"name" json:"name,computed"`
-	Status        types.String                   `tfsdk:"status" json:"status,computed"`
-	Aliases       customfield.List[types.String] `tfsdk:"aliases" json:"aliases,computed"`
+	ID            types.Int64                                               `tfsdk:"id" json:"id,computed"`
+	CreatedAt     timetypes.RFC3339                                         `tfsdk:"created_at" json:"created_at,computed" format:"date-time"`
+	CustomPageSet types.Int64                                               `tfsdk:"custom_page_set" json:"custom_page_set,computed"`
+	Name          types.String                                              `tfsdk:"name" json:"name,computed"`
+	Status        types.String                                              `tfsdk:"status" json:"status,computed"`
+	Aliases       customfield.List[types.String]                            `tfsdk:"aliases" json:"aliases,computed"`
+	CDNResourceID types.Int64                                               `tfsdk:"cdn_resource_id" json:"cdn_resource_id,computed"`
+	Stats         customfield.NestedObject[WaapDomainsStatsDataSourceModel] `tfsdk:"stats" json:"stats,computed"`
+}
+
+type WaapDomainsStatsDataSourceModel struct {
+	AttacksBlocked  types.Int64 `tfsdk:"attacks_blocked" json:"attacks_blocked,computed"`
+	AttacksDetected types.Int64 `tfsdk:"attacks_detected" json:"attacks_detected,computed"`
+	TotalRequests   types.Int64 `tfsdk:"total_requests" json:"total_requests,computed"`
 }

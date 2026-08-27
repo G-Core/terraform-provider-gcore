@@ -10,11 +10,11 @@ import (
 )
 
 type WaapDomainModel struct {
+	ID            types.Int64                                        `tfsdk:"id" json:"id,computed"`
 	DomainID      types.Int64                                        `tfsdk:"domain_id" path:"domain_id,required"`
 	Status        types.String                                       `tfsdk:"status" json:"status,required"`
 	CreatedAt     timetypes.RFC3339                                  `tfsdk:"created_at" json:"created_at,computed" format:"date-time"`
 	CustomPageSet types.Int64                                        `tfsdk:"custom_page_set" json:"custom_page_set,computed"`
-	ID            types.Int64                                        `tfsdk:"id" json:"id,computed"`
 	Name          types.String                                       `tfsdk:"name" json:"name,computed"`
 	Aliases       customfield.List[types.String]                     `tfsdk:"aliases" json:"aliases,computed"`
 	Quotas        customfield.NestedObjectMap[WaapDomainQuotasModel] `tfsdk:"quotas" json:"quotas,computed"`

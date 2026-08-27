@@ -7,12 +7,12 @@ import (
 	"fmt"
 	"io"
 	"net/http"
-	"strconv"
 
 	"github.com/G-Core/gcore-go"
 	"github.com/G-Core/gcore-go/option"
 	"github.com/G-Core/gcore-go/waap"
 	"github.com/G-Core/terraform-provider-gcore/internal/apijson"
+	"github.com/G-Core/terraform-provider-gcore/internal/importpath"
 	"github.com/G-Core/terraform-provider-gcore/internal/logging"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/types"
@@ -69,7 +69,7 @@ func (r *WaapDomainResource) Create(ctx context.Context, req resource.CreateRequ
 		resp.Diagnostics.AddError("failed to serialize http request", err.Error())
 		return
 	}
-	err = r.client.Waap.Domains.Update(
+	_, err = r.client.Waap.Domains.Update(
 		ctx,
 		data.DomainID.ValueInt64(),
 		waap.DomainUpdateParams{},
@@ -81,7 +81,7 @@ func (r *WaapDomainResource) Create(ctx context.Context, req resource.CreateRequ
 		return
 	}
 
-	// PATCH returns 204 No Content — read back the full domain state
+	// Read back the full domain state to populate computed fields
 	res := new(http.Response)
 	_, err = r.client.Waap.Domains.Get(
 		ctx,
@@ -125,7 +125,7 @@ func (r *WaapDomainResource) Update(ctx context.Context, req resource.UpdateRequ
 		resp.Diagnostics.AddError("failed to serialize http request", err.Error())
 		return
 	}
-	err = r.client.Waap.Domains.Update(
+	_, err = r.client.Waap.Domains.Update(
 		ctx,
 		data.DomainID.ValueInt64(),
 		waap.DomainUpdateParams{},
@@ -137,7 +137,7 @@ func (r *WaapDomainResource) Update(ctx context.Context, req resource.UpdateRequ
 		return
 	}
 
-	// PATCH returns 204 No Content — read back the full domain state
+	// Read back the full domain state to populate computed fields
 	res := new(http.Response)
 	_, err = r.client.Waap.Domains.Get(
 		ctx,
@@ -199,19 +199,25 @@ func (r *WaapDomainResource) Delete(ctx context.Context, req resource.DeleteRequ
 }
 
 func (r *WaapDomainResource) ImportState(ctx context.Context, req resource.ImportStateRequest, resp *resource.ImportStateResponse) {
-	domainID, err := strconv.ParseInt(req.ID, 10, 64)
-	if err != nil {
-		resp.Diagnostics.AddError("invalid import ID", fmt.Sprintf("Expected numeric domain_id, got: %s", req.ID))
+	var data = new(WaapDomainModel)
+
+	path := int64(0)
+	diags := importpath.ParseImportID(
+		req.ID,
+		"<domain_id>",
+		&path,
+	)
+	resp.Diagnostics.Append(diags...)
+	if resp.Diagnostics.HasError() {
 		return
 	}
 
-	var data WaapDomainModel
-	data.DomainID = types.Int64Value(domainID)
+	data.DomainID = types.Int64Value(path)
 
 	res := new(http.Response)
-	_, err = r.client.Waap.Domains.Get(
+	_, err := r.client.Waap.Domains.Get(
 		ctx,
-		domainID,
+		path,
 		option.WithResponseBodyInto(&res),
 		option.WithMiddleware(logging.Middleware(ctx)),
 	)
