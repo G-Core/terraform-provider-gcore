@@ -110,7 +110,6 @@ type CloudInstanceImagesItemsDataSourceModel struct {
 	SSHKey           types.String                                                         `tfsdk:"ssh_key" json:"ssh_key,computed"`
 	Status           types.String                                                         `tfsdk:"status" json:"status,computed"`
 	Tags             customfield.NestedObjectList[CloudInstanceImagesTagsDataSourceModel] `tfsdk:"tags" json:"tags_v2,computed"`
-	TaskID           types.String                                                         `tfsdk:"task_id" json:"task_id,computed"`
 	UpdatedAt        timetypes.RFC3339                                                    `tfsdk:"updated_at" json:"updated_at,computed" format:"date-time"`
 	Visibility       types.String                                                         `tfsdk:"visibility" json:"visibility,computed"`
 }

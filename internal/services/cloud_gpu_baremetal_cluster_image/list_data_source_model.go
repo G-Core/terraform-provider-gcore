@@ -59,7 +59,6 @@ type CloudGPUBaremetalClusterImagesItemsDataSourceModel struct {
 	OsVersion          types.String                                                                    `tfsdk:"os_version" json:"os_version,computed"`
 	Size               types.Int64                                                                     `tfsdk:"size" json:"size,computed"`
 	SSHKey             types.String                                                                    `tfsdk:"ssh_key" json:"ssh_key,computed"`
-	TaskID             types.String                                                                    `tfsdk:"task_id" json:"task_id,computed"`
 }
 
 type CloudGPUBaremetalClusterImagesTagsDataSourceModel struct {

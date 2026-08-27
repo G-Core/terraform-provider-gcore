@@ -5,7 +5,6 @@ package cloud_security_group_rule
 import (
 	"context"
 
-	"github.com/G-Core/terraform-provider-gcore/internal/customfield"
 	"github.com/hashicorp/terraform-plugin-framework-validators/int64validator"
 	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
@@ -14,7 +13,6 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringplanmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
-	"github.com/hashicorp/terraform-plugin-framework/types"
 )
 
 var _ resource.ResourceWithConfigValidators = (*CloudSecurityGroupRuleResource)(nil)
@@ -122,12 +120,6 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 					stringvalidator.OneOfCaseInsensitive("IPv4", "IPv6"),
 				},
 				PlanModifiers: []planmodifier.String{stringplanmodifier.RequiresReplace()},
-			},
-			"tasks": schema.ListAttribute{
-				Description: "List of task IDs representing asynchronous operations. Use these IDs to monitor operation progress:\n  - `GET /v1/tasks/{task_id}` - Check individual task status and details\n  Poll task status until completion (`FINISHED`/`ERROR`) before proceeding with dependent operations.",
-				Computed:    true,
-				CustomType:  customfield.NewListType[types.String](ctx),
-				ElementType: types.StringType,
 			},
 		},
 	}

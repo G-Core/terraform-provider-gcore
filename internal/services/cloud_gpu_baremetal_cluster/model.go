@@ -25,7 +25,6 @@ type CloudGPUBaremetalClusterModel struct {
 	Status            types.String                                  `tfsdk:"status" json:"status,computed"`
 	UpdatedAt         timetypes.RFC3339                             `tfsdk:"updated_at" json:"updated_at,computed" format:"date-time"`
 	ServersIDs        customfield.List[types.String]                `tfsdk:"servers_ids" json:"servers_ids,computed"`
-	Tasks             customfield.List[types.String]                `tfsdk:"tasks" json:"tasks,computed,no_refresh"`
 }
 
 func (m CloudGPUBaremetalClusterModel) MarshalJSON() (data []byte, err error) {

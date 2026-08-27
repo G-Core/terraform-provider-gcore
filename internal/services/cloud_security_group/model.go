@@ -21,7 +21,6 @@ type CloudSecurityGroupModel struct {
 	Region             types.String                                                            `tfsdk:"region" json:"region,computed"`
 	RevisionNumber     types.Int64                                                             `tfsdk:"revision_number" json:"revision_number,computed"`
 	UpdatedAt          timetypes.RFC3339                                                       `tfsdk:"updated_at" json:"updated_at,computed" format:"date-time"`
-	Tasks              customfield.List[types.String]                                          `tfsdk:"tasks" json:"tasks,computed,no_refresh"`
 	SecurityGroupRules customfield.NestedObjectList[CloudSecurityGroupSecurityGroupRulesModel] `tfsdk:"security_group_rules" json:"security_group_rules,computed"`
 }
 
