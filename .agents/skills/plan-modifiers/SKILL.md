@@ -49,7 +49,7 @@ Cover at minimum:
 | `UseStateUnlessCountChanges(countAttr)` | List | Preserves list state unless resource replaced or specified count attr changes |
 | `RequiresReplaceOnConfigChange()` | Object | Requires replace only when user-specified config fields change (ignores computed) |
 | `ListRequiresReplaceIfNotNull()` | List | Import-safe replacement: requires replace when the value changes, but skips it when prior state is null (post-import for a `no_refresh` field) |
-| `StringRequiresReplaceUnlessAdopting(key)` | String | Import-safe replacement for create-only fields, keyed on an **explicit private-state marker** rather than on prior state being null. Skips replacement only during the one-time adoption that follows `terraform import`; every other transition keeps built-in semantics, including removal and an unknown planned value. The owning resource sets `key` in `ImportState` and clears it in `Update` (`requires_replace_unless_adopting.go`) |
+| `{String,Bool,Int64,Map,Object}RequiresReplaceUnlessAdopting(key)` | Various | Import-safe replacement for create-only fields, keyed on an **explicit private-state marker** rather than on prior state being null. Skips replacement only during the one-time adoption that follows `terraform import`; every other transition keeps built-in semantics, including removal and an unknown planned value. The owning resource sets `key` in `ImportState` and clears it in `Update`. All five typed variants are thin wrappers over one shared decision, so their behaviour cannot drift apart (`requires_replace_unless_adopting.go`) |
 
 ### Import-safe replacement: prefer the marker
 
@@ -60,7 +60,8 @@ infrastructure. The tempting fix is to skip replacement whenever prior state is 
 silently there records a value the infrastructure does not have, turning a loud, destructive
 behaviour into a silent, wrong one.
 
-`StringRequiresReplaceUnlessAdopting()` avoids that by keying on a marker written at import time.
+`{String,Bool,Int64,Map,Object}RequiresReplaceUnlessAdopting()` avoids that by keying on a
+marker written at import time.
 `RequiresReplaceIfPriorValueKnown()` and `ListRequiresReplaceIfNotNull()` implement the older
 null-prior-state heuristic and carry that caveat; prefer the marker for new work.
 

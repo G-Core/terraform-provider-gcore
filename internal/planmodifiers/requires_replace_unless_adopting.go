@@ -49,10 +49,10 @@ func adoptionPending(ctx context.Context, private privateStateReader, key string
 	return len(value) > 0, diags
 }
 
-// requiresReplaceUnlessAdopting is the decision shared by both typed modifiers,
-// kept as a pure function so the whole matrix can be unit tested: the framework
-// request types carry private state as an internal type that cannot be
-// constructed from outside the framework module.
+// requiresReplaceUnlessAdopting is the decision shared by every typed modifier
+// in this family, kept as a pure function so the whole matrix can be unit
+// tested: the framework request types carry private state as an internal type
+// that cannot be constructed from outside the framework module.
 //
 // The only case that skips replacement on a null prior value is an adoption
 // following an import. In particular a resource created with the attribute
@@ -73,6 +73,11 @@ func requiresReplaceUnlessAdopting(stateRawNull, planRawNull, valueUnchanged, pr
 	}
 }
 
+// requiresReplaceUnlessAdoptingDescription is shared by every typed modifier in
+// this family so their documented behaviour cannot drift apart.
+const requiresReplaceUnlessAdoptingDescription = "Requires replacement when the value changes, except while adopting a value into " +
+	"state immediately after terraform import."
+
 // StringRequiresReplaceUnlessAdopting returns a plan modifier that requires
 // replacement when a create-only string attribute changes, except during the
 // one-time adoption that follows an import. See the package-level notes above.
@@ -85,8 +90,7 @@ type stringRequiresReplaceUnlessAdoptingModifier struct {
 }
 
 func (m stringRequiresReplaceUnlessAdoptingModifier) Description(_ context.Context) string {
-	return "Requires replacement when the value changes, except while adopting a value into " +
-		"state immediately after terraform import."
+	return requiresReplaceUnlessAdoptingDescription
 }
 
 func (m stringRequiresReplaceUnlessAdoptingModifier) MarkdownDescription(ctx context.Context) string {
@@ -94,6 +98,146 @@ func (m stringRequiresReplaceUnlessAdoptingModifier) MarkdownDescription(ctx con
 }
 
 func (m stringRequiresReplaceUnlessAdoptingModifier) PlanModifyString(ctx context.Context, req planmodifier.StringRequest, resp *planmodifier.StringResponse) {
+	pending, diags := adoptionPending(ctx, req.Private, m.privateKey)
+	resp.Diagnostics.Append(diags...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
+
+	resp.RequiresReplace = requiresReplaceUnlessAdopting(
+		req.State.Raw.IsNull(),
+		req.Plan.Raw.IsNull(),
+		req.PlanValue.Equal(req.StateValue),
+		req.StateValue.IsNull(),
+		pending,
+	)
+}
+
+// BoolRequiresReplaceUnlessAdopting returns the Bool counterpart of
+// StringRequiresReplaceUnlessAdopting. See the package-level notes above.
+func BoolRequiresReplaceUnlessAdopting(privateKey string) planmodifier.Bool {
+	return boolRequiresReplaceUnlessAdoptingModifier{privateKey: privateKey}
+}
+
+type boolRequiresReplaceUnlessAdoptingModifier struct {
+	privateKey string
+}
+
+func (m boolRequiresReplaceUnlessAdoptingModifier) Description(_ context.Context) string {
+	return requiresReplaceUnlessAdoptingDescription
+}
+
+func (m boolRequiresReplaceUnlessAdoptingModifier) MarkdownDescription(ctx context.Context) string {
+	return m.Description(ctx)
+}
+
+func (m boolRequiresReplaceUnlessAdoptingModifier) PlanModifyBool(ctx context.Context, req planmodifier.BoolRequest, resp *planmodifier.BoolResponse) {
+	pending, diags := adoptionPending(ctx, req.Private, m.privateKey)
+	resp.Diagnostics.Append(diags...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
+
+	resp.RequiresReplace = requiresReplaceUnlessAdopting(
+		req.State.Raw.IsNull(),
+		req.Plan.Raw.IsNull(),
+		req.PlanValue.Equal(req.StateValue),
+		req.StateValue.IsNull(),
+		pending,
+	)
+}
+
+// Int64RequiresReplaceUnlessAdopting returns the Int64 counterpart of
+// StringRequiresReplaceUnlessAdopting. See the package-level notes above.
+func Int64RequiresReplaceUnlessAdopting(privateKey string) planmodifier.Int64 {
+	return int64RequiresReplaceUnlessAdoptingModifier{privateKey: privateKey}
+}
+
+type int64RequiresReplaceUnlessAdoptingModifier struct {
+	privateKey string
+}
+
+func (m int64RequiresReplaceUnlessAdoptingModifier) Description(_ context.Context) string {
+	return requiresReplaceUnlessAdoptingDescription
+}
+
+func (m int64RequiresReplaceUnlessAdoptingModifier) MarkdownDescription(ctx context.Context) string {
+	return m.Description(ctx)
+}
+
+func (m int64RequiresReplaceUnlessAdoptingModifier) PlanModifyInt64(ctx context.Context, req planmodifier.Int64Request, resp *planmodifier.Int64Response) {
+	pending, diags := adoptionPending(ctx, req.Private, m.privateKey)
+	resp.Diagnostics.Append(diags...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
+
+	resp.RequiresReplace = requiresReplaceUnlessAdopting(
+		req.State.Raw.IsNull(),
+		req.Plan.Raw.IsNull(),
+		req.PlanValue.Equal(req.StateValue),
+		req.StateValue.IsNull(),
+		pending,
+	)
+}
+
+// MapRequiresReplaceUnlessAdopting returns the Map counterpart of
+// StringRequiresReplaceUnlessAdopting. See the package-level notes above.
+func MapRequiresReplaceUnlessAdopting(privateKey string) planmodifier.Map {
+	return mapRequiresReplaceUnlessAdoptingModifier{privateKey: privateKey}
+}
+
+type mapRequiresReplaceUnlessAdoptingModifier struct {
+	privateKey string
+}
+
+func (m mapRequiresReplaceUnlessAdoptingModifier) Description(_ context.Context) string {
+	return requiresReplaceUnlessAdoptingDescription
+}
+
+func (m mapRequiresReplaceUnlessAdoptingModifier) MarkdownDescription(ctx context.Context) string {
+	return m.Description(ctx)
+}
+
+func (m mapRequiresReplaceUnlessAdoptingModifier) PlanModifyMap(ctx context.Context, req planmodifier.MapRequest, resp *planmodifier.MapResponse) {
+	pending, diags := adoptionPending(ctx, req.Private, m.privateKey)
+	resp.Diagnostics.Append(diags...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
+
+	resp.RequiresReplace = requiresReplaceUnlessAdopting(
+		req.State.Raw.IsNull(),
+		req.Plan.Raw.IsNull(),
+		req.PlanValue.Equal(req.StateValue),
+		req.StateValue.IsNull(),
+		pending,
+	)
+}
+
+// ObjectRequiresReplaceUnlessAdopting returns the Object counterpart of
+// StringRequiresReplaceUnlessAdopting. See the package-level notes above.
+func ObjectRequiresReplaceUnlessAdopting(privateKey string) planmodifier.Object {
+	return objectRequiresReplaceUnlessAdoptingModifier{privateKey: privateKey}
+}
+
+type objectRequiresReplaceUnlessAdoptingModifier struct {
+	privateKey string
+}
+
+func (m objectRequiresReplaceUnlessAdoptingModifier) Description(_ context.Context) string {
+	return requiresReplaceUnlessAdoptingDescription
+}
+
+func (m objectRequiresReplaceUnlessAdoptingModifier) MarkdownDescription(ctx context.Context) string {
+	return m.Description(ctx)
+}
+
+func (m objectRequiresReplaceUnlessAdoptingModifier) PlanModifyObject(ctx context.Context, req planmodifier.ObjectRequest, resp *planmodifier.ObjectResponse) {
 	pending, diags := adoptionPending(ctx, req.Private, m.privateKey)
 	resp.Diagnostics.Append(diags...)
 
