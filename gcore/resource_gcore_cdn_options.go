@@ -972,25 +972,6 @@ var (
 				},
 			},
 		},
-		"waf": {
-			Type:        schema.TypeList,
-			MaxItems:    1,
-			Optional:    true,
-			Description: "Option allows to enable Basic WAF to protect you against the most common threats.",
-			Elem: &schema.Resource{
-				Schema: map[string]*schema.Schema{
-					"enabled": {
-						Type:     schema.TypeBool,
-						Optional: true,
-						Default:  true,
-					},
-					"value": {
-						Type:     schema.TypeBool,
-						Required: true,
-					},
-				},
-			},
-		},
 		"websockets": {
 			Type:        schema.TypeList,
 			MaxItems:    1,

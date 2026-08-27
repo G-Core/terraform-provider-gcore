@@ -648,12 +648,6 @@ func listToOptions(l []interface{}) *gcdn.Options {
 			Value:   opt["value"].(bool),
 		}
 	}
-	if opt, ok := getOptByName(fields, "waf"); ok {
-		opts.WAF = &gcdn.WAF{
-			Enabled: opt["enabled"].(bool),
-			Value:   opt["value"].(bool),
-		}
-	}
 	if opt, ok := getOptByName(fields, "websockets"); ok {
 		opts.WebSockets = &gcdn.WebSockets{
 			Enabled: opt["enabled"].(bool),
@@ -879,10 +873,6 @@ func optionsToList(options *gcdn.Options) []interface{} {
 	if options.WAAP != nil {
 		m := structToMap(options.WAAP)
 		result["waap"] = []interface{}{m}
-	}
-	if options.WAF != nil {
-		m := structToMap(options.WAF)
-		result["waf"] = []interface{}{m}
 	}
 	if options.WebSockets != nil {
 		m := structToMap(options.WebSockets)
