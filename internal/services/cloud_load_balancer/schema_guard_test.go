@@ -52,43 +52,43 @@ func TestCloudLoadBalancerResourceSchemaOmitsServerOnlyAttributes(t *testing.T) 
 	}
 }
 
-// TestCloudLoadBalancerResourceTagsV2IsNotPinned fails if a plan modifier is
-// attached to tags_v2.
+// TestCloudLoadBalancerResourceHasNoTagsMirror fails if a server-derived tag
+// mirror reappears on the load balancer resource.
 //
-// tags_v2 is derived server-side: it is the union of the user's tags and
-// read-only system tags, and its element order is not guaranteed. Any modifier
-// that reuses the prior state value therefore claims a planned value the API is
-// free to contradict, and an in-place tags update fails with "Provider produced
-// inconsistent result after apply".
+// The resource used to carry tags_v2, a read-only mirror of the union of the
+// user's tags and read-only system tags. It was removed deliberately: the
+// mirror is derived server-side, its element order is not guaranteed, and
+// nothing on the resource could pin it without an in-place tags update failing
+// with "Provider produced inconsistent result after apply". Tags are read
+// through the data source instead.
 //
-// The assertion is deliberately fail-closed: it rejects any modifier, not just
-// UseStateForUnknown, and it requires tags_v2 to stay a ListNestedAttribute. A
-// future change that wants either — a modifier that is genuinely safe here, or
-// a migration to a set to deal with the unstable ordering — has to come edit
-// this test and say so. That is the point.
+// The assertion is deliberately fail-closed: any nested-list tag mirror on the
+// resource, under either name, fails. A future change that wants one back has
+// to come edit this test and say so. That is the point.
 //
-// The reason for being this strict: UseStateForUnknown was removed from tags_v2
-// once before, with a comment explaining why. A regeneration dropped the
-// comment, and a later change restored the modifier because nothing recorded
-// that the removal had been deliberate. Deletions are the fragile shape in
-// custom code here — they can vanish in a reseal without producing a conflict —
-// so the deletion is asserted in a test rather than left to a comment.
-func TestCloudLoadBalancerResourceTagsV2IsNotPinned(t *testing.T) {
+// The reason for being this strict is unchanged from the modifier guard this
+// replaces: deletions are the fragile shape in custom code here - they can
+// vanish in a reseal without producing a conflict - so the deletion is asserted
+// in a test rather than left to a comment.
+func TestCloudLoadBalancerResourceHasNoTagsMirror(t *testing.T) {
 	t.Parallel()
 
-	attribute, found := cloud_load_balancer.ResourceSchema(context.TODO()).Attributes["tags_v2"]
-	if !found {
-		t.Fatal("tags_v2 is missing from the gcore_cloud_load_balancer resource schema")
+	attributes := cloud_load_balancer.ResourceSchema(context.TODO()).Attributes
+
+	if attribute, found := attributes["tags_v2"]; found {
+		t.Errorf("the gcore_cloud_load_balancer resource carries tags_v2 (%T); the "+
+			"server-derived tag mirror was removed on purpose and tags are read "+
+			"through the data source", attribute)
 	}
 
-	tagsV2, ok := attribute.(schema.ListNestedAttribute)
-	if !ok {
-		t.Fatalf("tags_v2 is a %T, want schema.ListNestedAttribute", attribute)
-	}
-
-	for _, modifier := range tagsV2.PlanModifiers {
-		t.Errorf("tags_v2 carries the plan modifier %T (%s); tags_v2 must stay unknown on "+
-			"updates, because the API may return tags the plan cannot predict",
-			modifier, modifier.Description(context.TODO()))
+	// tags itself is legitimate and must stay: it is the user-writable map the
+	// caller sets. What must not come back is a nested-list mirror under that
+	// name, which is the server-derived shape in a new disguise.
+	if attribute, found := attributes["tags"]; found {
+		if _, isMirror := attribute.(schema.ListNestedAttribute); isMirror {
+			t.Errorf("the gcore_cloud_load_balancer resource carries tags as a "+
+				"ListNestedAttribute (%T); that is the server-derived mirror under a "+
+				"new name. tags must stay the user-writable map", attribute)
+		}
 	}
 }

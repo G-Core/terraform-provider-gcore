@@ -23,7 +23,6 @@ type CloudSecurityGroupModel struct {
 	UpdatedAt          timetypes.RFC3339                                                       `tfsdk:"updated_at" json:"updated_at,computed" format:"date-time"`
 	Tasks              customfield.List[types.String]                                          `tfsdk:"tasks" json:"tasks,computed,no_refresh"`
 	SecurityGroupRules customfield.NestedObjectList[CloudSecurityGroupSecurityGroupRulesModel] `tfsdk:"security_group_rules" json:"security_group_rules,computed"`
-	TagsV2             customfield.NestedObjectList[CloudSecurityGroupTagsV2Model]             `tfsdk:"tags_v2" json:"tags_v2,computed"`
 }
 
 func (m CloudSecurityGroupModel) MarshalJSON() (data []byte, err error) {
@@ -59,10 +58,4 @@ type CloudSecurityGroupSecurityGroupRulesModel struct {
 	RevisionNumber  types.Int64       `tfsdk:"revision_number" json:"revision_number,computed"`
 	SecurityGroupID types.String      `tfsdk:"security_group_id" json:"security_group_id,computed"`
 	UpdatedAt       timetypes.RFC3339 `tfsdk:"updated_at" json:"updated_at,computed" format:"date-time"`
-}
-
-type CloudSecurityGroupTagsV2Model struct {
-	Key      types.String `tfsdk:"key" json:"key,computed"`
-	ReadOnly types.Bool   `tfsdk:"read_only" json:"read_only,computed"`
-	Value    types.String `tfsdk:"value" json:"value,computed"`
 }

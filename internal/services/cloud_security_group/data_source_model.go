@@ -25,7 +25,7 @@ type CloudSecurityGroupDataSourceModel struct {
 	RevisionNumber     types.Int64                                                                       `tfsdk:"revision_number" json:"revision_number,computed"`
 	UpdatedAt          timetypes.RFC3339                                                                 `tfsdk:"updated_at" json:"updated_at,computed" format:"date-time"`
 	SecurityGroupRules customfield.NestedObjectList[CloudSecurityGroupSecurityGroupRulesDataSourceModel] `tfsdk:"security_group_rules" json:"security_group_rules,computed"`
-	TagsV2             customfield.NestedObjectList[CloudSecurityGroupTagsV2DataSourceModel]             `tfsdk:"tags_v2" json:"tags_v2,computed"`
+	Tags               customfield.NestedObjectList[CloudSecurityGroupTagsDataSourceModel]               `tfsdk:"tags" json:"tags_v2,computed"`
 	FindOneBy          *CloudSecurityGroupFindOneByDataSourceModel                                       `tfsdk:"find_one_by"`
 }
 
@@ -86,7 +86,7 @@ type CloudSecurityGroupSecurityGroupRulesDataSourceModel struct {
 	UpdatedAt       timetypes.RFC3339 `tfsdk:"updated_at" json:"updated_at,computed" format:"date-time"`
 }
 
-type CloudSecurityGroupTagsV2DataSourceModel struct {
+type CloudSecurityGroupTagsDataSourceModel struct {
 	Key      types.String `tfsdk:"key" json:"key,computed"`
 	ReadOnly types.Bool   `tfsdk:"read_only" json:"read_only,computed"`
 	Value    types.String `tfsdk:"value" json:"value,computed"`

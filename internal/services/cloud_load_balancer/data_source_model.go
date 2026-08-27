@@ -37,7 +37,7 @@ type CloudLoadBalancerDataSourceModel struct {
 	FloatingIPs           customfield.NestedObjectList[CloudLoadBalancerFloatingIPsDataSourceModel]    `tfsdk:"floating_ips" json:"floating_ips,computed"`
 	Listeners             customfield.NestedObjectList[CloudLoadBalancerListenersDataSourceModel]      `tfsdk:"listeners" json:"listeners,computed"`
 	Logging               customfield.NestedObject[CloudLoadBalancerLoggingDataSourceModel]            `tfsdk:"logging" json:"logging,computed"`
-	TagsV2                customfield.NestedObjectList[CloudLoadBalancerTagsV2DataSourceModel]         `tfsdk:"tags_v2" json:"tags_v2,computed"`
+	Tags                  customfield.NestedObjectList[CloudLoadBalancerTagsDataSourceModel]           `tfsdk:"tags" json:"tags_v2,computed"`
 	VrrpIPs               customfield.NestedObjectList[CloudLoadBalancerVrrpIPsDataSourceModel]        `tfsdk:"vrrp_ips" json:"vrrp_ips,computed"`
 	FindOneBy             *CloudLoadBalancerFindOneByDataSourceModel                                   `tfsdk:"find_one_by"`
 }
@@ -153,7 +153,7 @@ type CloudLoadBalancerLoggingRetentionPolicyDataSourceModel struct {
 	Period types.Int64 `tfsdk:"period" json:"period,computed"`
 }
 
-type CloudLoadBalancerTagsV2DataSourceModel struct {
+type CloudLoadBalancerTagsDataSourceModel struct {
 	Key      types.String `tfsdk:"key" json:"key,computed"`
 	ReadOnly types.Bool   `tfsdk:"read_only" json:"read_only,computed"`
 	Value    types.String `tfsdk:"value" json:"value,computed"`

@@ -80,42 +80,42 @@ func (m *CloudBaremetalImagesDataSourceModel) toListParams(_ context.Context) (p
 }
 
 type CloudBaremetalImagesItemsDataSourceModel struct {
-	ID               types.String                                                            `tfsdk:"id" json:"id,computed"`
-	Architecture     types.String                                                            `tfsdk:"architecture" json:"architecture,computed"`
-	CreatedAt        timetypes.RFC3339                                                       `tfsdk:"created_at" json:"created_at,computed" format:"date-time"`
-	CreatorTaskID    types.String                                                            `tfsdk:"creator_task_id" json:"creator_task_id,computed"`
-	CurrencyCode     types.String                                                            `tfsdk:"currency_code" json:"currency_code,computed"`
-	Description      types.String                                                            `tfsdk:"description" json:"description,computed"`
-	DiskFormat       types.String                                                            `tfsdk:"disk_format" json:"disk_format,computed"`
-	DisplayOrder     types.Int64                                                             `tfsdk:"display_order" json:"display_order,computed"`
-	GPUDriver        types.String                                                            `tfsdk:"gpu_driver" json:"gpu_driver,computed"`
-	GPUDriverType    types.String                                                            `tfsdk:"gpu_driver_type" json:"gpu_driver_type,computed"`
-	GPUDriverVersion types.String                                                            `tfsdk:"gpu_driver_version" json:"gpu_driver_version,computed"`
-	HwFirmwareType   types.String                                                            `tfsdk:"hw_firmware_type" json:"hw_firmware_type,computed"`
-	HwMachineType    types.String                                                            `tfsdk:"hw_machine_type" json:"hw_machine_type,computed"`
-	IsBaremetal      types.Bool                                                              `tfsdk:"is_baremetal" json:"is_baremetal,computed"`
-	MinDisk          types.Int64                                                             `tfsdk:"min_disk" json:"min_disk,computed"`
-	MinRam           types.Int64                                                             `tfsdk:"min_ram" json:"min_ram,computed"`
-	Name             types.String                                                            `tfsdk:"name" json:"name,computed"`
-	OsDistro         types.String                                                            `tfsdk:"os_distro" json:"os_distro,computed"`
-	OsType           types.String                                                            `tfsdk:"os_type" json:"os_type,computed"`
-	OsVersion        types.String                                                            `tfsdk:"os_version" json:"os_version,computed"`
-	PricePerHour     types.Float64                                                           `tfsdk:"price_per_hour" json:"price_per_hour,computed"`
-	PricePerMonth    types.Float64                                                           `tfsdk:"price_per_month" json:"price_per_month,computed"`
-	PriceStatus      types.String                                                            `tfsdk:"price_status" json:"price_status,computed"`
-	ProjectID        types.Int64                                                             `tfsdk:"project_id" json:"project_id,computed"`
-	Region           types.String                                                            `tfsdk:"region" json:"region,computed"`
-	RegionID         types.Int64                                                             `tfsdk:"region_id" json:"region_id,computed"`
-	Size             types.Int64                                                             `tfsdk:"size" json:"size,computed"`
-	SSHKey           types.String                                                            `tfsdk:"ssh_key" json:"ssh_key,computed"`
-	Status           types.String                                                            `tfsdk:"status" json:"status,computed"`
-	TagsV2           customfield.NestedObjectList[CloudBaremetalImagesTagsV2DataSourceModel] `tfsdk:"tags_v2" json:"tags_v2,computed"`
-	TaskID           types.String                                                            `tfsdk:"task_id" json:"task_id,computed"`
-	UpdatedAt        timetypes.RFC3339                                                       `tfsdk:"updated_at" json:"updated_at,computed" format:"date-time"`
-	Visibility       types.String                                                            `tfsdk:"visibility" json:"visibility,computed"`
+	ID               types.String                                                          `tfsdk:"id" json:"id,computed"`
+	Architecture     types.String                                                          `tfsdk:"architecture" json:"architecture,computed"`
+	CreatedAt        timetypes.RFC3339                                                     `tfsdk:"created_at" json:"created_at,computed" format:"date-time"`
+	CreatorTaskID    types.String                                                          `tfsdk:"creator_task_id" json:"creator_task_id,computed"`
+	CurrencyCode     types.String                                                          `tfsdk:"currency_code" json:"currency_code,computed"`
+	Description      types.String                                                          `tfsdk:"description" json:"description,computed"`
+	DiskFormat       types.String                                                          `tfsdk:"disk_format" json:"disk_format,computed"`
+	DisplayOrder     types.Int64                                                           `tfsdk:"display_order" json:"display_order,computed"`
+	GPUDriver        types.String                                                          `tfsdk:"gpu_driver" json:"gpu_driver,computed"`
+	GPUDriverType    types.String                                                          `tfsdk:"gpu_driver_type" json:"gpu_driver_type,computed"`
+	GPUDriverVersion types.String                                                          `tfsdk:"gpu_driver_version" json:"gpu_driver_version,computed"`
+	HwFirmwareType   types.String                                                          `tfsdk:"hw_firmware_type" json:"hw_firmware_type,computed"`
+	HwMachineType    types.String                                                          `tfsdk:"hw_machine_type" json:"hw_machine_type,computed"`
+	IsBaremetal      types.Bool                                                            `tfsdk:"is_baremetal" json:"is_baremetal,computed"`
+	MinDisk          types.Int64                                                           `tfsdk:"min_disk" json:"min_disk,computed"`
+	MinRam           types.Int64                                                           `tfsdk:"min_ram" json:"min_ram,computed"`
+	Name             types.String                                                          `tfsdk:"name" json:"name,computed"`
+	OsDistro         types.String                                                          `tfsdk:"os_distro" json:"os_distro,computed"`
+	OsType           types.String                                                          `tfsdk:"os_type" json:"os_type,computed"`
+	OsVersion        types.String                                                          `tfsdk:"os_version" json:"os_version,computed"`
+	PricePerHour     types.Float64                                                         `tfsdk:"price_per_hour" json:"price_per_hour,computed"`
+	PricePerMonth    types.Float64                                                         `tfsdk:"price_per_month" json:"price_per_month,computed"`
+	PriceStatus      types.String                                                          `tfsdk:"price_status" json:"price_status,computed"`
+	ProjectID        types.Int64                                                           `tfsdk:"project_id" json:"project_id,computed"`
+	Region           types.String                                                          `tfsdk:"region" json:"region,computed"`
+	RegionID         types.Int64                                                           `tfsdk:"region_id" json:"region_id,computed"`
+	Size             types.Int64                                                           `tfsdk:"size" json:"size,computed"`
+	SSHKey           types.String                                                          `tfsdk:"ssh_key" json:"ssh_key,computed"`
+	Status           types.String                                                          `tfsdk:"status" json:"status,computed"`
+	Tags             customfield.NestedObjectList[CloudBaremetalImagesTagsDataSourceModel] `tfsdk:"tags" json:"tags_v2,computed"`
+	TaskID           types.String                                                          `tfsdk:"task_id" json:"task_id,computed"`
+	UpdatedAt        timetypes.RFC3339                                                     `tfsdk:"updated_at" json:"updated_at,computed" format:"date-time"`
+	Visibility       types.String                                                          `tfsdk:"visibility" json:"visibility,computed"`
 }
 
-type CloudBaremetalImagesTagsV2DataSourceModel struct {
+type CloudBaremetalImagesTagsDataSourceModel struct {
 	Key      types.String `tfsdk:"key" json:"key,computed"`
 	ReadOnly types.Bool   `tfsdk:"read_only" json:"read_only,computed"`
 	Value    types.String `tfsdk:"value" json:"value,computed"`

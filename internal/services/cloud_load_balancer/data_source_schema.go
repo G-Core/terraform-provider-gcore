@@ -301,10 +301,10 @@ func DataSourceSchema(ctx context.Context) schema.Schema {
 					},
 				},
 			},
-			"tags_v2": schema.ListNestedAttribute{
+			"tags": schema.ListNestedAttribute{
 				Description: "List of key-value tags associated with the resource. A tag is a key-value pair that can be associated with a resource, enabling efficient filtering and grouping for better organization and management. Some tags are read-only and cannot be modified by the user. Tags are also integrated with cost reports, allowing cost data to be filtered based on tag keys or values.",
 				Computed:    true,
-				CustomType:  customfield.NewNestedObjectListType[CloudLoadBalancerTagsV2DataSourceModel](ctx),
+				CustomType:  customfield.NewNestedObjectListType[CloudLoadBalancerTagsDataSourceModel](ctx),
 				NestedObject: schema.NestedAttributeObject{
 					Attributes: map[string]schema.Attribute{
 						"key": schema.StringAttribute{

@@ -32,7 +32,6 @@ type CloudLoadBalancerModel struct {
 	VipFqdn               types.String                                                       `tfsdk:"vip_fqdn" json:"vip_fqdn,computed"`
 	AdditionalVips        customfield.NestedObjectList[CloudLoadBalancerAdditionalVipsModel] `tfsdk:"additional_vips" json:"additional_vips,computed"`
 	FloatingIPs           customfield.NestedObjectList[CloudLoadBalancerFloatingIPsModel]    `tfsdk:"floating_ips" json:"floating_ips,computed"`
-	TagsV2                customfield.NestedObjectList[CloudLoadBalancerTagsV2Model]         `tfsdk:"tags_v2" json:"tags_v2,computed"`
 	VrrpIPs               customfield.NestedObjectList[CloudLoadBalancerVrrpIPsModel]        `tfsdk:"vrrp_ips" json:"vrrp_ips,computed"`
 }
 
@@ -77,12 +76,6 @@ type CloudLoadBalancerFloatingIPsModel struct {
 }
 
 type CloudLoadBalancerFloatingIPsTagsModel struct {
-	Key      types.String `tfsdk:"key" json:"key,computed"`
-	ReadOnly types.Bool   `tfsdk:"read_only" json:"read_only,computed"`
-	Value    types.String `tfsdk:"value" json:"value,computed"`
-}
-
-type CloudLoadBalancerTagsV2Model struct {
 	Key      types.String `tfsdk:"key" json:"key,computed"`
 	ReadOnly types.Bool   `tfsdk:"read_only" json:"read_only,computed"`
 	Value    types.String `tfsdk:"value" json:"value,computed"`

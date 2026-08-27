@@ -299,35 +299,6 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 				},
 				PlanModifiers: []planmodifier.List{listplanmodifier.UseStateForUnknown()},
 			},
-			"tags_v2": schema.ListNestedAttribute{
-				Description: "List of key-value tags associated with the resource. A tag is a key-value pair that can be associated with a resource, enabling efficient filtering and grouping for better organization and management. Some tags are read-only and cannot be modified by the user. Tags are also integrated with cost reports, allowing cost data to be filtered based on tag keys or values.",
-				Computed:    true,
-				CustomType:  customfield.NewNestedObjectListType[CloudLoadBalancerTagsV2Model](ctx),
-				NestedObject: schema.NestedAttributeObject{
-					Attributes: map[string]schema.Attribute{
-						"key": schema.StringAttribute{
-							Description: "Tag key. Maximum 255 characters. Cannot contain spaces, tabs, newlines, empty string or '=' character.",
-							Computed:    true,
-						},
-						"read_only": schema.BoolAttribute{
-							Description: "If true, the tag is read-only and cannot be modified by the user",
-							Computed:    true,
-						},
-						"value": schema.StringAttribute{
-							Description: "Tag value. Maximum 255 characters. Cannot contain spaces, tabs, newlines, empty string or '=' character.",
-							Computed:    true,
-						},
-					},
-				},
-				// NOTE: deliberately no UseStateForUnknown. tags_v2 is derived
-				// server-side: it is the union of the user's tags and read-only
-				// system tags, and its element order is not guaranteed. Pinning it
-				// to prior state makes any in-place tags update fail with "Provider
-				// produced inconsistent result after apply". Leaving it unknown
-				// costs a "(known after apply)" line on updates that already show a
-				// diff, and nothing on a no-op plan. Same trade-off, and the same
-				// reasoning, as provisioning_status.
-			},
 			"vrrp_ips": schema.ListNestedAttribute{
 				Description: "List of VRRP IP addresses",
 				Computed:    true,

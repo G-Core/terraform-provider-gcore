@@ -89,7 +89,7 @@ type CloudLoadBalancersItemsDataSourceModel struct {
 	ProvisioningStatus    types.String                                                                  `tfsdk:"provisioning_status" json:"provisioning_status,computed"`
 	Region                types.String                                                                  `tfsdk:"region" json:"region,computed"`
 	RegionID              types.Int64                                                                   `tfsdk:"region_id" json:"region_id,computed"`
-	TagsV2                customfield.NestedObjectList[CloudLoadBalancersTagsV2DataSourceModel]         `tfsdk:"tags_v2" json:"tags_v2,computed"`
+	Tags                  customfield.NestedObjectList[CloudLoadBalancersTagsDataSourceModel]           `tfsdk:"tags" json:"tags_v2,computed"`
 	AdditionalVips        customfield.NestedObjectList[CloudLoadBalancersAdditionalVipsDataSourceModel] `tfsdk:"additional_vips" json:"additional_vips,computed"`
 	CreatorTaskID         types.String                                                                  `tfsdk:"creator_task_id" json:"creator_task_id,computed"`
 	Flavor                customfield.NestedObject[CloudLoadBalancersFlavorDataSourceModel]             `tfsdk:"flavor" json:"flavor,computed"`
@@ -105,7 +105,7 @@ type CloudLoadBalancersItemsDataSourceModel struct {
 	VrrpIPs               customfield.NestedObjectList[CloudLoadBalancersVrrpIPsDataSourceModel]        `tfsdk:"vrrp_ips" json:"vrrp_ips,computed"`
 }
 
-type CloudLoadBalancersTagsV2DataSourceModel struct {
+type CloudLoadBalancersTagsDataSourceModel struct {
 	Key      types.String `tfsdk:"key" json:"key,computed"`
 	ReadOnly types.Bool   `tfsdk:"read_only" json:"read_only,computed"`
 	Value    types.String `tfsdk:"value" json:"value,computed"`
