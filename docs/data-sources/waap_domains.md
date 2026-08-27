@@ -30,7 +30,7 @@ data "gcore_waap_domains" "example_waap_domains" {
 - `max_items` (Number) Max items to fetch, default: 1000
 - `name` (String) Filter domains based on the domain name. Supports '*' as a wildcard character
 - `ordering` (String) Sort the response by given field.
-Available values: "id", "name", "status", "created_at", "-id", "-name", "-status", "-created_at".
+Available values: "id", "name", "status", "created_at", "-id", "-name", "-status", "-created_at", "total_requests", "-total_requests", "attacks_detected", "-attacks_detected".
 - `status` (String) Filter domains based on the domain status
 Available values: "active", "bypass", "monitor", "locked".
 
@@ -44,9 +44,20 @@ Available values: "active", "bypass", "monitor", "locked".
 Read-Only:
 
 - `aliases` (List of String) CNAME aliases pointing at this domain's CDN resource
+- `cdn_resource_id` (Number) The ID of the CDN resource this domain is bound to
 - `created_at` (String) The date and time the domain was created in ISO 8601 format
 - `custom_page_set` (Number) The ID of the custom page set
 - `id` (Number) The domain ID
 - `name` (String) The domain name
+- `stats` (Attributes) Traffic statistics for a domain. (see [below for nested schema](#nestedatt--items--stats))
 - `status` (String) The different statuses a domain can have
 Available values: "active", "bypass", "monitor", "locked".
+
+<a id="nestedatt--items--stats"></a>
+### Nested Schema for `items.stats`
+
+Read-Only:
+
+- `attacks_blocked` (Number) Total number of blocked attacks for the last 30 days
+- `attacks_detected` (Number) Total number of detected attacks for the last 30 days
+- `total_requests` (Number) Total number of requests for the last 30 days
