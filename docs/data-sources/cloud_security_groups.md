@@ -52,7 +52,7 @@ Read-Only:
 - `region_id` (Number) Region ID
 - `revision_number` (Number) The number of revisions
 - `security_group_rules` (Attributes List) Security group rules (see [below for nested schema](#nestedatt--items--security_group_rules))
-- `tags` (Attributes List) List of key-value tags associated with the resource. A tag is a key-value pair that can be associated with a resource, enabling efficient filtering and grouping for better organization and management. Some tags are read-only and cannot be modified by the user. Tags are also integrated with cost reports, allowing cost data to be filtered based on tag keys or values. (see [below for nested schema](#nestedatt--items--tags))
+- `tags_v2` (Attributes List) List of key-value tags associated with the resource. A tag is a key-value pair that can be associated with a resource, enabling efficient filtering and grouping for better organization and management. Some tags are read-only and cannot be modified by the user. Tags are also integrated with cost reports, allowing cost data to be filtered based on tag keys or values. (see [below for nested schema](#nestedatt--items--tags_v2))
 - `updated_at` (String) Datetime when the security group was last updated
 
 <a id="nestedatt--items--security_group_rules"></a>
@@ -78,8 +78,8 @@ Available values: "ah", "any", "dccp", "egp", "esp", "gre", "icmp", "igmp", "ipe
 - `updated_at` (String) Datetime when the rule was last updated
 
 
-<a id="nestedatt--items--tags"></a>
-### Nested Schema for `items.tags`
+<a id="nestedatt--items--tags_v2"></a>
+### Nested Schema for `items.tags_v2`
 
 Read-Only:
 

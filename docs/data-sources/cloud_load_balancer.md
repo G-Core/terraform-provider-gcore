@@ -51,7 +51,7 @@ Available values: "L2", "L3".
 - `provisioning_status` (String) Load balancer lifecycle status
 Available values: "ACTIVE", "DELETED", "ERROR", "PENDING_CREATE", "PENDING_DELETE", "PENDING_UPDATE".
 - `region` (String) Region name
-- `tags` (Attributes List) List of key-value tags associated with the resource. A tag is a key-value pair that can be associated with a resource, enabling efficient filtering and grouping for better organization and management. Some tags are read-only and cannot be modified by the user. Tags are also integrated with cost reports, allowing cost data to be filtered based on tag keys or values. (see [below for nested schema](#nestedatt--tags))
+- `tags_v2` (Attributes List) List of key-value tags associated with the resource. A tag is a key-value pair that can be associated with a resource, enabling efficient filtering and grouping for better organization and management. Some tags are read-only and cannot be modified by the user. Tags are also integrated with cost reports, allowing cost data to be filtered based on tag keys or values. (see [below for nested schema](#nestedatt--tags_v2))
 - `updated_at` (String) Datetime when the load balancer was last updated
 - `vip_address` (String) Load balancer IP address
 - `vip_fqdn` (String) Fully qualified domain name for the load balancer VIP
@@ -156,8 +156,8 @@ Read-Only:
 
 
 
-<a id="nestedatt--tags"></a>
-### Nested Schema for `tags`
+<a id="nestedatt--tags_v2"></a>
+### Nested Schema for `tags_v2`
 
 Read-Only:
 

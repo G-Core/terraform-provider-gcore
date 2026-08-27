@@ -78,8 +78,18 @@ Available values: "error", "hide", "show".
 - `region` (String) Region name
 - `size` (Number) Image size in bytes
 - `status` (String) Image status, i.e. active
+- `tags_v2` (Attributes List) List of key-value tags associated with the resource. A tag is a key-value pair that can be associated with a resource, enabling efficient filtering and grouping for better organization and management. Some tags are read-only and cannot be modified by the user. Tags are also integrated with cost reports, allowing cost data to be filtered based on tag keys or values. (see [below for nested schema](#nestedatt--tags_v2))
 - `updated_at` (String) Datetime when the image was updated
 - `visibility` (String) Image visibility. Globally visible images are public
+
+<a id="nestedatt--tags_v2"></a>
+### Nested Schema for `tags_v2`
+
+Read-Only:
+
+- `key` (String) Tag key. Maximum 255 characters. Cannot contain spaces, tabs, newlines, empty string or '=' character.
+- `read_only` (Boolean) If true, the tag is read-only and cannot be modified by the user
+- `value` (String) Tag value. Maximum 255 characters. Cannot contain spaces, tabs, newlines, empty string or '=' character.
 
 
 ## Import

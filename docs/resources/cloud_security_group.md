@@ -85,6 +85,7 @@ resource "gcore_cloud_security_group_rule" "allow_egress_tcp" {
 - `region` (String) Region name
 - `revision_number` (Number) The number of revisions
 - `security_group_rules` (Attributes List) Security group rules (see [below for nested schema](#nestedatt--security_group_rules))
+- `tags_v2` (Attributes List) List of key-value tags associated with the resource. A tag is a key-value pair that can be associated with a resource, enabling efficient filtering and grouping for better organization and management. Some tags are read-only and cannot be modified by the user. Tags are also integrated with cost reports, allowing cost data to be filtered based on tag keys or values. (see [below for nested schema](#nestedatt--tags_v2))
 - `tasks` (List of String) List of task IDs representing asynchronous operations. Use these IDs to monitor operation progress:
   - `GET /v1/tasks/{task_id}` - Check individual task status and details
   Poll task status until completion (`FINISHED`/`ERROR`) before proceeding with dependent operations.
@@ -132,6 +133,16 @@ Available values: "ah", "any", "dccp", "egp", "esp", "gre", "icmp", "igmp", "ipe
 - `revision_number` (Number) The revision number of the resource
 - `security_group_id` (String) The security group ID to associate with this security group rule
 - `updated_at` (String) Datetime when the rule was last updated
+
+
+<a id="nestedatt--tags_v2"></a>
+### Nested Schema for `tags_v2`
+
+Read-Only:
+
+- `key` (String) Tag key. Maximum 255 characters. Cannot contain spaces, tabs, newlines, empty string or '=' character.
+- `read_only` (Boolean) If true, the tag is read-only and cannot be modified by the user
+- `value` (String) Tag value. Maximum 255 characters. Cannot contain spaces, tabs, newlines, empty string or '=' character.
 
 
 ## Import
