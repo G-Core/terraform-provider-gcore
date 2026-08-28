@@ -85,6 +85,9 @@ resource "gcore_cloud_security_group_rule" "allow_egress_tcp" {
 - `region` (String) Region name
 - `revision_number` (Number) The number of revisions
 - `security_group_rules` (Attributes List) Security group rules (see [below for nested schema](#nestedatt--security_group_rules))
+- `tasks` (List of String) List of task IDs representing asynchronous operations. Use these IDs to monitor operation progress:
+  - `GET /v1/tasks/{task_id}` - Check individual task status and details
+  Poll task status until completion (`FINISHED`/`ERROR`) before proceeding with dependent operations.
 - `updated_at` (String) Datetime when the security group was last updated
 
 <a id="nestedatt--rules"></a>
