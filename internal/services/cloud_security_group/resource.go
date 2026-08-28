@@ -81,16 +81,24 @@ func (r *CloudSecurityGroupResource) Create(ctx context.Context, req resource.Cr
 		resp.Diagnostics.AddError("failed to serialize http request", err.Error())
 		return
 	}
-	// Send "rules":[] so the API creates no default egress rules.
-	// Per OAS: "If rules are explicitly set to empty, no rules will be created."
 	res := new(http.Response)
+	opts := []option.RequestOption{
+		option.WithRequestBody("application/json", dataBytes),
+		option.WithResponseBodyInto(&res),
+		option.WithMiddleware(logging.Middleware(ctx)),
+	}
+	// The API treats an omitted "rules" as "apply the default template
+	// (ingress + egress)", and an explicit [] as "create no rules". Terraform
+	// must never omit it, or an unconfigured group silently gains the template.
+	// Configured rules are already serialized into dataBytes by MarshalJSON, so
+	// force [] only when the attribute is unset.
+	if data.Rules.IsNullOrUnknown() {
+		opts = append(opts, option.WithJSONSet("rules", []any{}))
+	}
 	_, err = r.client.Cloud.SecurityGroups.NewAndPoll(
 		ctx,
 		params,
-		option.WithRequestBody("application/json", dataBytes),
-		option.WithJSONSet("rules", []any{}),
-		option.WithResponseBodyInto(&res),
-		option.WithMiddleware(logging.Middleware(ctx)),
+		opts...,
 	)
 	if err != nil {
 		resp.Diagnostics.AddError("failed to make http request", err.Error())
