@@ -159,7 +159,6 @@ Optional:
 - `use_rsa_le_cert` (Block List, Max: 1) The option allows choosing the RSA Let's Encrypt certificate type for the resource. (see [below for nested schema](#nestedblock--options--use_rsa_le_cert))
 - `user_agent_acl` (Block List, Max: 1) User agents policy option allows to control access to the content for specified user-agent. (see [below for nested schema](#nestedblock--options--user_agent_acl))
 - `waap` (Block List, Max: 1) Option allows to enable WAAP (Web Application and API Protection). (see [below for nested schema](#nestedblock--options--waap))
-- `waf` (Block List, Max: 1) Option allows to enable Basic WAF to protect you against the most common threats. (see [below for nested schema](#nestedblock--options--waf))
 - `websockets` (Block List, Max: 1) WebSockets option allows WebSockets connections to an origin server. (see [below for nested schema](#nestedblock--options--websockets))
 
 <a id="nestedblock--options--allowed_http_methods"></a>
@@ -764,18 +763,6 @@ Optional:
 
 <a id="nestedblock--options--waap"></a>
 ### Nested Schema for `options.waap`
-
-Required:
-
-- `value` (Boolean)
-
-Optional:
-
-- `enabled` (Boolean)
-
-
-<a id="nestedblock--options--waf"></a>
-### Nested Schema for `options.waf`
 
 Required:
 
