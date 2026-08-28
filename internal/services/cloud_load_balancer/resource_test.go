@@ -517,15 +517,13 @@ func TestAccCloudLoadBalancer_resize(t *testing.T) {
 
 // TestAccCloudLoadBalancer_tags covers in-place tag updates.
 //
-// The state checks assert `tags`, not `tags_v2`: tags_v2 also carries read-only
-// system tags in an order the API does not guarantee, so there is no stable
-// value to assert. It is still what the test exercises — pinning tags_v2 to
-// prior state fails step 2 during apply, before any state check runs, with
-// "Provider produced inconsistent result after apply".
+// The resource no longer exposes the read-only server view of tags at all - it
+// is a data source attribute now, named `tags` there - so `tags` here is the
+// write-shape map and the only thing to assert.
 //
 // Each step's post-apply plan must come back empty (the test framework enforces
-// this unless ExpectNonEmptyPlan is set), which is what rules out the opposite
-// failure of leaving tags_v2 unpinned: a perpetual diff.
+// this unless ExpectNonEmptyPlan is set), which is what rules out a perpetual
+// diff on the read-only tags the API adds on its own.
 func TestAccCloudLoadBalancer_tags(t *testing.T) {
 	rName := acctest.RandomName()
 	compareIDSame := statecheck.CompareValue(compare.ValuesSame())
@@ -547,8 +545,9 @@ func TestAccCloudLoadBalancer_tags(t *testing.T) {
 					compareIDSame.AddStateValue("gcore_cloud_load_balancer.test", tfjsonpath.New("id")),
 				},
 			},
-			// Adding a key grows tags_v2. This is the step that reproduces
-			// "new element N has appeared" when tags_v2 is pinned to prior state.
+			// Adding a key grows the server-side tag list. This is the step
+			// that used to reproduce "new element N has appeared" back when the
+			// resource mirrored that list and pinned it to prior state.
 			{
 				Config: testAccCloudLoadBalancerConfigWithTags(rName, `
     env   = "test"

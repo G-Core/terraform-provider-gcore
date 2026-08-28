@@ -21,6 +21,10 @@ type apiTag struct {
 // parseTagsFromJSON extracts the tags array from raw API JSON bytes.
 // Tries "tags_v2" first (proper object format used by load_balancer and security_group),
 // then falls back to "tags".
+//
+// These are wire keys, not Terraform attribute names. The provider exposes the
+// read-only list as `tags` on the data sources and the writable map as `tags`
+// on the resources; the response body still calls the list tags_v2.
 // Handles two API response formats:
 //   - Object format: [{"key":"k","value":"v","read_only":false}] (most resources)
 //   - String format: ["key=value"] (security_group "tags" field)
