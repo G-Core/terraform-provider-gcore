@@ -16,7 +16,6 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/int64default"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/int64planmodifier"
-	"github.com/hashicorp/terraform-plugin-framework/resource/schema/mapplanmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringplanmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
@@ -46,7 +45,7 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 			"flavor": schema.StringAttribute{
 				Description:   "The flavor of the instance.",
 				Required:      true,
-				PlanModifiers: []planmodifier.String{stringplanmodifier.RequiresReplace()},
+				PlanModifiers: []planmodifier.String{planmodifiers.StringRequiresReplaceUnlessAdopting(importAdoptionPrivateKey)},
 			},
 			"interfaces": schema.ListNestedAttribute{
 				Description: "A list of network interfaces for the server. You can create one or more interfaces - private, public, or both.",
@@ -129,7 +128,7 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 			"apptemplate_id": schema.StringAttribute{
 				Description:   "Apptemplate ID. Either `image_id` or `apptemplate_id` is required.",
 				Optional:      true,
-				PlanModifiers: []planmodifier.String{stringplanmodifier.RequiresReplace()},
+				PlanModifiers: []planmodifier.String{planmodifiers.StringRequiresReplaceUnlessAdopting(importAdoptionPrivateKey)},
 			},
 			"image_id": schema.StringAttribute{
 				Description: "Image ID. Either `image_id` or `apptemplate_id` is required.",
@@ -138,7 +137,7 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 			"name_template": schema.StringAttribute{
 				Description:   "If you want server names to be automatically generated based on IP addresses, you can provide a name template instead of specifying the name manually. The template should include a placeholder that will be replaced during provisioning. Supported placeholders are: `{ip_octets}` (last 3 octets of the IP), `{two_ip_octets}`, and `{one_ip_octet}`.",
 				Optional:      true,
-				PlanModifiers: []planmodifier.String{stringplanmodifier.RequiresReplace()},
+				PlanModifiers: []planmodifier.String{planmodifiers.StringRequiresReplaceUnlessAdopting(importAdoptionPrivateKey)},
 			},
 			"password_wo": schema.StringAttribute{
 				Description:   "For Linux instances, 'username' and 'password' are used to create a new user. When only 'password' is provided, it is set as the password for the default user of the image. For Windows instances, 'username' cannot be specified. Use the 'password' field to set the password for the 'Admin' user on Windows. Use the 'user_data' field to provide a script to create new users on Windows. The password of the Admin user cannot be updated via 'user_data'.",
@@ -154,7 +153,7 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 			"ssh_key_name": schema.StringAttribute{
 				Description:   "Specifies the name of the SSH keypair, created via the\n[/v1/`ssh_keys` endpoint](/docs/api-reference/cloud/ssh-keys/add-or-generate-ssh-key).",
 				Optional:      true,
-				PlanModifiers: []planmodifier.String{stringplanmodifier.RequiresReplace()},
+				PlanModifiers: []planmodifier.String{planmodifiers.StringRequiresReplaceUnlessAdopting(importAdoptionPrivateKey)},
 			},
 			"user_data": schema.StringAttribute{
 				Description: "String in base64 format. For Linux instances, 'user_data' is ignored when 'password' field is provided. For Windows instances, Admin user password is set by 'password' field and cannot be updated via 'user_data'. Examples of the `user_data`: https://cloudinit.readthedocs.io/en/latest/topics/examples.html",
@@ -163,13 +162,13 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 			"username": schema.StringAttribute{
 				Description:   "For Linux instances, 'username' and 'password' are used to create a new user. For Windows instances, 'username' cannot be specified. Use 'password' field to set the password for the 'Admin' user on Windows.",
 				Optional:      true,
-				PlanModifiers: []planmodifier.String{stringplanmodifier.RequiresReplace()},
+				PlanModifiers: []planmodifier.String{planmodifiers.StringRequiresReplaceUnlessAdopting(importAdoptionPrivateKey)},
 			},
 			"app_config": schema.MapAttribute{
 				Description:   "Parameters for the application template if creating the instance from an `apptemplate`.",
 				Optional:      true,
 				ElementType:   jsontypes.NormalizedType{},
-				PlanModifiers: []planmodifier.Map{mapplanmodifier.RequiresReplace()},
+				PlanModifiers: []planmodifier.Map{planmodifiers.MapRequiresReplaceUnlessAdopting(importAdoptionPrivateKey)},
 			},
 			"name": schema.StringAttribute{
 				Description: "Server name.",

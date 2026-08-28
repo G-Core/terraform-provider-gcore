@@ -129,6 +129,15 @@ func (r *CloudBaremetalServerResource) Update(ctx context.Context, req resource.
 		return
 	}
 
+	// Read the adoption marker before anything branches on it: it gates the
+	// rebuild below and is retired by the single state write at the end.
+	adopting, adoptionDiags := importAdoptionPending(ctx, req.Private)
+	resp.Diagnostics.Append(adoptionDiags...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
+
 	stateHasChanged := false
 
 	// Check if name or tags have changed.
@@ -181,6 +190,16 @@ func (r *CloudBaremetalServerResource) Update(ctx context.Context, req resource.
 	imageChanged := !data.ImageID.IsNull() && data.ImageID.ValueString() != state.ImageID.ValueString()
 	userDataChanged := !data.UserData.IsNull() && data.UserData.ValueString() != state.UserData.ValueString()
 
+	// While adopting after an import, these two are null in state because the
+	// API never returned them, not because the user changed anything. Both are
+	// no_refresh, so the difference above is an artefact of the import. Acting
+	// on it would call RebuildAndPoll and reinstall the operating system of a
+	// server that was only just imported, destroying everything on it - and
+	// because the plan reads as a benign in-place update, with no replacement
+	// proposed, nothing would warn the user first.
+	imageChanged = changeSurvivesAdoption(imageChanged, adopting, state.ImageID.IsNull())
+	userDataChanged = changeSurvivesAdoption(userDataChanged, adopting, state.UserData.IsNull())
+
 	if imageChanged || userDataChanged {
 		params := cloud.BaremetalServerRebuildParams{}
 		if !data.ProjectID.IsNull() {
@@ -222,12 +241,38 @@ func (r *CloudBaremetalServerResource) Update(ctx context.Context, req resource.
 	if stateHasChanged {
 		resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
 	} else {
-		// No API changes were made, but no_refresh fields (like interfaces) may
-		// need to be populated in state from the plan. This handles the post-import
-		// scenario: after import, interfaces is null in state because the API doesn't
-		// return it. The one-time update-in-place persists the config value to state
-		// so that future changes trigger replacement correctly.
-		resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("interfaces"), data.Interfaces)...)
+		// No API changes were made, but no_refresh fields may need to be
+		// populated in state from the plan. This handles the post-import
+		// scenario: after import those fields are null in state because the API
+		// does not return them. The one-time update-in-place persists the
+		// config values to state so that future changes trigger replacement
+		// correctly - and without it Terraform rejects the apply outright with
+		// "Provider produced inconsistent result after apply", because the
+		// planned adoption never reached state.
+		//
+		// The whole model is deliberately NOT written here: no request was
+		// made, so computed attributes are still unknown and writing them would
+		// produce an invalid state object.
+		for attribute, value := range map[string]any{
+			"interfaces":     data.Interfaces,
+			"apptemplate_id": data.ApptemplateID,
+			"app_config":     data.AppConfig,
+			"flavor":         data.Flavor,
+			"image_id":       data.ImageID,
+			"name_template":  data.NameTemplate,
+			"ssh_key_name":   data.SSHKeyName,
+			"user_data":      data.UserData,
+			"username":       data.Username,
+		} {
+			resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root(attribute), value)...)
+		}
+	}
+
+	// Clear only after the write succeeded: a marker cleared before success
+	// would turn a transient failure into a destroy+recreate on the retry,
+	// because the next plan would no longer recognise the import.
+	if adopting && !resp.Diagnostics.HasError() {
+		resp.Diagnostics.Append(clearImportAdoptionPending(ctx, resp.Private)...)
 	}
 }
 
@@ -415,9 +460,58 @@ func (r *CloudBaremetalServerResource) ImportState(ctx context.Context, req reso
 		}
 	}
 
+	// apptemplate_id, name_template, username, app_config and user_data are
+	// create-only and tagged no_refresh, so the read above cannot populate them
+	// and they stay null in state. Mark the adoption window so the plan
+	// modifiers on those attributes know this null came from an import rather
+	// than from a server created without them - the first apply adopts the
+	// configured values into state and clears the marker. The marker also stops
+	// that first apply from rebuilding the server, see Update.
+	resp.Diagnostics.Append(markImportAdoptionPending(ctx, resp.Private)...)
+
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
 }
 
-func (r *CloudBaremetalServerResource) ModifyPlan(_ context.Context, _ resource.ModifyPlanRequest, _ *resource.ModifyPlanResponse) {
+func (r *CloudBaremetalServerResource) ModifyPlan(ctx context.Context, req resource.ModifyPlanRequest, resp *resource.ModifyPlanResponse) {
+	// The adoption marker is deliberately NOT cleared here. A plan whose only
+	// effect would be the clear is a no-op plan, and Terraform never persists
+	// PlannedPrivate for no-op plans, so the clear would silently evaporate.
+	// Update owns retiring the marker.
+	//
+	// What this does do is warn while an adoption is actually planned. Adopted
+	// values are written to state without being sent to the API, and no later
+	// refresh can correct them, so this is the only moment a user can catch a
+	// wrong value before it becomes permanent.
+	if req.State.Raw.IsNull() || req.Plan.Raw.IsNull() {
+		return
+	}
 
+	adopting, diags := importAdoptionPending(ctx, req.Private)
+	resp.Diagnostics.Append(diags...)
+
+	if resp.Diagnostics.HasError() || !adopting {
+		return
+	}
+
+	var plan, state *CloudBaremetalServerModel
+
+	// The warning is advisory, so a decode problem must never fail the plan.
+	if req.Plan.Get(ctx, &plan).HasError() || req.State.Get(ctx, &state).HasError() {
+		return
+	}
+
+	if plan == nil || state == nil {
+		return
+	}
+
+	// Nothing is adopted on a plan that already replaces the server: Create
+	// runs and every configured value reaches the API, so the warning would be
+	// telling the user the opposite of what is about to happen.
+	if planForcesReplacement(ctx, req.Plan, req.State, req.Config) {
+		return
+	}
+
+	if adopted := adoptedCreateOnlyAttributes(*plan, *state); len(adopted) > 0 {
+		resp.Diagnostics.Append(importAdoptionWarning(adopted))
+	}
 }
