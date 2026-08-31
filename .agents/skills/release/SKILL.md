@@ -155,7 +155,7 @@ prose and the HCL block:
 > v2 is a ground-up rewrite of the provider, featuring OpenAPI-spec-driven
 > code generation and a move to terraform-plugin-framework under the hood.
 >
-> This is an **alpha** release, and **breaking changes** are expected.
+> This is a **release candidate**, and a stable release is expected soon.
 
 If you'd like to try it out, pin the provider version **exactly** to
 v{VERSION} in your Terraform configuration.
