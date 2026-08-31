@@ -1,5 +1,66 @@
 # Changelog
 
+## [2.0.0-rc.1](https://github.com/G-Core/terraform-provider-gcore/compare/v2.0.0-alpha.15...v2.0.0-rc.1) (2026-08-31)
+
+
+### ⚠ BREAKING CHANGES
+
+* **cloud:** remove task_id and tasks from images
+* **cloud:** remove task_id and tasks from images
+* **terraform:** rename tags_v2 to tags and drop the resource mirror
+* **terraform:** rename tags_v2 to tags and drop the resource mirror
+* **cdn:** map the applied-preset read endpoint and name the apply response
+* **fastedge:** add search/pagination params and paginate the secrets list
+* **cloud:** update cloud OpenAPI spec
+
+### Features
+
+* **cdn:** map the applied-preset read endpoint and name the apply response ([0054d19](https://github.com/G-Core/terraform-provider-gcore/commit/0054d199024faa61cdb8d1ba0c6717b1d5079780))
+* **cloud:** map the consolidated GPU baremetal cluster endpoints ([deb1561](https://github.com/G-Core/terraform-provider-gcore/commit/deb1561ed4a64f23a0154dd03b5b55af0f4084ee))
+* **cloud:** map the lifecycle policy endpoints ([fb2f32e](https://github.com/G-Core/terraform-provider-gcore/commit/fb2f32eda9bd8e64909368fded693ddf060a5131))
+* **cloud:** update cloud OpenAPI spec ([d8076a7](https://github.com/G-Core/terraform-provider-gcore/commit/d8076a709425318ffb072569adb357472fbcacde))
+* **fastedge:** add search/pagination params and paginate the secrets list ([23a7d37](https://github.com/G-Core/terraform-provider-gcore/commit/23a7d37dbcce85ccf09d25e5f5398778312a17af))
+* **terraform:** rename tags_v2 to tags and drop the resource mirror ([b5e589b](https://github.com/G-Core/terraform-provider-gcore/commit/b5e589b16e52bdbded764241d5985dceba8114fe))
+* **terraform:** rename tags_v2 to tags and drop the resource mirror ([84551e0](https://github.com/G-Core/terraform-provider-gcore/commit/84551e049393a353f61be0e3daef5512d3d368d0))
+
+
+### Bug Fixes
+
+* **cloud:** always refresh instance state after update and drop transient task_state from the resource ([c34d1d4](https://github.com/G-Core/terraform-provider-gcore/commit/c34d1d41cdce476a0d584b03afe26db93aa2405d))
+* **cloud:** keep bare metal server import from forcing replacement ([dbe3d95](https://github.com/G-Core/terraform-provider-gcore/commit/dbe3d959bed6acf208ec3abb4e0dc492b3f2440c))
+* **cloud:** keep load balancer import from forcing replacement ([ae816a6](https://github.com/G-Core/terraform-provider-gcore/commit/ae816a6ca75a9bb9848939fdfe3fb4f6d9f293de))
+* **cloud:** keep task_state on the instance resource ([b68392a](https://github.com/G-Core/terraform-provider-gcore/commit/b68392a93373b9eddc420315e4474f32324fb439))
+* **cloud:** remove task_id and tasks from images ([9aa2d38](https://github.com/G-Core/terraform-provider-gcore/commit/9aa2d388eb5333f196f1e43c1d4f30f67180ef74))
+* **cloud:** remove task_id and tasks from images ([3d0a828](https://github.com/G-Core/terraform-provider-gcore/commit/3d0a82823e771bb4cc62479d2cb97b0de1f561e3))
+* **cloud:** stop discarding configured security group rules ([8be0249](https://github.com/G-Core/terraform-provider-gcore/commit/8be024905287835a457dbaa278b44d29dedb1de2))
+* **cloud:** stop pinning load balancer tags_v2 to prior state ([66dd9fb](https://github.com/G-Core/terraform-provider-gcore/commit/66dd9fb95e8d7ee78512f86d2321c989c72c76cd))
+* **storage:** allow creation of an object storage bucket with an empty cors block ([b526a6d](https://github.com/G-Core/terraform-provider-gcore/commit/b526a6d4c2c22ffcdd7d9a97036dd130c96bd11b))
+
+
+### Chores
+
+* **cdn:** update cdn OpenAPI spec ([c5ad1fd](https://github.com/G-Core/terraform-provider-gcore/commit/c5ad1fd3d441d3a5c0f93e8fd24548c29dc3cf5b))
+* **cloud:** update cloud OpenAPI spec ([5bf431b](https://github.com/G-Core/terraform-provider-gcore/commit/5bf431be628330f9c716b24f24fe9930a8c7689b))
+* **dns:** update dns OpenAPI spec ([59be5c0](https://github.com/G-Core/terraform-provider-gcore/commit/59be5c08fa1431ec6f4e16bf9b77d07c066124d1))
+* **internal:** add typed variants of requires-replace-unless-adopting ([ac6a464](https://github.com/G-Core/terraform-provider-gcore/commit/ac6a4642feff2b01633e0155d6d6eaa94a2ab510))
+* reseal custom code from G-Core/terraform-provider-gcore-staging@5322f819b4df4fc8048c1fae502fa1b2bf5e174d ([a787246](https://github.com/G-Core/terraform-provider-gcore/commit/a787246fead258c221c69f8c817910752318217b))
+* **waap:** update waap OpenAPI spec ([55f885f](https://github.com/G-Core/terraform-provider-gcore/commit/55f885ffe1ac29a7a95ad9dafaf6d32ebd86a2c6))
+* **waap:** update waap OpenAPI spec ([f9c0c4b](https://github.com/G-Core/terraform-provider-gcore/commit/f9c0c4b3f12f2159d16c50e851fbf587294bf9a6))
+
+
+### Documentation
+
+* describe v2 as a release candidate ([5322f81](https://github.com/G-Core/terraform-provider-gcore/commit/5322f819b4df4fc8048c1fae502fa1b2bf5e174d))
+* **terraform:** regenerate from custom templates ([cae4be9](https://github.com/G-Core/terraform-provider-gcore/commit/cae4be9fce6e98682b5caf8d2b689ad7b1c44eac))
+* **terraform:** regenerate from custom templates ([c10a08c](https://github.com/G-Core/terraform-provider-gcore/commit/c10a08c2adcba796edad5be0449d7a8e9fd850df))
+* **terraform:** regenerate from custom templates ([6053533](https://github.com/G-Core/terraform-provider-gcore/commit/605353373c5605931cd639781fed94149cca181f))
+* **terraform:** regenerate from custom templates ([2259f39](https://github.com/G-Core/terraform-provider-gcore/commit/2259f3999ce816d4236dc3dc095aa8fc3af91d41))
+* **terraform:** regenerate from custom templates ([ef72c13](https://github.com/G-Core/terraform-provider-gcore/commit/ef72c13e7399ea5f243474a00ebb2d6eac2259d2))
+* **terraform:** regenerate from custom templates ([f939ba3](https://github.com/G-Core/terraform-provider-gcore/commit/f939ba312afa5a8c0c1587d16b4d73f89b3b0dfb))
+* **terraform:** regenerate from custom templates ([2fa0d0d](https://github.com/G-Core/terraform-provider-gcore/commit/2fa0d0d8aa8e091388be98df8cff43f39a5e1453))
+* **terraform:** regenerate from custom templates ([cdcf212](https://github.com/G-Core/terraform-provider-gcore/commit/cdcf212e3b0058b8088ea5f8d0cd6b42efd07112))
+* **terraform:** regenerate from custom templates ([a1cb14b](https://github.com/G-Core/terraform-provider-gcore/commit/a1cb14b89b77483ece829826edc082727b3b3e7a))
+
 ## [2.0.0-alpha.15](https://github.com/G-Core/terraform-provider-gcore/compare/v2.0.0-alpha.14...v2.0.0-alpha.15) (2026-08-06)
 
 
