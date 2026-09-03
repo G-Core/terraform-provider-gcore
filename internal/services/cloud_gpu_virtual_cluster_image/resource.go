@@ -16,7 +16,6 @@ import (
 	"github.com/G-Core/terraform-provider-gcore/internal/custom"
 	"github.com/G-Core/terraform-provider-gcore/internal/importpath"
 	"github.com/G-Core/terraform-provider-gcore/internal/logging"
-	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 )
@@ -67,12 +66,6 @@ func (r *CloudGPUVirtualClusterImageResource) Create(ctx context.Context, req re
 		return
 	}
 
-	// url is write-only: it is null in the plan, so read it from the config.
-	resp.Diagnostics.Append(req.Config.GetAttribute(ctx, path.Root("url_wo"), &data.URL)...)
-	if resp.Diagnostics.HasError() {
-		return
-	}
-
 	params := cloud.GPUVirtualClusterImageUploadParams{}
 
 	if !data.ProjectID.IsNull() {
@@ -114,7 +107,54 @@ func (r *CloudGPUVirtualClusterImageResource) Create(ctx context.Context, req re
 }
 
 func (r *CloudGPUVirtualClusterImageResource) Update(ctx context.Context, req resource.UpdateRequest, resp *resource.UpdateResponse) {
-	// Update is not supported for this resource
+	// The API has no update endpoint for this resource, so every real change
+	// forces replacement. The only in-place change that reaches this method is
+	// the adoption of url after `terraform import`: it is create-only and never
+	// returned on read, so its prior state is null and the plan carries the
+	// configured value. Persist the plan, refreshing the computed attributes the
+	// planner marked unknown, so no unknown value is written to state.
+	var data *CloudGPUVirtualClusterImageModel
+
+	resp.Diagnostics.Append(req.Plan.Get(ctx, &data)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
+
+	params := cloud.GPUVirtualClusterImageGetParams{}
+
+	if !data.ProjectID.IsNull() {
+		params.ProjectID = param.NewOpt(data.ProjectID.ValueInt64())
+	}
+
+	if !data.RegionID.IsNull() {
+		params.RegionID = param.NewOpt(data.RegionID.ValueInt64())
+	}
+
+	res := new(http.Response)
+	_, err := r.client.Cloud.GPUVirtual.Clusters.Images.Get(
+		ctx,
+		data.ID.ValueString(),
+		params,
+		option.WithResponseBodyInto(&res),
+		option.WithMiddleware(logging.Middleware(ctx)),
+	)
+	if err != nil {
+		resp.Diagnostics.AddError("failed to make http request", err.Error())
+		return
+	}
+	bytes, _ := io.ReadAll(res.Body)
+	err = apijson.UnmarshalComputed(bytes, &data)
+	if err != nil {
+		resp.Diagnostics.AddError("failed to deserialize http request", err.Error())
+		return
+	}
+
+	if tags, ok := custom.ConvertAPITagsToCustomfieldMap(ctx, bytes); ok {
+		data.Tags = tags
+	}
+
+	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
 }
 
 func (r *CloudGPUVirtualClusterImageResource) Read(ctx context.Context, req resource.ReadRequest, resp *resource.ReadResponse) {

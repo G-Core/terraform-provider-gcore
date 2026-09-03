@@ -6,6 +6,7 @@ import (
 	"context"
 
 	"github.com/G-Core/terraform-provider-gcore/internal/customfield"
+	"github.com/G-Core/terraform-provider-gcore/internal/planmodifiers"
 	"github.com/hashicorp/terraform-plugin-framework-timetypes/timetypes"
 	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
@@ -43,7 +44,8 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 			"url": schema.StringAttribute{
 				Description:   "URL of the image to download.",
 				Required:      true,
-				PlanModifiers: []planmodifier.String{stringplanmodifier.RequiresReplace()},
+				Sensitive:     true,
+				PlanModifiers: []planmodifier.String{planmodifiers.RequiresReplaceIfPriorValueKnown()},
 			},
 			"architecture": schema.StringAttribute{
 				Description: "Image CPU architecture type: `aarch64`, `x86_64`\nAvailable values: \"aarch64\", \"x86_64\".",

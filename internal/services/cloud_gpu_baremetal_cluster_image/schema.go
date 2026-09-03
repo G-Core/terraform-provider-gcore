@@ -6,6 +6,7 @@ import (
 	"context"
 
 	"github.com/G-Core/terraform-provider-gcore/internal/customfield"
+	"github.com/G-Core/terraform-provider-gcore/internal/planmodifiers"
 	"github.com/hashicorp/terraform-plugin-framework-timetypes/timetypes"
 	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
@@ -49,7 +50,8 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 			"url": schema.StringAttribute{
 				Description:   "Image URL",
 				Required:      true,
-				PlanModifiers: []planmodifier.String{stringplanmodifier.RequiresReplace()},
+				Sensitive:     true,
+				PlanModifiers: []planmodifier.String{planmodifiers.RequiresReplaceIfPriorValueKnown()},
 			},
 			"hw_firmware_type": schema.StringAttribute{
 				Description: "Specifies the type of firmware with which to boot the guest.\nAvailable values: \"bios\", \"uefi\".",

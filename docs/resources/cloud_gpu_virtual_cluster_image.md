@@ -33,10 +33,8 @@ resource "gcore_cloud_gpu_virtual_cluster_image" "ubuntu" {
 
 ### Required
 
-> **NOTE**: [Write-only arguments](https://developer.hashicorp.com/terraform/language/resources/ephemeral#write-only-arguments) are supported in Terraform 1.11 and later.
-
 - `name` (String) Image name
-- `url_wo` (String, [Write-only](https://developer.hashicorp.com/terraform/language/resources/ephemeral#write-only-arguments)) Source URL the image is uploaded from. Write-only: it is sent to the API on create but never stored in state (the API does not return it on read, and the URL may contain credentials). To upload a different image, taint or replace the resource.
+- `url` (String, Sensitive) Image URL
 
 ### Optional
 

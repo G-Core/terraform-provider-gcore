@@ -47,7 +47,7 @@ resource "gcore_cloud_gpu_virtual_cluster_image" "test" {
   project_id = %[1]s
   region_id  = %[2]s
   name       = %[3]q
-  url_wo     = %[4]q
+  url        = %[4]q
 }
 
 data "gcore_cloud_gpu_virtual_cluster_images" "test" {

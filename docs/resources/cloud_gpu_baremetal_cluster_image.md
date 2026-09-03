@@ -34,7 +34,7 @@ resource "gcore_cloud_gpu_baremetal_cluster_image" "ubuntu" {
 ### Required
 
 - `name` (String) Image name
-- `url` (String) Image URL
+- `url` (String, Sensitive) Image URL
 
 ### Optional
 

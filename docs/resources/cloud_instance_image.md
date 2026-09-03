@@ -35,7 +35,7 @@ resource "gcore_cloud_instance_image" "ubuntu" {
 ### Required
 
 - `name` (String) Image name
-- `url` (String) URL of the image to download.
+- `url` (String, Sensitive) URL of the image to download.
 
 ### Optional
 

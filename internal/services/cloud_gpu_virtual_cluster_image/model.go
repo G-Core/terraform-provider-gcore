@@ -14,7 +14,7 @@ type CloudGPUVirtualClusterImageModel struct {
 	ProjectID          types.Int64                   `tfsdk:"project_id" path:"project_id,optional"`
 	RegionID           types.Int64                   `tfsdk:"region_id" path:"region_id,optional"`
 	Name               types.String                  `tfsdk:"name" json:"name,required"`
-	URL                types.String                  `tfsdk:"url_wo" json:"url,required,no_refresh"`
+	URL                types.String                  `tfsdk:"url" json:"url,required,no_refresh"`
 	HwFirmwareType     types.String                  `tfsdk:"hw_firmware_type" json:"hw_firmware_type,optional"`
 	OsDistro           types.String                  `tfsdk:"os_distro" json:"os_distro,optional"`
 	OsVersion          types.String                  `tfsdk:"os_version" json:"os_version,optional"`

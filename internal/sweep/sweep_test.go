@@ -27,6 +27,7 @@ import (
 	_ "github.com/G-Core/terraform-provider-gcore/internal/services/cloud_gpu_baremetal_cluster"
 	_ "github.com/G-Core/terraform-provider-gcore/internal/services/cloud_gpu_baremetal_cluster_image"
 	_ "github.com/G-Core/terraform-provider-gcore/internal/services/cloud_gpu_virtual_cluster"
+	_ "github.com/G-Core/terraform-provider-gcore/internal/services/cloud_gpu_virtual_cluster_image"
 	_ "github.com/G-Core/terraform-provider-gcore/internal/services/cloud_inference_registry_credential"
 	_ "github.com/G-Core/terraform-provider-gcore/internal/services/cloud_inference_secret"
 	_ "github.com/G-Core/terraform-provider-gcore/internal/services/cloud_instance"

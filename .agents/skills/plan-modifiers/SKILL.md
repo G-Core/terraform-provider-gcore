@@ -44,7 +44,7 @@ Cover at minimum:
 | `{Bool,Int64,String,Set,Object}UseStateForUnknownInclNull()` | Various | Generic variants preserving state (including null) when plan unknown (in `use_state_for_unknown_incl_null.go`) |
 | `ObjectPreserveNullState()` | Object | Preserves null state when plan unknown; does not compute when neither config nor state specifies the object |
 | `StringRequiresReplaceIfConfiguredPreservingState()` | String | Import-safe replacement: requires replace only when both config and state have known values that differ. Skips replacement when state is null (e.g., after importing a resource with a write-only field like `origin` that the API doesn't return in GET responses). Also skips it when the config value is **removed or unknown** — only use it where the Update API can honour those cases in place |
-| `RequiresReplaceIfPriorValueKnown()` | String | Import-safe replacement: skips replacement only when the **prior state** is null/unknown (create or post-import for a `no_refresh` field); replaces on any other change, including removal from config and an unknown planned value. Prefer this one for create-only fields (`string_requires_replace_if_prior_value_known.go`) |
+| `RequiresReplaceIfPriorValueKnown()` | String | Import-safe replacement: skips replacement only when the **prior state** is null/unknown (create or post-import for a `no_refresh` field); replaces on any other change, including removal from config and an unknown planned value. **Safe only for `Required` attributes** — see the note below (`string_requires_replace_if_prior_value_known.go`) |
 | `SetSuppressServerAdditions()` | Set | Suppresses drift when the API enriches a user-provided set with server-managed elements. If every config element exists in state and state has more, uses state value |
 | `UseStateUnlessCountChanges(countAttr)` | List | Preserves list state unless resource replaced or specified count attr changes |
 | `RequiresReplaceOnConfigChange()` | Object | Requires replace only when user-specified config fields change (ignores computed) |
@@ -64,6 +64,39 @@ behaviour into a silent, wrong one.
 marker written at import time.
 `RequiresReplaceIfPriorValueKnown()` and `ListRequiresReplaceIfNotNull()` implement the older
 null-prior-state heuristic and carry that caveat; prefer the marker for new work.
+
+### Using the null-prior-state heuristic safely
+
+`RequiresReplaceIfPriorValueKnown()` fixes the post-import destroy+recreate by skipping
+replacement when the prior state is null.
+
+That heuristic needs the attribute to be **`Required`**: a required attribute cannot be omitted at
+create, Create persists it, and refresh skips `no_refresh` fields. For an **`Optional`** create-only
+attribute, null prior state also means "created without it", and adopting there would silently
+record a value the infrastructure does not have. Do not use this modifier for optional attributes.
+
+`Required` narrows the causes of a null prior state but does not reduce them to one. State is also
+null for a resource whose value was **never persisted in the first place** — most importantly after
+migrating an attribute away from `WriteOnly`, since write-only values are never stored. On the first
+plan after such a migration the modifier adopts whatever the config now says instead of forcing
+replacement, so a user who renames the attribute *and* changes its value in the same step gets a
+silent adoption. Adoption is the right outcome for the ordinary migration (same value, new name);
+call the edge out in the changelog, and reach for the private-state marker instead if silently
+accepting a changed value would be unsafe for that resource.
+
+Two companion changes are usually required, and are easy to miss:
+
+- **The resource needs a real `Update`.** The framework pre-populates `UpdateResponse.State` with the
+  *prior* state, so a no-op `Update` stub returns null for the adopted attribute and every
+  post-import apply fails with "Provider produced inconsistent result after apply". The adopting
+  `Update` should seed from the plan and refresh computed attributes from a GET — the planner marks
+  computed nulls as *unknown*, and state cannot hold unknowns.
+- **Check the update request body.** If `Update` hand-builds its body from a plan/state diff, the
+  create-only attribute lands in it on the adopting apply (prior state null ≠ plan value). Verify the
+  API tolerates it; strip it from the body if not.
+
+Test it with `ImportStateKind: resource.ImportBlockWithID` — plain `ImportState` + `ImportStateVerify`
+never plans after importing, so it cannot see a forced replacement.
 
 ## Resource-Specific Modifier Inventory
 
