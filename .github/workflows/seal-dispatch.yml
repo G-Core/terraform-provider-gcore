@@ -6,6 +6,13 @@ name: Seal custom code (dispatch)
 # skipped by the loop guard below, so the bot's own pushes (the "Build SDK"
 # squash commit and the docs-regen commit) can't trigger a reseal loop.
 #
+# Automation pushes are skipped wholesale (guard 3): "Sync from production"
+# fast-forwards this trunk with release commits (version/CHANGELOG) using a
+# gcore-sdk-bot App token, and App-token pushes trigger workflows. Those
+# release commits need no dispatch because the next regular build advances
+# each tracking file to the live origin/main tip. Dispatching here would run
+# an unnecessary multi-target reseal for every release.
+#
 # This workflow is itself custom code: it must be sealed once (stlc build
 # --commit) to bootstrap, after which it is preserved across regenerations.
 on:
@@ -27,9 +34,19 @@ jobs:
     # Canonical staging repo on the upstream only (never forks).
     if: github.repository == 'G-Core/terraform-provider-gcore-staging'
     steps:
+      - name: Generate gcore-sdk-bot token
+        id: app-token
+        uses: actions/create-github-app-token@v3
+        with:
+          client-id: ${{ vars.GCORE_SDK_BOT_CLIENT_ID }}
+          private-key: ${{ secrets.GCORE_SDK_BOT_PRIVATE_KEY }}
+          owner: G-Core
+          repositories: stlc-config
+          permission-contents: write
+
       - name: Loop-guard and send reseal dispatch
         env:
-          DISPATCH_TOKEN: ${{ secrets.STLC_CONFIG_DISPATCH_TOKEN }}
+          DISPATCH_TOKEN: ${{ steps.app-token.outputs.token }}
           HEAD_MSG: ${{ github.event.head_commit.message }}
           HEAD_AUTHOR_USERNAME: ${{ github.event.head_commit.author.username }}
           HEAD_AUTHOR_NAME: ${{ github.event.head_commit.author.name }}
@@ -53,9 +70,12 @@ jobs:
             exit 0
           fi
 
-          if [ -z "${DISPATCH_TOKEN}" ]; then
-            echo "STLC_CONFIG_DISPATCH_TOKEN is not set — cannot send dispatch." >&2
-            exit 1
+          # Loop guard 3: App-authenticated back-sync pushes trigger workflows,
+          # unlike pushes made with GITHUB_TOKEN. They contain release metadata,
+          # not out-of-band custom code that needs resealing.
+          if [ "$ACTOR" = "gcore-sdk-bot[bot]" ]; then
+            echo "Push performed by gcore-sdk-bot[bot] (automation, e.g. production back-sync) — skipping dispatch."
+            exit 0
           fi
 
           # Reseal all targets (matches the commit-back scope on stlc-config).
