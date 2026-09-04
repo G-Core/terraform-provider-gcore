@@ -22,7 +22,7 @@ import (
 // across packages, so the cluster resource config below is duplicated here
 // rather than shared.
 const (
-	k8sClusterVersion  = "v1.33.10"
+	k8sClusterVersion  = "v1.33.13"
 	k8sClusterFlavorID = "g1-standard-2-4"
 )
 

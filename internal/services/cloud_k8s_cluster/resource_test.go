@@ -21,7 +21,7 @@ import (
 
 // k8sClusterVersion is the Kubernetes version used in tests.
 // It should be a supported version in the target region.
-const k8sClusterVersion = "v1.33.10"
+const k8sClusterVersion = "v1.33.13"
 
 // k8sClusterFlavorID is the VM flavor ID used for worker node pools in tests.
 // This is a small VM flavor suitable for testing.

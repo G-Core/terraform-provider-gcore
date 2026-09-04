@@ -31,18 +31,22 @@ func DataSourceSchema(ctx context.Context) schema.Schema {
 			"client_certificate": schema.StringAttribute{
 				Description: "String in base64 format. Cluster client certificate",
 				Computed:    true,
+				Sensitive:   true,
 			},
 			"client_key": schema.StringAttribute{
 				Description: "String in base64 format. Cluster client key",
 				Computed:    true,
+				Sensitive:   true,
 			},
 			"cluster_ca_certificate": schema.StringAttribute{
 				Description: "String in base64 format. Cluster ca certificate",
 				Computed:    true,
+				Sensitive:   true,
 			},
 			"config": schema.StringAttribute{
 				Description: "Cluster kubeconfig",
 				Computed:    true,
+				Sensitive:   true,
 			},
 			"created_at": schema.StringAttribute{
 				Description: "Kubeconfig creation date",
