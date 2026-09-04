@@ -10,50 +10,12 @@ description: |-
 
 Applied presets represent the association between a preset and a CDN resource or rule. Use them to apply a preset to an object, list the objects a preset is applied to, unapply it, and inspect which object fields a preset manages.
 
-While a preset is applied, the options it carries cannot be edited on the target object. The
-preset itself is read-only and account-scoped - use the `gcore_cdn_presets` data source to find
-one rather than hardcoding its ID.
-
-There is no endpoint to change an applied preset, so both `preset_id` and `object_id` force
-replacement: changing either unapplies the preset and re-applies it.
-
 ## Example Usage
 
-### Apply a preset to a CDN resource
-
-Look up a preset that targets CDN resources and apply it to a newly created one.
-
 ```terraform
-# Apply a CDN preset to a CDN resource.
-#
-# Presets are read-only, account-scoped bundles of CDN settings, so look the one
-# you want up instead of hardcoding its ID. Only presets whose object_type is
-# "CDNResource" can be applied to a CDN resource; "Rule" presets apply to
-# gcore_cdn_resource_rule objects.
-data "gcore_cdn_presets" "all" {}
-
-locals {
-  live_streaming_preset_id = one([
-    for preset in data.gcore_cdn_presets.all.items :
-    preset.id if preset.object_type == "CDNResource" && preset.name == "LIVE STREAMING"
-  ])
-}
-
-resource "gcore_cdn_origin_group" "example" {
-  name = "origin_group_1"
-  sources = [{
-    source = "example.com"
-  }]
-}
-
-resource "gcore_cdn_resource" "example" {
-  cname        = "cdn.example.com"
-  origin_group = gcore_cdn_origin_group.example.id
-}
-
-resource "gcore_cdn_applied_preset" "example" {
-  preset_id = local.live_streaming_preset_id
-  object_id = gcore_cdn_resource.example.id
+resource "gcore_cdn_applied_preset" "example_cdn_applied_preset" {
+  preset_id = 0
+  object_id = 7531
 }
 ```
 
