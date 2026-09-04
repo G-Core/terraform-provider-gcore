@@ -24,9 +24,20 @@ jobs:
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
 
+      - name: Generate gcore-sdk-bot read token
+        if: github.event_name == 'push' && github.repository == 'G-Core/terraform-provider-gcore-staging'
+        id: app-token
+        uses: actions/create-github-app-token@v3
+        with:
+          client-id: ${{ vars.GCORE_SDK_BOT_CLIENT_ID }}
+          private-key: ${{ secrets.GCORE_SDK_BOT_PRIVATE_KEY }}
+          owner: G-Core
+          repositories: gcore-go-staging
+          permission-contents: read
+
       - uses: ./.github/actions/setup-go
         with:
-          go-repo-read-token: ${{ secrets.GO_REPO_READ_TOKEN }}
+          go-repo-read-token: ${{ steps.app-token.outputs.token }}
 
       # GCLOUD2-24419: link co-generated go SDK — gcore-go-staging@<branch> → @main → pinned release (staging-only).
       - name: Link staging branch
@@ -55,9 +66,20 @@ jobs:
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
 
+      - name: Generate gcore-sdk-bot read token
+        if: github.event_name == 'push' && github.repository == 'G-Core/terraform-provider-gcore-staging'
+        id: app-token
+        uses: actions/create-github-app-token@v3
+        with:
+          client-id: ${{ vars.GCORE_SDK_BOT_CLIENT_ID }}
+          private-key: ${{ secrets.GCORE_SDK_BOT_PRIVATE_KEY }}
+          owner: G-Core
+          repositories: gcore-go-staging
+          permission-contents: read
+
       - uses: ./.github/actions/setup-go
         with:
-          go-repo-read-token: ${{ secrets.GO_REPO_READ_TOKEN }}
+          go-repo-read-token: ${{ steps.app-token.outputs.token }}
 
       # GCLOUD2-24419: link co-generated go SDK — gcore-go-staging@<branch> → @main → pinned release (staging-only).
       - name: Link staging branch

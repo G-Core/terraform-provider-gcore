@@ -9,7 +9,7 @@ inputs:
     description: path to dependency files for caching
   go-repo-read-token:
     required: false
-    description: fine-grained GitHub PAT with Contents:Read on the Go SDK repo (needed when the SDK repo is private)
+    description: GitHub token with Contents:Read on the Go SDK repo (needed when the SDK repo is private)
 runs:
   using: composite
   steps:
