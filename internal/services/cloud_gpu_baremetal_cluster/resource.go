@@ -134,7 +134,7 @@ func (r *CloudGPUBaremetalClusterResource) Update(ctx context.Context, req resou
 	// when credentials are unknown at plan time the guard there is skipped,
 	// and by apply time the values are resolved. Rejecting here keeps an
 	// unsupported username/password change from being silently dropped
-	// (UpdateServersSettings only sends ssh_key_name) while state records it.
+	// (the settings patch only sends ssh_key_name) while state records it.
 	var planSettingsObj, stateSettingsObj types.Object
 	resp.Diagnostics.Append(req.Plan.GetAttribute(ctx, path.Root("servers_settings"), &planSettingsObj)...)
 	resp.Diagnostics.Append(req.State.GetAttribute(ctx, path.Root("servers_settings"), &stateSettingsObj)...)
@@ -235,7 +235,7 @@ func (r *CloudGPUBaremetalClusterResource) Update(ctx context.Context, req resou
 		stateHasChanged = true
 	}
 
-	// Check if server settings that require UpdateServersSettings + Rebuild have changed
+	// Check if server settings that require a settings patch + apply have changed
 	// (image_id, credentials, user_data)
 	imageChanged := !data.ImageID.IsNull() && data.ImageID.ValueString() != state.ImageID.ValueString()
 	userDataChanged := false
@@ -244,7 +244,7 @@ func (r *CloudGPUBaremetalClusterResource) Update(ctx context.Context, req resou
 	}
 
 	if imageChanged || credentialsChanged || userDataChanged {
-		updateParams := cloud.GPUBaremetalClusterUpdateServersSettingsParams{}
+		updateParams := cloud.GPUBaremetalClusterUpdateParams{}
 		if !data.ProjectID.IsNull() {
 			updateParams.ProjectID = param.NewOpt(data.ProjectID.ValueInt64())
 		}
@@ -264,7 +264,9 @@ func (r *CloudGPUBaremetalClusterResource) Update(ctx context.Context, req resou
 			updateParams.ServersSettings.UserData = param.NewOpt(data.ServersSettings.UserData.ValueString())
 		}
 
-		_, err := r.client.Cloud.GPUBaremetal.Clusters.UpdateServersSettings(
+		// Patch the cluster template. This only records the new settings; existing
+		// servers keep running with the old ones until they are applied below.
+		_, err := r.client.Cloud.GPUBaremetal.Clusters.Update(
 			ctx,
 			data.ID.ValueString(),
 			updateParams,
@@ -275,19 +277,23 @@ func (r *CloudGPUBaremetalClusterResource) Update(ctx context.Context, req resou
 			return
 		}
 
-		// Rebuild to apply changes to existing servers
-		rebuildParams := cloud.GPUBaremetalClusterRebuildParams{}
+		// Apply the patched settings to the existing servers. This re-images them,
+		// so max_disruption has to be "rebuild": the API default "none" always
+		// fails validation, by design, to block accidental destructive applies.
+		applyParams := cloud.GPUBaremetalClusterApplySettingsParams{
+			MaxDisruption: cloud.GPUBaremetalClusterApplySettingsParamsMaxDisruptionRebuild,
+		}
 		if !data.ProjectID.IsNull() {
-			rebuildParams.ProjectID = param.NewOpt(data.ProjectID.ValueInt64())
+			applyParams.ProjectID = param.NewOpt(data.ProjectID.ValueInt64())
 		}
 		if !data.RegionID.IsNull() {
-			rebuildParams.RegionID = param.NewOpt(data.RegionID.ValueInt64())
+			applyParams.RegionID = param.NewOpt(data.RegionID.ValueInt64())
 		}
 		res := new(http.Response)
-		_, err = r.client.Cloud.GPUBaremetal.Clusters.RebuildAndPoll(
+		_, err = r.client.Cloud.GPUBaremetal.Clusters.ApplySettingsAndPoll(
 			ctx,
 			data.ID.ValueString(),
-			rebuildParams,
+			applyParams,
 			option.WithResponseBodyInto(&res),
 			option.WithMiddleware(logging.Middleware(ctx)),
 		)
@@ -490,7 +496,7 @@ func (r *CloudGPUBaremetalClusterResource) ModifyPlan(ctx context.Context, req r
 		return
 	}
 
-	// The UpdateServersSettings API only supports updating ssh_key_name.
+	// The cluster settings patch only supports updating ssh_key_name.
 	// Reject username/password changes at plan time with a clear error.
 	if credentialsHaveChanged(planSettings, stateSettings) &&
 		usernameOrPasswordChanged(planSettings, stateSettings) {
@@ -548,7 +554,7 @@ func credentialsHaveChanged(plan, state types.Object) bool {
 
 // usernameOrPasswordChanged returns true if specifically the username or password
 // credential fields have changed (as opposed to ssh_key_name).
-// The UpdateServersSettings API only supports updating ssh_key_name, so changes to
+// The cluster settings patch only supports updating ssh_key_name, so changes to
 // username or password must be rejected.
 func usernameOrPasswordChanged(plan, state types.Object) bool {
 	planCreds := credentialsObject(plan)

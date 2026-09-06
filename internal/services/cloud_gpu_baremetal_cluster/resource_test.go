@@ -2,6 +2,7 @@ package cloud_gpu_baremetal_cluster_test
 
 import (
 	"context"
+	"encoding/base64"
 	"fmt"
 	"os"
 	"regexp"
@@ -151,6 +152,52 @@ func TestAccCloudGPUBaremetalCluster_update(t *testing.T) {
 	})
 }
 
+// TestAccCloudGPUBaremetalCluster_userData covers the servers-settings branch of Update:
+// changing user_data patches the cluster template through
+// PATCH /v3/gpu/baremetal/{project_id}/{region_id}/clusters/{cluster_id} and then rolls the
+// change out to the running servers through POST .../apply_settings.
+//
+// user_data is exempt from RequiresReplaceOnConfigChange, so the change is applied in place -
+// the id check below fails the test if the resource is replaced instead. Applying settings
+// re-images every server in the cluster, so this test is slow and consumes GPU bare metal quota.
+func TestAccCloudGPUBaremetalCluster_userData(t *testing.T) {
+	rName := acctest.RandomName()
+
+	compareIDSame := statecheck.CompareValue(compare.ValuesSame())
+
+	resource.ParallelTest(t, resource.TestCase{
+		PreCheck:                 func() { gpuBmClusterPreCheck(t) },
+		ProtoV6ProviderFactories: acctest.ProtoV6ProviderFactories,
+		CheckDestroy:             testAccCheckCloudGPUBaremetalClusterDestroy,
+		Steps: []resource.TestStep{
+			{
+				Config: testAccCloudGPUBaremetalClusterConfigWithUserData(rName, "#!/bin/bash\necho initial\n"),
+				ConfigStateChecks: []statecheck.StateCheck{
+					statecheck.ExpectKnownValue("gcore_cloud_gpu_baremetal_cluster.test",
+						tfjsonpath.New("servers_settings").AtMapKey("user_data"),
+						knownvalue.StringExact(base64.StdEncoding.EncodeToString([]byte("#!/bin/bash\necho initial\n")))),
+					compareIDSame.AddStateValue(
+						"gcore_cloud_gpu_baremetal_cluster.test",
+						tfjsonpath.New("id"),
+					),
+				},
+			},
+			{
+				Config: testAccCloudGPUBaremetalClusterConfigWithUserData(rName, "#!/bin/bash\necho updated\n"),
+				ConfigStateChecks: []statecheck.StateCheck{
+					statecheck.ExpectKnownValue("gcore_cloud_gpu_baremetal_cluster.test",
+						tfjsonpath.New("servers_settings").AtMapKey("user_data"),
+						knownvalue.StringExact(base64.StdEncoding.EncodeToString([]byte("#!/bin/bash\necho updated\n")))),
+					compareIDSame.AddStateValue(
+						"gcore_cloud_gpu_baremetal_cluster.test",
+						tfjsonpath.New("id"),
+					),
+				},
+			},
+		},
+	})
+}
+
 func TestAccCloudGPUBaremetalCluster_tags(t *testing.T) {
 	rName := acctest.RandomName()
 
@@ -252,6 +299,33 @@ resource "gcore_cloud_gpu_baremetal_cluster" "test" {
     %[7]s = %[8]q
   }
 }`, acctest.ProjectID(), acctest.RegionID(), name, gpuBmFlavor(), gpuBmImageID(), gpuBmSSHKey(), tagKey, tagValue)
+}
+
+// testAccCloudGPUBaremetalClusterConfigWithUserData mirrors
+// testAccCloudGPUBaremetalClusterConfig with a user_data script. The attribute carries the
+// Base64-encoded script, matching what Read writes back into state.
+func testAccCloudGPUBaremetalClusterConfigWithUserData(name, userData string) string {
+	return fmt.Sprintf(`
+resource "gcore_cloud_gpu_baremetal_cluster" "test" {
+  project_id    = %[1]s
+  region_id     = %[2]s
+  name          = %[3]q
+  flavor        = %[4]q
+  image_id      = %[5]q
+  servers_count = 1
+
+  servers_settings = {
+    interfaces = [{
+      type      = "external"
+      ip_family = "ipv4"
+    }]
+    credentials = {
+      ssh_key_name = %[6]q
+    }
+    user_data = %[7]q
+  }
+}`, acctest.ProjectID(), acctest.RegionID(), name, gpuBmFlavor(), gpuBmImageID(), gpuBmSSHKey(),
+		base64.StdEncoding.EncodeToString([]byte(userData)))
 }
 
 // Synthetic IDs for the plan-only validation cases. These must be literals, not
