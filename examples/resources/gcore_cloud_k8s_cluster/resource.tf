@@ -70,6 +70,7 @@ resource "gcore_cloud_k8s_cluster" "example_cloud_k8s_cluster" {
   }
   csi = {
     nfs = {
+      ddn_enabled = false
       vast_enabled = true
     }
   }

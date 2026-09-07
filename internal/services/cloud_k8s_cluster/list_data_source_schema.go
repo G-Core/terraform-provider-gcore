@@ -94,6 +94,10 @@ func ListDataSourceSchema(ctx context.Context) schema.Schema {
 									Computed:    true,
 									CustomType:  customfield.NewNestedObjectType[CloudK8SClustersCsiNfsDataSourceModel](ctx),
 									Attributes: map[string]schema.Attribute{
+										"ddn_enabled": schema.BoolAttribute{
+											Description: "Whether DDN (Lustre) integration is enabled. When `true`, the DDN EXAScaler CSI driver is deployed in the cluster and each DDN file share defined in the cloud is exposed as a dedicated StorageClass.",
+											Computed:    true,
+										},
 										"vast_enabled": schema.BoolAttribute{
 											Description: "Indicates the status of VAST NFS integration",
 											Computed:    true,

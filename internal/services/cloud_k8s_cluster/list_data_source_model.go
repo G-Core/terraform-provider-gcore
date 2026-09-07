@@ -81,6 +81,7 @@ type CloudK8SClustersCsiDataSourceModel struct {
 }
 
 type CloudK8SClustersCsiNfsDataSourceModel struct {
+	DdnEnabled  types.Bool `tfsdk:"ddn_enabled" json:"ddn_enabled,computed"`
 	VastEnabled types.Bool `tfsdk:"vast_enabled" json:"vast_enabled,computed"`
 }
 

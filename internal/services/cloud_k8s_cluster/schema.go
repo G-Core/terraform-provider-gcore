@@ -244,6 +244,12 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 						Optional:    true,
 						CustomType:  customfield.NewNestedObjectType[CloudK8SClusterCsiNfsModel](ctx),
 						Attributes: map[string]schema.Attribute{
+							"ddn_enabled": schema.BoolAttribute{
+								Description: "Enable or disable DDN (Lustre) integration. The default value is `false`. When set to `true`, the DDN EXAScaler CSI driver will be deployed in the cluster with a dedicated StorageClass for each DDN file share defined in the cloud. At least one DDN file share must already exist in the project; otherwise cluster creation fails with a `400` validation error. Existing file shares are available immediately, while those created after the cluster may take a few minutes to appear.",
+								Computed:    true,
+								Optional:    true,
+								Default:     booldefault.StaticBool(false),
+							},
 							"vast_enabled": schema.BoolAttribute{
 								Description: "Enable or disable VAST NFS integration. The default value is `false`. When set to `true`, a dedicated StorageClass will be created in the cluster for each VAST NFS file share defined in the cloud. All file shares created prior to cluster creation will be available immediately, while those created afterward may take a few minutes for to appear.",
 								Computed:    true,

@@ -19,16 +19,20 @@ func ListDataSourceSchema(ctx context.Context) schema.Schema {
 	return schema.Schema{
 		Attributes: map[string]schema.Attribute{
 			"registry_id": schema.Int64Attribute{
-				Required: true,
+				Description: "Registry ID",
+				Required:    true,
 			},
 			"repository_name": schema.StringAttribute{
-				Required: true,
+				Description: "Repository name. If it contains a slash, encode it with URL encoding, e.g. a/b -> a%252Fb",
+				Required:    true,
 			},
 			"project_id": schema.Int64Attribute{
-				Optional: true,
+				Description: "Project ID",
+				Optional:    true,
 			},
 			"region_id": schema.Int64Attribute{
-				Optional: true,
+				Description: "Region ID",
+				Optional:    true,
 			},
 			"max_items": schema.Int64Attribute{
 				Description: "Max items to fetch, default: 1000",
