@@ -14,9 +14,9 @@ description: |-
 
 ```terraform
 data "gcore_cloud_registry" "example_cloud_registry" {
-  project_id = 0
-  region_id = 0
-  registry_id = 0
+  project_id = 1
+  region_id = 1
+  registry_id = 1
 }
 ```
 
@@ -25,12 +25,12 @@ data "gcore_cloud_registry" "example_cloud_registry" {
 
 ### Required
 
-- `registry_id` (Number)
+- `registry_id` (Number) Registry ID
 
 ### Optional
 
-- `project_id` (Number)
-- `region_id` (Number)
+- `project_id` (Number) Project ID
+- `region_id` (Number) Region ID
 
 ### Read-Only
 

@@ -14,10 +14,10 @@ description: |-
 
 ```terraform
 data "gcore_cloud_registry_artifacts" "example_cloud_registry_artifacts" {
-  project_id = 0
-  region_id = 0
-  registry_id = 0
-  repository_name = "repository_name"
+  project_id = 1
+  region_id = 1
+  registry_id = 1
+  repository_name = "nginx"
 }
 ```
 
@@ -26,14 +26,14 @@ data "gcore_cloud_registry_artifacts" "example_cloud_registry_artifacts" {
 
 ### Required
 
-- `registry_id` (Number)
-- `repository_name` (String)
+- `registry_id` (Number) Registry ID
+- `repository_name` (String) Repository name. If it contains a slash, encode it with URL encoding, e.g. a/b -> a%252Fb
 
 ### Optional
 
 - `max_items` (Number) Max items to fetch, default: 1000
-- `project_id` (Number)
-- `region_id` (Number)
+- `project_id` (Number) Project ID
+- `region_id` (Number) Region ID
 
 ### Read-Only
 

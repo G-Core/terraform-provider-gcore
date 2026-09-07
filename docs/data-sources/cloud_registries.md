@@ -14,8 +14,8 @@ description: |-
 
 ```terraform
 data "gcore_cloud_registries" "example_cloud_registries" {
-  project_id = 0
-  region_id = 0
+  project_id = 1
+  region_id = 1
 }
 ```
 
@@ -25,8 +25,8 @@ data "gcore_cloud_registries" "example_cloud_registries" {
 ### Optional
 
 - `max_items` (Number) Max items to fetch, default: 1000
-- `project_id` (Number)
-- `region_id` (Number)
+- `project_id` (Number) Project ID
+- `region_id` (Number) Region ID
 
 ### Read-Only
 

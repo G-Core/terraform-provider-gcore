@@ -159,6 +159,7 @@ Read-Only:
 
 Read-Only:
 
+- `ddn_enabled` (Boolean) Whether DDN (Lustre) integration is enabled. When `true`, the DDN EXAScaler CSI driver is deployed in the cluster and each DDN file share defined in the cloud is exposed as a dedicated StorageClass.
 - `vast_enabled` (Boolean) Indicates the status of VAST NFS integration
 
 
