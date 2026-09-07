@@ -44,6 +44,11 @@ func DataSourceSchema(ctx context.Context) schema.Schema {
 				Description: "Optional human-readable description of the application's purpose",
 				Computed:    true,
 			},
+			"created_at": schema.StringAttribute{
+				Description: "Timestamp of app creation",
+				Computed:    true,
+				CustomType:  timetypes.RFC3339Type{},
+			},
 			"debug": schema.BoolAttribute{
 				Description: "Enable verbose debug logging for 30 minutes. Automatically expires to prevent performance impact.",
 				Computed:    true,
@@ -87,6 +92,11 @@ func DataSourceSchema(ctx context.Context) schema.Schema {
 			"template_name": schema.StringAttribute{
 				Description: "Template name",
 				Computed:    true,
+			},
+			"updated_at": schema.StringAttribute{
+				Description: "Timestamp of last app update",
+				Computed:    true,
+				CustomType:  timetypes.RFC3339Type{},
 			},
 			"url": schema.StringAttribute{
 				Description: "Auto-generated URL where the application is accessible",
@@ -170,7 +180,7 @@ func DataSourceSchema(ctx context.Context) schema.Schema {
 						},
 					},
 					"name": schema.StringAttribute{
-						Description: "Filter by application name (case-insensitive partial match)",
+						Description: "Filter by application name, exact match only (with or without client suffix)",
 						Optional:    true,
 					},
 					"ordering": schema.StringAttribute{

@@ -36,7 +36,7 @@ func ListDataSourceSchema(ctx context.Context) schema.Schema {
 				},
 			},
 			"name": schema.StringAttribute{
-				Description: "Filter by application name (case-insensitive partial match)",
+				Description: "Filter by application name, exact match only (with or without client suffix)",
 				Optional:    true,
 			},
 			"ordering": schema.StringAttribute{
@@ -108,6 +108,11 @@ func ListDataSourceSchema(ctx context.Context) schema.Schema {
 							Description: "Binary ID",
 							Computed:    true,
 						},
+						"created_at": schema.StringAttribute{
+							Description: "Timestamp of app creation",
+							Computed:    true,
+							CustomType:  timetypes.RFC3339Type{},
+						},
 						"name": schema.StringAttribute{
 							Description: "App name",
 							Computed:    true,
@@ -119,6 +124,11 @@ func ListDataSourceSchema(ctx context.Context) schema.Schema {
 						"status": schema.Int64Attribute{
 							Description: "Status code:  \n0 - draft (inactive)  \n1 - enabled  \n2 - disabled  \n3 - hourly call limit exceeded  \n4 - daily call limit exceeded  \n5 - suspended",
 							Computed:    true,
+						},
+						"updated_at": schema.StringAttribute{
+							Description: "Timestamp of last app update",
+							Computed:    true,
+							CustomType:  timetypes.RFC3339Type{},
 						},
 						"comment": schema.StringAttribute{
 							Description: "Description of the binary",

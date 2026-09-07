@@ -19,6 +19,7 @@ type FastedgeAppDataSourceModel struct {
 	APIType      types.String                                                   `tfsdk:"api_type" json:"api_type,computed"`
 	Binary       types.Int64                                                    `tfsdk:"binary" json:"binary,computed"`
 	Comment      types.String                                                   `tfsdk:"comment" json:"comment,computed"`
+	CreatedAt    timetypes.RFC3339                                              `tfsdk:"created_at" json:"created_at,computed" format:"date-time"`
 	Debug        types.Bool                                                     `tfsdk:"debug" json:"debug,computed"`
 	DebugUntil   timetypes.RFC3339                                              `tfsdk:"debug_until" json:"debug_until,computed" format:"date-time"`
 	Log          types.String                                                   `tfsdk:"log" json:"log,computed"`
@@ -28,6 +29,7 @@ type FastedgeAppDataSourceModel struct {
 	Status       types.Int64                                                    `tfsdk:"status" json:"status,computed"`
 	Template     types.Int64                                                    `tfsdk:"template" json:"template,computed"`
 	TemplateName types.String                                                   `tfsdk:"template_name" json:"template_name,computed"`
+	UpdatedAt    timetypes.RFC3339                                              `tfsdk:"updated_at" json:"updated_at,computed" format:"date-time"`
 	URL          types.String                                                   `tfsdk:"url" json:"url,computed"`
 	Env          customfield.Map[types.String]                                  `tfsdk:"env" json:"env,computed"`
 	Networks     customfield.List[types.String]                                 `tfsdk:"networks" json:"networks,computed"`

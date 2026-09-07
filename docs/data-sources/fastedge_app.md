@@ -31,6 +31,7 @@ data "gcore_fastedge_app" "example_fastedge_app" {
 - `api_type` (String) Wasm API type
 - `binary` (Number) ID of the WebAssembly binary to deploy
 - `comment` (String) Optional human-readable description of the application's purpose
+- `created_at` (String) Timestamp of app creation
 - `debug` (Boolean) Enable verbose debug logging for 30 minutes. Automatically expires to prevent performance impact.
 - `debug_until` (String) When debugging finishes
 - `env` (Map of String) Environment variables
@@ -50,6 +51,7 @@ data "gcore_fastedge_app" "example_fastedge_app" {
 - `stores` (Attributes Map) Application edge stores (see [below for nested schema](#nestedatt--stores))
 - `template` (Number) Template ID
 - `template_name` (String) Template name
+- `updated_at` (String) Timestamp of last app update
 - `url` (String) Auto-generated URL where the application is accessible
 
 <a id="nestedatt--find_one_by"></a>
@@ -62,7 +64,7 @@ wasi-http - WASI with HTTP entry point
 proxy-wasm - Proxy-Wasm app, callable from CDN
 Available values: "wasi-http", "proxy-wasm".
 - `binary` (Number) Filter by binary ID (shows apps using this binary)
-- `name` (String) Filter by application name (case-insensitive partial match)
+- `name` (String) Filter by application name, exact match only (with or without client suffix)
 - `ordering` (String) Sort order. Use - prefix for descending (e.g., -name sorts by name descending)
 Available values: "name", "-name", "status", "-status", "id", "-id", "template", "-template", "binary", "-binary", "plan", "-plan".
 - `plan` (Number) Filter by plan ID

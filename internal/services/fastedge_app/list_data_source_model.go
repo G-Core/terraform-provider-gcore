@@ -61,9 +61,11 @@ type FastedgeAppsItemsDataSourceModel struct {
 	ID            types.Int64                    `tfsdk:"id" json:"id,computed"`
 	APIType       types.String                   `tfsdk:"api_type" json:"api_type,computed"`
 	Binary        types.Int64                    `tfsdk:"binary" json:"binary,computed"`
+	CreatedAt     timetypes.RFC3339              `tfsdk:"created_at" json:"created_at,computed" format:"date-time"`
 	Name          types.String                   `tfsdk:"name" json:"name,computed"`
 	PlanID        types.Int64                    `tfsdk:"plan_id" json:"plan_id,computed"`
 	Status        types.Int64                    `tfsdk:"status" json:"status,computed"`
+	UpdatedAt     timetypes.RFC3339              `tfsdk:"updated_at" json:"updated_at,computed" format:"date-time"`
 	Comment       types.String                   `tfsdk:"comment" json:"comment,computed"`
 	Debug         types.Bool                     `tfsdk:"debug" json:"debug,computed"`
 	DebugUntil    timetypes.RFC3339              `tfsdk:"debug_until" json:"debug_until,computed" format:"date-time"`
