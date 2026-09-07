@@ -3,7 +3,7 @@ name: Seal custom code (dispatch)
 # When genuine out-of-band custom code is merged to this SDK repo's main,
 # notify G-Core/stlc-config to reseal so the custom-code tracking JSON
 # (the {base, integrated} commit pair) absorbs it. stlc-authored commits are
-# skipped by the loop guard below, so the bot's own pushes (the "Build SDK"
+# skipped by the loop guards below, so the bot's own pushes (the "Build SDK"
 # squash commit and the docs-regen commit) can't trigger a reseal loop.
 #
 # Automation pushes are skipped wholesale (guard 3): "Sync from production"
@@ -50,6 +50,8 @@ jobs:
           HEAD_MSG: ${{ github.event.head_commit.message }}
           HEAD_AUTHOR_USERNAME: ${{ github.event.head_commit.author.username }}
           HEAD_AUTHOR_NAME: ${{ github.event.head_commit.author.name }}
+          HEAD_COMMITTER_EMAIL: ${{ github.event.head_commit.committer.email }}
+          HEAD_COMMITTER_USERNAME: ${{ github.event.head_commit.committer.username }}
           SHA: ${{ github.sha }}
           REF: ${{ github.ref }}
           ACTOR: ${{ github.actor }}
@@ -57,10 +59,23 @@ jobs:
         run: |
           set -euo pipefail
 
-          # Loop guard 1: skip the stlc "Build SDK" squash commit (carries the
-          # Stainless-Generated-From trailer in its message).
-          if printf '%s' "$HEAD_MSG" | grep -q 'Stainless-Generated-From'; then
-            echo "Head commit carries Stainless-Generated-From trailer — skipping dispatch."
+          # Loop guard 1: skip commits produced by an stlc build, which carry a
+          # Stainless-Generated-From trailer. Authorship (guard 2) does not cover
+          # these -- `stlc build --commit` run locally is committed with the
+          # operator's own identity, not stlc-bot's.
+          #
+          # GitHub-UI merges are excluded: a squash merge folds every commit
+          # message in the PR into its body, so a human PR carrying a generated
+          # commit would match here and its custom code would never be sealed.
+          # Such merges are always committed by GitHub <noreply@github.com> /
+          # web-flow; an stlc build push never is.
+          #
+          # Anchored to a trailer line so a message that merely mentions the
+          # trailer does not match.
+          if [ "$HEAD_COMMITTER_EMAIL" != "noreply@github.com" ] \
+             && [ "$HEAD_COMMITTER_USERNAME" != "web-flow" ] \
+             && printf '%s' "$HEAD_MSG" | grep -qE '^Stainless-Generated-From:[[:space:]]'; then
+            echo "Head commit is an stlc build (trailer present, not a GitHub merge) — skipping dispatch."
             exit 0
           fi
 
