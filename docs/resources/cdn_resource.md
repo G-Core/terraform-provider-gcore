@@ -337,11 +337,6 @@ Can be used only with `"sslEnabled": true`.
 Possible values:
 - **true** - HTTPS is enabled.
 - **false** - HTTPS is disabled.
-- `waap_api_domain_enabled` (Boolean) Defines whether the associated WAAP Domain is identified as an API Domain.
-
-Possible values:
-- **true** - The associated WAAP Domain is designated as an API Domain.
-- **false** - The associated WAAP Domain is not designated as an API Domain.
 
 ### Read-Only
 
@@ -538,7 +533,9 @@ The option works only if `originProtocol` parameter is `HTTPS` or `MATCH`. (see 
 - `static_response_headers` (Attributes) Custom HTTP Headers that a CDN server adds to a response. (see [below for nested schema](#nestedatt--options--static_response_headers))
 - `tls_versions` (Attributes) List of SSL/TLS protocol versions allowed for HTTPS connections from end users to the domain.
 
-When the option is disabled, all protocols versions are allowed. (see [below for nested schema](#nestedatt--options--tls_versions))
+When the option is disabled, all protocols versions are allowed.
+
+While the `tls_ciphers` option is active on the resource, only the TLS versions its cipher profile allows can be enabled, and this option cannot be deleted or disabled. (see [below for nested schema](#nestedatt--options--tls_versions))
 - `use_default_le_chain` (Attributes) Let's Encrypt certificate chain.
 
 The specified chain will be used during the next Let's Encrypt certificate issue or renewal. (see [below for nested schema](#nestedatt--options--use_default_le_chain))
@@ -551,6 +548,18 @@ The specified value will be used during the next Let's Encrypt certificate issue
 - `user_agent_acl` (Attributes) Controls access to the content for specified User-Agents. (see [below for nested schema](#nestedatt--options--user_agent_acl))
 - `waap` (Attributes) Allows to enable WAAP (Web Application and API Protection). (see [below for nested schema](#nestedatt--options--waap))
 - `websockets` (Attributes) Enables or disables WebSockets connections to an origin server. (see [below for nested schema](#nestedatt--options--websockets))
+
+Read-Only:
+
+- `tls_ciphers` (Attributes) Cipher suite policy for HTTPS connections from end users to the domain, selected from predefined profiles.
+
+The exact cipher suites the policy enforces are returned in the `ciphers` field, and each profile defines which TLS versions may be enabled together with it. While the option is active:
+- The `tls_versions` option can include only the versions the profile allows.
+- The `tls_versions` option cannot be deleted or disabled.
+
+The option is read-only. Contact support to change it.
+
+When the option is absent or disabled, the default cipher suites of the CDN are used. (see [below for nested schema](#nestedatt--options--tls_ciphers))
 
 <a id="nestedatt--options--allowed_http_methods"></a>
 ### Nested Schema for `options.allowed_http_methods`
@@ -1526,6 +1535,24 @@ Possible values:
 - `value` (Boolean) Possible values:
 - **true** - Option is enabled.
 - **false** - Option is disabled.
+
+
+<a id="nestedatt--options--tls_ciphers"></a>
+### Nested Schema for `options.tls_ciphers`
+
+Read-Only:
+
+- `ciphers` (List of String) Cipher suites the profile resolves to, in the server preference order.
+- `enabled` (Boolean) Controls the option state.
+
+Possible values:
+- **true** - Option is enabled.
+- **false** - Option is disabled.
+- `mode` (String) Name of the cipher profile.
+
+Possible values:
+- **`pci_dss`** - TLS 1.2 cipher suites compliant with PCI DSS. Allows only `TLSv1.2` and `TLSv1.3`; TLS 1.3 connections use the protocol's own standard cipher suites, which are PCI DSS compliant.
+Available values: "pci_dss".
 
 
 ## Import

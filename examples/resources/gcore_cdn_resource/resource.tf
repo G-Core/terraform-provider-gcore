@@ -274,5 +274,4 @@ resource "gcore_cdn_resource" "example_cdn_resource" {
   secondary_hostnames = ["first.example.com", "second.example.com"]
   ssl_data = 192
   ssl_enabled = false
-  waap_api_domain_enabled = true
 }

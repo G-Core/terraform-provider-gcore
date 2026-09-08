@@ -76,6 +76,67 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 				ElementType: types.StringType,
 				Default:     mapdefault.StaticValue(types.MapValueMust(types.StringType, map[string]attr.Value{})),
 			},
+			"field_conversions": schema.MapNestedAttribute{
+				Description: "Per-field value conversions for exported logs. Maps a canonical Gcore field name to the pipeline applied to its values. Field names are limited to 255 characters and must not be empty. Each key must be present in `fields`, and each conversion type must be listed in that field's `allowed_conversions` from `/cdn/v2/logs_uploader/policies/fields`. Conversions in a pipeline are applied in array order. Values are converted independently of `field_remap`, which renames the exported field: both are keyed on the canonical field name.",
+				Optional:    true,
+				NestedObject: schema.NestedAttributeObject{
+					Attributes: map[string]schema.Attribute{
+						"conversions": schema.ListNestedAttribute{
+							Required: true,
+							NestedObject: schema.NestedAttributeObject{
+								Attributes: map[string]schema.Attribute{
+									"config": schema.SingleNestedAttribute{
+										Required: true,
+										Attributes: map[string]schema.Attribute{
+											"factor": schema.Float64Attribute{
+												Description: "Multiplier applied to the field value.",
+												Optional:    true,
+												Validators: []validator.Float64{
+													float64validator.Between(1e-15, 1000000000000000),
+												},
+											},
+											"precision": schema.Int64Attribute{
+												Description: "Optional number of decimal places in the converted value. Must be specified together with `rounding`; returned as `null` when unspecified.",
+												Optional:    true,
+												Validators: []validator.Int64{
+													int64validator.Between(0, 9),
+												},
+											},
+											"rounding": schema.StringAttribute{
+												Description: "Optional rounding mode. Must be specified together with `precision`; returned as `null` when unspecified.\nAvailable values: \"nearest\", \"down\", \"up\".",
+												Optional:    true,
+												Validators: []validator.String{
+													stringvalidator.OneOfCaseInsensitive(
+														"nearest",
+														"down",
+														"up",
+													),
+												},
+											},
+											"values": schema.MapAttribute{
+												Description: "Exact, case-sensitive replacements, matched and written without trimming. Keys must not be empty and are limited to 255 characters; values are limited to 100 characters and may be empty.",
+												Optional:    true,
+												ElementType: types.StringType,
+											},
+											"default": schema.StringAttribute{
+												Description: "Value used when the input does not match any key in `values`.",
+												Optional:    true,
+											},
+										},
+									},
+									"type": schema.StringAttribute{
+										Description: `Available values: "scale", "replace".`,
+										Required:    true,
+										Validators: []validator.String{
+											stringvalidator.OneOfCaseInsensitive("scale", "replace"),
+										},
+									},
+								},
+							},
+						},
+					},
+				},
+			},
 			"escape_special_characters": schema.BoolAttribute{
 				Description: "When set to true, the service sanitizes string values by escaping characters that may be unsafe for transport, logging, or downstream processing.\n\nThe following categories of characters are escaped:\n- Control and non-printable characters\n- Quotation marks and escape characters\n- Characters outside the standard ASCII range\n\nThe resulting output contains only printable ASCII characters.",
 				Computed:    true,

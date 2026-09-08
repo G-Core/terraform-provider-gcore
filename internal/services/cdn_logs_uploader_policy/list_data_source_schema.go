@@ -68,6 +68,71 @@ func ListDataSourceSchema(ctx context.Context) schema.Schema {
 							Description: "When set to true, the service sanitizes string values by escaping characters that may be unsafe for transport, logging, or downstream processing.\n\nThe following categories of characters are escaped:\n- Control and non-printable characters\n- Quotation marks and escape characters\n- Characters outside the standard ASCII range\n\nThe resulting output contains only printable ASCII characters.",
 							Computed:    true,
 						},
+						"field_conversions": schema.MapNestedAttribute{
+							Description: "Per-field value conversions for exported logs. Maps a canonical Gcore field name to the pipeline applied to its values. Field names are limited to 255 characters and must not be empty. Each key must be present in `fields`, and each conversion type must be listed in that field's `allowed_conversions` from `/cdn/v2/logs_uploader/policies/fields`. Conversions in a pipeline are applied in array order. Values are converted independently of `field_remap`, which renames the exported field: both are keyed on the canonical field name.",
+							Computed:    true,
+							CustomType:  customfield.NewNestedObjectMapType[CDNLogsUploaderPoliciesFieldConversionsDataSourceModel](ctx),
+							NestedObject: schema.NestedAttributeObject{
+								Attributes: map[string]schema.Attribute{
+									"conversions": schema.ListNestedAttribute{
+										Computed:   true,
+										CustomType: customfield.NewNestedObjectListType[CDNLogsUploaderPoliciesFieldConversionsConversionsDataSourceModel](ctx),
+										NestedObject: schema.NestedAttributeObject{
+											Attributes: map[string]schema.Attribute{
+												"config": schema.SingleNestedAttribute{
+													Computed:   true,
+													CustomType: customfield.NewNestedObjectType[CDNLogsUploaderPoliciesFieldConversionsConversionsConfigDataSourceModel](ctx),
+													Attributes: map[string]schema.Attribute{
+														"factor": schema.Float64Attribute{
+															Description: "Multiplier applied to the field value.",
+															Computed:    true,
+															Validators: []validator.Float64{
+																float64validator.Between(1e-15, 1000000000000000),
+															},
+														},
+														"precision": schema.Int64Attribute{
+															Description: "Optional number of decimal places in the converted value. Must be specified together with `rounding`; returned as `null` when unspecified.",
+															Computed:    true,
+															Validators: []validator.Int64{
+																int64validator.Between(0, 9),
+															},
+														},
+														"rounding": schema.StringAttribute{
+															Description: "Optional rounding mode. Must be specified together with `precision`; returned as `null` when unspecified.\nAvailable values: \"nearest\", \"down\", \"up\".",
+															Computed:    true,
+															Validators: []validator.String{
+																stringvalidator.OneOfCaseInsensitive(
+																	"nearest",
+																	"down",
+																	"up",
+																),
+															},
+														},
+														"values": schema.MapAttribute{
+															Description: "Exact, case-sensitive replacements, matched and written without trimming. Keys must not be empty and are limited to 255 characters; values are limited to 100 characters and may be empty.",
+															Computed:    true,
+															CustomType:  customfield.NewMapType[types.String](ctx),
+															ElementType: types.StringType,
+														},
+														"default": schema.StringAttribute{
+															Description: "Value used when the input does not match any key in `values`.",
+															Computed:    true,
+														},
+													},
+												},
+												"type": schema.StringAttribute{
+													Description: `Available values: "scale", "replace".`,
+													Computed:    true,
+													Validators: []validator.String{
+														stringvalidator.OneOfCaseInsensitive("scale", "replace"),
+													},
+												},
+											},
+										},
+									},
+								},
+							},
+						},
 						"field_delimiter": schema.StringAttribute{
 							Description: "Field delimiter for logs.",
 							Computed:    true,

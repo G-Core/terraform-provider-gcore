@@ -398,9 +398,20 @@ The option works only if `originProtocol` parameter is `HTTPS` or `MATCH`. (see 
 Custom HTTP Headers that a CDN server adds to response. Up to fifty custom HTTP Headers can be specified. May contain a header with multiple values. (see [below for nested schema](#nestedatt--items--options--static_headers))
 - `static_request_headers` (Attributes) Custom HTTP Headers for a CDN server to add to request. Up to fifty custom HTTP Headers can be specified. (see [below for nested schema](#nestedatt--items--options--static_request_headers))
 - `static_response_headers` (Attributes) Custom HTTP Headers that a CDN server adds to a response. (see [below for nested schema](#nestedatt--items--options--static_response_headers))
+- `tls_ciphers` (Attributes) Cipher suite policy for HTTPS connections from end users to the domain, selected from predefined profiles.
+
+The exact cipher suites the policy enforces are returned in the `ciphers` field, and each profile defines which TLS versions may be enabled together with it. While the option is active:
+- The `tls_versions` option can include only the versions the profile allows.
+- The `tls_versions` option cannot be deleted or disabled.
+
+The option is read-only. Contact support to change it.
+
+When the option is absent or disabled, the default cipher suites of the CDN are used. (see [below for nested schema](#nestedatt--items--options--tls_ciphers))
 - `tls_versions` (Attributes) List of SSL/TLS protocol versions allowed for HTTPS connections from end users to the domain.
 
-When the option is disabled, all protocols versions are allowed. (see [below for nested schema](#nestedatt--items--options--tls_versions))
+When the option is disabled, all protocols versions are allowed.
+
+While the `tls_ciphers` option is active on the resource, only the TLS versions its cipher profile allows can be enabled, and this option cannot be deleted or disabled. (see [below for nested schema](#nestedatt--items--options--tls_versions))
 - `use_default_le_chain` (Attributes) Let's Encrypt certificate chain.
 
 The specified chain will be used during the next Let's Encrypt certificate issue or renewal. (see [below for nested schema](#nestedatt--items--options--use_default_le_chain))
@@ -1263,6 +1274,24 @@ Restrictions:
 - Must start with a letter, number, asterisk or {.
 - Multiple values can be added.
 
+
+
+<a id="nestedatt--items--options--tls_ciphers"></a>
+### Nested Schema for `items.options.tls_ciphers`
+
+Read-Only:
+
+- `ciphers` (List of String) Cipher suites the profile resolves to, in the server preference order.
+- `enabled` (Boolean) Controls the option state.
+
+Possible values:
+- **true** - Option is enabled.
+- **false** - Option is disabled.
+- `mode` (String) Name of the cipher profile.
+
+Possible values:
+- **`pci_dss`** - TLS 1.2 cipher suites compliant with PCI DSS. Allows only `TLSv1.2` and `TLSv1.3`; TLS 1.3 connections use the protocol's own standard cipher suites, which are PCI DSS compliant.
+Available values: "pci_dss".
 
 
 <a id="nestedatt--items--options--tls_versions"></a>

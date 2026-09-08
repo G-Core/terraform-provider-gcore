@@ -17,12 +17,36 @@ resource "gcore_cdn_logs_uploader_policy" "example_cdn_logs_uploader_policy" {
   date_format = "[02/Jan/2006:15:04:05 -0700]"
   description = "New policy"
   escape_special_characters = true
+  field_conversions = {
+    request_time = {
+      conversions = [{
+        config = {
+          factor = 1000
+          precision = 0
+          rounding = "nearest"
+        }
+        type = "scale"
+      }]
+    }
+    upstream_cache_status = {
+      conversions = [{
+        config = {
+          values = {
+            HIT = "cached"
+            MISS = "uncached"
+          }
+          default = "other"
+        }
+        type = "replace"
+      }]
+    }
+  }
   field_delimiter = ","
   field_remap = {
 
   }
   field_separator = ";"
-  fields = ["remote_addr", "status"]
+  fields = ["remote_addr", "request_time", "upstream_cache_status"]
   file_name_template = "{{YYYY}}_{{MM}}_{{DD}}_{{HH}}_{{mm}}_{{ss}}_access.log.gz"
   format_type = "json"
   include_empty_logs = true
@@ -54,6 +78,7 @@ The following categories of characters are escaped:
 - Characters outside the standard ASCII range
 
 The resulting output contains only printable ASCII characters.
+- `field_conversions` (Attributes Map) Per-field value conversions for exported logs. Maps a canonical Gcore field name to the pipeline applied to its values. Field names are limited to 255 characters and must not be empty. Each key must be present in `fields`, and each conversion type must be listed in that field's `allowed_conversions` from `/cdn/v2/logs_uploader/policies/fields`. Conversions in a pipeline are applied in array order. Values are converted independently of `field_remap`, which renames the exported field: both are keyed on the canonical field name. (see [below for nested schema](#nestedatt--field_conversions))
 - `field_delimiter` (String) Field delimiter for logs.
 - `field_remap` (Map of String) Per-field output-name remap for exported logs. Maps a canonical Gcore field name (from `/cdn/logs_uploader/policies/fields`, and must be present in `fields`) to the field name it should have in the exported logs. Unmapped fields keep their canonical name. Output names (after remapping) must be unique.
 - `field_separator` (String) Field separator for logs.
@@ -86,6 +111,33 @@ Available values: "json", "".
 - `id` (Number) The ID of this resource.
 - `related_uploader_configs` (List of Number) List of logs uploader configs that use this policy.
 - `updated` (String) Time when logs uploader policy was updated.
+
+<a id="nestedatt--field_conversions"></a>
+### Nested Schema for `field_conversions`
+
+Required:
+
+- `conversions` (Attributes List) (see [below for nested schema](#nestedatt--field_conversions--conversions))
+
+<a id="nestedatt--field_conversions--conversions"></a>
+### Nested Schema for `field_conversions.conversions`
+
+Required:
+
+- `config` (Attributes) (see [below for nested schema](#nestedatt--field_conversions--conversions--config))
+- `type` (String) Available values: "scale", "replace".
+
+<a id="nestedatt--field_conversions--conversions--config"></a>
+### Nested Schema for `field_conversions.conversions.config`
+
+Optional:
+
+- `default` (String) Value used when the input does not match any key in `values`.
+- `factor` (Number) Multiplier applied to the field value.
+- `precision` (Number) Optional number of decimal places in the converted value. Must be specified together with `rounding`; returned as `null` when unspecified.
+- `rounding` (String) Optional rounding mode. Must be specified together with `precision`; returned as `null` when unspecified.
+Available values: "nearest", "down", "up".
+- `values` (Map of String) Exact, case-sensitive replacements, matched and written without trimming. Keys must not be empty and are limited to 255 characters; values are limited to 100 characters and may be empty.
 
 ## Import
 

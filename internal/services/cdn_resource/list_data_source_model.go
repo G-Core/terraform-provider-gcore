@@ -207,6 +207,7 @@ type CDNResourcesOptionsDataSourceModel struct {
 	StaticResponseHeaders       customfield.NestedObject[CDNResourcesOptionsStaticResponseHeadersDataSourceModel]       `tfsdk:"static_response_headers" json:"static_response_headers,computed"`
 	StaticHeaders               customfield.NestedObject[CDNResourcesOptionsStaticHeadersDataSourceModel]               `tfsdk:"static_headers" json:"staticHeaders,computed"`
 	StaticRequestHeaders        customfield.NestedObject[CDNResourcesOptionsStaticRequestHeadersDataSourceModel]        `tfsdk:"static_request_headers" json:"staticRequestHeaders,computed"`
+	TlsCiphers                  customfield.NestedObject[CDNResourcesOptionsTlsCiphersDataSourceModel]                  `tfsdk:"tls_ciphers" json:"tls_ciphers,computed"`
 	TlsVersions                 customfield.NestedObject[CDNResourcesOptionsTlsVersionsDataSourceModel]                 `tfsdk:"tls_versions" json:"tls_versions,computed"`
 	UseDefaultLeChain           customfield.NestedObject[CDNResourcesOptionsUseDefaultLeChainDataSourceModel]           `tfsdk:"use_default_le_chain" json:"use_default_le_chain,computed"`
 	UseDns01LeChallenge         customfield.NestedObject[CDNResourcesOptionsUseDns01LeChallengeDataSourceModel]         `tfsdk:"use_dns01_le_challenge" json:"use_dns01_le_challenge,computed"`
@@ -505,6 +506,12 @@ type CDNResourcesOptionsStaticHeadersDataSourceModel struct {
 type CDNResourcesOptionsStaticRequestHeadersDataSourceModel struct {
 	Enabled types.Bool                    `tfsdk:"enabled" json:"enabled,computed"`
 	Value   customfield.Map[types.String] `tfsdk:"value" json:"value,computed"`
+}
+
+type CDNResourcesOptionsTlsCiphersDataSourceModel struct {
+	Enabled types.Bool                     `tfsdk:"enabled" json:"enabled,computed"`
+	Mode    types.String                   `tfsdk:"mode" json:"mode,computed"`
+	Ciphers customfield.List[types.String] `tfsdk:"ciphers" json:"ciphers,computed"`
 }
 
 type CDNResourcesOptionsTlsVersionsDataSourceModel struct {

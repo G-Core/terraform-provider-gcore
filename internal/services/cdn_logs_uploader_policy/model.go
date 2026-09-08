@@ -14,29 +14,30 @@ import (
 )
 
 type CDNLogsUploaderPolicyModel struct {
-	ID                      types.Int64                    `tfsdk:"id" json:"id,computed"`
-	DateFormat              types.String                   `tfsdk:"date_format" json:"date_format,computed_optional"`
-	Description             types.String                   `tfsdk:"description" json:"description,computed_optional"`
-	FormatType              types.String                   `tfsdk:"format_type" json:"format_type,computed_optional"`
-	RotateThresholdMB       types.Int64                    `tfsdk:"rotate_threshold_mb" json:"rotate_threshold_mb,optional"`
-	FieldRemap              *map[string]types.String       `tfsdk:"field_remap" json:"field_remap,optional"`
-	Tags                    *map[string]types.String       `tfsdk:"tags" json:"tags,computed_optional"`
-	EscapeSpecialCharacters types.Bool                     `tfsdk:"escape_special_characters" json:"escape_special_characters,computed_optional"`
-	FieldDelimiter          types.String                   `tfsdk:"field_delimiter" json:"field_delimiter,computed_optional"`
-	FieldSeparator          types.String                   `tfsdk:"field_separator" json:"field_separator,computed_optional"`
-	FileNameTemplate        types.String                   `tfsdk:"file_name_template" json:"file_name_template,computed_optional"`
-	IncludeEmptyLogs        types.Bool                     `tfsdk:"include_empty_logs" json:"include_empty_logs,computed_optional"`
-	IncludeShieldLogs       types.Bool                     `tfsdk:"include_shield_logs" json:"include_shield_logs,computed_optional"`
-	LogSampleRate           types.Float64                  `tfsdk:"log_sample_rate" json:"log_sample_rate,computed_optional"`
-	Name                    types.String                   `tfsdk:"name" json:"name,computed_optional"`
-	RetryIntervalMinutes    types.Int64                    `tfsdk:"retry_interval_minutes" json:"retry_interval_minutes,computed_optional"`
-	RotateIntervalMinutes   types.Int64                    `tfsdk:"rotate_interval_minutes" json:"rotate_interval_minutes,computed_optional"`
-	RotateThresholdLines    types.Int64                    `tfsdk:"rotate_threshold_lines" json:"rotate_threshold_lines,computed_optional"`
-	Fields                  customfield.List[types.String] `tfsdk:"fields" json:"fields,computed_optional"`
-	ClientID                types.Int64                    `tfsdk:"client_id" json:"client_id,computed"`
-	Created                 timetypes.RFC3339              `tfsdk:"created" json:"created,computed" format:"date-time"`
-	Updated                 timetypes.RFC3339              `tfsdk:"updated" json:"updated,computed" format:"date-time"`
-	RelatedUploaderConfigs  customfield.List[types.Int64]  `tfsdk:"related_uploader_configs" json:"related_uploader_configs,computed"`
+	ID                      types.Int64                                            `tfsdk:"id" json:"id,computed"`
+	DateFormat              types.String                                           `tfsdk:"date_format" json:"date_format,computed_optional"`
+	Description             types.String                                           `tfsdk:"description" json:"description,computed_optional"`
+	FormatType              types.String                                           `tfsdk:"format_type" json:"format_type,computed_optional"`
+	RotateThresholdMB       types.Int64                                            `tfsdk:"rotate_threshold_mb" json:"rotate_threshold_mb,optional"`
+	FieldRemap              *map[string]types.String                               `tfsdk:"field_remap" json:"field_remap,optional"`
+	Tags                    *map[string]types.String                               `tfsdk:"tags" json:"tags,computed_optional"`
+	FieldConversions        *map[string]CDNLogsUploaderPolicyFieldConversionsModel `tfsdk:"field_conversions" json:"field_conversions,optional"`
+	EscapeSpecialCharacters types.Bool                                             `tfsdk:"escape_special_characters" json:"escape_special_characters,computed_optional"`
+	FieldDelimiter          types.String                                           `tfsdk:"field_delimiter" json:"field_delimiter,computed_optional"`
+	FieldSeparator          types.String                                           `tfsdk:"field_separator" json:"field_separator,computed_optional"`
+	FileNameTemplate        types.String                                           `tfsdk:"file_name_template" json:"file_name_template,computed_optional"`
+	IncludeEmptyLogs        types.Bool                                             `tfsdk:"include_empty_logs" json:"include_empty_logs,computed_optional"`
+	IncludeShieldLogs       types.Bool                                             `tfsdk:"include_shield_logs" json:"include_shield_logs,computed_optional"`
+	LogSampleRate           types.Float64                                          `tfsdk:"log_sample_rate" json:"log_sample_rate,computed_optional"`
+	Name                    types.String                                           `tfsdk:"name" json:"name,computed_optional"`
+	RetryIntervalMinutes    types.Int64                                            `tfsdk:"retry_interval_minutes" json:"retry_interval_minutes,computed_optional"`
+	RotateIntervalMinutes   types.Int64                                            `tfsdk:"rotate_interval_minutes" json:"rotate_interval_minutes,computed_optional"`
+	RotateThresholdLines    types.Int64                                            `tfsdk:"rotate_threshold_lines" json:"rotate_threshold_lines,computed_optional"`
+	Fields                  customfield.List[types.String]                         `tfsdk:"fields" json:"fields,computed_optional"`
+	ClientID                types.Int64                                            `tfsdk:"client_id" json:"client_id,computed"`
+	Created                 timetypes.RFC3339                                      `tfsdk:"created" json:"created,computed" format:"date-time"`
+	Updated                 timetypes.RFC3339                                      `tfsdk:"updated" json:"updated,computed" format:"date-time"`
+	RelatedUploaderConfigs  customfield.List[types.Int64]                          `tfsdk:"related_uploader_configs" json:"related_uploader_configs,computed"`
 }
 
 func (m CDNLogsUploaderPolicyModel) MarshalJSON() (data []byte, err error) {
@@ -75,4 +76,21 @@ func setFullMap(result []byte, key string, plan *map[string]types.String) []byte
 	raw, _ := json.Marshal(full)
 	result, _ = sjson.SetRawBytes(result, key, raw)
 	return result
+}
+
+type CDNLogsUploaderPolicyFieldConversionsModel struct {
+	Conversions *[]*CDNLogsUploaderPolicyFieldConversionsConversionsModel `tfsdk:"conversions" json:"conversions,required"`
+}
+
+type CDNLogsUploaderPolicyFieldConversionsConversionsModel struct {
+	Config *CDNLogsUploaderPolicyFieldConversionsConversionsConfigModel `tfsdk:"config" json:"config,required"`
+	Type   types.String                                                 `tfsdk:"type" json:"type,required"`
+}
+
+type CDNLogsUploaderPolicyFieldConversionsConversionsConfigModel struct {
+	Factor    types.Float64            `tfsdk:"factor" json:"factor,optional"`
+	Precision types.Int64              `tfsdk:"precision" json:"precision,optional"`
+	Rounding  types.String             `tfsdk:"rounding" json:"rounding,optional"`
+	Values    *map[string]types.String `tfsdk:"values" json:"values,optional"`
+	Default   types.String             `tfsdk:"default" json:"default,optional"`
 }

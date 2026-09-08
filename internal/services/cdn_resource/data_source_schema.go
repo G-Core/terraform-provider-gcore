@@ -1152,8 +1152,32 @@ func DataSourceSchema(ctx context.Context) schema.Schema {
 							},
 						},
 					},
+					"tls_ciphers": schema.SingleNestedAttribute{
+						Description: "Cipher suite policy for HTTPS connections from end users to the domain, selected from predefined profiles.\n\nThe exact cipher suites the policy enforces are returned in the `ciphers` field, and each profile defines which TLS versions may be enabled together with it. While the option is active:\n- The `tls_versions` option can include only the versions the profile allows.\n- The `tls_versions` option cannot be deleted or disabled.\n\nThe option is read-only. Contact support to change it.\n\nWhen the option is absent or disabled, the default cipher suites of the CDN are used.",
+						Computed:    true,
+						CustomType:  customfield.NewNestedObjectType[CDNResourceOptionsTlsCiphersDataSourceModel](ctx),
+						Attributes: map[string]schema.Attribute{
+							"enabled": schema.BoolAttribute{
+								Description: "Controls the option state.\n\nPossible values:\n- **true** - Option is enabled.\n- **false** - Option is disabled.",
+								Computed:    true,
+							},
+							"mode": schema.StringAttribute{
+								Description: "Name of the cipher profile.\n\nPossible values:\n- **`pci_dss`** - TLS 1.2 cipher suites compliant with PCI DSS. Allows only `TLSv1.2` and `TLSv1.3`; TLS 1.3 connections use the protocol's own standard cipher suites, which are PCI DSS compliant.\nAvailable values: \"pci_dss\".",
+								Computed:    true,
+								Validators: []validator.String{
+									stringvalidator.OneOfCaseInsensitive("pci_dss"),
+								},
+							},
+							"ciphers": schema.ListAttribute{
+								Description: "Cipher suites the profile resolves to, in the server preference order.",
+								Computed:    true,
+								CustomType:  customfield.NewListType[types.String](ctx),
+								ElementType: types.StringType,
+							},
+						},
+					},
 					"tls_versions": schema.SingleNestedAttribute{
-						Description: "List of SSL/TLS protocol versions allowed for HTTPS connections from end users to the domain.\n\nWhen the option is disabled, all protocols versions are allowed.",
+						Description: "List of SSL/TLS protocol versions allowed for HTTPS connections from end users to the domain.\n\nWhen the option is disabled, all protocols versions are allowed.\n\nWhile the `tls_ciphers` option is active on the resource, only the TLS versions its cipher profile allows can be enabled, and this option cannot be deleted or disabled.",
 						Computed:    true,
 						CustomType:  customfield.NewNestedObjectType[CDNResourceOptionsTlsVersionsDataSourceModel](ctx),
 						Attributes: map[string]schema.Attribute{

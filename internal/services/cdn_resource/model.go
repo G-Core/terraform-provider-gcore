@@ -15,39 +15,38 @@ import (
 )
 
 type CDNResourceModel struct {
-	ID                   types.Int64                                       `tfsdk:"id" json:"id,computed"`
-	Cname                types.String                                      `tfsdk:"cname" json:"cname,required"`
-	PrimaryResource      types.Int64                                       `tfsdk:"primary_resource" json:"primary_resource,optional"`
-	WaapAPIDomainEnabled types.Bool                                        `tfsdk:"waap_api_domain_enabled" json:"waap_api_domain_enabled,optional,no_refresh"`
-	Origin               types.String                                      `tfsdk:"origin" json:"origin,computed_optional,no_refresh"`
-	Active               types.Bool                                        `tfsdk:"active" json:"active,computed_optional"`
-	Description          types.String                                      `tfsdk:"description" json:"description,computed_optional"`
-	Name                 types.String                                      `tfsdk:"name" json:"name,computed_optional"`
-	OriginGroup          types.Int64                                       `tfsdk:"origin_group" json:"originGroup,computed_optional"`
-	OriginProtocol       types.String                                      `tfsdk:"origin_protocol" json:"originProtocol,computed_optional"`
-	ProxySslCa           types.Int64                                       `tfsdk:"proxy_ssl_ca" json:"proxy_ssl_ca,computed_optional"`
-	ProxySslData         types.Int64                                       `tfsdk:"proxy_ssl_data" json:"proxy_ssl_data,computed_optional"`
-	ProxySslEnabled      types.Bool                                        `tfsdk:"proxy_ssl_enabled" json:"proxy_ssl_enabled,computed_optional"`
-	SslData              types.Int64                                       `tfsdk:"ssl_data" json:"sslData,computed_optional"`
-	SslEnabled           types.Bool                                        `tfsdk:"ssl_enabled" json:"sslEnabled,computed_optional"`
-	SecondaryHostnames   customfield.Set[types.String]                     `tfsdk:"secondary_hostnames" json:"secondaryHostnames,computed_optional"`
-	Options              customfield.NestedObject[CDNResourceOptionsModel] `tfsdk:"options" json:"options,computed_optional"`
-	CanPurgeByURLs       types.Bool                                        `tfsdk:"can_purge_by_urls" json:"can_purge_by_urls,computed"`
-	Client               types.Int64                                       `tfsdk:"client" json:"client,computed"`
-	Created              types.String                                      `tfsdk:"created" json:"created,computed"`
-	FullCustomEnabled    types.Bool                                        `tfsdk:"full_custom_enabled" json:"full_custom_enabled,computed"`
-	IsPrimary            types.Bool                                        `tfsdk:"is_primary" json:"is_primary,computed"`
-	OriginGroupName      types.String                                      `tfsdk:"origin_group_name" json:"originGroup_name,computed"`
-	PresetApplied        types.Bool                                        `tfsdk:"preset_applied" json:"preset_applied,computed"`
-	ShieldDc             types.String                                      `tfsdk:"shield_dc" json:"shield_dc,computed"`
-	ShieldEnabled        types.Bool                                        `tfsdk:"shield_enabled" json:"shield_enabled,computed"`
-	ShieldRoutingMap     types.Int64                                       `tfsdk:"shield_routing_map" json:"shield_routing_map,computed"`
-	Shielded             types.Bool                                        `tfsdk:"shielded" json:"shielded,computed"`
-	SuspendDate          types.String                                      `tfsdk:"suspend_date" json:"suspend_date,computed"`
-	Suspended            types.Bool                                        `tfsdk:"suspended" json:"suspended,computed"`
-	VpEnabled            types.Bool                                        `tfsdk:"vp_enabled" json:"vp_enabled,computed"`
-	WaapDomainID         types.String                                      `tfsdk:"waap_domain_id" json:"waap_domain_id,computed"`
-	Rules                customfield.List[jsontypes.Normalized]            `tfsdk:"rules" json:"rules,computed"`
+	ID                 types.Int64                                       `tfsdk:"id" json:"id,computed"`
+	Cname              types.String                                      `tfsdk:"cname" json:"cname,required"`
+	PrimaryResource    types.Int64                                       `tfsdk:"primary_resource" json:"primary_resource,optional"`
+	Origin             types.String                                      `tfsdk:"origin" json:"origin,computed_optional,no_refresh"`
+	Active             types.Bool                                        `tfsdk:"active" json:"active,computed_optional"`
+	Description        types.String                                      `tfsdk:"description" json:"description,computed_optional"`
+	Name               types.String                                      `tfsdk:"name" json:"name,computed_optional"`
+	OriginGroup        types.Int64                                       `tfsdk:"origin_group" json:"originGroup,computed_optional"`
+	OriginProtocol     types.String                                      `tfsdk:"origin_protocol" json:"originProtocol,computed_optional"`
+	ProxySslCa         types.Int64                                       `tfsdk:"proxy_ssl_ca" json:"proxy_ssl_ca,computed_optional"`
+	ProxySslData       types.Int64                                       `tfsdk:"proxy_ssl_data" json:"proxy_ssl_data,computed_optional"`
+	ProxySslEnabled    types.Bool                                        `tfsdk:"proxy_ssl_enabled" json:"proxy_ssl_enabled,computed_optional"`
+	SslData            types.Int64                                       `tfsdk:"ssl_data" json:"sslData,computed_optional"`
+	SslEnabled         types.Bool                                        `tfsdk:"ssl_enabled" json:"sslEnabled,computed_optional"`
+	SecondaryHostnames customfield.Set[types.String]                     `tfsdk:"secondary_hostnames" json:"secondaryHostnames,computed_optional"`
+	Options            customfield.NestedObject[CDNResourceOptionsModel] `tfsdk:"options" json:"options,computed_optional"`
+	CanPurgeByURLs     types.Bool                                        `tfsdk:"can_purge_by_urls" json:"can_purge_by_urls,computed"`
+	Client             types.Int64                                       `tfsdk:"client" json:"client,computed"`
+	Created            types.String                                      `tfsdk:"created" json:"created,computed"`
+	FullCustomEnabled  types.Bool                                        `tfsdk:"full_custom_enabled" json:"full_custom_enabled,computed"`
+	IsPrimary          types.Bool                                        `tfsdk:"is_primary" json:"is_primary,computed"`
+	OriginGroupName    types.String                                      `tfsdk:"origin_group_name" json:"originGroup_name,computed"`
+	PresetApplied      types.Bool                                        `tfsdk:"preset_applied" json:"preset_applied,computed"`
+	ShieldDc           types.String                                      `tfsdk:"shield_dc" json:"shield_dc,computed"`
+	ShieldEnabled      types.Bool                                        `tfsdk:"shield_enabled" json:"shield_enabled,computed"`
+	ShieldRoutingMap   types.Int64                                       `tfsdk:"shield_routing_map" json:"shield_routing_map,computed"`
+	Shielded           types.Bool                                        `tfsdk:"shielded" json:"shielded,computed"`
+	SuspendDate        types.String                                      `tfsdk:"suspend_date" json:"suspend_date,computed"`
+	Suspended          types.Bool                                        `tfsdk:"suspended" json:"suspended,computed"`
+	VpEnabled          types.Bool                                        `tfsdk:"vp_enabled" json:"vp_enabled,computed"`
+	WaapDomainID       types.String                                      `tfsdk:"waap_domain_id" json:"waap_domain_id,computed"`
+	Rules              customfield.List[jsontypes.Normalized]            `tfsdk:"rules" json:"rules,computed"`
 }
 
 func (m CDNResourceModel) MarshalJSON() (data []byte, err error) {
@@ -99,6 +98,7 @@ type CDNResourceOptionsModel struct {
 	Stale                       customfield.NestedObject[CDNResourceOptionsStaleModel]                       `tfsdk:"stale" json:"stale,computed_optional"`
 	StaticResponseHeaders       customfield.NestedObject[CDNResourceOptionsStaticResponseHeadersModel]       `tfsdk:"static_response_headers" json:"static_response_headers,computed_optional"`
 	StaticRequestHeaders        customfield.NestedObject[CDNResourceOptionsStaticRequestHeadersModel]        `tfsdk:"static_request_headers" json:"staticRequestHeaders,computed_optional"`
+	TlsCiphers                  customfield.NestedObject[CDNResourceOptionsTlsCiphersModel]                  `tfsdk:"tls_ciphers" json:"tls_ciphers,computed"`
 	TlsVersions                 customfield.NestedObject[CDNResourceOptionsTlsVersionsModel]                 `tfsdk:"tls_versions" json:"tls_versions,computed_optional"`
 	UseDefaultLeChain           customfield.NestedObject[CDNResourceOptionsUseDefaultLeChainModel]           `tfsdk:"use_default_le_chain" json:"use_default_le_chain,computed_optional"`
 	UseDns01LeChallenge         customfield.NestedObject[CDNResourceOptionsUseDns01LeChallengeModel]         `tfsdk:"use_dns01_le_challenge" json:"use_dns01_le_challenge,computed_optional"`
@@ -472,6 +472,12 @@ type CDNResourceOptionsStaticResponseHeadersValueModel struct {
 type CDNResourceOptionsStaticRequestHeadersModel struct {
 	Enabled types.Bool               `tfsdk:"enabled" json:"enabled,required"`
 	Value   *map[string]types.String `tfsdk:"value" json:"value,required"`
+}
+
+type CDNResourceOptionsTlsCiphersModel struct {
+	Enabled types.Bool                     `tfsdk:"enabled" json:"enabled,computed"`
+	Mode    types.String                   `tfsdk:"mode" json:"mode,computed"`
+	Ciphers customfield.List[types.String] `tfsdk:"ciphers" json:"ciphers,computed"`
 }
 
 type CDNResourceOptionsTlsVersionsModel struct {
