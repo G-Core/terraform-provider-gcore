@@ -36,9 +36,10 @@ jobs:
       - name: Evaluate sync state and post status to open main PRs
         run: |
           set -euo pipefail
-          git remote add production "https://x-access-token:${GH_TOKEN}@github.com/${PRODUCTION_REPO}.git"
+          git remote add production "https://github.com/${PRODUCTION_REPO}.git"
           git fetch --no-tags production "${PRODUCTION_BRANCH}"
-          if git merge-base --is-ancestor "production/${PRODUCTION_BRANCH}" HEAD; then
+          trunk=$(git rev-parse --verify refs/remotes/origin/main)
+          if git merge-base --is-ancestor "production/${PRODUCTION_BRANCH}" "$trunk"; then
             state=success; desc="main is in sync with production"
           else
             state=failure; desc="production is ahead — wait for the back-sync before merging"
