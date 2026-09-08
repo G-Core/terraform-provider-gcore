@@ -259,3 +259,34 @@ func TestMetaStringType_Equal(t *testing.T) {
 		}
 	})
 }
+
+func TestMetaStringValue_UnmarshalJSONAbsentNode(t *testing.T) {
+	t.Parallel()
+
+	// apijson decodes a map key the response does not carry by calling the
+	// element decoder with an empty node. That must leave the value alone: the
+	// raw-JSON fallback would otherwise record an empty string.
+	value := NewMetaStringValue("qa_value")
+	if err := value.UnmarshalJSON(nil); err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+
+	if value.ValueString() != "qa_value" {
+		t.Errorf("expected %q to survive an absent node, got %q", "qa_value", value.ValueString())
+	}
+}
+
+func TestMetaStringValue_UnmarshalJSONEmptyString(t *testing.T) {
+	t.Parallel()
+
+	// An empty string the API really did return still has to land, so the
+	// guard above must key on "no bytes", not on an empty value.
+	value := NewMetaStringValue("qa_value")
+	if err := value.UnmarshalJSON([]byte(`""`)); err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+
+	if value.ValueString() != "" {
+		t.Errorf("expected an empty string, got %q", value.ValueString())
+	}
+}

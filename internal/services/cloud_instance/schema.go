@@ -7,6 +7,7 @@ import (
 	"fmt"
 
 	"github.com/G-Core/terraform-provider-gcore/internal/customfield"
+	"github.com/G-Core/terraform-provider-gcore/internal/planmodifiers"
 	"github.com/hashicorp/terraform-plugin-framework-jsontypes/jsontypes"
 	"github.com/hashicorp/terraform-plugin-framework-timetypes/timetypes"
 	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
@@ -14,10 +15,8 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
-	"github.com/hashicorp/terraform-plugin-framework/resource/schema/boolplanmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/int64planmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/listplanmodifier"
-	"github.com/hashicorp/terraform-plugin-framework/resource/schema/mapplanmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/objectplanmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringplanmodifier"
@@ -156,12 +155,12 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 			"allow_app_ports": schema.BoolAttribute{
 				Description:   "Set to `true` if creating the instance from an `apptemplate`. This allows application ports in the security group for instances created from a marketplace application template.",
 				Optional:      true,
-				PlanModifiers: []planmodifier.Bool{boolplanmodifier.RequiresReplace()},
+				PlanModifiers: []planmodifier.Bool{planmodifiers.BoolRequiresReplaceUnlessAdopting(importAdoptionPrivateKey)},
 			},
 			"name_template": schema.StringAttribute{
 				Description:   "If you want the instance name to be automatically generated based on IP addresses, you can provide a name template instead of specifying the name manually. The template should include a placeholder that will be replaced during provisioning. Supported placeholders are: `{ip_octets}` (last 3 octets of the IP), `{two_ip_octets}`, and `{one_ip_octet}`.",
 				Optional:      true,
-				PlanModifiers: []planmodifier.String{stringplanmodifier.RequiresReplace()},
+				PlanModifiers: []planmodifier.String{planmodifiers.StringRequiresReplaceUnlessAdopting(importAdoptionPrivateKey)},
 			},
 			"password_wo": schema.StringAttribute{
 				Description:   "For Linux instances, 'username' and 'password' are used to create a new user. When only 'password' is provided, it is set as the password for the default user of the image. For Windows instances, 'username' cannot be specified. Use the 'password' field to set the password for the 'Admin' user on Windows. Use the 'user_data' field to provide a script to create new users on Windows. The password of the Admin user cannot be updated via 'user_data'.",
@@ -178,28 +177,28 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 			"servergroup_id": schema.StringAttribute{
 				Description:   "Placement group ID for instance placement policy.\n\n  Supported group types:\n  - `anti-affinity`: Ensures instances are placed on different hosts for high availability.\n  - `affinity`: Places instances on the same host for low-latency communication.\n  - `soft-anti-affinity`: Tries to place instances on different hosts but allows sharing if needed.",
 				Optional:      true,
-				PlanModifiers: []planmodifier.String{stringplanmodifier.RequiresReplace()},
+				PlanModifiers: []planmodifier.String{planmodifiers.StringRequiresReplaceUnlessAdopting(importAdoptionPrivateKey)},
 			},
 			"ssh_key_name": schema.StringAttribute{
 				Description:   "Specifies the name of the SSH keypair, created via the\n[/v1/`ssh_keys` endpoint](/docs/api-reference/cloud/ssh-keys/add-or-generate-ssh-key).",
 				Optional:      true,
-				PlanModifiers: []planmodifier.String{stringplanmodifier.RequiresReplace()},
+				PlanModifiers: []planmodifier.String{planmodifiers.StringRequiresReplaceUnlessAdopting(importAdoptionPrivateKey)},
 			},
 			"user_data": schema.StringAttribute{
 				Description:   "String in base64 format. For Linux instances, 'user_data' is ignored when 'password' field is provided. For Windows instances, Admin user password is set by 'password' field and cannot be updated via 'user_data'. Examples of the `user_data`: https://cloudinit.readthedocs.io/en/latest/topics/examples.html",
 				Optional:      true,
-				PlanModifiers: []planmodifier.String{stringplanmodifier.RequiresReplace()},
+				PlanModifiers: []planmodifier.String{planmodifiers.StringRequiresReplaceUnlessAdopting(importAdoptionPrivateKey)},
 			},
 			"username": schema.StringAttribute{
 				Description:   "For Linux instances, 'username' and 'password' are used to create a new user. For Windows instances, 'username' cannot be specified. Use 'password' field to set the password for the 'Admin' user on Windows.",
 				Optional:      true,
-				PlanModifiers: []planmodifier.String{stringplanmodifier.RequiresReplace()},
+				PlanModifiers: []planmodifier.String{planmodifiers.StringRequiresReplaceUnlessAdopting(importAdoptionPrivateKey)},
 			},
 			"configuration": schema.MapAttribute{
 				Description:   "Parameters for the application template if creating the instance from an `apptemplate`.",
 				Optional:      true,
 				ElementType:   customfield.MetaStringType{},
-				PlanModifiers: []planmodifier.Map{mapplanmodifier.RequiresReplace()},
+				PlanModifiers: []planmodifier.Map{planmodifiers.MapRequiresReplaceUnlessAdopting(importAdoptionPrivateKey)},
 			},
 			"security_groups": schema.ListNestedAttribute{
 				Description:        "Deprecated. Use per-interface `security_groups` inside `interfaces[]` instead. Cannot be combined with per-interface `security_groups`. If omitted everywhere, the project's default security group is applied.",

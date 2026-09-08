@@ -5,6 +5,7 @@ package cloud_instance
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 	"net/http"
@@ -173,6 +174,27 @@ func (r *CloudInstanceResource) Update(ctx context.Context, req resource.UpdateR
 	if resp.Diagnostics.HasError() {
 		return
 	}
+
+	// Read the adoption marker before any of the operation-specific branches
+	// below: every one of them falls through to the single state write at the
+	// end of this function, which is where the window is closed.
+	adopting, adoptionDiags := importAdoptionPending(ctx, req.Private)
+	resp.Diagnostics.Append(adoptionDiags...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
+
+	// A failed adopting apply must not consume the adoption window: the
+	// refresh that preceded this Update already advanced the marker, and
+	// without a re-arm the next refresh would retire it and the retry would
+	// plan a destroy+recreate. Terraform persists private state returned from
+	// an errored apply, so this write reaches the state file.
+	defer func() {
+		if adopting && resp.Diagnostics.HasError() {
+			resp.Diagnostics.Append(rearmImportAdoption(ctx, resp.Private)...)
+		}
+	}()
 
 	instanceID := data.ID.ValueString()
 
@@ -976,36 +998,51 @@ func (r *CloudInstanceResource) Update(ctx context.Context, req resource.UpdateR
 
 		// Then, add to new servergroup if any
 		if planServergroupID != "" {
-			addParams := cloud.InstanceAddToPlacementGroupParams{
-				ServergroupID: planServergroupID,
-			}
-			if !data.ProjectID.IsNull() {
-				addParams.ProjectID = param.NewOpt(data.ProjectID.ValueInt64())
-			}
-			if !data.RegionID.IsNull() {
-				addParams.RegionID = param.NewOpt(data.RegionID.ValueInt64())
-			}
-
-			_, err := r.client.Cloud.Instances.AddToPlacementGroupAndPoll(
-				ctx,
-				instanceID,
-				addParams,
-				option.WithMiddleware(logging.Middleware(ctx)),
-			)
+			// The instance may already be in the planned group. servergroup_id
+			// is create-only and never returned, so it is null in state after
+			// an import and a configured value looks like a change even when
+			// the placement is already in place - and AddToPlacementGroup then
+			// answers 400 "Instance is already inside server group". An import
+			// does not prove membership either, though: an instance imported
+			// ungrouped still has to be added, and skipping the call would
+			// record a placement that does not exist. The group's own GET lists
+			// its members, so check rather than assume.
+			member, err := instanceInPlacementGroup(ctx, r.client, planServergroupID, instanceID, data)
 			if err != nil {
 				resp.Diagnostics.AddError(
-					"failed to add instance to placement group",
+					"failed to read placement group",
 					fmt.Sprintf("Placement group %s: %s", planServergroupID, err.Error()),
 				)
 				return
 			}
+
+			if !member {
+				addParams := cloud.InstanceAddToPlacementGroupParams{
+					ServergroupID: planServergroupID,
+				}
+				if !data.ProjectID.IsNull() {
+					addParams.ProjectID = param.NewOpt(data.ProjectID.ValueInt64())
+				}
+				if !data.RegionID.IsNull() {
+					addParams.RegionID = param.NewOpt(data.RegionID.ValueInt64())
+				}
+
+				_, err := r.client.Cloud.Instances.AddToPlacementGroupAndPoll(
+					ctx,
+					instanceID,
+					addParams,
+					option.WithMiddleware(logging.Middleware(ctx)),
+				)
+				if err != nil {
+					resp.Diagnostics.AddError(
+						"failed to add instance to placement group",
+						fmt.Sprintf("Placement group %s: %s", planServergroupID, err.Error()),
+					)
+					return
+				}
+			}
 		}
 	}
-
-	// Check if there are simple field changes that need the standard PATCH endpoint.
-	// This runs AFTER specialized endpoints, allowing combined updates like:
-	//   name = "new-name" (PATCH) + flavor = "g1-standard-2" (specialized /changeflavor)
-	// The PATCH endpoint handles: name, tags (and potentially other simple fields in the future).
 
 	// tags is computed+optional: with no tags in config the planned value is unknown
 	// unless an earlier update path refreshed it. Unknown means "unchanged", not a diff,
@@ -1014,7 +1051,12 @@ func (r *CloudInstanceResource) Update(ctx context.Context, req resource.UpdateR
 		data.Tags = state.Tags
 	}
 
-	nameChanged := !data.Name.Equal(state.Name)
+	// name is Optional and never Computed, so a config that omits it plans a
+	// null even when state carries the API-assigned name - the shape after
+	// importing an instance created from name_template. That is not a rename:
+	// the API rejects a null name, and the planned null is what belongs in
+	// state. Only a configured name is a change.
+	nameChanged := !data.Name.IsNull() && !data.Name.Equal(state.Name)
 	tagsChanged := !data.Tags.Equal(state.Tags)
 
 	if nameChanged || tagsChanged {
@@ -1028,7 +1070,15 @@ func (r *CloudInstanceResource) Update(ctx context.Context, req resource.UpdateR
 			params.RegionID = param.NewOpt(data.RegionID.ValueInt64())
 		}
 
-		dataBytes, err := data.MarshalJSONForUpdate(*state)
+		// Marshal from a copy whose name matches state so an unconfigured name
+		// drops out of the patch instead of being sent as null. data keeps the
+		// planned null, which is what the state write at the end has to record.
+		patchPlan := *data
+		if patchPlan.Name.IsNull() {
+			patchPlan.Name = state.Name
+		}
+
+		dataBytes, err := patchPlan.MarshalJSONForUpdate(*state)
 		if err != nil {
 			resp.Diagnostics.AddError("failed to serialize http request", err.Error())
 			return
@@ -1126,6 +1176,13 @@ func (r *CloudInstanceResource) Update(ctx context.Context, req resource.UpdateR
 	resolveUnknownInterfaceComputedFields(data.Interfaces)
 
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
+
+	// Clear only after the write succeeded: a marker cleared before success
+	// would turn a transient failure into a destroy+recreate on the retry,
+	// because the next plan would no longer recognise the import.
+	if adopting && !resp.Diagnostics.HasError() {
+		resp.Diagnostics.Append(clearImportAdoptionPending(ctx, resp.Private)...)
+	}
 }
 
 func (r *CloudInstanceResource) Read(ctx context.Context, req resource.ReadRequest, resp *resource.ReadResponse) {
@@ -1219,6 +1276,12 @@ func (r *CloudInstanceResource) Read(ctx context.Context, req resource.ReadReque
 		}
 	}
 
+	// Advance the import-adoption marker (see import_adoption.go). Must run on
+	// every successful Read: Terraform persists this refresh in `terraform
+	// apply` even when the resulting plan is a no-op, which is the only hook
+	// that retires a marker whose import adopted nothing.
+	resp.Diagnostics.Append(advanceImportAdoption(ctx, resp.Private)...)
+
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
 }
 
@@ -1253,6 +1316,17 @@ func (r *CloudInstanceResource) Delete(ctx context.Context, req resource.DeleteR
 	}
 
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
+}
+
+// isNotFound reports whether an API error is a 404, distinguishing "the object
+// is gone" from "the call did not get through".
+func isNotFound(err error) bool {
+	var apiErr *gcore.Error
+	if errors.As(err, &apiErr) {
+		return apiErr.StatusCode == http.StatusNotFound
+	}
+
+	return false
 }
 
 func (r *CloudInstanceResource) ImportState(ctx context.Context, req resource.ImportStateRequest, resp *resource.ImportStateResponse) {
@@ -1312,6 +1386,66 @@ func (r *CloudInstanceResource) ImportState(ctx context.Context, req resource.Im
 		// Extract name from API response
 		if name, ok := rawResponse["name"].(string); ok {
 			data.Name = types.StringValue(name)
+		}
+
+		// ssh_key_name is response-backed but not computed, so UnmarshalComputed
+		// skips it and it would otherwise stay null after an import - which the
+		// unconditional replacement on that attribute used to turn into a
+		// destroy+recreate of a healthy instance. The response carries the
+		// keypair UUID rather than its name, so resolve it; on a null key, an
+		// empty value or a failed lookup the field stays null and the adopting
+		// plan modifier takes over. Mirrors cloud_baremetal_server.
+		if sshKeyID, ok := rawResponse["ssh_key_name"].(string); ok && sshKeyID != "" {
+			sshKey, sshErr := r.client.Cloud.SSHKeys.Get(
+				ctx,
+				sshKeyID,
+				cloud.SSHKeyGetParams{
+					ProjectID: param.NewOpt(path_project_id),
+				},
+				option.WithMiddleware(logging.Middleware(ctx)),
+			)
+			switch {
+			case sshErr == nil:
+				data.SSHKeyName = types.StringValue(sshKey.Name)
+
+			case isNotFound(sshErr):
+				// The keypair object itself is gone. The instance still holds the
+				// key material, so this must not fail the import and it must not
+				// force a replacement either - falling through to the adopting
+				// modifier keeps the instance. But the configured name then goes
+				// into state with nothing having checked it, so say so: a key
+				// deleted and recreated under a different name is exactly the case
+				// where the config can be silently wrong.
+				resp.Diagnostics.AddWarning(
+					"Could not resolve the instance's SSH keypair",
+					fmt.Sprintf(
+						"The instance references keypair %q, which no longer exists.\n\n"+
+							"\"ssh_key_name\" has been left unset in state. If your configuration sets it, "+
+							"the next apply records that value as-is without verifying it against the "+
+							"instance. Check it names the key the instance was actually built with.",
+						sshKeyID,
+					),
+				)
+
+			default:
+				// Anything else - a timeout, a 403, a 5xx - says nothing about the
+				// keypair. Leaving the field null here would hand a transient blip
+				// to the adopting modifier, which would then write the configured
+				// value into state as though it had been corroborated. Import is a
+				// read: failing it costs a retry, whereas guessing costs a state
+				// that no later refresh can correct.
+				resp.Diagnostics.AddError(
+					"Could not resolve the instance's SSH keypair",
+					fmt.Sprintf(
+						"Looking up keypair %q failed: %s\n\n"+
+							"This says nothing about the keypair itself, so the import was stopped "+
+							"rather than guessing at \"ssh_key_name\". Retry the import.",
+						sshKeyID, sshErr.Error(),
+					),
+				)
+
+				return
+			}
 		}
 
 		// Create volumes array from API response for import
@@ -1408,11 +1542,56 @@ func (r *CloudInstanceResource) ImportState(ctx context.Context, req resource.Im
 		data.Interfaces = &interfaces
 	}
 
+	// allow_app_ports, name_template, servergroup_id, user_data, username and
+	// configuration are create-only and tagged no_refresh, so the reads above
+	// cannot populate them and they stay null in state. ssh_key_name joins them
+	// only when the lookup above could not resolve it. Mark the adoption window
+	// so the plan modifiers on those attributes know this null came from an
+	// import rather than from an instance created without them - the first
+	// apply adopts the configured values into state and clears the marker.
+	resp.Diagnostics.Append(markImportAdoptionPending(ctx, resp.Private)...)
+
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
 }
 
-func (r *CloudInstanceResource) ModifyPlan(_ context.Context, _ resource.ModifyPlanRequest, _ *resource.ModifyPlanResponse) {
+func (r *CloudInstanceResource) ModifyPlan(ctx context.Context, req resource.ModifyPlanRequest, resp *resource.ModifyPlanResponse) {
+	// The adoption marker is deliberately NOT touched here. A plan whose only
+	// effect would be a marker write is a no-op plan, and Terraform never
+	// persists PlannedPrivate for no-op plans, so the write would silently
+	// evaporate. Retirement lives in Read's phase advance instead (see
+	// advanceImportAdoption in import_adoption.go), whose private-state writes
+	// every apply persists; Update handles the success (clear) and failure
+	// (re-arm) cases.
+	//
+	// What this does do is warn while an adoption is actually planned. Adopted
+	// values are written to state without being sent to the API, and no later
+	// refresh can correct them, so this is the only moment a user can catch a
+	// wrong value before it becomes permanent.
+	if req.State.Raw.IsNull() || req.Plan.Raw.IsNull() {
+		return
+	}
 
+	adopting, diags := importAdoptionPending(ctx, req.Private)
+	resp.Diagnostics.Append(diags...)
+
+	if resp.Diagnostics.HasError() || !adopting {
+		return
+	}
+
+	var plan, state *CloudInstanceModel
+
+	// The warning is advisory, so a decode problem must never fail the plan.
+	if req.Plan.Get(ctx, &plan).HasError() || req.State.Get(ctx, &state).HasError() {
+		return
+	}
+
+	if plan == nil || state == nil {
+		return
+	}
+
+	if adopted := adoptedCreateOnlyAttributes(*plan, *state); len(adopted) > 0 {
+		resp.Diagnostics.Append(importAdoptionWarning(adopted))
+	}
 }
 
 // mergeInterfaceComputedFields matches Terraform interfaces to API interfaces and copies

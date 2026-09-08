@@ -166,6 +166,13 @@ func (v MetaStringValue) MarshalJSONWithState(plan any, state any) ([]byte, erro
 // With the marker field breaking timetypes.RFC3339 convertibility, the apijson decoder
 // reaches the json.Unmarshaler check instead of routing through the custom time decoder.
 func (v *MetaStringValue) UnmarshalJSON(data []byte) error {
+	// No bytes at all is not JSON: apijson calls the element decoder with an
+	// empty node for a map key the response does not carry, and the raw
+	// fallback below would turn that into an empty string, overwriting a value
+	// the API was never asked about. Absent means unchanged.
+	if len(data) == 0 {
+		return nil
+	}
 	if string(data) == "null" {
 		*v = MetaStringNull()
 		return nil

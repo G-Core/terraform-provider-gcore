@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 
+	tfjson "github.com/hashicorp/terraform-json"
 	"github.com/hashicorp/terraform-plugin-testing/plancheck"
 	"github.com/hashicorp/terraform-plugin-testing/tfjsonpath"
 )
@@ -109,4 +110,47 @@ func containsUnknown(afterUnknown any) bool {
 		}
 	}
 	return false
+}
+
+// ExpectResourceNotReplaced returns a plan check asserting that the resource is
+// not being destroyed, recreated or replaced. Creating and updating both pass,
+// as does a no-op.
+//
+// plancheck.ExpectResourceAction cannot express this: it pins the action to one
+// exact value, so a test guarding "import must not replace this" has to name the
+// action it does expect and then fails whenever an unrelated attribute changes
+// whether the plan is an update or a no-op. This check states the invariant
+// directly, which keeps import-no-replace regression tests from being coupled to
+// whichever incidental diffs an import currently leaves behind.
+func ExpectResourceNotReplaced(resourceAddress string) plancheck.PlanCheck {
+	return expectResourceNotReplaced{resourceAddress: resourceAddress}
+}
+
+type expectResourceNotReplaced struct {
+	resourceAddress string
+}
+
+func (e expectResourceNotReplaced) CheckPlan(_ context.Context, req plancheck.CheckPlanRequest, resp *plancheck.CheckPlanResponse) {
+	if req.Plan == nil {
+		resp.Error = fmt.Errorf("plan is nil")
+		return
+	}
+
+	for _, resourceChange := range req.Plan.ResourceChanges {
+		if resourceChange.Address != e.resourceAddress {
+			continue
+		}
+
+		for _, action := range resourceChange.Change.Actions {
+			if action == tfjson.ActionDelete {
+				resp.Error = fmt.Errorf("%s is planned for %s (actions: %v); expected it to be kept in place",
+					e.resourceAddress, action, resourceChange.Change.Actions)
+				return
+			}
+		}
+
+		return
+	}
+
+	resp.Error = fmt.Errorf("%s - resource not found in plan", e.resourceAddress)
 }
