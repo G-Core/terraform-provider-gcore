@@ -138,8 +138,6 @@ func TestAccDNSZone_withMeta(t *testing.T) {
 				ImportState:       true,
 				ImportStateIdFunc: acctest.BuildImportID("gcore_dns_zone.test", "name"),
 				ImportStateKind:   resource.ImportBlockWithID,
-				// meta is cleared on import to avoid drift from server-injected keys
-				ImportStateVerifyIgnore: []string{"meta"},
 			},
 		},
 	})

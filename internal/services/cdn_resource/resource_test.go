@@ -104,10 +104,6 @@ func TestAccCDNResource_import(t *testing.T) {
 				ImportState:       true,
 				ImportStateKind:   resource.ImportBlockWithID,
 				ImportStateIdFunc: acctest.BuildImportID("gcore_cdn_resource.test", "id"),
-				ImportStateVerifyIgnore: []string{
-					"origin",
-					"waap_api_domain_enabled",
-				},
 			},
 		},
 	})

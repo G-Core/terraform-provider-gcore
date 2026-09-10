@@ -70,10 +70,9 @@ func TestAccFastedgeBinary_import(t *testing.T) {
 				},
 			},
 			{
-				ResourceName:            "gcore_fastedge_binary.test",
-				ImportState:             true,
-				ImportStateKind:         resource.ImportBlockWithID,
-				ImportStateVerifyIgnore: []string{"filename"},
+				ResourceName:    "gcore_fastedge_binary.test",
+				ImportState:     true,
+				ImportStateKind: resource.ImportBlockWithID,
 			},
 		},
 	})

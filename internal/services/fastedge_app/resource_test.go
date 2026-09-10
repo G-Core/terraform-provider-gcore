@@ -123,12 +123,6 @@ func TestAccFastedgeApp_import(t *testing.T) {
 				ResourceName:    "gcore_fastedge_app.test",
 				ImportState:     true,
 				ImportStateKind: resource.ImportBlockWithID,
-				ImportStateVerifyIgnore: []string{
-					// binary is computed from template by API, may not match config exactly
-					"binary",
-					// status may change after import
-					"status",
-				},
 			},
 		},
 	})
