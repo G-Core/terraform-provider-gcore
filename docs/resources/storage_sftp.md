@@ -16,12 +16,10 @@ SFTP storages provide file transfer protocol access for securely uploading, down
 resource "gcore_storage_sftp" "example_storage_sftp" {
   location_name = "s-region-1"
   name = "my-sftp-storage"
-  password_mode = "auto"
   expires = "2 years 6 months"
   has_custom_config_file = false
   is_http_disabled = false
   server_alias = "my-storage.example.com"
-  sftp_password = "sftp_password"
   ssh_key_ids = [1, 2, 3]
 }
 ```
@@ -33,11 +31,6 @@ resource "gcore_storage_sftp" "example_storage_sftp" {
 
 - `location_name` (String) Location code where the storage should be created
 - `name` (String) User-defined name for the storage instance
-- `password_mode` (String) Password handling mode for SFTP access:
-'auto': generate a random password (returned in the response)
-'set': use the password provided in `sftp_password`
-'none': no password (SSH-key-only access)
-Available values: "auto", "set", "none".
 
 ### Optional
 
@@ -45,8 +38,6 @@ Available values: "auto", "set", "none".
 - `has_custom_config_file` (Boolean) Whether this storage should use a custom configuration file
 - `is_http_disabled` (Boolean) Whether HTTP access should be disabled (HTTPS only)
 - `server_alias` (String) Custom domain alias for accessing the storage. Omit for no alias.
-- `sftp_password` (String) SFTP password (8-63 chars). Required when `password_mode` is 'set'.
-Must be omitted when `password_mode` is 'auto' or 'none'.
 - `ssh_key_ids` (List of Number) SSH key IDs to associate with this storage at creation time. If omitted, no keys are linked.
 
 ### Read-Only
@@ -58,7 +49,6 @@ Used by the SFTP backend as the login username. Clients should use this value wh
 but should continue to identify the storage by `name` in their own configuration.
 - `has_password` (Boolean) Whether password authentication is configured for this storage
 - `id` (Number) Unique identifier for the storage instance
-- `password` (String, Sensitive) SFTP password. Only returned when newly generated or set (create/patch). Omitted in GET/list responses.
 - `provisioning_status` (String) Lifecycle status of the storage. Use this to check readiness before operations.
 Available values: "creating", "active", "updating", "deleting", "deleted".
 

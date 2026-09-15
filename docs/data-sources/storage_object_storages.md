@@ -19,6 +19,7 @@ data "gcore_storage_object_storages" "example_storage_object_storages" {
   name = "name"
   provisioning_status = "active"
   show_deleted = true
+  type = "standard"
 }
 ```
 
@@ -35,6 +36,11 @@ data "gcore_storage_object_storages" "example_storage_object_storages" {
 - `provisioning_status` (String) Filter by provisioning status
 Available values: "active", "creating", "updating", "deleting", "deleted".
 - `show_deleted` (Boolean) Include deleted storages
+- `type` (String) Filter by performance tier. "standard" returns Standard storages, "fast"
+returns Fast storages. Storages on any other backend (Backblaze,
+Wasabi) report a "standard" type but are never returned by this filter —
+omit the parameter to include them.
+Available values: "standard", "fast".
 
 ### Read-Only
 
@@ -54,3 +60,5 @@ Used internally by the backend. Clients should continue to identify the storage 
 - `name` (String) User-defined name for the storage instance, as supplied at creation time.
 - `provisioning_status` (String) Lifecycle status of the storage. Use this to check readiness before operations.
 Available values: "creating", "active", "updating", "deleting", "deleted".
+- `type` (String) Performance tier of the storage, determined by the backend it is provisioned on.
+Available values: "standard", "fast".

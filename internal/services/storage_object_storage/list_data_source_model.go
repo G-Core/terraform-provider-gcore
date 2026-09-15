@@ -23,6 +23,7 @@ type StorageObjectStoragesDataSourceModel struct {
 	Name               types.String                                                            `tfsdk:"name" query:"name,optional"`
 	ProvisioningStatus types.String                                                            `tfsdk:"provisioning_status" query:"provisioning_status,optional"`
 	ShowDeleted        types.Bool                                                              `tfsdk:"show_deleted" query:"show_deleted,optional"`
+	Type               types.String                                                            `tfsdk:"type" query:"type,optional"`
 	OrderBy            types.String                                                            `tfsdk:"order_by" query:"order_by,computed_optional"`
 	MaxItems           types.Int64                                                             `tfsdk:"max_items"`
 	Items              customfield.NestedObjectList[StorageObjectStoragesItemsDataSourceModel] `tfsdk:"items"`
@@ -49,6 +50,9 @@ func (m *StorageObjectStoragesDataSourceModel) toListParams(_ context.Context) (
 	if !m.ShowDeleted.IsNull() {
 		params.ShowDeleted = param.NewOpt(m.ShowDeleted.ValueBool())
 	}
+	if !m.Type.IsNull() {
+		params.Type = storage.ObjectStorageListParamsType(m.Type.ValueString())
+	}
 
 	return
 }
@@ -61,4 +65,5 @@ type StorageObjectStoragesItemsDataSourceModel struct {
 	LocationName       types.String      `tfsdk:"location_name" json:"location_name,computed"`
 	Name               types.String      `tfsdk:"name" json:"name,computed"`
 	ProvisioningStatus types.String      `tfsdk:"provisioning_status" json:"provisioning_status,computed"`
+	Type               types.String      `tfsdk:"type" json:"type,computed"`
 }

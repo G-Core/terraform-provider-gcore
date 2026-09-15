@@ -65,10 +65,6 @@ func DataSourceSchema(ctx context.Context) schema.Schema {
 				Description: "User-defined name for the storage instance, as supplied at creation time.",
 				Computed:    true,
 			},
-			"password": schema.StringAttribute{
-				Description: "SFTP password. Only returned when newly generated or set (create/patch). Omitted in GET/list responses.",
-				Computed:    true,
-			},
 			"provisioning_status": schema.StringAttribute{
 				Description: "Lifecycle status of the storage. Use this to check readiness before operations.\nAvailable values: \"creating\", \"active\", \"updating\", \"deleting\", \"deleted\".",
 				Computed:    true,

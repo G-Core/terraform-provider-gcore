@@ -60,6 +60,13 @@ func DataSourceSchema(ctx context.Context) schema.Schema {
 					),
 				},
 			},
+			"type": schema.StringAttribute{
+				Description: "Performance tier of the storage, determined by the backend it is provisioned on.\nAvailable values: \"standard\", \"fast\".",
+				Computed:    true,
+				Validators: []validator.String{
+					stringvalidator.OneOfCaseInsensitive("standard", "fast"),
+				},
+			},
 			"find_one_by": schema.SingleNestedAttribute{
 				Optional: true,
 				Attributes: map[string]schema.Attribute{
@@ -95,6 +102,13 @@ func DataSourceSchema(ctx context.Context) schema.Schema {
 					"show_deleted": schema.BoolAttribute{
 						Description: "Include deleted storages",
 						Optional:    true,
+					},
+					"type": schema.StringAttribute{
+						Description: "Filter by performance tier. \"standard\" returns Standard storages, \"fast\"\nreturns Fast storages. Storages on any other backend (Backblaze,\nWasabi) report a \"standard\" type but are never returned by this filter —\nomit the parameter to include them.\nAvailable values: \"standard\", \"fast\".",
+						Optional:    true,
+						Validators: []validator.String{
+							stringvalidator.OneOfCaseInsensitive("standard", "fast"),
+						},
 					},
 				},
 			},

@@ -12,6 +12,7 @@ type StorageAccessKeyModel struct {
 	ID        types.String      `tfsdk:"id" json:"-,computed"`
 	AccessKey types.String      `tfsdk:"access_key" json:"access_key,computed"`
 	StorageID types.Int64       `tfsdk:"storage_id" path:"storage_id,required"`
+	ReadOnly  types.Bool        `tfsdk:"read_only" json:"read_only,optional"`
 	CreatedAt timetypes.RFC3339 `tfsdk:"created_at" json:"created_at,computed" format:"date-time"`
 	SecretKey types.String      `tfsdk:"secret_key" json:"secret_key,computed,no_refresh"`
 }

@@ -127,14 +127,10 @@ func (r *StorageSftpResource) Update(ctx context.Context, req resource.UpdateReq
 		return
 	}
 	bytes, _ := io.ReadAll(res.Body)
-	priorPassword := data.Password
 	err = apijson.UnmarshalComputed(bytes, &data)
 	if err != nil {
 		resp.Diagnostics.AddError("failed to deserialize http request", err.Error())
 		return
-	}
-	if data.Password.IsNull() || data.Password.IsUnknown() {
-		data.Password = priorPassword
 	}
 
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)

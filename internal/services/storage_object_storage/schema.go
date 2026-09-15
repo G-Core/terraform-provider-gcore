@@ -63,6 +63,13 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 					),
 				},
 			},
+			"type": schema.StringAttribute{
+				Description: "Performance tier of the storage, determined by the backend it is provisioned on.\nAvailable values: \"standard\", \"fast\".",
+				Computed:    true,
+				Validators: []validator.String{
+					stringvalidator.OneOfCaseInsensitive("standard", "fast"),
+				},
+			},
 			"access_keys": schema.ListNestedAttribute{
 				Description: "S3 access keys",
 				Computed:    true,

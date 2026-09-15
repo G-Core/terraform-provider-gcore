@@ -17,6 +17,7 @@ type StorageObjectStorageModel struct {
 	CreatedAt          timetypes.RFC3339                                                 `tfsdk:"created_at" json:"created_at,computed" format:"date-time"`
 	FullName           types.String                                                      `tfsdk:"full_name" json:"full_name,computed"`
 	ProvisioningStatus types.String                                                      `tfsdk:"provisioning_status" json:"provisioning_status,computed"`
+	Type               types.String                                                      `tfsdk:"type" json:"type,computed"`
 	AccessKeys         customfield.NestedObjectList[StorageObjectStorageAccessKeysModel] `tfsdk:"access_keys" json:"access_keys,computed,no_refresh"`
 }
 

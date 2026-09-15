@@ -37,6 +37,8 @@ Used internally by the backend. Clients should continue to identify the storage 
 - `id` (Number) Unique identifier for the storage instance
 - `provisioning_status` (String) Lifecycle status of the storage. Use this to check readiness before operations.
 Available values: "creating", "active", "updating", "deleting", "deleted".
+- `type` (String) Performance tier of the storage, determined by the backend it is provisioned on.
+Available values: "standard", "fast".
 
 <a id="nestedatt--access_keys"></a>
 ### Nested Schema for `access_keys`

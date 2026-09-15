@@ -73,6 +73,7 @@ func (r *StorageAccessKeyResource) Create(ctx context.Context, req resource.Crea
 	_, err = r.client.Storage.ObjectStorages.AccessKeys.New(
 		ctx,
 		data.StorageID.ValueInt64(),
+		storage.ObjectStorageAccessKeyNewParams{},
 		option.WithRequestBody("application/json", dataBytes),
 		option.WithResponseBodyInto(&res),
 		option.WithMiddleware(logging.Middleware(ctx)),

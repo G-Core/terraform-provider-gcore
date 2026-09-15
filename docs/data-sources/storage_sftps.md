@@ -57,7 +57,6 @@ but should continue to identify the storage by `name` in their own configuration
 - `is_http_disabled` (Boolean) Whether HTTP access is disabled for this storage (HTTPS only)
 - `location_name` (String) Geographic location code where the storage is provisioned
 - `name` (String) User-defined name for the storage instance, as supplied at creation time.
-- `password` (String) SFTP password. Only returned when newly generated or set (create/patch). Omitted in GET/list responses.
 - `provisioning_status` (String) Lifecycle status of the storage. Use this to check readiness before operations.
 Available values: "creating", "active", "updating", "deleting", "deleted".
 - `server_alias` (String) Custom domain alias for accessing the storage. Null if no alias is configured.

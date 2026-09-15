@@ -25,7 +25,6 @@ type StorageSftpDataSourceModel struct {
 	IsHTTPDisabled      types.Bool                           `tfsdk:"is_http_disabled" json:"is_http_disabled,computed"`
 	LocationName        types.String                         `tfsdk:"location_name" json:"location_name,computed"`
 	Name                types.String                         `tfsdk:"name" json:"name,computed"`
-	Password            types.String                         `tfsdk:"password" json:"password,computed"`
 	ProvisioningStatus  types.String                         `tfsdk:"provisioning_status" json:"provisioning_status,computed"`
 	ServerAlias         types.String                         `tfsdk:"server_alias" json:"server_alias,computed"`
 	SSHKeyIDs           customfield.List[types.Int64]        `tfsdk:"ssh_key_ids" json:"ssh_key_ids,computed"`

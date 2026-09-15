@@ -67,5 +67,4 @@ type StorageSftpsItemsDataSourceModel struct {
 	ProvisioningStatus  types.String                  `tfsdk:"provisioning_status" json:"provisioning_status,computed"`
 	ServerAlias         types.String                  `tfsdk:"server_alias" json:"server_alias,computed"`
 	SSHKeyIDs           customfield.List[types.Int64] `tfsdk:"ssh_key_ids" json:"ssh_key_ids,computed"`
-	Password            types.String                  `tfsdk:"password" json:"password,computed"`
 }

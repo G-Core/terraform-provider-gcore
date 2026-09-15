@@ -131,10 +131,6 @@ func ListDataSourceSchema(ctx context.Context) schema.Schema {
 							CustomType:  customfield.NewListType[types.Int64](ctx),
 							ElementType: types.Int64Type,
 						},
-						"password": schema.StringAttribute{
-							Description: "SFTP password. Only returned when newly generated or set (create/patch). Omitted in GET/list responses.",
-							Computed:    true,
-						},
 					},
 				},
 			},

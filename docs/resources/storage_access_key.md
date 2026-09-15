@@ -15,6 +15,7 @@ Object storage access keys provide secure credentials for API access to object s
 ```terraform
 resource "gcore_storage_access_key" "example_storage_access_key" {
   storage_id = 0
+  read_only = false
 }
 ```
 
@@ -24,6 +25,11 @@ resource "gcore_storage_access_key" "example_storage_access_key" {
 ### Required
 
 - `storage_id` (Number)
+
+### Optional
+
+- `read_only` (Boolean) Request a key scoped to read-only data access. Only supported for Standard storages; a
+Fast storage rejects true. Defaults to false (full read-write) when omitted.
 
 ### Read-Only
 

@@ -38,22 +38,6 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 				Required:      true,
 				PlanModifiers: []planmodifier.String{stringplanmodifier.RequiresReplace()},
 			},
-			"sftp_password": schema.StringAttribute{
-				Description:   "SFTP password (8-63 chars). Required when `password_mode` is 'set'.\nMust be omitted when `password_mode` is 'auto' or 'none'.",
-				Optional:      true,
-				PlanModifiers: []planmodifier.String{stringplanmodifier.RequiresReplace()},
-			},
-			"password_mode": schema.StringAttribute{
-				Description: "Password handling mode for SFTP access:\n'auto': generate a random password (returned in the response)\n'set': use the password provided in `sftp_password`\n'none': no password (SSH-key-only access)\nAvailable values: \"auto\", \"set\", \"none\".",
-				Required:    true,
-				Validators: []validator.String{
-					stringvalidator.OneOfCaseInsensitive(
-						"auto",
-						"set",
-						"none",
-					),
-				},
-			},
 			"expires": schema.StringAttribute{
 				Description: `Duration when the storage should expire (e.g., "2 years 6 months"). Omit for no expiration.`,
 				Optional:    true,
@@ -96,12 +80,6 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 			"has_password": schema.BoolAttribute{
 				Description: "Whether password authentication is configured for this storage",
 				Computed:    true,
-			},
-			"password": schema.StringAttribute{
-				Description:   "SFTP password. Only returned when newly generated or set (create/patch). Omitted in GET/list responses.",
-				Computed:      true,
-				Sensitive:     true,
-				PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
 			},
 			"provisioning_status": schema.StringAttribute{
 				Description: "Lifecycle status of the storage. Use this to check readiness before operations.\nAvailable values: \"creating\", \"active\", \"updating\", \"deleting\", \"deleted\".",

@@ -21,6 +21,7 @@ type StorageObjectStorageDataSourceModel struct {
 	LocationName       types.String                                  `tfsdk:"location_name" json:"location_name,computed"`
 	Name               types.String                                  `tfsdk:"name" json:"name,computed"`
 	ProvisioningStatus types.String                                  `tfsdk:"provisioning_status" json:"provisioning_status,computed"`
+	Type               types.String                                  `tfsdk:"type" json:"type,computed"`
 	FindOneBy          *StorageObjectStorageFindOneByDataSourceModel `tfsdk:"find_one_by"`
 }
 
@@ -45,6 +46,9 @@ func (m *StorageObjectStorageDataSourceModel) toListParams(_ context.Context) (p
 	if !m.FindOneBy.ShowDeleted.IsNull() {
 		params.ShowDeleted = param.NewOpt(m.FindOneBy.ShowDeleted.ValueBool())
 	}
+	if !m.FindOneBy.Type.IsNull() {
+		params.Type = storage.ObjectStorageListParamsType(m.FindOneBy.Type.ValueString())
+	}
 
 	return
 }
@@ -56,4 +60,5 @@ type StorageObjectStorageFindOneByDataSourceModel struct {
 	OrderBy            types.String `tfsdk:"order_by" query:"order_by,computed_optional"`
 	ProvisioningStatus types.String `tfsdk:"provisioning_status" query:"provisioning_status,optional"`
 	ShowDeleted        types.Bool   `tfsdk:"show_deleted" query:"show_deleted,optional"`
+	Type               types.String `tfsdk:"type" query:"type,optional"`
 }
