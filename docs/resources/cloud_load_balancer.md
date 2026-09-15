@@ -188,7 +188,7 @@ Available values: "dual", "ipv4", "ipv6".
 - `additional_vips` (Attributes List) List of additional IP addresses (see [below for nested schema](#nestedatt--additional_vips))
 - `admin_state_up` (Boolean) Administrative state of the resource. When set to true, the resource is enabled and operational. When set to false, the resource is disabled and will not process traffic. Defaults to true.
 - `created_at` (String) Datetime when the load balancer was created
-- `creator_task_id` (String) Task that created this entity
+- `creator_task_id` (String) Task that created this entity. Null when the load balancer wasn't created via a tracked task.
 - `floating_ips` (Attributes List) List of assigned floating IPs (see [below for nested schema](#nestedatt--floating_ips))
 - `id` (String) The ID of this resource.
 - `operating_status` (String) Load balancer operating status
@@ -197,7 +197,7 @@ Available values: "DEGRADED", "DRAINING", "ERROR", "NO_MONITOR", "OFFLINE", "ONL
 Available values: "ACTIVE", "DELETED", "ERROR", "PENDING_CREATE", "PENDING_DELETE", "PENDING_UPDATE".
 - `region` (String) Region name
 - `vip_address` (String) Load balancer IP address
-- `vip_fqdn` (String) Fully qualified domain name for the load balancer VIP
+- `vip_fqdn` (String) Fully qualified domain name for the load balancer VIP. Null when no FQDN is assigned.
 - `vrrp_ips` (Attributes List) List of VRRP IP addresses (see [below for nested schema](#nestedatt--vrrp_ips))
 
 <a id="nestedatt--logging"></a>
@@ -234,15 +234,15 @@ Read-Only:
 Read-Only:
 
 - `created_at` (String) Datetime when the floating IP was created
-- `creator_task_id` (String) Task that created this entity
-- `fixed_ip_address` (String) IP address of the port the floating IP is attached to
+- `creator_task_id` (String) Task that created this entity. Null when the floating IP wasn't created via a tracked task.
+- `fixed_ip_address` (String) IP address of the port the floating IP is attached to. Null when the floating IP is not attached to a port.
 - `floating_ip_address` (String) IP Address of the floating IP
 - `id` (String) Floating IP ID
-- `port_id` (String) Port ID the floating IP is attached to. The `fixed_ip_address` is the IP address of the port.
+- `port_id` (String) Port ID the floating IP is attached to. The `fixed_ip_address` is the IP address of the port. Null when the floating IP is not attached to a port.
 - `project_id` (Number) Project ID
 - `region` (String) Region name
 - `region_id` (Number) Region ID
-- `router_id` (String) Router ID
+- `router_id` (String) Router ID. Null when the floating IP is not attached to a port.
 - `status` (String) Floating IP status. DOWN - unassigned (available). ACTIVE - attached to a port (in use). ERROR - error state.
 Available values: "ACTIVE", "DOWN", "ERROR".
 - `tags` (Attributes List) List of key-value tags associated with the resource. A tag is a key-value pair that can be associated with a resource, enabling efficient filtering and grouping for better organization and management. Some tags are read-only and cannot be modified by the user. Tags are also integrated with cost reports, allowing cost data to be filtered based on tag keys or values. (see [below for nested schema](#nestedatt--floating_ips--tags))

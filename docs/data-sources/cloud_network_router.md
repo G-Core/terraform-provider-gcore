@@ -33,9 +33,9 @@ data "gcore_cloud_network_router" "example_cloud_network_router" {
 ### Read-Only
 
 - `created_at` (String) Datetime when the router was created
-- `creator_task_id` (String) Task that created this entity
+- `creator_task_id` (String) Task that created this entity. Null when the router wasn't created via a tracked task.
 - `distributed` (Boolean) Whether the router is distributed or centralized.
-- `external_gateway_info` (Attributes) State of this router's external gateway. (see [below for nested schema](#nestedatt--external_gateway_info))
+- `external_gateway_info` (Attributes) State of this router's external gateway. Null when the router has no external gateway. (see [below for nested schema](#nestedatt--external_gateway_info))
 - `id` (String) Router ID
 - `interfaces` (Attributes List) List of router interfaces. (see [below for nested schema](#nestedatt--interfaces))
 - `name` (String) Router name

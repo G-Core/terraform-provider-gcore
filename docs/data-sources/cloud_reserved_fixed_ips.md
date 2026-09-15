@@ -50,21 +50,21 @@ Read-Only:
 - `allowed_address_pairs` (Attributes List) Group of subnet masks and/or IP addresses that share the current IP as VIP (see [below for nested schema](#nestedatt--items--allowed_address_pairs))
 - `attachments` (Attributes List) Reserved fixed IP attachment entities (see [below for nested schema](#nestedatt--items--attachments))
 - `created_at` (String) Datetime when the reserved fixed IP was created
-- `creator_task_id` (String) Task that created this entity
-- `fixed_ip_address` (String) IPv4 address of the reserved fixed IP
-- `fixed_ipv6_address` (String) IPv6 address of the reserved fixed IP
+- `creator_task_id` (String) Task that created this entity. Null when the reservation wasn't created via a tracked task.
+- `fixed_ip_address` (String) IPv4 address of the reserved fixed IP. Null when the reservation has no IPv4 address.
+- `fixed_ipv6_address` (String) IPv6 address of the reserved fixed IP. Null when the reservation has no IPv6 address.
 - `is_external` (Boolean) If reserved fixed IP belongs to a public network
 - `is_vip` (Boolean) If reserved fixed IP is a VIP
 - `name` (String) Reserved fixed IP name
 - `network` (Attributes) Network details (see [below for nested schema](#nestedatt--items--network))
 - `network_id` (String) ID of the network the port is attached to
 - `port_id` (String) ID of the port underlying the reserved fixed IP
-- `project_id` (Number) Project ID
+- `project_id` (Number) Project ID. Null in an internal, project-less context.
 - `region` (String) Region name
 - `region_id` (Number) Region ID
 - `status` (String) Underlying port status
-- `subnet_id` (String) ID of the subnet that owns the IP address
-- `subnet_v6_id` (String) ID of the subnet that owns the IPv6 address
+- `subnet_id` (String) ID of the subnet that owns the IP address. Null when the reservation has no IPv4 address.
+- `subnet_v6_id` (String) ID of the subnet that owns the IPv6 address. Null when the reservation has no IPv6 address.
 - `updated_at` (String) Datetime when the reserved fixed IP was last updated
 
 <a id="nestedatt--items--allowed_address_pairs"></a>
@@ -73,7 +73,7 @@ Read-Only:
 Read-Only:
 
 - `ip_address` (String) Subnet mask or IP address of the port specified in `allowed_address_pairs`
-- `mac_address` (String) MAC address of the port specified in `allowed_address_pairs`
+- `mac_address` (String) MAC address of the port specified in `allowed_address_pairs`. Null when the pair has no explicit MAC.
 
 
 <a id="nestedatt--items--attachments"></a>
@@ -81,8 +81,8 @@ Read-Only:
 
 Read-Only:
 
-- `resource_id` (String) Resource ID
-- `resource_type` (String) Resource type
+- `resource_id` (String) Resource ID. Null when the attachment's resource is unknown.
+- `resource_type` (String) Resource type. Null when the attachment's resource type is unknown.
 
 
 <a id="nestedatt--items--network"></a>

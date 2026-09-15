@@ -47,8 +47,8 @@ Available values: "ACTIVE", "DOWN", "ERROR".
 Read-Only:
 
 - `created_at` (String) Datetime when the floating IP was created
-- `creator_task_id` (String) Task that created this entity
-- `fixed_ip_address` (String) IP address of the port the floating IP is attached to
+- `creator_task_id` (String) Task that created this entity. Null when the floating IP wasn't created via a tracked task.
+- `fixed_ip_address` (String) IP address of the port the floating IP is attached to. Null when the floating IP is not attached to a port.
 - `floating_ip_address` (String) IP Address of the floating IP
 - `id` (String) Floating IP ID
 - `instance` (Attributes) Instance the floating IP is attached to (see [below for nested schema](#nestedatt--items--instance))
@@ -57,7 +57,7 @@ Read-Only:
 - `project_id` (Number) Project ID
 - `region` (String) Region name
 - `region_id` (Number) Region ID
-- `router_id` (String) Router ID
+- `router_id` (String) Router ID. Null when the floating IP is not attached to a port.
 - `status` (String) Floating IP status. DOWN - unassigned (available). ACTIVE - attached to a port (in use). ERROR - error state.
 Available values: "ACTIVE", "DOWN", "ERROR".
 - `tags` (Attributes List) List of key-value tags associated with the resource. A tag is a key-value pair that can be associated with a resource, enabling efficient filtering and grouping for better organization and management. Some tags are read-only and cannot be modified by the user. Tags are also integrated with cost reports, allowing cost data to be filtered based on tag keys or values. (see [below for nested schema](#nestedatt--items--tags))
@@ -135,13 +135,13 @@ Read-Only:
 - `additional_vips` (Attributes List) List of additional IP addresses (see [below for nested schema](#nestedatt--items--loadbalancer--additional_vips))
 - `admin_state_up` (Boolean) Administrative state of the resource. When set to true, the resource is enabled and operational. When set to false, the resource is disabled and will not process traffic. Defaults to true.
 - `created_at` (String) Datetime when the load balancer was created
-- `creator_task_id` (String) Task that created this entity
-- `ddos_profile` (Attributes) Loadbalancer advanced DDoS protection profile. (see [below for nested schema](#nestedatt--items--loadbalancer--ddos_profile))
-- `flavor` (Attributes) Load balancer flavor (if not default) (see [below for nested schema](#nestedatt--items--loadbalancer--flavor))
+- `creator_task_id` (String) Task that created this entity. Null when the load balancer wasn't created via a tracked task.
+- `ddos_profile` (Attributes) Loadbalancer advanced DDoS protection profile. Null unless requested via `with_ddos`, or when no profile is attached. (see [below for nested schema](#nestedatt--items--loadbalancer--ddos_profile))
+- `flavor` (Attributes) Load balancer flavor. Null when using the default flavor. (see [below for nested schema](#nestedatt--items--loadbalancer--flavor))
 - `floating_ips` (Attributes List) List of assigned floating IPs (see [below for nested schema](#nestedatt--items--loadbalancer--floating_ips))
 - `id` (String) Load balancer ID
 - `listeners` (Attributes List) Load balancer listeners (see [below for nested schema](#nestedatt--items--loadbalancer--listeners))
-- `logging` (Attributes) Logging configuration (see [below for nested schema](#nestedatt--items--loadbalancer--logging))
+- `logging` (Attributes) Logging configuration. Null when logging isn't configured. (see [below for nested schema](#nestedatt--items--loadbalancer--logging))
 - `name` (String) Load balancer name
 - `operating_status` (String) Load balancer operating status
 Available values: "DEGRADED", "DRAINING", "ERROR", "NO_MONITOR", "OFFLINE", "ONLINE".
@@ -152,11 +152,11 @@ Available values: "L2", "L3".
 Available values: "ACTIVE", "DELETED", "ERROR", "PENDING_CREATE", "PENDING_DELETE", "PENDING_UPDATE".
 - `region` (String) Region name
 - `region_id` (Number) Region ID
-- `stats` (Attributes) Statistics of load balancer. (see [below for nested schema](#nestedatt--items--loadbalancer--stats))
+- `stats` (Attributes) Statistics of load balancer. Null unless requested via `show_stats`. (see [below for nested schema](#nestedatt--items--loadbalancer--stats))
 - `tags` (Attributes List) List of key-value tags associated with the resource. A tag is a key-value pair that can be associated with a resource, enabling efficient filtering and grouping for better organization and management. Some tags are read-only and cannot be modified by the user. Tags are also integrated with cost reports, allowing cost data to be filtered based on tag keys or values. (see [below for nested schema](#nestedatt--items--loadbalancer--tags))
-- `updated_at` (String) Datetime when the load balancer was last updated
+- `updated_at` (String) Datetime when the load balancer was last updated. Null until the first update.
 - `vip_address` (String) Load balancer IP address
-- `vip_fqdn` (String) Fully qualified domain name for the load balancer VIP
+- `vip_fqdn` (String) Fully qualified domain name for the load balancer VIP. Null when no FQDN is assigned.
 - `vip_ip_family` (String) Load balancer IP family
 Available values: "dual", "ipv4", "ipv6".
 - `vip_port_id` (String) The ID of the Virtual IP (VIP) port.
@@ -271,15 +271,15 @@ Read-Only:
 Read-Only:
 
 - `created_at` (String) Datetime when the floating IP was created
-- `creator_task_id` (String) Task that created this entity
-- `fixed_ip_address` (String) IP address of the port the floating IP is attached to
+- `creator_task_id` (String) Task that created this entity. Null when the floating IP wasn't created via a tracked task.
+- `fixed_ip_address` (String) IP address of the port the floating IP is attached to. Null when the floating IP is not attached to a port.
 - `floating_ip_address` (String) IP Address of the floating IP
 - `id` (String) Floating IP ID
-- `port_id` (String) Port ID the floating IP is attached to. The `fixed_ip_address` is the IP address of the port.
+- `port_id` (String) Port ID the floating IP is attached to. The `fixed_ip_address` is the IP address of the port. Null when the floating IP is not attached to a port.
 - `project_id` (Number) Project ID
 - `region` (String) Region name
 - `region_id` (Number) Region ID
-- `router_id` (String) Router ID
+- `router_id` (String) Router ID. Null when the floating IP is not attached to a port.
 - `status` (String) Floating IP status. DOWN - unassigned (available). ACTIVE - attached to a port (in use). ERROR - error state.
 Available values: "ACTIVE", "DOWN", "ERROR".
 - `tags` (Attributes List) List of key-value tags associated with the resource. A tag is a key-value pair that can be associated with a resource, enabling efficient filtering and grouping for better organization and management. Some tags are read-only and cannot be modified by the user. Tags are also integrated with cost reports, allowing cost data to be filtered based on tag keys or values. (see [below for nested schema](#nestedatt--items--loadbalancer--floating_ips--tags))

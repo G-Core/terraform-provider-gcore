@@ -33,13 +33,13 @@ data "gcore_cloud_floating_ip" "example_cloud_floating_ip" {
 ### Read-Only
 
 - `created_at` (String) Datetime when the floating IP was created
-- `creator_task_id` (String) Task that created this entity
-- `fixed_ip_address` (String) IP address of the port the floating IP is attached to
+- `creator_task_id` (String) Task that created this entity. Null when the floating IP wasn't created via a tracked task.
+- `fixed_ip_address` (String) IP address of the port the floating IP is attached to. Null when the floating IP is not attached to a port.
 - `floating_ip_address` (String) IP Address of the floating IP
 - `id` (String) Floating IP ID
-- `port_id` (String) Port ID the floating IP is attached to. The `fixed_ip_address` is the IP address of the port.
+- `port_id` (String) Port ID the floating IP is attached to. The `fixed_ip_address` is the IP address of the port. Null when the floating IP is not attached to a port.
 - `region` (String) Region name
-- `router_id` (String) Router ID
+- `router_id` (String) Router ID. Null when the floating IP is not attached to a port.
 - `status` (String) Floating IP status. DOWN - unassigned (available). ACTIVE - attached to a port (in use). ERROR - error state.
 Available values: "ACTIVE", "DOWN", "ERROR".
 - `tags` (Attributes List) List of key-value tags associated with the resource. A tag is a key-value pair that can be associated with a resource, enabling efficient filtering and grouping for better organization and management. Some tags are read-only and cannot be modified by the user. Tags are also integrated with cost reports, allowing cost data to be filtered based on tag keys or values. (see [below for nested schema](#nestedatt--tags))

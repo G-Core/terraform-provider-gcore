@@ -52,7 +52,7 @@ resource "gcore_cloud_network_router" "main" {
 ### Read-Only
 
 - `created_at` (String) Datetime when the router was created
-- `creator_task_id` (String) Task that created this entity
+- `creator_task_id` (String) Task that created this entity. Null when the router wasn't created via a tracked task.
 - `distributed` (Boolean) Whether the router is distributed or centralized.
 - `id` (String) The ID of this resource.
 - `region` (String) Region name

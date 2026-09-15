@@ -32,10 +32,10 @@ data "gcore_cloud_network_subnet" "example_cloud_network_subnet" {
 
 ### Read-Only
 
-- `available_ips` (Number) Number of available ips in subnet
+- `available_ips` (Number) Number of available ips in subnet. Null when this data isn't available.
 - `cidr` (String) CIDR
 - `created_at` (String) Datetime when the subnet was created
-- `creator_task_id` (String) Task that created this entity
+- `creator_task_id` (String) Task that created this entity. Null when the subnet wasn't created via a tracked task.
 - `dns_nameservers` (List of String) List IP addresses of a DNS resolver reachable from the network
 - `enable_dhcp` (Boolean) True if DHCP should be enabled
 - `gateway_ip` (String) Default GW IPv4 address, advertised in DHCP routes of this subnet. If null, no gateway is advertised by this subnet.
@@ -48,7 +48,7 @@ Available values: 4, 6.
 - `network_id` (String) Network ID
 - `region` (String) Region name
 - `tags` (Attributes List) List of key-value tags associated with the resource. A tag is a key-value pair that can be associated with a resource, enabling efficient filtering and grouping for better organization and management. Some tags are read-only and cannot be modified by the user. Tags are also integrated with cost reports, allowing cost data to be filtered based on tag keys or values. (see [below for nested schema](#nestedatt--tags))
-- `total_ips` (Number) Total number of ips in subnet
+- `total_ips` (Number) Total number of ips in subnet. Null when this data isn't available.
 - `updated_at` (String) Datetime when the subnet was last updated
 
 <a id="nestedatt--find_one_by"></a>
