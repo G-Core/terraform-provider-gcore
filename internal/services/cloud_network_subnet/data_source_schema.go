@@ -40,7 +40,7 @@ func DataSourceSchema(ctx context.Context) schema.Schema {
 				Optional:    true,
 			},
 			"available_ips": schema.Int64Attribute{
-				Description: "Number of available ips in subnet",
+				Description: "Number of available ips in subnet. Null when this data isn't available.",
 				Computed:    true,
 			},
 			"cidr": schema.StringAttribute{
@@ -53,7 +53,7 @@ func DataSourceSchema(ctx context.Context) schema.Schema {
 				CustomType:  timetypes.RFC3339Type{},
 			},
 			"creator_task_id": schema.StringAttribute{
-				Description: "Task that created this entity",
+				Description: "Task that created this entity. Null when the subnet wasn't created via a tracked task.",
 				Computed:    true,
 			},
 			"enable_dhcp": schema.BoolAttribute{
@@ -89,7 +89,7 @@ func DataSourceSchema(ctx context.Context) schema.Schema {
 				Computed:    true,
 			},
 			"total_ips": schema.Int64Attribute{
-				Description: "Total number of ips in subnet",
+				Description: "Total number of ips in subnet. Null when this data isn't available.",
 				Computed:    true,
 			},
 			"updated_at": schema.StringAttribute{

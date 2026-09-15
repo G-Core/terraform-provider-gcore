@@ -134,36 +134,30 @@ type CloudFloatingIPsInstanceVolumesDataSourceModel struct {
 
 type CloudFloatingIPsLoadbalancerDataSourceModel struct {
 	ID                    types.String                                                                            `tfsdk:"id" json:"id,computed"`
+	AdditionalVips        customfield.NestedObjectList[CloudFloatingIPsLoadbalancerAdditionalVipsDataSourceModel] `tfsdk:"additional_vips" json:"additional_vips,computed"`
 	AdminStateUp          types.Bool                                                                              `tfsdk:"admin_state_up" json:"admin_state_up,computed"`
 	CreatedAt             timetypes.RFC3339                                                                       `tfsdk:"created_at" json:"created_at,computed" format:"date-time"`
-	Name                  types.String                                                                            `tfsdk:"name" json:"name,computed"`
-	OperatingStatus       types.String                                                                            `tfsdk:"operating_status" json:"operating_status,computed"`
-	ProjectID             types.Int64                                                                             `tfsdk:"project_id" json:"project_id,computed"`
-	ProvisioningStatus    types.String                                                                            `tfsdk:"provisioning_status" json:"provisioning_status,computed"`
-	Region                types.String                                                                            `tfsdk:"region" json:"region,computed"`
-	RegionID              types.Int64                                                                             `tfsdk:"region_id" json:"region_id,computed"`
-	Tags                  customfield.NestedObjectList[CloudFloatingIPsLoadbalancerTagsDataSourceModel]           `tfsdk:"tags" json:"tags_v2,computed"`
-	AdditionalVips        customfield.NestedObjectList[CloudFloatingIPsLoadbalancerAdditionalVipsDataSourceModel] `tfsdk:"additional_vips" json:"additional_vips,computed"`
 	CreatorTaskID         types.String                                                                            `tfsdk:"creator_task_id" json:"creator_task_id,computed"`
 	DDOSProfile           customfield.NestedObject[CloudFloatingIPsLoadbalancerDDOSProfileDataSourceModel]        `tfsdk:"ddos_profile" json:"ddos_profile,computed"`
 	Flavor                customfield.NestedObject[CloudFloatingIPsLoadbalancerFlavorDataSourceModel]             `tfsdk:"flavor" json:"flavor,computed"`
 	FloatingIPs           customfield.NestedObjectList[CloudFloatingIPsLoadbalancerFloatingIPsDataSourceModel]    `tfsdk:"floating_ips" json:"floating_ips,computed"`
 	Listeners             customfield.NestedObjectList[CloudFloatingIPsLoadbalancerListenersDataSourceModel]      `tfsdk:"listeners" json:"listeners,computed"`
 	Logging               customfield.NestedObject[CloudFloatingIPsLoadbalancerLoggingDataSourceModel]            `tfsdk:"logging" json:"logging,computed"`
+	Name                  types.String                                                                            `tfsdk:"name" json:"name,computed"`
+	OperatingStatus       types.String                                                                            `tfsdk:"operating_status" json:"operating_status,computed"`
 	PreferredConnectivity types.String                                                                            `tfsdk:"preferred_connectivity" json:"preferred_connectivity,computed"`
+	ProjectID             types.Int64                                                                             `tfsdk:"project_id" json:"project_id,computed"`
+	ProvisioningStatus    types.String                                                                            `tfsdk:"provisioning_status" json:"provisioning_status,computed"`
+	Region                types.String                                                                            `tfsdk:"region" json:"region,computed"`
+	RegionID              types.Int64                                                                             `tfsdk:"region_id" json:"region_id,computed"`
 	Stats                 customfield.NestedObject[CloudFloatingIPsLoadbalancerStatsDataSourceModel]              `tfsdk:"stats" json:"stats,computed"`
+	Tags                  customfield.NestedObjectList[CloudFloatingIPsLoadbalancerTagsDataSourceModel]           `tfsdk:"tags" json:"tags_v2,computed"`
 	UpdatedAt             timetypes.RFC3339                                                                       `tfsdk:"updated_at" json:"updated_at,computed" format:"date-time"`
 	VipAddress            types.String                                                                            `tfsdk:"vip_address" json:"vip_address,computed"`
 	VipFqdn               types.String                                                                            `tfsdk:"vip_fqdn" json:"vip_fqdn,computed"`
 	VipIPFamily           types.String                                                                            `tfsdk:"vip_ip_family" json:"vip_ip_family,computed"`
 	VipPortID             types.String                                                                            `tfsdk:"vip_port_id" json:"vip_port_id,computed"`
 	VrrpIPs               customfield.NestedObjectList[CloudFloatingIPsLoadbalancerVrrpIPsDataSourceModel]        `tfsdk:"vrrp_ips" json:"vrrp_ips,computed"`
-}
-
-type CloudFloatingIPsLoadbalancerTagsDataSourceModel struct {
-	Key      types.String `tfsdk:"key" json:"key,computed"`
-	ReadOnly types.Bool   `tfsdk:"read_only" json:"read_only,computed"`
-	Value    types.String `tfsdk:"value" json:"value,computed"`
 }
 
 type CloudFloatingIPsLoadbalancerAdditionalVipsDataSourceModel struct {
@@ -276,6 +270,12 @@ type CloudFloatingIPsLoadbalancerStatsDataSourceModel struct {
 	BytesOut          types.Int64 `tfsdk:"bytes_out" json:"bytes_out,computed"`
 	RequestErrors     types.Int64 `tfsdk:"request_errors" json:"request_errors,computed"`
 	TotalConnections  types.Int64 `tfsdk:"total_connections" json:"total_connections,computed"`
+}
+
+type CloudFloatingIPsLoadbalancerTagsDataSourceModel struct {
+	Key      types.String `tfsdk:"key" json:"key,computed"`
+	ReadOnly types.Bool   `tfsdk:"read_only" json:"read_only,computed"`
+	Value    types.String `tfsdk:"value" json:"value,computed"`
 }
 
 type CloudFloatingIPsLoadbalancerVrrpIPsDataSourceModel struct {

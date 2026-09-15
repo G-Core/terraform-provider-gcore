@@ -73,9 +73,9 @@ type CloudNetworkRouterExternalGatewayInfoExternalFixedIPsDataSourceModel struct
 
 type CloudNetworkRouterInterfacesDataSourceModel struct {
 	IPAssignments customfield.NestedObjectList[CloudNetworkRouterInterfacesIPAssignmentsDataSourceModel] `tfsdk:"ip_assignments" json:"ip_assignments,computed"`
+	MacAddress    types.String                                                                           `tfsdk:"mac_address" json:"mac_address,computed"`
 	NetworkID     types.String                                                                           `tfsdk:"network_id" json:"network_id,computed"`
 	PortID        types.String                                                                           `tfsdk:"port_id" json:"port_id,computed"`
-	MacAddress    types.String                                                                           `tfsdk:"mac_address" json:"mac_address,computed"`
 }
 
 type CloudNetworkRouterInterfacesIPAssignmentsDataSourceModel struct {

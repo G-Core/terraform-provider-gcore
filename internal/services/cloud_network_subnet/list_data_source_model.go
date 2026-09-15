@@ -65,9 +65,15 @@ func (m *CloudNetworkSubnetsDataSourceModel) toListParams(_ context.Context) (pa
 
 type CloudNetworkSubnetsItemsDataSourceModel struct {
 	ID             types.String                                                               `tfsdk:"id" json:"id,computed"`
+	AvailableIPs   types.Int64                                                                `tfsdk:"available_ips" json:"available_ips,computed"`
 	Cidr           types.String                                                               `tfsdk:"cidr" json:"cidr,computed"`
 	CreatedAt      timetypes.RFC3339                                                          `tfsdk:"created_at" json:"created_at,computed" format:"date-time"`
+	CreatorTaskID  types.String                                                               `tfsdk:"creator_task_id" json:"creator_task_id,computed"`
+	DNSNameservers customfield.List[types.String]                                             `tfsdk:"dns_nameservers" json:"dns_nameservers,computed"`
 	EnableDhcp     types.Bool                                                                 `tfsdk:"enable_dhcp" json:"enable_dhcp,computed"`
+	GatewayIP      types.String                                                               `tfsdk:"gateway_ip" json:"gateway_ip,computed"`
+	HasRouter      types.Bool                                                                 `tfsdk:"has_router" json:"has_router,computed"`
+	HostRoutes     customfield.NestedObjectList[CloudNetworkSubnetsHostRoutesDataSourceModel] `tfsdk:"host_routes" json:"host_routes,computed"`
 	IPVersion      types.Int64                                                                `tfsdk:"ip_version" json:"ip_version,computed"`
 	Name           types.String                                                               `tfsdk:"name" json:"name,computed"`
 	NetworkID      types.String                                                               `tfsdk:"network_id" json:"network_id,computed"`
@@ -75,23 +81,17 @@ type CloudNetworkSubnetsItemsDataSourceModel struct {
 	Region         types.String                                                               `tfsdk:"region" json:"region,computed"`
 	RegionID       types.Int64                                                                `tfsdk:"region_id" json:"region_id,computed"`
 	Tags           customfield.NestedObjectList[CloudNetworkSubnetsTagsDataSourceModel]       `tfsdk:"tags" json:"tags,computed"`
-	UpdatedAt      timetypes.RFC3339                                                          `tfsdk:"updated_at" json:"updated_at,computed" format:"date-time"`
-	AvailableIPs   types.Int64                                                                `tfsdk:"available_ips" json:"available_ips,computed"`
-	CreatorTaskID  types.String                                                               `tfsdk:"creator_task_id" json:"creator_task_id,computed"`
-	DNSNameservers customfield.List[types.String]                                             `tfsdk:"dns_nameservers" json:"dns_nameservers,computed"`
-	GatewayIP      types.String                                                               `tfsdk:"gateway_ip" json:"gateway_ip,computed"`
-	HasRouter      types.Bool                                                                 `tfsdk:"has_router" json:"has_router,computed"`
-	HostRoutes     customfield.NestedObjectList[CloudNetworkSubnetsHostRoutesDataSourceModel] `tfsdk:"host_routes" json:"host_routes,computed"`
 	TotalIPs       types.Int64                                                                `tfsdk:"total_ips" json:"total_ips,computed"`
+	UpdatedAt      timetypes.RFC3339                                                          `tfsdk:"updated_at" json:"updated_at,computed" format:"date-time"`
+}
+
+type CloudNetworkSubnetsHostRoutesDataSourceModel struct {
+	Destination types.String `tfsdk:"destination" json:"destination,computed"`
+	Nexthop     types.String `tfsdk:"nexthop" json:"nexthop,computed"`
 }
 
 type CloudNetworkSubnetsTagsDataSourceModel struct {
 	Key      types.String `tfsdk:"key" json:"key,computed"`
 	ReadOnly types.Bool   `tfsdk:"read_only" json:"read_only,computed"`
 	Value    types.String `tfsdk:"value" json:"value,computed"`
-}
-
-type CloudNetworkSubnetsHostRoutesDataSourceModel struct {
-	Destination types.String `tfsdk:"destination" json:"destination,computed"`
-	Nexthop     types.String `tfsdk:"nexthop" json:"nexthop,computed"`
 }

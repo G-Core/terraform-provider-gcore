@@ -53,9 +53,45 @@ func ListDataSourceSchema(ctx context.Context) schema.Schema {
 							Computed:    true,
 							CustomType:  timetypes.RFC3339Type{},
 						},
+						"creator_task_id": schema.StringAttribute{
+							Description: "Task that created this entity. Null when the router wasn't created via a tracked task.",
+							Computed:    true,
+						},
 						"distributed": schema.BoolAttribute{
 							Description: "Whether the router is distributed or centralized.",
 							Computed:    true,
+						},
+						"external_gateway_info": schema.SingleNestedAttribute{
+							Description: "State of this router's external gateway. Null when the router has no external gateway.",
+							Computed:    true,
+							CustomType:  customfield.NewNestedObjectType[CloudNetworkRoutersExternalGatewayInfoDataSourceModel](ctx),
+							Attributes: map[string]schema.Attribute{
+								"enable_snat": schema.BoolAttribute{
+									Description: "Is SNAT enabled.",
+									Computed:    true,
+								},
+								"external_fixed_ips": schema.ListNestedAttribute{
+									Description: "List of external IPs that emit SNAT-ed traffic.",
+									Computed:    true,
+									CustomType:  customfield.NewNestedObjectListType[CloudNetworkRoutersExternalGatewayInfoExternalFixedIPsDataSourceModel](ctx),
+									NestedObject: schema.NestedAttributeObject{
+										Attributes: map[string]schema.Attribute{
+											"ip_address": schema.StringAttribute{
+												Description: "IP address",
+												Computed:    true,
+											},
+											"subnet_id": schema.StringAttribute{
+												Description: "ID of the subnet that allocated the IP",
+												Computed:    true,
+											},
+										},
+									},
+								},
+								"network_id": schema.StringAttribute{
+									Description: "Id of the external network.",
+									Computed:    true,
+								},
+							},
 						},
 						"interfaces": schema.ListNestedAttribute{
 							Description: "List of router interfaces.",
@@ -80,16 +116,16 @@ func ListDataSourceSchema(ctx context.Context) schema.Schema {
 											},
 										},
 									},
+									"mac_address": schema.StringAttribute{
+										Description: "MAC address of the virtual port",
+										Computed:    true,
+									},
 									"network_id": schema.StringAttribute{
 										Description: "ID of the network the port is attached to",
 										Computed:    true,
 									},
 									"port_id": schema.StringAttribute{
 										Description: "ID of virtual ethernet port object",
-										Computed:    true,
-									},
-									"mac_address": schema.StringAttribute{
-										Description: "MAC address of the virtual port",
 										Computed:    true,
 									},
 								},
@@ -136,42 +172,6 @@ func ListDataSourceSchema(ctx context.Context) schema.Schema {
 							Description: "Datetime when the router was last updated",
 							Computed:    true,
 							CustomType:  timetypes.RFC3339Type{},
-						},
-						"creator_task_id": schema.StringAttribute{
-							Description: "Task that created this entity",
-							Computed:    true,
-						},
-						"external_gateway_info": schema.SingleNestedAttribute{
-							Description: "State of this router's external gateway.",
-							Computed:    true,
-							CustomType:  customfield.NewNestedObjectType[CloudNetworkRoutersExternalGatewayInfoDataSourceModel](ctx),
-							Attributes: map[string]schema.Attribute{
-								"enable_snat": schema.BoolAttribute{
-									Description: "Is SNAT enabled.",
-									Computed:    true,
-								},
-								"external_fixed_ips": schema.ListNestedAttribute{
-									Description: "List of external IPs that emit SNAT-ed traffic.",
-									Computed:    true,
-									CustomType:  customfield.NewNestedObjectListType[CloudNetworkRoutersExternalGatewayInfoExternalFixedIPsDataSourceModel](ctx),
-									NestedObject: schema.NestedAttributeObject{
-										Attributes: map[string]schema.Attribute{
-											"ip_address": schema.StringAttribute{
-												Description: "IP address",
-												Computed:    true,
-											},
-											"subnet_id": schema.StringAttribute{
-												Description: "ID of the subnet that allocated the IP",
-												Computed:    true,
-											},
-										},
-									},
-								},
-								"network_id": schema.StringAttribute{
-									Description: "Id of the external network.",
-									Computed:    true,
-								},
-							},
 						},
 					},
 				},

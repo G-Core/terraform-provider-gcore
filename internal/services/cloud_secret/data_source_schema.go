@@ -37,11 +37,11 @@ func DataSourceSchema(ctx context.Context) schema.Schema {
 				Optional:    true,
 			},
 			"algorithm": schema.StringAttribute{
-				Description: "Metadata provided by a user or system for informational purposes. Defaults to None",
+				Description: "Metadata provided by a user or system for informational purposes. Null when not specified at secret creation.",
 				Computed:    true,
 			},
 			"bit_length": schema.Int64Attribute{
-				Description: "Metadata provided by a user or system for informational purposes. Value must be greater than zero. Defaults to None",
+				Description: "Metadata provided by a user or system for informational purposes. Value must be greater than zero. Null when not specified at secret creation.",
 				Computed:    true,
 			},
 			"created": schema.StringAttribute{
@@ -50,12 +50,12 @@ func DataSourceSchema(ctx context.Context) schema.Schema {
 				CustomType:  timetypes.RFC3339Type{},
 			},
 			"expiration": schema.StringAttribute{
-				Description: "Datetime when the secret will expire. The format is 2020-01-01T12:00:00+00:00. Defaults to None",
+				Description: "Datetime when the secret will expire. The format is 2020-01-01T12:00:00+00:00. Null when no expiration was set.",
 				Computed:    true,
 				CustomType:  timetypes.RFC3339Type{},
 			},
 			"mode": schema.StringAttribute{
-				Description: "Metadata provided by a user or system for informational purposes. Defaults to None",
+				Description: "Metadata provided by a user or system for informational purposes. Null when not specified at secret creation.",
 				Computed:    true,
 			},
 			"name": schema.StringAttribute{
@@ -81,7 +81,7 @@ func DataSourceSchema(ctx context.Context) schema.Schema {
 				Computed:    true,
 			},
 			"content_types": schema.MapAttribute{
-				Description: "Describes the content-types that can be used to retrieve the payload. The content-type used with symmetric secrets is application/octet-stream",
+				Description: "Describes the content-types that can be used to retrieve the payload. The content-type used with symmetric secrets is application/octet-stream. Null until the secret has a payload.",
 				Computed:    true,
 				CustomType:  customfield.NewMapType[types.String](ctx),
 				ElementType: types.StringType,

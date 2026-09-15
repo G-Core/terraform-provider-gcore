@@ -152,6 +152,27 @@ func DataSourceSchema(ctx context.Context) schema.Schema {
 						Description: "Domain name for HTTP host header. Can only be used together with `HTTP` or `HTTPS` health monitor type.",
 						Computed:    true,
 					},
+					"expected_codes": schema.StringAttribute{
+						Description: "Expected HTTP response codes. Can be a single code, a comma-separated list of codes, or a single range of codes. Can only be used together with `HTTP` or `HTTPS` health monitor type. For example, 200, 200,202,401,403,404, or 200-204. If not specified, the default is 200. Null for non-HTTP(S) health monitor types.",
+						Computed:    true,
+					},
+					"http_method": schema.StringAttribute{
+						Description: "HTTP method. Null for non-HTTP(S) health monitor types.\nAvailable values: \"CONNECT\", \"DELETE\", \"GET\", \"HEAD\", \"OPTIONS\", \"PATCH\", \"POST\", \"PUT\", \"TRACE\".",
+						Computed:    true,
+						Validators: []validator.String{
+							stringvalidator.OneOfCaseInsensitive(
+								"CONNECT",
+								"DELETE",
+								"GET",
+								"HEAD",
+								"OPTIONS",
+								"PATCH",
+								"POST",
+								"PUT",
+								"TRACE",
+							),
+						},
+					},
 					"http_version": schema.StringAttribute{
 						Description: "HTTP version. Can only be used together with `HTTP` or `HTTPS` health monitor type.\nAvailable values: \"1.0\", \"1.1\".",
 						Computed:    true,
@@ -223,29 +244,8 @@ func DataSourceSchema(ctx context.Context) schema.Schema {
 							),
 						},
 					},
-					"expected_codes": schema.StringAttribute{
-						Description: "Expected HTTP response codes. Can be a single code or a range of codes. Can only be used together with `HTTP` or `HTTPS` health monitor type. For example, 200,202,300-302,401,403,404,500-504. If not specified, the default is 200.",
-						Computed:    true,
-					},
-					"http_method": schema.StringAttribute{
-						Description: "HTTP method\nAvailable values: \"CONNECT\", \"DELETE\", \"GET\", \"HEAD\", \"OPTIONS\", \"PATCH\", \"POST\", \"PUT\", \"TRACE\".",
-						Computed:    true,
-						Validators: []validator.String{
-							stringvalidator.OneOfCaseInsensitive(
-								"CONNECT",
-								"DELETE",
-								"GET",
-								"HEAD",
-								"OPTIONS",
-								"PATCH",
-								"POST",
-								"PUT",
-								"TRACE",
-							),
-						},
-					},
 					"url_path": schema.StringAttribute{
-						Description: "URL Path. Defaults to '/'",
+						Description: "URL Path. Defaults to '/'. Null for non-HTTP(S) health monitor types.",
 						Computed:    true,
 					},
 				},
@@ -364,6 +364,18 @@ func DataSourceSchema(ctx context.Context) schema.Schema {
 				Computed:    true,
 				CustomType:  customfield.NewNestedObjectType[CloudLoadBalancerPoolSessionPersistenceDataSourceModel](ctx),
 				Attributes: map[string]schema.Attribute{
+					"cookie_name": schema.StringAttribute{
+						Description: "Should be set if app cookie or http cookie is used. Null otherwise.",
+						Computed:    true,
+					},
+					"persistence_granularity": schema.StringAttribute{
+						Description: "Subnet mask if `source_ip` is used. For UDP ports only, null otherwise.",
+						Computed:    true,
+					},
+					"persistence_timeout": schema.Int64Attribute{
+						Description: "Session persistence timeout. For UDP ports only, null otherwise.",
+						Computed:    true,
+					},
 					"type": schema.StringAttribute{
 						Description: "Session persistence type\nAvailable values: \"APP_COOKIE\", \"HTTP_COOKIE\", \"SOURCE_IP\".",
 						Computed:    true,
@@ -374,18 +386,6 @@ func DataSourceSchema(ctx context.Context) schema.Schema {
 								"SOURCE_IP",
 							),
 						},
-					},
-					"cookie_name": schema.StringAttribute{
-						Description: "Should be set if app cookie or http cookie is used",
-						Computed:    true,
-					},
-					"persistence_granularity": schema.StringAttribute{
-						Description: "Subnet mask if `source_ip` is used. For UDP ports only",
-						Computed:    true,
-					},
-					"persistence_timeout": schema.Int64Attribute{
-						Description: "Session persistence timeout. For UDP ports only",
-						Computed:    true,
 					},
 				},
 			},

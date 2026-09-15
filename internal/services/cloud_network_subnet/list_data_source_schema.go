@@ -88,6 +88,10 @@ func ListDataSourceSchema(ctx context.Context) schema.Schema {
 							Description: "Subnet id.",
 							Computed:    true,
 						},
+						"available_ips": schema.Int64Attribute{
+							Description: "Number of available ips in subnet. Null when this data isn't available.",
+							Computed:    true,
+						},
 						"cidr": schema.StringAttribute{
 							Description: "CIDR",
 							Computed:    true,
@@ -97,9 +101,45 @@ func ListDataSourceSchema(ctx context.Context) schema.Schema {
 							Computed:    true,
 							CustomType:  timetypes.RFC3339Type{},
 						},
+						"creator_task_id": schema.StringAttribute{
+							Description: "Task that created this entity. Null when the subnet wasn't created via a tracked task.",
+							Computed:    true,
+						},
+						"dns_nameservers": schema.ListAttribute{
+							Description: "List IP addresses of a DNS resolver reachable from the network",
+							Computed:    true,
+							CustomType:  customfield.NewListType[types.String](ctx),
+							ElementType: types.StringType,
+						},
 						"enable_dhcp": schema.BoolAttribute{
 							Description: "True if DHCP should be enabled",
 							Computed:    true,
+						},
+						"gateway_ip": schema.StringAttribute{
+							Description: "Default GW IPv4 address, advertised in DHCP routes of this subnet. If null, no gateway is advertised by this subnet.",
+							Computed:    true,
+						},
+						"has_router": schema.BoolAttribute{
+							Description:        "Deprecated. Always returns `false`.",
+							Computed:           true,
+							DeprecationMessage: "This attribute is deprecated.",
+						},
+						"host_routes": schema.ListNestedAttribute{
+							Description: "List of custom static routes to advertise via DHCP.",
+							Computed:    true,
+							CustomType:  customfield.NewNestedObjectListType[CloudNetworkSubnetsHostRoutesDataSourceModel](ctx),
+							NestedObject: schema.NestedAttributeObject{
+								Attributes: map[string]schema.Attribute{
+									"destination": schema.StringAttribute{
+										Description: "CIDR of destination IPv4 or IPv6 subnet.",
+										Computed:    true,
+									},
+									"nexthop": schema.StringAttribute{
+										Description: "IPv4 or IPv6 address to forward traffic to if it's destination IP matches 'destination' CIDR.",
+										Computed:    true,
+									},
+								},
+							},
 						},
 						"ip_version": schema.Int64Attribute{
 							Description: "IP version\nAvailable values: 4, 6.",
@@ -149,54 +189,14 @@ func ListDataSourceSchema(ctx context.Context) schema.Schema {
 								},
 							},
 						},
+						"total_ips": schema.Int64Attribute{
+							Description: "Total number of ips in subnet. Null when this data isn't available.",
+							Computed:    true,
+						},
 						"updated_at": schema.StringAttribute{
 							Description: "Datetime when the subnet was last updated",
 							Computed:    true,
 							CustomType:  timetypes.RFC3339Type{},
-						},
-						"available_ips": schema.Int64Attribute{
-							Description: "Number of available ips in subnet",
-							Computed:    true,
-						},
-						"creator_task_id": schema.StringAttribute{
-							Description: "Task that created this entity",
-							Computed:    true,
-						},
-						"dns_nameservers": schema.ListAttribute{
-							Description: "List IP addresses of a DNS resolver reachable from the network",
-							Computed:    true,
-							CustomType:  customfield.NewListType[types.String](ctx),
-							ElementType: types.StringType,
-						},
-						"gateway_ip": schema.StringAttribute{
-							Description: "Default GW IPv4 address, advertised in DHCP routes of this subnet. If null, no gateway is advertised by this subnet.",
-							Computed:    true,
-						},
-						"has_router": schema.BoolAttribute{
-							Description:        "Deprecated. Always returns `false`.",
-							Computed:           true,
-							DeprecationMessage: "This attribute is deprecated.",
-						},
-						"host_routes": schema.ListNestedAttribute{
-							Description: "List of custom static routes to advertise via DHCP.",
-							Computed:    true,
-							CustomType:  customfield.NewNestedObjectListType[CloudNetworkSubnetsHostRoutesDataSourceModel](ctx),
-							NestedObject: schema.NestedAttributeObject{
-								Attributes: map[string]schema.Attribute{
-									"destination": schema.StringAttribute{
-										Description: "CIDR of destination IPv4 or IPv6 subnet.",
-										Computed:    true,
-									},
-									"nexthop": schema.StringAttribute{
-										Description: "IPv4 or IPv6 address to forward traffic to if it's destination IP matches 'destination' CIDR.",
-										Computed:    true,
-									},
-								},
-							},
-						},
-						"total_ips": schema.Int64Attribute{
-							Description: "Total number of ips in subnet",
-							Computed:    true,
 						},
 					},
 				},

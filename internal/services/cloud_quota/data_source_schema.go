@@ -451,6 +451,14 @@ func DataSourceSchema(ctx context.Context) schema.Schema {
 							Description: "Basic VMs Count usage",
 							Computed:    true,
 						},
+						"slurm_cluster_count_limit": schema.Int64Attribute{
+							Description: "Slurm cluster count limit for this region. 0 disables Slurm in this region.",
+							Computed:    true,
+						},
+						"slurm_cluster_count_usage": schema.Int64Attribute{
+							Description: "Slurm cluster count usage",
+							Computed:    true,
+						},
 						"snapshot_schedule_count_limit": schema.Int64Attribute{
 							Description: "Snapshot Schedules Count limit",
 							Computed:    true,

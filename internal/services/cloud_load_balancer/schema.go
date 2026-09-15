@@ -145,7 +145,7 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 				PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
 			},
 			"creator_task_id": schema.StringAttribute{
-				Description:   "Task that created this entity",
+				Description:   "Task that created this entity. Null when the load balancer wasn't created via a tracked task.",
 				Computed:      true,
 				PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
 			},
@@ -189,7 +189,7 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 				PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
 			},
 			"vip_fqdn": schema.StringAttribute{
-				Description:   "Fully qualified domain name for the load balancer VIP",
+				Description:   "Fully qualified domain name for the load balancer VIP. Null when no FQDN is assigned.",
 				Computed:      true,
 				PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
 			},
@@ -227,11 +227,11 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 							CustomType:  timetypes.RFC3339Type{},
 						},
 						"creator_task_id": schema.StringAttribute{
-							Description: "Task that created this entity",
+							Description: "Task that created this entity. Null when the floating IP wasn't created via a tracked task.",
 							Computed:    true,
 						},
 						"fixed_ip_address": schema.StringAttribute{
-							Description: "IP address of the port the floating IP is attached to",
+							Description: "IP address of the port the floating IP is attached to. Null when the floating IP is not attached to a port.",
 							Computed:    true,
 						},
 						"floating_ip_address": schema.StringAttribute{
@@ -239,7 +239,7 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 							Computed:    true,
 						},
 						"port_id": schema.StringAttribute{
-							Description: "Port ID the floating IP is attached to. The `fixed_ip_address` is the IP address of the port.",
+							Description: "Port ID the floating IP is attached to. The `fixed_ip_address` is the IP address of the port. Null when the floating IP is not attached to a port.",
 							Computed:    true,
 						},
 						"project_id": schema.Int64Attribute{
@@ -255,7 +255,7 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 							Computed:    true,
 						},
 						"router_id": schema.StringAttribute{
-							Description: "Router ID",
+							Description: "Router ID. Null when the floating IP is not attached to a port.",
 							Computed:    true,
 						},
 						"status": schema.StringAttribute{

@@ -131,7 +131,7 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 				PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
 			},
 			"creator_task_id": schema.StringAttribute{
-				Description:   "Task that created this entity",
+				Description:   "Task that created this entity. Null when the router wasn't created via a tracked task.",
 				Computed:      true,
 				PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
 			},

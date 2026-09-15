@@ -69,22 +69,22 @@ type CloudReservedFixedIPsItemsDataSourceModel struct {
 	AllowedAddressPairs customfield.NestedObjectList[CloudReservedFixedIPsAllowedAddressPairsDataSourceModel] `tfsdk:"allowed_address_pairs" json:"allowed_address_pairs,computed"`
 	Attachments         customfield.NestedObjectList[CloudReservedFixedIPsAttachmentsDataSourceModel]         `tfsdk:"attachments" json:"attachments,computed"`
 	CreatedAt           timetypes.RFC3339                                                                     `tfsdk:"created_at" json:"created_at,computed" format:"date-time"`
+	CreatorTaskID       types.String                                                                          `tfsdk:"creator_task_id" json:"creator_task_id,computed"`
+	FixedIPAddress      types.String                                                                          `tfsdk:"fixed_ip_address" json:"fixed_ip_address,computed"`
+	FixedIpv6Address    types.String                                                                          `tfsdk:"fixed_ipv6_address" json:"fixed_ipv6_address,computed"`
 	IsExternal          types.Bool                                                                            `tfsdk:"is_external" json:"is_external,computed"`
 	IsVip               types.Bool                                                                            `tfsdk:"is_vip" json:"is_vip,computed"`
 	Name                types.String                                                                          `tfsdk:"name" json:"name,computed"`
 	Network             customfield.NestedObject[CloudReservedFixedIPsNetworkDataSourceModel]                 `tfsdk:"network" json:"network,computed"`
 	NetworkID           types.String                                                                          `tfsdk:"network_id" json:"network_id,computed"`
 	PortID              types.String                                                                          `tfsdk:"port_id" json:"port_id,computed"`
+	ProjectID           types.Int64                                                                           `tfsdk:"project_id" json:"project_id,computed"`
 	Region              types.String                                                                          `tfsdk:"region" json:"region,computed"`
 	RegionID            types.Int64                                                                           `tfsdk:"region_id" json:"region_id,computed"`
 	Status              types.String                                                                          `tfsdk:"status" json:"status,computed"`
-	UpdatedAt           timetypes.RFC3339                                                                     `tfsdk:"updated_at" json:"updated_at,computed" format:"date-time"`
-	CreatorTaskID       types.String                                                                          `tfsdk:"creator_task_id" json:"creator_task_id,computed"`
-	FixedIPAddress      types.String                                                                          `tfsdk:"fixed_ip_address" json:"fixed_ip_address,computed"`
-	FixedIpv6Address    types.String                                                                          `tfsdk:"fixed_ipv6_address" json:"fixed_ipv6_address,computed"`
-	ProjectID           types.Int64                                                                           `tfsdk:"project_id" json:"project_id,computed"`
 	SubnetID            types.String                                                                          `tfsdk:"subnet_id" json:"subnet_id,computed"`
 	SubnetV6ID          types.String                                                                          `tfsdk:"subnet_v6_id" json:"subnet_v6_id,computed"`
+	UpdatedAt           timetypes.RFC3339                                                                     `tfsdk:"updated_at" json:"updated_at,computed" format:"date-time"`
 }
 
 type CloudReservedFixedIPsAllowedAddressPairsDataSourceModel struct {

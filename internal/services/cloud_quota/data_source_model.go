@@ -121,6 +121,8 @@ type CloudQuotaRegionalQuotasDataSourceModel struct {
 	SfsSizeUsage                      types.Int64 `tfsdk:"sfs_size_usage" json:"sfs_size_usage,computed"`
 	SharedVmCountLimit                types.Int64 `tfsdk:"shared_vm_count_limit" json:"shared_vm_count_limit,computed"`
 	SharedVmCountUsage                types.Int64 `tfsdk:"shared_vm_count_usage" json:"shared_vm_count_usage,computed"`
+	SlurmClusterCountLimit            types.Int64 `tfsdk:"slurm_cluster_count_limit" json:"slurm_cluster_count_limit,computed"`
+	SlurmClusterCountUsage            types.Int64 `tfsdk:"slurm_cluster_count_usage" json:"slurm_cluster_count_usage,computed"`
 	SnapshotScheduleCountLimit        types.Int64 `tfsdk:"snapshot_schedule_count_limit" json:"snapshot_schedule_count_limit,computed"`
 	SnapshotScheduleCountUsage        types.Int64 `tfsdk:"snapshot_schedule_count_usage" json:"snapshot_schedule_count_usage,computed"`
 	SubnetCountLimit                  types.Int64 `tfsdk:"subnet_count_limit" json:"subnet_count_limit,computed"`

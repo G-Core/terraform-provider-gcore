@@ -36,15 +36,15 @@ func DataSourceSchema(ctx context.Context) schema.Schema {
 				CustomType:  timetypes.RFC3339Type{},
 			},
 			"creator_task_id": schema.StringAttribute{
-				Description: "Task that created this entity",
+				Description: "Task that created this entity. Null when the reservation wasn't created via a tracked task.",
 				Computed:    true,
 			},
 			"fixed_ip_address": schema.StringAttribute{
-				Description: "IPv4 address of the reserved fixed IP",
+				Description: "IPv4 address of the reserved fixed IP. Null when the reservation has no IPv4 address.",
 				Computed:    true,
 			},
 			"fixed_ipv6_address": schema.StringAttribute{
-				Description: "IPv6 address of the reserved fixed IP",
+				Description: "IPv6 address of the reserved fixed IP. Null when the reservation has no IPv6 address.",
 				Computed:    true,
 			},
 			"is_external": schema.BoolAttribute{
@@ -72,11 +72,11 @@ func DataSourceSchema(ctx context.Context) schema.Schema {
 				Computed:    true,
 			},
 			"subnet_id": schema.StringAttribute{
-				Description: "ID of the subnet that owns the IP address",
+				Description: "ID of the subnet that owns the IP address. Null when the reservation has no IPv4 address.",
 				Computed:    true,
 			},
 			"subnet_v6_id": schema.StringAttribute{
-				Description: "ID of the subnet that owns the IPv6 address",
+				Description: "ID of the subnet that owns the IPv6 address. Null when the reservation has no IPv6 address.",
 				Computed:    true,
 			},
 			"updated_at": schema.StringAttribute{
@@ -95,7 +95,7 @@ func DataSourceSchema(ctx context.Context) schema.Schema {
 							Computed:    true,
 						},
 						"mac_address": schema.StringAttribute{
-							Description: "MAC address of the port specified in `allowed_address_pairs`",
+							Description: "MAC address of the port specified in `allowed_address_pairs`. Null when the pair has no explicit MAC.",
 							Computed:    true,
 						},
 					},
@@ -108,11 +108,11 @@ func DataSourceSchema(ctx context.Context) schema.Schema {
 				NestedObject: schema.NestedAttributeObject{
 					Attributes: map[string]schema.Attribute{
 						"resource_id": schema.StringAttribute{
-							Description: "Resource ID",
+							Description: "Resource ID. Null when the attachment's resource is unknown.",
 							Computed:    true,
 						},
 						"resource_type": schema.StringAttribute{
-							Description: "Resource type",
+							Description: "Resource type. Null when the attachment's resource type is unknown.",
 							Computed:    true,
 						},
 					},

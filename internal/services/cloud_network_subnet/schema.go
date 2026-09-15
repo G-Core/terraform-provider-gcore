@@ -105,7 +105,7 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 				},
 			},
 			"available_ips": schema.Int64Attribute{
-				Description: "Number of available ips in subnet",
+				Description: "Number of available ips in subnet. Null when this data isn't available.",
 				Computed:    true,
 			},
 			"created_at": schema.StringAttribute{
@@ -114,21 +114,20 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 				CustomType:  timetypes.RFC3339Type{},
 			},
 			"creator_task_id": schema.StringAttribute{
-				Description: "Task that created this entity",
+				Description: "Task that created this entity. Null when the subnet wasn't created via a tracked task.",
 				Computed:    true,
 			},
 			"has_router": schema.BoolAttribute{
 				Description:        "Deprecated. Always returns `false`.",
 				Computed:           true,
 				DeprecationMessage: "This attribute is deprecated.",
-				Default:            booldefault.StaticBool(false),
 			},
 			"region": schema.StringAttribute{
 				Description: "Region name",
 				Computed:    true,
 			},
 			"total_ips": schema.Int64Attribute{
-				Description: "Total number of ips in subnet",
+				Description: "Total number of ips in subnet. Null when this data isn't available.",
 				Computed:    true,
 			},
 			"updated_at": schema.StringAttribute{

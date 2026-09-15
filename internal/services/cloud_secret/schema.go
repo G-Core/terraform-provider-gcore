@@ -81,11 +81,11 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 				PlanModifiers: []planmodifier.String{stringplanmodifier.RequiresReplace()},
 			},
 			"algorithm": schema.StringAttribute{
-				Description: "Metadata provided by a user or system for informational purposes. Defaults to None",
+				Description: "Metadata provided by a user or system for informational purposes. Null when not specified at secret creation.",
 				Computed:    true,
 			},
 			"bit_length": schema.Int64Attribute{
-				Description: "Metadata provided by a user or system for informational purposes. Value must be greater than zero. Defaults to None",
+				Description: "Metadata provided by a user or system for informational purposes. Value must be greater than zero. Null when not specified at secret creation.",
 				Computed:    true,
 			},
 			"created": schema.StringAttribute{
@@ -94,7 +94,7 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 				CustomType:  timetypes.RFC3339Type{},
 			},
 			"mode": schema.StringAttribute{
-				Description: "Metadata provided by a user or system for informational purposes. Defaults to None",
+				Description: "Metadata provided by a user or system for informational purposes. Null when not specified at secret creation.",
 				Computed:    true,
 			},
 			"secret_type": schema.StringAttribute{
@@ -116,7 +116,7 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 				Computed:    true,
 			},
 			"content_types": schema.MapAttribute{
-				Description: "Describes the content-types that can be used to retrieve the payload. The content-type used with symmetric secrets is application/octet-stream",
+				Description: "Describes the content-types that can be used to retrieve the payload. The content-type used with symmetric secrets is application/octet-stream. Null until the secret has a payload.",
 				Computed:    true,
 				CustomType:  customfield.NewMapType[types.String](ctx),
 				ElementType: types.StringType,

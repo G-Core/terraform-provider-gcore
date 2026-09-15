@@ -80,6 +80,8 @@ type CloudLoadBalancerPoolHealthmonitorDataSourceModel struct {
 	AdminStateUp       types.Bool   `tfsdk:"admin_state_up" json:"admin_state_up,computed"`
 	Delay              types.Int64  `tfsdk:"delay" json:"delay,computed"`
 	DomainName         types.String `tfsdk:"domain_name" json:"domain_name,computed"`
+	ExpectedCodes      types.String `tfsdk:"expected_codes" json:"expected_codes,computed"`
+	HTTPMethod         types.String `tfsdk:"http_method" json:"http_method,computed"`
 	HTTPVersion        types.String `tfsdk:"http_version" json:"http_version,computed"`
 	MaxRetries         types.Int64  `tfsdk:"max_retries" json:"max_retries,computed"`
 	MaxRetriesDown     types.Int64  `tfsdk:"max_retries_down" json:"max_retries_down,computed"`
@@ -87,8 +89,6 @@ type CloudLoadBalancerPoolHealthmonitorDataSourceModel struct {
 	ProvisioningStatus types.String `tfsdk:"provisioning_status" json:"provisioning_status,computed"`
 	Timeout            types.Int64  `tfsdk:"timeout" json:"timeout,computed"`
 	Type               types.String `tfsdk:"type" json:"type,computed"`
-	ExpectedCodes      types.String `tfsdk:"expected_codes" json:"expected_codes,computed"`
-	HTTPMethod         types.String `tfsdk:"http_method" json:"http_method,computed"`
 	URLPath            types.String `tfsdk:"url_path" json:"url_path,computed"`
 }
 
@@ -115,10 +115,10 @@ type CloudLoadBalancerPoolMembersDataSourceModel struct {
 }
 
 type CloudLoadBalancerPoolSessionPersistenceDataSourceModel struct {
-	Type                   types.String `tfsdk:"type" json:"type,computed"`
 	CookieName             types.String `tfsdk:"cookie_name" json:"cookie_name,computed"`
 	PersistenceGranularity types.String `tfsdk:"persistence_granularity" json:"persistence_granularity,computed"`
 	PersistenceTimeout     types.Int64  `tfsdk:"persistence_timeout" json:"persistence_timeout,computed"`
+	Type                   types.String `tfsdk:"type" json:"type,computed"`
 }
 
 type CloudLoadBalancerPoolFindOneByDataSourceModel struct {

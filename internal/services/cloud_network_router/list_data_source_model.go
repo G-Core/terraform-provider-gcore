@@ -44,7 +44,9 @@ func (m *CloudNetworkRoutersDataSourceModel) toListParams(_ context.Context) (pa
 type CloudNetworkRoutersItemsDataSourceModel struct {
 	ID                  types.String                                                                    `tfsdk:"id" json:"id,computed"`
 	CreatedAt           timetypes.RFC3339                                                               `tfsdk:"created_at" json:"created_at,computed" format:"date-time"`
+	CreatorTaskID       types.String                                                                    `tfsdk:"creator_task_id" json:"creator_task_id,computed"`
 	Distributed         types.Bool                                                                      `tfsdk:"distributed" json:"distributed,computed"`
+	ExternalGatewayInfo customfield.NestedObject[CloudNetworkRoutersExternalGatewayInfoDataSourceModel] `tfsdk:"external_gateway_info" json:"external_gateway_info,computed"`
 	Interfaces          customfield.NestedObjectList[CloudNetworkRoutersInterfacesDataSourceModel]      `tfsdk:"interfaces" json:"interfaces,computed"`
 	Name                types.String                                                                    `tfsdk:"name" json:"name,computed"`
 	ProjectID           types.Int64                                                                     `tfsdk:"project_id" json:"project_id,computed"`
@@ -53,25 +55,6 @@ type CloudNetworkRoutersItemsDataSourceModel struct {
 	Routes              customfield.NestedObjectList[CloudNetworkRoutersRoutesDataSourceModel]          `tfsdk:"routes" json:"routes,computed"`
 	Status              types.String                                                                    `tfsdk:"status" json:"status,computed"`
 	UpdatedAt           timetypes.RFC3339                                                               `tfsdk:"updated_at" json:"updated_at,computed" format:"date-time"`
-	CreatorTaskID       types.String                                                                    `tfsdk:"creator_task_id" json:"creator_task_id,computed"`
-	ExternalGatewayInfo customfield.NestedObject[CloudNetworkRoutersExternalGatewayInfoDataSourceModel] `tfsdk:"external_gateway_info" json:"external_gateway_info,computed"`
-}
-
-type CloudNetworkRoutersInterfacesDataSourceModel struct {
-	IPAssignments customfield.NestedObjectList[CloudNetworkRoutersInterfacesIPAssignmentsDataSourceModel] `tfsdk:"ip_assignments" json:"ip_assignments,computed"`
-	NetworkID     types.String                                                                            `tfsdk:"network_id" json:"network_id,computed"`
-	PortID        types.String                                                                            `tfsdk:"port_id" json:"port_id,computed"`
-	MacAddress    types.String                                                                            `tfsdk:"mac_address" json:"mac_address,computed"`
-}
-
-type CloudNetworkRoutersInterfacesIPAssignmentsDataSourceModel struct {
-	IPAddress types.String `tfsdk:"ip_address" json:"ip_address,computed"`
-	SubnetID  types.String `tfsdk:"subnet_id" json:"subnet_id,computed"`
-}
-
-type CloudNetworkRoutersRoutesDataSourceModel struct {
-	Destination types.String `tfsdk:"destination" json:"destination,computed"`
-	Nexthop     types.String `tfsdk:"nexthop" json:"nexthop,computed"`
 }
 
 type CloudNetworkRoutersExternalGatewayInfoDataSourceModel struct {
@@ -83,4 +66,21 @@ type CloudNetworkRoutersExternalGatewayInfoDataSourceModel struct {
 type CloudNetworkRoutersExternalGatewayInfoExternalFixedIPsDataSourceModel struct {
 	IPAddress types.String `tfsdk:"ip_address" json:"ip_address,computed"`
 	SubnetID  types.String `tfsdk:"subnet_id" json:"subnet_id,computed"`
+}
+
+type CloudNetworkRoutersInterfacesDataSourceModel struct {
+	IPAssignments customfield.NestedObjectList[CloudNetworkRoutersInterfacesIPAssignmentsDataSourceModel] `tfsdk:"ip_assignments" json:"ip_assignments,computed"`
+	MacAddress    types.String                                                                            `tfsdk:"mac_address" json:"mac_address,computed"`
+	NetworkID     types.String                                                                            `tfsdk:"network_id" json:"network_id,computed"`
+	PortID        types.String                                                                            `tfsdk:"port_id" json:"port_id,computed"`
+}
+
+type CloudNetworkRoutersInterfacesIPAssignmentsDataSourceModel struct {
+	IPAddress types.String `tfsdk:"ip_address" json:"ip_address,computed"`
+	SubnetID  types.String `tfsdk:"subnet_id" json:"subnet_id,computed"`
+}
+
+type CloudNetworkRoutersRoutesDataSourceModel struct {
+	Destination types.String `tfsdk:"destination" json:"destination,computed"`
+	Nexthop     types.String `tfsdk:"nexthop" json:"nexthop,computed"`
 }

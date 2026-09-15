@@ -125,80 +125,6 @@ func ListDataSourceSchema(ctx context.Context) schema.Schema {
 							Description: "Load balancer ID",
 							Computed:    true,
 						},
-						"admin_state_up": schema.BoolAttribute{
-							Description: "Administrative state of the resource. When set to true, the resource is enabled and operational. When set to false, the resource is disabled and will not process traffic. Defaults to true.",
-							Computed:    true,
-						},
-						"created_at": schema.StringAttribute{
-							Description: "Datetime when the load balancer was created",
-							Computed:    true,
-							CustomType:  timetypes.RFC3339Type{},
-						},
-						"name": schema.StringAttribute{
-							Description: "Load balancer name",
-							Computed:    true,
-						},
-						"operating_status": schema.StringAttribute{
-							Description: "Load balancer operating status\nAvailable values: \"DEGRADED\", \"DRAINING\", \"ERROR\", \"NO_MONITOR\", \"OFFLINE\", \"ONLINE\".",
-							Computed:    true,
-							Validators: []validator.String{
-								stringvalidator.OneOfCaseInsensitive(
-									"DEGRADED",
-									"DRAINING",
-									"ERROR",
-									"NO_MONITOR",
-									"OFFLINE",
-									"ONLINE",
-								),
-							},
-						},
-						"project_id": schema.Int64Attribute{
-							Description: "Project ID",
-							Computed:    true,
-						},
-						"provisioning_status": schema.StringAttribute{
-							Description: "Load balancer lifecycle status\nAvailable values: \"ACTIVE\", \"DELETED\", \"ERROR\", \"PENDING_CREATE\", \"PENDING_DELETE\", \"PENDING_UPDATE\".",
-							Computed:    true,
-							Validators: []validator.String{
-								stringvalidator.OneOfCaseInsensitive(
-									"ACTIVE",
-									"DELETED",
-									"ERROR",
-									"PENDING_CREATE",
-									"PENDING_DELETE",
-									"PENDING_UPDATE",
-								),
-							},
-						},
-						"region": schema.StringAttribute{
-							Description: "Region name",
-							Computed:    true,
-						},
-						"region_id": schema.Int64Attribute{
-							Description: "Region ID",
-							Computed:    true,
-						},
-						"tags": schema.ListNestedAttribute{
-							Description: "List of key-value tags associated with the resource. A tag is a key-value pair that can be associated with a resource, enabling efficient filtering and grouping for better organization and management. Some tags are read-only and cannot be modified by the user. Tags are also integrated with cost reports, allowing cost data to be filtered based on tag keys or values.",
-							Computed:    true,
-							CustomType:  customfield.NewNestedObjectListType[CloudLoadBalancersTagsDataSourceModel](ctx),
-							NestedObject: schema.NestedAttributeObject{
-								Attributes: map[string]schema.Attribute{
-									"key": schema.StringAttribute{
-										Description: "Tag key. Maximum 255 characters. Cannot contain spaces, tabs, newlines, empty string or '=' character.",
-										Computed:    true,
-									},
-									"read_only": schema.BoolAttribute{
-										Description: "If true, the tag is read-only and cannot be modified by the user",
-										Computed:    true,
-									},
-									"value": schema.StringAttribute{
-										Description: "Tag value. Maximum 255 characters. Cannot contain spaces, tabs, newlines, empty string or '=' character.",
-										Computed:    true,
-									},
-								},
-							},
-						},
 						"additional_vips": schema.ListNestedAttribute{
 							Description: "List of additional IP addresses",
 							Computed:    true,
@@ -216,12 +142,21 @@ func ListDataSourceSchema(ctx context.Context) schema.Schema {
 								},
 							},
 						},
+						"admin_state_up": schema.BoolAttribute{
+							Description: "Administrative state of the resource. When set to true, the resource is enabled and operational. When set to false, the resource is disabled and will not process traffic. Defaults to true.",
+							Computed:    true,
+						},
+						"created_at": schema.StringAttribute{
+							Description: "Datetime when the load balancer was created",
+							Computed:    true,
+							CustomType:  timetypes.RFC3339Type{},
+						},
 						"creator_task_id": schema.StringAttribute{
-							Description: "Task that created this entity",
+							Description: "Task that created this entity. Null when the load balancer wasn't created via a tracked task.",
 							Computed:    true,
 						},
 						"flavor": schema.SingleNestedAttribute{
-							Description: "Load balancer flavor (if not default)",
+							Description: "Load balancer flavor. Null when using the default flavor.",
 							Computed:    true,
 							CustomType:  customfield.NewNestedObjectType[CloudLoadBalancersFlavorDataSourceModel](ctx),
 							Attributes: map[string]schema.Attribute{
@@ -259,11 +194,11 @@ func ListDataSourceSchema(ctx context.Context) schema.Schema {
 										CustomType:  timetypes.RFC3339Type{},
 									},
 									"creator_task_id": schema.StringAttribute{
-										Description: "Task that created this entity",
+										Description: "Task that created this entity. Null when the floating IP wasn't created via a tracked task.",
 										Computed:    true,
 									},
 									"fixed_ip_address": schema.StringAttribute{
-										Description: "IP address of the port the floating IP is attached to",
+										Description: "IP address of the port the floating IP is attached to. Null when the floating IP is not attached to a port.",
 										Computed:    true,
 									},
 									"floating_ip_address": schema.StringAttribute{
@@ -271,7 +206,7 @@ func ListDataSourceSchema(ctx context.Context) schema.Schema {
 										Computed:    true,
 									},
 									"port_id": schema.StringAttribute{
-										Description: "Port ID the floating IP is attached to. The `fixed_ip_address` is the IP address of the port.",
+										Description: "Port ID the floating IP is attached to. The `fixed_ip_address` is the IP address of the port. Null when the floating IP is not attached to a port.",
 										Computed:    true,
 									},
 									"project_id": schema.Int64Attribute{
@@ -287,7 +222,7 @@ func ListDataSourceSchema(ctx context.Context) schema.Schema {
 										Computed:    true,
 									},
 									"router_id": schema.StringAttribute{
-										Description: "Router ID",
+										Description: "Router ID. Null when the floating IP is not attached to a port.",
 										Computed:    true,
 									},
 									"status": schema.StringAttribute{
@@ -344,7 +279,7 @@ func ListDataSourceSchema(ctx context.Context) schema.Schema {
 							},
 						},
 						"logging": schema.SingleNestedAttribute{
-							Description: "Logging configuration",
+							Description: "Logging configuration. Null when logging isn't configured.",
 							Computed:    true,
 							CustomType:  customfield.NewNestedObjectType[CloudLoadBalancersLoggingDataSourceModel](ctx),
 							Attributes: map[string]schema.Attribute{
@@ -376,6 +311,24 @@ func ListDataSourceSchema(ctx context.Context) schema.Schema {
 								},
 							},
 						},
+						"name": schema.StringAttribute{
+							Description: "Load balancer name",
+							Computed:    true,
+						},
+						"operating_status": schema.StringAttribute{
+							Description: "Load balancer operating status\nAvailable values: \"DEGRADED\", \"DRAINING\", \"ERROR\", \"NO_MONITOR\", \"OFFLINE\", \"ONLINE\".",
+							Computed:    true,
+							Validators: []validator.String{
+								stringvalidator.OneOfCaseInsensitive(
+									"DEGRADED",
+									"DRAINING",
+									"ERROR",
+									"NO_MONITOR",
+									"OFFLINE",
+									"ONLINE",
+								),
+							},
+						},
 						"preferred_connectivity": schema.StringAttribute{
 							Description: "Preferred option to establish connectivity between load balancer and its pools members\nAvailable values: \"L2\", \"L3\".",
 							Computed:    true,
@@ -383,8 +336,55 @@ func ListDataSourceSchema(ctx context.Context) schema.Schema {
 								stringvalidator.OneOfCaseInsensitive("L2", "L3"),
 							},
 						},
+						"project_id": schema.Int64Attribute{
+							Description: "Project ID",
+							Computed:    true,
+						},
+						"provisioning_status": schema.StringAttribute{
+							Description: "Load balancer lifecycle status\nAvailable values: \"ACTIVE\", \"DELETED\", \"ERROR\", \"PENDING_CREATE\", \"PENDING_DELETE\", \"PENDING_UPDATE\".",
+							Computed:    true,
+							Validators: []validator.String{
+								stringvalidator.OneOfCaseInsensitive(
+									"ACTIVE",
+									"DELETED",
+									"ERROR",
+									"PENDING_CREATE",
+									"PENDING_DELETE",
+									"PENDING_UPDATE",
+								),
+							},
+						},
+						"region": schema.StringAttribute{
+							Description: "Region name",
+							Computed:    true,
+						},
+						"region_id": schema.Int64Attribute{
+							Description: "Region ID",
+							Computed:    true,
+						},
+						"tags": schema.ListNestedAttribute{
+							Description: "List of key-value tags associated with the resource. A tag is a key-value pair that can be associated with a resource, enabling efficient filtering and grouping for better organization and management. Some tags are read-only and cannot be modified by the user. Tags are also integrated with cost reports, allowing cost data to be filtered based on tag keys or values.",
+							Computed:    true,
+							CustomType:  customfield.NewNestedObjectListType[CloudLoadBalancersTagsDataSourceModel](ctx),
+							NestedObject: schema.NestedAttributeObject{
+								Attributes: map[string]schema.Attribute{
+									"key": schema.StringAttribute{
+										Description: "Tag key. Maximum 255 characters. Cannot contain spaces, tabs, newlines, empty string or '=' character.",
+										Computed:    true,
+									},
+									"read_only": schema.BoolAttribute{
+										Description: "If true, the tag is read-only and cannot be modified by the user",
+										Computed:    true,
+									},
+									"value": schema.StringAttribute{
+										Description: "Tag value. Maximum 255 characters. Cannot contain spaces, tabs, newlines, empty string or '=' character.",
+										Computed:    true,
+									},
+								},
+							},
+						},
 						"updated_at": schema.StringAttribute{
-							Description: "Datetime when the load balancer was last updated",
+							Description: "Datetime when the load balancer was last updated. Null until the first update.",
 							Computed:    true,
 							CustomType:  timetypes.RFC3339Type{},
 						},
@@ -393,7 +393,7 @@ func ListDataSourceSchema(ctx context.Context) schema.Schema {
 							Computed:    true,
 						},
 						"vip_fqdn": schema.StringAttribute{
-							Description: "Fully qualified domain name for the load balancer VIP",
+							Description: "Fully qualified domain name for the load balancer VIP. Null when no FQDN is assigned.",
 							Computed:    true,
 						},
 						"vip_ip_family": schema.StringAttribute{

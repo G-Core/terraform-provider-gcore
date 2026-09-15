@@ -63,7 +63,7 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 				CustomType:  timetypes.RFC3339Type{},
 			},
 			"creator_task_id": schema.StringAttribute{
-				Description: "Task that created this entity",
+				Description: "Task that created this entity. Null when the floating IP wasn't created via a tracked task.",
 				Computed:    true,
 			},
 			"floating_ip_address": schema.StringAttribute{
@@ -75,7 +75,7 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 				Computed:    true,
 			},
 			"router_id": schema.StringAttribute{
-				Description:   "Router ID",
+				Description:   "Router ID. Null when the floating IP is not attached to a port.",
 				Computed:      true,
 				PlanModifiers: []planmodifier.String{UnknownOnPortChange()},
 			},

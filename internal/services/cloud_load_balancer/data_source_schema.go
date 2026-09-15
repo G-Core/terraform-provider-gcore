@@ -54,7 +54,7 @@ func DataSourceSchema(ctx context.Context) schema.Schema {
 				CustomType:  timetypes.RFC3339Type{},
 			},
 			"creator_task_id": schema.StringAttribute{
-				Description: "Task that created this entity",
+				Description: "Task that created this entity. Null when the load balancer wasn't created via a tracked task.",
 				Computed:    true,
 			},
 			"name": schema.StringAttribute{
@@ -101,7 +101,7 @@ func DataSourceSchema(ctx context.Context) schema.Schema {
 				Computed:    true,
 			},
 			"updated_at": schema.StringAttribute{
-				Description: "Datetime when the load balancer was last updated",
+				Description: "Datetime when the load balancer was last updated. Null until the first update.",
 				Computed:    true,
 				CustomType:  timetypes.RFC3339Type{},
 			},
@@ -110,7 +110,7 @@ func DataSourceSchema(ctx context.Context) schema.Schema {
 				Computed:    true,
 			},
 			"vip_fqdn": schema.StringAttribute{
-				Description: "Fully qualified domain name for the load balancer VIP",
+				Description: "Fully qualified domain name for the load balancer VIP. Null when no FQDN is assigned.",
 				Computed:    true,
 			},
 			"vip_ip_family": schema.StringAttribute{
@@ -146,7 +146,7 @@ func DataSourceSchema(ctx context.Context) schema.Schema {
 				},
 			},
 			"flavor": schema.SingleNestedAttribute{
-				Description: "Load balancer flavor (if not default)",
+				Description: "Load balancer flavor. Null when using the default flavor.",
 				Computed:    true,
 				CustomType:  customfield.NewNestedObjectType[CloudLoadBalancerFlavorDataSourceModel](ctx),
 				Attributes: map[string]schema.Attribute{
@@ -184,11 +184,11 @@ func DataSourceSchema(ctx context.Context) schema.Schema {
 							CustomType:  timetypes.RFC3339Type{},
 						},
 						"creator_task_id": schema.StringAttribute{
-							Description: "Task that created this entity",
+							Description: "Task that created this entity. Null when the floating IP wasn't created via a tracked task.",
 							Computed:    true,
 						},
 						"fixed_ip_address": schema.StringAttribute{
-							Description: "IP address of the port the floating IP is attached to",
+							Description: "IP address of the port the floating IP is attached to. Null when the floating IP is not attached to a port.",
 							Computed:    true,
 						},
 						"floating_ip_address": schema.StringAttribute{
@@ -196,7 +196,7 @@ func DataSourceSchema(ctx context.Context) schema.Schema {
 							Computed:    true,
 						},
 						"port_id": schema.StringAttribute{
-							Description: "Port ID the floating IP is attached to. The `fixed_ip_address` is the IP address of the port.",
+							Description: "Port ID the floating IP is attached to. The `fixed_ip_address` is the IP address of the port. Null when the floating IP is not attached to a port.",
 							Computed:    true,
 						},
 						"project_id": schema.Int64Attribute{
@@ -212,7 +212,7 @@ func DataSourceSchema(ctx context.Context) schema.Schema {
 							Computed:    true,
 						},
 						"router_id": schema.StringAttribute{
-							Description: "Router ID",
+							Description: "Router ID. Null when the floating IP is not attached to a port.",
 							Computed:    true,
 						},
 						"status": schema.StringAttribute{
@@ -269,7 +269,7 @@ func DataSourceSchema(ctx context.Context) schema.Schema {
 				},
 			},
 			"logging": schema.SingleNestedAttribute{
-				Description: "Logging configuration",
+				Description: "Logging configuration. Null when logging isn't configured.",
 				Computed:    true,
 				CustomType:  customfield.NewNestedObjectType[CloudLoadBalancerLoggingDataSourceModel](ctx),
 				Attributes: map[string]schema.Attribute{

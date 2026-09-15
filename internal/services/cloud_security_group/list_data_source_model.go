@@ -64,15 +64,9 @@ type CloudSecurityGroupsItemsDataSourceModel struct {
 	Region             types.String                                                                       `tfsdk:"region" json:"region,computed"`
 	RegionID           types.Int64                                                                        `tfsdk:"region_id" json:"region_id,computed"`
 	RevisionNumber     types.Int64                                                                        `tfsdk:"revision_number" json:"revision_number,computed"`
+	SecurityGroupRules customfield.NestedObjectList[CloudSecurityGroupsSecurityGroupRulesDataSourceModel] `tfsdk:"security_group_rules" json:"security_group_rules,computed"`
 	Tags               customfield.NestedObjectList[CloudSecurityGroupsTagsDataSourceModel]               `tfsdk:"tags" json:"tags_v2,computed"`
 	UpdatedAt          timetypes.RFC3339                                                                  `tfsdk:"updated_at" json:"updated_at,computed" format:"date-time"`
-	SecurityGroupRules customfield.NestedObjectList[CloudSecurityGroupsSecurityGroupRulesDataSourceModel] `tfsdk:"security_group_rules" json:"security_group_rules,computed"`
-}
-
-type CloudSecurityGroupsTagsDataSourceModel struct {
-	Key      types.String `tfsdk:"key" json:"key,computed"`
-	ReadOnly types.Bool   `tfsdk:"read_only" json:"read_only,computed"`
-	Value    types.String `tfsdk:"value" json:"value,computed"`
 }
 
 type CloudSecurityGroupsSecurityGroupRulesDataSourceModel struct {
@@ -89,4 +83,10 @@ type CloudSecurityGroupsSecurityGroupRulesDataSourceModel struct {
 	RevisionNumber  types.Int64       `tfsdk:"revision_number" json:"revision_number,computed"`
 	SecurityGroupID types.String      `tfsdk:"security_group_id" json:"security_group_id,computed"`
 	UpdatedAt       timetypes.RFC3339 `tfsdk:"updated_at" json:"updated_at,computed" format:"date-time"`
+}
+
+type CloudSecurityGroupsTagsDataSourceModel struct {
+	Key      types.String `tfsdk:"key" json:"key,computed"`
+	ReadOnly types.Bool   `tfsdk:"read_only" json:"read_only,computed"`
+	Value    types.String `tfsdk:"value" json:"value,computed"`
 }

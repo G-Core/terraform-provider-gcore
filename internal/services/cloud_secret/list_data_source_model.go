@@ -39,13 +39,13 @@ func (m *CloudSecretsDataSourceModel) toListParams(_ context.Context) (params cl
 
 type CloudSecretsItemsDataSourceModel struct {
 	ID           types.String                  `tfsdk:"id" json:"id,computed"`
-	Name         types.String                  `tfsdk:"name" json:"name,computed"`
-	SecretType   types.String                  `tfsdk:"secret_type" json:"secret_type,computed"`
-	Status       types.String                  `tfsdk:"status" json:"status,computed"`
 	Algorithm    types.String                  `tfsdk:"algorithm" json:"algorithm,computed"`
 	BitLength    types.Int64                   `tfsdk:"bit_length" json:"bit_length,computed"`
 	ContentTypes customfield.Map[types.String] `tfsdk:"content_types" json:"content_types,computed"`
 	Created      timetypes.RFC3339             `tfsdk:"created" json:"created,computed" format:"date-time"`
 	Expiration   timetypes.RFC3339             `tfsdk:"expiration" json:"expiration,computed" format:"date-time"`
 	Mode         types.String                  `tfsdk:"mode" json:"mode,computed"`
+	Name         types.String                  `tfsdk:"name" json:"name,computed"`
+	SecretType   types.String                  `tfsdk:"secret_type" json:"secret_type,computed"`
+	Status       types.String                  `tfsdk:"status" json:"status,computed"`
 }
