@@ -10,9 +10,13 @@ import (
 )
 
 type StorageSftpModel struct {
-	ID                  types.Int64                   `tfsdk:"id" json:"id,computed"`
-	LocationName        types.String                  `tfsdk:"location_name" json:"location_name,required"`
-	Name                types.String                  `tfsdk:"name" json:"name,required"`
+	ID           types.Int64  `tfsdk:"id" json:"id,computed"`
+	LocationName types.String `tfsdk:"location_name" json:"location_name,required"`
+	Name         types.String `tfsdk:"name" json:"name,required"`
+	// no_refresh keeps API responses from writing the password to state. Create
+	// uses the JSON name, while Update adds the password directly to the request.
+	PasswordWo          types.String                  `tfsdk:"password_wo" json:"password,optional,no_refresh"`
+	PasswordWoVersion   types.Int64                   `tfsdk:"password_wo_version"`
 	Expires             types.String                  `tfsdk:"expires" json:"expires,optional"`
 	HasCustomConfigFile types.Bool                    `tfsdk:"has_custom_config_file" json:"has_custom_config_file,computed_optional"`
 	IsHTTPDisabled      types.Bool                    `tfsdk:"is_http_disabled" json:"is_http_disabled,computed_optional"`

@@ -10,6 +10,8 @@ import (
 
 var _ resource.ResourceWithUpgradeState = (*StorageSftpResource)(nil)
 
+// Keep schema version 0. Terraform drops the removed password fields and fills
+// the new fields with null before the provider reads old state.
 func (r *StorageSftpResource) UpgradeState(ctx context.Context) map[int64]resource.StateUpgrader {
 	return map[int64]resource.StateUpgrader{}
 }

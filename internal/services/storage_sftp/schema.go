@@ -38,6 +38,29 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 				Required:      true,
 				PlanModifiers: []planmodifier.String{stringplanmodifier.RequiresReplace()},
 			},
+			"password_wo": schema.StringAttribute{
+				Description: "SFTP password (8-63 chars). This is a write-only field — it is sent to the API " +
+					"but never stored in state or plan artifacts. Set it together with " +
+					"`password_wo_version`. Change the version to send a new password; the storage is " +
+					"updated in place. Editing `password_wo` alone produces no plan. Remove both " +
+					"arguments to clear password authentication in place. Omit both to create a " +
+					"storage with SSH-key-only access.",
+				Optional: true,
+				// Sensitive does not redact source lines shown with diagnostics. Never
+				// attach a validator or diagnostic to this attribute; the length check
+				// lives in passwordPairValidator, which reports without a path
+				Sensitive: true,
+				WriteOnly: true,
+			},
+			"password_wo_version": schema.Int64Attribute{
+				Description: "The version of `password_wo`. Terraform never sees the password value, so this " +
+					"number is what tells it the password changed: change it (conventionally increment) " +
+					"to re-send `password_wo` to the API in place — a rotation, or the first password on " +
+					"a storage that has none or one Terraform did not set. Editing `password_wo` alone is " +
+					"not detected. Remove it together with `password_wo` to clear password authentication " +
+					"in place. Never causes a replacement.",
+				Optional: true,
+			},
 			"expires": schema.StringAttribute{
 				Description: `Duration when the storage should expire (e.g., "2 years 6 months"). Omit for no expiration.`,
 				Optional:    true,
@@ -77,9 +100,13 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 				Description: "Read-only internal full name of the storage, composed as \"{`client_id`}-{name}\".\nUsed by the SFTP backend as the login username. Clients should use this value when connecting\nbut should continue to identify the storage by `name` in their own configuration.",
 				Computed:    true,
 			},
+			// PlanHasPassword sets this only when the request decides the value.
+			// Do not copy stale state when the version is still unknown.
 			"has_password": schema.BoolAttribute{
-				Description: "Whether password authentication is configured for this storage",
-				Computed:    true,
+				Description: "Whether password authentication is configured for this storage. Refreshed on " +
+					"every read; if it becomes false while `password_wo` is configured, the next apply " +
+					"re-applies the password.",
+				Computed: true,
 			},
 			"provisioning_status": schema.StringAttribute{
 				Description: "Lifecycle status of the storage. Use this to check readiness before operations.\nAvailable values: \"creating\", \"active\", \"updating\", \"deleting\", \"deleted\".",
@@ -103,5 +130,7 @@ func (r *StorageSftpResource) Schema(ctx context.Context, req resource.SchemaReq
 }
 
 func (r *StorageSftpResource) ConfigValidators(_ context.Context) []resource.ConfigValidator {
-	return []resource.ConfigValidator{}
+	return []resource.ConfigValidator{
+		passwordPairValidator{},
+	}
 }

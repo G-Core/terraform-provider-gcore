@@ -98,7 +98,6 @@ func testAccStorageSftpDataSourceConfigByID(name string) string {
 resource "gcore_storage_sftp" "test" {
   name          = %[1]q
   location_name = %[2]q
-  password_mode = "auto"
 }
 
 data "gcore_storage_sftp" "test" {
@@ -111,7 +110,6 @@ func testAccStorageSftpDataSourceConfigByName(name string) string {
 resource "gcore_storage_sftp" "test" {
   name          = %[1]q
   location_name = %[2]q
-  password_mode = "auto"
 }
 
 data "gcore_storage_sftp" "test" {
@@ -126,7 +124,6 @@ func testAccStorageSftpsDataSourceConfig(name string) string {
 resource "gcore_storage_sftp" "test" {
   name          = %[1]q
   location_name = %[2]q
-  password_mode = "auto"
 }
 
 data "gcore_storage_sftps" "test" {

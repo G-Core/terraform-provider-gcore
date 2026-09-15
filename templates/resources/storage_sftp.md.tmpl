@@ -1,0 +1,76 @@
+---
+page_title: "{{ .Name }} {{ .Type }} - {{ .RenderedProviderName }}"
+subcategory: ""
+description: |-
+  {{ .Description }}
+---
+
+# {{ .Name }} ({{ .Type }})
+
+{{ .Description }}
+
+## Example Usage
+
+{{tffile "examples/resources/gcore_storage_sftp/resource.tf"}}
+
+-> **`location_name` must be a storage location available to your account.** The example uses a placeholder.
+List your locations with the `gcore_storage_locations` data source and select one that supports SFTP. Changing the
+location replaces the storage.
+
+## Managing the password
+
+`password_wo` is write-only, so Terraform does not store it in state or plan files. Write-only arguments require
+Terraform 1.11 or later. Set `password_wo` and `password_wo_version` together, or omit both.
+
+| Change | Result |
+|---|---|
+| Add both arguments | Sets or replaces the password in place |
+| Change `password_wo_version` | Rotates the password in place |
+| Change only `password_wo` | No change; Terraform cannot compare write-only values |
+| Remove both arguments | Clears a password previously managed by Terraform |
+| Omit both after import or upgrade | Leaves the existing password unchanged |
+| Password removed outside Terraform | Reapplies the configured password on the next apply |
+
+`password_wo_version` is the only rotation trigger. Change it whenever the password changes. When the password comes
+from a secret store, use the secret's version so both values change together.
+
+Password changes do not replace the storage or its contents. The SFTP server can take about a minute to apply a
+password change.
+
+### Existing and external passwords
+
+Terraform does not manage a password found during import or upgrade unless you configure both password arguments.
+Adding the pair replaces that password in place and produces a warning. To clear it through Terraform, add the pair
+first, apply, and then remove both arguments.
+
+If someone changes a password outside Terraform, the provider cannot detect the new value. The configured password is
+used again only after `password_wo_version` changes. If someone removes the password, the next apply restores the
+configured value.
+
+~> **Do not set `TF_LOG=DEBUG` during password changes.** Debug logs contain raw API requests and responses, including
+the password and API key. If such a log was created, rotate both secrets.
+
+## Upgrading from `password_mode`
+
+Earlier versions used `password_mode`, `sftp_password`, and a computed `password`. Remove the old arguments from the
+configuration. The provider drops the old fields from state without replacing the storage. Run
+`terraform apply -refresh-only` to save the cleaned state.
+
+Passwords created with the old `auto` or `set` modes remain active but are not managed by Terraform. Configure
+`password_wo` and `password_wo_version` to replace one in place.
+
+!> **Rotate passwords created with the old `auto` or `set` modes.** Earlier provider versions stored them in cleartext
+in Terraform state and its backups. Use a new password when adding the write-only arguments.
+
+{{ .SchemaMarkdown | trimspace }}
+
+{{ if .HasImport }}
+## Import
+
+Import is supported using the following syntax:
+
+{{ codefile "shell" .ImportFile }}
+
+~> Import does not manage the existing password. Configure both password arguments to replace it in place, or omit
+both to leave it unchanged.
+{{ end }}
