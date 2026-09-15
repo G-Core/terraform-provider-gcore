@@ -77,8 +77,8 @@ Read-Only:
 - `admin_state_up` (Boolean) Administrative state of the resource. When set to true, the resource is enabled and operational. When set to false, the resource is disabled and will not process traffic. Defaults to true.
 - `delay` (Number) The time, in seconds, between sending probes to members
 - `domain_name` (String) Domain name for HTTP host header. Can only be used together with `HTTP` or `HTTPS` health monitor type.
-- `expected_codes` (String) Expected HTTP response codes. Can be a single code, a comma-separated list of codes, or a single range of codes. Can only be used together with `HTTP` or `HTTPS` health monitor type. For example, 200, 200,202,401,403,404, or 200-204. If not specified, the default is 200. Null for non-HTTP(S) health monitor types.
-- `http_method` (String) HTTP method. Null for non-HTTP(S) health monitor types.
+- `expected_codes` (String) Expected HTTP response codes. Can be a single code or a range of codes. Can only be used together with `HTTP` or `HTTPS` health monitor type. For example, 200,202,300-302,401,403,404,500-504. If not specified, the default is 200.
+- `http_method` (String) HTTP method
 Available values: "CONNECT", "DELETE", "GET", "HEAD", "OPTIONS", "PATCH", "POST", "PUT", "TRACE".
 - `http_version` (String) HTTP version. Can only be used together with `HTTP` or `HTTPS` health monitor type.
 Available values: "1.0", "1.1".
@@ -92,7 +92,7 @@ Available values: "ACTIVE", "DELETED", "ERROR", "PENDING_CREATE", "PENDING_DELET
 - `timeout` (Number) The maximum time to connect. Must be less than the delay value
 - `type` (String) Health monitor type. Once health monitor is created, cannot be changed.
 Available values: "HTTP", "HTTPS", "K8S", "PING", "TCP", "TLS-HELLO", "UDP-CONNECT".
-- `url_path` (String) URL Path. Defaults to '/'. Null for non-HTTP(S) health monitor types.
+- `url_path` (String) URL Path. Defaults to '/'
 
 
 <a id="nestedatt--items--listeners"></a>
@@ -139,8 +139,8 @@ Available values: "ACTIVE", "DELETED", "ERROR", "PENDING_CREATE", "PENDING_DELET
 
 Read-Only:
 
-- `cookie_name` (String) Should be set if app cookie or http cookie is used. Null otherwise.
-- `persistence_granularity` (String) Subnet mask if `source_ip` is used. For UDP ports only, null otherwise.
-- `persistence_timeout` (Number) Session persistence timeout. For UDP ports only, null otherwise.
+- `cookie_name` (String) Should be set if app cookie or http cookie is used
+- `persistence_granularity` (String) Subnet mask if `source_ip` is used. For UDP ports only
+- `persistence_timeout` (Number) Session persistence timeout. For UDP ports only
 - `type` (String) Session persistence type
 Available values: "APP_COOKIE", "HTTP_COOKIE", "SOURCE_IP".

@@ -143,8 +143,6 @@ Read-Only:
 - `sfs_size_usage` (Number) Shared file system Size, GiB usage
 - `shared_vm_count_limit` (Number) Basic VMs Count limit
 - `shared_vm_count_usage` (Number) Basic VMs Count usage
-- `slurm_cluster_count_limit` (Number) Slurm cluster count limit for this region. 0 disables Slurm in this region.
-- `slurm_cluster_count_usage` (Number) Slurm cluster count usage
 - `snapshot_schedule_count_limit` (Number) Snapshot Schedules Count limit
 - `snapshot_schedule_count_usage` (Number) Snapshot Schedules Count usage
 - `subnet_count_limit` (Number) Subnets Count limit

@@ -127,16 +127,16 @@ Available values: "dual", "ipv4", "ipv6".
 - `allowed_address_pairs` (Attributes List) Group of subnet masks and/or IP addresses that share the current IP as VIP (see [below for nested schema](#nestedatt--allowed_address_pairs))
 - `attachments` (Attributes List) Reserved fixed IP attachment entities (see [below for nested schema](#nestedatt--attachments))
 - `created_at` (String) Datetime when the reserved fixed IP was created
-- `creator_task_id` (String) Task that created this entity. Null when the reservation wasn't created via a tracked task.
-- `fixed_ip_address` (String) IPv4 address of the reserved fixed IP. Null when the reservation has no IPv4 address.
-- `fixed_ipv6_address` (String) IPv6 address of the reserved fixed IP. Null when the reservation has no IPv6 address.
+- `creator_task_id` (String) Task that created this entity
+- `fixed_ip_address` (String) IPv4 address of the reserved fixed IP
+- `fixed_ipv6_address` (String) IPv6 address of the reserved fixed IP
 - `id` (String) The ID of this resource.
 - `is_external` (Boolean) If reserved fixed IP belongs to a public network
 - `name` (String) Reserved fixed IP name
 - `network` (Attributes) Network details (see [below for nested schema](#nestedatt--network))
 - `region` (String) Region name
 - `status` (String) Underlying port status
-- `subnet_v6_id` (String) ID of the subnet that owns the IPv6 address. Null when the reservation has no IPv6 address.
+- `subnet_v6_id` (String) ID of the subnet that owns the IPv6 address
 - `updated_at` (String) Datetime when the reserved fixed IP was last updated
 
 <a id="nestedatt--allowed_address_pairs"></a>
@@ -145,7 +145,7 @@ Available values: "dual", "ipv4", "ipv6".
 Read-Only:
 
 - `ip_address` (String) Subnet mask or IP address of the port specified in `allowed_address_pairs`
-- `mac_address` (String) MAC address of the port specified in `allowed_address_pairs`. Null when the pair has no explicit MAC.
+- `mac_address` (String) MAC address of the port specified in `allowed_address_pairs`
 
 
 <a id="nestedatt--attachments"></a>
@@ -153,8 +153,8 @@ Read-Only:
 
 Read-Only:
 
-- `resource_id` (String) Resource ID. Null when the attachment's resource is unknown.
-- `resource_type` (String) Resource type. Null when the attachment's resource type is unknown.
+- `resource_id` (String) Resource ID
+- `resource_type` (String) Resource type
 
 
 <a id="nestedatt--network"></a>

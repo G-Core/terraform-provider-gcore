@@ -48,12 +48,12 @@ resource "gcore_cloud_secret" "example" {
 
 ### Read-Only
 
-- `algorithm` (String) Metadata provided by a user or system for informational purposes. Null when not specified at secret creation.
-- `bit_length` (Number) Metadata provided by a user or system for informational purposes. Value must be greater than zero. Null when not specified at secret creation.
-- `content_types` (Map of String) Describes the content-types that can be used to retrieve the payload. The content-type used with symmetric secrets is application/octet-stream. Null until the secret has a payload.
+- `algorithm` (String) Metadata provided by a user or system for informational purposes. Defaults to None
+- `bit_length` (Number) Metadata provided by a user or system for informational purposes. Value must be greater than zero. Defaults to None
+- `content_types` (Map of String) Describes the content-types that can be used to retrieve the payload. The content-type used with symmetric secrets is application/octet-stream
 - `created` (String) Datetime when the secret was created. The format is 2020-01-01T12:00:00+00:00
 - `id` (String) The ID of this resource.
-- `mode` (String) Metadata provided by a user or system for informational purposes. Null when not specified at secret creation.
+- `mode` (String) Metadata provided by a user or system for informational purposes. Defaults to None
 - `secret_type` (String) Secret type, base64 encoded. symmetric - Used for storing byte arrays such as keys suitable for symmetric encryption; public - Used for storing the public key of an asymmetric keypair; private - Used for storing the private key of an asymmetric keypair; passphrase - Used for storing plain text passphrases; certificate - Used for storing cryptographic certificates such as X.509 certificates; opaque - Used for backwards compatibility with previous versions of the API
 Available values: "certificate", "opaque", "passphrase", "private", "public", "symmetric".
 - `status` (String) Status

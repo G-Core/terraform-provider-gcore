@@ -86,13 +86,13 @@ Available values: 4, 6.
 
 ### Read-Only
 
-- `available_ips` (Number) Number of available ips in subnet. Null when this data isn't available.
+- `available_ips` (Number) Number of available ips in subnet
 - `created_at` (String) Datetime when the subnet was created
-- `creator_task_id` (String) Task that created this entity. Null when the subnet wasn't created via a tracked task.
+- `creator_task_id` (String) Task that created this entity
 - `has_router` (Boolean, Deprecated) Deprecated. Always returns `false`.
 - `id` (String) The ID of this resource.
 - `region` (String) Region name
-- `total_ips` (Number) Total number of ips in subnet. Null when this data isn't available.
+- `total_ips` (Number) Total number of ips in subnet
 - `updated_at` (String) Datetime when the subnet was last updated
 
 <a id="nestedatt--host_routes"></a>

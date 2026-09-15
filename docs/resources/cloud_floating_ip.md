@@ -56,11 +56,11 @@ resource "gcore_cloud_floating_ip" "web_ip" {
 ### Read-Only
 
 - `created_at` (String) Datetime when the floating IP was created
-- `creator_task_id` (String) Task that created this entity. Null when the floating IP wasn't created via a tracked task.
+- `creator_task_id` (String) Task that created this entity
 - `floating_ip_address` (String) IP Address of the floating IP
 - `id` (String) The ID of this resource.
 - `region` (String) Region name
-- `router_id` (String) Router ID. Null when the floating IP is not attached to a port.
+- `router_id` (String) Router ID
 - `status` (String) Floating IP status. DOWN - unassigned (available). ACTIVE - attached to a port (in use). ERROR - error state.
 Available values: "ACTIVE", "DOWN", "ERROR".
 
