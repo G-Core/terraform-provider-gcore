@@ -29,3 +29,13 @@ resource "gcore_cdn_origin_shielding" "example_cdn_origin_shielding" {
 
 - `resource_id` (Number) ID of the CDN resource for which origin shielding is configured. Changing this forces a new resource.
 - `shielding_pop` (Number) Origin shielding location ID (point of presence). Look up available IDs with the gcore_cdn_origin_shielding data source or the GET /cdn/shieldingpop_v2 endpoint.
+
+## Import
+
+Import is supported using the following syntax:
+
+The [`terraform import` command](https://developer.hashicorp.com/terraform/cli/commands/import) can be used, for example:
+
+```shell
+$ terraform import gcore_cdn_origin_shielding.example '<resource_id>'
+```
