@@ -1,0 +1,146 @@
+// File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
+
+package cloud_load_balancer_pool_member
+
+import (
+	"context"
+
+	"github.com/G-Core/terraform-provider-gcore/internal/customfield"
+	"github.com/hashicorp/terraform-plugin-framework-validators/int64validator"
+	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
+	"github.com/hashicorp/terraform-plugin-framework/datasource"
+	"github.com/hashicorp/terraform-plugin-framework/datasource/schema"
+	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
+)
+
+var _ datasource.DataSourceWithConfigValidators = (*CloudLoadBalancerPoolMembersDataSource)(nil)
+
+func ListDataSourceSchema(ctx context.Context) schema.Schema {
+	return schema.Schema{
+		MarkdownDescription: "Pool members represent backend instances that receive load-balanced traffic from a pool.",
+		Attributes: map[string]schema.Attribute{
+			"pool_id": schema.StringAttribute{
+				Description: "Pool ID",
+				Required:    true,
+			},
+			"project_id": schema.Int64Attribute{
+				Description: "Project ID",
+				Optional:    true,
+			},
+			"region_id": schema.Int64Attribute{
+				Description: "Region ID",
+				Optional:    true,
+			},
+			"order_by": schema.StringAttribute{
+				Description: "Ordering pool members list result by `address` or `created_at` fields and directions (e.g. `address.desc`). Default is `address.asc`.\nAvailable values: \"address.asc\", \"address.desc\", \"created_at.asc\", \"created_at.desc\".",
+				Computed:    true,
+				Optional:    true,
+				Validators: []validator.String{
+					stringvalidator.OneOfCaseInsensitive(
+						"address.asc",
+						"address.desc",
+						"created_at.asc",
+						"created_at.desc",
+					),
+				},
+			},
+			"max_items": schema.Int64Attribute{
+				Description: "Max items to fetch, default: 1000",
+				Optional:    true,
+				Validators: []validator.Int64{
+					int64validator.AtLeast(0),
+				},
+			},
+			"items": schema.ListNestedAttribute{
+				Description: "The items returned by the data source",
+				Computed:    true,
+				CustomType:  customfield.NewNestedObjectListType[CloudLoadBalancerPoolMembersItemsDataSourceModel](ctx),
+				NestedObject: schema.NestedAttributeObject{
+					Attributes: map[string]schema.Attribute{
+						"id": schema.StringAttribute{
+							Description: "Member ID must be provided if an existing member is being updated",
+							Computed:    true,
+						},
+						"address": schema.StringAttribute{
+							Description: "Member IP address",
+							Computed:    true,
+						},
+						"admin_state_up": schema.BoolAttribute{
+							Description: "Administrative state of the resource. When set to true, the resource is enabled and operational. When set to false, the resource is disabled and will not process traffic. Defaults to true.",
+							Computed:    true,
+						},
+						"backup": schema.BoolAttribute{
+							Description: "Set to true if the member is a backup member, to which traffic will be sent exclusively when all non-backup members will be unreachable. It allows to realize ACTIVE-BACKUP load balancing without thinking about VRRP and VIP configuration. Default is false",
+							Computed:    true,
+						},
+						"monitor_address": schema.StringAttribute{
+							Description: "An alternate IP address used for health monitoring of a backend member. Default is null which monitors the member address.",
+							Computed:    true,
+						},
+						"monitor_port": schema.Int64Attribute{
+							Description: "An alternate protocol port used for health monitoring of a backend member. Default is null which monitors the member `protocol_port`.",
+							Computed:    true,
+							Validators: []validator.Int64{
+								int64validator.Between(1, 65535),
+							},
+						},
+						"operating_status": schema.StringAttribute{
+							Description: "Member operating status of the entity\nAvailable values: \"DEGRADED\", \"DRAINING\", \"ERROR\", \"NO_MONITOR\", \"OFFLINE\", \"ONLINE\".",
+							Computed:    true,
+							Validators: []validator.String{
+								stringvalidator.OneOfCaseInsensitive(
+									"DEGRADED",
+									"DRAINING",
+									"ERROR",
+									"NO_MONITOR",
+									"OFFLINE",
+									"ONLINE",
+								),
+							},
+						},
+						"protocol_port": schema.Int64Attribute{
+							Description: "Member IP port",
+							Computed:    true,
+							Validators: []validator.Int64{
+								int64validator.Between(1, 65535),
+							},
+						},
+						"provisioning_status": schema.StringAttribute{
+							Description: "Pool member lifecycle status\nAvailable values: \"ACTIVE\", \"DELETED\", \"ERROR\", \"PENDING_CREATE\", \"PENDING_DELETE\", \"PENDING_UPDATE\".",
+							Computed:    true,
+							Validators: []validator.String{
+								stringvalidator.OneOfCaseInsensitive(
+									"ACTIVE",
+									"DELETED",
+									"ERROR",
+									"PENDING_CREATE",
+									"PENDING_DELETE",
+									"PENDING_UPDATE",
+								),
+							},
+						},
+						"subnet_id": schema.StringAttribute{
+							Description: "`subnet_id` in which `address` is present.",
+							Computed:    true,
+						},
+						"weight": schema.Int64Attribute{
+							Description: "Member weight. Valid values are 0 < `weight` <= 256, defaults to 1. Controls traffic distribution based on the pool's load balancing algorithm:\n  - `ROUND_ROBIN`: Distributes connections to each member in turn according to weights. Higher weight = more turns in the cycle. Example: weights 3 vs 1 = ~75% vs ~25% of requests.\n  - `LEAST_CONNECTIONS`: Sends new connections to the member with fewest active connections, performing round-robin within groups of the same normalized load. Higher weight = allowed to hold more simultaneous connections before being considered 'more loaded'. Example: weights 2 vs 1 means 20 vs 10 active connections is treated as balanced.\n  - `SOURCE_IP`: Routes clients consistently to the same member by hashing client source IP; hash result is modulo total weight of running members. Higher weight = more hash buckets, so more client IPs map to that member. Example: weights 2 vs 1 = roughly two-thirds of distinct client IPs map to the higher-weight member.",
+							Computed:    true,
+							Validators: []validator.Int64{
+								int64validator.AtMost(256),
+							},
+						},
+					},
+				},
+			},
+		},
+	}
+}
+
+func (d *CloudLoadBalancerPoolMembersDataSource) Schema(ctx context.Context, req datasource.SchemaRequest, resp *datasource.SchemaResponse) {
+	resp.Schema = ListDataSourceSchema(ctx)
+}
+
+func (d *CloudLoadBalancerPoolMembersDataSource) ConfigValidators(_ context.Context) []datasource.ConfigValidator {
+	return []datasource.ConfigValidator{}
+}

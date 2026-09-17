@@ -6,10 +6,10 @@ import (
 	"context"
 
 	"github.com/hashicorp/terraform-plugin-framework-validators/int64validator"
+	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/booldefault"
-	"github.com/hashicorp/terraform-plugin-framework/resource/schema/boolplanmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/int64planmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringplanmodifier"
@@ -24,7 +24,7 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 		Attributes: map[string]schema.Attribute{
 			"id": schema.StringAttribute{
 				Computed:      true,
-				PlanModifiers: []planmodifier.String{stringplanmodifier.UseNonNullStateForUnknown(), stringplanmodifier.RequiresReplace()},
+				PlanModifiers: []planmodifier.String{stringplanmodifier.UseNonNullStateForUnknown()},
 			},
 			"pool_id": schema.StringAttribute{
 				Description:   "Pool ID",
@@ -52,8 +52,8 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 					int64validator.Between(1, 65535),
 				},
 			},
-			"instance_id": schema.StringAttribute{
-				Description:   "Either `subnet_id` or `instance_id` should be provided",
+			"subnet_id": schema.StringAttribute{
+				Description:   "`subnet_id` in which `address` is present. Either `subnet_id` or `instance_id` should be provided",
 				Optional:      true,
 				PlanModifiers: []planmodifier.String{stringplanmodifier.RequiresReplace()},
 			},
@@ -68,10 +68,6 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 					int64validator.Between(1, 65535),
 				},
 			},
-			"subnet_id": schema.StringAttribute{
-				Description: "`subnet_id` in which `address` is present. Either `subnet_id` or `instance_id` should be provided",
-				Optional:    true,
-			},
 			"weight": schema.Int64Attribute{
 				Description: "Member weight. Valid values are 0 < `weight` <= 256, defaults to 1. Controls traffic distribution based on the pool's load balancing algorithm:\n  - `ROUND_ROBIN`: Distributes connections to each member in turn according to weights. Higher weight = more turns in the cycle. Example: weights 3 vs 1 = ~75% vs ~25% of requests.\n  - `LEAST_CONNECTIONS`: Sends new connections to the member with fewest active connections, performing round-robin within groups of the same normalized load. Higher weight = allowed to hold more simultaneous connections before being considered 'more loaded'. Example: weights 2 vs 1 means 20 vs 10 active connections is treated as balanced.\n  - `SOURCE_IP`: Routes clients consistently to the same member by hashing client source IP; hash result is modulo total weight of running members. Higher weight = more hash buckets, so more client IPs map to that member. Example: weights 2 vs 1 = roughly two-thirds of distinct client IPs map to the higher-weight member.",
 				Optional:    true,
@@ -80,18 +76,44 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 				},
 			},
 			"admin_state_up": schema.BoolAttribute{
-				Description:   "Administrative state of the resource. When set to true, the resource is enabled and operational. When set to false, the resource is disabled and will not process traffic. Defaults to true.",
-				Computed:      true,
-				Optional:      true,
-				PlanModifiers: []planmodifier.Bool{boolplanmodifier.RequiresReplaceIfConfigured()},
-				Default:       booldefault.StaticBool(true),
+				Description: "Administrative state of the resource. When set to true, the resource is enabled and operational. When set to false, the resource is disabled and will not process traffic. Defaults to true.",
+				Computed:    true,
+				Optional:    true,
+				Default:     booldefault.StaticBool(true),
 			},
 			"backup": schema.BoolAttribute{
-				Description:   "Set to true if the member is a backup member, to which traffic will be sent exclusively when all non-backup members will be unreachable. It allows to realize ACTIVE-BACKUP load balancing without thinking about VRRP and VIP configuration. Default is false.",
-				Computed:      true,
-				Optional:      true,
-				PlanModifiers: []planmodifier.Bool{boolplanmodifier.RequiresReplaceIfConfigured()},
-				Default:       booldefault.StaticBool(false),
+				Description: "Set to true if the member is a backup member, to which traffic will be sent exclusively when all non-backup members will be unreachable. It allows to realize ACTIVE-BACKUP load balancing without thinking about VRRP and VIP configuration. Default is false.",
+				Computed:    true,
+				Optional:    true,
+				Default:     booldefault.StaticBool(false),
+			},
+			"operating_status": schema.StringAttribute{
+				Description: "Member operating status of the entity\nAvailable values: \"DEGRADED\", \"DRAINING\", \"ERROR\", \"NO_MONITOR\", \"OFFLINE\", \"ONLINE\".",
+				Computed:    true,
+				Validators: []validator.String{
+					stringvalidator.OneOfCaseInsensitive(
+						"DEGRADED",
+						"DRAINING",
+						"ERROR",
+						"NO_MONITOR",
+						"OFFLINE",
+						"ONLINE",
+					),
+				},
+			},
+			"provisioning_status": schema.StringAttribute{
+				Description: "Pool member lifecycle status\nAvailable values: \"ACTIVE\", \"DELETED\", \"ERROR\", \"PENDING_CREATE\", \"PENDING_DELETE\", \"PENDING_UPDATE\".",
+				Computed:    true,
+				Validators: []validator.String{
+					stringvalidator.OneOfCaseInsensitive(
+						"ACTIVE",
+						"DELETED",
+						"ERROR",
+						"PENDING_CREATE",
+						"PENDING_DELETE",
+						"PENDING_UPDATE",
+					),
+				},
 			},
 		},
 	}

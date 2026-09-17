@@ -310,6 +310,8 @@ func (p *GcoreProvider) DataSources(ctx context.Context) []func() datasource.Dat
 		cloud_load_balancer_listener.NewCloudLoadBalancerListenersDataSource,
 		cloud_load_balancer_pool.NewCloudLoadBalancerPoolDataSource,
 		cloud_load_balancer_pool.NewCloudLoadBalancerPoolsDataSource,
+		cloud_load_balancer_pool_member.NewCloudLoadBalancerPoolMemberDataSource,
+		cloud_load_balancer_pool_member.NewCloudLoadBalancerPoolMembersDataSource,
 		cloud_reserved_fixed_ip.NewCloudReservedFixedIPDataSource,
 		cloud_reserved_fixed_ip.NewCloudReservedFixedIPsDataSource,
 		cloud_network.NewCloudNetworkDataSource,

@@ -275,10 +275,6 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 							Optional:    true,
 							Default:     booldefault.StaticBool(false),
 						},
-						"instance_id": schema.StringAttribute{
-							Description: "Either `subnet_id` or `instance_id` should be provided",
-							Optional:    true,
-						},
 						"monitor_address": schema.StringAttribute{
 							Description: "An alternate IP address used for health monitoring of a backend member. Default is null which monitors the member address.",
 							Optional:    true,
