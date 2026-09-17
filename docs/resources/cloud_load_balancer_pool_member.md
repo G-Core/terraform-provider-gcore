@@ -162,7 +162,6 @@ resource "gcore_cloud_load_balancer_pool_member" "public_member" {
 
 - `admin_state_up` (Boolean) Administrative state of the resource. When set to true, the resource is enabled and operational. When set to false, the resource is disabled and will not process traffic. Defaults to true.
 - `backup` (Boolean) Set to true if the member is a backup member, to which traffic will be sent exclusively when all non-backup members will be unreachable. It allows to realize ACTIVE-BACKUP load balancing without thinking about VRRP and VIP configuration. Default is false.
-- `instance_id` (String) Either `subnet_id` or `instance_id` should be provided
 - `monitor_address` (String) An alternate IP address used for health monitoring of a backend member. Default is null which monitors the member address.
 - `monitor_port` (Number) An alternate protocol port used for health monitoring of a backend member. Default is null which monitors the member `protocol_port`.
 - `project_id` (Number) Project ID
@@ -176,3 +175,7 @@ resource "gcore_cloud_load_balancer_pool_member" "public_member" {
 ### Read-Only
 
 - `id` (String) The ID of this resource.
+- `operating_status` (String) Member operating status of the entity
+Available values: "DEGRADED", "DRAINING", "ERROR", "NO_MONITOR", "OFFLINE", "ONLINE".
+- `provisioning_status` (String) Pool member lifecycle status
+Available values: "ACTIVE", "DELETED", "ERROR", "PENDING_CREATE", "PENDING_DELETE", "PENDING_UPDATE".
