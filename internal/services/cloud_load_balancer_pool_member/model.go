@@ -14,10 +14,10 @@ type CloudLoadBalancerPoolMemberModel struct {
 	RegionID           types.Int64  `tfsdk:"region_id" path:"region_id,optional"`
 	Address            types.String `tfsdk:"address" json:"address,required"`
 	ProtocolPort       types.Int64  `tfsdk:"protocol_port" json:"protocol_port,required"`
-	SubnetID           types.String `tfsdk:"subnet_id" json:"subnet_id,optional"`
+	SubnetID           types.String `tfsdk:"subnet_id" json:"subnet_id,computed_optional"`
 	MonitorAddress     types.String `tfsdk:"monitor_address" json:"monitor_address,optional"`
 	MonitorPort        types.Int64  `tfsdk:"monitor_port" json:"monitor_port,optional"`
-	Weight             types.Int64  `tfsdk:"weight" json:"weight,optional"`
+	Weight             types.Int64  `tfsdk:"weight" json:"weight,computed_optional"`
 	AdminStateUp       types.Bool   `tfsdk:"admin_state_up" json:"admin_state_up,computed_optional"`
 	Backup             types.Bool   `tfsdk:"backup" json:"backup,computed_optional"`
 	OperatingStatus    types.String `tfsdk:"operating_status" json:"operating_status,computed"`

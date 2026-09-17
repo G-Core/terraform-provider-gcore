@@ -18,11 +18,11 @@ resource "gcore_cloud_reserved_fixed_ip" "fixed_ip" {
   project_id = 1
   region_id  = 1
 
-  type             = "ip_address"
-  network_id       = gcore_cloud_network.private_network.id
-  subnet_id        = gcore_cloud_network_subnet.private_subnet.id
-  fixed_ip_address = "10.0.0.10"
-  is_vip           = false
+  type       = "ip_address"
+  network_id = gcore_cloud_network.private_network.id
+  subnet_id  = gcore_cloud_network_subnet.private_subnet.id
+  ip_address = "10.0.0.10"
+  is_vip     = false
 }
 
 resource "gcore_cloud_load_balancer_pool_member" "private_member" {

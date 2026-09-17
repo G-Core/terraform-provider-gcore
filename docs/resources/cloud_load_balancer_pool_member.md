@@ -36,11 +36,11 @@ resource "gcore_cloud_reserved_fixed_ip" "instance_member_fixed_ip" {
   project_id = 1
   region_id  = 1
 
-  type             = "ip_address"
-  network_id       = gcore_cloud_network.instance_member_private_network.id
-  subnet_id        = gcore_cloud_network_subnet.instance_member_private_subnet.id
-  fixed_ip_address = "10.0.0.11"
-  is_vip           = false
+  type       = "ip_address"
+  network_id = gcore_cloud_network.instance_member_private_network.id
+  subnet_id  = gcore_cloud_network_subnet.instance_member_private_subnet.id
+  ip_address = "10.0.0.11"
+  is_vip     = false
 }
 
 resource "gcore_cloud_volume" "instance_member_volume" {
@@ -48,6 +48,7 @@ resource "gcore_cloud_volume" "instance_member_volume" {
   region_id  = 1
 
   name      = "boot volume"
+  source    = "image"
   type_name = "ssd_hiiops"
   size      = 10
   image_id  = "your-ubuntu-image-id"
@@ -111,11 +112,11 @@ resource "gcore_cloud_reserved_fixed_ip" "fixed_ip" {
   project_id = 1
   region_id  = 1
 
-  type             = "ip_address"
-  network_id       = gcore_cloud_network.private_network.id
-  subnet_id        = gcore_cloud_network_subnet.private_subnet.id
-  fixed_ip_address = "10.0.0.10"
-  is_vip           = false
+  type       = "ip_address"
+  network_id = gcore_cloud_network.private_network.id
+  subnet_id  = gcore_cloud_network_subnet.private_subnet.id
+  ip_address = "10.0.0.10"
+  is_vip     = false
 }
 
 resource "gcore_cloud_load_balancer_pool_member" "private_member" {

@@ -138,7 +138,7 @@ func (r *CloudLoadBalancerPoolMemberResource) Update(ctx context.Context, req re
 		return
 	}
 	res := new(http.Response)
-	_, err = r.client.Cloud.LoadBalancers.Pools.Members.Update(
+	_, err = r.client.Cloud.LoadBalancers.Pools.Members.UpdateAndPoll(
 		ctx,
 		data.ID.ValueString(),
 		params,
