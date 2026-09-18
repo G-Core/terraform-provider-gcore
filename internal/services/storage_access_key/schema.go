@@ -47,6 +47,7 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 			"secret_key": schema.StringAttribute{
 				Description: "Secret key used as the password in S3 authentication. Save this now — it cannot be retrieved again.",
 				Computed:    true,
+				Sensitive:   true,
 			},
 		},
 	}

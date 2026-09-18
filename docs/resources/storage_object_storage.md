@@ -46,7 +46,7 @@ Available values: "standard", "fast".
 Read-Only:
 
 - `access_key` (String) Access key ID used as the username in S3 authentication. Pass this in the `AWS_ACCESS_KEY_ID` field of your S3 client.
-- `secret_key` (String) Secret key used as the password in S3 authentication. Save this now — it cannot be retrieved again.
+- `secret_key` (String, Sensitive) Secret key used as the password in S3 authentication. Save this now — it cannot be retrieved again.
 
 ## Import
 
