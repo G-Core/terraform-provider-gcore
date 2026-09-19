@@ -211,6 +211,13 @@ func (p *GcoreProvider) Configure(ctx context.Context, req provider.ConfigureReq
 
 	if !data.PollingTimeoutSeconds.IsNull() && !data.PollingTimeoutSeconds.IsUnknown() {
 		opts = append(opts, option.WithPollingTimeoutSeconds(data.PollingTimeoutSeconds.ValueInt64()))
+	} else if o, ok := os.LookupEnv("GCORE_POLLING_TIMEOUT_SECONDS"); ok {
+		parsed, err := strconv.ParseInt(o, 10, 64)
+		if err != nil {
+			resp.Diagnostics.Append(diag.NewErrorDiagnostic("failed to parse environment variable: GCORE_POLLING_TIMEOUT_SECONDS", err.Error()))
+			return
+		}
+		opts = append(opts, option.WithPollingTimeoutSeconds(parsed))
 	} else {
 		opts = append(opts, option.WithPollingTimeoutSeconds(7200))
 	}

@@ -37,8 +37,8 @@ provider "gcore" {
   cloud_region_id = 0 # or set GCORE_CLOUD_REGION_ID env variable
   # Interval in seconds between polling attempts for long-running operations. Used by polling methods across services (e.g. Cloud tasks, Storage provisioning).
   polling_interval_seconds = 0
-  # Maximum time in seconds to wait for long-running operations to complete before timing out. Used by polling methods across services (e.g. Cloud tasks, Storage provisioning).
-  polling_timeout_seconds = 0
+  # Maximum time in seconds to wait for long-running operations to complete before timing out. Used by polling methods across services (e.g. Cloud tasks, Storage provisioning). Can also be set via the GCORE_POLLING_TIMEOUT_SECONDS environment variable.
+  polling_timeout_seconds = 0 # or set GCORE_POLLING_TIMEOUT_SECONDS env variable
 }
 
 # Configure a resource
@@ -60,13 +60,13 @@ refer to the full documentation on [the Terraform Registry](https://registry.ter
 When you initialize the provider, the following options are supported. It is recommended to use environment variables for sensitive values like access tokens.
 If an environment variable is provided, then the option does not need to be set in the terraform source.
 
-| Property                 | Environment variable     | Required | Default value |
-| ------------------------ | ------------------------ | -------- | ------------- |
-| api_key                  | `GCORE_API_KEY`          | true     | —             |
-| polling_timeout_seconds  | -                        | false    | `7200`        |
-| polling_interval_seconds | -                        | false    | `3`           |
-| cloud_region_id          | `GCORE_CLOUD_REGION_ID`  | false    | —             |
-| cloud_project_id         | `GCORE_CLOUD_PROJECT_ID` | false    | —             |
+| Property                 | Environment variable            | Required | Default value |
+| ------------------------ | ------------------------------- | -------- | ------------- |
+| api_key                  | `GCORE_API_KEY`                 | true     | —             |
+| polling_timeout_seconds  | `GCORE_POLLING_TIMEOUT_SECONDS` | false    | `7200`        |
+| polling_interval_seconds | -                               | false    | `3`           |
+| cloud_region_id          | `GCORE_CLOUD_REGION_ID`         | false    | —             |
+| cloud_project_id         | `GCORE_CLOUD_PROJECT_ID`        | false    | —             |
 
 ## Semantic versioning
 
