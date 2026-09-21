@@ -95,9 +95,9 @@ func TestAccCloudGPUBaremetalClusterImage_import(t *testing.T) {
 				ResourceName:      "gcore_cloud_gpu_baremetal_cluster_image.test",
 				ImportState:       true,
 				ImportStateVerify: true,
-				// url, hw_firmware_type, tags, and cow_format are create-only
-				// inputs not returned by the API on read.
-				ImportStateVerifyIgnore: []string{"url", "hw_firmware_type", "tags", "cow_format"},
+				// url is the only create-only input the API never returns;
+				// cow_format is recovered from disk_format on import.
+				ImportStateVerifyIgnore: []string{"url"},
 				ImportStateIdFunc: acctest.BuildImportID(
 					"gcore_cloud_gpu_baremetal_cluster_image.test",
 					"project_id", "region_id", "id",
@@ -136,6 +136,120 @@ func TestAccCloudGPUBaremetalClusterImage_import(t *testing.T) {
 				Config: testAccCloudGPUBaremetalClusterImageConfig(rName),
 				ConfigPlanChecks: resource.ConfigPlanChecks{
 					PreApply: []plancheck.PlanCheck{plancheck.ExpectEmptyPlan()},
+				},
+			},
+		},
+	})
+}
+
+// TestAccCloudGPUBaremetalClusterImage_importAdoptionApplies runs the leg the
+// import-block test cannot: the adopting apply itself. The import step above is
+// plan-only, so the GET-backed Update that persists url after an import was
+// never executed by CI. This test imports with `terraform import` semantics
+// (ImportCommandWithID + ImportStatePersist), applies the config and checks
+// that url lands in state, the image is not replaced, and the next plan is
+// empty.
+//
+// The image is uploaded with cow_format = true. The API never returns
+// cow_format, so before it was derived from disk_format on import the same
+// config planned a replacement over cow_format after every import.
+func TestAccCloudGPUBaremetalClusterImage_importAdoptionApplies(t *testing.T) {
+	rName := acctest.RandomName()
+	var imageID string
+
+	resource.ParallelTest(t, resource.TestCase{
+		PreCheck:                 func() { acctest.PreCheck(t) },
+		ProtoV6ProviderFactories: acctest.ProtoV6ProviderFactories,
+		CheckDestroy:             testAccCheckCloudGPUBaremetalClusterImageDestroy,
+		Steps: []resource.TestStep{
+			{
+				Config: testAccCloudGPUBaremetalClusterImageConfigCow(rName),
+				Check: func(s *terraform.State) error {
+					rs, ok := s.RootModule().Resources["gcore_cloud_gpu_baremetal_cluster_image.test"]
+					if !ok {
+						return fmt.Errorf("gcore_cloud_gpu_baremetal_cluster_image.test not found in state")
+					}
+					imageID = rs.Primary.ID
+					return nil
+				},
+				ConfigStateChecks: []statecheck.StateCheck{
+					statecheck.ExpectKnownValue("gcore_cloud_gpu_baremetal_cluster_image.test",
+						tfjsonpath.New("disk_format"), knownvalue.StringExact("raw")),
+				},
+			},
+			{
+				// Forget the image without destroying it, so the import below
+				// targets an address absent from state.
+				Config: testAccCloudGPUBaremetalClusterImageConfigCowForgotten(rName),
+			},
+			{
+				Config:             testAccCloudGPUBaremetalClusterImageConfigCow(rName),
+				ResourceName:       "gcore_cloud_gpu_baremetal_cluster_image.test",
+				ImportState:        true,
+				ImportStateKind:    resource.ImportCommandWithID,
+				ImportStatePersist: true,
+				ImportStateIdFunc: func(*terraform.State) (string, error) {
+					return fmt.Sprintf("%s/%s/%s", acctest.ProjectID(), acctest.RegionID(), imageID), nil
+				},
+			},
+			{
+				// The adopting apply: url lands in state in place, cow_format
+				// was already recovered by the import, nothing is replaced.
+				Config: testAccCloudGPUBaremetalClusterImageConfigCow(rName),
+				ConfigPlanChecks: resource.ConfigPlanChecks{
+					PreApply: []plancheck.PlanCheck{
+						plancheck.ExpectResourceAction("gcore_cloud_gpu_baremetal_cluster_image.test",
+							plancheck.ResourceActionUpdate),
+					},
+				},
+				ConfigStateChecks: []statecheck.StateCheck{
+					statecheck.ExpectKnownValue("gcore_cloud_gpu_baremetal_cluster_image.test",
+						tfjsonpath.New("id"), knownvalue.StringFunc(func(v string) error {
+							if v != imageID {
+								return fmt.Errorf("image was replaced: %s != %s", v, imageID)
+							}
+							return nil
+						})),
+					statecheck.ExpectKnownValue("gcore_cloud_gpu_baremetal_cluster_image.test",
+						tfjsonpath.New("url"), knownvalue.StringExact(testImageURL)),
+					statecheck.ExpectKnownValue("gcore_cloud_gpu_baremetal_cluster_image.test",
+						tfjsonpath.New("cow_format"), knownvalue.Bool(true)),
+				},
+			},
+			{
+				// Adoption is stable: the same config plans nothing.
+				Config:   testAccCloudGPUBaremetalClusterImageConfigCow(rName),
+				PlanOnly: true,
+			},
+			{
+				// Dropping cow_format from config keeps the recovered value:
+				// the schema default must not turn "not configured" into a
+				// silent in-place update to false on a raw image.
+				Config: testAccCloudGPUBaremetalClusterImageConfig(rName),
+				ConfigPlanChecks: resource.ConfigPlanChecks{
+					PreApply: []plancheck.PlanCheck{plancheck.ExpectEmptyPlan()},
+				},
+				ConfigStateChecks: []statecheck.StateCheck{
+					statecheck.ExpectKnownValue("gcore_cloud_gpu_baremetal_cluster_image.test",
+						tfjsonpath.New("cow_format"), knownvalue.Bool(true)),
+				},
+			},
+			{
+				// A value that really differs from the image (false on a raw
+				// image) is a genuine change and still forces replacement;
+				// the replacement is stored as qcow2.
+				Config: testAccCloudGPUBaremetalClusterImageConfigCowFormat(rName, false),
+				ConfigPlanChecks: resource.ConfigPlanChecks{
+					PreApply: []plancheck.PlanCheck{
+						plancheck.ExpectResourceAction("gcore_cloud_gpu_baremetal_cluster_image.test",
+							plancheck.ResourceActionReplace),
+					},
+				},
+				ConfigStateChecks: []statecheck.StateCheck{
+					statecheck.ExpectKnownValue("gcore_cloud_gpu_baremetal_cluster_image.test",
+						tfjsonpath.New("cow_format"), knownvalue.Bool(false)),
+					statecheck.ExpectKnownValue("gcore_cloud_gpu_baremetal_cluster_image.test",
+						tfjsonpath.New("disk_format"), knownvalue.StringExact("qcow2")),
 				},
 			},
 		},
@@ -220,6 +334,37 @@ func testAccCheckCloudGPUBaremetalClusterImageDestroy(s *terraform.State) error 
 
 func testAccCloudGPUBaremetalClusterImageConfig(name string) string {
 	return testAccCloudGPUBaremetalClusterImageConfigWithURL(name, testImageURL)
+}
+
+// testAccCloudGPUBaremetalClusterImageConfigCow uploads the image with
+// cow_format = true, which the API stores as disk_format raw.
+func testAccCloudGPUBaremetalClusterImageConfigCow(name string) string {
+	return testAccCloudGPUBaremetalClusterImageConfigCowFormat(name, true)
+}
+
+func testAccCloudGPUBaremetalClusterImageConfigCowFormat(name string, cowFormat bool) string {
+	return fmt.Sprintf(`
+resource "gcore_cloud_gpu_baremetal_cluster_image" "test" {
+  project_id = %[1]s
+  region_id  = %[2]s
+  name       = %[3]q
+  url        = %[4]q
+  cow_format = %[5]t
+}`, acctest.ProjectID(), acctest.RegionID(), name, testImageURL, cowFormat)
+}
+
+// testAccCloudGPUBaremetalClusterImageConfigCowForgotten replaces the resource
+// block with a removed block (Terraform >= 1.7): the state entry goes away, the
+// live image stays, and a later step can import it again.
+func testAccCloudGPUBaremetalClusterImageConfigCowForgotten(string) string {
+	return `
+removed {
+  from = gcore_cloud_gpu_baremetal_cluster_image.test
+
+  lifecycle {
+    destroy = false
+  }
+}`
 }
 
 func testAccCloudGPUBaremetalClusterImageConfigWithURL(name, url string) string {
