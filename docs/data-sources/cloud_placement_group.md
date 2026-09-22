@@ -25,7 +25,7 @@ data "gcore_cloud_placement_group" "example_cloud_placement_group" {
 
 ### Required
 
-- `group_id` (String) The ID of the placement group.
+- `group_id` (String) The ID of the server group.
 
 ### Optional
 
@@ -35,11 +35,11 @@ data "gcore_cloud_placement_group" "example_cloud_placement_group" {
 ### Read-Only
 
 - `id` (String) The ID of this resource.
-- `instances` (Attributes List) The list of instances in this placement group. (see [below for nested schema](#nestedatt--instances))
-- `name` (String) The name of the placement group.
-- `policy` (String) The placement group policy. Options are: anti-affinity, affinity, or soft-anti-affinity.
+- `instances` (Attributes List) The list of instances in this server group. (see [below for nested schema](#nestedatt--instances))
+- `name` (String) The name of the server group.
+- `policy` (String) The server group policy. Options are: anti-affinity, affinity, or soft-anti-affinity.
 - `region` (String) Region name
-- `servergroup_id` (String) The ID of the placement group.
+- `servergroup_id` (String) The ID of the server group.
 
 <a id="nestedatt--instances"></a>
 ### Nested Schema for `instances`

@@ -41,7 +41,7 @@ Available values: "core", "edge".
 - `display_name` (String) Human-readable region name
 - `endpoint_type` (String) Endpoint type
 Available values: "admin", "internal", "public".
-- `external_network_id` (String) External network ID
+- `external_network_id` (String) External network ID for Neutron
 - `file_share_types` (List of String) List of available file share types
 - `has_ai` (Boolean) Region has AI capability
 - `has_ai_gpu` (Boolean) Region has AI GPU capability
@@ -50,10 +50,10 @@ Available values: "admin", "internal", "public".
 - `has_dbaas` (Boolean) Region has DBAAS service
 - `has_ddos` (Boolean) Region has Advanced DDoS Protection capability
 - `has_k8s` (Boolean) Region has managed kubernetes capability
-- `has_kvm` (Boolean) Region supports virtual machine instances
+- `has_kvm` (Boolean) Region has KVM virtualization capability
 - `has_sfs` (Boolean) Region has SFS capability
 - `id` (Number) Region ID
-- `keystone_id` (Number) ID of the identity service record
+- `keystone_id` (Number) Foreign key to Keystone entity
 - `keystone_name` (String) Technical region name
 - `metrics_database_id` (Number) Foreign key to Metrics database entity
 - `slug` (String) Short, human-readable region identifier (e.g. luxembourg-2, santa-clara-1).

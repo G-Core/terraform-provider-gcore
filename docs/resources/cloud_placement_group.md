@@ -105,22 +105,21 @@ resource "gcore_cloud_placement_group" "servergroup" {
 
 ### Required
 
-- `name` (String) The name of the placement group.
-- `policy` (String) The placement group policy.
+- `name` (String) The name of the server group.
+- `policy` (String) The server group policy.
 Available values: "affinity", "anti-affinity", "soft-anti-affinity".
 
 ### Optional
 
-- `group_id` (String) The ID of the placement group.
-- `instances` (Attributes Set) The list of instances in this placement group. (see [below for nested schema](#nestedatt--instances))
+- `instances` (Attributes Set) The list of instances in this server group. (see [below for nested schema](#nestedatt--instances))
 - `project_id` (Number) Project ID
 - `region_id` (Number) Region ID
 
 ### Read-Only
 
-- `id` (String) The ID of the placement group.
+- `id` (String) The ID of the server group.
 - `region` (String) Region name
-- `servergroup_id` (String) The ID of the placement group.
+- `servergroup_id` (String) The ID of the server group.
 
 <a id="nestedatt--instances"></a>
 ### Nested Schema for `instances`

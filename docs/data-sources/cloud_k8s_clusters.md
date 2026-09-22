@@ -61,7 +61,7 @@ Read-Only:
 - `services_ip_pool` (String) The IP pool for the services
 - `services_ipv6_pool` (String) The IPv6 pool for the services
 - `status` (String) Status
-Available values: "Deleting", "Failed", "Pending", "Provisioned", "Provisioning", "Unknown".
+Available values: "Deleting", "Provisioned", "Provisioning".
 - `task_id` (String) The UUID of the active task that currently holds a lock on the resource. This lock prevents concurrent modifications to ensure consistency. If `null`, the resource is not locked.
 - `version` (String) K8s version
 
@@ -223,8 +223,8 @@ Read-Only:
 - `name` (String) Name of the cluster pool
 - `node_count` (Number) Node count in the cluster pool
 - `security_group_ids` (List of String) Security group IDs applied to the cluster pool nodes
-- `servergroup_id` (String) Placement group ID
-- `servergroup_name` (String) Placement group name
-- `servergroup_policy` (String) Anti-affinity, affinity or soft-anti-affinity placement group policy
+- `servergroup_id` (String) Server group ID
+- `servergroup_name` (String) Server group name
+- `servergroup_policy` (String) Anti-affinity, affinity or soft-anti-affinity server group policy
 - `status` (String) Status of the cluster pool
 - `taints` (Map of String) Taints applied to the cluster pool
