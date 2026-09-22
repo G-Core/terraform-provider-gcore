@@ -1,5 +1,69 @@
 # Changelog
 
+## [2.0.0-rc.2](https://github.com/G-Core/terraform-provider-gcore/compare/v2.0.0-rc.1...v2.0.0-rc.2) (2026-09-22)
+
+
+### ⚠ BREAKING CHANGES
+
+* **cloud:** poll lb pool members, replace on address/port, fix drift
+* **storage:** make the SFTP password write-only
+* **waap:** migrate compatible endpoints to v2
+* **cloud:** `url_wo` on gcore_cloud_gpu_virtual_cluster_image is `url` again. Configs using url_wo must rename it back. No state migration is needed: write-only values were never stored in state.
+
+### Features
+
+* **cdn:** add aliases_limit to account limits response ([1ec5b27](https://github.com/G-Core/terraform-provider-gcore/commit/1ec5b2739ddc3a9b858b60d56e537c8e7b5ff193))
+* **cdn:** add preset and applied preset terraform resource and data source ([46b6d9a](https://github.com/G-Core/terraform-provider-gcore/commit/46b6d9ae5c2df5dde201429780483c9410cb16b6))
+* **cdn:** add preset and applied preset terraform resource and data source ([c014c1b](https://github.com/G-Core/terraform-provider-gcore/commit/c014c1b10db9bb81d7dc7c70b5885170d649e3e6))
+* **client:** support polling timeout environment variable ([b0cf243](https://github.com/G-Core/terraform-provider-gcore/commit/b0cf243ebc98cdf945521cab0c2ec9147eee43a9))
+* **cloud:** generate the LB pool member methods for terraform and cli ([e7c9402](https://github.com/G-Core/terraform-provider-gcore/commit/e7c94028c72d65aa0c861ed9ef36a14eefc12500))
+* **cloud:** poll lb pool members, replace on address/port, fix drift ([703a624](https://github.com/G-Core/terraform-provider-gcore/commit/703a624b120c061bc00c339fc40bb21a12cb847b))
+* **dns:** add from/to time filters to rrset failover log ([2579238](https://github.com/G-Core/terraform-provider-gcore/commit/2579238f0f75cb6170a135c0ef675dbd3fd68bb6))
+* **storage:** make the SFTP password write-only ([8b7d3d6](https://github.com/G-Core/terraform-provider-gcore/commit/8b7d3d644deca195d7cbfc6497cfb20ab049f366))
+* **storage:** SFTP spec update and named write response model ([16cc595](https://github.com/G-Core/terraform-provider-gcore/commit/16cc59590f6030b1694561c64da024f5cd900c3a))
+* **waap:** migrate compatible endpoints to v2 ([1b84b16](https://github.com/G-Core/terraform-provider-gcore/commit/1b84b16fb174eb933c2c27330c53d9adf8920fdb))
+
+
+### Bug Fixes
+
+* **cloud:** keep image import from forcing replacement ([99f7174](https://github.com/G-Core/terraform-provider-gcore/commit/99f7174c28ce7422850582bb2f5db50f3fe6427d))
+* **cloud:** keep instance import from forcing replacement ([6d90513](https://github.com/G-Core/terraform-provider-gcore/commit/6d90513123e787299a90bcf1e35125c87d90fd4c))
+* **cloud:** mark k8s kubeconfig credentials as sensitive ([7da9002](https://github.com/G-Core/terraform-provider-gcore/commit/7da9002428dea4f51635e275db07654f9548d511))
+* **cloud:** recover cow_format when importing a GPU baremetal image ([b7387c5](https://github.com/G-Core/terraform-provider-gcore/commit/b7387c55b11d15ae5b5d810e51077f73875c0dec))
+* **cloud:** use the consolidated GPU baremetal cluster settings endpoints ([35819ec](https://github.com/G-Core/terraform-provider-gcore/commit/35819ecc477538cf444fa2e592b3a5847ca6ac75))
+* **cloud:** warn before an update reinstalls a bare metal server ([0ddf5ad](https://github.com/G-Core/terraform-provider-gcore/commit/0ddf5ad7ccf3ea504cfc08a0cf8ce5d466a923d4))
+* **storage:** mark object storage secret keys as sensitive ([5371c56](https://github.com/G-Core/terraform-provider-gcore/commit/5371c56b4b7efad013356ca5e2f3b55669f51c15))
+
+
+### Chores
+
+* bump gcore-go to v0.57.0 ([dfa2716](https://github.com/G-Core/terraform-provider-gcore/commit/dfa27164a51be37bf5cf94b6cf0d492a6aca5ebc))
+* **cdn:** update cdn OpenAPI spec ([cf0d542](https://github.com/G-Core/terraform-provider-gcore/commit/cf0d542c2db2a0f5ea2fbee382805e2dddf196af))
+* **cdn:** update cdn OpenAPI spec ([c67b5a7](https://github.com/G-Core/terraform-provider-gcore/commit/c67b5a77ee47d5d9a53e78aed3f3b67d6533f190))
+* **cloud:** update cloud OpenAPI spec ([2bf29f3](https://github.com/G-Core/terraform-provider-gcore/commit/2bf29f3173e40270b92cb0de3f6f3f86b2799d1a))
+* **cloud:** update cloud OpenAPI spec ([ac6c135](https://github.com/G-Core/terraform-provider-gcore/commit/ac6c135123999928aea87574770e105265c9f96f))
+* **cloud:** update cloud OpenAPI spec ([37a83e1](https://github.com/G-Core/terraform-provider-gcore/commit/37a83e1b2adc98be8ac199c458740d3027a2dfce))
+* **cloud:** update cloud OpenAPI spec ([b0f9f60](https://github.com/G-Core/terraform-provider-gcore/commit/b0f9f60f24801a5f7747a2168b4abb80f472f30b))
+* **cloud:** update cloud OpenAPI spec ([69107c6](https://github.com/G-Core/terraform-provider-gcore/commit/69107c6c47c51bf5c151e2d9181694e7e36bcc78))
+* **fastedge:** update fastedge OpenAPI spec ([ee6e916](https://github.com/G-Core/terraform-provider-gcore/commit/ee6e9169877c42922a24d8a9fe2b648cd15f6ce3))
+* reseal custom code from G-Core/terraform-provider-gcore-staging@263a065da6f133ab91190429124b16781309bd84 ([888c295](https://github.com/G-Core/terraform-provider-gcore/commit/888c295d0658d53731d5259d715425ddd5af59da))
+* **waap:** update descriptions ([e8479f5](https://github.com/G-Core/terraform-provider-gcore/commit/e8479f51d135c098d9bc59df85a1606b36b5eab3))
+
+
+### Documentation
+
+* **cdn:** document origin shielding import ([1713530](https://github.com/G-Core/terraform-provider-gcore/commit/17135301e37911a129d3de7e54634763f8fc16b3))
+* **terraform:** regenerate from custom templates ([7f53058](https://github.com/G-Core/terraform-provider-gcore/commit/7f53058a6f7d57c461cdeb026f7876211afd9b7d))
+* **terraform:** regenerate from custom templates ([d536175](https://github.com/G-Core/terraform-provider-gcore/commit/d5361753a2eb1f142625362f0e6382d5eb529257))
+* **terraform:** regenerate from custom templates ([95301e1](https://github.com/G-Core/terraform-provider-gcore/commit/95301e1cc55e79f9d7a90f90451ed134abf499ab))
+* **terraform:** regenerate from custom templates ([e72d32e](https://github.com/G-Core/terraform-provider-gcore/commit/e72d32e01edb34ee950703df501d14774835533c))
+* **terraform:** regenerate from custom templates ([5c92b1e](https://github.com/G-Core/terraform-provider-gcore/commit/5c92b1e8d27ae20ac4cc35c4e64907b263c77cf5))
+* **terraform:** regenerate from custom templates ([807642a](https://github.com/G-Core/terraform-provider-gcore/commit/807642a0eb0d2faaf065d72f9a467698285adcc7))
+* **terraform:** regenerate from custom templates ([440f38d](https://github.com/G-Core/terraform-provider-gcore/commit/440f38d5d35e39072c507130f8adc9e26488023b))
+* **terraform:** regenerate from custom templates ([f1e49c2](https://github.com/G-Core/terraform-provider-gcore/commit/f1e49c2ee9b223011bdabcf7e979c829976acf15))
+* **terraform:** regenerate from custom templates ([83b6dda](https://github.com/G-Core/terraform-provider-gcore/commit/83b6dda29fa084bb38c8c1f8834a21115e9f07df))
+* **terraform:** regenerate from custom templates ([729638d](https://github.com/G-Core/terraform-provider-gcore/commit/729638d9077ce8697181de2eeeac56aaa2262685))
+
 ## [2.0.0-rc.1](https://github.com/G-Core/terraform-provider-gcore/compare/v2.0.0-alpha.15...v2.0.0-rc.1) (2026-08-31)
 
 
