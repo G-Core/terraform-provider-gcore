@@ -51,8 +51,8 @@ data "gcore_cloud_k8s_cluster_pool" "example_cloud_k8s_cluster_pool" {
 - `name` (String) Name of the cluster pool
 - `node_count` (Number) Node count in the cluster pool
 - `security_group_ids` (List of String) Security group IDs applied to the cluster pool nodes
-- `servergroup_id` (String) Server group ID
-- `servergroup_name` (String) Server group name
-- `servergroup_policy` (String) Anti-affinity, affinity or soft-anti-affinity server group policy
+- `servergroup_id` (String) Placement group ID
+- `servergroup_name` (String) Placement group name
+- `servergroup_policy` (String) Anti-affinity, affinity or soft-anti-affinity placement group policy
 - `status` (String) Status of the cluster pool
 - `taints` (Map of String) Taints applied to the cluster pool

@@ -54,7 +54,7 @@ data "gcore_cloud_gpu_virtual_clusters" "example_cloud_gpu_virtual_clusters" {
     suffix = ["string"]
   }
   tags = {
-    env = "prod"
+    env = ["prod"]
   }
   updated_at = {
     gt = "2019-12-27T18:11:19.117Z"
@@ -80,7 +80,7 @@ data "gcore_cloud_gpu_virtual_clusters" "example_cloud_gpu_virtual_clusters" {
 - `servers_count` (Attributes) Filter by node count, e.g. `servers_count[gte]=2`, `servers_count[gte]=2&servers_count[lt]=8`. (see [below for nested schema](#nestedatt--servers_count))
 - `tag_key` (Attributes) Filter by tag key regardless of value, e.g. `tag_key[contains]=team`. (see [below for nested schema](#nestedatt--tag_key))
 - `tag_value` (Attributes) Filter by tag value regardless of key, e.g. `tag_value[prefix]=prod`. (see [below for nested schema](#nestedatt--tag_value))
-- `tags` (Map of String) Filter by exact tag key-value pairs, e.g. `tags[env]=prod&tags[team]=core`. Pairs are ANDed; values match case-insensitively.
+- `tags` (Map of List of String) Filter by exact tag key-value pairs, e.g. `tags[env]=prod&tags[team]=core`. Repeat a key to match any of several values for it, e.g. `tags[env]=prod&tags[env]=dev`. Values for one key are ORed, different keys are ANDed; values match case-insensitively.
 - `updated_at` (Attributes) Filter by last-change time (UTC), e.g. `updated_at[gte]=2026-06-01T00:00:00Z`. (see [below for nested schema](#nestedatt--updated_at))
 
 ### Read-Only
