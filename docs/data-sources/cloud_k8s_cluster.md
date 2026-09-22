@@ -57,7 +57,7 @@ data "gcore_cloud_k8s_cluster" "example_cloud_k8s_cluster" {
 - `services_ip_pool` (String) The IP pool for the services
 - `services_ipv6_pool` (String) The IPv6 pool for the services
 - `status` (String) Status
-Available values: "Deleting", "Provisioned", "Provisioning".
+Available values: "Deleting", "Failed", "Pending", "Provisioned", "Provisioning", "Unknown".
 - `version` (String) K8s version
 
 <a id="nestedatt--add_ons"></a>
@@ -198,8 +198,8 @@ Read-Only:
 - `name` (String) Name of the cluster pool
 - `node_count` (Number) Node count in the cluster pool
 - `security_group_ids` (List of String) Security group IDs applied to the cluster pool nodes
-- `servergroup_id` (String) Server group ID
-- `servergroup_name` (String) Server group name
-- `servergroup_policy` (String) Anti-affinity, affinity or soft-anti-affinity server group policy
+- `servergroup_id` (String) Placement group ID
+- `servergroup_name` (String) Placement group name
+- `servergroup_policy` (String) Anti-affinity, affinity or soft-anti-affinity placement group policy
 - `status` (String) Status of the cluster pool
 - `taints` (Map of String) Taints applied to the cluster pool

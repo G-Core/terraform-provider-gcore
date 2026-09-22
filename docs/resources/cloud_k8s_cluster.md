@@ -179,7 +179,7 @@ resource "gcore_cloud_k8s_cluster" "cluster" {
 - `id` (String) The name of the cluster
 - `is_public` (Boolean) Cluster is public
 - `status` (String) Status
-Available values: "Deleting", "Provisioned", "Provisioning".
+Available values: "Deleting", "Failed", "Pending", "Provisioned", "Provisioning", "Unknown".
 
 <a id="nestedatt--pools"></a>
 ### Nested Schema for `pools`
@@ -202,7 +202,7 @@ Available values: "cold", "ssd_hiiops", "ssd_local", "ssd_lowlatency", "standard
 - `max_node_count` (Number) Maximum node count
 - `min_node_count` (Number) Minimum node count
 - `security_group_ids` (List of String) Security group IDs applied to the cluster pool nodes
-- `servergroup_policy` (String) Server group policy: anti-affinity, soft-anti-affinity or affinity
+- `servergroup_policy` (String) Placement group policy: anti-affinity, soft-anti-affinity or affinity
 Available values: "affinity", "anti-affinity", "soft-anti-affinity".
 - `taints` (Map of String) Taints applied to the cluster pool
 
