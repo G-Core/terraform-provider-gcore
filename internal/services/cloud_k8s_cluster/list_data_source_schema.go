@@ -236,28 +236,31 @@ func ListDataSourceSchema(ctx context.Context) schema.Schema {
 										ElementType: types.StringType,
 									},
 									"servergroup_id": schema.StringAttribute{
-										Description: "Server group ID",
+										Description: "Placement group ID",
 										Computed:    true,
 									},
 									"servergroup_name": schema.StringAttribute{
-										Description: "Server group name",
+										Description: "Placement group name",
 										Computed:    true,
 									},
 									"servergroup_policy": schema.StringAttribute{
-										Description: "Anti-affinity, affinity or soft-anti-affinity server group policy",
+										Description: "Anti-affinity, affinity or soft-anti-affinity placement group policy",
 										Computed:    true,
 									},
 								},
 							},
 						},
 						"status": schema.StringAttribute{
-							Description: "Status\nAvailable values: \"Deleting\", \"Provisioned\", \"Provisioning\".",
+							Description: "Status\nAvailable values: \"Deleting\", \"Failed\", \"Pending\", \"Provisioned\", \"Provisioning\", \"Unknown\".",
 							Computed:    true,
 							Validators: []validator.String{
 								stringvalidator.OneOfCaseInsensitive(
 									"Deleting",
+									"Failed",
+									"Pending",
 									"Provisioned",
 									"Provisioning",
+									"Unknown",
 								),
 							},
 						},

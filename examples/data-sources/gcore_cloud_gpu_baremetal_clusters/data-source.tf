@@ -40,7 +40,7 @@ data "gcore_cloud_gpu_baremetal_clusters" "example_cloud_gpu_baremetal_clusters"
     suffix = ["string"]
   }
   tags = {
-    env = "prod"
+    env = ["prod"]
   }
   updated_at = {
     gt = "2019-12-27T18:11:19.117Z"

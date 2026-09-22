@@ -22,14 +22,14 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 		MarkdownDescription: "Placement groups enforce affinity or anti-affinity policies that control whether virtual machines are hosted on the same or different physical servers.",
 		Attributes: map[string]schema.Attribute{
 			"id": schema.StringAttribute{
-				Description:   "The ID of the server group.",
+				Description:   "The ID of the placement group.",
 				Computed:      true,
 				PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown(), stringplanmodifier.RequiresReplace()},
 			},
-			"servergroup_id": schema.StringAttribute{
-				Description:   "The ID of the server group.",
-				Computed:      true,
-				PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown(), stringplanmodifier.RequiresReplace()},
+			"group_id": schema.StringAttribute{
+				Description:   "The ID of the placement group.",
+				Optional:      true,
+				PlanModifiers: []planmodifier.String{stringplanmodifier.RequiresReplace()},
 			},
 			"project_id": schema.Int64Attribute{
 				Description:   "Project ID",
@@ -42,12 +42,12 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 				PlanModifiers: []planmodifier.Int64{int64planmodifier.RequiresReplaceIfConfigured()},
 			},
 			"name": schema.StringAttribute{
-				Description:   "The name of the server group.",
+				Description:   "The name of the placement group.",
 				Required:      true,
 				PlanModifiers: []planmodifier.String{stringplanmodifier.RequiresReplace()},
 			},
 			"policy": schema.StringAttribute{
-				Description: "The server group policy.\nAvailable values: \"affinity\", \"anti-affinity\", \"soft-anti-affinity\".",
+				Description: "The placement group policy.\nAvailable values: \"affinity\", \"anti-affinity\", \"soft-anti-affinity\".",
 				Required:    true,
 				Validators: []validator.String{
 					stringvalidator.OneOfCaseInsensitive(
@@ -62,8 +62,12 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 				Description: "Region name",
 				Computed:    true,
 			},
+			"servergroup_id": schema.StringAttribute{
+				Description: "The ID of the placement group.",
+				Computed:    true,
+			},
 			"instances": schema.SetNestedAttribute{
-				Description: "The list of instances in this server group.",
+				Description: "The list of instances in this placement group.",
 				Optional:    true,
 				Computed:    true,
 				CustomType:  customfield.NewNestedObjectSetType[CloudPlacementGroupInstancesModel](ctx),

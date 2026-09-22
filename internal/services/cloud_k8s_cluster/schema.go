@@ -164,7 +164,7 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 							ElementType: types.StringType,
 						},
 						"servergroup_policy": schema.StringAttribute{
-							Description: "Server group policy: anti-affinity, soft-anti-affinity or affinity\nAvailable values: \"affinity\", \"anti-affinity\", \"soft-anti-affinity\".",
+							Description: "Placement group policy: anti-affinity, soft-anti-affinity or affinity\nAvailable values: \"affinity\", \"anti-affinity\", \"soft-anti-affinity\".",
 							Optional:    true,
 							Validators: []validator.String{
 								stringvalidator.OneOfCaseInsensitive(
@@ -550,14 +550,17 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 				PlanModifiers: []planmodifier.Bool{boolplanmodifier.UseStateForUnknown()},
 			},
 			"status": schema.StringAttribute{
-				Description:   "Status\nAvailable values: \"Deleting\", \"Provisioned\", \"Provisioning\".",
+				Description:   "Status\nAvailable values: \"Deleting\", \"Failed\", \"Pending\", \"Provisioned\", \"Provisioning\", \"Unknown\".",
 				Computed:      true,
 				PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
 				Validators: []validator.String{
 					stringvalidator.OneOfCaseInsensitive(
 						"Deleting",
+						"Failed",
+						"Pending",
 						"Provisioned",
 						"Provisioning",
+						"Unknown",
 					),
 				},
 			},

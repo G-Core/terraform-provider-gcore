@@ -21,7 +21,7 @@ type CloudGPUVirtualClustersDataSourceModel struct {
 	ProjectID    types.Int64                                                               `tfsdk:"project_id" path:"project_id,optional"`
 	RegionID     types.Int64                                                               `tfsdk:"region_id" path:"region_id,optional"`
 	IDs          *[]types.String                                                           `tfsdk:"ids" query:"ids,optional"`
-	Tags         *map[string]types.String                                                  `tfsdk:"tags" query:"tags,optional"`
+	Tags         *map[string]*[]types.String                                               `tfsdk:"tags" query:"tags,optional"`
 	CreatedAt    *CloudGPUVirtualClustersCreatedAtDataSourceModel                          `tfsdk:"created_at" query:"created_at,optional"`
 	Flavor       *CloudGPUVirtualClustersFlavorDataSourceModel                             `tfsdk:"flavor" query:"flavor,optional"`
 	Name         *CloudGPUVirtualClustersNameDataSourceModel                               `tfsdk:"name" query:"name,optional"`
@@ -168,11 +168,17 @@ func (m *CloudGPUVirtualClustersDataSourceModel) toListParams(_ context.Context)
 			}
 		}
 	}
-	mTags := map[string]string{}
+	mTags := map[string][]string{}
 	for key, value := range *m.Tags {
-		if !value.IsNull() {
-			mTags[key] = value.ValueString()
+		paramsValue := []string{}
+		if value != nil {
+			for _, item := range *value {
+				if !item.IsNull() {
+					paramsValue = append(paramsValue, item.ValueString())
+				}
+			}
 		}
+		mTags[key] = paramsValue
 	}
 
 	params = cloud.GPUVirtualClusterListParams{

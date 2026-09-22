@@ -40,7 +40,7 @@ func ListDataSourceSchema(ctx context.Context) schema.Schema {
 				NestedObject: schema.NestedAttributeObject{
 					Attributes: map[string]schema.Attribute{
 						"instances": schema.ListNestedAttribute{
-							Description: "The list of instances in this server group.",
+							Description: "The list of instances in this placement group.",
 							Computed:    true,
 							CustomType:  customfield.NewNestedObjectListType[CloudPlacementGroupsInstancesDataSourceModel](ctx),
 							NestedObject: schema.NestedAttributeObject{
@@ -57,11 +57,11 @@ func ListDataSourceSchema(ctx context.Context) schema.Schema {
 							},
 						},
 						"name": schema.StringAttribute{
-							Description: "The name of the server group.",
+							Description: "The name of the placement group.",
 							Computed:    true,
 						},
 						"policy": schema.StringAttribute{
-							Description: "The server group policy. Options are: anti-affinity, affinity, or soft-anti-affinity.",
+							Description: "The placement group policy. Options are: anti-affinity, affinity, or soft-anti-affinity.",
 							Computed:    true,
 						},
 						"project_id": schema.Int64Attribute{
@@ -77,7 +77,7 @@ func ListDataSourceSchema(ctx context.Context) schema.Schema {
 							Computed:    true,
 						},
 						"servergroup_id": schema.StringAttribute{
-							Description: "The ID of the server group.",
+							Description: "The ID of the placement group.",
 							Computed:    true,
 						},
 					},

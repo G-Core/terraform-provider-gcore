@@ -75,7 +75,7 @@ func DataSourceSchema(ctx context.Context) schema.Schema {
 				},
 			},
 			"external_network_id": schema.StringAttribute{
-				Description: "External network ID for Neutron",
+				Description: "External network ID",
 				Computed:    true,
 			},
 			"has_ai": schema.BoolAttribute{
@@ -107,7 +107,7 @@ func DataSourceSchema(ctx context.Context) schema.Schema {
 				Computed:    true,
 			},
 			"has_kvm": schema.BoolAttribute{
-				Description: "Region has KVM virtualization capability",
+				Description: "Region supports virtual machine instances",
 				Computed:    true,
 			},
 			"has_sfs": schema.BoolAttribute{
@@ -119,7 +119,7 @@ func DataSourceSchema(ctx context.Context) schema.Schema {
 				Computed:    true,
 			},
 			"keystone_id": schema.Int64Attribute{
-				Description: "Foreign key to Keystone entity",
+				Description: "ID of the identity service record",
 				Computed:    true,
 			},
 			"keystone_name": schema.StringAttribute{

@@ -22,7 +22,7 @@ type CloudGPUBaremetalClustersDataSourceModel struct {
 	RegionID     types.Int64                                                                 `tfsdk:"region_id" path:"region_id,optional"`
 	IDs          *[]types.String                                                             `tfsdk:"ids" query:"ids,optional"`
 	ImageIDs     *[]types.String                                                             `tfsdk:"image_ids" query:"image_ids,optional"`
-	Tags         *map[string]types.String                                                    `tfsdk:"tags" query:"tags,optional"`
+	Tags         *map[string]*[]types.String                                                 `tfsdk:"tags" query:"tags,optional"`
 	CreatedAt    *CloudGPUBaremetalClustersCreatedAtDataSourceModel                          `tfsdk:"created_at" query:"created_at,optional"`
 	Flavor       *CloudGPUBaremetalClustersFlavorDataSourceModel                             `tfsdk:"flavor" query:"flavor,optional"`
 	Name         *CloudGPUBaremetalClustersNameDataSourceModel                               `tfsdk:"name" query:"name,optional"`
@@ -181,11 +181,17 @@ func (m *CloudGPUBaremetalClustersDataSourceModel) toListParams(ctx context.Cont
 			}
 		}
 	}
-	mTags := map[string]string{}
+	mTags := map[string][]string{}
 	for key, value := range *m.Tags {
-		if !value.IsNull() {
-			mTags[key] = value.ValueString()
+		paramsValue := []string{}
+		if value != nil {
+			for _, item := range *value {
+				if !item.IsNull() {
+					paramsValue = append(paramsValue, item.ValueString())
+				}
+			}
 		}
+		mTags[key] = paramsValue
 	}
 
 	params = cloud.GPUBaremetalClusterListParams{

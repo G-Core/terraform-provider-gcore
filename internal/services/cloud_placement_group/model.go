@@ -10,6 +10,7 @@ import (
 
 type CloudPlacementGroupModel struct {
 	ID            types.String                                                   `tfsdk:"id" json:"-,computed"`
+	GroupID       types.String                                                   `tfsdk:"group_id" path:"group_id,optional"`
 	ServergroupID types.String                                                   `tfsdk:"servergroup_id" json:"servergroup_id,computed"`
 	ProjectID     types.Int64                                                    `tfsdk:"project_id" path:"project_id,optional"`
 	RegionID      types.Int64                                                    `tfsdk:"region_id" path:"region_id,optional"`

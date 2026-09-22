@@ -40,9 +40,11 @@ func ListDataSourceSchema(ctx context.Context) schema.Schema {
 				ElementType: types.StringType,
 			},
 			"tags": schema.MapAttribute{
-				Description: "Filter by exact tag key-value pairs, e.g. `tags[env]=prod&tags[team]=core`. Pairs are ANDed; values match case-insensitively.",
+				Description: "Filter by exact tag key-value pairs, e.g. `tags[env]=prod&tags[team]=core`. Repeat a key to match any of several values for it, e.g. `tags[env]=prod&tags[env]=dev`. Values for one key are ORed, different keys are ANDed; values match case-insensitively.",
 				Optional:    true,
-				ElementType: types.StringType,
+				ElementType: types.ListType{
+					ElemType: types.StringType,
+				},
 			},
 			"created_at": schema.SingleNestedAttribute{
 				Description: "Filter by creation time (UTC), e.g. `created_at[gte]=2026-01-01T00:00:00Z`.",
