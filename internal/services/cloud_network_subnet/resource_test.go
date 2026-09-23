@@ -11,6 +11,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-testing/compare"
 	"github.com/hashicorp/terraform-plugin-testing/helper/resource"
 	"github.com/hashicorp/terraform-plugin-testing/knownvalue"
+	"github.com/hashicorp/terraform-plugin-testing/plancheck"
 	"github.com/hashicorp/terraform-plugin-testing/statecheck"
 	"github.com/hashicorp/terraform-plugin-testing/terraform"
 	"github.com/hashicorp/terraform-plugin-testing/tfjsonpath"
@@ -63,6 +64,14 @@ func TestAccCloudNetworkSubnet_update(t *testing.T) {
 			},
 			{
 				Config: testAccCloudNetworkSubnetConfigWithDNS(rNameUpdated, `dns_nameservers = ["8.8.8.8"]`),
+				ConfigPlanChecks: resource.ConfigPlanChecks{
+					// ip_version is not configured. It must not force a replacement
+					// when another attribute changes, or every attached resource,
+					// such as a file share, is replaced with the subnet.
+					PreApply: []plancheck.PlanCheck{
+						plancheck.ExpectResourceAction("gcore_cloud_network_subnet.test", plancheck.ResourceActionUpdate),
+					},
+				},
 				ConfigStateChecks: []statecheck.StateCheck{
 					statecheck.ExpectKnownValue("gcore_cloud_network_subnet.test",
 						tfjsonpath.New("name"), knownvalue.StringExact(rNameUpdated)),
