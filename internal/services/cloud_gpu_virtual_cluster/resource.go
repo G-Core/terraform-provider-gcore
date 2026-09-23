@@ -16,6 +16,7 @@ import (
 	"github.com/G-Core/gcore-go/packages/param"
 	"github.com/G-Core/terraform-provider-gcore/internal/apijson"
 	"github.com/G-Core/terraform-provider-gcore/internal/custom"
+	"github.com/G-Core/terraform-provider-gcore/internal/customvalidator"
 	"github.com/G-Core/terraform-provider-gcore/internal/importpath"
 	"github.com/G-Core/terraform-provider-gcore/internal/logging"
 	"github.com/hashicorp/terraform-plugin-framework/path"
@@ -70,6 +71,16 @@ func (r *CloudGPUVirtualClusterResource) Create(ctx context.Context, req resourc
 	}
 
 	resp.Diagnostics.Append(req.Config.GetAttribute(ctx, path.Root("servers_settings"), &data.ServersSettings)...)
+
+	// Re-check the credentials now that every value is resolved; the validator
+	// defers rules an unknown could change. Read from config: the plan always
+	// carries the write-only password_wo as null. See customvalidator.ValidateResolvedCredentials.
+	var credentials types.Object
+	resp.Diagnostics.Append(req.Config.GetAttribute(ctx, path.Root("servers_settings").AtName("credentials"), &credentials)...)
+	resp.Diagnostics.Append(customvalidator.ValidateResolvedCredentials(path.Root("servers_settings").AtName("credentials"), credentials)...)
+	if resp.Diagnostics.HasError() {
+		return
+	}
 
 	params := cloud.GPUVirtualClusterNewParams{}
 

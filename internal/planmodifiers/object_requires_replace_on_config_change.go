@@ -58,6 +58,23 @@ func (m requiresReplaceOnConfigChangeModifier) PlanModifyObject(_ context.Contex
 	}
 }
 
+// ConfigChangedFromState reports whether RequiresReplaceOnConfigChange(ignoreFields...)
+// would force a replacement for these config and state values. It exists so a
+// resource's ModifyPlan can ask the same question the attribute modifier answers:
+// the framework hands ModifyPlan an empty RequiresReplace, so a resource that
+// must not error or warn on a plan that already replaces it has to re-derive the
+// answer from the values the modifier compared.
+func ConfigChangedFromState(configVal, stateVal attr.Value, ignoreFields ...string) bool {
+	if stateVal.IsNull() || stateVal.IsUnknown() || configVal.IsNull() {
+		return false
+	}
+	ignore := make(map[string]struct{}, len(ignoreFields))
+	for _, f := range ignoreFields {
+		ignore[f] = struct{}{}
+	}
+	return configValuesChangedFromState(configVal, stateVal, ignore)
+}
+
 // configValuesChangedFromState performs a deep comparison between config and state values,
 // only checking fields that are explicitly set in config (not null/unknown).
 // This allows computed fields in state to differ without triggering replacement.

@@ -16,6 +16,7 @@ import (
 	"github.com/G-Core/gcore-go/packages/param"
 	"github.com/G-Core/terraform-provider-gcore/internal/apijson"
 	"github.com/G-Core/terraform-provider-gcore/internal/custom"
+	"github.com/G-Core/terraform-provider-gcore/internal/customvalidator"
 	"github.com/G-Core/terraform-provider-gcore/internal/importpath"
 	"github.com/G-Core/terraform-provider-gcore/internal/logging"
 	"github.com/hashicorp/terraform-plugin-framework/attr"
@@ -72,6 +73,16 @@ func (r *CloudGPUBaremetalClusterResource) Create(ctx context.Context, req resou
 
 	// Preserve servers_settings from config (for no_refresh fields like credentials)
 	resp.Diagnostics.Append(req.Config.GetAttribute(ctx, path.Root("servers_settings"), &data.ServersSettings)...)
+
+	// Re-check the credentials now that every value is resolved; the validator
+	// defers rules an unknown could change. Read from config: the plan always
+	// carries the write-only password_wo as null. See customvalidator.ValidateResolvedCredentials.
+	var credentials types.Object
+	resp.Diagnostics.Append(req.Config.GetAttribute(ctx, path.Root("servers_settings").AtName("credentials"), &credentials)...)
+	resp.Diagnostics.Append(customvalidator.ValidateResolvedCredentials(path.Root("servers_settings").AtName("credentials"), credentials)...)
+	if resp.Diagnostics.HasError() {
+		return
+	}
 
 	params := cloud.GPUBaremetalClusterNewParams{}
 
@@ -147,6 +158,18 @@ func (r *CloudGPUBaremetalClusterResource) Update(ctx context.Context, req resou
 			"Unsupported credential update",
 			"Updating username or password is not supported. These credentials can only be set during resource creation. To change them, the resource must be recreated.",
 		)
+		return
+	}
+
+	// Read the re-image triggers off the plan before any API response is folded
+	// into `data`; the decision, the payload and the state write all use them.
+	// See rebuild.go.
+	planned := rebuildTriggersOf(ctx, req.Plan)
+	prior := rebuildTriggersOf(ctx, req.State)
+	rebuild := rebuildsOnApply(planned, prior)
+
+	if sshKeyRemoved(planned, prior) {
+		resp.Diagnostics.Append(sshKeyRemovalError())
 		return
 	}
 
@@ -235,15 +258,16 @@ func (r *CloudGPUBaremetalClusterResource) Update(ctx context.Context, req resou
 		stateHasChanged = true
 	}
 
-	// Check if server settings that require a settings patch + apply have changed
-	// (image_id, credentials, user_data)
-	imageChanged := !data.ImageID.IsNull() && data.ImageID.ValueString() != state.ImageID.ValueString()
-	userDataChanged := false
-	if data.ServersSettings != nil && state.ServersSettings != nil {
-		userDataChanged = !data.ServersSettings.UserData.Equal(state.ServersSettings.UserData)
+	imageChanged := rebuildDecisionFor(planned.imageID, prior.imageID) == rebuildYes
+
+	// After the name/tags/resize branches on purpose; see rebuildAtUnknownValueError.
+	if rebuild == rebuildUnknown {
+		resp.Diagnostics.Append(rebuildAtUnknownValueError())
+
+		return
 	}
 
-	if imageChanged || credentialsChanged || userDataChanged {
+	if rebuild == rebuildYes {
 		updateParams := cloud.GPUBaremetalClusterUpdateParams{}
 		if !data.ProjectID.IsNull() {
 			updateParams.ProjectID = param.NewOpt(data.ProjectID.ValueInt64())
@@ -251,18 +275,7 @@ func (r *CloudGPUBaremetalClusterResource) Update(ctx context.Context, req resou
 		if !data.RegionID.IsNull() {
 			updateParams.RegionID = param.NewOpt(data.RegionID.ValueInt64())
 		}
-		if imageChanged {
-			updateParams.ImageID = param.NewOpt(data.ImageID.ValueString())
-		}
-		if data.ServersSettings != nil && data.ServersSettings.Credentials != nil {
-			creds := data.ServersSettings.Credentials
-			if !creds.SSHKeyName.IsNull() {
-				updateParams.ServersSettings.Credentials.SSHKeyName = param.NewOpt(creds.SSHKeyName.ValueString())
-			}
-		}
-		if data.ServersSettings != nil && !data.ServersSettings.UserData.IsNull() && !data.ServersSettings.UserData.IsUnknown() {
-			updateParams.ServersSettings.UserData = param.NewOpt(data.ServersSettings.UserData.ValueString())
-		}
+		applyTriggerPayload(&updateParams, planned, imageChanged)
 
 		// Patch the cluster template. This only records the new settings; existing
 		// servers keep running with the old ones until they are applied below.
@@ -280,6 +293,7 @@ func (r *CloudGPUBaremetalClusterResource) Update(ctx context.Context, req resou
 		// Apply the patched settings to the existing servers. This re-images them,
 		// so max_disruption has to be "rebuild": the API default "none" always
 		// fails validation, by design, to block accidental destructive applies.
+		// The plan-time warning is the only prompt before this confirmation.
 		applyParams := cloud.GPUBaremetalClusterApplySettingsParams{
 			MaxDisruption: cloud.GPUBaremetalClusterApplySettingsParamsMaxDisruptionRebuild,
 		}
@@ -311,6 +325,12 @@ func (r *CloudGPUBaremetalClusterResource) Update(ctx context.Context, req resou
 			data.Tags = tags
 		}
 		stateHasChanged = true
+	}
+
+	// UnmarshalComputed ignores user_data's no_refresh tag; state must match the
+	// plan, not the API. See applyTriggerPayload in rebuild.go.
+	if data.ServersSettings != nil && !planned.userData.IsUnknown() {
+		data.ServersSettings.UserData = planned.userData
 	}
 
 	if stateHasChanged {
@@ -496,6 +516,13 @@ func (r *CloudGPUBaremetalClusterResource) ModifyPlan(ctx context.Context, req r
 		return
 	}
 
+	// On a plan that replaces the cluster, Create runs instead of Update:
+	// nothing below applies, and a new cluster may be built with any
+	// credentials or none. See planReplacesCluster in rebuild.go.
+	if planReplacesCluster(ctx, req.Plan, req.State, req.Config) {
+		return
+	}
+
 	// The cluster settings patch only supports updating ssh_key_name.
 	// Reject username/password changes at plan time with a clear error.
 	if credentialsHaveChanged(planSettings, stateSettings) &&
@@ -504,6 +531,21 @@ func (r *CloudGPUBaremetalClusterResource) ModifyPlan(ctx context.Context, req r
 			"Unsupported credential update",
 			"Updating username or password is not supported. These credentials can only be set during resource creation. To change them, the resource must be recreated.",
 		)
+
+		return
+	}
+
+	// Re-image warning and key-removal guard; see rebuild.go.
+	planned := rebuildTriggersOf(ctx, req.Plan)
+	prior := rebuildTriggersOf(ctx, req.State)
+
+	if sshKeyRemoved(planned, prior) {
+		resp.Diagnostics.Append(sshKeyRemovalError())
+		return
+	}
+
+	if rebuildsOnApply(planned, prior) != rebuildNo {
+		resp.Diagnostics.Append(rebuildWarning())
 	}
 }
 

@@ -31,6 +31,37 @@ This example demonstrates how to create a baremetal GPU cluster with VAST file s
 
 {{tffile "examples/resources/gcore_cloud_gpu_baremetal_cluster/gpu-with-vast-manual-mount.tf"}}
 
+## Changing the image, SSH key or user data re-images the servers
+
+Changing `image_id`, `servers_settings.credentials.ssh_key_name` or `servers_settings.user_data`
+is applied in place: the cluster keeps its ID and the servers keep their addresses, but the API
+reinstalls the operating system on every server whose settings are out of date, and anything on
+their local disks is lost. Terraform shows this as an ordinary in-place update, so the provider
+emits a warning at plan time. Read it before applying, and revert the attribute if the re-image
+is not intended.
+
+The API refuses this operation unless the caller confirms it (`max_disruption = "rebuild"` on
+`apply_settings`). The provider sends that confirmation on your behalf; the plan-time warning is
+the only prompt, and a non-interactive apply (`-auto-approve`, or applying a saved plan) proceeds
+past it.
+
+The warning is also emitted when one of these attributes is not yet known at plan time (for
+example, interpolated from a resource that does not exist yet). The apply then re-images the
+servers only if the resolved value actually differs.
+
+~> **On a plan that replaces the cluster** (a `flavor` change, or `terraform plan -replace`) no
+in-place re-image takes place: every server is destroyed and created again. The provider
+suppresses the warning and the credential checks below when the replacement is caused by an
+attribute change. A `-replace` given on the command line, or a `replace_triggered_by`, is
+resolved by Terraform after the provider has answered and is not visible to it: on such a plan
+the warning may still appear and the credential checks still apply.
+
+Removing `servers_settings.credentials.ssh_key_name` from the configuration is rejected: the API
+has no operation that takes a key away from running servers. Keep the key; to build the cluster
+again without it, change an attribute that forces replacement or destroy and recreate it.
+Changing `username` or `password_wo_version` is rejected as well, since the settings update
+accepts only `ssh_key_name`.
+
 {{ .SchemaMarkdown | trimspace }}
 
 {{ if .HasImport }}
