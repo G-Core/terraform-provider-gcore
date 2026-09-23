@@ -45,15 +45,9 @@ func TestRequiresReplaceUnlessAdopting(t *testing.T) {
 			priorValueNull: true,
 		},
 		{
-			name: "changed known value replaces",
-			want: true,
-		},
-		{
-			name: "removal replaces",
-			want: true,
-		},
-		{
-			name: "unknown planned value replaces",
+			// A known change, a removal and an unknown planned value all reach
+			// the decision as this one row; the typed tests tell them apart.
+			name: "changed value over a known prior value replaces",
 			want: true,
 		},
 		{

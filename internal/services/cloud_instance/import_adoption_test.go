@@ -10,9 +10,26 @@ import (
 	"unicode"
 
 	"github.com/G-Core/terraform-provider-gcore/internal/customfield"
+	"github.com/G-Core/terraform-provider-gcore/internal/importadoption/adoptiontest"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 )
+
+// TestAdoptingModifiersPinned pins, by %T, that every create-only attribute in
+// createOnlyAttributes carries the marker-keyed modifier in schema.go. The
+// schema lines are modifications of generated code - the shape most likely to
+// be reverted by a conflicting reseal - and the revert is silent: the built-in
+// RequiresReplace() comes back and `terraform import` plans a destroy+recreate.
+func TestAdoptingModifiersPinned(t *testing.T) {
+	t.Parallel()
+
+	names := make([]string, 0, len(createOnlyAttributes))
+	for name := range createOnlyAttributes {
+		names = append(names, name)
+	}
+	slices.Sort(names)
+	adoptiontest.AssertAdoptingModifiers(t, ResourceSchema(context.Background()).Attributes, names...)
+}
 
 // fakePrivate stands in for the framework's private state, whose concrete type
 // lives in an internal package and cannot be constructed from here.

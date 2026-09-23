@@ -815,11 +815,17 @@ func TestAccCloudInstance_importAdoptionApplies(t *testing.T) {
 			{
 				// A standalone plan of the adopting config: in-place update
 				// planned, window not consumed - plans persist nothing.
+				// PlanOnly steps skip ConfigPlanChecks.PreApply entirely
+				// (plugin-testing runs it only around a real apply), so the
+				// assertions ride the two plans a PlanOnly step does run.
 				Config:             testAccCloudInstanceConfigAdoptsCreateOnly(rName, imageID),
 				PlanOnly:           true,
 				ExpectNonEmptyPlan: true,
 				ConfigPlanChecks: resource.ConfigPlanChecks{
-					PreApply: []plancheck.PlanCheck{
+					PostApplyPreRefresh: []plancheck.PlanCheck{
+						acctest.ExpectResourceNotReplaced("gcore_cloud_instance.test"),
+					},
+					PostApplyPostRefresh: []plancheck.PlanCheck{
 						acctest.ExpectResourceNotReplaced("gcore_cloud_instance.test"),
 					},
 				},
@@ -908,11 +914,21 @@ func TestAccCloudInstance_importThenNoopApplyThenSetForcesReplace(t *testing.T) 
 				// a replacement - the only action that applies the value.
 				// Plan-only: actually replacing the instance proves nothing
 				// more and burns minutes of real infra.
+				//
+				// PlanOnly steps skip ConfigPlanChecks.PreApply, so the
+				// assertion lives on the refreshing plan. The -refresh=false
+				// plan still sees the spent-but-present marker and adopts;
+				// that is the documented `-refresh=false` residual, pinned
+				// here explicitly rather than hidden.
 				Config:             testAccCloudInstanceConfigAdoptsCreateOnly(rName, imageID),
 				PlanOnly:           true,
 				ExpectNonEmptyPlan: true,
 				ConfigPlanChecks: resource.ConfigPlanChecks{
-					PreApply: []plancheck.PlanCheck{
+					PostApplyPreRefresh: []plancheck.PlanCheck{
+						plancheck.ExpectResourceAction("gcore_cloud_instance.test",
+							plancheck.ResourceActionUpdate),
+					},
+					PostApplyPostRefresh: []plancheck.PlanCheck{
 						plancheck.ExpectResourceAction("gcore_cloud_instance.test",
 							plancheck.ResourceActionReplace),
 					},

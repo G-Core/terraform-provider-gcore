@@ -17,13 +17,24 @@ import (
 // null for a resource created with the attribute omitted, and silently adopting
 // there would record a value the infrastructure does not have.
 //
-// The modifier therefore skips replacement only when the resource carries a
-// private-state marker written at import time and cleared once the value has
-// been adopted. Every other transition keeps the built-in semantics, including
-// removal (config set -> null) and an unknown planned value.
+// The modifier therefore skips replacement only when the prior value is null
+// and the resource carries a private-state marker written at import time. An
+// unknown planned value is adopted there like a known one, the same rule
+// cloud_baremetal_server uses for its rebuild decision. The plan-time warning
+// still names the attribute. Every other transition keeps the built-in
+// semantics: removal (config set -> null) replaces, and so does an unknown
+// planned value over a known prior value.
 //
-// The resource owning the attribute defines the private-state key and is
-// responsible for setting it in ImportState and clearing it in Update.
+// The marker has a lifecycle, not just a mark/clear pair: ImportState writes
+// it, Read advances it (pending -> armed -> spent -> deleted) on every refresh
+// Terraform persists - no-op applies included - and Update clears it early on
+// a successful adopting apply or re-arms it on a failed one. Read is the hook
+// that retires a marker whose import adopted nothing; ModifyPlan never writes
+// private state because a no-op plan's private data is discarded. The shared
+// implementation is internal/importadoption; the resource owning the attribute
+// declares an importadoption.Marker and passes its Key here. This modifier
+// only tests presence, so "spent" still adopts - that is what lets the first
+// apply after `terraform import` adopt.
 //
 // requiresReplaceUnlessAdopting below is the type-agnostic half of the
 // decision, so a typed counterpart for another attribute type is a thin
@@ -50,9 +61,9 @@ func adoptionPending(ctx context.Context, private privateStateReader, key string
 }
 
 // requiresReplaceUnlessAdopting is the decision shared by every typed modifier
-// in this family, kept as a pure function so the whole matrix can be unit
-// tested: the framework request types carry private state as an internal type
-// that cannot be constructed from outside the framework module.
+// in this family, kept as a pure function so the typed wrappers cannot drift
+// apart. It sees only booleans, so it cannot tell a known change from a
+// removal or an unknown value; the typed tests cover those shapes.
 //
 // The only case that skips replacement on a null prior value is an adoption
 // following an import. In particular a resource created with the attribute
@@ -85,8 +96,22 @@ func StringRequiresReplaceUnlessAdopting(privateKey string) planmodifier.String 
 	return stringRequiresReplaceUnlessAdoptingModifier{privateKey: privateKey}
 }
 
+// StringRequiresReplaceUnlessAdoptingAllowingRemoval is
+// StringRequiresReplaceUnlessAdopting for a create-only attribute whose
+// removal from configuration is honoured in place because a sibling takes
+// over - the plan modifier before this one plans null for it and the sibling
+// carries the change (cdn_resource origin -> origin_group, where ExactlyOneOf
+// guarantees the sibling is configured whenever this one is not). A null
+// planned value on a live resource therefore does not force replacement;
+// every other row of the decision is unchanged, including "set on day two
+// without a marker replaces".
+func StringRequiresReplaceUnlessAdoptingAllowingRemoval(privateKey string) planmodifier.String {
+	return stringRequiresReplaceUnlessAdoptingModifier{privateKey: privateKey, allowRemoval: true}
+}
+
 type stringRequiresReplaceUnlessAdoptingModifier struct {
-	privateKey string
+	privateKey   string
+	allowRemoval bool
 }
 
 func (m stringRequiresReplaceUnlessAdoptingModifier) Description(_ context.Context) string {
@@ -102,6 +127,12 @@ func (m stringRequiresReplaceUnlessAdoptingModifier) PlanModifyString(ctx contex
 	resp.Diagnostics.Append(diags...)
 
 	if resp.Diagnostics.HasError() {
+		return
+	}
+
+	if m.allowRemoval && req.PlanValue.IsNull() && !req.Plan.Raw.IsNull() {
+		// Handed over to the sibling attribute: an in-place update, see
+		// StringRequiresReplaceUnlessAdoptingAllowingRemoval.
 		return
 	}
 

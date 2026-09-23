@@ -12,18 +12,27 @@ import (
 type baseUseStateForUnknownInclNull struct{}
 
 func (m baseUseStateForUnknownInclNull) Description(_ context.Context) string {
-	return "Preserves the prior state value (including null) when the plan value is unknown."
+	return "Preserves the prior state value (including null) when the plan value is unknown " +
+		"and the configured value is known."
 }
 
-func (m baseUseStateForUnknownInclNull) MarkdownDescription(_ context.Context) string {
-	return "Preserves the prior state value (including null) when the plan value is unknown."
+func (m baseUseStateForUnknownInclNull) MarkdownDescription(ctx context.Context) string {
+	return m.Description(ctx)
 }
 
 // shouldUseStateValue returns true if the state value should be used.
 // This is the common logic shared by all type-specific modifiers.
-func shouldUseStateValue(stateRawIsNull, planValueIsUnknown bool) bool {
+func shouldUseStateValue(stateRawIsNull, planValueIsUnknown, configValueIsUnknown bool) bool {
 	// Do nothing if there is no state value (new resource)
 	if stateRawIsNull {
+		return false
+	}
+	// Do nothing if the configuration itself is unknown (an interpolation
+	// whose upstream value is not known until apply): the same guard as the
+	// framework's UseStateForUnknown. Copying prior state over an unknown
+	// configured value would tell a following RequiresReplace* modifier that
+	// nothing changed, so the resolved value would never be applied.
+	if configValueIsUnknown {
 		return false
 	}
 	// Only use state value if plan value is unknown
@@ -31,9 +40,9 @@ func shouldUseStateValue(stateRawIsNull, planValueIsUnknown bool) bool {
 }
 
 // BoolUseStateForUnknownInclNull returns a Bool plan modifier that preserves
-// the prior state value when the plan value is unknown, INCLUDING when
-// the state value is null. This differs from the standard UseStateForUnknown()
-// which only preserves non-null state values.
+// the prior state value when the plan value is unknown and the configured
+// value is known, INCLUDING when the state value is null. This differs from
+// the standard UseStateForUnknown() which only preserves non-null state values.
 func BoolUseStateForUnknownInclNull() planmodifier.Bool {
 	return boolUseStateForUnknownInclNull{}
 }
@@ -43,14 +52,14 @@ type boolUseStateForUnknownInclNull struct {
 }
 
 func (m boolUseStateForUnknownInclNull) PlanModifyBool(_ context.Context, req planmodifier.BoolRequest, resp *planmodifier.BoolResponse) {
-	if shouldUseStateValue(req.State.Raw.IsNull(), req.PlanValue.IsUnknown()) {
+	if shouldUseStateValue(req.State.Raw.IsNull(), req.PlanValue.IsUnknown(), req.ConfigValue.IsUnknown()) {
 		resp.PlanValue = req.StateValue
 	}
 }
 
 // Int64UseStateForUnknownInclNull returns an Int64 plan modifier that preserves
-// the prior state value when the plan value is unknown, INCLUDING when
-// the state value is null.
+// the prior state value when the plan value is unknown and the configured
+// value is known, INCLUDING when the state value is null.
 func Int64UseStateForUnknownInclNull() planmodifier.Int64 {
 	return int64UseStateForUnknownInclNull{}
 }
@@ -60,14 +69,14 @@ type int64UseStateForUnknownInclNull struct {
 }
 
 func (m int64UseStateForUnknownInclNull) PlanModifyInt64(_ context.Context, req planmodifier.Int64Request, resp *planmodifier.Int64Response) {
-	if shouldUseStateValue(req.State.Raw.IsNull(), req.PlanValue.IsUnknown()) {
+	if shouldUseStateValue(req.State.Raw.IsNull(), req.PlanValue.IsUnknown(), req.ConfigValue.IsUnknown()) {
 		resp.PlanValue = req.StateValue
 	}
 }
 
 // StringUseStateForUnknownInclNull returns a String plan modifier that preserves
-// the prior state value when the plan value is unknown, INCLUDING when
-// the state value is null.
+// the prior state value when the plan value is unknown and the configured
+// value is known, INCLUDING when the state value is null.
 func StringUseStateForUnknownInclNull() planmodifier.String {
 	return stringUseStateForUnknownInclNull{}
 }
@@ -77,14 +86,14 @@ type stringUseStateForUnknownInclNull struct {
 }
 
 func (m stringUseStateForUnknownInclNull) PlanModifyString(_ context.Context, req planmodifier.StringRequest, resp *planmodifier.StringResponse) {
-	if shouldUseStateValue(req.State.Raw.IsNull(), req.PlanValue.IsUnknown()) {
+	if shouldUseStateValue(req.State.Raw.IsNull(), req.PlanValue.IsUnknown(), req.ConfigValue.IsUnknown()) {
 		resp.PlanValue = req.StateValue
 	}
 }
 
 // SetUseStateForUnknownInclNull returns a Set plan modifier that preserves
-// the prior state value when the plan value is unknown, INCLUDING when
-// the state value is null.
+// the prior state value when the plan value is unknown and the configured
+// value is known, INCLUDING when the state value is null.
 func SetUseStateForUnknownInclNull() planmodifier.Set {
 	return setUseStateForUnknownInclNull{}
 }
@@ -94,14 +103,14 @@ type setUseStateForUnknownInclNull struct {
 }
 
 func (m setUseStateForUnknownInclNull) PlanModifySet(_ context.Context, req planmodifier.SetRequest, resp *planmodifier.SetResponse) {
-	if shouldUseStateValue(req.State.Raw.IsNull(), req.PlanValue.IsUnknown()) {
+	if shouldUseStateValue(req.State.Raw.IsNull(), req.PlanValue.IsUnknown(), req.ConfigValue.IsUnknown()) {
 		resp.PlanValue = req.StateValue
 	}
 }
 
 // ObjectUseStateForUnknownInclNull returns an Object plan modifier that preserves
-// the prior state value when the plan value is unknown, INCLUDING when
-// the state value is null.
+// the prior state value when the plan value is unknown and the configured
+// value is known, INCLUDING when the state value is null.
 func ObjectUseStateForUnknownInclNull() planmodifier.Object {
 	return objectUseStateForUnknownInclNull{}
 }
@@ -111,7 +120,7 @@ type objectUseStateForUnknownInclNull struct {
 }
 
 func (m objectUseStateForUnknownInclNull) PlanModifyObject(_ context.Context, req planmodifier.ObjectRequest, resp *planmodifier.ObjectResponse) {
-	if shouldUseStateValue(req.State.Raw.IsNull(), req.PlanValue.IsUnknown()) {
+	if shouldUseStateValue(req.State.Raw.IsNull(), req.PlanValue.IsUnknown(), req.ConfigValue.IsUnknown()) {
 		resp.PlanValue = req.StateValue
 	}
 }
@@ -141,7 +150,10 @@ func (m objectPreserveNullState) PlanModifyObject(_ context.Context, req planmod
 		return
 	}
 
-	// If plan value is unknown, use state value (even if state value is null)
+	// If plan value is unknown, use state value (even if state value is null).
+	// Unlike the *UseStateForUnknownInclNull family above this has no
+	// unknown-config guard: it is wired to ~50 nested objects and widening the
+	// guard to them is a separate decision.
 	if req.PlanValue.IsUnknown() {
 		resp.PlanValue = req.StateValue
 	}

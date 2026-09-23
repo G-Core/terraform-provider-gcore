@@ -4,6 +4,7 @@ import (
 	"context"
 	"testing"
 
+	"github.com/G-Core/terraform-provider-gcore/internal/importadoption/adoptiontest"
 	"github.com/G-Core/terraform-provider-gcore/internal/planmodifiers"
 	"github.com/hashicorp/terraform-plugin-framework/attr"
 	rschema "github.com/hashicorp/terraform-plugin-framework/resource/schema"
@@ -14,13 +15,23 @@ import (
 )
 
 // adoptionKey stands for the private-state key an owning resource would define.
-// Every request below leaves Private nil, which reads as "no adoption pending" —
-// the state these modifiers are in for every plan except the one right after an
-// import. That is deliberate: the framework's private state is an internal type
-// that cannot be constructed from here, so the adopting half of the matrix is
-// covered by TestRequiresReplaceUnlessAdopting against the pure decision
-// function, and these tests pin the typed wrappers to the non-adopting half.
+// An adopting row writes it into a real framework private state, so the typed
+// wrappers are tested on both halves of the matrix. Every other row leaves
+// Private nil, which reads as "no adoption pending" — the state these
+// modifiers are in for every plan except the ones right after an import.
 const adoptionKey = "adoption_pending"
+
+// markIfAdopting gives req a private state holding the adoption marker when
+// the row is adopting. The modifiers test presence only, so any phase will do.
+func markIfAdopting(t *testing.T, c adoptionCase, req any) {
+	t.Helper()
+	if !c.adopting {
+		return
+	}
+	if d := adoptiontest.NewPrivate(t, req).SetKey(context.Background(), adoptionKey, []byte(`{"phase":"armed"}`)); d.HasError() {
+		t.Fatalf("SetKey: %v", d)
+	}
+}
 
 var adoptionProbeSchema = rschema.Schema{
 	Attributes: map[string]rschema.Attribute{
@@ -59,12 +70,15 @@ func adoptionDestroyingPlan() tfsdk.Plan {
 type adoptionCase struct {
 	name string
 	// stateKind and planKind select which of the type's sample values to use:
-	// "null", "one" or "two". A raw-null state or plan is requested separately.
+	// "null", "unknown", "one" or "two". The configured value is the planned
+	// one. A raw-null state or plan is requested separately.
 	stateKind  string
 	planKind   string
 	creating   bool
 	destroying bool
-	want       bool
+	// adopting puts the import-adoption marker in private state.
+	adopting bool
+	want     bool
 }
 
 // The rows are identical for every attribute type, which is the point: the
@@ -76,10 +90,20 @@ var adoptionCases = []adoptionCase{
 	{name: "unset on both sides does not replace", stateKind: "null", planKind: "null", want: false},
 	{name: "changed known value replaces", stateKind: "one", planKind: "two", want: true},
 	{name: "removal replaces", stateKind: "one", planKind: "null", want: true},
+	{name: "unknown over a known prior value replaces", stateKind: "one", planKind: "unknown", want: true},
 	// The case the null-prior-state heuristic gets wrong: an attribute left
 	// unset at create is null in state too, so setting it later must still
 	// force replacement when no import adoption is pending.
 	{name: "null prior value replaces without an adoption marker", stateKind: "null", planKind: "one", want: true},
+	{name: "unknown over a null prior value replaces without an adoption marker", stateKind: "null", planKind: "unknown", want: true},
+
+	// Inside the adoption window only a null prior value is adopted, and an
+	// unknown planned value is adopted like a known one.
+	{name: "null prior value adopts under an adoption marker", stateKind: "null", planKind: "one", adopting: true, want: false},
+	{name: "unknown over a null prior value adopts under an adoption marker", stateKind: "null", planKind: "unknown", adopting: true, want: false},
+	{name: "adoption marker does not override a known prior value", stateKind: "one", planKind: "two", adopting: true, want: true},
+	{name: "unknown over a known prior value replaces under an adoption marker", stateKind: "one", planKind: "unknown", adopting: true, want: true},
+	{name: "removal replaces under an adoption marker", stateKind: "one", planKind: "null", adopting: true, want: true},
 }
 
 func adoptionRequestShape(c adoptionCase) (tfsdk.State, tfsdk.Plan) {
@@ -98,9 +122,10 @@ func TestStringRequiresReplaceUnlessAdopting(t *testing.T) {
 	t.Parallel()
 
 	pick := map[string]types.String{
-		"null": types.StringNull(),
-		"one":  types.StringValue("one"),
-		"two":  types.StringValue("two"),
+		"null":    types.StringNull(),
+		"unknown": types.StringUnknown(),
+		"one":     types.StringValue("one"),
+		"two":     types.StringValue("two"),
 	}
 
 	for _, tt := range adoptionCases {
@@ -108,15 +133,16 @@ func TestStringRequiresReplaceUnlessAdopting(t *testing.T) {
 			t.Parallel()
 
 			state, plan := adoptionRequestShape(tt)
-			resp := &planmodifier.StringResponse{PlanValue: pick[tt.planKind]}
-			planmodifiers.StringRequiresReplaceUnlessAdopting(adoptionKey).PlanModifyString(
-				context.Background(),
-				planmodifier.StringRequest{
-					StateValue: pick[tt.stateKind],
-					PlanValue:  pick[tt.planKind],
-					State:      state,
-					Plan:       plan,
-				}, resp)
+			req := planmodifier.StringRequest{
+				StateValue:  pick[tt.stateKind],
+				PlanValue:   pick[tt.planKind],
+				ConfigValue: pick[tt.planKind],
+				State:       state,
+				Plan:        plan,
+			}
+			markIfAdopting(t, tt, &req)
+			resp := &planmodifier.StringResponse{PlanValue: req.PlanValue}
+			planmodifiers.StringRequiresReplaceUnlessAdopting(adoptionKey).PlanModifyString(context.Background(), req, resp)
 
 			if resp.Diagnostics.HasError() {
 				t.Fatalf("unexpected error diagnostics: %v", resp.Diagnostics)
@@ -128,13 +154,58 @@ func TestStringRequiresReplaceUnlessAdopting(t *testing.T) {
 	}
 }
 
+// TestStringRequiresReplaceUnlessAdoptingAllowingRemoval: identical to the
+// plain String variant on every row except removal, with or without an
+// adoption marker, which is honoured in place because a sibling attribute
+// takes over (cdn_resource origin).
+func TestStringRequiresReplaceUnlessAdoptingAllowingRemoval(t *testing.T) {
+	t.Parallel()
+
+	pick := map[string]types.String{
+		"null":    types.StringNull(),
+		"unknown": types.StringUnknown(),
+		"one":     types.StringValue("one"),
+		"two":     types.StringValue("two"),
+	}
+
+	for _, tt := range adoptionCases {
+		want := tt.want
+		if tt.planKind == "null" {
+			want = false
+		}
+		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+
+			state, plan := adoptionRequestShape(tt)
+			req := planmodifier.StringRequest{
+				StateValue:  pick[tt.stateKind],
+				PlanValue:   pick[tt.planKind],
+				ConfigValue: pick[tt.planKind],
+				State:       state,
+				Plan:        plan,
+			}
+			markIfAdopting(t, tt, &req)
+			resp := &planmodifier.StringResponse{PlanValue: req.PlanValue}
+			planmodifiers.StringRequiresReplaceUnlessAdoptingAllowingRemoval(adoptionKey).PlanModifyString(context.Background(), req, resp)
+
+			if resp.Diagnostics.HasError() {
+				t.Fatalf("unexpected error diagnostics: %v", resp.Diagnostics)
+			}
+			if resp.RequiresReplace != want {
+				t.Errorf("RequiresReplace = %v, want %v", resp.RequiresReplace, want)
+			}
+		})
+	}
+}
+
 func TestBoolRequiresReplaceUnlessAdopting(t *testing.T) {
 	t.Parallel()
 
 	pick := map[string]types.Bool{
-		"null": types.BoolNull(),
-		"one":  types.BoolValue(true),
-		"two":  types.BoolValue(false),
+		"null":    types.BoolNull(),
+		"unknown": types.BoolUnknown(),
+		"one":     types.BoolValue(true),
+		"two":     types.BoolValue(false),
 	}
 
 	for _, tt := range adoptionCases {
@@ -142,15 +213,16 @@ func TestBoolRequiresReplaceUnlessAdopting(t *testing.T) {
 			t.Parallel()
 
 			state, plan := adoptionRequestShape(tt)
-			resp := &planmodifier.BoolResponse{PlanValue: pick[tt.planKind]}
-			planmodifiers.BoolRequiresReplaceUnlessAdopting(adoptionKey).PlanModifyBool(
-				context.Background(),
-				planmodifier.BoolRequest{
-					StateValue: pick[tt.stateKind],
-					PlanValue:  pick[tt.planKind],
-					State:      state,
-					Plan:       plan,
-				}, resp)
+			req := planmodifier.BoolRequest{
+				StateValue:  pick[tt.stateKind],
+				PlanValue:   pick[tt.planKind],
+				ConfigValue: pick[tt.planKind],
+				State:       state,
+				Plan:        plan,
+			}
+			markIfAdopting(t, tt, &req)
+			resp := &planmodifier.BoolResponse{PlanValue: req.PlanValue}
+			planmodifiers.BoolRequiresReplaceUnlessAdopting(adoptionKey).PlanModifyBool(context.Background(), req, resp)
 
 			if resp.Diagnostics.HasError() {
 				t.Fatalf("unexpected error diagnostics: %v", resp.Diagnostics)
@@ -166,9 +238,10 @@ func TestInt64RequiresReplaceUnlessAdopting(t *testing.T) {
 	t.Parallel()
 
 	pick := map[string]types.Int64{
-		"null": types.Int64Null(),
-		"one":  types.Int64Value(1),
-		"two":  types.Int64Value(2),
+		"null":    types.Int64Null(),
+		"unknown": types.Int64Unknown(),
+		"one":     types.Int64Value(1),
+		"two":     types.Int64Value(2),
 	}
 
 	for _, tt := range adoptionCases {
@@ -176,15 +249,16 @@ func TestInt64RequiresReplaceUnlessAdopting(t *testing.T) {
 			t.Parallel()
 
 			state, plan := adoptionRequestShape(tt)
-			resp := &planmodifier.Int64Response{PlanValue: pick[tt.planKind]}
-			planmodifiers.Int64RequiresReplaceUnlessAdopting(adoptionKey).PlanModifyInt64(
-				context.Background(),
-				planmodifier.Int64Request{
-					StateValue: pick[tt.stateKind],
-					PlanValue:  pick[tt.planKind],
-					State:      state,
-					Plan:       plan,
-				}, resp)
+			req := planmodifier.Int64Request{
+				StateValue:  pick[tt.stateKind],
+				PlanValue:   pick[tt.planKind],
+				ConfigValue: pick[tt.planKind],
+				State:       state,
+				Plan:        plan,
+			}
+			markIfAdopting(t, tt, &req)
+			resp := &planmodifier.Int64Response{PlanValue: req.PlanValue}
+			planmodifiers.Int64RequiresReplaceUnlessAdopting(adoptionKey).PlanModifyInt64(context.Background(), req, resp)
 
 			if resp.Diagnostics.HasError() {
 				t.Fatalf("unexpected error diagnostics: %v", resp.Diagnostics)
@@ -200,9 +274,10 @@ func TestMapRequiresReplaceUnlessAdopting(t *testing.T) {
 	t.Parallel()
 
 	pick := map[string]types.Map{
-		"null": types.MapNull(types.StringType),
-		"one":  types.MapValueMust(types.StringType, map[string]attr.Value{"k": types.StringValue("1")}),
-		"two":  types.MapValueMust(types.StringType, map[string]attr.Value{"k": types.StringValue("2")}),
+		"null":    types.MapNull(types.StringType),
+		"unknown": types.MapUnknown(types.StringType),
+		"one":     types.MapValueMust(types.StringType, map[string]attr.Value{"k": types.StringValue("1")}),
+		"two":     types.MapValueMust(types.StringType, map[string]attr.Value{"k": types.StringValue("2")}),
 	}
 
 	for _, tt := range adoptionCases {
@@ -210,15 +285,16 @@ func TestMapRequiresReplaceUnlessAdopting(t *testing.T) {
 			t.Parallel()
 
 			state, plan := adoptionRequestShape(tt)
-			resp := &planmodifier.MapResponse{PlanValue: pick[tt.planKind]}
-			planmodifiers.MapRequiresReplaceUnlessAdopting(adoptionKey).PlanModifyMap(
-				context.Background(),
-				planmodifier.MapRequest{
-					StateValue: pick[tt.stateKind],
-					PlanValue:  pick[tt.planKind],
-					State:      state,
-					Plan:       plan,
-				}, resp)
+			req := planmodifier.MapRequest{
+				StateValue:  pick[tt.stateKind],
+				PlanValue:   pick[tt.planKind],
+				ConfigValue: pick[tt.planKind],
+				State:       state,
+				Plan:        plan,
+			}
+			markIfAdopting(t, tt, &req)
+			resp := &planmodifier.MapResponse{PlanValue: req.PlanValue}
+			planmodifiers.MapRequiresReplaceUnlessAdopting(adoptionKey).PlanModifyMap(context.Background(), req, resp)
 
 			if resp.Diagnostics.HasError() {
 				t.Fatalf("unexpected error diagnostics: %v", resp.Diagnostics)
@@ -235,9 +311,10 @@ func TestObjectRequiresReplaceUnlessAdopting(t *testing.T) {
 
 	attrTypes := map[string]attr.Type{"k": types.StringType}
 	pick := map[string]types.Object{
-		"null": types.ObjectNull(attrTypes),
-		"one":  types.ObjectValueMust(attrTypes, map[string]attr.Value{"k": types.StringValue("1")}),
-		"two":  types.ObjectValueMust(attrTypes, map[string]attr.Value{"k": types.StringValue("2")}),
+		"null":    types.ObjectNull(attrTypes),
+		"unknown": types.ObjectUnknown(attrTypes),
+		"one":     types.ObjectValueMust(attrTypes, map[string]attr.Value{"k": types.StringValue("1")}),
+		"two":     types.ObjectValueMust(attrTypes, map[string]attr.Value{"k": types.StringValue("2")}),
 	}
 
 	for _, tt := range adoptionCases {
@@ -245,15 +322,16 @@ func TestObjectRequiresReplaceUnlessAdopting(t *testing.T) {
 			t.Parallel()
 
 			state, plan := adoptionRequestShape(tt)
-			resp := &planmodifier.ObjectResponse{PlanValue: pick[tt.planKind]}
-			planmodifiers.ObjectRequiresReplaceUnlessAdopting(adoptionKey).PlanModifyObject(
-				context.Background(),
-				planmodifier.ObjectRequest{
-					StateValue: pick[tt.stateKind],
-					PlanValue:  pick[tt.planKind],
-					State:      state,
-					Plan:       plan,
-				}, resp)
+			req := planmodifier.ObjectRequest{
+				StateValue:  pick[tt.stateKind],
+				PlanValue:   pick[tt.planKind],
+				ConfigValue: pick[tt.planKind],
+				State:       state,
+				Plan:        plan,
+			}
+			markIfAdopting(t, tt, &req)
+			resp := &planmodifier.ObjectResponse{PlanValue: req.PlanValue}
+			planmodifiers.ObjectRequiresReplaceUnlessAdopting(adoptionKey).PlanModifyObject(context.Background(), req, resp)
 
 			if resp.Diagnostics.HasError() {
 				t.Fatalf("unexpected error diagnostics: %v", resp.Diagnostics)
