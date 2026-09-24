@@ -76,6 +76,7 @@ Read-Only:
 - `root_squash` (Boolean) Enables or disables root squash for NFS clients.
   - If `true`, root squash is enabled: the root user is mapped to nobody for all file and folder management operations on the export.
   - If `false`, root squash is disabled: the NFS client `root` user retains root privileges.
+- `trash_access` (Boolean) Shows whether clients within the share's access range can move files and folders to the hidden `.vast_trash` folder for asynchronous deletion.
 - `type_name` (String) Standard file share type
 Available values: "standard", "ddn", "vast".
 - `uid` (Number) User ID being owner of the share
