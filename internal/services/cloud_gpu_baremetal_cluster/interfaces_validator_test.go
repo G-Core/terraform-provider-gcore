@@ -6,6 +6,7 @@ import (
 	"testing"
 
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringplanmodifier"
 
 	"github.com/G-Core/terraform-provider-gcore/internal/customvalidator"
 	"github.com/G-Core/terraform-provider-gcore/internal/planmodifiers"
@@ -69,4 +70,36 @@ func TestCloudGPUBaremetalClusterIPFamilyPreservesNullState(t *testing.T) {
 	}
 
 	t.Errorf("servers_settings.interfaces[].ip_family is missing %s", want)
+}
+
+// TestCloudGPUBaremetalClusterInterfaceNameIsReadOnly pins the spec annotation that
+// makes interfaces[].name computed-only. The API never honours a requested name
+// (external interfaces get the network's name, subnet interfaces store it without
+// applying it), so an Optional name can never match state and servers_settings
+// forces replacement on every plan.
+func TestCloudGPUBaremetalClusterInterfaceNameIsReadOnly(t *testing.T) {
+	t.Parallel()
+
+	nameAttr := interfacesAttribute(t).NestedObject.Attributes["name"]
+	name, ok := nameAttr.(schema.StringAttribute)
+	if !ok {
+		t.Fatalf("name is %T, want schema.StringAttribute", nameAttr)
+	}
+
+	if !name.Computed || name.Optional || name.Required {
+		t.Errorf("servers_settings.interfaces[].name must be computed-only, got computed=%t optional=%t required=%t",
+			name.Computed, name.Optional, name.Required)
+	}
+
+	// Read-only is not enough on its own: without UseStateForUnknown the name goes
+	// unknown on every plan, and the servers_settings replace modifier turns any
+	// unknown inside the object into a replacement.
+	want := reflect.TypeOf(stringplanmodifier.UseStateForUnknown())
+	for _, pm := range name.PlanModifiers {
+		if reflect.TypeOf(pm) == want {
+			return
+		}
+	}
+
+	t.Errorf("servers_settings.interfaces[].name is missing %s", want)
 }

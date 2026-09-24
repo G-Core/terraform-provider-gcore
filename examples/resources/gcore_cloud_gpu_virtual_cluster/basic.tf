@@ -8,7 +8,6 @@ resource "gcore_cloud_gpu_virtual_cluster" "example" {
 
   servers_settings = {
     interfaces = [{
-      name      = "pub_net"
       type      = "external"
       ip_family = "ipv4"
     }]
