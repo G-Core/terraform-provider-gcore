@@ -181,6 +181,10 @@ func DataSourceSchema(ctx context.Context) schema.Schema {
 						Description: "Enables or disables root squash for NFS clients.\n  - If `true`, root squash is enabled: the root user is mapped to nobody for all file and folder management operations on the export.\n  - If `false`, root squash is disabled: the NFS client `root` user retains root privileges.",
 						Computed:    true,
 					},
+					"trash_access": schema.BoolAttribute{
+						Description: "Shows whether clients within the share's access range can move files and folders to the hidden `.vast_trash` folder for asynchronous deletion.",
+						Computed:    true,
+					},
 				},
 			},
 			"tags": schema.ListNestedAttribute{

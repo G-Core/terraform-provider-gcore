@@ -51,4 +51,5 @@ type CloudFileShareShareSettingsModel struct {
 	AllowedCharacters types.String `tfsdk:"allowed_characters" json:"allowed_characters,computed_optional"`
 	PathLength        types.String `tfsdk:"path_length" json:"path_length,computed_optional"`
 	RootSquash        types.Bool   `tfsdk:"root_squash" json:"root_squash,computed_optional"`
+	TrashAccess       types.Bool   `tfsdk:"trash_access" json:"trash_access,computed_optional"`
 }

@@ -96,9 +96,12 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 									PlanModifiers: []planmodifier.String{planmodifiers.StringUseStateForUnknownInclNull()},
 								},
 								"name": schema.StringAttribute{
-									Description:   "Interface name",
-									Computed:      true,
-									Optional:      true,
+									Description: "Interface name",
+									Computed:    true,
+									// The API never honours a requested name (external interfaces get the
+									// external network's name), so the attribute is read-only. Keep the state
+									// value across plans: the servers_settings replace modifier fires on any
+									// unknown inside the object.
 									PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
 								},
 								"port_security_enabled": schema.BoolAttribute{
