@@ -1,23 +1,15 @@
 package sweep
 
 import (
-	"context"
 	"fmt"
 	"os"
 )
 
 const (
-	// ResourcePrefix is the standard prefix for test resources
-	// All test resources should be named with this prefix to ensure they can be swept
-	ResourcePrefix = "tf-test"
+	// ResourcePrefix is the standard prefix for test resources.
+	// The trailing separator matters; see IsTestResource in framework.go.
+	ResourcePrefix = "tf-test-"
 )
-
-// Context returns a context for sweeper operations in the specified region.
-// This is a convenience function that creates a background context with
-// region information that can be used throughout sweeper operations.
-func Context(region string) context.Context {
-	return context.Background()
-}
 
 // ValidateSweeperEnvironment checks that all required environment variables are set.
 // Call this at the beginning of each sweeper function.

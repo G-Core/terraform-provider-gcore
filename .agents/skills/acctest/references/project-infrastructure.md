@@ -84,18 +84,25 @@ acctest.IsNotFoundError(err)  // checks for: "not found", "Not Found", "NOT_FOUN
 ### Constants and Validation (`sweep.go`)
 
 ```go
-sweep.ResourcePrefix           // "tf-test"
-sweep.Context(region)          // returns context.Background()
+sweep.ResourcePrefix           // "tf-test-"
 sweep.ValidateSweeperEnvironment()  // checks GCORE_API_KEY, GCORE_CLOUD_PROJECT_ID, GCORE_CLOUD_REGION_ID
 ```
 
 ### Name Filtering (`framework.go`)
 
 ```go
-sweep.IsTestResource(name)      // true for "tf-test-*", "tf_test_*", or bare 10-char alphanumeric
+sweep.IsTestResource(name)      // true only for the "tf-test-" / "tf_test_" prefixes
 sweep.ShouldSweep(resType, name)  // IsTestResource + logging
 sweep.SkipSweepError(err)       // true for "Access Denied", "Forbidden", "403", etc.
 ```
+
+`IsTestResource` matches an exact prefix and nothing else -- no length or shape heuristics -- and the trailing
+separator is required, so `tf-testing-prod` does not match. **Do not widen it.** API keys are client-scoped and 14
+sweepers list an entire account with no project to bound them; for those, this predicate is the only thing between a
+sweep and unrelated infrastructure. The prefixes are unexported consts so the allowlist cannot be widened at run time.
+
+Any new name generator must produce names this accepts. `TestRandomNameIsSweepable` enforces that for
+`acctest.RandomName`, so a change there fails the build rather than silently creating resources no sweeper can reclaim.
 
 ## Missing Infrastructure
 
