@@ -271,13 +271,13 @@ func validateS3GcoreConfig(diff *schema.ResourceDiff, cfg map[string]interface{}
 
 	storageID, _ := cfg["storage_id"].(int)
 	if storageID != 0 || !known("storage_id") {
-		for _, field := range s3GcoreOwnedFields {
-			if val, _ := cfg[field].(string); val != "" || !known(field) {
+		raw := diff.GetRawConfig()
+		for _, field := range append(s3GcoreOwnedFields, "use_path_style") {
+			// use_path_style has a schema default, so only the raw config shows whether it was written.
+			val, _ := cfg[field].(string)
+			if val != "" || !known(field) || rawConfigAttrSet(raw, "config", 0, "s3_gcore", 0, field) {
 				return fmt.Errorf("config.s3_gcore: `%s` cannot be set together with `storage_id`: the CDN fills it from the selected storage", field)
 			}
-		}
-		if s3GcoreUsePathStyleConfigured(diff) {
-			return fmt.Errorf("config.s3_gcore: `use_path_style` cannot be set together with `storage_id`: the CDN fills it from the selected storage")
 		}
 		return nil
 	}
@@ -288,34 +288,6 @@ func validateS3GcoreConfig(diff *schema.ResourceDiff, cfg map[string]interface{}
 		}
 	}
 	return nil
-}
-
-// s3GcoreUsePathStyleConfigured reports whether use_path_style is written in the configuration,
-// which the schema default otherwise hides.
-func s3GcoreUsePathStyleConfigured(diff *schema.ResourceDiff) bool {
-	raw := diff.GetRawConfig()
-	if raw.IsNull() || !raw.IsKnown() {
-		return false
-	}
-	val := raw
-	for _, step := range []interface{}{"config", 0, "s3_gcore", 0, "use_path_style"} {
-		if val.IsNull() || !val.IsKnown() {
-			return false
-		}
-		switch s := step.(type) {
-		case string:
-			if !val.Type().IsObjectType() || !val.Type().HasAttribute(s) {
-				return false
-			}
-			val = val.GetAttr(s)
-		case int:
-			if !val.CanIterateElements() || val.LengthInt() <= s {
-				return false
-			}
-			val = val.AsValueSlice()[s]
-		}
-	}
-	return !val.IsNull()
 }
 
 // buildTargetConfig converts a config block of the given storage type into the API payload.

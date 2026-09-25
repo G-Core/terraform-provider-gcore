@@ -265,7 +265,8 @@ func validateCDNOriginGroupConfig(ctx context.Context, diff *schema.ResourceDiff
 
 				if s3Type, _ := cfg["s3_type"].(string); s3Type == "gcore" {
 					hostHeader, _ := origin["host_header_override"].(string)
-					if hostHeader != "" || !diff.NewValueKnown(fmt.Sprintf("origin.%d.host_header_override", i)) {
+					if hostHeader != "" || !diff.NewValueKnown(fmt.Sprintf("origin.%d.host_header_override", i)) ||
+						rawConfigAttrSet(diff.GetRawConfig(), "origin", i, "host_header_override") {
 						return fmt.Errorf("origin.%d: `host_header_override` cannot be set when `s3_type` is 'gcore': the CDN manages the Host header", i)
 					}
 				}
@@ -289,8 +290,10 @@ func validateS3ConfigFields(diff *schema.ResourceDiff, index int, cfg map[string
 		if storageID == 0 && known("storage_id") {
 			return fmt.Errorf("origin.%d.config: `storage_id` is required when `s3_type` is 'gcore'", index)
 		}
+		raw := diff.GetRawConfig()
 		for _, field := range []string{"s3_access_key_id", "s3_secret_access_key", "s3_region", "s3_storage_hostname"} {
-			if val, _ := cfg[field].(string); val != "" || !known(field) {
+			val, _ := cfg[field].(string)
+			if val != "" || !known(field) || rawConfigAttrSet(raw, "origin", index, "config", 0, field) {
 				return fmt.Errorf("origin.%d.config: `%s` cannot be set when `s3_type` is 'gcore': the CDN fills it from the selected storage", index, field)
 			}
 		}

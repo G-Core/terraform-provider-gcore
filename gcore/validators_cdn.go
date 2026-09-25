@@ -3,6 +3,8 @@ package gcore
 import (
 	"context"
 	"fmt"
+
+	"github.com/hashicorp/go-cty/cty"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 )
 
@@ -32,4 +34,28 @@ func validateCDNOptions(ctx context.Context, diff *schema.ResourceDiff, meta any
 	}
 
 	return nil
+}
+
+// rawConfigAttrSet reports whether the attribute at path is written in the raw configuration,
+// including an empty or unknown value. Path steps are attribute names and list indexes.
+func rawConfigAttrSet(raw cty.Value, path ...interface{}) bool {
+	val := raw
+	for _, step := range path {
+		if val.IsNull() || !val.IsKnown() {
+			return false
+		}
+		switch s := step.(type) {
+		case string:
+			if !val.Type().IsObjectType() || !val.Type().HasAttribute(s) {
+				return false
+			}
+			val = val.GetAttr(s)
+		case int:
+			if !val.CanIterateElements() || val.LengthInt() <= s {
+				return false
+			}
+			val = val.AsValueSlice()[s]
+		}
+	}
+	return !val.IsNull()
 }
