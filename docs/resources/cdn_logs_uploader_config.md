@@ -41,20 +41,16 @@ resource "gcore_cdn_logs_uploader_config" "config_1" {
   for_all_resources = true
 }
 
-# Serve content from and upload logs to a Gcore Object Storage: the CDN fills in the endpoint, region and credentials
+# Gcore Object Storage used by the two examples below
 resource "gcore_storage_s3" "storage" {
   name     = "cdn-storage"
   location = "s-region-1"
 }
 
+# CDN origin bound to a Gcore Object Storage bucket: the CDN fills in the endpoint, region and credentials
 resource "gcore_storage_s3_bucket" "content" {
   storage_id = gcore_storage_s3.storage.storage_id
   name       = "cdn-content"
-}
-
-resource "gcore_storage_s3_bucket" "logs" {
-  storage_id = gcore_storage_s3.storage.storage_id
-  name       = "cdn-logs"
 }
 
 resource "gcore_cdn_origingroup" "storage" {
@@ -75,6 +71,12 @@ resource "gcore_cdn_origingroup" "storage" {
 resource "gcore_cdn_resource" "storage" {
   cname        = "cdn.example.com"
   origin_group = gcore_cdn_origingroup.storage.id
+}
+
+# CDN logs uploaded to a Gcore Object Storage bucket: the CDN fills in the endpoint, region and credentials
+resource "gcore_storage_s3_bucket" "logs" {
+  storage_id = gcore_storage_s3.storage.storage_id
+  name       = "cdn-logs"
 }
 
 resource "gcore_cdn_logs_uploader_target" "storage" {
