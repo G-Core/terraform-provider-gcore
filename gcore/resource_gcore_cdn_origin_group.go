@@ -285,6 +285,11 @@ func validateS3ConfigFields(diff *schema.ResourceDiff, index int, cfg map[string
 		return diff.NewValueKnown(fmt.Sprintf("origin.%d.config.0.%s", index, field))
 	}
 
+	// Every rule below depends on the type, which the diff collapses to "" while it is unknown.
+	if !known("s3_type") {
+		return nil
+	}
+
 	if s3Type == "gcore" {
 		storageID, _ := cfg["storage_id"].(int)
 		if storageID == 0 && known("storage_id") {

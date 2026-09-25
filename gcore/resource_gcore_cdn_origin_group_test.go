@@ -720,6 +720,18 @@ func TestValidateCDNOriginGroupConfigS3Gcore(t *testing.T) {
 			name:   "computed amazon keys do not error",
 			config: s3Origin(testOriginGroupS3Config("bucket", "eu-west-1", unknownVariableValue, unknownVariableValue), nil),
 		},
+		{
+			name:   "computed s3_type with gcore binding does not error",
+			config: s3Origin(withField(testOriginGroupS3GcoreConfig("bucket", 123), "s3_type", unknownVariableValue), nil),
+		},
+		{
+			name:   "computed s3_type with amazon credentials does not error",
+			config: s3Origin(withField(testOriginGroupS3Config("bucket", "eu-west-1", "ak", "sk"), "s3_type", unknownVariableValue), nil),
+		},
+		{
+			name:   "computed s3_type without storage_id or credentials does not error",
+			config: s3Origin(map[string]interface{}{"s3_type": unknownVariableValue, "s3_bucket_name": "bucket"}, nil),
+		},
 	}
 
 	originGroupResource := resourceCDNOriginGroup()

@@ -106,6 +106,26 @@ resource "gcore_cdn_origingroup" "og" {
 		{name: "origin empty host header override", config: origin(`host_header_override = ""`, ""), wantErr: "`host_header_override` cannot be set when `s3_type` is 'gcore'"},
 		{name: "valid bound target", config: target("")},
 		{name: "valid bound origin", config: origin("", "")},
+		{
+			name: "bound origin with s3_type known only after apply",
+			config: `
+resource "terraform_data" "type" {
+  input = "gcore"
+}
+
+resource "gcore_cdn_origingroup" "og" {
+  name = "og"
+  origin {
+    origin_type = "s3"
+    config {
+      s3_type        = terraform_data.type.output
+      storage_id     = 123
+      s3_bucket_name = "bucket"
+    }
+  }
+}
+`,
+		},
 	}
 
 	for _, tt := range tests {
