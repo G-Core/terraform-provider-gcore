@@ -82,7 +82,7 @@ func resourceCDNOriginGroup() *schema.Resource {
 										Type:         schema.TypeString,
 										Required:     true,
 										ValidateFunc: validation.StringInSlice([]string{"other", "amazon", "gcore"}, false),
-										Description:  "Type of S3 storage: 'amazon', 'other' or 'gcore'. With 'gcore', the origin is bound to a Gcore Object Storage by `storage_id` and the CDN fills in the endpoint, region and credentials.",
+										Description:  "Type of S3 storage: 'amazon', 'other' or 'gcore'. With 'gcore', the origin is bound to a Gcore Object Storage by `storage_id`.",
 									},
 									"storage_id": {
 										Type:         schema.TypeInt,

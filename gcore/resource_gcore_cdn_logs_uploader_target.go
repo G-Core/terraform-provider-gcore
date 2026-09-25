@@ -216,7 +216,7 @@ func schemaForS3Gcore() *schema.Schema {
 			Schema: map[string]*schema.Schema{
 				"storage_id": {
 					Type:         schema.TypeInt,
-					Description:  "ID of a Standard Gcore Object Storage to upload logs to. When set, the CDN fills in the endpoint, region and credentials, and `access_key_id`, `secret_access_key`, `region`, `endpoint` and `use_path_style` must not be set.",
+					Description:  "ID of a Standard Gcore Object Storage to upload logs to. When set, `access_key_id`, `secret_access_key`, `region`, `endpoint` and `use_path_style` must not be set.",
 					Optional:     true,
 					ValidateFunc: validation.IntBetween(1, 2147483647),
 				},

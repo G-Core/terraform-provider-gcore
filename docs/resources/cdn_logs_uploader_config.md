@@ -41,41 +41,14 @@ resource "gcore_cdn_logs_uploader_config" "config_1" {
   for_all_resources = true
 }
 
-# Gcore Object Storage used by the two examples below
-resource "gcore_storage_s3" "storage" {
-  name     = "cdn-storage"
+# Logs uploaded to a Gcore Object Storage bucket
+resource "gcore_storage_s3" "logs" {
+  name     = "cdn-logs"
   location = "s-region-1"
 }
 
-# CDN origin bound to a Gcore Object Storage bucket: the CDN fills in the endpoint, region and credentials
-resource "gcore_storage_s3_bucket" "content" {
-  storage_id = gcore_storage_s3.storage.storage_id
-  name       = "cdn-content"
-}
-
-resource "gcore_cdn_origingroup" "storage" {
-  name     = "storage-origin"
-  use_next = true
-
-  origin {
-    origin_type = "s3"
-    enabled     = true
-    config {
-      s3_type        = "gcore"
-      storage_id     = gcore_storage_s3.storage.storage_id
-      s3_bucket_name = gcore_storage_s3_bucket.content.name
-    }
-  }
-}
-
-resource "gcore_cdn_resource" "storage" {
-  cname        = "cdn.example.com"
-  origin_group = gcore_cdn_origingroup.storage.id
-}
-
-# CDN logs uploaded to a Gcore Object Storage bucket: the CDN fills in the endpoint, region and credentials
 resource "gcore_storage_s3_bucket" "logs" {
-  storage_id = gcore_storage_s3.storage.storage_id
+  storage_id = gcore_storage_s3.logs.storage_id
   name       = "cdn-logs"
 }
 
@@ -83,7 +56,7 @@ resource "gcore_cdn_logs_uploader_target" "storage" {
   name = "Storage target"
   config {
     s3_gcore {
-      storage_id  = gcore_storage_s3.storage.storage_id
+      storage_id  = gcore_storage_s3.logs.storage_id
       bucket_name = gcore_storage_s3_bucket.logs.name
       directory   = "cdn"
     }
@@ -91,10 +64,10 @@ resource "gcore_cdn_logs_uploader_target" "storage" {
 }
 
 resource "gcore_cdn_logs_uploader_config" "storage" {
-  name      = "Storage logs uploader config"
-  policy    = gcore_cdn_logs_uploader_policy.policy_1.id
-  target    = gcore_cdn_logs_uploader_target.storage.id
-  resources = [gcore_cdn_resource.storage.id]
+  name              = "Storage logs uploader config"
+  policy            = gcore_cdn_logs_uploader_policy.policy_1.id
+  target            = gcore_cdn_logs_uploader_target.storage.id
+  for_all_resources = true
 }
 ```
 

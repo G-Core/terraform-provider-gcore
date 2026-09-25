@@ -82,7 +82,7 @@ resource "gcore_cdn_origingroup" "s3_origin_group_new" {
   }
 }
 
-# S3 origin bound to a Gcore Object Storage: the CDN fills in the endpoint, region and credentials
+# S3 origin bound to a Gcore Object Storage
 resource "gcore_storage_s3" "content" {
   name     = "cdn-content"
   location = "s-region-1"

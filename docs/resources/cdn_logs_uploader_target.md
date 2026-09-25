@@ -43,7 +43,7 @@ resource "gcore_cdn_logs_uploader_target" "target_2" {
   }
 }
 
-# Logs target bound to a Gcore Object Storage: the CDN fills in the endpoint, region and credentials
+# Logs target bound to a Gcore Object Storage
 resource "gcore_storage_s3" "logs" {
   name     = "cdn-logs"
   location = "s-region-1"
@@ -263,7 +263,7 @@ Optional:
 - `endpoint` (String) Endpoint of the Gcore Object Storage. Required when `storage_id` is not set.
 - `region` (String) Region of the Gcore Object Storage bucket. Required when `storage_id` is not set.
 - `secret_access_key` (String, Sensitive) Secret access key for the Gcore Object Storage. Required when `storage_id` is not set.
-- `storage_id` (Number) ID of a Standard Gcore Object Storage to upload logs to. When set, the CDN fills in the endpoint, region and credentials, and `access_key_id`, `secret_access_key`, `region`, `endpoint` and `use_path_style` must not be set.
+- `storage_id` (Number) ID of a Standard Gcore Object Storage to upload logs to. When set, `access_key_id`, `secret_access_key`, `region`, `endpoint` and `use_path_style` must not be set.
 - `use_path_style` (Boolean) Default value is true. Not allowed when `storage_id` is set.
 
 

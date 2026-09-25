@@ -97,7 +97,7 @@ resource "gcore_cdn_origingroup" "s3_origin_group_new" {
   }
 }
 
-# S3 origin bound to a Gcore Object Storage: the CDN fills in the endpoint, region and credentials
+# S3 origin bound to a Gcore Object Storage
 resource "gcore_storage_s3" "content" {
   name     = "cdn-content"
   location = "s-region-1"
@@ -176,7 +176,7 @@ Optional:
 Required:
 
 - `s3_bucket_name` (String) S3 bucket name. With s3_type 'gcore', the bucket must already exist in the storage.
-- `s3_type` (String) Type of S3 storage: 'amazon', 'other' or 'gcore'. With 'gcore', the origin is bound to a Gcore Object Storage by `storage_id` and the CDN fills in the endpoint, region and credentials.
+- `s3_type` (String) Type of S3 storage: 'amazon', 'other' or 'gcore'. With 'gcore', the origin is bound to a Gcore Object Storage by `storage_id`.
 
 Optional:
 

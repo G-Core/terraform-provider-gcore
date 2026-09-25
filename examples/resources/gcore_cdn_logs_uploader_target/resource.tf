@@ -28,7 +28,7 @@ resource "gcore_cdn_logs_uploader_target" "target_2" {
   }
 }
 
-# Logs target bound to a Gcore Object Storage: the CDN fills in the endpoint, region and credentials
+# Logs target bound to a Gcore Object Storage
 resource "gcore_storage_s3" "logs" {
   name     = "cdn-logs"
   location = "s-region-1"
