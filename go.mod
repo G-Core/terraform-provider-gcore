@@ -10,7 +10,7 @@ require (
 	github.com/G-Core/gcore-dns-sdk-go v0.3.3
 	github.com/G-Core/gcore-storage-sdk-go v0.1.34
 	github.com/G-Core/gcore-waap-sdk-go v0.5.0
-	github.com/G-Core/gcorelabscdn-go v1.0.36
+	github.com/G-Core/gcorelabscdn-go v1.0.38-0.20260925103208-0a5310a4ffc1
 	github.com/G-Core/gcorelabscloud-go v0.32.0
 	github.com/google/go-cmp v0.7.0
 	github.com/google/uuid v1.6.0

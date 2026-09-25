@@ -81,3 +81,29 @@ resource "gcore_cdn_origingroup" "s3_origin_group_new" {
     }
   }
 }
+
+# S3 origin bound to a Gcore Object Storage: the CDN fills in the endpoint, region and credentials
+resource "gcore_storage_s3" "content" {
+  name     = "cdn-content"
+  location = "s-region-1"
+}
+
+resource "gcore_storage_s3_bucket" "content" {
+  storage_id = gcore_storage_s3.content.storage_id
+  name       = "cdn-content"
+}
+
+resource "gcore_cdn_origingroup" "gcore_storage_origin_group" {
+  name     = "gcore_storage_origin_group"
+  use_next = true
+
+  origin {
+    origin_type = "s3"
+    enabled     = true
+    config {
+      s3_type        = "gcore"
+      storage_id     = gcore_storage_s3.content.storage_id
+      s3_bucket_name = gcore_storage_s3_bucket.content.name
+    }
+  }
+}
