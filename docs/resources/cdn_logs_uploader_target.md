@@ -256,6 +256,7 @@ Required:
 Optional:
 
 - `directory` (String) Directory in the OSS bucket where logs will be uploaded.
+- `endpoint` (String) Endpoint of the OSS service.
 - `region` (String) Region of the OSS bucket.
 
 

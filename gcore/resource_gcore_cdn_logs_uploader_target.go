@@ -153,6 +153,11 @@ func schemaForS3Oss() *schema.Schema {
 					Description: "Directory in the OSS bucket where logs will be uploaded.",
 					Optional:    true,
 				},
+				"endpoint": {
+					Type:        schema.TypeString,
+					Description: "Endpoint of the OSS service.",
+					Optional:    true,
+				},
 			},
 		},
 	}
@@ -506,6 +511,10 @@ func resourceCDNLogsUploaderTargetRead(ctx context.Context, d *schema.ResourceDa
 		return diag.FromErr(err)
 	}
 
+	if _, ok := targetConfigFieldSchemas(string(result.StorageType)); !ok {
+		return diag.Errorf("storage type %q of logs uploader target %s is not supported by the provider", result.StorageType, targetID)
+	}
+
 	d.Set("name", result.Name)
 	d.Set("description", result.Description)
 
@@ -621,7 +630,7 @@ func mergeStateConfig(result *logsuploader.Target, d *schema.ResourceData) map[s
 	cleanedConfig := make(map[string]interface{})
 	if configList, ok := d.Get("config").([]interface{}); ok && len(configList) > 0 {
 		if configMap, ok := configList[0].(map[string]interface{}); ok {
-			stateConfigList := configMap[string(result.StorageType)].([]interface{})
+			stateConfigList, _ := configMap[string(result.StorageType)].([]interface{})
 			if len(stateConfigList) > 0 {
 				stateConfig := stateConfigList[0].(map[string]interface{})
 				for k, v := range stateConfig {
@@ -630,7 +639,12 @@ func mergeStateConfig(result *logsuploader.Target, d *schema.ResourceData) map[s
 			}
 		}
 	}
+	fields, _ := targetConfigFieldSchemas(string(result.StorageType))
 	for k, v := range result.Config {
+		// Fields the API added after this provider version cannot be stored in state.
+		if _, ok := fields[k]; !ok {
+			continue
+		}
 		// Sensitive values like passwords are returned as "*****" from the API. We want to use values from
 		// the state instead to avoid unnecessary diffs.
 		if v != "*****" {
@@ -638,6 +652,16 @@ func mergeStateConfig(result *logsuploader.Target, d *schema.ResourceData) map[s
 		}
 	}
 	return cleanedConfig
+}
+
+// targetConfigFieldSchemas returns the config fields the provider knows for a storage type.
+func targetConfigFieldSchemas(storageType string) (map[string]*schema.Schema, bool) {
+	config := resourceCDNLogsUploaderTarget().Schema["config"].Elem.(*schema.Resource)
+	storageSchema, ok := config.Schema[storageType]
+	if !ok {
+		return nil, false
+	}
+	return storageSchema.Elem.(*schema.Resource).Schema, true
 }
 
 func listToDict(nestedValue interface{}) interface{} {
