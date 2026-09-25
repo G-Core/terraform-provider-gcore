@@ -87,3 +87,43 @@ func TestMergeStateConfigUnsupportedStorageType(t *testing.T) {
 		t.Fatal("s3_oss must be reported as supported")
 	}
 }
+
+func TestMergeStateConfigSkipsUnknownNestedHTTPFields(t *testing.T) {
+	d := schema.TestResourceDataRaw(t, resourceCDNLogsUploaderTarget().Schema, map[string]interface{}{})
+
+	merged := mergeStateConfig(&logsuploader.Target{
+		StorageType: logsuploader.StorageType("http"),
+		Config: map[string]interface{}{
+			"content_type": "json",
+			"upload": map[string]interface{}{
+				"url":          "https://logs.example.com",
+				"method":       "POST",
+				"headers":      map[string]interface{}{"X-Custom": "value"},
+				"future_field": "value",
+				"response_actions": []interface{}{
+					map[string]interface{}{"action": "drop", "match_status_code": float64(400), "future_field": "value"},
+				},
+			},
+			"auth": map[string]interface{}{
+				"type":   "token",
+				"config": map[string]interface{}{"header_name": "Authorization", "future_field": "value"},
+			},
+		},
+	}, d)
+
+	upload := merged["upload"].(map[string]interface{})
+	if _, ok := upload["future_field"]; ok {
+		t.Fatalf("unknown upload field must be skipped: %#v", upload)
+	}
+	if upload["headers"].(map[string]interface{})["X-Custom"] != "value" {
+		t.Fatalf("free-form headers must be kept: %#v", upload["headers"])
+	}
+	action := upload["response_actions"].([]interface{})[0].(map[string]interface{})
+	if _, ok := action["future_field"]; ok || action["action"] != "drop" {
+		t.Fatalf("unexpected response action: %#v", action)
+	}
+	authConfig := merged["auth"].(map[string]interface{})["config"].(map[string]interface{})
+	if _, ok := authConfig["future_field"]; ok || authConfig["header_name"] != "Authorization" {
+		t.Fatalf("unexpected auth config: %#v", authConfig)
+	}
+}

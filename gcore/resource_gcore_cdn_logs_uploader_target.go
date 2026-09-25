@@ -640,11 +640,8 @@ func mergeStateConfig(result *logsuploader.Target, d *schema.ResourceData) map[s
 		}
 	}
 	fields, _ := targetConfigFieldSchemas(string(result.StorageType))
-	for k, v := range result.Config {
-		// Fields the API added after this provider version cannot be stored in state.
-		if _, ok := fields[k]; !ok {
-			continue
-		}
+	// Fields the API added after this provider version cannot be stored in state.
+	for k, v := range filterConfigFields(result.Config, fields) {
 		// Sensitive values like passwords are returned as "*****" from the API. We want to use values from
 		// the state instead to avoid unnecessary diffs.
 		if v != "*****" {
@@ -652,6 +649,39 @@ func mergeStateConfig(result *logsuploader.Target, d *schema.ResourceData) map[s
 		}
 	}
 	return cleanedConfig
+}
+
+// filterConfigFields drops the keys of an API config that have no field in the schema,
+// following nested blocks such as the http actions and auth.
+func filterConfigFields(config map[string]interface{}, fields map[string]*schema.Schema) map[string]interface{} {
+	filtered := make(map[string]interface{}, len(config))
+	for k, v := range config {
+		field, ok := fields[k]
+		if !ok {
+			continue
+		}
+		nested, isBlock := field.Elem.(*schema.Resource)
+		if !isBlock {
+			filtered[k] = v
+			continue
+		}
+		switch value := v.(type) {
+		case map[string]interface{}:
+			filtered[k] = filterConfigFields(value, nested.Schema)
+		case []interface{}:
+			items := make([]interface{}, len(value))
+			for i, item := range value {
+				if itemMap, ok := item.(map[string]interface{}); ok {
+					item = filterConfigFields(itemMap, nested.Schema)
+				}
+				items[i] = item
+			}
+			filtered[k] = items
+		default:
+			filtered[k] = v
+		}
+	}
+	return filtered
 }
 
 // targetConfigFieldSchemas returns the config fields the provider knows for a storage type.
