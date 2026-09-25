@@ -27,3 +27,25 @@ resource "gcore_cdn_logs_uploader_target" "target_2" {
     }
   }
 }
+
+# Logs target bound to a Gcore Object Storage
+resource "gcore_storage_s3" "logs" {
+  name     = "cdn-logs"
+  location = "s-region-1"
+}
+
+resource "gcore_storage_s3_bucket" "logs" {
+  storage_id = gcore_storage_s3.logs.storage_id
+  name       = "cdn-logs"
+}
+
+resource "gcore_cdn_logs_uploader_target" "target_3" {
+  name = "Gcore storage target"
+  config {
+    s3_gcore {
+      storage_id  = gcore_storage_s3.logs.storage_id
+      bucket_name = gcore_storage_s3_bucket.logs.name
+      directory   = "cdn"
+    }
+  }
+}

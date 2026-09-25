@@ -207,6 +207,114 @@ func schemaForS3Other() *schema.Schema {
 	}
 }
 
+func schemaForS3Gcore() *schema.Schema {
+	return &schema.Schema{
+		Type:     schema.TypeList,
+		Optional: true,
+		MaxItems: 1,
+		Elem: &schema.Resource{
+			Schema: map[string]*schema.Schema{
+				"storage_id": {
+					Type:         schema.TypeInt,
+					Description:  "ID of a Standard Gcore Object Storage to upload logs to. When set, `access_key_id`, `secret_access_key`, `region`, `endpoint` and `use_path_style` must not be set.",
+					Optional:     true,
+					ValidateFunc: validation.IntBetween(1, 2147483647),
+				},
+				"access_key_id": {
+					Type:        schema.TypeString,
+					Description: "Access key ID for the Gcore Object Storage. Required when `storage_id` is not set.",
+					Optional:    true,
+				},
+				"secret_access_key": {
+					Type:        schema.TypeString,
+					Description: "Secret access key for the Gcore Object Storage. Required when `storage_id` is not set.",
+					Optional:    true,
+					Sensitive:   true,
+				},
+				"region": {
+					Type:        schema.TypeString,
+					Description: "Region of the Gcore Object Storage bucket. Required when `storage_id` is not set.",
+					Optional:    true,
+				},
+				"bucket_name": {
+					Type:        schema.TypeString,
+					Description: "Name of the Gcore Object Storage bucket. With `storage_id`, the bucket must already exist in the storage.",
+					Required:    true,
+				},
+				"directory": {
+					Type:        schema.TypeString,
+					Description: "Directory in the bucket where logs will be uploaded.",
+					Optional:    true,
+				},
+				"endpoint": {
+					Type:        schema.TypeString,
+					Description: "Endpoint of the Gcore Object Storage. Required when `storage_id` is not set.",
+					Optional:    true,
+				},
+				"use_path_style": {
+					Type:        schema.TypeBool,
+					Optional:    true,
+					Description: "Default value is true. Not allowed when `storage_id` is set.",
+					Default:     true,
+				},
+			},
+		},
+	}
+}
+
+var s3GcoreOwnedFields = []string{"access_key_id", "secret_access_key", "region", "endpoint"}
+
+func validateS3GcoreConfig(diff *schema.ResourceDiff, cfg map[string]interface{}) error {
+	known := func(field string) bool {
+		return diff.NewValueKnown("config.0.s3_gcore.0." + field)
+	}
+
+	storageID, _ := cfg["storage_id"].(int)
+	if storageID != 0 || !known("storage_id") {
+		raw := diff.GetRawConfig()
+		for _, field := range append(s3GcoreOwnedFields, "use_path_style") {
+			// use_path_style has a schema default, so only the raw config shows whether it was written.
+			val, _ := cfg[field].(string)
+			if val != "" || !known(field) || rawConfigAttrSet(raw, "config", 0, "s3_gcore", 0, field) {
+				return fmt.Errorf("config.s3_gcore: `%s` cannot be set together with `storage_id`: the CDN fills it from the selected storage", field)
+			}
+		}
+		return nil
+	}
+
+	for _, field := range s3GcoreOwnedFields {
+		if val, _ := cfg[field].(string); val == "" && known(field) {
+			return fmt.Errorf("config.s3_gcore: `%s` is required when `storage_id` is not set", field)
+		}
+	}
+	return nil
+}
+
+// buildTargetConfig converts a config block of the given storage type into the API payload.
+func buildTargetConfig(storageType string, configDict map[string]interface{}) map[string]interface{} {
+	switch storageType {
+	case "http":
+		return sanitizeConfig(convertHttpConfigToDict(configDict))
+	case "s3_gcore":
+		// The API refuses any CDN-owned field that is present in a bound request, even when empty.
+		if storageID, _ := configDict["storage_id"].(int); storageID != 0 {
+			return sanitizeConfig(map[string]interface{}{
+				"storage_id":  storageID,
+				"bucket_name": configDict["bucket_name"],
+				"directory":   configDict["directory"],
+			})
+		}
+		manual := make(map[string]interface{}, len(configDict))
+		for k, v := range configDict {
+			if k != "storage_id" {
+				manual[k] = v
+			}
+		}
+		return sanitizeConfig(manual)
+	}
+	return sanitizeConfig(configDict)
+}
+
 func schemaForFTP() *schema.Schema {
 	return &schema.Schema{
 		Type:     schema.TypeList,
@@ -403,7 +511,7 @@ func resourceCDNLogsUploaderTarget() *schema.Resource {
 				MaxItems:    1,
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
-						"s3_gcore":  schemaForS3Other(),
+						"s3_gcore":  schemaForS3Gcore(),
 						"s3_amazon": schemaForS3Amazon(),
 						"s3_oss":    schemaForS3Oss(),
 						"s3_other":  schemaForS3Other(),
@@ -443,6 +551,10 @@ func customizeDiffStorageTypeConfig(ctx context.Context, diff *schema.ResourceDi
 		return fmt.Errorf("only one storage type should be provided in the 'config' field")
 	}
 
+	if s3Gcore, _ := config["s3_gcore"].([]interface{}); len(s3Gcore) > 0 && s3Gcore[0] != nil {
+		return validateS3GcoreConfig(diff, s3Gcore[0].(map[string]interface{}))
+	}
+
 	return nil
 }
 
@@ -460,11 +572,7 @@ func resourceCDNLogsUploaderTargetCreate(ctx context.Context, d *schema.Resource
 	for key, value := range configAttr {
 		value := value.([]interface{})
 		if len(value) != 0 {
-			configDict := value[0].(map[string]interface{})
-			if key == "http" {
-				configDict = convertHttpConfigToDict(configDict)
-			}
-			req.Config = sanitizeConfig(configDict)
+			req.Config = buildTargetConfig(key, value[0].(map[string]interface{}))
 			req.StorageType = logsuploader.StorageType(key)
 			break
 		}
@@ -560,11 +668,7 @@ func resourceCDNLogsUploaderTargetUpdate(ctx context.Context, d *schema.Resource
 	for key, value := range configAttr {
 		value := value.([]interface{})
 		if len(value) != 0 {
-			configDict := value[0].(map[string]interface{})
-			if key == "http" {
-				configDict = convertHttpConfigToDict(configDict)
-			}
-			req.Config = sanitizeConfig(configDict)
+			req.Config = buildTargetConfig(key, value[0].(map[string]interface{}))
 			req.StorageType = logsuploader.StorageType(key)
 			break
 		}
@@ -635,6 +739,13 @@ func mergeStateConfig(result *logsuploader.Target, d *schema.ResourceData) map[s
 		// the state instead to avoid unnecessary diffs.
 		if v != "*****" {
 			cleanedConfig[k] = v
+		}
+	}
+	if storageID, ok := cleanedConfig["storage_id"].(float64); ok {
+		cleanedConfig["storage_id"] = int(storageID)
+		// A bound target does not return use_path_style; keep the schema default so an import has no diff.
+		if _, ok := cleanedConfig["use_path_style"]; !ok {
+			cleanedConfig["use_path_style"] = true
 		}
 	}
 	return cleanedConfig

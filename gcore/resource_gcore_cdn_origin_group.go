@@ -69,7 +69,7 @@ func resourceCDNOriginGroup() *schema.Resource {
 						"host_header_override": {
 							Type:        schema.TypeString,
 							Optional:    true,
-							Description: "Per-origin host header override.",
+							Description: "Per-origin host header override. Not allowed for s3 origins with `s3_type = \"gcore\"`.",
 						},
 						"config": {
 							Type:        schema.TypeList,
@@ -81,35 +81,41 @@ func resourceCDNOriginGroup() *schema.Resource {
 									"s3_type": {
 										Type:         schema.TypeString,
 										Required:     true,
-										ValidateFunc: validation.StringInSlice([]string{"other", "amazon"}, false),
-										Description:  "Type of S3 storage: 'amazon' or 'other'.",
+										ValidateFunc: validation.StringInSlice([]string{"other", "amazon", "gcore"}, false),
+										Description:  "Type of S3 storage: 'amazon', 'other' or 'gcore'. With 'gcore', the origin is bound to a Gcore Object Storage by `storage_id`.",
+									},
+									"storage_id": {
+										Type:         schema.TypeInt,
+										Optional:     true,
+										ValidateFunc: validation.IntAtLeast(1),
+										Description:  "ID of a Standard Gcore Object Storage to pull content from. Required when s3_type is 'gcore', not allowed otherwise.",
 									},
 									"s3_bucket_name": {
 										Type:        schema.TypeString,
 										Required:    true,
-										Description: "S3 bucket name.",
+										Description: "S3 bucket name. With s3_type 'gcore', the bucket must already exist in the storage.",
 									},
 									"s3_region": {
 										Type:        schema.TypeString,
 										Optional:    true,
-										Description: "S3 region. Required when s3_type is 'amazon'.",
+										Description: "S3 region. Required when s3_type is 'amazon'. Not allowed when s3_type is 'gcore'.",
 									},
 									"s3_storage_hostname": {
 										Type:        schema.TypeString,
 										Optional:    true,
-										Description: "S3 storage hostname. Required when s3_type is 'other'.",
+										Description: "S3 storage hostname. Required when s3_type is 'other'. Not allowed when s3_type is 'gcore'.",
 									},
 									"s3_access_key_id": {
 										Type:        schema.TypeString,
-										Required:    true,
+										Optional:    true,
 										Sensitive:   true,
-										Description: "S3 access key ID.",
+										Description: "S3 access key ID. Required when s3_type is 'amazon' or 'other'. Not allowed when s3_type is 'gcore'.",
 									},
 									"s3_secret_access_key": {
 										Type:        schema.TypeString,
-										Required:    true,
+										Optional:    true,
 										Sensitive:   true,
-										Description: "S3 secret access key.",
+										Description: "S3 secret access key. Required when s3_type is 'amazon' or 'other'. Not allowed when s3_type is 'gcore'.",
 									},
 									"s3_auth_type": {
 										Type:         schema.TypeString,
@@ -256,6 +262,14 @@ func validateCDNOriginGroupConfig(ctx context.Context, diff *schema.ResourceDiff
 				if err := validateS3ConfigFields(diff, i, cfg); err != nil {
 					return err
 				}
+
+				if s3Type, _ := cfg["s3_type"].(string); s3Type == "gcore" {
+					hostHeader, _ := origin["host_header_override"].(string)
+					if hostHeader != "" || !diff.NewValueKnown(fmt.Sprintf("origin.%d.host_header_override", i)) ||
+						rawConfigAttrSet(diff.GetRawConfig(), "origin", i, "host_header_override") {
+						return fmt.Errorf("origin.%d: `host_header_override` cannot be set when `s3_type` is 'gcore': the CDN manages the Host header", i)
+					}
+				}
 			}
 		}
 	}
@@ -267,6 +281,39 @@ func validateCDNOriginGroupConfig(ctx context.Context, diff *schema.ResourceDiff
 // "known after apply" (NewValueKnown), which the diff collapses to an empty string.
 func validateS3ConfigFields(diff *schema.ResourceDiff, index int, cfg map[string]interface{}) error {
 	s3Type, _ := cfg["s3_type"].(string)
+	known := func(field string) bool {
+		return diff.NewValueKnown(fmt.Sprintf("origin.%d.config.0.%s", index, field))
+	}
+
+	// Every rule below depends on the type, which the diff collapses to "" while it is unknown.
+	if !known("s3_type") {
+		return nil
+	}
+
+	if s3Type == "gcore" {
+		storageID, _ := cfg["storage_id"].(int)
+		if storageID == 0 && known("storage_id") {
+			return fmt.Errorf("origin.%d.config: `storage_id` is required when `s3_type` is 'gcore'", index)
+		}
+		raw := diff.GetRawConfig()
+		for _, field := range []string{"s3_access_key_id", "s3_secret_access_key", "s3_region", "s3_storage_hostname"} {
+			val, _ := cfg[field].(string)
+			if val != "" || !known(field) || rawConfigAttrSet(raw, "origin", index, "config", 0, field) {
+				return fmt.Errorf("origin.%d.config: `%s` cannot be set when `s3_type` is 'gcore': the CDN fills it from the selected storage", index, field)
+			}
+		}
+		return nil
+	}
+
+	if storageID, _ := cfg["storage_id"].(int); storageID != 0 || !known("storage_id") {
+		return fmt.Errorf("origin.%d.config: `storage_id` is only allowed when `s3_type` is 'gcore'", index)
+	}
+
+	for _, field := range []string{"s3_access_key_id", "s3_secret_access_key"} {
+		if val, _ := cfg[field].(string); val == "" && known(field) {
+			return fmt.Errorf("origin.%d.config: `%s` is required when `s3_type` is '%s'", index, field, s3Type)
+		}
+	}
 
 	if s3Type == "other" {
 		val, _ := cfg["s3_storage_hostname"].(string)
@@ -515,18 +562,26 @@ func listToSourceRequests(origins []interface{}) []origingroups.SourceRequest {
 				if s3AuthType == "" {
 					s3AuthType = "awsSignatureV4"
 				}
+				s3Type := cfg["s3_type"].(string)
 				originReq.Config = &origingroups.S3Config{
-					S3Type:            cfg["s3_type"].(string),
-					S3BucketName:      cfg["s3_bucket_name"].(string),
-					S3AccessKeyID:     cfg["s3_access_key_id"].(string),
-					S3SecretAccessKey: cfg["s3_secret_access_key"].(string),
-					S3AuthType:        s3AuthType,
+					S3Type:       s3Type,
+					S3BucketName: cfg["s3_bucket_name"].(string),
+					S3AuthType:   s3AuthType,
 				}
-				if region, ok := cfg["s3_region"].(string); ok && region != "" {
-					originReq.Config.S3Region = region
-				}
-				if hostname, ok := cfg["s3_storage_hostname"].(string); ok && hostname != "" {
-					originReq.Config.S3StorageHostname = hostname
+				if s3Type == "gcore" {
+					// The API refuses any CDN-owned field that is present in the request, even when empty.
+					storageID, _ := cfg["storage_id"].(int)
+					originReq.Config.StorageID = int64(storageID)
+					originReq.HostHeaderOverride = nil
+				} else {
+					originReq.Config.S3AccessKeyID, _ = cfg["s3_access_key_id"].(string)
+					originReq.Config.S3SecretAccessKey, _ = cfg["s3_secret_access_key"].(string)
+					if region, ok := cfg["s3_region"].(string); ok && region != "" {
+						originReq.Config.S3Region = region
+					}
+					if hostname, ok := cfg["s3_storage_hostname"].(string); ok && hostname != "" {
+						originReq.Config.S3StorageHostname = hostname
+					}
 				}
 			}
 		} else {
@@ -567,6 +622,7 @@ func sourcesToList(sources []origingroups.Source) []interface{} {
 				"s3_access_key_id":     origin.Config.S3AccessKeyID,
 				"s3_secret_access_key": origin.Config.S3SecretAccessKey,
 				"s3_auth_type":         "awsSignatureV4",
+				"storage_id":           int(origin.Config.StorageID),
 			}
 			if origin.Config.S3AuthType != "" {
 				cfgMap["s3_auth_type"] = origin.Config.S3AuthType
@@ -638,6 +694,9 @@ func restoreS3OriginCredentials(origins []interface{}, creds map[int]s3OriginCre
 			continue
 		}
 		cfg := configList[0].(map[string]interface{})
+		if s3Type, _ := cfg["s3_type"].(string); s3Type == "gcore" {
+			continue
+		}
 		if saved, ok := creds[i]; ok {
 			cfg["s3_access_key_id"] = saved.accessKeyID
 			cfg["s3_secret_access_key"] = saved.secretAccessKey
