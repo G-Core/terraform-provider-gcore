@@ -145,3 +145,66 @@ resource "gcore_cdn_origingroup" "og" {
 		})
 	}
 }
+
+// TestApplyRejectsConflictsOnceS3TypeIsKnown checks that the checks skipped while s3_type is
+// unknown run in the final plan during apply, before any API request.
+func TestApplyRejectsConflictsOnceS3TypeIsKnown(t *testing.T) {
+	t.Setenv("GCORE_PERMANENT_TOKEN", "dummy")
+	t.Setenv("GCORE_API_ENDPOINT", "https://api.example.invalid")
+
+	config := func(s3Type, originField, configField string) string {
+		return `
+resource "terraform_data" "type" {
+  input = "` + s3Type + `"
+}
+
+resource "gcore_cdn_origingroup" "og" {
+  name = "og"
+  origin {
+    origin_type = "s3"
+    ` + originField + `
+    config {
+      s3_type        = terraform_data.type.output
+      s3_bucket_name = "bucket"
+      storage_id     = 123
+      ` + configField + `
+    }
+  }
+}
+`
+	}
+
+	tests := []struct {
+		name    string
+		config  string
+		wantErr string
+	}{
+		{
+			name:    "resolves to amazon with storage_id",
+			config:  config("amazon", "", `s3_region = "eu-west-1"`+"\n"+`s3_access_key_id = "ak"`+"\n"+`s3_secret_access_key = "sk"`),
+			wantErr: "`storage_id` is only allowed when `s3_type` is 'gcore'",
+		},
+		{
+			name:    "resolves to gcore with region",
+			config:  config("gcore", "", `s3_region = "eu-west-1"`),
+			wantErr: "`s3_region` cannot be set when `s3_type` is 'gcore'",
+		},
+		{
+			name:    "resolves to gcore with host_header_override",
+			config:  config("gcore", `host_header_override = "example.com"`, ""),
+			wantErr: "`host_header_override` cannot be set when `s3_type` is 'gcore'",
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			resource.UnitTest(t, resource.TestCase{
+				ProviderFactories: testAccProviders,
+				Steps: []resource.TestStep{{
+					Config:      tt.config,
+					ExpectError: regexp.MustCompile(regexp.QuoteMeta(tt.wantErr)),
+				}},
+			})
+		})
+	}
+}
