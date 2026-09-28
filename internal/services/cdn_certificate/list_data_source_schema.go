@@ -68,7 +68,7 @@ func ListDataSourceSchema(ctx context.Context) schema.Schema {
 							Computed:    true,
 						},
 						"has_related_resources": schema.BoolAttribute{
-							Description: "Defines whether the SSL certificate is used by a CDN resource.\n\nPossible values:\n- **true** - Certificate is used by a CDN resource.\n- **false** - Certificate is not used by a CDN resource.",
+							Description: "Defines whether the SSL certificate is used by a CDN resource or an alias.\n\nPossible values:\n- **true** - Certificate is used by a CDN resource or an alias.\n- **false** - Certificate is not used by a CDN resource or an alias.",
 							Computed:    true,
 						},
 						"name": schema.StringAttribute{
