@@ -61,11 +61,11 @@ Possible values:
 Possible values:
 - **true** - Certificate has been deleted.
 - **false** - Certificate has not been deleted.
-- `has_related_resources` (Boolean) Defines whether the SSL certificate is used by a CDN resource.
+- `has_related_resources` (Boolean) Defines whether the SSL certificate is used by a CDN resource or an alias.
 
 Possible values:
-- **true** - Certificate is used by a CDN resource.
-- **false** - Certificate is not used by a CDN resource.
+- **true** - Certificate is used by a CDN resource or an alias.
+- **false** - Certificate is not used by a CDN resource or an alias.
 - `id` (Number) SSL certificate ID.
 - `ssl_certificate_chain` (String) Parameter is **deprecated**.
 - `ssl_id` (Number)
