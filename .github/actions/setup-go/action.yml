@@ -21,7 +21,8 @@ runs:
       run: git config --global url."https://x-access-token:${{ inputs.go-repo-read-token }}@github.com/${GO_MODULE_REPO}".insteadOf "https://github.com/${GO_MODULE_REPO}"
 
     - name: Setup go
-      uses: actions/setup-go@40f1582b2485089dde7abd97c1529aa768e1baff # v5.6.0
+      # Pinned Go setup uses the latest stable runtime and cache fixes safely.
+      uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
       with:
         go-version: ${{ inputs.go-version }}
         go-version-file: ./go.mod
