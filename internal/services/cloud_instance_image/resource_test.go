@@ -65,8 +65,8 @@ func TestAccCloudInstanceImage_basic(t *testing.T) {
 //
 // The third step closes that gap with ImportStateKind: resource.ImportBlockWithID
 // — config-driven import, which drives the import from an `import` block against
-// the configuration and plans it. url (plus the other create-only attributes) is
-// null in the freshly imported state, so the plan is legitimately non-empty; the
+// the configuration and plans it. url is null in the freshly imported state
+// (cow_format is recovered from disk_format), so the plan is legitimately non-empty; the
 // point of the test is that it must be an in-place UPDATE and never a
 // replace/destroy. When a user applies that update, the adoption is served by
 // this resource's real Update (PATCH) implementation, which
@@ -90,9 +90,10 @@ func TestAccCloudInstanceImage_import(t *testing.T) {
 				ResourceName:      "gcore_cloud_instance_image.test",
 				ImportState:       true,
 				ImportStateVerify: true,
-				// url, hw_firmware_type, tags, and cow_format are create-only inputs
-				// not returned by the API on read.
-				ImportStateVerifyIgnore: []string{"url", "hw_firmware_type", "tags", "cow_format"},
+				// url is the only create-only input the API never returns;
+				// cow_format is recovered from disk_format on import, and
+				// hw_firmware_type and tags are echoed by GET.
+				ImportStateVerifyIgnore: []string{"url"},
 				ImportStateIdFunc: acctest.BuildImportID(
 					"gcore_cloud_instance_image.test",
 					"project_id", "region_id", "id",
@@ -131,6 +132,120 @@ func TestAccCloudInstanceImage_import(t *testing.T) {
 				Config: testAccCloudInstanceImageConfig(rName),
 				ConfigPlanChecks: resource.ConfigPlanChecks{
 					PreApply: []plancheck.PlanCheck{plancheck.ExpectEmptyPlan()},
+				},
+			},
+		},
+	})
+}
+
+// TestAccCloudInstanceImage_importAdoptionApplies runs the leg the import-block
+// test cannot: the adopting apply itself. The import-block step above is
+// plan-only, so the Update that persists url after an import is not executed
+// there. This test imports with `terraform import` semantics
+// (ImportCommandWithID + ImportStatePersist), applies the config and checks
+// that url lands in state, the image is not replaced, and the next plan is
+// empty.
+//
+// The image is uploaded with cow_format = true. The API never returns
+// cow_format, so before it was derived from disk_format on import the same
+// config planned a replacement over cow_format after every import.
+func TestAccCloudInstanceImage_importAdoptionApplies(t *testing.T) {
+	rName := acctest.RandomName()
+	var imageID string
+
+	resource.ParallelTest(t, resource.TestCase{
+		PreCheck:                 func() { acctest.PreCheck(t) },
+		ProtoV6ProviderFactories: acctest.ProtoV6ProviderFactories,
+		CheckDestroy:             testAccCheckCloudInstanceImageDestroy,
+		Steps: []resource.TestStep{
+			{
+				Config: testAccCloudInstanceImageConfigCow(rName),
+				Check: func(s *terraform.State) error {
+					rs, ok := s.RootModule().Resources["gcore_cloud_instance_image.test"]
+					if !ok {
+						return fmt.Errorf("gcore_cloud_instance_image.test not found in state")
+					}
+					imageID = rs.Primary.ID
+					return nil
+				},
+				ConfigStateChecks: []statecheck.StateCheck{
+					statecheck.ExpectKnownValue("gcore_cloud_instance_image.test",
+						tfjsonpath.New("disk_format"), knownvalue.StringExact("raw")),
+				},
+			},
+			{
+				// Forget the image without destroying it, so the import below
+				// targets an address absent from state.
+				Config: testAccCloudInstanceImageConfigForgotten(),
+			},
+			{
+				Config:             testAccCloudInstanceImageConfigCow(rName),
+				ResourceName:       "gcore_cloud_instance_image.test",
+				ImportState:        true,
+				ImportStateKind:    resource.ImportCommandWithID,
+				ImportStatePersist: true,
+				ImportStateIdFunc: func(*terraform.State) (string, error) {
+					return fmt.Sprintf("%s/%s/%s", acctest.ProjectID(), acctest.RegionID(), imageID), nil
+				},
+			},
+			{
+				// The adopting apply: url lands in state in place, cow_format
+				// was already recovered by the import, nothing is replaced.
+				Config: testAccCloudInstanceImageConfigCow(rName),
+				ConfigPlanChecks: resource.ConfigPlanChecks{
+					PreApply: []plancheck.PlanCheck{
+						plancheck.ExpectResourceAction("gcore_cloud_instance_image.test",
+							plancheck.ResourceActionUpdate),
+					},
+				},
+				ConfigStateChecks: []statecheck.StateCheck{
+					statecheck.ExpectKnownValue("gcore_cloud_instance_image.test",
+						tfjsonpath.New("id"), knownvalue.StringFunc(func(v string) error {
+							if v != imageID {
+								return fmt.Errorf("image was replaced: %s != %s", v, imageID)
+							}
+							return nil
+						})),
+					statecheck.ExpectKnownValue("gcore_cloud_instance_image.test",
+						tfjsonpath.New("url"), knownvalue.StringExact(testImageURL)),
+					statecheck.ExpectKnownValue("gcore_cloud_instance_image.test",
+						tfjsonpath.New("cow_format"), knownvalue.Bool(true)),
+				},
+			},
+			{
+				// Adoption is stable: the same config plans nothing.
+				Config:   testAccCloudInstanceImageConfigCow(rName),
+				PlanOnly: true,
+			},
+			{
+				// Dropping cow_format from config keeps the recovered value:
+				// "not configured" must not turn into a silent in-place update
+				// to false on a raw image.
+				Config: testAccCloudInstanceImageConfig(rName),
+				ConfigPlanChecks: resource.ConfigPlanChecks{
+					PreApply: []plancheck.PlanCheck{plancheck.ExpectEmptyPlan()},
+				},
+				ConfigStateChecks: []statecheck.StateCheck{
+					statecheck.ExpectKnownValue("gcore_cloud_instance_image.test",
+						tfjsonpath.New("cow_format"), knownvalue.Bool(true)),
+				},
+			},
+			{
+				// A value that really differs from the image (false on a raw
+				// image) is a genuine change and still forces replacement;
+				// the replacement is stored as qcow2.
+				Config: testAccCloudInstanceImageConfigCowFormat(rName, false),
+				ConfigPlanChecks: resource.ConfigPlanChecks{
+					PreApply: []plancheck.PlanCheck{
+						plancheck.ExpectResourceAction("gcore_cloud_instance_image.test",
+							plancheck.ResourceActionReplace),
+					},
+				},
+				ConfigStateChecks: []statecheck.StateCheck{
+					statecheck.ExpectKnownValue("gcore_cloud_instance_image.test",
+						tfjsonpath.New("cow_format"), knownvalue.Bool(false)),
+					statecheck.ExpectKnownValue("gcore_cloud_instance_image.test",
+						tfjsonpath.New("disk_format"), knownvalue.StringExact("qcow2")),
 				},
 			},
 		},
@@ -243,6 +358,37 @@ func testAccCheckCloudInstanceImageDestroy(s *terraform.State) error {
 
 func testAccCloudInstanceImageConfig(name string) string {
 	return testAccCloudInstanceImageConfigWithURL(name, testImageURL)
+}
+
+// testAccCloudInstanceImageConfigCow uploads the image with cow_format = true,
+// which the API stores as disk_format raw.
+func testAccCloudInstanceImageConfigCow(name string) string {
+	return testAccCloudInstanceImageConfigCowFormat(name, true)
+}
+
+func testAccCloudInstanceImageConfigCowFormat(name string, cowFormat bool) string {
+	return fmt.Sprintf(`
+resource "gcore_cloud_instance_image" "test" {
+  project_id = %[1]s
+  region_id  = %[2]s
+  name       = %[3]q
+  url        = %[4]q
+  cow_format = %[5]t
+}`, acctest.ProjectID(), acctest.RegionID(), name, testImageURL, cowFormat)
+}
+
+// testAccCloudInstanceImageConfigForgotten replaces the resource block with a
+// removed block (Terraform >= 1.7): the state entry goes away, the live image
+// stays, and a later step can import it again.
+func testAccCloudInstanceImageConfigForgotten() string {
+	return `
+removed {
+  from = gcore_cloud_instance_image.test
+
+  lifecycle {
+    destroy = false
+  }
+}`
 }
 
 func testAccCloudInstanceImageConfigWithURL(name, url string) string {

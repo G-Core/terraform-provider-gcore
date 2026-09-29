@@ -104,6 +104,13 @@ func (r *CloudInstanceImageResource) Create(ctx context.Context, req resource.Cr
 		data.Tags = tags
 	}
 
+	// cow_format has no schema default, so an omitted attribute reaches
+	// Create unknown and comes out of the decode null (the API never returns
+	// it); recover it from the stored disk_format instead.
+	if data.CowFormat.IsUnknown() || data.CowFormat.IsNull() {
+		data.CowFormat = cowFormatFromDiskFormat(data.DiskFormat)
+	}
+
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
 }
 
@@ -166,6 +173,13 @@ func (r *CloudInstanceImageResource) Update(ctx context.Context, req resource.Up
 		data.Tags = tags
 	}
 
+	// A plan built over a null prior cow_format (state written before it
+	// was recovered, or -refresh=false) carries it unknown; recover it from
+	// the stored disk_format like Create and Read do.
+	if data.CowFormat.IsUnknown() || data.CowFormat.IsNull() {
+		data.CowFormat = cowFormatFromDiskFormat(data.DiskFormat)
+	}
+
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
 }
 
@@ -214,6 +228,13 @@ func (r *CloudInstanceImageResource) Read(ctx context.Context, req resource.Read
 
 	if tags, ok := custom.ConvertAPITagsToCustomfieldMap(ctx, bytes); ok {
 		data.Tags = tags
+	}
+
+	// cow_format is never returned, but disk_format is its stored form, so
+	// refresh it from there. This also repairs state written before the
+	// recovery existed (null, or a default false recorded on a raw image).
+	if cow := cowFormatFromDiskFormat(data.DiskFormat); !cow.IsNull() {
+		data.CowFormat = cow
 	}
 
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
@@ -298,9 +319,30 @@ func (r *CloudInstanceImageResource) ImportState(ctx context.Context, req resour
 		data.Tags = tags
 	}
 
+	// cow_format is create-only and never returned; recover it from the
+	// stored disk format so the first plan after import does not replace
+	// the image over a value the API cannot echo.
+	data.CowFormat = cowFormatFromDiskFormat(data.DiskFormat)
+
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
 }
 
-func (r *CloudInstanceImageResource) ModifyPlan(_ context.Context, _ resource.ModifyPlanRequest, _ *resource.ModifyPlanResponse) {
+func (r *CloudInstanceImageResource) ModifyPlan(ctx context.Context, req resource.ModifyPlanRequest, resp *resource.ModifyPlanResponse) {
+	// Warn while an import adoption of url is planned: the value is written
+	// to state without the API acting on it and no refresh can correct it,
+	// so this is the only moment a wrong value can be caught.
+	if req.State.Raw.IsNull() || req.Plan.Raw.IsNull() {
+		return
+	}
 
+	var plan, state *CloudInstanceImageModel
+
+	// The warning is advisory, so a decode problem must never fail the plan.
+	if req.Plan.Get(ctx, &plan).HasError() || req.State.Get(ctx, &state).HasError() {
+		return
+	}
+
+	if adoptingURL(state.URL, plan.URL) {
+		resp.Diagnostics.Append(urlAdoptionWarning())
+	}
 }

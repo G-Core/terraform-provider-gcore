@@ -12,7 +12,6 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/booldefault"
-	"github.com/hashicorp/terraform-plugin-framework/resource/schema/boolplanmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/int64planmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringdefault"
@@ -61,8 +60,7 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 				Description:   "When True, image cannot be deleted unless all volumes, created from it, are deleted.",
 				Computed:      true,
 				Optional:      true,
-				PlanModifiers: []planmodifier.Bool{boolplanmodifier.RequiresReplaceIfConfigured()},
-				Default:       booldefault.StaticBool(false),
+				PlanModifiers: []planmodifier.Bool{cowFormatPlanModifier()},
 			},
 			"os_distro": schema.StringAttribute{
 				Description:   "OS Distribution, i.e. Debian, CentOS, Ubuntu, CoreOS etc.",
