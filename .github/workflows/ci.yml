@@ -1,14 +1,11 @@
 name: CI
 on:
+  # Keep push on `main` only. A branch push and its pull request share one head
+  # SHA, so triggering on both produces two check runs with the same job name.
+  # GitHub does not wait for both, which lets a required check pass unverified.
   push:
     branches:
-      - '**'
-      - '!integrated/**'
-      - '!stl-preview-head/**'
-      - '!stl-preview-base/**'
-      - '!generated'
-      - '!codegen/**'
-      - 'codegen/stl/**'
+      - main
   pull_request:
     branches-ignore:
       - 'stl-preview-head/**'
@@ -20,12 +17,14 @@ env:
 jobs:
   lint:
     runs-on: ubuntu-latest
-    if: github.event_name == 'push' || github.event.pull_request.head.repo.fork
+    if: github.event_name != 'push' || github.event.head_commit.message != 'codegen metadata'
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
 
+      # Fork pull requests receive no secrets, so skip the token there and let
+      # the link step fall back to the pinned public release.
       - name: Generate gcore-sdk-bot read token
-        if: github.event_name == 'push' && github.repository == 'G-Core/terraform-provider-gcore-staging'
+        if: github.repository == 'G-Core/terraform-provider-gcore-staging' && !github.event.pull_request.head.repo.fork
         id: app-token
         uses: actions/create-github-app-token@v3
         with:
@@ -43,7 +42,9 @@ jobs:
       - name: Link staging branch
         if: github.repository == 'G-Core/terraform-provider-gcore-staging'
         env:
-          GH_REF: ${{ github.ref_name }}
+          # On a pull request `ref_name` is `<number>/merge`, which no SDK
+          # branch matches, so prefer the head branch name.
+          GH_REF: ${{ github.head_ref || github.ref_name }}
         run: |
           for ref in "$GH_REF" main; do
             if go list -m "github.com/G-Core/gcore-go-staging@$ref" >/dev/null 2>&1; then
@@ -62,12 +63,14 @@ jobs:
 
   test:
     runs-on: ubuntu-latest
-    if: github.event_name == 'push' || github.event.pull_request.head.repo.fork
+    if: github.event_name != 'push' || github.event.head_commit.message != 'codegen metadata'
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
 
+      # Fork pull requests receive no secrets, so skip the token there and let
+      # the link step fall back to the pinned public release.
       - name: Generate gcore-sdk-bot read token
-        if: github.event_name == 'push' && github.repository == 'G-Core/terraform-provider-gcore-staging'
+        if: github.repository == 'G-Core/terraform-provider-gcore-staging' && !github.event.pull_request.head.repo.fork
         id: app-token
         uses: actions/create-github-app-token@v3
         with:
@@ -85,7 +88,9 @@ jobs:
       - name: Link staging branch
         if: github.repository == 'G-Core/terraform-provider-gcore-staging'
         env:
-          GH_REF: ${{ github.ref_name }}
+          # On a pull request `ref_name` is `<number>/merge`, which no SDK
+          # branch matches, so prefer the head branch name.
+          GH_REF: ${{ github.head_ref || github.ref_name }}
         run: |
           for ref in "$GH_REF" main; do
             if go list -m "github.com/G-Core/gcore-go-staging@$ref" >/dev/null 2>&1; then
