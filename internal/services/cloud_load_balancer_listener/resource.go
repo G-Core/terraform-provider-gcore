@@ -124,7 +124,28 @@ func (r *CloudLoadBalancerListenerResource) Update(ctx context.Context, req reso
 		return
 	}
 
-	dataBytes, err := data.MarshalJSONForUpdate(*state)
+	// Read the adoption marker before any of the branches below: every one of
+	// them falls through to a state write, which is where the window closes.
+	adopting, adoptionDiags := importAdoptionPending(ctx, req.Private)
+	resp.Diagnostics.Append(adoptionDiags...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
+
+	// A failed adopting apply must not consume the adoption window: the
+	// refresh that preceded this Update already advanced the marker, and
+	// without a re-arm the next refresh would retire it and the retry would
+	// plan a destroy+recreate. Terraform persists private state returned from
+	// an errored apply, so this write reaches the state file.
+	defer func() {
+		if adopting && resp.Diagnostics.HasError() {
+			resp.Diagnostics.Append(rearmImportAdoption(ctx, resp.Private)...)
+		}
+	}()
+
+	// Keeps adopted create-only values out of the PATCH body; see patchBaselineFor.
+	dataBytes, err := data.MarshalJSONForUpdate(patchBaselineFor(*state, *data, adopting))
 	if err != nil {
 		resp.Diagnostics.AddError("failed to serialize http request", err.Error())
 		return
@@ -161,6 +182,14 @@ func (r *CloudLoadBalancerListenerResource) Update(ctx context.Context, req reso
 			return
 		}
 		resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
+
+		// Clear only after the write succeeded: a marker cleared before
+		// success would turn a transient failure into a destroy+recreate on
+		// the retry, because the next plan would no longer recognise the
+		// import.
+		if adopting && !resp.Diagnostics.HasError() {
+			resp.Diagnostics.Append(clearImportAdoptionPending(ctx, resp.Private)...)
+		}
 		return
 	}
 
@@ -198,6 +227,13 @@ func (r *CloudLoadBalancerListenerResource) Update(ctx context.Context, req reso
 	}
 
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
+
+	// Clear only after the write succeeded: a marker cleared before success
+	// would turn a transient failure into a destroy+recreate on the retry,
+	// because the next plan would no longer recognise the import.
+	if adopting && !resp.Diagnostics.HasError() {
+		resp.Diagnostics.Append(clearImportAdoptionPending(ctx, resp.Private)...)
+	}
 }
 
 func (r *CloudLoadBalancerListenerResource) Read(ctx context.Context, req resource.ReadRequest, resp *resource.ReadResponse) {
@@ -242,6 +278,12 @@ func (r *CloudLoadBalancerListenerResource) Read(ctx context.Context, req resour
 		resp.Diagnostics.AddError("failed to deserialize http request", err.Error())
 		return
 	}
+
+	// Advance the import-adoption marker (see import_adoption.go). Must run on
+	// every successful Read: Terraform persists this refresh in `terraform
+	// apply` even when the resulting plan is a no-op, which is the only hook
+	// that retires a marker whose import adopted nothing.
+	resp.Diagnostics.Append(advanceImportAdoption(ctx, resp.Private)...)
 
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
 }
@@ -323,9 +365,60 @@ func (r *CloudLoadBalancerListenerResource) ImportState(ctx context.Context, req
 		return
 	}
 
+	// default_pool_id and insert_x_forwarded are create-only and tagged
+	// no_refresh, so the Get above cannot populate them and they stay null in
+	// state. Mark the adoption window so the plan modifiers on those
+	// attributes know this null came from an import rather than from a
+	// listener created without them - the first apply adopts the configured
+	// values into state and clears the marker.
+	resp.Diagnostics.Append(markImportAdoptionPending(ctx, resp.Private)...)
+
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
 }
 
-func (r *CloudLoadBalancerListenerResource) ModifyPlan(_ context.Context, _ resource.ModifyPlanRequest, _ *resource.ModifyPlanResponse) {
+func (r *CloudLoadBalancerListenerResource) ModifyPlan(ctx context.Context, req resource.ModifyPlanRequest, resp *resource.ModifyPlanResponse) {
+	// The adoption marker is deliberately NOT touched here. A plan whose only
+	// effect would be a marker write is a no-op plan, and Terraform never
+	// persists PlannedPrivate for no-op plans, so the write would silently
+	// evaporate. Retirement lives in Read's phase advance instead (see
+	// advanceImportAdoption in import_adoption.go), whose private-state writes
+	// every apply persists; Update handles the success (clear) and failure
+	// (re-arm) cases.
+	//
+	// What this does do is warn while an adoption is actually planned. Adopted
+	// values are written to state without being sent to the API, and no later
+	// refresh can correct them, so this is the only moment a user can catch a
+	// wrong value before it becomes permanent.
+	if req.State.Raw.IsNull() || req.Plan.Raw.IsNull() {
+		return
+	}
 
+	adopting, diags := importAdoptionPending(ctx, req.Private)
+	resp.Diagnostics.Append(diags...)
+
+	if resp.Diagnostics.HasError() || !adopting {
+		return
+	}
+
+	var plan, state *CloudLoadBalancerListenerModel
+
+	// The warning is advisory, so a decode problem must never fail the plan.
+	if req.Plan.Get(ctx, &plan).HasError() || req.State.Get(ctx, &state).HasError() {
+		return
+	}
+
+	if plan == nil || state == nil {
+		return
+	}
+
+	// A replacement runs Create, not Update: nothing is adopted and every
+	// configured value reaches the API, so the warning would describe the
+	// opposite of what is about to happen.
+	if planForcesReplacement(ctx, req.Plan, req.State, req.Config, adopting) {
+		return
+	}
+
+	if adopted := adoptedCreateOnlyAttributes(*plan, *state); len(adopted) > 0 {
+		resp.Diagnostics.Append(importAdoptionWarning(adopted))
+	}
 }

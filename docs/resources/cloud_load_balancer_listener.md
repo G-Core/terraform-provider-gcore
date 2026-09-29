@@ -116,3 +116,7 @@ Import is supported using the following syntax:
 $ terraform import gcore_cloud_load_balancer_listener.example '<project_id>/<region_id>/<listener_id>'
 ```
 
+The API does not return `default_pool_id` or `insert_x_forwarded`, so an import cannot read them. The first apply after an import records them from your configuration instead of replacing the listener, and shows a warning that names them. Check that the configured values match the listener before you apply. If the same apply also changes an attribute that forces replacement, such as `protocol`, `protocol_port` or `load_balancer_id`, the listener is recreated with your configured values and no adoption warning is shown.
+
+~> **Import the listener on its own.** If the same apply also changes a resource that the listener depends on, such as its load balancer, and that change fails, Terraform skips the listener but the one-time adoption still expires. The next plan then replaces the listener. To recover, run `terraform state rm` for the listener and import it again. `-refresh=false` cannot bring back an adoption that a refreshed apply has already expired.
+
