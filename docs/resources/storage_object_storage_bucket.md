@@ -16,6 +16,15 @@ Buckets are containers within object storage that hold files (objects) and defin
 resource "gcore_storage_object_storage_bucket" "example_storage_object_storage_bucket" {
   storage_id = 0
   name = "my-new-bucket"
+  cors = {
+    allowed_origins = ["https://example.com"]
+  }
+  storage_object_storage_bucket_lifecycle = {
+    expiration_days = 30
+  }
+  policy = {
+    is_public = true
+  }
 }
 ```
 
@@ -47,6 +56,7 @@ Optional:
 Optional:
 
 - `is_public` (Boolean) Set to true to allow unauthenticated object downloads, false to require valid S3 credentials.
+Omit to leave the current policy unchanged.
 
 
 <a id="nestedatt--storage_object_storage_bucket_lifecycle"></a>

@@ -14,7 +14,7 @@ Locations represent cloud regions where new storages can be created.
 
 ```terraform
 data "gcore_storage_locations" "example_storage_locations" {
-
+  type = "standard"
 }
 ```
 
@@ -25,6 +25,8 @@ data "gcore_storage_locations" "example_storage_locations" {
 
 - `max_items` (Number) Max items to fetch, default: 1000
 - `order_by` (String)
+- `type` (String) Filter by location type: object storage performance tier (standard, fast) or sftp
+Available values: "standard", "fast", "sftp".
 
 ### Read-Only
 
