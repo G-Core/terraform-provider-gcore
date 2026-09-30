@@ -17,6 +17,7 @@ type StorageLocationsResultsListDataSourceEnvelope struct {
 }
 
 type StorageLocationsDataSourceModel struct {
+	Type     types.String                                                       `tfsdk:"type" query:"type,optional"`
 	OrderBy  types.String                                                       `tfsdk:"order_by" query:"order_by,computed_optional"`
 	MaxItems types.Int64                                                        `tfsdk:"max_items"`
 	Items    customfield.NestedObjectList[StorageLocationsItemsDataSourceModel] `tfsdk:"items"`
@@ -27,6 +28,9 @@ func (m *StorageLocationsDataSourceModel) toListParams(_ context.Context) (param
 
 	if !m.OrderBy.IsNull() {
 		params.OrderBy = param.NewOpt(m.OrderBy.ValueString())
+	}
+	if !m.Type.IsNull() {
+		params.Type = storage.LocationListParamsType(m.Type.ValueString())
 	}
 
 	return

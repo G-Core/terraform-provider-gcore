@@ -19,6 +19,17 @@ func ListDataSourceSchema(ctx context.Context) schema.Schema {
 	return schema.Schema{
 		MarkdownDescription: "Locations represent cloud regions where new storages can be created.",
 		Attributes: map[string]schema.Attribute{
+			"type": schema.StringAttribute{
+				Description: "Filter by location type: object storage performance tier (standard, fast) or sftp\nAvailable values: \"standard\", \"fast\", \"sftp\".",
+				Optional:    true,
+				Validators: []validator.String{
+					stringvalidator.OneOfCaseInsensitive(
+						"standard",
+						"fast",
+						"sftp",
+					),
+				},
+			},
 			"order_by": schema.StringAttribute{
 				Computed: true,
 				Optional: true,

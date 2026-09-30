@@ -59,7 +59,7 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 				Optional: true,
 				Attributes: map[string]schema.Attribute{
 					"is_public": schema.BoolAttribute{
-						Description: "Set to true to allow unauthenticated object downloads, false to require valid S3 credentials.",
+						Description: "Set to true to allow unauthenticated object downloads, false to require valid S3 credentials.\nOmit to leave the current policy unchanged.",
 						Optional:    true,
 						Computed:    true,
 					},
