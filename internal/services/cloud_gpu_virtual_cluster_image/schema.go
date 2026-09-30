@@ -11,8 +11,6 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
-	"github.com/hashicorp/terraform-plugin-framework/resource/schema/booldefault"
-	"github.com/hashicorp/terraform-plugin-framework/resource/schema/boolplanmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/int64planmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/mapplanmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
@@ -85,8 +83,7 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 				Description:   "When True, image cannot be deleted unless all volumes, created from it, are deleted.",
 				Computed:      true,
 				Optional:      true,
-				PlanModifiers: []planmodifier.Bool{boolplanmodifier.RequiresReplaceIfConfigured()},
-				Default:       booldefault.StaticBool(false),
+				PlanModifiers: []planmodifier.Bool{cowFormatPlanModifier()},
 			},
 			"os_type": schema.StringAttribute{
 				Description: "The operating system installed on the image. Linux by default\nAvailable values: \"linux\", \"windows\".",
