@@ -49,30 +49,31 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 						"new-volume",
 					),
 				},
-				PlanModifiers: []planmodifier.String{planmodifiers.StringRequiresReplaceIfConfiguredPreservingState()},
+				PlanModifiers: []planmodifier.String{planmodifiers.StringRequiresReplaceUnlessAdopting(importAdoption.Key)},
 			},
 			"attachment_tag": schema.StringAttribute{
 				Description:   "Block device attachment tag (not exposed in the user tags). Only used in conjunction with `instance_id_to_attach_to`",
 				Optional:      true,
-				PlanModifiers: []planmodifier.String{planmodifiers.StringRequiresReplaceIfConfiguredPreservingState()},
+				PlanModifiers: []planmodifier.String{planmodifiers.StringRequiresReplaceUnlessAdopting(importAdoption.Key)},
 			},
 			"image_id": schema.StringAttribute{
 				Description:   "Image ID",
 				Optional:      true,
-				PlanModifiers: []planmodifier.String{planmodifiers.StringRequiresReplaceIfConfiguredPreservingState()},
+				PlanModifiers: []planmodifier.String{planmodifiers.StringRequiresReplaceUnlessAdopting(importAdoption.Key)},
 			},
 			"instance_id_to_attach_to": schema.StringAttribute{
 				Description:   "`instance_id` to attach newly-created volume to",
 				Optional:      true,
-				PlanModifiers: []planmodifier.String{planmodifiers.StringRequiresReplaceIfConfiguredPreservingState()},
+				PlanModifiers: []planmodifier.String{planmodifiers.StringRequiresReplaceUnlessAdopting(importAdoption.Key)},
 			},
 			"snapshot_id": schema.StringAttribute{
 				Description:   "Snapshot ID",
 				Optional:      true,
-				PlanModifiers: []planmodifier.String{planmodifiers.StringRequiresReplaceIfConfiguredPreservingState()},
+				PlanModifiers: []planmodifier.String{planmodifiers.StringRequiresReplaceUnlessAdopting(importAdoption.Key)},
 			},
 			"type_name": schema.StringAttribute{
 				Description: "Volume type. Defaults to `standard`. If not specified for source `snapshot`, volume type will be derived from the snapshot volume.\nAvailable values: \"cold\", \"ssd_hiiops\", \"ssd_local\", \"ssd_lowlatency\", \"standard\", \"ultra\".",
+				Computed:    true, // read back as volume_type; see backfillTypeName
 				Optional:    true,
 				Validators: []validator.String{
 					stringvalidator.OneOfCaseInsensitive(
@@ -84,7 +85,14 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 						"ultra",
 					),
 				},
-				PlanModifiers: []planmodifier.String{planmodifiers.StringRequiresReplaceIfConfiguredPreservingState()},
+				PlanModifiers: []planmodifier.String{
+					// NOT UseStateForUnknown: a null rc.1 state under -refresh=false must
+					// plan unknown, not null, because the apply-time back-fill resolves it.
+					stringplanmodifier.UseNonNullStateForUnknown(),
+					// The validator is case-insensitive, the API reports canonical case.
+					planmodifiers.StringUseStateForCaseInsensitiveEqual(),
+					stringplanmodifier.RequiresReplaceIfConfigured(),
+				},
 			},
 			"lifecycle_policy_ids": schema.ListAttribute{
 				Description:   "List of lifecycle policy IDs (snapshot creation schedules) to associate with the volume",

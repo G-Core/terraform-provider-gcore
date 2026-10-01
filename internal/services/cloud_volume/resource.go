@@ -14,6 +14,7 @@ import (
 	"github.com/G-Core/gcore-go/packages/param"
 	"github.com/G-Core/terraform-provider-gcore/internal/apijson"
 	"github.com/G-Core/terraform-provider-gcore/internal/custom"
+	"github.com/G-Core/terraform-provider-gcore/internal/importadoption"
 	"github.com/G-Core/terraform-provider-gcore/internal/importpath"
 	"github.com/G-Core/terraform-provider-gcore/internal/logging"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
@@ -103,11 +104,22 @@ func (r *CloudVolumeResource) Create(ctx context.Context, req resource.CreateReq
 	if tags, ok := custom.ConvertAPITagsToCustomfieldMap(ctx, bytes); ok {
 		data.Tags = tags
 	}
+	backfillTypeName(data)
 
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
 }
 
 func (r *CloudVolumeResource) Update(ctx context.Context, req resource.UpdateRequest, resp *resource.UpdateResponse) {
+	// Import-adoption window (internal/importadoption): settle re-arms the
+	// marker on an errored apply and clears it on a successful one. Installed
+	// before the first fallible step so every error raised in this method
+	// re-arms. Every non-error exit below writes plan state.
+	adopting, settle := importAdoption.BeginUpdate(ctx, req.Private, resp.Private, &resp.Diagnostics)
+	defer settle()
+	if resp.Diagnostics.HasError() {
+		return
+	}
+
 	var data *CloudVolumeModel
 
 	resp.Diagnostics.Append(req.Plan.Get(ctx, &data)...)
@@ -122,6 +134,14 @@ func (r *CloudVolumeResource) Update(ctx context.Context, req resource.UpdateReq
 
 	if resp.Diagnostics.HasError() {
 		return
+	}
+
+	if adopting {
+		// Verify before the resize/PATCH branches so a mismatch never follows a real change.
+		resp.Diagnostics.Append(verifyAdoption(ctx, *data, *state)...)
+		if resp.Diagnostics.HasError() {
+			return
+		}
 	}
 
 	// Handle volume size changes (resize) separately before other updates
@@ -180,6 +200,11 @@ func (r *CloudVolumeResource) Update(ctx context.Context, req resource.UpdateReq
 		}
 
 		dataBytes, err := data.MarshalJSONForUpdate(*state)
+		if err == nil {
+			// PATCH /v1/volumes accepts name and tags only; keep adopted create-only
+			// attributes (state null, plan set) off the wire.
+			dataBytes, err = importadoption.KeepKeys(dataBytes, "name", "tags")
+		}
 		if err != nil {
 			resp.Diagnostics.AddError("failed to serialize http request", err.Error())
 			return
@@ -209,9 +234,9 @@ func (r *CloudVolumeResource) Update(ctx context.Context, req resource.UpdateReq
 	}
 
 	// Any change entering Update marks computed plan values as unknown, and
-	// state-only reconciliations (e.g. create-only fields restored after
-	// import) never receive an API response to resolve them. Always refresh
-	// from the API so every computed field is known before saving state.
+	// an adopting apply after import may send nothing at all. Always refresh
+	// from the API so every computed field is known before saving state;
+	// type_name follows volume_type where it is still unset.
 	getParams := cloud.VolumeGetParams{}
 
 	if !data.ProjectID.IsNull() {
@@ -243,6 +268,7 @@ func (r *CloudVolumeResource) Update(ctx context.Context, req resource.UpdateReq
 	if tags, ok := custom.ConvertAPITagsToCustomfieldMap(ctx, bytes); ok {
 		data.Tags = tags
 	}
+	backfillTypeName(data)
 
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
 }
@@ -293,6 +319,13 @@ func (r *CloudVolumeResource) Read(ctx context.Context, req resource.ReadRequest
 	if tags, ok := custom.ConvertAPITagsToCustomfieldMap(ctx, bytes); ok {
 		data.Tags = tags
 	}
+	backfillTypeName(data)
+
+	// Advance the import-adoption marker (internal/importadoption). Must run on
+	// every successful Read: Terraform persists this refresh in `terraform apply`
+	// even when the plan is a no-op - the only hook that retires a marker whose
+	// import adopted nothing.
+	resp.Diagnostics.Append(importAdoption.Advance(ctx, resp.Private)...)
 
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
 }
@@ -377,10 +410,22 @@ func (r *CloudVolumeResource) ImportState(ctx context.Context, req resource.Impo
 	if tags, ok := custom.ConvertAPITagsToCustomfieldMap(ctx, bytes); ok {
 		data.Tags = tags
 	}
+	backfillTypeName(data)
+
+	// source, attachment_tag, image_id, instance_id_to_attach_to and snapshot_id
+	// are no_refresh and stay null here; mark the adoption window so their plan
+	// modifiers know this null came from an import.
+	resp.Diagnostics.Append(importAdoption.Mark(ctx, resp.Private)...)
 
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
 }
 
-func (r *CloudVolumeResource) ModifyPlan(_ context.Context, _ resource.ModifyPlanRequest, _ *resource.ModifyPlanResponse) {
-
+func (r *CloudVolumeResource) ModifyPlan(ctx context.Context, req resource.ModifyPlanRequest, resp *resource.ModifyPlanResponse) {
+	// Never writes private state (PlannedPrivate is dropped on no-op plans);
+	// retirement is Read's Advance. The guard errors, the hook only warns, and
+	// the hook stays silent once the guard has erred.
+	refuseAdoptionWithoutSource(ctx, req, resp)
+	importAdoptionPlan.ModifyPlan(ctx, req, resp)
+	warnRecordedTypeNameDrift(ctx, req, resp)
+	checkCreatePrerequisites(ctx, req, resp)
 }

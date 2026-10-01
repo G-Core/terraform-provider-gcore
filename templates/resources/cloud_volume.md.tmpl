@@ -45,11 +45,37 @@ Import is supported using the following syntax:
 
 {{ codefile "shell" .ImportFile }}
 
-~> **One reconciliation apply is needed after import.** The API does not return
-the create-only fields `source`, `type_name`, `image_id`, `snapshot_id`,
-`attachment_tag`, `instance_id_to_attach_to` or `lifecycle_policy_ids` in `GET`
-responses, so they are absent from state immediately after import. The first
-`terraform plan` therefore shows an update-in-place that copies these values
-from your configuration into state. The volume is **not** replaced and no
-infrastructure changes occur; subsequent plans are clean.
+~> **One adopting apply is needed after import.** The API does not return
+`source`, `image_id`, `snapshot_id`, `attachment_tag` or
+`instance_id_to_attach_to`, so the first apply after import records the values
+from your configuration into state without changing the volume; the plan shows
+an update-in-place and a warning naming the attributes. `image_id` and
+`instance_id_to_attach_to` are checked against what the API reports and a
+contradiction fails the apply; the others are trusted as-is, so check them
+first. `type_name` is read from the API, so omitting it keeps the recorded
+value; write the lowercase value the API reports (`standard`, not
+`Standard`): a value that differs only in case is accepted without
+replacement, but the plan keeps showing an in-place update of the computed
+attributes until the spelling matches. After that apply, changing or
+removing `source`, `image_id`, `snapshot_id`, `attachment_tag` or
+`instance_id_to_attach_to` plans a replacement; use `terraform apply
+-replace=` to recreate the volume with different values. A configuration
+that could not create the volume (`source = "image"` without `image_id`,
+`source = "snapshot"` without `snapshot_id`, `attachment_tag` without
+`instance_id_to_attach_to`) is rejected at plan time whenever the relevant
+values are known and the plan would create or replace the volume, and warned
+about otherwise. The adoption window closes on the successful adopting apply,
+or on the second refresh after import; the plan warns while it is open. After
+a command-mode import, an apply that fails after refresh but before this volume
+update runs may cause the next run to plan replacement. Retry with `terraform
+apply -refresh=false`, or remove the resource from state and import it again. A
+configuration `import` block survives one such failed apply and can retry
+adoption on the next run. Excluding `source` from the plan with `lifecycle {
+ignore_changes = [source] }` after import leaves
+`source` unrecorded and, together with a no-op `terraform apply
+-refresh=false` (which does not refresh), keeps the window open until the
+next refreshing apply; a later plan that would record any of the other four
+attributes while `source` is ignored is refused - remove `source` from
+`ignore_changes` so the adopting apply records them together, or use
+`-replace=`.
 {{ end }}
