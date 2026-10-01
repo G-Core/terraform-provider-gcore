@@ -5,9 +5,12 @@ package gcore
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
+	"os"
 	"strings"
 	"testing"
+	"time"
 
 	"github.com/G-Core/gcorelabscdn-go/origingroups"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
@@ -619,4 +622,369 @@ func testOriginGroupS3OtherConfig(bucketName, storageHostname, accessKeyID, secr
 		"s3_access_key_id":     accessKeyID,
 		"s3_secret_access_key": secretAccessKey,
 	}
+}
+
+func TestValidateCDNOriginGroupConfigS3Gcore(t *testing.T) {
+	s3Origin := func(cfg map[string]interface{}, extra map[string]interface{}) map[string]interface{} {
+		origin := map[string]interface{}{
+			"origin_type": "s3",
+			"config":      []interface{}{cfg},
+		}
+		for k, v := range extra {
+			origin[k] = v
+		}
+		return map[string]interface{}{
+			"name":   "terraform_acctest_group",
+			"origin": []interface{}{origin},
+		}
+	}
+	withField := func(cfg map[string]interface{}, key string, value interface{}) map[string]interface{} {
+		cfg[key] = value
+		return cfg
+	}
+
+	tests := []struct {
+		name    string
+		config  map[string]interface{}
+		wantErr string
+	}{
+		{
+			name:   "valid gcore origin",
+			config: s3Origin(testOriginGroupS3GcoreConfig("bucket", 123), nil),
+		},
+		{
+			name:   "computed storage_id does not error",
+			config: s3Origin(withField(testOriginGroupS3GcoreConfig("bucket", 0), "storage_id", unknownVariableValue), nil),
+		},
+		{
+			name:    "gcore origin requires storage_id",
+			config:  s3Origin(testOriginGroupS3GcoreConfig("bucket", 0), nil),
+			wantErr: "origin.0.config: `storage_id` is required when `s3_type` is 'gcore'",
+		},
+		{
+			name:    "gcore origin rejects access key",
+			config:  s3Origin(withField(testOriginGroupS3GcoreConfig("bucket", 123), "s3_access_key_id", "ak"), nil),
+			wantErr: "origin.0.config: `s3_access_key_id` cannot be set when `s3_type` is 'gcore'",
+		},
+		{
+			name:    "gcore origin rejects secret key",
+			config:  s3Origin(withField(testOriginGroupS3GcoreConfig("bucket", 123), "s3_secret_access_key", "sk"), nil),
+			wantErr: "origin.0.config: `s3_secret_access_key` cannot be set when `s3_type` is 'gcore'",
+		},
+		{
+			name:    "gcore origin rejects region",
+			config:  s3Origin(withField(testOriginGroupS3GcoreConfig("bucket", 123), "s3_region", "eu-west-1"), nil),
+			wantErr: "origin.0.config: `s3_region` cannot be set when `s3_type` is 'gcore'",
+		},
+		{
+			name:    "gcore origin rejects storage hostname",
+			config:  s3Origin(withField(testOriginGroupS3GcoreConfig("bucket", 123), "s3_storage_hostname", "s3.example.com"), nil),
+			wantErr: "origin.0.config: `s3_storage_hostname` cannot be set when `s3_type` is 'gcore'",
+		},
+		{
+			name:    "gcore origin rejects computed region",
+			config:  s3Origin(withField(testOriginGroupS3GcoreConfig("bucket", 123), "s3_region", unknownVariableValue), nil),
+			wantErr: "origin.0.config: `s3_region` cannot be set when `s3_type` is 'gcore'",
+		},
+		{
+			name:    "gcore origin rejects host_header_override",
+			config:  s3Origin(testOriginGroupS3GcoreConfig("bucket", 123), map[string]interface{}{"host_header_override": "example.com"}),
+			wantErr: "origin.0: `host_header_override` cannot be set when `s3_type` is 'gcore'",
+		},
+		{
+			name:    "amazon origin rejects storage_id",
+			config:  s3Origin(withField(testOriginGroupS3Config("bucket", "eu-west-1", "ak", "sk"), "storage_id", 123), nil),
+			wantErr: "origin.0.config: `storage_id` is only allowed when `s3_type` is 'gcore'",
+		},
+		{
+			name: "amazon origin requires access key",
+			config: s3Origin(map[string]interface{}{
+				"s3_type":              "amazon",
+				"s3_bucket_name":       "bucket",
+				"s3_region":            "eu-west-1",
+				"s3_secret_access_key": "sk",
+			}, nil),
+			wantErr: "origin.0.config: `s3_access_key_id` is required when `s3_type` is 'amazon'",
+		},
+		{
+			name: "other origin requires secret key",
+			config: s3Origin(map[string]interface{}{
+				"s3_type":             "other",
+				"s3_bucket_name":      "bucket",
+				"s3_storage_hostname": "s3.example.com",
+				"s3_access_key_id":    "ak",
+			}, nil),
+			wantErr: "origin.0.config: `s3_secret_access_key` is required when `s3_type` is 'other'",
+		},
+		{
+			name:   "computed amazon keys do not error",
+			config: s3Origin(testOriginGroupS3Config("bucket", "eu-west-1", unknownVariableValue, unknownVariableValue), nil),
+		},
+		{
+			name:   "computed s3_type with gcore binding does not error",
+			config: s3Origin(withField(testOriginGroupS3GcoreConfig("bucket", 123), "s3_type", unknownVariableValue), nil),
+		},
+		{
+			name:   "computed s3_type with amazon credentials does not error",
+			config: s3Origin(withField(testOriginGroupS3Config("bucket", "eu-west-1", "ak", "sk"), "s3_type", unknownVariableValue), nil),
+		},
+		{
+			name:   "computed s3_type without storage_id or credentials does not error",
+			config: s3Origin(map[string]interface{}{"s3_type": unknownVariableValue, "s3_bucket_name": "bucket"}, nil),
+		},
+	}
+
+	originGroupResource := resourceCDNOriginGroup()
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			_, err := originGroupResource.Diff(context.Background(), nil, terraform.NewResourceConfigRaw(tt.config), nil)
+			if tt.wantErr == "" {
+				if err != nil {
+					t.Fatalf("unexpected error: %v", err)
+				}
+				return
+			}
+			if err == nil {
+				t.Fatalf("expected error containing %q", tt.wantErr)
+			}
+			if !strings.Contains(err.Error(), tt.wantErr) {
+				t.Fatalf("unexpected error: %v", err)
+			}
+		})
+	}
+}
+
+func TestOriginGroupS3GcoreMapping(t *testing.T) {
+	reqs := listToSourceRequests([]interface{}{
+		map[string]interface{}{
+			"source":               "",
+			"enabled":              true,
+			"backup":               false,
+			"origin_type":          "s3",
+			"host_header_override": "",
+			"config": []interface{}{
+				withS3AuthType(testOriginGroupS3GcoreConfig("bucket", 123)),
+			},
+		},
+	})
+
+	if len(reqs) != 1 {
+		t.Fatalf("expected 1 request, got %d", len(reqs))
+	}
+
+	body, err := json.Marshal(reqs[0])
+	if err != nil {
+		t.Fatal(err)
+	}
+	var got map[string]interface{}
+	if err := json.Unmarshal(body, &got); err != nil {
+		t.Fatal(err)
+	}
+	if _, ok := got["host_header_override"]; ok {
+		t.Fatalf("host_header_override must be omitted: %s", body)
+	}
+	cfg := got["config"].(map[string]interface{})
+	for _, key := range []string{"s3_access_key_id", "s3_secret_access_key", "s3_region", "s3_storage_hostname"} {
+		if _, ok := cfg[key]; ok {
+			t.Fatalf("%s must be omitted: %s", key, body)
+		}
+	}
+	if cfg["storage_id"] != float64(123) || cfg["s3_type"] != "gcore" || cfg["s3_bucket_name"] != "bucket" {
+		t.Fatalf("unexpected config: %s", body)
+	}
+
+	sources := sourcesToList([]origingroups.Source{
+		{
+			Enabled:    true,
+			OriginType: "s3",
+			Config: &origingroups.S3Config{
+				S3Type:       "gcore",
+				S3BucketName: "bucket",
+				S3AuthType:   "awsSignatureV4",
+				StorageID:    123,
+			},
+		},
+	})
+	fields := sources[0].(map[string]interface{})
+	stateCfg := fields["config"].([]interface{})[0].(map[string]interface{})
+	if stateCfg["storage_id"] != 123 || stateCfg["s3_type"] != "gcore" {
+		t.Fatalf("unexpected state config: %#v", stateCfg)
+	}
+	if fields["host_header_override"] != "" {
+		t.Fatalf("host_header_override = %v, want empty", fields["host_header_override"])
+	}
+}
+
+func TestOriginGroupS3ManualMappingOmitsStorageID(t *testing.T) {
+	cfg := withS3AuthType(testOriginGroupS3Config("bucket", "eu-west-1", "ak", "sk"))
+	cfg["storage_id"] = 0
+	reqs := listToSourceRequests([]interface{}{
+		map[string]interface{}{
+			"enabled":     true,
+			"backup":      false,
+			"origin_type": "s3",
+			"config":      []interface{}{cfg},
+		},
+	})
+
+	body, err := json.Marshal(reqs[0].Config)
+	if err != nil {
+		t.Fatal(err)
+	}
+	var got map[string]interface{}
+	if err := json.Unmarshal(body, &got); err != nil {
+		t.Fatal(err)
+	}
+	if _, ok := got["storage_id"]; ok {
+		t.Fatalf("storage_id must be omitted: %s", body)
+	}
+	if got["s3_access_key_id"] != "ak" || got["s3_secret_access_key"] != "sk" || got["s3_region"] != "eu-west-1" {
+		t.Fatalf("unexpected config: %s", body)
+	}
+}
+
+func TestRestoreS3OriginCredentialsSkipsGcore(t *testing.T) {
+	origins := []interface{}{
+		map[string]interface{}{
+			"origin_type": "s3",
+			"config": []interface{}{
+				map[string]interface{}{"s3_type": "gcore", "s3_access_key_id": "", "s3_secret_access_key": ""},
+			},
+		},
+	}
+
+	restoreS3OriginCredentials(origins, map[int]s3OriginCredentials{0: {accessKeyID: "old", secretAccessKey: "old"}})
+
+	cfg := origins[0].(map[string]interface{})["config"].([]interface{})[0].(map[string]interface{})
+	if cfg["s3_access_key_id"] != "" || cfg["s3_secret_access_key"] != "" {
+		t.Fatalf("credentials must not be restored into a gcore origin: %#v", cfg)
+	}
+}
+
+func testOriginGroupS3GcoreConfig(bucketName string, storageID int) map[string]interface{} {
+	cfg := map[string]interface{}{
+		"s3_type":        "gcore",
+		"s3_bucket_name": bucketName,
+	}
+	if storageID != 0 {
+		cfg["storage_id"] = storageID
+	}
+	return cfg
+}
+
+func withS3AuthType(cfg map[string]interface{}) map[string]interface{} {
+	cfg["s3_auth_type"] = "awsSignatureV4"
+	return cfg
+}
+
+// testAccGcoreStorageConfig declares a Gcore Object Storage with two buckets for storage-binding tests.
+func testAccGcoreStorageConfig(prefix string) string {
+	location := os.Getenv("GCORE_STORAGE_S3_LOCATION")
+	if location == "" {
+		location = "s-region-1"
+	}
+	return fmt.Sprintf(`
+resource "gcore_storage_s3" "acctest" {
+  name     = "%[1]s"
+  location = "%[2]s"
+}
+
+resource "gcore_storage_s3_bucket" "first" {
+  storage_id = gcore_storage_s3.acctest.storage_id
+  name       = "%[1]s-first"
+}
+
+resource "gcore_storage_s3_bucket" "second" {
+  storage_id = gcore_storage_s3.acctest.storage_id
+  name       = "%[1]s-second"
+}
+`, prefix, location)
+}
+
+func TestAccOriginGroupS3GcoreStorage(t *testing.T) {
+	fullName := "gcore_cdn_origingroup.acctest_gcore"
+	prefix := fmt.Sprintf("tfacc-%d", time.Now().Unix())
+
+	gcoreOrigin := func(bucket string) string {
+		return testAccGcoreStorageConfig(prefix) + fmt.Sprintf(`
+resource "gcore_cdn_origingroup" "acctest_gcore" {
+  name     = "%[1]s"
+  use_next = true
+
+  origin {
+    origin_type = "s3"
+    config {
+      s3_type        = "gcore"
+      storage_id     = gcore_storage_s3.acctest.storage_id
+      s3_bucket_name = gcore_storage_s3_bucket.%[2]s.name
+    }
+  }
+}
+`, prefix, bucket)
+	}
+
+	otherOrigin := testAccGcoreStorageConfig(prefix) + fmt.Sprintf(`
+resource "gcore_cdn_origingroup" "acctest_gcore" {
+  name     = "%[1]s"
+  use_next = true
+
+  origin {
+    origin_type = "s3"
+    config {
+      s3_type              = "other"
+      s3_storage_hostname  = trimprefix(gcore_storage_s3.acctest.generated_s3_endpoint, "https://")
+      s3_bucket_name       = gcore_storage_s3_bucket.second.name
+      s3_access_key_id     = gcore_storage_s3.acctest.generated_access_key
+      s3_secret_access_key = gcore_storage_s3.acctest.generated_secret_key
+    }
+  }
+}
+`, prefix)
+
+	resource.Test(t, resource.TestCase{
+		PreCheck: func() {
+			testAccPreCheckVars(t, GCORE_CDN_URL_VAR, GCORE_STORAGE_URL_VAR)
+		},
+		ProviderFactories: testAccProviders,
+		Steps: []resource.TestStep{
+			{
+				Config: gcoreOrigin("first"),
+				Check: resource.ComposeTestCheckFunc(
+					testAccCheckResourceExists(fullName),
+					resource.TestCheckResourceAttr(fullName, "origin.#", "1"),
+					resource.TestCheckResourceAttr(fullName, "origin.0.config.0.s3_type", "gcore"),
+					resource.TestCheckResourceAttrPair(fullName, "origin.0.config.0.storage_id", "gcore_storage_s3.acctest", "storage_id"),
+					resource.TestCheckResourceAttr(fullName, "origin.0.config.0.s3_bucket_name", prefix+"-first"),
+					resource.TestCheckResourceAttr(fullName, "origin.0.config.0.s3_access_key_id", ""),
+					resource.TestCheckResourceAttr(fullName, "origin.0.host_header_override", ""),
+				),
+			},
+			{
+				ResourceName:      fullName,
+				ImportState:       true,
+				ImportStateVerify: true,
+			},
+			{
+				Config: gcoreOrigin("second"),
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr(fullName, "origin.0.config.0.s3_bucket_name", prefix+"-second"),
+				),
+			},
+			{
+				Config: otherOrigin,
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr(fullName, "origin.0.config.0.s3_type", "other"),
+					resource.TestCheckResourceAttr(fullName, "origin.0.config.0.storage_id", "0"),
+				),
+			},
+			{
+				Config: gcoreOrigin("first"),
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr(fullName, "origin.0.config.0.s3_type", "gcore"),
+					resource.TestCheckResourceAttr(fullName, "origin.0.config.0.s3_storage_hostname", ""),
+				),
+			},
+		},
+	})
 }
