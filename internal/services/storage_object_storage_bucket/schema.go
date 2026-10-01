@@ -55,21 +55,22 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 					},
 				},
 			},
-			"policy": schema.SingleNestedAttribute{
-				Optional: true,
-				Attributes: map[string]schema.Attribute{
-					"is_public": schema.BoolAttribute{
-						Description: "Set to true to allow unauthenticated object downloads, false to require valid S3 credentials.\nOmit to leave the current policy unchanged.",
-						Optional:    true,
-						Computed:    true,
-					},
-				},
-			},
 			"storage_object_storage_bucket_lifecycle": schema.SingleNestedAttribute{
 				Optional: true,
 				Attributes: map[string]schema.Attribute{
 					"expiration_days": schema.Int64Attribute{
 						Description: "Days before objects are automatically deleted. Set to a positive number to enable, or null/0 to remove the rule.",
+						Optional:    true,
+					},
+				},
+			},
+			"policy": schema.SingleNestedAttribute{
+				Computed:   true,
+				Optional:   true,
+				CustomType: customfield.NewNestedObjectType[StorageObjectStorageBucketPolicyModel](ctx),
+				Attributes: map[string]schema.Attribute{
+					"is_public": schema.BoolAttribute{
+						Description: "Set to true to allow unauthenticated object downloads, false to require valid S3 credentials.\nOmit to leave the current policy unchanged.",
 						Optional:    true,
 						Computed:    true,
 					},

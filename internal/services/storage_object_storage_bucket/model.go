@@ -14,8 +14,8 @@ type StorageObjectStorageBucketModel struct {
 	StorageID                           types.Int64                                                         `tfsdk:"storage_id" path:"storage_id,required"`
 	Name                                types.String                                                        `tfsdk:"name" json:"name,required"`
 	Cors                                *StorageObjectStorageBucketCorsModel                                `tfsdk:"cors" json:"cors,optional"`
-	Policy                              *StorageObjectStorageBucketPolicyModel                              `tfsdk:"policy" json:"policy,optional"`
 	StorageObjectStorageBucketLifecycle *StorageObjectStorageBucketStorageObjectStorageBucketLifecycleModel `tfsdk:"storage_object_storage_bucket_lifecycle" json:"lifecycle,optional"`
+	Policy                              customfield.NestedObject[StorageObjectStorageBucketPolicyModel]     `tfsdk:"policy" json:"policy,computed_optional"`
 }
 
 func (m StorageObjectStorageBucketModel) MarshalJSON() (data []byte, err error) {
@@ -61,10 +61,10 @@ type StorageObjectStorageBucketCorsModel struct {
 	AllowedOrigins customfield.List[types.String] `tfsdk:"allowed_origins" json:"allowed_origins,computed_optional"`
 }
 
-type StorageObjectStorageBucketPolicyModel struct {
-	IsPublic types.Bool `tfsdk:"is_public" json:"is_public,computed_optional"`
+type StorageObjectStorageBucketStorageObjectStorageBucketLifecycleModel struct {
+	ExpirationDays types.Int64 `tfsdk:"expiration_days" json:"expiration_days,optional"`
 }
 
-type StorageObjectStorageBucketStorageObjectStorageBucketLifecycleModel struct {
-	ExpirationDays types.Int64 `tfsdk:"expiration_days" json:"expiration_days,computed_optional"`
+type StorageObjectStorageBucketPolicyModel struct {
+	IsPublic types.Bool `tfsdk:"is_public" json:"is_public,computed_optional"`
 }
