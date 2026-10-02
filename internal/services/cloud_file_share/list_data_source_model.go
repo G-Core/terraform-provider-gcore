@@ -50,6 +50,7 @@ type CloudFileSharesItemsDataSourceModel struct {
 	CreatedAt        types.String                                                          `tfsdk:"created_at" json:"created_at,computed"`
 	CreatorTaskID    types.String                                                          `tfsdk:"creator_task_id" json:"creator_task_id,computed"`
 	Name             types.String                                                          `tfsdk:"name" json:"name,computed"`
+	Network          customfield.NestedObject[CloudFileSharesNetworkDataSourceModel]       `tfsdk:"network" json:"network,computed"`
 	NetworkID        types.String                                                          `tfsdk:"network_id" json:"network_id,computed"`
 	NetworkName      types.String                                                          `tfsdk:"network_name" json:"network_name,computed"`
 	ProjectID        types.Int64                                                           `tfsdk:"project_id" json:"project_id,computed"`
@@ -64,6 +65,13 @@ type CloudFileSharesItemsDataSourceModel struct {
 	SubnetName       types.String                                                          `tfsdk:"subnet_name" json:"subnet_name,computed"`
 	Tags             customfield.NestedObjectList[CloudFileSharesTagsDataSourceModel]      `tfsdk:"tags" json:"tags,computed"`
 	TypeName         types.String                                                          `tfsdk:"type_name" json:"type_name,computed"`
+}
+
+type CloudFileSharesNetworkDataSourceModel struct {
+	NetworkID   types.String `tfsdk:"network_id" json:"network_id,computed"`
+	NetworkName types.String `tfsdk:"network_name" json:"network_name,computed"`
+	SubnetID    types.String `tfsdk:"subnet_id" json:"subnet_id,computed"`
+	SubnetName  types.String `tfsdk:"subnet_name" json:"subnet_name,computed"`
 }
 
 type CloudFileSharesShareSettingsDataSourceModel struct {

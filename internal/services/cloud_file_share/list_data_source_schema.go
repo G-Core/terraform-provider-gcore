@@ -75,13 +75,38 @@ func ListDataSourceSchema(ctx context.Context) schema.Schema {
 							Description: "File share name",
 							Computed:    true,
 						},
-						"network_id": schema.StringAttribute{
-							Description: "Network ID.",
+						"network": schema.SingleNestedAttribute{
+							Description: "Network and subnet of the file share.",
 							Computed:    true,
+							CustomType:  customfield.NewNestedObjectType[CloudFileSharesNetworkDataSourceModel](ctx),
+							Attributes: map[string]schema.Attribute{
+								"network_id": schema.StringAttribute{
+									Description: "Network ID.",
+									Computed:    true,
+								},
+								"network_name": schema.StringAttribute{
+									Description: "Network name.",
+									Computed:    true,
+								},
+								"subnet_id": schema.StringAttribute{
+									Description: "ID of the subnet that the file share uses.",
+									Computed:    true,
+								},
+								"subnet_name": schema.StringAttribute{
+									Description: "Subnet name.",
+									Computed:    true,
+								},
+							},
+						},
+						"network_id": schema.StringAttribute{
+							Description:        "Deprecated. Use `network.network_id` instead. Network ID.",
+							Computed:           true,
+							DeprecationMessage: "This attribute is deprecated.",
 						},
 						"network_name": schema.StringAttribute{
-							Description: "Network name.",
-							Computed:    true,
+							Description:        "Deprecated. Use `network.network_name` instead. Network name.",
+							Computed:           true,
+							DeprecationMessage: "This attribute is deprecated.",
 						},
 						"project_id": schema.Int64Attribute{
 							Description: "Project ID",
@@ -199,12 +224,14 @@ func ListDataSourceSchema(ctx context.Context) schema.Schema {
 							},
 						},
 						"subnet_id": schema.StringAttribute{
-							Description: "Subnet ID.",
-							Computed:    true,
+							Description:        "Deprecated. Use `network.subnet_id` instead. Subnet ID.",
+							Computed:           true,
+							DeprecationMessage: "This attribute is deprecated.",
 						},
 						"subnet_name": schema.StringAttribute{
-							Description: "Subnet name.",
-							Computed:    true,
+							Description:        "Deprecated. Use `network.subnet_name` instead. Subnet name.",
+							Computed:           true,
+							DeprecationMessage: "This attribute is deprecated.",
 						},
 						"tags": schema.ListNestedAttribute{
 							Description: "List of key-value tags associated with the resource. A tag is a key-value pair that can be associated with a resource, enabling efficient filtering and grouping for better organization and management. Some tags are read-only and cannot be modified by the user. Tags are also integrated with cost reports, allowing cost data to be filtered based on tag keys or values.",

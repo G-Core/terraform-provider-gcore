@@ -14,9 +14,9 @@ type CloudFileShareModel struct {
 	RegionID         types.Int64                                                `tfsdk:"region_id" path:"region_id,optional"`
 	Protocol         types.String                                               `tfsdk:"protocol" json:"protocol,required"`
 	Size             types.Int64                                                `tfsdk:"size" json:"size,required"`
-	Network          *CloudFileShareNetworkModel                                `tfsdk:"network" json:"network,optional,no_refresh"`
 	TypeName         types.String                                               `tfsdk:"type_name" json:"type_name,computed_optional"`
 	AccessRuleIDs    customfield.List[types.String]                             `tfsdk:"access_rule_ids" json:"-,computed,no_refresh"`
+	Network          customfield.NestedObject[CloudFileShareNetworkModel]       `tfsdk:"network" json:"network,computed_optional"`
 	Name             types.String                                               `tfsdk:"name" json:"name,required"`
 	Tags             customfield.Map[types.String]                              `tfsdk:"tags" json:"tags,computed_optional,no_refresh"`
 	ShareSettings    customfield.NestedObject[CloudFileShareShareSettingsModel] `tfsdk:"share_settings" json:"share_settings,computed_optional"`
@@ -41,8 +41,8 @@ func (m CloudFileShareModel) MarshalJSONForUpdate(state CloudFileShareModel) (da
 }
 
 type CloudFileShareNetworkModel struct {
-	NetworkID types.String `tfsdk:"network_id" json:"network_id,required"`
-	SubnetID  types.String `tfsdk:"subnet_id" json:"subnet_id,optional"`
+	NetworkID types.String `tfsdk:"network_id" json:"network_id,computed_optional"`
+	SubnetID  types.String `tfsdk:"subnet_id" json:"subnet_id,computed_optional"`
 }
 
 type CloudFileShareShareSettingsModel struct {

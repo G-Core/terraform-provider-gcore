@@ -80,24 +80,21 @@ Available values: "standard", "ddn", "vast".
 - `created_at` (String) Datetime when the file share was created
 - `creator_task_id` (String) Task that created this entity
 - `id` (String) The ID of this resource.
-- `network_id` (String) Network ID.
-- `network_name` (String) Network name.
+- `network_id` (String, Deprecated) Deprecated. Use `network.network_id` instead. Network ID.
+- `network_name` (String, Deprecated) Deprecated. Use `network.network_name` instead. Network name.
 - `region` (String) Region name
 - `share_network_name` (String) Share network name. May be null if the file share was created with volume type VAST
 - `status` (String) File share status
 Available values: "available", "awaiting_transfer", "backup_creating", "backup_restoring", "backup_restoring_error", "creating", "creating_from_snapshot", "deleted", "deleting", "ensuring", "error", "error_deleting", "extending", "extending_error", "inactive", "manage_error", "manage_starting", "migrating", "migrating_to", "replication_change", "reverting", "reverting_error", "shrinking", "shrinking_error", "shrinking_possible_data_loss_error", "unmanage_error", "unmanage_starting", "unmanaged".
-- `subnet_id` (String) Subnet ID.
-- `subnet_name` (String) Subnet name.
+- `subnet_id` (String, Deprecated) Deprecated. Use `network.subnet_id` instead. Subnet ID.
+- `subnet_name` (String, Deprecated) Deprecated. Use `network.subnet_name` instead. Subnet name.
 
 <a id="nestedatt--network"></a>
 ### Nested Schema for `network`
 
-Required:
-
-- `network_id` (String) Network ID.
-
 Optional:
 
+- `network_id` (String) Network ID.
 - `subnet_id` (String) Subnetwork ID. If the subnet is not selected, it will be selected automatically.
 
 

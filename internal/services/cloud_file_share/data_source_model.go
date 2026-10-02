@@ -31,6 +31,7 @@ type CloudFileShareDataSourceModel struct {
 	SubnetID         types.String                                                         `tfsdk:"subnet_id" json:"subnet_id,computed"`
 	SubnetName       types.String                                                         `tfsdk:"subnet_name" json:"subnet_name,computed"`
 	TypeName         types.String                                                         `tfsdk:"type_name" json:"type_name,computed"`
+	Network          customfield.NestedObject[CloudFileShareNetworkDataSourceModel]       `tfsdk:"network" json:"network,computed"`
 	ShareSettings    customfield.NestedObject[CloudFileShareShareSettingsDataSourceModel] `tfsdk:"share_settings" json:"share_settings,computed"`
 	Tags             customfield.NestedObjectList[CloudFileShareTagsDataSourceModel]      `tfsdk:"tags" json:"tags,computed"`
 	FindOneBy        *CloudFileShareFindOneByDataSourceModel                              `tfsdk:"find_one_by"`
@@ -66,6 +67,13 @@ func (m *CloudFileShareDataSourceModel) toListParams(_ context.Context) (params 
 	}
 
 	return
+}
+
+type CloudFileShareNetworkDataSourceModel struct {
+	NetworkID   types.String `tfsdk:"network_id" json:"network_id,computed"`
+	NetworkName types.String `tfsdk:"network_name" json:"network_name,computed"`
+	SubnetID    types.String `tfsdk:"subnet_id" json:"subnet_id,computed"`
+	SubnetName  types.String `tfsdk:"subnet_name" json:"subnet_name,computed"`
 }
 
 type CloudFileShareShareSettingsDataSourceModel struct {

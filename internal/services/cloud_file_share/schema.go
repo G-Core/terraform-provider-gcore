@@ -54,21 +54,6 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 					int64validator.AtLeast(1),
 				},
 			},
-			"network": schema.SingleNestedAttribute{
-				Description: "File share network configuration",
-				Optional:    true,
-				Attributes: map[string]schema.Attribute{
-					"network_id": schema.StringAttribute{
-						Description: "Network ID.",
-						Required:    true,
-					},
-					"subnet_id": schema.StringAttribute{
-						Description: "Subnetwork ID. If the subnet is not selected, it will be selected automatically.",
-						Optional:    true,
-					},
-				},
-				PlanModifiers: []planmodifier.Object{objectplanmodifier.RequiresReplace()},
-			},
 			"type_name": schema.StringAttribute{
 				Description: "Standard file share type\nAvailable values: \"standard\", \"ddn\", \"vast\".",
 				Computed:    true,
@@ -87,6 +72,30 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 				Computed:    true,
 				CustomType:  customfield.NewListType[types.String](ctx),
 				ElementType: types.StringType,
+			},
+			"network": schema.SingleNestedAttribute{
+				Description: "File share network configuration",
+				Computed:    true,
+				Optional:    true,
+				CustomType:  customfield.NewNestedObjectType[CloudFileShareNetworkModel](ctx),
+				Attributes: map[string]schema.Attribute{
+					"network_id": schema.StringAttribute{
+						Description:   "Network ID.",
+						Computed:      true,
+						Optional:      true,
+						PlanModifiers: []planmodifier.String{stringplanmodifier.RequiresReplace()},
+					},
+					"subnet_id": schema.StringAttribute{
+						Description: "Subnetwork ID. If the subnet is not selected, it will be selected automatically.",
+						Computed:    true,
+						Optional:    true,
+						PlanModifiers: []planmodifier.String{
+							stringplanmodifier.UseStateForUnknown(),
+							stringplanmodifier.RequiresReplaceIfConfigured(),
+						},
+					},
+				},
+				PlanModifiers: []planmodifier.Object{objectplanmodifier.UseStateForUnknown()},
 			},
 			"name": schema.StringAttribute{
 				Description: "File share name",
@@ -161,12 +170,14 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 				Computed:    true,
 			},
 			"network_id": schema.StringAttribute{
-				Description: "Network ID.",
-				Computed:    true,
+				Description:        "Deprecated. Use `network.network_id` instead. Network ID.",
+				Computed:           true,
+				DeprecationMessage: "This attribute is deprecated.",
 			},
 			"network_name": schema.StringAttribute{
-				Description: "Network name.",
-				Computed:    true,
+				Description:        "Deprecated. Use `network.network_name` instead. Network name.",
+				Computed:           true,
+				DeprecationMessage: "This attribute is deprecated.",
 			},
 			"region": schema.StringAttribute{
 				Description: "Region name",
@@ -213,12 +224,14 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 				},
 			},
 			"subnet_id": schema.StringAttribute{
-				Description: "Subnet ID.",
-				Computed:    true,
+				Description:        "Deprecated. Use `network.subnet_id` instead. Subnet ID.",
+				Computed:           true,
+				DeprecationMessage: "This attribute is deprecated.",
 			},
 			"subnet_name": schema.StringAttribute{
-				Description: "Subnet name.",
-				Computed:    true,
+				Description:        "Deprecated. Use `network.subnet_name` instead. Subnet name.",
+				Computed:           true,
+				DeprecationMessage: "This attribute is deprecated.",
 			},
 		},
 	}
@@ -284,15 +297,37 @@ func (v *typeNameNetworkValidator) ValidateResource(ctx context.Context, req res
 		return
 	}
 
+	// An unknown value (e.g. from a variable) cannot be checked until apply
+	if config.Network.IsNull() || config.Network.IsUnknown() {
+		return
+	}
+
+	// network_id is computed so that a share without a network block keeps the
+	// one the API returns, but a configured block still needs it
+	var networkID types.String
+	resp.Diagnostics.Append(req.Config.GetAttribute(ctx, path.Root("network").AtName("network_id"), &networkID)...)
+	if resp.Diagnostics.HasError() {
+		return
+	}
+	if networkID.IsNull() {
+		resp.Diagnostics.AddAttributeError(
+			path.Root("network").AtName("network_id"),
+			"Missing Required Attribute",
+			"network_id is required when network is provided",
+		)
+	}
+
+	if config.TypeName.IsUnknown() {
+		return
+	}
+
 	// If network is provided but type_name is not "standard", add error
-	if config.Network != nil {
-		typeName := config.TypeName.ValueString()
-		if typeName != "" && typeName != "standard" {
-			resp.Diagnostics.AddAttributeError(
-				path.Root("network"),
-				"Invalid Attribute Combination",
-				"network can only be provided when type_name is 'standard'",
-			)
-		}
+	typeName := config.TypeName.ValueString()
+	if typeName != "" && typeName != "standard" {
+		resp.Diagnostics.AddAttributeError(
+			path.Root("network"),
+			"Invalid Attribute Combination",
+			"network can only be provided when type_name is 'standard'",
+		)
 	}
 }

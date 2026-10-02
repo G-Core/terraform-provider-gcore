@@ -54,12 +54,14 @@ func DataSourceSchema(ctx context.Context) schema.Schema {
 				Computed:    true,
 			},
 			"network_id": schema.StringAttribute{
-				Description: "Network ID.",
-				Computed:    true,
+				Description:        "Deprecated. Use `network.network_id` instead. Network ID.",
+				Computed:           true,
+				DeprecationMessage: "This attribute is deprecated.",
 			},
 			"network_name": schema.StringAttribute{
-				Description: "Network name.",
-				Computed:    true,
+				Description:        "Deprecated. Use `network.network_name` instead. Network name.",
+				Computed:           true,
+				DeprecationMessage: "This attribute is deprecated.",
 			},
 			"protocol": schema.StringAttribute{
 				Description: "File share protocol",
@@ -117,12 +119,14 @@ func DataSourceSchema(ctx context.Context) schema.Schema {
 				},
 			},
 			"subnet_id": schema.StringAttribute{
-				Description: "Subnet ID.",
-				Computed:    true,
+				Description:        "Deprecated. Use `network.subnet_id` instead. Subnet ID.",
+				Computed:           true,
+				DeprecationMessage: "This attribute is deprecated.",
 			},
 			"subnet_name": schema.StringAttribute{
-				Description: "Subnet name.",
-				Computed:    true,
+				Description:        "Deprecated. Use `network.subnet_name` instead. Subnet name.",
+				Computed:           true,
+				DeprecationMessage: "This attribute is deprecated.",
 			},
 			"type_name": schema.StringAttribute{
 				Description: "File share type name\nAvailable values: \"ddn\", \"standard\", \"vast\".",
@@ -133,6 +137,29 @@ func DataSourceSchema(ctx context.Context) schema.Schema {
 						"standard",
 						"vast",
 					),
+				},
+			},
+			"network": schema.SingleNestedAttribute{
+				Description: "Network and subnet of the file share.",
+				Computed:    true,
+				CustomType:  customfield.NewNestedObjectType[CloudFileShareNetworkDataSourceModel](ctx),
+				Attributes: map[string]schema.Attribute{
+					"network_id": schema.StringAttribute{
+						Description: "Network ID.",
+						Computed:    true,
+					},
+					"network_name": schema.StringAttribute{
+						Description: "Network name.",
+						Computed:    true,
+					},
+					"subnet_id": schema.StringAttribute{
+						Description: "ID of the subnet that the file share uses.",
+						Computed:    true,
+					},
+					"subnet_name": schema.StringAttribute{
+						Description: "Subnet name.",
+						Computed:    true,
+					},
 				},
 			},
 			"share_settings": schema.SingleNestedAttribute{

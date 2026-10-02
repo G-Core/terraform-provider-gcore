@@ -47,8 +47,9 @@ Read-Only:
 - `creator_task_id` (String) Task that created this entity
 - `id` (String) File share ID
 - `name` (String) File share name
-- `network_id` (String) Network ID.
-- `network_name` (String) Network name.
+- `network` (Attributes) Network and subnet of the file share. (see [below for nested schema](#nestedatt--items--network))
+- `network_id` (String, Deprecated) Deprecated. Use `network.network_id` instead. Network ID.
+- `network_name` (String, Deprecated) Deprecated. Use `network.network_name` instead. Network name.
 - `project_id` (Number) Project ID
 - `protocol` (String) File share protocol
 - `region` (String) Region name
@@ -58,11 +59,22 @@ Read-Only:
 - `size` (Number) File share size in GiB
 - `status` (String) File share status
 Available values: "available", "awaiting_transfer", "backup_creating", "backup_restoring", "backup_restoring_error", "creating", "creating_from_snapshot", "deleted", "deleting", "ensuring", "error", "error_deleting", "extending", "extending_error", "inactive", "manage_error", "manage_starting", "migrating", "migrating_to", "replication_change", "reverting", "reverting_error", "shrinking", "shrinking_error", "shrinking_possible_data_loss_error", "unmanage_error", "unmanage_starting", "unmanaged".
-- `subnet_id` (String) Subnet ID.
-- `subnet_name` (String) Subnet name.
+- `subnet_id` (String, Deprecated) Deprecated. Use `network.subnet_id` instead. Subnet ID.
+- `subnet_name` (String, Deprecated) Deprecated. Use `network.subnet_name` instead. Subnet name.
 - `tags` (Attributes List) List of key-value tags associated with the resource. A tag is a key-value pair that can be associated with a resource, enabling efficient filtering and grouping for better organization and management. Some tags are read-only and cannot be modified by the user. Tags are also integrated with cost reports, allowing cost data to be filtered based on tag keys or values. (see [below for nested schema](#nestedatt--items--tags))
 - `type_name` (String) File share type name
 Available values: "ddn", "standard", "vast".
+
+<a id="nestedatt--items--network"></a>
+### Nested Schema for `items.network`
+
+Read-Only:
+
+- `network_id` (String) Network ID.
+- `network_name` (String) Network name.
+- `subnet_id` (String) ID of the subnet that the file share uses.
+- `subnet_name` (String) Subnet name.
+
 
 <a id="nestedatt--items--share_settings"></a>
 ### Nested Schema for `items.share_settings`
