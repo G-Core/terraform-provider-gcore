@@ -21,14 +21,19 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 	return schema.Schema{
 		MarkdownDescription: "Buckets are containers within object storage that hold files (objects) and define their CORS, lifecycle, and access policy configuration.",
 		Attributes: map[string]schema.Attribute{
-			"storage_id": schema.Int64Attribute{
-				Required:      true,
-				PlanModifiers: []planmodifier.Int64{int64planmodifier.RequiresReplace()},
+			"id": schema.StringAttribute{
+				Description:   "Name of the bucket to create",
+				Computed:      true,
+				PlanModifiers: []planmodifier.String{stringplanmodifier.UseNonNullStateForUnknown(), stringplanmodifier.RequiresReplace()},
 			},
 			"name": schema.StringAttribute{
 				Description:   "Name of the bucket to create",
 				Required:      true,
-				PlanModifiers: []planmodifier.String{stringplanmodifier.RequiresReplace()},
+				PlanModifiers: []planmodifier.String{stringplanmodifier.UseNonNullStateForUnknown(), stringplanmodifier.RequiresReplace()},
+			},
+			"storage_id": schema.Int64Attribute{
+				Required:      true,
+				PlanModifiers: []planmodifier.Int64{int64planmodifier.RequiresReplace()},
 			},
 			"cors": schema.SingleNestedAttribute{
 				Optional: true,

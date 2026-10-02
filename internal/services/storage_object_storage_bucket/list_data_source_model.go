@@ -28,6 +28,7 @@ func (m *StorageObjectStorageBucketsDataSourceModel) toListParams(_ context.Cont
 }
 
 type StorageObjectStorageBucketsItemsDataSourceModel struct {
+	ID                                  types.String                                                                                            `tfsdk:"id" json:"name,computed"`
 	Cors                                customfield.NestedObject[StorageObjectStorageBucketsCorsDataSourceModel]                                `tfsdk:"cors" json:"cors,computed"`
 	StorageObjectStorageBucketLifecycle customfield.NestedObject[StorageObjectStorageBucketsStorageObjectStorageBucketLifecycleDataSourceModel] `tfsdk:"storage_object_storage_bucket_lifecycle" json:"lifecycle,computed"`
 	Name                                types.String                                                                                            `tfsdk:"name" json:"name,computed"`

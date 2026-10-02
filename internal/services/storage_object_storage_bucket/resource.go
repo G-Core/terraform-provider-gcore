@@ -12,13 +12,16 @@ import (
 	"github.com/G-Core/gcore-go/option"
 	"github.com/G-Core/gcore-go/storage"
 	"github.com/G-Core/terraform-provider-gcore/internal/apijson"
+	"github.com/G-Core/terraform-provider-gcore/internal/importpath"
 	"github.com/G-Core/terraform-provider-gcore/internal/logging"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
+	"github.com/hashicorp/terraform-plugin-framework/types"
 )
 
 // Ensure provider defined types fully satisfy framework interfaces.
 var _ resource.ResourceWithConfigure = (*StorageObjectStorageBucketResource)(nil)
 var _ resource.ResourceWithModifyPlan = (*StorageObjectStorageBucketResource)(nil)
+var _ resource.ResourceWithImportState = (*StorageObjectStorageBucketResource)(nil)
 
 func NewResource() resource.Resource {
 	return &StorageObjectStorageBucketResource{}
@@ -85,6 +88,7 @@ func (r *StorageObjectStorageBucketResource) Create(ctx context.Context, req res
 		resp.Diagnostics.AddError("failed to deserialize http request", err.Error())
 		return
 	}
+	data.ID = data.Name
 
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
 }
@@ -132,6 +136,7 @@ func (r *StorageObjectStorageBucketResource) Update(ctx context.Context, req res
 		resp.Diagnostics.AddError("failed to deserialize http request", err.Error())
 		return
 	}
+	data.ID = data.Name
 
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
 }
@@ -170,6 +175,7 @@ func (r *StorageObjectStorageBucketResource) Read(ctx context.Context, req resou
 		resp.Diagnostics.AddError("failed to deserialize http request", err.Error())
 		return
 	}
+	data.ID = data.Name
 
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
 }
@@ -195,6 +201,51 @@ func (r *StorageObjectStorageBucketResource) Delete(ctx context.Context, req res
 		resp.Diagnostics.AddError("failed to make http request", err.Error())
 		return
 	}
+	data.ID = data.Name
+
+	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
+}
+
+func (r *StorageObjectStorageBucketResource) ImportState(ctx context.Context, req resource.ImportStateRequest, resp *resource.ImportStateResponse) {
+	var data = new(StorageObjectStorageBucketModel)
+
+	path_storage_id := int64(0)
+	path_name := ""
+	diags := importpath.ParseImportID(
+		req.ID,
+		"<storage_id>/<name>",
+		&path_storage_id,
+		&path_name,
+	)
+	resp.Diagnostics.Append(diags...)
+	if resp.Diagnostics.HasError() {
+		return
+	}
+
+	data.StorageID = types.Int64Value(path_storage_id)
+	data.Name = types.StringValue(path_name)
+
+	res := new(http.Response)
+	_, err := r.client.Storage.ObjectStorages.Buckets.Get(
+		ctx,
+		path_name,
+		storage.ObjectStorageBucketGetParams{
+			StorageID: path_storage_id,
+		},
+		option.WithResponseBodyInto(&res),
+		option.WithMiddleware(logging.Middleware(ctx)),
+	)
+	if err != nil {
+		resp.Diagnostics.AddError("failed to make http request", err.Error())
+		return
+	}
+	bytes, _ := io.ReadAll(res.Body)
+	err = apijson.Unmarshal(bytes, &data)
+	if err != nil {
+		resp.Diagnostics.AddError("failed to deserialize http request", err.Error())
+		return
+	}
+	data.ID = data.Name
 
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
 }

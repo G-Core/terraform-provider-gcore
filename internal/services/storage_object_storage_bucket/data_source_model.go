@@ -12,6 +12,7 @@ import (
 )
 
 type StorageObjectStorageBucketDataSourceModel struct {
+	ID                                  types.String                                                                                           `tfsdk:"id" path:"name,computed"`
 	Name                                types.String                                                                                           `tfsdk:"name" path:"name,required"`
 	StorageID                           types.Int64                                                                                            `tfsdk:"storage_id" path:"storage_id,required"`
 	Cors                                customfield.NestedObject[StorageObjectStorageBucketCorsDataSourceModel]                                `tfsdk:"cors" json:"cors,computed"`

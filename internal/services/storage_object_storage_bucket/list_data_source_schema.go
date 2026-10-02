@@ -35,6 +35,10 @@ func ListDataSourceSchema(ctx context.Context) schema.Schema {
 				CustomType:  customfield.NewNestedObjectListType[StorageObjectStorageBucketsItemsDataSourceModel](ctx),
 				NestedObject: schema.NestedAttributeObject{
 					Attributes: map[string]schema.Attribute{
+						"id": schema.StringAttribute{
+							Description: "Globally unique bucket name within the storage. Used as the path prefix when accessing objects via S3 API.",
+							Computed:    true,
+						},
 						"cors": schema.SingleNestedAttribute{
 							Computed:   true,
 							CustomType: customfield.NewNestedObjectType[StorageObjectStorageBucketsCorsDataSourceModel](ctx),

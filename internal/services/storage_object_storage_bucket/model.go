@@ -11,8 +11,9 @@ import (
 )
 
 type StorageObjectStorageBucketModel struct {
-	StorageID                           types.Int64                                                         `tfsdk:"storage_id" path:"storage_id,required"`
+	ID                                  types.String                                                        `tfsdk:"id" json:"-,computed"`
 	Name                                types.String                                                        `tfsdk:"name" json:"name,required"`
+	StorageID                           types.Int64                                                         `tfsdk:"storage_id" path:"storage_id,required"`
 	Cors                                *StorageObjectStorageBucketCorsModel                                `tfsdk:"cors" json:"cors,optional"`
 	StorageObjectStorageBucketLifecycle *StorageObjectStorageBucketStorageObjectStorageBucketLifecycleModel `tfsdk:"storage_object_storage_bucket_lifecycle" json:"lifecycle,optional"`
 	Policy                              customfield.NestedObject[StorageObjectStorageBucketPolicyModel]     `tfsdk:"policy" json:"policy,computed_optional"`

@@ -81,6 +81,7 @@ func (d *StorageObjectStorageBucketDataSource) Read(ctx context.Context, req dat
 		resp.Diagnostics.AddError("failed to deserialize http request", err.Error())
 		return
 	}
+	data.ID = data.Name
 
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
 }
