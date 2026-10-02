@@ -42,6 +42,10 @@ resource "gcore_storage_object_storage_bucket" "example_storage_object_storage_b
 - `policy` (Attributes) (see [below for nested schema](#nestedatt--policy))
 - `storage_object_storage_bucket_lifecycle` (Attributes) (see [below for nested schema](#nestedatt--storage_object_storage_bucket_lifecycle))
 
+### Read-Only
+
+- `id` (String) Name of the bucket to create
+
 <a id="nestedatt--cors"></a>
 ### Nested Schema for `cors`
 
@@ -65,3 +69,13 @@ Omit to leave the current policy unchanged.
 Optional:
 
 - `expiration_days` (Number) Days before objects are automatically deleted. Set to a positive number to enable, or null/0 to remove the rule.
+
+## Import
+
+Import is supported using the following syntax:
+
+The [`terraform import` command](https://developer.hashicorp.com/terraform/cli/commands/import) can be used, for example:
+
+```shell
+$ terraform import gcore_storage_object_storage_bucket.example '<storage_id>/<name>'
+```

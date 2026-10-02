@@ -39,6 +39,7 @@ data "gcore_storage_object_storage_buckets" "example_storage_object_storage_buck
 Read-Only:
 
 - `cors` (Attributes) (see [below for nested schema](#nestedatt--items--cors))
+- `id` (String) Globally unique bucket name within the storage. Used as the path prefix when accessing objects via S3 API.
 - `name` (String) Globally unique bucket name within the storage. Used as the path prefix when accessing objects via S3 API.
 - `policy` (Attributes) (see [below for nested schema](#nestedatt--items--policy))
 - `storage_id` (Number) Parent storage this bucket belongs to. Use this ID in the URL path for bucket operations.

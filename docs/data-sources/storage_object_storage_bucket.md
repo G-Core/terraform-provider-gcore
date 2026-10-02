@@ -30,6 +30,7 @@ data "gcore_storage_object_storage_bucket" "example_storage_object_storage_bucke
 ### Read-Only
 
 - `cors` (Attributes) (see [below for nested schema](#nestedatt--cors))
+- `id` (String) The ID of this resource.
 - `policy` (Attributes) (see [below for nested schema](#nestedatt--policy))
 - `storage_object_storage_bucket_lifecycle` (Attributes) (see [below for nested schema](#nestedatt--storage_object_storage_bucket_lifecycle))
 
