@@ -13,8 +13,7 @@ import (
 )
 
 var importSupportSkipReasons = map[string]string{
-	"gcore_cloud_file_share_access_rule":  "GCLOUD2-20036: API has no single-resource read endpoint",
-	"gcore_storage_object_storage_bucket": "GCLOUD2-29373: blocked by STO-529 bucket create API behavior",
+	"gcore_cloud_file_share_access_rule": "GCLOUD2-20036: API has no single-resource read endpoint",
 }
 
 func TestRegisteredResourcesSupportImport(t *testing.T) {
