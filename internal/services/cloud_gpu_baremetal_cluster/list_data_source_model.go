@@ -377,6 +377,7 @@ type CloudGPUBaremetalClustersServersSettingsDataSourceModel struct {
 	SecurityGroups customfield.NestedObjectList[CloudGPUBaremetalClustersServersSettingsSecurityGroupsDataSourceModel] `tfsdk:"security_groups" json:"security_groups,computed"`
 	SSHKeyName     types.String                                                                                        `tfsdk:"ssh_key_name" json:"ssh_key_name,computed"`
 	UserData       types.String                                                                                        `tfsdk:"user_data" json:"user_data,computed"`
+	Username       types.String                                                                                        `tfsdk:"username" json:"username,computed"`
 }
 
 type CloudGPUBaremetalClustersServersSettingsFileSharesDataSourceModel struct {
@@ -385,14 +386,15 @@ type CloudGPUBaremetalClustersServersSettingsFileSharesDataSourceModel struct {
 }
 
 type CloudGPUBaremetalClustersServersSettingsInterfacesDataSourceModel struct {
-	IPFamily       types.String                                                                                                  `tfsdk:"ip_family" json:"ip_family,computed"`
-	Name           types.String                                                                                                  `tfsdk:"name" json:"name,computed"`
-	SecurityGroups customfield.NestedObjectList[CloudGPUBaremetalClustersServersSettingsInterfacesSecurityGroupsDataSourceModel] `tfsdk:"security_groups" json:"security_groups,computed"`
-	Type           types.String                                                                                                  `tfsdk:"type" json:"type,computed"`
-	FloatingIP     customfield.NestedObject[CloudGPUBaremetalClustersServersSettingsInterfacesFloatingIPDataSourceModel]         `tfsdk:"floating_ip" json:"floating_ip,computed"`
-	NetworkID      types.String                                                                                                  `tfsdk:"network_id" json:"network_id,computed"`
-	SubnetID       types.String                                                                                                  `tfsdk:"subnet_id" json:"subnet_id,computed"`
-	IPAddress      types.String                                                                                                  `tfsdk:"ip_address" json:"ip_address,computed"`
+	IPFamily            types.String                                                                                                  `tfsdk:"ip_family" json:"ip_family,computed"`
+	Name                types.String                                                                                                  `tfsdk:"name" json:"name,computed"`
+	PortSecurityEnabled types.Bool                                                                                                    `tfsdk:"port_security_enabled" json:"port_security_enabled,computed"`
+	SecurityGroups      customfield.NestedObjectList[CloudGPUBaremetalClustersServersSettingsInterfacesSecurityGroupsDataSourceModel] `tfsdk:"security_groups" json:"security_groups,computed"`
+	Type                types.String                                                                                                  `tfsdk:"type" json:"type,computed"`
+	FloatingIP          customfield.NestedObject[CloudGPUBaremetalClustersServersSettingsInterfacesFloatingIPDataSourceModel]         `tfsdk:"floating_ip" json:"floating_ip,computed"`
+	NetworkID           types.String                                                                                                  `tfsdk:"network_id" json:"network_id,computed"`
+	SubnetID            types.String                                                                                                  `tfsdk:"subnet_id" json:"subnet_id,computed"`
+	IPAddress           types.String                                                                                                  `tfsdk:"ip_address" json:"ip_address,computed"`
 }
 
 type CloudGPUBaremetalClustersServersSettingsInterfacesSecurityGroupsDataSourceModel struct {

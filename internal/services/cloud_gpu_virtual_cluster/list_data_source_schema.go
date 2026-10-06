@@ -316,6 +316,10 @@ func ListDataSourceSchema(ctx context.Context) schema.Schema {
 												Description: "Interface name",
 												Computed:    true,
 											},
+											"port_security_enabled": schema.BoolAttribute{
+												Description: "Shows the port security state of this interface. A `null` value means port security is on, with the default security group attached. A `true` or `false` value shows the state set at creation.",
+												Computed:    true,
+											},
 											"security_groups": schema.ListNestedAttribute{
 												Description: "Resolved security groups applied to this interface.",
 												Computed:    true,
@@ -397,6 +401,10 @@ func ListDataSourceSchema(ctx context.Context) schema.Schema {
 								},
 								"user_data": schema.StringAttribute{
 									Description: "Optional custom user data",
+									Computed:    true,
+								},
+								"username": schema.StringAttribute{
+									Description: "Shows the username that `credentials.username` set at creation. The value is `null` when the cluster uses only `credentials.ssh_key_name`, or has no credentials.",
 									Computed:    true,
 								},
 								"volumes": schema.ListNestedAttribute{

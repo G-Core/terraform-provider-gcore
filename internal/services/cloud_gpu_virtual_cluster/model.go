@@ -46,7 +46,7 @@ type CloudGPUVirtualClusterServersSettingsInterfacesModel struct {
 	Type                types.String                                                                                     `tfsdk:"type" json:"type,required"`
 	IPFamily            types.String                                                                                     `tfsdk:"ip_family" json:"ip_family,computed_optional"`
 	Name                types.String                                                                                     `tfsdk:"name" json:"name,computed"`
-	PortSecurityEnabled types.Bool                                                                                       `tfsdk:"port_security_enabled" json:"port_security_enabled,optional,no_refresh"`
+	PortSecurityEnabled types.Bool                                                                                       `tfsdk:"port_security_enabled" json:"port_security_enabled,optional"`
 	SecurityGroups      customfield.NestedObjectList[CloudGPUVirtualClusterServersSettingsInterfacesSecurityGroupsModel] `tfsdk:"security_groups" json:"security_groups,computed_optional"`
 	NetworkID           types.String                                                                                     `tfsdk:"network_id" json:"network_id,optional"`
 	SubnetID            types.String                                                                                     `tfsdk:"subnet_id" json:"subnet_id,optional"`
