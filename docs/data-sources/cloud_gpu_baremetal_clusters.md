@@ -198,6 +198,7 @@ Read-Only:
 - `security_groups` (Attributes List, Deprecated) Deprecated. Deduplicated union of security groups across all interfaces; the actual assignment may differ per interface. Use `interfaces[].security_groups` for the authoritative per-interface list. (see [below for nested schema](#nestedatt--items--servers_settings--security_groups))
 - `ssh_key_name` (String) SSH key name
 - `user_data` (String) Optional custom user data
+- `username` (String) Shows the username that `credentials.username` set at creation. The value is `null` when the cluster uses only `credentials.ssh_key_name`, or has no credentials.
 
 <a id="nestedatt--items--servers_settings--file_shares"></a>
 ### Nested Schema for `items.servers_settings.file_shares`
@@ -219,6 +220,7 @@ Read-Only:
 Available values: "dual", "ipv4", "ipv6".
 - `name` (String) Interface name
 - `network_id` (String) Network ID the subnet belongs to. Port will be plugged in this network
+- `port_security_enabled` (Boolean) Shows the port security state of this interface. A `null` value means port security is on, with the default security group attached. A `true` or `false` value shows the state set at creation.
 - `security_groups` (Attributes List) Resolved security groups applied to this interface. (see [below for nested schema](#nestedatt--items--servers_settings--interfaces--security_groups))
 - `subnet_id` (String) Port is assigned an IP address from this subnet
 - `type` (String) Available values: "external", "subnet", "any_subnet".
