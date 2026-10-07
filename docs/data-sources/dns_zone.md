@@ -64,6 +64,9 @@ Optional:
 - `healthcheck` (Boolean) Zones with RRsets that have healthchecks
 - `iam_reseller_id` (List of Number)
 - `id` (List of Number) to pass several ids `id=1&id=3&id=5...`
+- `is_secondary` (Boolean) Filter by AXFR secondary zone marker (meta.`is_secondary`).
+true returns only secondary zones, false returns only zones without that marker
+(primary zones have no `is_secondary` key at all), omitted returns all zones.
 - `name` (List of String) to pass several names `name=first&name=second...`
 - `order_by` (String) Field name to sort by
 - `order_direction` (String) Ascending or descending order

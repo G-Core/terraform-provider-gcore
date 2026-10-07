@@ -22,6 +22,7 @@ data "gcore_dns_zones" "example_dns_zones" {
   exact_match = true
   healthcheck = true
   iam_reseller_id = [0]
+  is_secondary = true
   name = ["string"]
   order_by = "order_by"
   order_direction = "asc"
@@ -45,6 +46,9 @@ data "gcore_dns_zones" "example_dns_zones" {
 - `healthcheck` (Boolean) Zones with RRsets that have healthchecks
 - `iam_reseller_id` (List of Number)
 - `id` (List of Number) to pass several ids `id=1&id=3&id=5...`
+- `is_secondary` (Boolean) Filter by AXFR secondary zone marker (meta.`is_secondary`).
+true returns only secondary zones, false returns only zones without that marker
+(primary zones have no `is_secondary` key at all), omitted returns all zones.
 - `max_items` (Number) Max items to fetch, default: 1000
 - `name` (List of String) to pass several names `name=first&name=second...`
 - `order_by` (String) Field name to sort by
