@@ -116,6 +116,7 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 				Attributes: map[string]schema.Attribute{
 					"gid": schema.Int64Attribute{
 						Description: "When set created file share will be owned by user with given GID",
+						Computed:    true,
 						Optional:    true,
 						Validators: []validator.Int64{
 							int64validator.Between(0, 2147483647),
@@ -123,6 +124,7 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 					},
 					"uid": schema.Int64Attribute{
 						Description: "When set created file share will be owned by group with given UID",
+						Computed:    true,
 						Optional:    true,
 						Validators: []validator.Int64{
 							int64validator.Between(0, 2147483647),

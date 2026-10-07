@@ -73,6 +73,7 @@ data "gcore_cloud_gpu_virtual_clusters" "example_cloud_gpu_virtual_clusters" {
 - `created_at` (Attributes) Filter by creation time (UTC), e.g. `created_at[gte]=2026-01-01T00:00:00Z`. (see [below for nested schema](#nestedatt--created_at))
 - `flavor` (Attributes) Filter by flavor (case-insensitive), e.g. `flavor[prefix]=g3-`, `flavor[exact]=g3-ai-32-192-1500-l40s-48-1`. (see [below for nested schema](#nestedatt--flavor))
 - `ids` (List of String) Return only clusters with these IDs, e.g. `ids=<id1>&ids=<id2>`.
+- `managed_by` (List of String) Filter by who manages the cluster: `user` (default) or `k8s` (Managed Kubernetes). Pass both to include all, e.g. `managed_by=user&managed_by=k8s`.
 - `max_items` (Number) Max items to fetch, default: 1000
 - `name` (Attributes) Filter by name (case-insensitive), e.g. `name[contains]=gpu`, `name[prefix]=prod-`. (see [below for nested schema](#nestedatt--name))
 - `project_id` (Number) Project ID
@@ -173,6 +174,8 @@ Read-Only:
 - `flavor` (String) Cluster flavor name
 - `has_pending_changes` (Boolean) True if any server in the cluster has pending (not yet applied) settings changes
 - `id` (String) Cluster unique identifier
+- `managed_by` (String) User type managing the resource
+Available values: "k8s", "user".
 - `name` (String) Cluster name
 - `servers_count` (Number) Cluster servers count
 - `servers_ids` (List of String) List of cluster nodes

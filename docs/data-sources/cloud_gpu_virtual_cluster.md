@@ -36,6 +36,8 @@ data "gcore_cloud_gpu_virtual_cluster" "example_cloud_gpu_virtual_cluster" {
 - `flavor` (String) Cluster flavor name
 - `has_pending_changes` (Boolean) True if any server in the cluster has pending (not yet applied) settings changes
 - `id` (String) Cluster unique identifier
+- `managed_by` (String) User type managing the resource
+Available values: "k8s", "user".
 - `name` (String) Cluster name
 - `servers_count` (Number) Cluster servers count
 - `servers_ids` (List of String) List of cluster nodes
@@ -53,6 +55,7 @@ Optional:
 - `created_at` (Attributes) Filter by creation time (UTC), e.g. `created_at[gte]=2026-01-01T00:00:00Z`. (see [below for nested schema](#nestedatt--find_one_by--created_at))
 - `flavor` (Attributes) Filter by flavor (case-insensitive), e.g. `flavor[prefix]=g3-`, `flavor[exact]=g3-ai-32-192-1500-l40s-48-1`. (see [below for nested schema](#nestedatt--find_one_by--flavor))
 - `ids` (List of String) Return only clusters with these IDs, e.g. `ids=<id1>&ids=<id2>`.
+- `managed_by` (List of String) Filter by who manages the cluster: `user` (default) or `k8s` (Managed Kubernetes). Pass both to include all, e.g. `managed_by=user&managed_by=k8s`.
 - `name` (Attributes) Filter by name (case-insensitive), e.g. `name[contains]=gpu`, `name[prefix]=prod-`. (see [below for nested schema](#nestedatt--find_one_by--name))
 - `servers_count` (Attributes) Filter by node count, e.g. `servers_count[gte]=2`, `servers_count[gte]=2&servers_count[lt]=8`. (see [below for nested schema](#nestedatt--find_one_by--servers_count))
 - `tag_key` (Attributes) Filter by tag key regardless of value, e.g. `tag_key[contains]=team`. (see [below for nested schema](#nestedatt--find_one_by--tag_key))

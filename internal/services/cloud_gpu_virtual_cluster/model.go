@@ -20,6 +20,7 @@ type CloudGPUVirtualClusterModel struct {
 	Tags              customfield.Map[types.String]               `tfsdk:"tags" json:"tags,computed_optional,no_refresh"`
 	CreatedAt         timetypes.RFC3339                           `tfsdk:"created_at" json:"created_at,computed" format:"date-time"`
 	HasPendingChanges types.Bool                                  `tfsdk:"has_pending_changes" json:"has_pending_changes,computed"`
+	ManagedBy         types.String                                `tfsdk:"managed_by" json:"managed_by,computed"`
 	Status            types.String                                `tfsdk:"status" json:"status,computed"`
 	UpdatedAt         timetypes.RFC3339                           `tfsdk:"updated_at" json:"updated_at,computed" format:"date-time"`
 	ServersIDs        customfield.List[types.String]              `tfsdk:"servers_ids" json:"servers_ids,computed"`

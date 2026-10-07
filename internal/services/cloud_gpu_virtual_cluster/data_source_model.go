@@ -21,6 +21,7 @@ type CloudGPUVirtualClusterDataSourceModel struct {
 	CreatedAt         timetypes.RFC3339                                                              `tfsdk:"created_at" json:"created_at,computed" format:"date-time"`
 	Flavor            types.String                                                                   `tfsdk:"flavor" json:"flavor,computed"`
 	HasPendingChanges types.Bool                                                                     `tfsdk:"has_pending_changes" json:"has_pending_changes,computed"`
+	ManagedBy         types.String                                                                   `tfsdk:"managed_by" json:"managed_by,computed"`
 	Name              types.String                                                                   `tfsdk:"name" json:"name,computed"`
 	ServersCount      types.Int64                                                                    `tfsdk:"servers_count" json:"servers_count,computed"`
 	Status            types.String                                                                   `tfsdk:"status" json:"status,computed"`
@@ -44,12 +45,17 @@ func (m *CloudGPUVirtualClusterDataSourceModel) toReadParams(_ context.Context) 
 	return
 }
 
-func (m *CloudGPUVirtualClusterDataSourceModel) toListParams(_ context.Context) (params cloud.GPUVirtualClusterListParams, diags diag.Diagnostics) {
+func (m *CloudGPUVirtualClusterDataSourceModel) toListParams(ctx context.Context) (params cloud.GPUVirtualClusterListParams, diags diag.Diagnostics) {
 	mFindOneByIDs := []string{}
 	if m.FindOneBy.IDs != nil {
 		for _, item := range *m.FindOneBy.IDs {
 			mFindOneByIDs = append(mFindOneByIDs, item.ValueString())
 		}
+	}
+	mFindOneByManagedBy := []string{}
+	diags.Append(m.FindOneBy.ManagedBy.ElementsAs(ctx, &mFindOneByManagedBy, true)...)
+	if diags.HasError() {
+		return
 	}
 	mFindOneByFlavorContains := []string{}
 	if m.FindOneBy.Flavor.Contains != nil {
@@ -193,7 +199,8 @@ func (m *CloudGPUVirtualClusterDataSourceModel) toListParams(_ context.Context) 
 	}
 
 	params = cloud.GPUVirtualClusterListParams{
-		IDs: mFindOneByIDs,
+		IDs:       mFindOneByIDs,
+		ManagedBy: mFindOneByManagedBy,
 	}
 
 	if !m.ProjectID.IsNull() {
@@ -369,6 +376,7 @@ type CloudGPUVirtualClusterFindOneByDataSourceModel struct {
 	CreatedAt    *CloudGPUVirtualClustersCreatedAtDataSourceModel    `tfsdk:"created_at" query:"created_at,optional"`
 	Flavor       *CloudGPUVirtualClustersFlavorDataSourceModel       `tfsdk:"flavor" query:"flavor,optional"`
 	IDs          *[]types.String                                     `tfsdk:"ids" query:"ids,optional"`
+	ManagedBy    customfield.List[types.String]                      `tfsdk:"managed_by" query:"managed_by,computed_optional"`
 	Name         *CloudGPUVirtualClustersNameDataSourceModel         `tfsdk:"name" query:"name,optional"`
 	ServersCount *CloudGPUVirtualClustersServersCountDataSourceModel `tfsdk:"servers_count" query:"servers_count,optional"`
 	TagKey       *CloudGPUVirtualClustersTagKeyDataSourceModel       `tfsdk:"tag_key" query:"tag_key,optional"`

@@ -69,6 +69,8 @@ resource "gcore_cloud_gpu_virtual_cluster" "example" {
 - `created_at` (String) Cluster creation date time
 - `has_pending_changes` (Boolean) True if any server in the cluster has pending (not yet applied) settings changes
 - `id` (String) The ID of this resource.
+- `managed_by` (String) User type managing the resource
+Available values: "k8s", "user".
 - `servers_ids` (List of String) List of cluster nodes
 - `status` (String) Cluster status
 Available values: "active", "creating", "degraded", "deleting", "error", "rebooting", "rebuilding", "resizing", "shutoff".

@@ -298,6 +298,13 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 				Computed:      true,
 				PlanModifiers: []planmodifier.Bool{planmodifiers.BoolUseStateUnlessAttributesChange("name", "tags", "servers_count")},
 			},
+			"managed_by": schema.StringAttribute{
+				Description: "User type managing the resource\nAvailable values: \"k8s\", \"user\".",
+				Computed:    true,
+				Validators: []validator.String{
+					stringvalidator.OneOfCaseInsensitive("k8s", "user"),
+				},
+			},
 			"status": schema.StringAttribute{
 				Description: "Cluster status\nAvailable values: \"active\", \"creating\", \"degraded\", \"deleting\", \"error\", \"rebooting\", \"rebuilding\", \"resizing\", \"shutoff\".",
 				Computed:    true,

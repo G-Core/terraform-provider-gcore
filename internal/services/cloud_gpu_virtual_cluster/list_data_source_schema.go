@@ -8,6 +8,7 @@ import (
 	"github.com/G-Core/terraform-provider-gcore/internal/customfield"
 	"github.com/hashicorp/terraform-plugin-framework-timetypes/timetypes"
 	"github.com/hashicorp/terraform-plugin-framework-validators/int64validator"
+	"github.com/hashicorp/terraform-plugin-framework-validators/listvalidator"
 	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/datasource/schema"
@@ -231,6 +232,18 @@ func ListDataSourceSchema(ctx context.Context) schema.Schema {
 					},
 				},
 			},
+			"managed_by": schema.ListAttribute{
+				Description: "Filter by who manages the cluster: `user` (default) or `k8s` (Managed Kubernetes). Pass both to include all, e.g. `managed_by=user&managed_by=k8s`.",
+				Computed:    true,
+				Optional:    true,
+				Validators: []validator.List{
+					listvalidator.ValueStringsAre(
+						stringvalidator.OneOfCaseInsensitive("k8s", "user"),
+					),
+				},
+				CustomType:  customfield.NewListType[types.String](ctx),
+				ElementType: types.StringType,
+			},
 			"max_items": schema.Int64Attribute{
 				Description: "Max items to fetch, default: 1000",
 				Optional:    true,
@@ -260,6 +273,13 @@ func ListDataSourceSchema(ctx context.Context) schema.Schema {
 						"has_pending_changes": schema.BoolAttribute{
 							Description: "True if any server in the cluster has pending (not yet applied) settings changes",
 							Computed:    true,
+						},
+						"managed_by": schema.StringAttribute{
+							Description: "User type managing the resource\nAvailable values: \"k8s\", \"user\".",
+							Computed:    true,
+							Validators: []validator.String{
+								stringvalidator.OneOfCaseInsensitive("k8s", "user"),
+							},
 						},
 						"name": schema.StringAttribute{
 							Description: "Cluster name",

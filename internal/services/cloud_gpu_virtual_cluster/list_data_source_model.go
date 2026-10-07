@@ -29,16 +29,22 @@ type CloudGPUVirtualClustersDataSourceModel struct {
 	TagKey       *CloudGPUVirtualClustersTagKeyDataSourceModel                             `tfsdk:"tag_key" query:"tag_key,optional"`
 	TagValue     *CloudGPUVirtualClustersTagValueDataSourceModel                           `tfsdk:"tag_value" query:"tag_value,optional"`
 	UpdatedAt    *CloudGPUVirtualClustersUpdatedAtDataSourceModel                          `tfsdk:"updated_at" query:"updated_at,optional"`
+	ManagedBy    customfield.List[types.String]                                            `tfsdk:"managed_by" query:"managed_by,computed_optional"`
 	MaxItems     types.Int64                                                               `tfsdk:"max_items"`
 	Items        customfield.NestedObjectList[CloudGPUVirtualClustersItemsDataSourceModel] `tfsdk:"items"`
 }
 
-func (m *CloudGPUVirtualClustersDataSourceModel) toListParams(_ context.Context) (params cloud.GPUVirtualClusterListParams, diags diag.Diagnostics) {
+func (m *CloudGPUVirtualClustersDataSourceModel) toListParams(ctx context.Context) (params cloud.GPUVirtualClusterListParams, diags diag.Diagnostics) {
 	mIDs := []string{}
 	if m.IDs != nil {
 		for _, item := range *m.IDs {
 			mIDs = append(mIDs, item.ValueString())
 		}
+	}
+	mManagedBy := []string{}
+	diags.Append(m.ManagedBy.ElementsAs(ctx, &mManagedBy, true)...)
+	if diags.HasError() {
+		return
 	}
 	mFlavorContains := []string{}
 	if m.Flavor.Contains != nil {
@@ -182,7 +188,8 @@ func (m *CloudGPUVirtualClustersDataSourceModel) toListParams(_ context.Context)
 	}
 
 	params = cloud.GPUVirtualClusterListParams{
-		IDs: mIDs,
+		IDs:       mIDs,
+		ManagedBy: mManagedBy,
 	}
 
 	if !m.ProjectID.IsNull() {
@@ -345,6 +352,7 @@ type CloudGPUVirtualClustersItemsDataSourceModel struct {
 	CreatedAt         timetypes.RFC3339                                                               `tfsdk:"created_at" json:"created_at,computed" format:"date-time"`
 	Flavor            types.String                                                                    `tfsdk:"flavor" json:"flavor,computed"`
 	HasPendingChanges types.Bool                                                                      `tfsdk:"has_pending_changes" json:"has_pending_changes,computed"`
+	ManagedBy         types.String                                                                    `tfsdk:"managed_by" json:"managed_by,computed"`
 	Name              types.String                                                                    `tfsdk:"name" json:"name,computed"`
 	ServersCount      types.Int64                                                                     `tfsdk:"servers_count" json:"servers_count,computed"`
 	ServersIDs        customfield.List[types.String]                                                  `tfsdk:"servers_ids" json:"servers_ids,computed"`
