@@ -50,6 +50,16 @@ func RandomNameCompact() string {
 	return fmt.Sprintf("tftest%s%s", runToken(), acctest.RandString(randomSuffixLen))
 }
 
+// OwnershipTagHCL returns a tags entry marking a resource as created by this
+// run, for embedding in test HCL.
+//
+// Resources whose API exposes no name carry the run token here instead.
+// Floating IPs are the case that forced it: with no name and no tag there is
+// nothing to tell a test address from a reserved production one.
+func OwnershipTagHCL() string {
+	return fmt.Sprintf("%s = %q", sweep.TagKey, runToken())
+}
+
 var (
 	runTokenOnce  sync.Once
 	runTokenValue string

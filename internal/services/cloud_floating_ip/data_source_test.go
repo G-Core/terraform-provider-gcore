@@ -45,11 +45,14 @@ func testAccCloudFloatingIPDataSourceConfig() string {
 resource "gcore_cloud_floating_ip" "test" {
   project_id = %[1]s
   region_id  = %[2]s
+  tags = {
+    %[3]s
+  }
 }
 
 data "gcore_cloud_floating_ip" "test" {
   project_id     = %[1]s
   region_id      = %[2]s
   floating_ip_id = gcore_cloud_floating_ip.test.id
-}`, acctest.ProjectID(), acctest.RegionID())
+}`, acctest.ProjectID(), acctest.RegionID(), acctest.OwnershipTagHCL())
 }

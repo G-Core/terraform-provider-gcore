@@ -57,15 +57,29 @@ func sweepCloudFloatingIPs(_ string) error {
 	}
 
 	for _, fip := range page.Results {
-		// Floating IPs don't have names, so we can't use ShouldSweep by name
-		// Instead, sweep all floating IPs that are DOWN (unattached) status
-		// This is safe because the test creates standalone floating IPs
 		id := fip.ID
 
-		log.Printf("[INFO] Checking floating IP: %s (status: %s)", id, fip.Status)
+		// Floating IPs have no name field, so the run token travels in a tag
+		// the tests set. Nothing else distinguishes a test address from a
+		// reserved production one: an earlier version deleted every unattached
+		// address it found, and unattached is the normal state for an address
+		// that has been reserved but not yet assigned.
+		var token string
+		for _, tag := range fip.Tags {
+			if tag.Key == sweep.TagKey {
+				token = tag.Value
+				break
+			}
+		}
 
-		// Only sweep DOWN (unattached) floating IPs to be safe
+		if !sweep.ShouldSweepToken("gcore_cloud_floating_ip", id, token) {
+			continue
+		}
+
+		// Leave attached addresses for a later sweep, once whatever holds them
+		// has itself been reclaimed.
 		if fip.Status != "DOWN" {
+			log.Printf("[INFO] Skipping floating IP %s: still attached (status: %s)", id, fip.Status)
 			continue
 		}
 

@@ -2,6 +2,7 @@ package sweep
 
 import (
 	"hash/fnv"
+	"log"
 	"os"
 	"strings"
 )
@@ -26,8 +27,40 @@ const (
 	// to compare against, so requiring one would scope nothing. That also means
 	// it cannot tell a leaked resource from a live one: only use it once no
 	// branch or job still runs code that creates untokenised names.
+	//
+	// It applies to test-prefixed names only. Resources with no name, such as
+	// floating IPs, are never swept without a token; see ShouldSweepToken.
 	EnvSweepUntokenized = "GCORE_SWEEP_UNTOKENIZED"
+
+	// EnvSweepAllReservedFixedIPs allows sweeping external reserved fixed IPs
+	// by state alone, with no ownership check at all.
+	//
+	// That family can carry no ownership marker: the name is computed by the
+	// API, there is no tags field, and an external address sits on the region's
+	// shared public network rather than a test one. Without this the sweeper
+	// reclaims nothing, so a run killed mid-test leaks a billable address
+	// permanently.
+	//
+	// Unlike EnvSweepUntokenized, which still narrows to test-prefixed names,
+	// this narrows to nothing beyond project, region, IsExternal and DOWN. What
+	// makes that tolerable is scope rather than precision: the list call is
+	// project-scoped, so it can only reach a project dedicated to acceptance
+	// tests. Do not copy the pattern into an account-global sweeper, where the
+	// same reasoning does not hold.
+	//
+	// The residual cost is that it cannot tell a leaked address from one a
+	// concurrent run still holds. CI runs are serialised by a shared
+	// concurrency group, so the exposure is a local run overlapping a scheduled
+	// sweep, and the result is a confusing test failure rather than lost
+	// production capacity. Deletions name this variable in the log so that
+	// failure is diagnosable rather than mysterious.
+	EnvSweepAllReservedFixedIPs = "GCORE_SWEEP_ALL_RESERVED_FIXED_IPS"
 )
+
+// TagKey carries the run token for resources whose API exposes no name to put
+// it in. Floating IPs are the case that forced this: they have no name field at
+// all, so before tags the sweeper had nothing to identify them by.
+const TagKey = "gcore_tf_acctest_run"
 
 // TokenLen is the fixed width of the run token inside a resource name. Names
 // are the only channel the sweeper has, and several Gcore APIs cap their
@@ -88,4 +121,35 @@ func RunToken() string {
 		return Token(v)
 	}
 	return ""
+}
+
+// ShouldSweepToken reports whether a resource may be deleted, given the run
+// token it carries. ShouldSweep is the name-based entry point to this; call
+// this one directly for resources with no name, where the token arrives some
+// other way such as a tag.
+//
+// A resource with no token is never swept, even with EnvSweepUntokenized set.
+// For a named resource the test prefix still bounds that opt-in, but a
+// resource with no name has nothing else to go on: an untagged floating IP is
+// indistinguishable from a reserved production one, so honouring the opt-in
+// here would bring back the sweep that deleted every unattached address.
+func ShouldSweepToken(resourceType, identifier, token string) bool {
+	if token == "" {
+		log.Printf("[INFO] Skipping %s: %s (carries no run token; resources with no name are never swept without one, audit them manually)", resourceType, identifier)
+		return false
+	}
+
+	want, ok := os.LookupEnv(EnvSweepRunID)
+	if !ok || want == "" {
+		log.Printf("[WARN] Skipping %s: %s (%s is unset; a sweep must name the finished run it reclaims)", resourceType, identifier, EnvSweepRunID)
+		return false
+	}
+
+	if wantToken := Token(want); token != wantToken {
+		log.Printf("[DEBUG] Skipping %s: %s (token %q, sweeping %q)", resourceType, identifier, token, wantToken)
+		return false
+	}
+
+	log.Printf("[INFO] Sweeping %s: %s", resourceType, identifier)
+	return true
 }

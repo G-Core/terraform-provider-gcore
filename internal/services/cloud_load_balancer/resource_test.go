@@ -876,5 +876,8 @@ resource "gcore_cloud_floating_ip" "test" {
   region_id        = %[2]s
   port_id          = gcore_cloud_load_balancer.test.vip_port_id
   fixed_ip_address = gcore_cloud_load_balancer.test.vip_address
-}`, acctest.ProjectID(), acctest.RegionID(), name)
+  tags = {
+    %[4]s
+  }
+}`, acctest.ProjectID(), acctest.RegionID(), name, acctest.OwnershipTagHCL())
 }

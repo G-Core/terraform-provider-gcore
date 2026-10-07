@@ -157,7 +157,10 @@ func testAccCloudFloatingIPConfig() string {
 resource "gcore_cloud_floating_ip" "test" {
   project_id = %[1]s
   region_id  = %[2]s
-}`, acctest.ProjectID(), acctest.RegionID())
+  tags = {
+    %[3]s
+  }
+}`, acctest.ProjectID(), acctest.RegionID(), acctest.OwnershipTagHCL())
 }
 
 func testAccCloudFloatingIPConfigWithReservedFixedIP(name string) string {
@@ -191,7 +194,10 @@ resource "gcore_cloud_floating_ip" "test" {
   region_id        = %[2]s
   port_id          = gcore_cloud_reserved_fixed_ip.test.port_id
   fixed_ip_address = gcore_cloud_reserved_fixed_ip.test.fixed_ip_address
-}`, acctest.ProjectID(), acctest.RegionID(), name)
+  tags = {
+    %[4]s
+  }
+}`, acctest.ProjectID(), acctest.RegionID(), name, acctest.OwnershipTagHCL())
 }
 
 func testAccCloudFloatingIPConfigWithTags(tagValue string) string {
@@ -201,6 +207,7 @@ resource "gcore_cloud_floating_ip" "test" {
   region_id  = %[2]s
   tags = {
     test_key = %[3]q
+    %[4]s
   }
-}`, acctest.ProjectID(), acctest.RegionID(), tagValue)
+}`, acctest.ProjectID(), acctest.RegionID(), tagValue, acctest.OwnershipTagHCL())
 }

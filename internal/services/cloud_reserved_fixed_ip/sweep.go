@@ -23,9 +23,34 @@ func init() {
 	})
 }
 
+// sweepCloudReservedFixedIPs reclaims external reserved fixed IPs, but only
+// when sweep.EnvSweepAllReservedFixedIPs is set.
+//
+// Nothing can tie one of these to the run that created it. The name is computed
+// by the API, no create or update variant accepts a name or tags, and an
+// external address sits on the region's shared public network rather than a
+// test one, so not even the parent carries a token. Every ownership mechanism
+// the other sweepers rely on is unavailable here.
+//
+// So this is deliberately an unsafe operation behind an explicit flag rather
+// than a clever filter pretending to establish ownership. Unset, it deletes
+// nothing; set, it deletes every external address in the DOWN state in this
+// project and region. What bounds it is scope rather than precision: the list
+// call is project-scoped, so it reaches only a project dedicated to acceptance
+// tests.
+//
+// Internal addresses are never considered. They are attached to a port on a
+// test network and are reclaimed with it, so they need nothing from here.
 func sweepCloudReservedFixedIPs(_ string) error {
 	if err := sweep.ValidateSweeperEnvironment(); err != nil {
 		return err
+	}
+
+	if os.Getenv(sweep.EnvSweepAllReservedFixedIPs) != "1" {
+		log.Printf("[INFO] Skipping reserved fixed IP sweep: the API exposes no name or tag to carry a "+
+			"run token, so ownership cannot be established. Set %s=1 to delete every external address "+
+			"in the DOWN state in this project.", sweep.EnvSweepAllReservedFixedIPs)
+		return nil
 	}
 
 	apiKey := os.Getenv("GCORE_API_KEY")
@@ -44,6 +69,10 @@ func sweepCloudReservedFixedIPs(_ string) error {
 
 	ctx := context.Background()
 
+	log.Printf("[WARN] Reserved fixed IP sweep running with %s=1: every external address in the DOWN "+
+		"state in project %d region %d will be deleted, including any a concurrent run is holding.",
+		sweep.EnvSweepAllReservedFixedIPs, projectID, regionID)
+
 	page, err := client.Cloud.ReservedFixedIPs.List(ctx, cloud.ReservedFixedIPListParams{
 		ProjectID: param.NewOpt(projectID),
 		RegionID:  param.NewOpt(regionID),
@@ -57,31 +86,30 @@ func sweepCloudReservedFixedIPs(_ string) error {
 	}
 
 	for _, ip := range page.Results {
-		// Only sweep external reserved IPs: internal IPs are always attached to a port
-		// and cannot be deleted independently.
+		// Internal addresses cannot be deleted independently of the port they
+		// are attached to, and go with the test network that holds them.
 		if !ip.IsExternal {
 			continue
 		}
 
-		// Only sweep unattached IPs (status DOWN) to avoid breaking in-use resources.
+		// Anything in another state is attached to something still in use,
+		// whether or not a test owns it.
 		if ip.Reservation.Status != "DOWN" && ip.Reservation.Status != "" {
-			log.Printf("[INFO] Skipping attached reserved fixed IP: %s (status: %s)", ip.PortID, ip.Reservation.Status)
+			log.Printf("[DEBUG] Skipping reserved fixed IP %s: status %s", ip.PortID, ip.Reservation.Status)
 			continue
 		}
 
-		// External IPs have auto-generated names; use ShouldSweep to filter by the
-		// tf-test prefix when one is present, and allow unnamed IPs through as a
-		// best-effort cleanup (they have no production significance).
-		if ip.Name != "" && !sweep.ShouldSweep("gcore_cloud_reserved_fixed_ip", ip.Name) {
-			continue
-		}
+		// The flag is named in the line deliberately. With no ownership check,
+		// a developer whose local run breaks because of this needs the log to
+		// say why rather than being left to file a provider bug.
+		log.Printf("[INFO] Deleting reserved fixed IP %s (external, status %q, created %s) under %s=1",
+			ip.PortID, ip.Reservation.Status, ip.CreatedAt.Format("2006-01-02T15:04:05Z"),
+			sweep.EnvSweepAllReservedFixedIPs)
 
-		log.Printf("[INFO] Deleting reserved fixed IP: %s (external: %t, status: %s)", ip.PortID, ip.IsExternal, ip.Reservation.Status)
-		_, err := client.Cloud.ReservedFixedIPs.Delete(ctx, ip.PortID, cloud.ReservedFixedIPDeleteParams{
+		if _, err := client.Cloud.ReservedFixedIPs.Delete(ctx, ip.PortID, cloud.ReservedFixedIPDeleteParams{
 			ProjectID: param.NewOpt(projectID),
 			RegionID:  param.NewOpt(regionID),
-		})
-		if err != nil {
+		}); err != nil {
 			log.Printf("[ERROR] Failed to delete reserved fixed IP %s: %s", ip.PortID, err)
 		}
 	}

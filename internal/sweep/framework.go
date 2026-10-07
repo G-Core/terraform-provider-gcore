@@ -38,6 +38,10 @@ func IsTestResource(name string) bool {
 // that, which is why no tokenised resource is swept when the variable is
 // unset. The exception is EnvSweepUntokenized, which sweeps names carrying no
 // token regardless; see its doc for why it cannot be scoped to a run.
+//
+// The opt-in is decided here, after the prefix check, and not in
+// ShouldSweepToken: the prefix is what still bounds an untokenised sweep to
+// test resources, and a resource with no name has no prefix to check.
 func ShouldSweep(resourceType, name string) bool {
 	if !IsTestResource(name) {
 		log.Printf("[DEBUG] Skipping %s: %s (not a test resource)", resourceType, name)
@@ -54,19 +58,7 @@ func ShouldSweep(resourceType, name string) bool {
 		return false
 	}
 
-	want, ok := os.LookupEnv(EnvSweepRunID)
-	if !ok || want == "" {
-		log.Printf("[WARN] Skipping %s: %s (%s is unset; a sweep must name the finished run it reclaims)", resourceType, name, EnvSweepRunID)
-		return false
-	}
-
-	if wantToken := Token(want); token != wantToken {
-		log.Printf("[DEBUG] Skipping %s: %s (token %q, sweeping %q)", resourceType, name, token, wantToken)
-		return false
-	}
-
-	log.Printf("[INFO] Sweeping %s: %s", resourceType, name)
-	return true
+	return ShouldSweepToken(resourceType, name, token)
 }
 
 // SkipSweepError determines if a sweeper error should be skipped.

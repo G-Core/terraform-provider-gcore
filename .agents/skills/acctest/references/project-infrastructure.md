@@ -19,6 +19,7 @@ acctest.ProjectID()   // returns os.Getenv("GCORE_CLOUD_PROJECT_ID")
 acctest.RegionID()    // returns os.Getenv("GCORE_CLOUD_REGION_ID")
 acctest.RandomName()         // "tf-test-<token4>-<random6>"; the token identifies the run
 acctest.RandomNameCompact()  // "tftest<token4><random6>", exactly 16 chars, no hyphens
+acctest.OwnershipTagHCL()    // a tags entry carrying the token, for resources with no name
 ```
 
 ## Resource Helpers (`internal/acctest/resource.go`)
@@ -93,6 +94,7 @@ sweep.ValidateSweeperEnvironment()  // checks GCORE_API_KEY, GCORE_CLOUD_PROJECT
 ```go
 sweep.IsTestResource(name)        // true only for the "tf-test-" / "tf_test_" prefixes
 sweep.ShouldSweep(resType, name)  // prefix match AND an exact run-token match
+sweep.ShouldSweepToken(resType, id, token)  // the same decision, for resources with no name; "" is never swept
 sweep.SkipSweepError(err)       // true for "Access Denied", "Forbidden", "403", etc.
 ```
 
@@ -110,6 +112,7 @@ Any new name generator must produce names this accepts. `TestRandomNameIsSweepab
 sweep.Token(runID)         // reduces any run id to a fixed-width, name-safe token
 sweep.TokenFromName(name)  // (token, ok); ok is false for names predating tokens
 sweep.RunToken()           // this run's token, or "" when GCORE_ACCTEST_RUN_ID is unset
+sweep.TagKey               // "gcore_tf_acctest_run"; carries the token where no name can
 ```
 
 Every run gets a token and every resource it creates carries one, so a sweep deletes exactly the run it was told to
@@ -125,6 +128,9 @@ own live resources, and the nightly suite runs for hours.
 not consult `GCORE_SWEEP_RUN_ID`, because such a name records no run to compare against -- requiring a run id would
 scope nothing. For the same reason it cannot tell a leaked resource from a live one, so only use it once no branch or
 job still runs code that creates untokenized names.
+
+It never reaches resources with no name, such as floating IPs. For those the prefix is not there to bound it, so an
+untagged one is indistinguishable from production and `ShouldSweepToken` always skips it.
 
 `Token` hashes rather than truncates, so a GitHub run id, a UUID and an ad hoc string all yield something name-safe,
 and the test side and the sweeper derive the same token from the same run id without coordinating.
@@ -148,7 +154,8 @@ The following documented items do **not exist yet** and must be created if neede
 | `TF_ACC` | yes (set by scripts/acctest) | Enable acceptance tests |
 | `GCORE_ACCTEST_RUN_ID` | set by scripts/acctest | Identifies the run creating resources; see below |
 | `GCORE_SWEEP_RUN_ID` | yes, to delete tokenized resources | The finished run a sweep may reclaim. Unset means no tokenized resource is swept |
-| `GCORE_SWEEP_UNTOKENIZED` | no | Sweeps resources carrying no token, ignoring `GCORE_SWEEP_RUN_ID`. For a one-time project audit, not routine use |
+| `GCORE_SWEEP_UNTOKENIZED` | no | Sweeps test-prefixed names carrying no token, ignoring `GCORE_SWEEP_RUN_ID`. Never applies to resources with no name. For a one-time project audit, not routine use |
+| `GCORE_SWEEP_ALL_RESERVED_FIXED_IPS` | no | Deletes every external reserved fixed IP in the `DOWN` state in the project, with no ownership check -- that family can carry none. Bounded by the list call being project-scoped. Unset means the sweeper deletes nothing |
 
 One `GCORE_ACCTEST_RUN_ID` covers a whole run. Each package is its own test binary, so without it each mints a
 different run id and one run's resources scatter across several of them. Each binary logs its id with a `[WARN]`

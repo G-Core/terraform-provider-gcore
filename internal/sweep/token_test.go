@@ -139,3 +139,44 @@ func TestShouldSweepRequiresATokenMatch(t *testing.T) {
 		}
 	})
 }
+
+func TestShouldSweepTokenForResourcesWithoutNames(t *testing.T) {
+	const runID = "18273645509"
+	token := sweep.Token(runID)
+
+	t.Run("no sweep run id means no deletion", func(t *testing.T) {
+		t.Setenv(sweep.EnvSweepRunID, "")
+		if sweep.ShouldSweepToken("gcore_cloud_floating_ip", "fip-1", token) {
+			t.Error("swept without a run id")
+		}
+	})
+
+	t.Run("matching token is swept", func(t *testing.T) {
+		t.Setenv(sweep.EnvSweepRunID, runID)
+		if !sweep.ShouldSweepToken("gcore_cloud_floating_ip", "fip-1", token) {
+			t.Error("did not sweep a resource tagged with the named run")
+		}
+	})
+
+	t.Run("another run is left alone", func(t *testing.T) {
+		t.Setenv(sweep.EnvSweepRunID, "99999999999")
+		if sweep.ShouldSweepToken("gcore_cloud_floating_ip", "fip-1", token) {
+			t.Error("swept another run's resource")
+		}
+	})
+
+	// An untagged floating IP is indistinguishable from a reserved production
+	// address. Deleting every unattached one is what this replaces, so the
+	// untokenized opt-in, which is bounded by the name prefix for everything
+	// else, must not reach resources that have no name.
+	t.Run("untagged is never swept, even with the opt-in", func(t *testing.T) {
+		t.Setenv(sweep.EnvSweepRunID, runID)
+		if sweep.ShouldSweepToken("gcore_cloud_floating_ip", "fip-2", "") {
+			t.Error("swept an untagged address")
+		}
+		t.Setenv(sweep.EnvSweepUntokenized, "1")
+		if sweep.ShouldSweepToken("gcore_cloud_floating_ip", "fip-2", "") {
+			t.Error("untokenized opt-in swept an untagged address")
+		}
+	})
+}
