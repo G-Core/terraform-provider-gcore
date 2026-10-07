@@ -7,6 +7,7 @@ data "gcore_dns_zones" "example_dns_zones" {
   exact_match = true
   healthcheck = true
   iam_reseller_id = [0]
+  is_secondary = true
   name = ["string"]
   order_by = "order_by"
   order_direction = "asc"

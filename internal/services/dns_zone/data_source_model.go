@@ -90,6 +90,9 @@ func (m *DNSZoneDataSourceModel) toListParams(_ context.Context) (params dns.Zon
 	if !m.FindOneBy.Healthcheck.IsNull() {
 		params.Healthcheck = param.NewOpt(m.FindOneBy.Healthcheck.ValueBool())
 	}
+	if !m.FindOneBy.IsSecondary.IsNull() {
+		params.IsSecondary = param.NewOpt(m.FindOneBy.IsSecondary.ValueBool())
+	}
 	if !m.FindOneBy.OrderBy.IsNull() {
 		params.OrderBy = param.NewOpt(m.FindOneBy.OrderBy.ValueString())
 	}
@@ -140,6 +143,7 @@ type DNSZoneFindOneByDataSourceModel struct {
 	ExactMatch     types.Bool        `tfsdk:"exact_match" query:"exact_match,optional"`
 	Healthcheck    types.Bool        `tfsdk:"healthcheck" query:"healthcheck,optional"`
 	IamResellerID  *[]types.Int64    `tfsdk:"iam_reseller_id" query:"iam_reseller_id,optional"`
+	IsSecondary    types.Bool        `tfsdk:"is_secondary" query:"is_secondary,optional"`
 	Name           *[]types.String   `tfsdk:"name" query:"name,optional"`
 	OrderBy        types.String      `tfsdk:"order_by" query:"order_by,optional"`
 	OrderDirection types.String      `tfsdk:"order_direction" query:"order_direction,optional"`

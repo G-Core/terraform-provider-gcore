@@ -167,6 +167,10 @@ func DataSourceSchema(ctx context.Context) schema.Schema {
 						Optional:    true,
 						ElementType: types.Int64Type,
 					},
+					"is_secondary": schema.BoolAttribute{
+						Description: "Filter by AXFR secondary zone marker (meta.`is_secondary`).\ntrue returns only secondary zones, false returns only zones without that marker\n(primary zones have no `is_secondary` key at all), omitted returns all zones.",
+						Optional:    true,
+					},
 					"name": schema.ListAttribute{
 						Description: "to pass several names `name=first&name=second...`",
 						Optional:    true,

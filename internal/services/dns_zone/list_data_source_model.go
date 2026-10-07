@@ -24,6 +24,7 @@ type DNSZonesDataSourceModel struct {
 	Enabled        types.Bool                                                 `tfsdk:"enabled" query:"enabled,optional"`
 	ExactMatch     types.Bool                                                 `tfsdk:"exact_match" query:"exact_match,optional"`
 	Healthcheck    types.Bool                                                 `tfsdk:"healthcheck" query:"healthcheck,optional"`
+	IsSecondary    types.Bool                                                 `tfsdk:"is_secondary" query:"is_secondary,optional"`
 	OrderBy        types.String                                               `tfsdk:"order_by" query:"order_by,optional"`
 	OrderDirection types.String                                               `tfsdk:"order_direction" query:"order_direction,optional"`
 	Status         types.String                                               `tfsdk:"status" query:"status,optional"`
@@ -92,6 +93,9 @@ func (m *DNSZonesDataSourceModel) toListParams(_ context.Context) (params dns.Zo
 	}
 	if !m.Healthcheck.IsNull() {
 		params.Healthcheck = param.NewOpt(m.Healthcheck.ValueBool())
+	}
+	if !m.IsSecondary.IsNull() {
+		params.IsSecondary = param.NewOpt(m.IsSecondary.ValueBool())
 	}
 	if !m.OrderBy.IsNull() {
 		params.OrderBy = param.NewOpt(m.OrderBy.ValueString())

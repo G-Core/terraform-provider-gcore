@@ -39,6 +39,10 @@ func ListDataSourceSchema(ctx context.Context) schema.Schema {
 				Description: "Zones with RRsets that have healthchecks",
 				Optional:    true,
 			},
+			"is_secondary": schema.BoolAttribute{
+				Description: "Filter by AXFR secondary zone marker (meta.`is_secondary`).\ntrue returns only secondary zones, false returns only zones without that marker\n(primary zones have no `is_secondary` key at all), omitted returns all zones.",
+				Optional:    true,
+			},
 			"order_by": schema.StringAttribute{
 				Description: "Field name to sort by",
 				Optional:    true,
