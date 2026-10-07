@@ -4,5 +4,19 @@ set -e
 
 cd "$(dirname "$0")/.."
 
-echo "==> Running acceptance tests"
+# One token for the whole run, shared by every package. Each package is its own
+# test binary, so without this each would mint a different token and a single
+# run's resources would be split across several of them.
+#
+# The random part matters: in containers the PID is often 1, so runs started in
+# the same second would otherwise share an id. $RANDOM is no substitute, since
+# bash seeds it from the time and PID.
+if [ -z "${GCORE_ACCTEST_RUN_ID:-}" ]; then
+  GCORE_ACCTEST_RUN_ID="local-$(date +%s)-$$-$(od -An -N4 -tx1 /dev/urandom | tr -d ' \n')"
+fi
+export GCORE_ACCTEST_RUN_ID
+
+echo "==> Running acceptance tests (run id: $GCORE_ACCTEST_RUN_ID)"
+echo "    Reclaim afterwards with:"
+printf '      GCORE_SWEEP_RUN_ID=%q ./scripts/sweep\n' "$GCORE_ACCTEST_RUN_ID"
 TF_ACC=1 go test -count=1 -parallel=4 -timeout=30m "${@:-./...}"

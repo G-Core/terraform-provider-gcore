@@ -19,7 +19,7 @@ import (
 )
 
 func TestAccDNSZoneRrset_basic(t *testing.T) {
-	zoneName := fmt.Sprintf("tf-test-%s.com", acctest.RandomName())
+	zoneName := fmt.Sprintf("%s.com", acctest.RandomName())
 	rrsetName := fmt.Sprintf("www.%s.", zoneName)
 
 	resource.ParallelTest(t, resource.TestCase{
@@ -54,7 +54,7 @@ func TestAccDNSZoneRrset_basic(t *testing.T) {
 }
 
 func TestAccDNSZoneRrset_update(t *testing.T) {
-	zoneName := fmt.Sprintf("tf-test-%s.com", acctest.RandomName())
+	zoneName := fmt.Sprintf("%s.com", acctest.RandomName())
 	rrsetName := fmt.Sprintf("www.%s.", zoneName)
 
 	resource.ParallelTest(t, resource.TestCase{
@@ -98,7 +98,7 @@ func TestAccDNSZoneRrset_update(t *testing.T) {
 }
 
 func TestAccDNSZoneRrset_withMeta(t *testing.T) {
-	zoneName := fmt.Sprintf("tf-test-%s.com", acctest.RandomName())
+	zoneName := fmt.Sprintf("%s.com", acctest.RandomName())
 	rrsetName := fmt.Sprintf("geo.%s.", zoneName)
 
 	resource.ParallelTest(t, resource.TestCase{
@@ -147,7 +147,7 @@ func TestAccDNSZoneRrset_withMeta(t *testing.T) {
 }
 
 func TestAccDNSZoneRrset_import(t *testing.T) {
-	zoneName := fmt.Sprintf("tf-test-%s.com", acctest.RandomName())
+	zoneName := fmt.Sprintf("%s.com", acctest.RandomName())
 	rrsetName := fmt.Sprintf("www.%s.", zoneName)
 
 	resource.ParallelTest(t, resource.TestCase{
@@ -171,7 +171,7 @@ func TestAccDNSZoneRrset_import(t *testing.T) {
 }
 
 func TestAccDNSZoneRrset_multipleRecordsOrdering(t *testing.T) {
-	zoneName := fmt.Sprintf("tf-test-%s.com", acctest.RandomName())
+	zoneName := fmt.Sprintf("%s.com", acctest.RandomName())
 	rrsetName := fmt.Sprintf("multi.%s.", zoneName)
 
 	resource.ParallelTest(t, resource.TestCase{

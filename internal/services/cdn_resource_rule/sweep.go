@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"log"
 	"os"
-	"strings"
 
 	"github.com/G-Core/gcore-go"
 	"github.com/G-Core/gcore-go/cdn"
@@ -32,7 +31,9 @@ func init() {
 }
 
 // sweepCDNResourceRules lists all CDN resources with test-prefixed cnames,
-// then deletes any rules with test-prefixed names on those resources.
+// then deletes the rules on them that belong to the run being swept. The cname
+// check only narrows which resources to look inside; ShouldSweep on each rule
+// name decides what is deleted.
 func sweepCDNResourceRules(_ string) error {
 	if err := sweep.ValidateSweeperEnvironment(); err != nil {
 		return err
@@ -87,8 +88,9 @@ func sweepCDNResourceRules(_ string) error {
 	return nil
 }
 
-// sweepCDNResources lists all CDN resources and deletes those that were
-// created by acceptance tests (identified by test-prefixed cnames).
+// sweepCDNResources lists all CDN resources and deletes those created by the
+// run being swept. Test cnames are "<RandomName>.example.com", so they carry
+// the run token and go through ShouldSweep like any other name.
 func sweepCDNResources(_ string) error {
 	if err := sweep.ValidateSweeperEnvironment(); err != nil {
 		return err
@@ -112,7 +114,7 @@ func sweepCDNResources(_ string) error {
 	}
 
 	for _, cdnRes := range cdnResources.Results {
-		if !isTestCDNResource(cdnRes) {
+		if !sweep.ShouldSweep("gcore_cdn_resource", cdnRes.Cname) {
 			continue
 		}
 
@@ -127,8 +129,8 @@ func sweepCDNResources(_ string) error {
 }
 
 // isTestCDNResource checks whether a CDN resource was created by acceptance
-// tests. The fixture helper creates CDN resources with cnames like
-// "tf-test-<random>.example.com", so we check the cname prefix.
+// tests, whatever run it belongs to. It must not gate deletion of the resource
+// itself; use sweep.ShouldSweep for that.
 func isTestCDNResource(res cdn.CDNResource) bool {
-	return strings.HasPrefix(res.Cname, sweep.ResourcePrefix)
+	return sweep.IsTestResource(res.Cname)
 }

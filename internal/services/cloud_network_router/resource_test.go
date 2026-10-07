@@ -177,14 +177,14 @@ func testAccCloudNetworkRouterWithSubnetConfig(name string, routes string) strin
 resource "gcore_cloud_network" "test" {
   project_id = %[1]s
   region_id  = %[2]s
-  name       = "tf-test-net-%[3]s"
+  name       = "%[3]s-net"
   type       = "vxlan"
 }
 
 resource "gcore_cloud_network_subnet" "test" {
   project_id  = %[1]s
   region_id   = %[2]s
-  name        = "tf-test-subnet-%[3]s"
+  name        = "%[3]s-subnet"
   network_id  = gcore_cloud_network.test.id
   cidr        = "10.0.0.0/24"
   enable_dhcp = true

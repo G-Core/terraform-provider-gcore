@@ -317,14 +317,14 @@ func testAccCloudReservedFixedIPConfigSubnetIsVip(name string, isVip bool) strin
 resource "gcore_cloud_network" "test" {
   project_id = %[1]s
   region_id  = %[2]s
-  name       = "tf-test-net-%[3]s"
+  name       = "%[3]s-net"
   type       = "vxlan"
 }
 
 resource "gcore_cloud_network_subnet" "test" {
   project_id  = %[1]s
   region_id   = %[2]s
-  name        = "tf-test-subnet-%[3]s"
+  name        = "%[3]s-subnet"
   network_id  = gcore_cloud_network.test.id
   cidr        = "10.0.0.0/24"
   enable_dhcp = true
@@ -344,14 +344,14 @@ func testAccCloudReservedFixedIPConfigAnySubnet(name string) string {
 resource "gcore_cloud_network" "test" {
   project_id = %[1]s
   region_id  = %[2]s
-  name       = "tf-test-net-%[3]s"
+  name       = "%[3]s-net"
   type       = "vxlan"
 }
 
 resource "gcore_cloud_network_subnet" "test" {
   project_id  = %[1]s
   region_id   = %[2]s
-  name        = "tf-test-subnet-%[3]s"
+  name        = "%[3]s-subnet"
   network_id  = gcore_cloud_network.test.id
   cidr        = "10.0.0.0/24"
   enable_dhcp = true
@@ -507,14 +507,14 @@ func testAccCloudReservedFixedIPConfigAnySubnetIsVip(name string, isVip bool) st
 resource "gcore_cloud_network" "test" {
   project_id = %[1]s
   region_id  = %[2]s
-  name       = "tf-test-net-%[3]s"
+  name       = "%[3]s-net"
   type       = "vxlan"
 }
 
 resource "gcore_cloud_network_subnet" "test" {
   project_id  = %[1]s
   region_id   = %[2]s
-  name        = "tf-test-subnet-%[3]s"
+  name        = "%[3]s-subnet"
   network_id  = gcore_cloud_network.test.id
   cidr        = "10.0.0.0/24"
   enable_dhcp = true
@@ -565,14 +565,14 @@ func testAccCloudReservedFixedIPConfigIPAddress(name string, ipAddress string) s
 resource "gcore_cloud_network" "test" {
   project_id = %[1]s
   region_id  = %[2]s
-  name       = "tf-test-net-%[3]s"
+  name       = "%[3]s-net"
   type       = "vxlan"
 }
 
 resource "gcore_cloud_network_subnet" "test" {
   project_id  = %[1]s
   region_id   = %[2]s
-  name        = "tf-test-subnet-%[3]s"
+  name        = "%[3]s-subnet"
   network_id  = gcore_cloud_network.test.id
   cidr        = "10.0.0.0/24"
   enable_dhcp = true

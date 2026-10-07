@@ -71,7 +71,9 @@ func TestAccCloudExample_basic(t *testing.T) {
 
 - **Function naming**: `TestAcc<ResourceType>_<variant>` (e.g., `TestAccCloudSSHKey_basic`)
 - **Resource address in config**: Always use `"test"` as the resource label (e.g., `gcore_cloud_ssh_key.test`)
-- **Random names**: Always use `acctest.RandomName()` (produces `"tf-test-<10chars>"`) for sweeper compatibility
+- **Random names**: Always use `acctest.RandomName()` (produces `"tf-test-<token>-<random>"`). The token identifies the run, and the sweeper deletes only exact token matches, so a hand-written name is unreclaimable
+- **Qualified names**: Append, never prepend -- `rName + "-subnet"`, not `"tf-test-subnet-" + rName`. Prefixing repeats `tf-test-` further along the name and wastes the length budget
+- **Names the API will not take**: use `acctest.RandomNameCompact()` where hyphens are rejected or the cap is tight (registry users: lowercase alphanumeric, 16 max)
 - **Provider factories**: Always use `acctest.ProtoV6ProviderFactories` (this is a Protocol V6 provider)
 - **PreCheck**: Always include `func() { acctest.PreCheck(t) }` to validate env vars
 - **Parallelism**: Use `resource.ParallelTest()` for parallel execution (it calls `t.Parallel()` internally). Use `resource.Test()` when tests must run serially (e.g., resources that conflict in the same project)
@@ -125,6 +127,12 @@ func sweepCloudExample(_ string) error {
     // list resources, filter with sweep.ShouldSweep(), delete matches
 }
 ```
+
+`sweep.ShouldSweep` requires more than a name prefix: the resource must carry the run token named by
+`GCORE_SWEEP_RUN_ID`, and with that unset **no tokenized resource is swept**. Deletion is only safe once the owning
+run has finished, and no sweeper can determine that for itself, so the caller has to say which run it is reclaiming.
+`scripts/acctest` prints the command. The one exception is `GCORE_SWEEP_UNTOKENIZED=1`, which reclaims names predating
+tokens and ignores the run id; see the infrastructure reference before using it.
 
 ## References
 

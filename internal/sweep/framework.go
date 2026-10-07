@@ -2,6 +2,7 @@ package sweep
 
 import (
 	"log"
+	"os"
 	"strings"
 )
 
@@ -29,21 +30,43 @@ func IsTestResource(name string) bool {
 		strings.HasPrefix(name, testPrefixUnderscore)
 }
 
-// ShouldSweep logs and returns whether a resource should be swept.
+// ShouldSweep reports whether a resource may be deleted.
 //
-// Parameters:
-//   - resourceType: The Terraform resource type (e.g., "gcore_cloud_volume")
-//   - name: The resource name to check
-//
-// Returns true if the resource should be deleted, false otherwise.
+// A prefix match is not sufficient. Deletion also requires the resource to
+// carry the run token named by EnvSweepRunID, so a sweep can only reclaim a run
+// whose completion the caller has established — a scheduled job cannot know
+// that, which is why no tokenised resource is swept when the variable is
+// unset. The exception is EnvSweepUntokenized, which sweeps names carrying no
+// token regardless; see its doc for why it cannot be scoped to a run.
 func ShouldSweep(resourceType, name string) bool {
-	if IsTestResource(name) {
-		log.Printf("[INFO] Sweeping %s: %s", resourceType, name)
-		return true
+	if !IsTestResource(name) {
+		log.Printf("[DEBUG] Skipping %s: %s (not a test resource)", resourceType, name)
+		return false
 	}
 
-	log.Printf("[DEBUG] Skipping %s: %s (not a test resource)", resourceType, name)
-	return false
+	token, tokenized := TokenFromName(name)
+	if !tokenized {
+		if os.Getenv(EnvSweepUntokenized) == "1" {
+			log.Printf("[INFO] Sweeping %s: %s (predates run tokens, %s=1)", resourceType, name, EnvSweepUntokenized)
+			return true
+		}
+		log.Printf("[INFO] Skipping %s: %s (predates run tokens; set %s=1 to reclaim)", resourceType, name, EnvSweepUntokenized)
+		return false
+	}
+
+	want, ok := os.LookupEnv(EnvSweepRunID)
+	if !ok || want == "" {
+		log.Printf("[WARN] Skipping %s: %s (%s is unset; a sweep must name the finished run it reclaims)", resourceType, name, EnvSweepRunID)
+		return false
+	}
+
+	if wantToken := Token(want); token != wantToken {
+		log.Printf("[DEBUG] Skipping %s: %s (token %q, sweeping %q)", resourceType, name, token, wantToken)
+		return false
+	}
+
+	log.Printf("[INFO] Sweeping %s: %s", resourceType, name)
+	return true
 }
 
 // SkipSweepError determines if a sweeper error should be skipped.

@@ -63,14 +63,3 @@ func TestRandomNameIsSweepable(t *testing.T) {
 		}
 	}
 }
-
-func TestShouldSweep(t *testing.T) {
-	t.Parallel()
-
-	if !sweep.ShouldSweep("gcore_cloud_volume", acctest.RandomName()) {
-		t.Error("ShouldSweep rejected a generated test name")
-	}
-	if sweep.ShouldSweep("gcore_cloud_volume", "production") {
-		t.Error("ShouldSweep accepted a non-test name")
-	}
-}

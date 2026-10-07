@@ -59,8 +59,10 @@ func TestAccCloudRegistryUsersDataSource_basic(t *testing.T) {
 		}
 	})
 
-	// Registry user names must be lowercase letters/numbers, max 16 chars.
-	userName := "tftestuser"
+	// Registry user names must be lowercase letters/numbers, max 16 chars, so
+	// this cannot use RandomName. A fixed literal collided between concurrent
+	// runs; RandomNameCompact is unique and fits in 16.
+	userName := acctest.RandomNameCompact()
 	user, err := client.Cloud.Registries.Users.New(context.Background(), registry.ID, cloud.RegistryUserNewParams{
 		ProjectID: param.NewOpt(projectID),
 		RegionID:  param.NewOpt(regionID),

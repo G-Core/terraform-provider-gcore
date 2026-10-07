@@ -17,7 +17,8 @@ acctest.PreCheck(t)               // fatals if GCORE_API_KEY, GCORE_CLOUD_PROJEC
 ```go
 acctest.ProjectID()   // returns os.Getenv("GCORE_CLOUD_PROJECT_ID")
 acctest.RegionID()    // returns os.Getenv("GCORE_CLOUD_REGION_ID")
-acctest.RandomName()  // returns "tf-test-<10 random alphanumeric chars>"
+acctest.RandomName()         // "tf-test-<token4>-<random6>"; the token identifies the run
+acctest.RandomNameCompact()  // "tftest<token4><random6>", exactly 16 chars, no hyphens
 ```
 
 ## Resource Helpers (`internal/acctest/resource.go`)
@@ -81,18 +82,17 @@ acctest.IsNotFoundError(err)  // checks for: "not found", "Not Found", "NOT_FOUN
 
 ## Sweep Utilities (`internal/sweep/`)
 
-### Constants and Validation (`sweep.go`)
+### Validation (`sweep.go`)
 
 ```go
-sweep.ResourcePrefix           // "tf-test-"
 sweep.ValidateSweeperEnvironment()  // checks GCORE_API_KEY, GCORE_CLOUD_PROJECT_ID, GCORE_CLOUD_REGION_ID
 ```
 
 ### Name Filtering (`framework.go`)
 
 ```go
-sweep.IsTestResource(name)      // true only for the "tf-test-" / "tf_test_" prefixes
-sweep.ShouldSweep(resType, name)  // IsTestResource + logging
+sweep.IsTestResource(name)        // true only for the "tf-test-" / "tf_test_" prefixes
+sweep.ShouldSweep(resType, name)  // prefix match AND an exact run-token match
 sweep.SkipSweepError(err)       // true for "Access Denied", "Forbidden", "403", etc.
 ```
 
@@ -103,6 +103,31 @@ sweep and unrelated infrastructure. The prefixes are unexported consts so the al
 
 Any new name generator must produce names this accepts. `TestRandomNameIsSweepable` enforces that for
 `acctest.RandomName`, so a change there fails the build rather than silently creating resources no sweeper can reclaim.
+
+### Run Tokens (`token.go`)
+
+```go
+sweep.Token(runID)         // reduces any run id to a fixed-width, name-safe token
+sweep.TokenFromName(name)  // (token, ok); ok is false for names predating tokens
+sweep.RunToken()           // this run's token, or "" when GCORE_ACCTEST_RUN_ID is unset
+```
+
+Every run gets a token and every resource it creates carries one, so a sweep deletes exactly the run it was told to
+and provably nothing else. That is what makes concurrent runs safe: the nightly suite and an engineer testing a
+subset against the same project cannot see each other's resources.
+
+**A sweep with `GCORE_SWEEP_RUN_ID` unset deletes no tokenized resource.** Deletion is only safe once the owning run
+has finished, and nothing in a sweeper can establish that -- a scheduled job least of all. The caller supplies the
+knowledge. There is deliberately no age heuristic: a run longer than any plausible threshold would start deleting its
+own live resources, and the nightly suite runs for hours.
+
+`GCORE_SWEEP_UNTOKENIZED=1` is the one exception. It sweeps every test-prefixed name that carries no token and does
+not consult `GCORE_SWEEP_RUN_ID`, because such a name records no run to compare against -- requiring a run id would
+scope nothing. For the same reason it cannot tell a leaked resource from a live one, so only use it once no branch or
+job still runs code that creates untokenized names.
+
+`Token` hashes rather than truncates, so a GitHub run id, a UUID and an ad hoc string all yield something name-safe,
+and the test side and the sweeper derive the same token from the same run id without coordinating.
 
 ## Missing Infrastructure
 
@@ -121,6 +146,14 @@ The following documented items do **not exist yet** and must be created if neede
 | `GCORE_CLOUD_REGION_ID` | yes | Default region for cloud resources |
 | `GCORE_BASE_URL` | no | Override API base URL |
 | `TF_ACC` | yes (set by scripts/acctest) | Enable acceptance tests |
+| `GCORE_ACCTEST_RUN_ID` | set by scripts/acctest | Identifies the run creating resources; see below |
+| `GCORE_SWEEP_RUN_ID` | yes, to delete tokenized resources | The finished run a sweep may reclaim. Unset means no tokenized resource is swept |
+| `GCORE_SWEEP_UNTOKENIZED` | no | Sweeps resources carrying no token, ignoring `GCORE_SWEEP_RUN_ID`. For a one-time project audit, not routine use |
+
+One `GCORE_ACCTEST_RUN_ID` covers a whole run. Each package is its own test binary, so without it each mints a
+different run id and one run's resources scatter across several of them. Each binary logs its id with a `[WARN]`
+line giving the sweep command, but `go test` hides a passing package's output unless `-v` is set, so run through
+`scripts/acctest` whenever the resources may need reclaiming.
 
 ## Gcore API Client Patterns
 

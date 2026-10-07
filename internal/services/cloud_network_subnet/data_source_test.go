@@ -46,7 +46,7 @@ func testAccCloudNetworkSubnetDataSourceConfig(name string) string {
 resource "gcore_cloud_network" "test" {
   project_id = %[1]s
   region_id  = %[2]s
-  name       = "tf-test-net-%[3]s"
+  name       = "%[3]s-net"
   type       = "vxlan"
 }
 

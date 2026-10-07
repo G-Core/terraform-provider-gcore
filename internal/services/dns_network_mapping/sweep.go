@@ -5,12 +5,13 @@ import (
 	"fmt"
 	"log"
 	"os"
-	"strings"
 
 	"github.com/G-Core/gcore-go"
 	"github.com/G-Core/gcore-go/dns"
 	"github.com/G-Core/gcore-go/option"
 	"github.com/hashicorp/terraform-plugin-testing/helper/resource"
+
+	"github.com/G-Core/terraform-provider-gcore/internal/sweep"
 )
 
 func init() {
@@ -36,8 +37,7 @@ func sweepDNSNetworkMappings(_ string) error {
 	}
 
 	for _, mapping := range resp.NetworkMappings {
-		if !strings.HasPrefix(mapping.Name, "tf-test") && !strings.HasPrefix(mapping.Name, "tf_test") {
-			log.Printf("[DEBUG] Skipping dns_network_mapping: %s (not a test resource)", mapping.Name)
+		if !sweep.ShouldSweep("gcore_dns_network_mapping", mapping.Name) {
 			continue
 		}
 

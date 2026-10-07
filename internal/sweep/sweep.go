@@ -5,12 +5,6 @@ import (
 	"os"
 )
 
-const (
-	// ResourcePrefix is the standard prefix for test resources.
-	// The trailing separator matters; see IsTestResource in framework.go.
-	ResourcePrefix = "tf-test-"
-)
-
 // ValidateSweeperEnvironment checks that all required environment variables are set.
 // Call this at the beginning of each sweeper function.
 //
