@@ -9,6 +9,13 @@ description: |-
 
 File shares provide NFS-based shared storage that can be mounted by virtual machines and Kubernetes clusters for persistent data.
 
+## Network configuration
+
+- `standard` file shares, the default `type_name`, need a `network` block with `network_id`. `subnet_id` is optional. When it is omitted, the API picks a subnet of the network, and Terraform stores it.
+- `vast` and `ddn` file shares do not take a `network` block. The API assigns their network, and Terraform shows it in `network` as a read-only value.
+- A file share cannot move to another network. Changing `network.network_id`, or setting `network.subnet_id` to a different subnet, replaces the file share and deletes its data.
+- Removing the `network` block from the configuration keeps the file share and its network.
+
 ## Example Usage
 
 ### Standard NFS file share
@@ -65,7 +72,7 @@ Available values: "NFS", "LUSTRE".
 
 ### Optional
 
-- `network` (Attributes) File share network configuration (see [below for nested schema](#nestedatt--network))
+- `network` (Attributes) File share network configuration. Required when `type_name` is `standard`. Not accepted for `vast` and `ddn` shares, which get their network from the API. (see [below for nested schema](#nestedatt--network))
 - `project_id` (Number) Project ID
 - `region_id` (Number) Region ID
 - `share_settings` (Attributes) Configuration settings for the share (see [below for nested schema](#nestedatt--share_settings))
@@ -94,7 +101,7 @@ Available values: "available", "awaiting_transfer", "backup_creating", "backup_r
 
 Optional:
 
-- `network_id` (String) Network ID.
+- `network_id` (String) Network ID. Required when `network` is set. Changing it replaces the file share.
 - `subnet_id` (String) Subnetwork ID. If the subnet is not selected, it will be selected automatically.
 
 

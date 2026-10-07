@@ -9,6 +9,13 @@ description: |-
 
 {{ .Description }}
 
+## Network configuration
+
+- `standard` file shares, the default `type_name`, need a `network` block with `network_id`. `subnet_id` is optional. When it is omitted, the API picks a subnet of the network, and Terraform stores it.
+- `vast` and `ddn` file shares do not take a `network` block. The API assigns their network, and Terraform shows it in `network` as a read-only value.
+- A file share cannot move to another network. Changing `network.network_id`, or setting `network.subnet_id` to a different subnet, replaces the file share and deletes its data.
+- Removing the `network` block from the configuration keeps the file share and its network.
+
 ## Example Usage
 
 ### Standard NFS file share

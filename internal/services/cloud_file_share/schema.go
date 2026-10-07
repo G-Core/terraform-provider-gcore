@@ -74,13 +74,13 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 				ElementType: types.StringType,
 			},
 			"network": schema.SingleNestedAttribute{
-				Description: "File share network configuration",
+				Description: "File share network configuration. Required when `type_name` is `standard`. Not accepted for `vast` and `ddn` shares, which get their network from the API.",
 				Computed:    true,
 				Optional:    true,
 				CustomType:  customfield.NewNestedObjectType[CloudFileShareNetworkModel](ctx),
 				Attributes: map[string]schema.Attribute{
 					"network_id": schema.StringAttribute{
-						Description:   "Network ID.",
+						Description:   "Network ID. Required when `network` is set. Changing it replaces the file share.",
 						Computed:      true,
 						Optional:      true,
 						PlanModifiers: []planmodifier.String{stringplanmodifier.RequiresReplace()},
