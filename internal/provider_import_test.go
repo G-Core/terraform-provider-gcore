@@ -14,6 +14,7 @@ import (
 
 var importSupportSkipReasons = map[string]string{
 	"gcore_cloud_file_share_access_rule": "GCLOUD2-20036: API has no single-resource read endpoint",
+	"gcore_waap_domain_policy":           "WAAP API has no single-policy read endpoint",
 }
 
 func TestRegisteredResourcesSupportImport(t *testing.T) {

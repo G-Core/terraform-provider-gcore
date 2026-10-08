@@ -4,6 +4,7 @@ package waap_domain_policy
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"io"
 	"net/http"
@@ -14,6 +15,7 @@ import (
 	"github.com/G-Core/terraform-provider-gcore/internal/apijson"
 	"github.com/G-Core/terraform-provider-gcore/internal/logging"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
+	"github.com/hashicorp/terraform-plugin-framework/types"
 )
 
 // Ensure provider defined types fully satisfy framework interfaces.
@@ -141,7 +143,40 @@ func (r *WaapDomainPolicyResource) Update(ctx context.Context, req resource.Upda
 }
 
 func (r *WaapDomainPolicyResource) Read(ctx context.Context, req resource.ReadRequest, resp *resource.ReadResponse) {
+	var data *WaapDomainPolicyModel
 
+	resp.Diagnostics.Append(req.State.Get(ctx, &data)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
+
+	// The API has no single-policy GET, so page through the domain's policies.
+	// Drop this once GET /waap/v2/domains/{domain_id}/policies/{policy_id} exists:
+	// the generator then emits Read and ImportState itself.
+	iter := r.client.Waap.Domains.Policies.ListAutoPaging(
+		ctx,
+		data.DomainID.ValueInt64(),
+		waap.DomainPolicyListParams{},
+		option.WithMiddleware(logging.Middleware(ctx)),
+	)
+	for iter.Next() {
+		policy := iter.Current()
+		if policy.ID != data.PolicyID.ValueString() {
+			continue
+		}
+		data.Mode = types.BoolValue(policy.Mode)
+		data.ID = data.PolicyID
+		resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
+		return
+	}
+	var apiErr *gcore.Error
+	if err := iter.Err(); err != nil && !(errors.As(err, &apiErr) && apiErr.StatusCode == http.StatusNotFound) {
+		resp.Diagnostics.AddError("failed to make http request", err.Error())
+		return
+	}
+	resp.Diagnostics.AddWarning("Resource not found", "The resource was not found on the server and will be removed from state.")
+	resp.State.RemoveResource(ctx)
 }
 
 func (r *WaapDomainPolicyResource) Delete(ctx context.Context, req resource.DeleteRequest, resp *resource.DeleteResponse) {

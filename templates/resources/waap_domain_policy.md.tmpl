@@ -1,0 +1,88 @@
+---
+page_title: "{{ .Name }} {{ .Type }} - {{ .RenderedProviderName }}"
+subcategory: ""
+description: |-
+  {{ .Description }}
+---
+
+# {{ .Name }} ({{ .Type }})
+
+{{ .Description }}
+
+Each resource manages the mode of one existing policy. Policies are built in: Terraform never creates or deletes them.
+Removing a resource, or changing its `domain_id` or `policy_id`, leaves the old policy in the mode it had last.
+Set it back first if you want a different mode.
+
+## Example Usage
+
+### All attributes
+
+The following example shows all configurable attributes for this resource.
+
+{{ tffile "examples/resources/gcore_waap_domain_policy/resource.tf" }}
+
+### Manage several policies
+
+Look up policy IDs with the `gcore_waap_domain_policies` data source and manage each with `for_each`.
+Policy names can repeat across rule sets, so filter by `rule_set_id` when you key by name:
+
+```terraform
+data "gcore_waap_domain_policies" "owasp" {
+  domain_id   = 12345
+  rule_set_id = 2
+}
+
+locals {
+  disabled = ["SQL injection", "Shellshock exploit"]
+}
+
+resource "gcore_waap_domain_policy" "owasp" {
+  for_each = { for p in data.gcore_waap_domain_policies.owasp.items : p.name => p.id }
+
+  domain_id = 12345
+  policy_id = each.value
+  mode      = !contains(local.disabled, each.key)
+}
+```
+
+### Migrating from the v0 `gcore_waap_policy` resource
+
+The v0 provider managed all policies of a domain in one `gcore_waap_policy` resource with a `policies` map
+(policy ID to enabled). Here each policy is its own resource with the same IDs:
+
+```terraform
+# v0
+resource "gcore_waap_policy" "example" {
+  domain_id = 12345
+  policies = {
+    "S2951079" = true
+    "S2951081" = false
+  }
+}
+
+# now
+resource "gcore_waap_domain_policy" "example" {
+  for_each = {
+    "S2951079" = true
+    "S2951081" = false
+  }
+
+  domain_id = 12345
+  policy_id = each.key
+  mode      = each.value
+}
+```
+
+Import is not supported yet. Applying the new configuration sets each listed policy to its mode, which is safe
+to repeat. Remove the v0 resource from v0 state (`terraform state rm`) instead of destroying it, so both
+providers never manage the same policy.
+
+{{ .SchemaMarkdown | trimspace }}
+
+{{ if .HasImport }}
+## Import
+
+Import is supported using the following syntax:
+
+{{ codefile "shell" .ImportFile }}
+{{ end }}
