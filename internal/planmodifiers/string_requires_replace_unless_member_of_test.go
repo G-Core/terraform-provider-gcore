@@ -75,13 +75,13 @@ func TestStringRequiresReplaceUnlessMemberOf(t *testing.T) {
 		// The parent listener is being replaced: its id is unknown and the pool
 		// must be replaced with it (the built-in's decision).
 		{name: "unknown config replaces", state: l1, listeners: []string{"l1"}, config: unknown, plan: unknown, wantPlan: unknown, wantReplace: true},
-		{name: "unknown config replaces even when an earlier modifier restored state into the plan", state: l1, listeners: []string{"l1"}, config: unknown, plan: l1, wantPlan: l1, wantReplace: true},
+		{name: "unknown config replaces even when an earlier modifier restored state into the plan", state: l1, listeners: []string{"l1"}, config: unknown, plan: l1, wantPlan: unknown, wantReplace: true},
 		{name: "unchanged does not replace", state: l1, listeners: []string{"l1"}, config: l1, plan: l1, wantPlan: l1},
 		// The multi-listener import: back-fill picked l1, config names l2 -
 		// a true parent, so no replacement and the plan records it.
 		{name: "configured member of the list is accepted in place", state: l1, listeners: []string{"l1", "l2"}, config: l2, plan: l2, wantPlan: l2},
 		{name: "configured non-member replaces", state: l1, listeners: []string{"l1", "l2"}, config: l3, plan: l3, wantPlan: l3, wantReplace: true},
-		// rc.1-poisoned state (recorded "stale", not in the list).
+		// State records a parent the list does not contain.
 		{name: "stale prior + configured member corrects in place", state: types.StringValue("stale"), listeners: []string{"l1"}, config: l1, plan: l1, wantPlan: l1},
 		{name: "stale prior + configured non-member replaces", state: types.StringValue("stale"), listeners: []string{"l1"}, config: l2, plan: l2, wantPlan: l2, wantReplace: true},
 		{name: "null prior + configured member is accepted", state: null, listeners: []string{"l1"}, config: l1, plan: l1, wantPlan: l1},
@@ -126,5 +126,46 @@ func TestStringRequiresReplaceUnlessMemberOf(t *testing.T) {
 	m := planmodifiers.StringRequiresReplaceUnlessMemberOf("listeners", "id")
 	if m.Description(context.Background()) == "" || m.MarkdownDescription(context.Background()) == "" {
 		t.Error("empty description")
+	}
+}
+
+func TestStringRequiresReplaceUnlessMemberOfReturnsRelationshipDiagnostics(t *testing.T) {
+	t.Parallel()
+	ctx := context.Background()
+	s := rschema.Schema{Attributes: map[string]rschema.Attribute{
+		"listener_id": rschema.StringAttribute{Optional: true, Computed: true},
+		"listeners": rschema.ListNestedAttribute{
+			Computed: true,
+			NestedObject: rschema.NestedAttributeObject{Attributes: map[string]rschema.Attribute{
+				"id": rschema.BoolAttribute{Computed: true},
+			}},
+		},
+	}}
+	elemType := tftypes.Object{AttributeTypes: map[string]tftypes.Type{"id": tftypes.Bool}}
+	objType := tftypes.Object{AttributeTypes: map[string]tftypes.Type{
+		"listener_id": tftypes.String,
+		"listeners":   tftypes.List{ElementType: elemType},
+	}}
+	raw := tftypes.NewValue(objType, map[string]tftypes.Value{
+		"listener_id": tftypes.NewValue(tftypes.String, "l1"),
+		"listeners": tftypes.NewValue(tftypes.List{ElementType: elemType}, []tftypes.Value{
+			tftypes.NewValue(elemType, map[string]tftypes.Value{"id": tftypes.NewValue(tftypes.Bool, true)}),
+		}),
+	})
+	req := planmodifier.StringRequest{
+		StateValue:  types.StringValue("l1"),
+		ConfigValue: types.StringValue("l2"),
+		PlanValue:   types.StringValue("l2"),
+		State:       tfsdk.State{Schema: s, Raw: raw},
+		Plan:        tfsdk.Plan{Schema: s, Raw: raw},
+	}
+	resp := &planmodifier.StringResponse{PlanValue: req.PlanValue}
+
+	planmodifiers.StringRequiresReplaceUnlessMemberOf("listeners", "id").PlanModifyString(ctx, req, resp)
+	if !resp.Diagnostics.HasError() {
+		t.Fatal("expected invalid relationship ID diagnostics")
+	}
+	if resp.RequiresReplace {
+		t.Fatal("invalid relationship data must stop the replacement decision")
 	}
 }

@@ -106,6 +106,10 @@ func (r *CloudLoadBalancerPoolResource) Create(ctx context.Context, req resource
 	}
 	resolveHealthmonitorUnknowns(data)
 	dropPhantomHealthmonitor(data)
+	resp.Diagnostics.Append(backfillParentIDs(ctx, data)...)
+	if resp.Diagnostics.HasError() {
+		return
+	}
 
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
 }
@@ -213,6 +217,10 @@ func (r *CloudLoadBalancerPoolResource) Update(ctx context.Context, req resource
 		}
 		resolveHealthmonitorUnknowns(data)
 		dropPhantomHealthmonitor(data)
+		resp.Diagnostics.Append(backfillParentIDs(ctx, data)...)
+		if resp.Diagnostics.HasError() {
+			return
+		}
 		resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
 		return
 	}
@@ -282,6 +290,10 @@ func (r *CloudLoadBalancerPoolResource) Update(ctx context.Context, req resource
 	}
 	resolveHealthmonitorUnknowns(data)
 	dropPhantomHealthmonitor(data)
+	resp.Diagnostics.Append(backfillParentIDs(ctx, data)...)
+	if resp.Diagnostics.HasError() {
+		return
+	}
 
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
 }
@@ -329,6 +341,10 @@ func (r *CloudLoadBalancerPoolResource) Read(ctx context.Context, req resource.R
 		return
 	}
 	refreshHealthmonitor(bytes, data)
+	resp.Diagnostics.Append(refreshParentIDs(ctx, data)...)
+	if resp.Diagnostics.HasError() {
+		return
+	}
 
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
 }
@@ -410,23 +426,10 @@ func (r *CloudLoadBalancerPoolResource) ImportState(ctx context.Context, req res
 		return
 	}
 
-	// Populate listener_id from listeners relationship for proper import.
-	// The API doesn't return listener_id directly, but returns it in the listeners array.
-	// Without this, terraform plan after import would show listener_id changing from null
-	// to the config value, which would force replacement due to RequiresReplace() modifier.
-	// See: GCLOUD2-20778
-	if data.ListenerID.IsNull() || data.ListenerID.IsUnknown() {
-		if !data.Listeners.IsNull() && !data.Listeners.IsUnknown() {
-			listeners, diags := data.Listeners.AsStructSliceT(ctx)
-			if !diags.HasError() && len(listeners) > 0 && !listeners[0].ID.IsNull() {
-				data.ListenerID = listeners[0].ID
-			}
-		}
+	resp.Diagnostics.Append(refreshParentIDs(ctx, data)...)
+	if resp.Diagnostics.HasError() {
+		return
 	}
-	// Note: We intentionally do NOT populate load_balancer_id from loadbalancers relationship.
-	// Users typically create pools with either listener_id OR load_balancer_id, not both.
-	// If we populate load_balancer_id when user's config only has listener_id, it would
-	// cause drift (state has load_balancer_id, config doesn't, triggers replacement).
 
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
 }

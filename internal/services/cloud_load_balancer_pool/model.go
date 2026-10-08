@@ -12,8 +12,8 @@ type CloudLoadBalancerPoolModel struct {
 	ID                   types.String                                                          `tfsdk:"id" json:"id,computed"`
 	ProjectID            types.Int64                                                           `tfsdk:"project_id" path:"project_id,optional"`
 	RegionID             types.Int64                                                           `tfsdk:"region_id" path:"region_id,optional"`
-	ListenerID           types.String                                                          `tfsdk:"listener_id" json:"listener_id,optional,no_refresh"`
-	LoadBalancerID       types.String                                                          `tfsdk:"load_balancer_id" json:"load_balancer_id,optional,no_refresh"`
+	ListenerID           types.String                                                          `tfsdk:"listener_id" json:"listener_id,computed_optional,no_refresh"`
+	LoadBalancerID       types.String                                                          `tfsdk:"load_balancer_id" json:"load_balancer_id,computed_optional,no_refresh"`
 	LbAlgorithm          types.String                                                          `tfsdk:"lb_algorithm" json:"lb_algorithm,required"`
 	Name                 types.String                                                          `tfsdk:"name" json:"name,required"`
 	Protocol             types.String                                                          `tfsdk:"protocol" json:"protocol,required"`

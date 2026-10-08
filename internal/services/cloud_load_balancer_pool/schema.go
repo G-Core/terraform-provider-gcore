@@ -41,14 +41,26 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 				PlanModifiers: []planmodifier.Int64{int64planmodifier.RequiresReplaceIfConfigured()},
 			},
 			"listener_id": schema.StringAttribute{
-				Description:   "Listener ID",
-				Optional:      true,
-				PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown(), planmodifiers.StringRequiresReplaceIfConfiguredPreservingState()},
+				Description: "Listener ID",
+				Computed:    true, // read back from listeners[]; see backfillParentIDs
+				Optional:    true,
+				PlanModifiers: []planmodifier.String{
+					// NOT UseStateForUnknown: a null state plus a coincident change must
+					// plan unknown, not null, because the apply-time back-fill resolves it.
+					stringplanmodifier.UseNonNullStateForUnknown(),
+					// Shared pools list several default listeners; the API does not
+					// mark L7-only entries, so every listed listener stays in place.
+					planmodifiers.StringRequiresReplaceUnlessMemberOf("listeners", "id"),
+				},
 			},
 			"load_balancer_id": schema.StringAttribute{
-				Description:   "Loadbalancer ID",
-				Optional:      true,
-				PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown(), planmodifiers.StringRequiresReplaceIfConfiguredPreservingState()},
+				Description: "Loadbalancer ID",
+				Computed:    true, // read back from loadbalancers[]; see backfillParentIDs
+				Optional:    true,
+				PlanModifiers: []planmodifier.String{
+					stringplanmodifier.UseNonNullStateForUnknown(),
+					planmodifiers.StringRequiresReplaceUnlessMemberOf("loadbalancers", "id"),
+				},
 			},
 			"lb_algorithm": schema.StringAttribute{
 				Description: "Load balancer algorithm\nAvailable values: \"LEAST_CONNECTIONS\", \"ROUND_ROBIN\", \"SOURCE_IP\".",

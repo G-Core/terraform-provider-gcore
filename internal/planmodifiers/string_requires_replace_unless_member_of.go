@@ -36,10 +36,9 @@ import (
 //   - otherwise: replacement, the framework's RequiresReplaceIfConfigured
 //     decision.
 //
-// A prior value the list does not contain (recorded by an earlier provider
-// version without being applied) is left alone when the configuration does
-// not touch it; a configuration naming a listed parent corrects the record in
-// place, any other value replaces.
+// A prior value the list does not contain is left alone when the
+// configuration restates it; Terraform ignores a replacement for an unchanged
+// value. The resource's Read must replace such a value with a listed one.
 func StringRequiresReplaceUnlessMemberOf(listAttribute, idAttribute string) planmodifier.String {
 	return stringRequiresReplaceUnlessMemberOfModifier{listAttribute: listAttribute, idAttribute: idAttribute}
 }
@@ -68,6 +67,7 @@ func (m stringRequiresReplaceUnlessMemberOfModifier) PlanModifyString(ctx contex
 	// chain may already have copied prior state over an unknown configured
 	// value, and an unknown parent must replace regardless of that.
 	if req.ConfigValue.IsUnknown() {
+		resp.PlanValue = req.ConfigValue
 		resp.RequiresReplace = true
 		return
 	}
@@ -98,26 +98,62 @@ func listedIDs(ctx context.Context, from tfsdk.State, listAttribute, idAttribute
 		return nil, diags
 	}
 	raw, err := list.ToTerraformValue(ctx)
-	if err != nil || !raw.IsKnown() || raw.IsNull() {
+	if err != nil {
+		diags.AddAttributeError(
+			path.Root(listAttribute),
+			"Unable to inspect relationship list",
+			fmt.Sprintf("Could not convert %s to a Terraform value: %s", listAttribute, err),
+		)
+		return nil, diags
+	}
+	if !raw.IsKnown() || raw.IsNull() {
 		return nil, diags
 	}
 	var elems []tftypes.Value
 	if err := raw.As(&elems); err != nil {
+		diags.AddAttributeError(
+			path.Root(listAttribute),
+			"Unable to inspect relationship list",
+			fmt.Sprintf("Could not convert %s to a list: %s", listAttribute, err),
+		)
 		return nil, diags
 	}
 	var out []string
-	for _, e := range elems {
+	for i, e := range elems {
 		if !e.IsKnown() || e.IsNull() {
 			continue
 		}
 		var fields map[string]tftypes.Value
 		if err := e.As(&fields); err != nil {
+			diags.AddAttributeError(
+				path.Root(listAttribute),
+				"Unable to inspect relationship list",
+				fmt.Sprintf("Could not convert %s element %d to an object: %s", listAttribute, i, err),
+			)
+			return nil, diags
+		}
+		v, ok := fields[idAttribute]
+		if !ok {
+			diags.AddAttributeError(
+				path.Root(listAttribute),
+				"Unable to inspect relationship list",
+				fmt.Sprintf("The %s element %d has no %s attribute.", listAttribute, i, idAttribute),
+			)
+			return nil, diags
+		}
+		if !v.IsKnown() || v.IsNull() {
 			continue
 		}
 		var id string
-		if v, ok := fields[idAttribute]; ok && v.IsKnown() && !v.IsNull() && v.As(&id) == nil {
-			out = append(out, id)
+		if err := v.As(&id); err != nil {
+			diags.AddAttributeError(
+				path.Root(listAttribute).AtListIndex(i).AtName(idAttribute),
+				"Unable to inspect relationship ID",
+				fmt.Sprintf("Could not convert %s to a string: %s", idAttribute, err),
+			)
+			return nil, diags
 		}
+		out = append(out, id)
 	}
 	return out, diags
 }
