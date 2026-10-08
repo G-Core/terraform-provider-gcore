@@ -70,6 +70,14 @@ jobs:
     runs-on: ubuntu-latest
     if: github.event_name != 'push' || github.event.head_commit.message != 'codegen metadata'
     steps:
+      # `go test ./...` links the whole provider into every test binary; the build cache alone is ~5 GB and
+      # runs out of runner disk. Drop preinstalled toolchains the job never uses.
+      - name: Free runner disk
+        run: |
+          df -h /
+          sudo rm -rf /usr/share/dotnet /opt/ghc /usr/local/.ghcup /opt/hostedtoolcache/CodeQL
+          df -h /
+
       # Pinned checkout keeps source retrieval reproducible while using the latest stable fixes.
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
