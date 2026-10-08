@@ -9,7 +9,6 @@ import (
 	"github.com/G-Core/terraform-provider-gcore/internal/planmodifiers"
 	"github.com/hashicorp/terraform-plugin-framework-jsontypes/jsontypes"
 	"github.com/hashicorp/terraform-plugin-framework-validators/int64validator"
-	"github.com/hashicorp/terraform-plugin-framework-validators/resourcevalidator"
 	"github.com/hashicorp/terraform-plugin-framework-validators/setvalidator"
 	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
 	"github.com/hashicorp/terraform-plugin-framework/path"
@@ -47,11 +46,9 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 				Optional:      true,
 				PlanModifiers: []planmodifier.Int64{int64planmodifier.RequiresReplace()},
 			},
-			"origin": schema.StringAttribute{
-				Description:   "IP address or domain name of the origin and the port, if custom port is used.\n\nYou can use either the `origin` or `originGroup` parameter in the request.",
-				Computed:      true,
-				Optional:      true,
-				PlanModifiers: []planmodifier.String{planmodifiers.StringUseStateForUnknownInclNull(), planmodifiers.StringRequiresReplaceIfConfiguredPreservingState()},
+			"origin_group": schema.Int64Attribute{
+				Description: "ID of the origin group with which the CDN resource is associated. Manage the origin group with the `gcore_cdn_origin_group` resource.",
+				Required:    true,
 			},
 			"description": schema.StringAttribute{
 				Description:   "Optional comment describing the CDN resource.",
@@ -70,12 +67,6 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 				Computed:      true,
 				Optional:      true,
 				PlanModifiers: []planmodifier.String{planmodifiers.StringUseStateForUnknownInclNull()},
-			},
-			"origin_group": schema.Int64Attribute{
-				Description:   "Origin group ID with which the CDN resource is associated.\n\nYou can use either the `origin` or `originGroup` parameter in the request.",
-				Computed:      true,
-				Optional:      true,
-				PlanModifiers: []planmodifier.Int64{int64planmodifier.UseStateForUnknown()},
 			},
 			"origin_protocol": schema.StringAttribute{
 				Description: "Protocol used by CDN servers to request content from an origin source.\n\nPossible values:\n- **HTTPS** - CDN servers will connect to the origin via HTTPS.\n- **HTTP** - CDN servers will connect to the origin via HTTP.\n- **MATCH** - connection protocol will be chosen automatically (content on the origin source should be available for the CDN both through HTTP and HTTPS).\n\nIf protocol is not specified, HTTP is used to connect to an origin server.\nAvailable values: \"HTTP\", \"HTTPS\", \"MATCH\".",
@@ -1399,7 +1390,7 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 			"origin_group_name": schema.StringAttribute{
 				Description:   "Origin group name.",
 				Computed:      true,
-				PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
+				PlanModifiers: []planmodifier.String{planmodifiers.StringUseStateUnlessAttributesChange("origin_group")},
 			},
 			"preset_applied": schema.BoolAttribute{
 				Description:   "Defines whether the CDN resource has a preset applied.\n\nPossible values:\n- **true** - CDN resource has a preset applied. CDN resource options included in the preset cannot be edited.\n- **false** - CDN resource does not have a preset applied.",
@@ -1462,11 +1453,5 @@ func (r *CDNResourceResource) Schema(ctx context.Context, req resource.SchemaReq
 }
 
 func (r *CDNResourceResource) ConfigValidators(_ context.Context) []resource.ConfigValidator {
-	return []resource.ConfigValidator{
-		// Either origin or origin_group must be specified, but not both.
-		resourcevalidator.ExactlyOneOf(
-			path.MatchRoot("origin"),
-			path.MatchRoot("origin_group"),
-		),
-	}
+	return []resource.ConfigValidator{}
 }

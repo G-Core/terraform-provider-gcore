@@ -36,36 +36,6 @@ func TestKeepKeys(t *testing.T) {
 	}
 }
 
-func TestStripKeys(t *testing.T) {
-	t.Parallel()
-
-	tests := []struct {
-		name    string
-		body    string
-		keys    []string
-		want    string
-		wantErr bool
-	}{
-		{name: "drops listed", body: `{"a":1,"origin":"x"}`, keys: []string{"origin"}, want: `{"a":1}`},
-		{name: "only listed", body: `{"origin":"x"}`, keys: []string{"origin"}, want: `{}`},
-		{name: "absent key is fine", body: `{"a":1}`, keys: []string{"origin"}, want: `{"a":1}`},
-		{name: "null passes through", body: `null`, keys: []string{"origin"}, want: `null`},
-		{name: "invalid json errors", body: `[`, keys: []string{"origin"}, wantErr: true},
-	}
-	for _, tc := range tests {
-		t.Run(tc.name, func(t *testing.T) {
-			t.Parallel()
-			got, err := importadoption.StripKeys([]byte(tc.body), tc.keys...)
-			if (err != nil) != tc.wantErr {
-				t.Fatalf("err = %v, wantErr %v", err, tc.wantErr)
-			}
-			if !tc.wantErr && string(got) != tc.want {
-				t.Errorf("StripKeys = %s, want %s", got, tc.want)
-			}
-		})
-	}
-}
-
 func TestIsEmptyBody(t *testing.T) {
 	t.Parallel()
 

@@ -119,7 +119,7 @@ func AssertOrderInMethod(t testing.TB, resourceGoPath, receiver, method, first, 
 // and that at least one such call exists. %T pins the modifier type but not
 // its constructor: a hand-resolved seal that passes the wrong private-state
 // key, watches the wrong sibling attribute, swaps in a sibling constructor of
-// the same type (...AllowingRemoval), or re-emits the framework's
+// the same type, or re-emits the framework's
 // RequiresReplace() where RequiresReplaceIfConfigured() was (same %T) is
 // invisible to it. The callee is matched whole, so a longer sibling name
 // never satisfies the pin for the shorter one.

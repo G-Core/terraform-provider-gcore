@@ -27,22 +27,6 @@ func KeepKeys(body []byte, keys ...string) ([]byte, error) {
 	return json.Marshal(kept)
 }
 
-// StripKeys drops top-level keys from a JSON object body. Used where the PATCH
-// endpoint accepts many keys but never this one (cdn: origin).
-func StripKeys(body []byte, keys ...string) ([]byte, error) {
-	var obj map[string]json.RawMessage
-	if err := json.Unmarshal(body, &obj); err != nil {
-		return nil, err
-	}
-	if obj == nil {
-		return body, nil
-	}
-	for _, k := range keys {
-		delete(obj, k)
-	}
-	return json.Marshal(obj)
-}
-
 // IsEmptyBody reports a body that carries nothing to send.
 func IsEmptyBody(body []byte) bool {
 	s := strings.TrimSpace(string(body))

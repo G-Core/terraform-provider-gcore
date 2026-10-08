@@ -51,7 +51,7 @@ func volumeTransport([]string) string {
 }
 
 // refuseAdoptionWithoutSource is the volume's fail-closed half of the plan-time
-// adoption hook. cdn verifies every adopted value in Update; the volume cannot
+// adoption hook. The volume cannot verify every adopted value in Update
 // (source, snapshot_id and attachment_tag are unverifiable, see
 // volumeTransport), so the one update shape in which an adopting apply can
 // record the other create-only attributes without ever recording source - the

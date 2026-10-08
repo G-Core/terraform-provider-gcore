@@ -18,11 +18,10 @@ type CDNResourceModel struct {
 	ID                 types.Int64                                       `tfsdk:"id" json:"id,computed"`
 	Cname              types.String                                      `tfsdk:"cname" json:"cname,required"`
 	PrimaryResource    types.Int64                                       `tfsdk:"primary_resource" json:"primary_resource,optional"`
-	Origin             types.String                                      `tfsdk:"origin" json:"origin,computed_optional,no_refresh"`
+	OriginGroup        types.Int64                                       `tfsdk:"origin_group" json:"originGroup,required"`
 	Active             types.Bool                                        `tfsdk:"active" json:"active,computed_optional"`
 	Description        types.String                                      `tfsdk:"description" json:"description,computed_optional"`
 	Name               types.String                                      `tfsdk:"name" json:"name,computed_optional"`
-	OriginGroup        types.Int64                                       `tfsdk:"origin_group" json:"originGroup,computed_optional"`
 	OriginProtocol     types.String                                      `tfsdk:"origin_protocol" json:"originProtocol,computed_optional"`
 	ProxySslCa         types.Int64                                       `tfsdk:"proxy_ssl_ca" json:"proxy_ssl_ca,computed_optional"`
 	ProxySslData       types.Int64                                       `tfsdk:"proxy_ssl_data" json:"proxy_ssl_data,computed_optional"`

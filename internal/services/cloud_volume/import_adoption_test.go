@@ -64,9 +64,8 @@ var adoptingAttributes = []string{"source", "attachment_tag", "image_id", "insta
 // resolves, not null, which it would contradict), the case-folding modifier
 // before the framework's RequiresReplaceIfConfigured. Every constructor is
 // pinned by its exact callee as well as by %T: the framework's
-// RequiresReplace() and RequiresReplaceIfConfigured() share a type, as do
-// our plain and ...AllowingRemoval adopting constructors, so %T alone lets a
-// reseal swap the rule while keeping the pin green.
+// RequiresReplace() and RequiresReplaceIfConfigured() share a type, so %T
+// alone lets a reseal swap the rule while keeping the pin green.
 func TestSchemaModifiersPinned(t *testing.T) {
 	t.Parallel()
 
@@ -74,9 +73,8 @@ func TestSchemaModifiersPinned(t *testing.T) {
 	adoptiontest.AssertAdoptingModifiers(t, attrs, adoptingAttributes...)
 	// %T cannot see the constructor argument: each call must carry this
 	// resource's marker key, or the modifier reads a key nothing writes and
-	// every import plans a replacement. Nor can it see the allowRemoval flag:
-	// the exact callee (not ...AllowingRemoval) is pinned here and the removal
-	// row itself in TestRemovalReplacesThroughChain.
+	// every import plans a replacement. The exact callee is pinned here and the
+	// removal row itself in TestRemovalReplacesThroughChain.
 	for _, name := range adoptingAttributes {
 		adoptiontest.AssertAttributeCallArgs(t, "schema.go", name, "planmodifiers.StringRequiresReplaceUnlessAdopting", "importAdoption.Key")
 	}
@@ -102,10 +100,9 @@ func TestSchemaModifiersPinned(t *testing.T) {
 // TestRemovalReplacesThroughChain runs removal - config and plan null over a
 // known prior value, no marker - through each adopting attribute's real
 // PlanModifiers chain and asserts a replacement. %T and the exact-callee pin
-// both live in this package's tests; this is the behavioural mirror of cdn's
-// handover-shape test, and it is what fails when a seal resolution copies
-// cdn's ...AllowingRemoval constructor into the volume: there removal would
-// silently drop the record instead of replacing.
+// both live in this package's tests; this is the behavioural check that fails
+// when a seal resolution swaps in a modifier that honours removal in place:
+// there removal would silently drop the record instead of replacing.
 func TestRemovalReplacesThroughChain(t *testing.T) {
 	t.Parallel()
 	ctx := context.Background()

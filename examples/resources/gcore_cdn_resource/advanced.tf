@@ -11,7 +11,6 @@ resource "gcore_cdn_resource" "example" {
   cname           = "cdn.example.com"
   origin_group    = gcore_cdn_origin_group.example.id
   origin_protocol = "HTTPS"
-  ssl_enabled     = true
   active          = true
   description     = "CDN resource with advanced options"
 
@@ -38,10 +37,6 @@ resource "gcore_cdn_resource" "example" {
     ignore_query_string = {
       enabled = true
       value   = false
-    }
-    slice = {
-      enabled = true
-      value   = true
     }
     stale = {
       enabled = true

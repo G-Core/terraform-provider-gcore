@@ -203,6 +203,9 @@ func TestSchemaPinHelpersSelfCheck(t *testing.T) {
 	}
 }
 
+// schemaFixture is parsed, never compiled: "origin" carries a synthetic
+// longer-named sibling of StringRequiresReplaceUnlessAdopting so the self-check
+// can prove callee names are matched whole.
 const schemaFixture = `package x
 
 func ResourceSchema(ctx context.Context) schema.Schema {

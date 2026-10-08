@@ -10,6 +10,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-testing/compare"
 	"github.com/hashicorp/terraform-plugin-testing/helper/resource"
 	"github.com/hashicorp/terraform-plugin-testing/knownvalue"
+	"github.com/hashicorp/terraform-plugin-testing/plancheck"
 	"github.com/hashicorp/terraform-plugin-testing/statecheck"
 	"github.com/hashicorp/terraform-plugin-testing/terraform"
 	"github.com/hashicorp/terraform-plugin-testing/tfjsonpath"
@@ -77,6 +78,46 @@ func TestAccCDNResource_update(t *testing.T) {
 						"gcore_cdn_resource.test",
 						tfjsonpath.New("id"),
 					),
+				},
+			},
+		},
+	})
+}
+
+// TestAccCDNResource_switchOriginGroup moves a CDN resource to another origin
+// group in place. origin_group_name follows the group, so the plan must not
+// carry the old name over.
+func TestAccCDNResource_switchOriginGroup(t *testing.T) {
+	rName := acctest.RandomName()
+	cname := rName + ".example.com"
+
+	compareIDSame := statecheck.CompareValue(compare.ValuesSame())
+
+	resource.ParallelTest(t, resource.TestCase{
+		PreCheck:                 func() { acctest.PreCheck(t) },
+		ProtoV6ProviderFactories: acctest.ProtoV6ProviderFactories,
+		CheckDestroy:             testAccCheckCDNResourceDestroy,
+		Steps: []resource.TestStep{
+			{
+				Config: testAccCDNResourceConfigTwoGroups(rName, cname, "a"),
+				ConfigStateChecks: []statecheck.StateCheck{
+					statecheck.ExpectKnownValue("gcore_cdn_resource.test",
+						tfjsonpath.New("origin_group_name"), knownvalue.StringExact(rName+"-a")),
+					compareIDSame.AddStateValue("gcore_cdn_resource.test", tfjsonpath.New("id")),
+				},
+			},
+			{
+				Config: testAccCDNResourceConfigTwoGroups(rName, cname, "b"),
+				ConfigPlanChecks: resource.ConfigPlanChecks{
+					PreApply: []plancheck.PlanCheck{
+						plancheck.ExpectResourceAction("gcore_cdn_resource.test", plancheck.ResourceActionUpdate),
+						plancheck.ExpectUnknownValue("gcore_cdn_resource.test", tfjsonpath.New("origin_group_name")),
+					},
+				},
+				ConfigStateChecks: []statecheck.StateCheck{
+					statecheck.ExpectKnownValue("gcore_cdn_resource.test",
+						tfjsonpath.New("origin_group_name"), knownvalue.StringExact(rName+"-b")),
+					compareIDSame.AddStateValue("gcore_cdn_resource.test", tfjsonpath.New("id")),
 				},
 			},
 		},
@@ -153,4 +194,30 @@ resource "gcore_cdn_resource" "test" {
   origin_group = gcore_cdn_origin_group.test.id
   description  = %[3]q
 }`, name, cname, description)
+}
+
+func testAccCDNResourceConfigTwoGroups(name, cname, use string) string {
+	return fmt.Sprintf(`
+resource "gcore_cdn_origin_group" "a" {
+  name = "%[1]s-a"
+  sources = [
+    {
+      source = "example.com"
+    }
+  ]
+}
+
+resource "gcore_cdn_origin_group" "b" {
+  name = "%[1]s-b"
+  sources = [
+    {
+      source = "example.org"
+    }
+  ]
+}
+
+resource "gcore_cdn_resource" "test" {
+  cname        = %[2]q
+  origin_group = gcore_cdn_origin_group.%[3]s.id
+}`, name, cname, use)
 }

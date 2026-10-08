@@ -96,22 +96,8 @@ func StringRequiresReplaceUnlessAdopting(privateKey string) planmodifier.String 
 	return stringRequiresReplaceUnlessAdoptingModifier{privateKey: privateKey}
 }
 
-// StringRequiresReplaceUnlessAdoptingAllowingRemoval is
-// StringRequiresReplaceUnlessAdopting for a create-only attribute whose
-// removal from configuration is honoured in place because a sibling takes
-// over - the plan modifier before this one plans null for it and the sibling
-// carries the change (cdn_resource origin -> origin_group, where ExactlyOneOf
-// guarantees the sibling is configured whenever this one is not). A null
-// planned value on a live resource therefore does not force replacement;
-// every other row of the decision is unchanged, including "set on day two
-// without a marker replaces".
-func StringRequiresReplaceUnlessAdoptingAllowingRemoval(privateKey string) planmodifier.String {
-	return stringRequiresReplaceUnlessAdoptingModifier{privateKey: privateKey, allowRemoval: true}
-}
-
 type stringRequiresReplaceUnlessAdoptingModifier struct {
-	privateKey   string
-	allowRemoval bool
+	privateKey string
 }
 
 func (m stringRequiresReplaceUnlessAdoptingModifier) Description(_ context.Context) string {
@@ -127,12 +113,6 @@ func (m stringRequiresReplaceUnlessAdoptingModifier) PlanModifyString(ctx contex
 	resp.Diagnostics.Append(diags...)
 
 	if resp.Diagnostics.HasError() {
-		return
-	}
-
-	if m.allowRemoval && req.PlanValue.IsNull() && !req.Plan.Raw.IsNull() {
-		// Handed over to the sibling attribute: an in-place update, see
-		// StringRequiresReplaceUnlessAdoptingAllowingRemoval.
 		return
 	}
 

@@ -154,50 +154,6 @@ func TestStringRequiresReplaceUnlessAdopting(t *testing.T) {
 	}
 }
 
-// TestStringRequiresReplaceUnlessAdoptingAllowingRemoval: identical to the
-// plain String variant on every row except removal, with or without an
-// adoption marker, which is honoured in place because a sibling attribute
-// takes over (cdn_resource origin).
-func TestStringRequiresReplaceUnlessAdoptingAllowingRemoval(t *testing.T) {
-	t.Parallel()
-
-	pick := map[string]types.String{
-		"null":    types.StringNull(),
-		"unknown": types.StringUnknown(),
-		"one":     types.StringValue("one"),
-		"two":     types.StringValue("two"),
-	}
-
-	for _, tt := range adoptionCases {
-		want := tt.want
-		if tt.planKind == "null" {
-			want = false
-		}
-		t.Run(tt.name, func(t *testing.T) {
-			t.Parallel()
-
-			state, plan := adoptionRequestShape(tt)
-			req := planmodifier.StringRequest{
-				StateValue:  pick[tt.stateKind],
-				PlanValue:   pick[tt.planKind],
-				ConfigValue: pick[tt.planKind],
-				State:       state,
-				Plan:        plan,
-			}
-			markIfAdopting(t, tt, &req)
-			resp := &planmodifier.StringResponse{PlanValue: req.PlanValue}
-			planmodifiers.StringRequiresReplaceUnlessAdoptingAllowingRemoval(adoptionKey).PlanModifyString(context.Background(), req, resp)
-
-			if resp.Diagnostics.HasError() {
-				t.Fatalf("unexpected error diagnostics: %v", resp.Diagnostics)
-			}
-			if resp.RequiresReplace != want {
-				t.Errorf("RequiresReplace = %v, want %v", resp.RequiresReplace, want)
-			}
-		})
-	}
-}
-
 func TestBoolRequiresReplaceUnlessAdopting(t *testing.T) {
 	t.Parallel()
 
