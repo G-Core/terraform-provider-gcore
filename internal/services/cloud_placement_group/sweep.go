@@ -4,12 +4,8 @@ import (
 	"context"
 	"fmt"
 	"log"
-	"os"
-	"strconv"
 
-	"github.com/G-Core/gcore-go"
 	"github.com/G-Core/gcore-go/cloud"
-	"github.com/G-Core/gcore-go/option"
 	"github.com/G-Core/gcore-go/packages/param"
 	"github.com/hashicorp/terraform-plugin-testing/helper/resource"
 
@@ -24,34 +20,31 @@ func init() {
 }
 
 func sweepCloudPlacementGroups(_ string) error {
-	if err := sweep.ValidateSweeperEnvironment(); err != nil {
+	const resourceType = "gcore_cloud_placement_group"
+	defer sweep.Finish(resourceType)
+
+	ctx := context.Background()
+	target, err := sweep.Resolve(ctx)
+	if err != nil {
 		return err
 	}
 
-	apiKey := os.Getenv("GCORE_API_KEY")
-	projectIDStr := os.Getenv("GCORE_CLOUD_PROJECT_ID")
-	projectID, err := strconv.ParseInt(projectIDStr, 10, 64)
-	if err != nil {
-		return fmt.Errorf("failed to parse GCORE_CLOUD_PROJECT_ID: %w", err)
-	}
-	regionIDStr := os.Getenv("GCORE_CLOUD_REGION_ID")
-	regionID, err := strconv.ParseInt(regionIDStr, 10, 64)
-	if err != nil {
-		return fmt.Errorf("failed to parse GCORE_CLOUD_REGION_ID: %w", err)
-	}
-
-	client := gcore.NewClient(
-		option.WithAPIKey(apiKey),
-		option.WithCloudProjectID(projectID),
-	)
-
-	ctx := context.Background()
-
-	groups, err := client.Cloud.PlacementGroups.List(ctx, cloud.PlacementGroupListParams{
-		ProjectID: param.NewOpt(projectID),
-		RegionID:  param.NewOpt(regionID),
+	// Collect first, delete second. Deleting while iterating an
+	// offset-paginated collection shifts it, so the next offset skips exactly
+	// as many items as were removed.
+	var doomed []cloud.PlacementGroup
+	iter := target.Client.Cloud.PlacementGroups.ListAutoPaging(ctx, cloud.PlacementGroupListParams{
+		ProjectID: param.NewOpt(target.ProjectID),
+		RegionID:  param.NewOpt(target.RegionID),
 	})
-	if err != nil {
+	for iter.Next() {
+		group := iter.Current()
+		sweep.RecordListed(resourceType, 1)
+		if sweep.ShouldSweep(resourceType, group.Name) {
+			doomed = append(doomed, group)
+		}
+	}
+	if err := iter.Err(); err != nil {
 		if sweep.SkipSweepError(err) {
 			log.Printf("[WARN] Skipping placement group sweep: %s", err)
 			return nil
@@ -59,22 +52,16 @@ func sweepCloudPlacementGroups(_ string) error {
 		return fmt.Errorf("error listing placement groups: %w", err)
 	}
 
-	for _, group := range groups.Results {
-		name := group.Name
-		id := group.ServergroupID
-
-		if !sweep.ShouldSweep("gcore_cloud_placement_group", name) {
+	for _, group := range doomed {
+		log.Printf("[INFO] Deleting placement group: %s (%s)", group.Name, group.ServergroupID)
+		if _, err := target.Client.Cloud.PlacementGroups.Delete(ctx, group.ServergroupID, cloud.PlacementGroupDeleteParams{
+			ProjectID: param.NewOpt(target.ProjectID),
+			RegionID:  param.NewOpt(target.RegionID),
+		}); err != nil {
+			sweep.RecordFailure(resourceType, group.Name, err)
 			continue
 		}
-
-		log.Printf("[INFO] Deleting placement group: %s (%s)", name, id)
-		_, err := client.Cloud.PlacementGroups.Delete(ctx, id, cloud.PlacementGroupDeleteParams{
-			ProjectID: param.NewOpt(projectID),
-			RegionID:  param.NewOpt(regionID),
-		})
-		if err != nil {
-			log.Printf("[ERROR] Failed to delete placement group %s: %s", name, err)
-		}
+		sweep.RecordDeleted(resourceType, group.Name)
 	}
 
 	return nil

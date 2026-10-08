@@ -69,6 +69,15 @@ func RecordFailure(resourceType, name string, err error) {
 	log.Printf("[ERROR] Failed to delete %s %s: %s", resourceType, name, err)
 }
 
+// RecordSkipped notes a resource a sweeper saw and deliberately left alone
+// after it passed the ownership check -- an address still attached, a group
+// still referenced. Without it those resources appear in listed but in
+// neither matched nor skipped, and the counts stop adding up.
+func RecordSkipped(resourceType, name, reason string) {
+	log.Printf("[INFO] Skipping %s: %s (%s)", resourceType, name, reason)
+	recordSkip(resourceType)
+}
+
 // recordSkip notes a resource left alone, whatever the reason.
 func recordSkip(resourceType string) {
 	mu.Lock()

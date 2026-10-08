@@ -155,6 +155,7 @@ The following documented items do **not exist yet** and must be created if neede
 | `GCORE_ACCTEST_RUN_ID` | set by scripts/acctest | Identifies the run creating resources; see below |
 | `GCORE_SWEEP_RUN_ID` | yes, to delete tokenized resources | The finished run a sweep may reclaim. Unset means no tokenized resource is swept |
 | `GCORE_SWEEP_ACCOUNT_ID` | yes, for any sweep | The account the credentials must resolve to. Every sweeper refuses to run without it or on a mismatch. Checked once per sweep with one API call |
+| `GCORE_POLLING_TIMEOUT_SECONDS` | no | Longest a single create or delete may poll. `scripts/acctest` sets 1200; sweeps default to 600. Keep it well inside the `go test -timeout`, since hitting that deadline panics past cleanup and reporting |
 | `GCORE_SWEEP_UNTOKENIZED` | no | Sweeps test-prefixed names carrying no token, ignoring `GCORE_SWEEP_RUN_ID`. Never applies to resources with no name. For a one-time project audit, not routine use |
 | `GCORE_SWEEP_ALL_RESERVED_FIXED_IPS` | no | Deletes every external reserved fixed IP in the `DOWN` state in the project, with no ownership check -- that family can carry none. Bounded by the list call being project-scoped. Unset means the sweeper deletes nothing |
 

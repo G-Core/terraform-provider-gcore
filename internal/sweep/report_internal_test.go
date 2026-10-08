@@ -51,6 +51,24 @@ func TestFinalExitCode(t *testing.T) {
 	})
 }
 
+// A resource that passes the ownership check but is deliberately left alone
+// must still be counted, or listed stops equalling matched plus skipped.
+func TestRecordSkippedCountsDeliberateSkips(t *testing.T) {
+	reset()
+	RecordListed("gcore_cloud_floating_ip", 2)
+	RecordSkipped("gcore_cloud_floating_ip", "fip-1", "still attached")
+	RecordDeleted("gcore_cloud_floating_ip", "fip-2")
+
+	c := count("gcore_cloud_floating_ip")
+	if c.skipped != 1 || c.matched+c.skipped != c.listed {
+		t.Errorf("listed=%d matched=%d skipped=%d, want skipped=1 and matched+skipped=listed",
+			c.listed, c.matched, c.skipped)
+	}
+	if got := FinalExitCode(); got != 0 {
+		t.Errorf("FinalExitCode() = %d, want 0: a deliberate skip is not a failure", got)
+	}
+}
+
 func TestSkipSweepError(t *testing.T) {
 	apiErr := func(status int) error {
 		return &gcore.Error{StatusCode: status}

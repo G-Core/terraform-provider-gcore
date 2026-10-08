@@ -4,12 +4,8 @@ import (
 	"context"
 	"fmt"
 	"log"
-	"os"
-	"strconv"
 
-	"github.com/G-Core/gcore-go"
 	"github.com/G-Core/gcore-go/cloud"
-	"github.com/G-Core/gcore-go/option"
 	"github.com/G-Core/gcore-go/packages/param"
 	"github.com/hashicorp/terraform-plugin-testing/helper/resource"
 
@@ -24,32 +20,31 @@ func init() {
 }
 
 func sweepCloudVolumeSnapshots(_ string) error {
-	if err := sweep.ValidateSweeperEnvironment(); err != nil {
+	const resourceType = "gcore_cloud_volume_snapshot"
+	defer sweep.Finish(resourceType)
+
+	ctx := context.Background()
+	target, err := sweep.Resolve(ctx)
+	if err != nil {
 		return err
 	}
 
-	apiKey := os.Getenv("GCORE_API_KEY")
-	projectID, err := strconv.ParseInt(os.Getenv("GCORE_CLOUD_PROJECT_ID"), 10, 64)
-	if err != nil {
-		return fmt.Errorf("failed to parse GCORE_CLOUD_PROJECT_ID: %w", err)
-	}
-	regionID, err := strconv.ParseInt(os.Getenv("GCORE_CLOUD_REGION_ID"), 10, 64)
-	if err != nil {
-		return fmt.Errorf("failed to parse GCORE_CLOUD_REGION_ID: %w", err)
-	}
-
-	client := gcore.NewClient(
-		option.WithAPIKey(apiKey),
-		option.WithCloudProjectID(projectID),
-	)
-
-	ctx := context.Background()
-
-	page, err := client.Cloud.VolumeSnapshots.List(ctx, cloud.VolumeSnapshotListParams{
-		ProjectID: param.NewOpt(projectID),
-		RegionID:  param.NewOpt(regionID),
+	// Collect first, delete second. Deleting while iterating an
+	// offset-paginated collection shifts it, so the next offset skips exactly
+	// as many items as were removed.
+	var doomed []cloud.Snapshot
+	iter := target.Client.Cloud.VolumeSnapshots.ListAutoPaging(ctx, cloud.VolumeSnapshotListParams{
+		ProjectID: param.NewOpt(target.ProjectID),
+		RegionID:  param.NewOpt(target.RegionID),
 	})
-	if err != nil {
+	for iter.Next() {
+		snapshot := iter.Current()
+		sweep.RecordListed(resourceType, 1)
+		if sweep.ShouldSweep(resourceType, snapshot.Name) {
+			doomed = append(doomed, snapshot)
+		}
+	}
+	if err := iter.Err(); err != nil {
 		if sweep.SkipSweepError(err) {
 			log.Printf("[WARN] Skipping volume snapshot sweep: %s", err)
 			return nil
@@ -57,22 +52,16 @@ func sweepCloudVolumeSnapshots(_ string) error {
 		return fmt.Errorf("error listing volume snapshots: %w", err)
 	}
 
-	for _, snapshot := range page.Results {
-		name := snapshot.Name
-		id := snapshot.ID
-
-		if !sweep.ShouldSweep("gcore_cloud_volume_snapshot", name) {
+	for _, snapshot := range doomed {
+		log.Printf("[INFO] Deleting volume snapshot: %s (%s)", snapshot.Name, snapshot.ID)
+		if err := target.Client.Cloud.VolumeSnapshots.DeleteAndPoll(ctx, snapshot.ID, cloud.VolumeSnapshotDeleteParams{
+			ProjectID: param.NewOpt(target.ProjectID),
+			RegionID:  param.NewOpt(target.RegionID),
+		}); err != nil {
+			sweep.RecordFailure(resourceType, snapshot.Name, err)
 			continue
 		}
-
-		log.Printf("[INFO] Deleting volume snapshot: %s (%s)", name, id)
-		err := client.Cloud.VolumeSnapshots.DeleteAndPoll(ctx, id, cloud.VolumeSnapshotDeleteParams{
-			ProjectID: param.NewOpt(projectID),
-			RegionID:  param.NewOpt(regionID),
-		})
-		if err != nil {
-			log.Printf("[ERROR] Failed to delete volume snapshot %s: %s", name, err)
-		}
+		sweep.RecordDeleted(resourceType, snapshot.Name)
 	}
 
 	return nil

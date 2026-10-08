@@ -4,5 +4,9 @@ set -e
 
 cd "$(dirname "$0")/.."
 
+# Same reason as scripts/acctest: this script did not set GOPRIVATE, so the
+# private SDK could resolve through the public proxy.
+export GOPRIVATE="${GOPRIVATE:+$GOPRIVATE,}github.com/G-Core/gcore-go,github.com/G-Core/gcore-go-staging"
+
 echo "==> Running sweepers"
 go test ./internal/sweep -v -sweep=all -sweep-allow-failures -timeout 30m

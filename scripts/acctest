@@ -4,6 +4,29 @@ set -e
 
 cd "$(dirname "$0")/.."
 
+# Mark the private SDK modules so they don't resolve through the public proxy.
+# scripts/test and scripts/lint already do this; this script did not, so a run
+# outside CI could fail to fetch the staging SDK or pick up a stale version.
+export GOPRIVATE="${GOPRIVATE:+$GOPRIVATE,}github.com/G-Core/gcore-go,github.com/G-Core/gcore-go-staging"
+
+# -p caps how many package binaries run at once, -parallel how many tests run
+# inside one binary; the product is how many resources exist simultaneously.
+# Without -p, `./...` fans out to GOMAXPROCS packages, so the real figure moved
+# with the machine. Quota is the binding constraint and it is shared across the
+# account's projects, so the default is deliberately small — raise it only
+# against known headroom.
+: "${GCORE_ACCTEST_PACKAGES:=1}"
+: "${GCORE_ACCTEST_PARALLEL:=2}"
+: "${GCORE_ACCTEST_TIMEOUT:=75m}"
+
+# Keep the polling timeout well inside the test timeout. A Go test timeout
+# panics the process, so CheckDestroy and t.Cleanup never run and real
+# resources are orphaned; a polling timeout returns an error and unwinds, so
+# teardown still happens. The budget also has to cover a create *and* a
+# destroy, since destroy polls too.
+: "${GCORE_POLLING_TIMEOUT_SECONDS:=1200}"
+export GCORE_POLLING_TIMEOUT_SECONDS
+
 # One token for the whole run, shared by every package. Each package is its own
 # test binary, so without this each would mint a different token and a single
 # run's resources would be split across several of them.
@@ -17,6 +40,7 @@ fi
 export GCORE_ACCTEST_RUN_ID
 
 echo "==> Running acceptance tests (run id: $GCORE_ACCTEST_RUN_ID)"
+echo "    packages=$GCORE_ACCTEST_PACKAGES parallel=$GCORE_ACCTEST_PARALLEL timeout=$GCORE_ACCTEST_TIMEOUT poll=${GCORE_POLLING_TIMEOUT_SECONDS}s"
 # The sweep refuses to run until GCORE_SWEEP_ACCOUNT_ID names the account the
 # credentials resolve to. It is deliberately not looked up here: the point is
 # that whoever runs the sweep states which account they mean.
@@ -27,4 +51,10 @@ else
   echo "    Reclaim afterwards by exporting GCORE_SWEEP_ACCOUNT_ID (the account these credentials belong to), then:"
   printf '      GCORE_SWEEP_RUN_ID=%q ./scripts/sweep\n' "$GCORE_ACCTEST_RUN_ID"
 fi
-TF_ACC=1 go test -count=1 -parallel=4 -timeout=30m "${@:-./...}"
+
+TF_ACC=1 go test \
+  -count=1 \
+  -p="$GCORE_ACCTEST_PACKAGES" \
+  -parallel="$GCORE_ACCTEST_PARALLEL" \
+  -timeout="$GCORE_ACCTEST_TIMEOUT" \
+  "${@:-./...}"

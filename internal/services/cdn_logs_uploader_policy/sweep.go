@@ -4,11 +4,8 @@ import (
 	"context"
 	"fmt"
 	"log"
-	"os"
 
-	"github.com/G-Core/gcore-go"
 	"github.com/G-Core/gcore-go/cdn"
-	"github.com/G-Core/gcore-go/option"
 	"github.com/hashicorp/terraform-plugin-testing/helper/resource"
 
 	"github.com/G-Core/terraform-provider-gcore/internal/sweep"
@@ -22,17 +19,31 @@ func init() {
 }
 
 func sweepCDNLogsUploaderPolicies(_ string) error {
-	if err := sweep.ValidateSweeperEnvironment(); err != nil {
+	const resourceType = "gcore_cdn_logs_uploader_policy"
+	defer sweep.Finish(resourceType)
+
+	ctx := context.Background()
+	target, err := sweep.Resolve(ctx)
+	if err != nil {
 		return err
 	}
 
-	apiKey := os.Getenv("GCORE_API_KEY")
-	client := gcore.NewClient(option.WithAPIKey(apiKey))
-
-	ctx := context.Background()
-
-	policies, err := client.CDN.LogsUploader.Policies.List(ctx, cdn.LogsUploaderPolicyListParams{})
-	if err != nil {
+	// Collect first, delete second. Deleting while iterating an
+	// offset-paginated collection shifts it, so the next offset skips exactly
+	// as many items as were removed.
+	//
+	// Account-global: this enumerates every policy in the account, so the token
+	// match is the only thing bounding what gets deleted.
+	var doomed []cdn.LogsUploaderPolicy
+	iter := target.Client.CDN.LogsUploader.Policies.ListAutoPaging(ctx, cdn.LogsUploaderPolicyListParams{})
+	for iter.Next() {
+		policy := iter.Current()
+		sweep.RecordListed(resourceType, 1)
+		if sweep.ShouldSweep(resourceType, policy.Name) {
+			doomed = append(doomed, policy)
+		}
+	}
+	if err := iter.Err(); err != nil {
 		if sweep.SkipSweepError(err) {
 			log.Printf("[WARN] Skipping CDN logs uploader policy sweep: %s", err)
 			return nil
@@ -40,18 +51,13 @@ func sweepCDNLogsUploaderPolicies(_ string) error {
 		return fmt.Errorf("error listing CDN logs uploader policies: %w", err)
 	}
 
-	// CDN list endpoints are now offset pagers; the result exposes .Results
-	// (the {count,results} envelope), not the plain-array union.
-	for _, policy := range policies.Results {
-		if !sweep.ShouldSweep("gcore_cdn_logs_uploader_policy", policy.Name) {
+	for _, policy := range doomed {
+		log.Printf("[INFO] Deleting CDN logs uploader policy: %s (%d)", policy.Name, policy.ID)
+		if err := target.Client.CDN.LogsUploader.Policies.Delete(ctx, policy.ID); err != nil {
+			sweep.RecordFailure(resourceType, policy.Name, err)
 			continue
 		}
-
-		log.Printf("[INFO] Deleting CDN logs uploader policy: %s (%d)", policy.Name, policy.ID)
-		err := client.CDN.LogsUploader.Policies.Delete(ctx, policy.ID)
-		if err != nil {
-			log.Printf("[ERROR] Failed to delete CDN logs uploader policy %s (%d): %s", policy.Name, policy.ID, err)
-		}
+		sweep.RecordDeleted(resourceType, policy.Name)
 	}
 
 	return nil

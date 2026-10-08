@@ -4,12 +4,8 @@ import (
 	"context"
 	"fmt"
 	"log"
-	"os"
-	"strconv"
 
-	"github.com/G-Core/gcore-go"
 	"github.com/G-Core/gcore-go/cloud"
-	"github.com/G-Core/gcore-go/option"
 	"github.com/G-Core/gcore-go/packages/param"
 	"github.com/hashicorp/terraform-plugin-testing/helper/resource"
 
@@ -24,33 +20,31 @@ func init() {
 }
 
 func sweepCloudSecrets(_ string) error {
-	if err := sweep.ValidateSweeperEnvironment(); err != nil {
+	const resourceType = "gcore_cloud_secret"
+	defer sweep.Finish(resourceType)
+
+	ctx := context.Background()
+	target, err := sweep.Resolve(ctx)
+	if err != nil {
 		return err
 	}
 
-	apiKey := os.Getenv("GCORE_API_KEY")
-	projectID, err := strconv.ParseInt(os.Getenv("GCORE_CLOUD_PROJECT_ID"), 10, 64)
-	if err != nil {
-		return fmt.Errorf("failed to parse GCORE_CLOUD_PROJECT_ID: %w", err)
-	}
-
-	regionID, err := strconv.ParseInt(os.Getenv("GCORE_CLOUD_REGION_ID"), 10, 64)
-	if err != nil {
-		return fmt.Errorf("failed to parse GCORE_CLOUD_REGION_ID: %w", err)
-	}
-
-	client := gcore.NewClient(
-		option.WithAPIKey(apiKey),
-		option.WithCloudProjectID(projectID),
-	)
-
-	ctx := context.Background()
-
-	page, err := client.Cloud.Secrets.List(ctx, cloud.SecretListParams{
-		ProjectID: param.NewOpt(projectID),
-		RegionID:  param.NewOpt(regionID),
+	// Collect first, delete second. Deleting while iterating an
+	// offset-paginated collection shifts it, so the next offset skips exactly
+	// as many items as were removed.
+	var doomed []cloud.Secret
+	iter := target.Client.Cloud.Secrets.ListAutoPaging(ctx, cloud.SecretListParams{
+		ProjectID: param.NewOpt(target.ProjectID),
+		RegionID:  param.NewOpt(target.RegionID),
 	})
-	if err != nil {
+	for iter.Next() {
+		secret := iter.Current()
+		sweep.RecordListed(resourceType, 1)
+		if sweep.ShouldSweep(resourceType, secret.Name) {
+			doomed = append(doomed, secret)
+		}
+	}
+	if err := iter.Err(); err != nil {
 		if sweep.SkipSweepError(err) {
 			log.Printf("[WARN] Skipping secret sweep: %s", err)
 			return nil
@@ -58,22 +52,16 @@ func sweepCloudSecrets(_ string) error {
 		return fmt.Errorf("error listing secrets: %w", err)
 	}
 
-	for _, secret := range page.Results {
-		name := secret.Name
-		id := secret.ID
-
-		if !sweep.ShouldSweep("gcore_cloud_secret", name) {
+	for _, secret := range doomed {
+		log.Printf("[INFO] Deleting secret: %s (%s)", secret.Name, secret.ID)
+		if err := target.Client.Cloud.Secrets.DeleteAndPoll(ctx, secret.ID, cloud.SecretDeleteParams{
+			ProjectID: param.NewOpt(target.ProjectID),
+			RegionID:  param.NewOpt(target.RegionID),
+		}); err != nil {
+			sweep.RecordFailure(resourceType, secret.Name, err)
 			continue
 		}
-
-		log.Printf("[INFO] Deleting secret: %s (%s)", name, id)
-		err := client.Cloud.Secrets.DeleteAndPoll(ctx, id, cloud.SecretDeleteParams{
-			ProjectID: param.NewOpt(projectID),
-			RegionID:  param.NewOpt(regionID),
-		})
-		if err != nil {
-			log.Printf("[ERROR] Failed to delete secret %s: %s", name, err)
-		}
+		sweep.RecordDeleted(resourceType, secret.Name)
 	}
 
 	return nil

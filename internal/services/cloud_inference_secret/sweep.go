@@ -4,12 +4,8 @@ import (
 	"context"
 	"fmt"
 	"log"
-	"os"
-	"strconv"
 
-	"github.com/G-Core/gcore-go"
 	"github.com/G-Core/gcore-go/cloud"
-	"github.com/G-Core/gcore-go/option"
 	"github.com/G-Core/gcore-go/packages/param"
 	"github.com/hashicorp/terraform-plugin-testing/helper/resource"
 
@@ -24,27 +20,30 @@ func init() {
 }
 
 func sweepCloudInferenceSecrets(_ string) error {
-	if err := sweep.ValidateSweeperEnvironment(); err != nil {
+	const resourceType = "gcore_cloud_inference_secret"
+	defer sweep.Finish(resourceType)
+
+	ctx := context.Background()
+	target, err := sweep.Resolve(ctx)
+	if err != nil {
 		return err
 	}
 
-	apiKey := os.Getenv("GCORE_API_KEY")
-	projectID, err := strconv.ParseInt(os.Getenv("GCORE_CLOUD_PROJECT_ID"), 10, 64)
-	if err != nil {
-		return fmt.Errorf("failed to parse GCORE_CLOUD_PROJECT_ID: %w", err)
-	}
-
-	client := gcore.NewClient(
-		option.WithAPIKey(apiKey),
-		option.WithCloudProjectID(projectID),
-	)
-
-	ctx := context.Background()
-
-	page, err := client.Cloud.Inference.Secrets.List(ctx, cloud.InferenceSecretListParams{
-		ProjectID: param.NewOpt(projectID),
+	// Collect first, delete second. Deleting while iterating an
+	// offset-paginated collection shifts it, so the next offset skips exactly
+	// as many items as were removed.
+	var doomed []cloud.InferenceSecret
+	iter := target.Client.Cloud.Inference.Secrets.ListAutoPaging(ctx, cloud.InferenceSecretListParams{
+		ProjectID: param.NewOpt(target.ProjectID),
 	})
-	if err != nil {
+	for iter.Next() {
+		secret := iter.Current()
+		sweep.RecordListed(resourceType, 1)
+		if sweep.ShouldSweep(resourceType, secret.Name) {
+			doomed = append(doomed, secret)
+		}
+	}
+	if err := iter.Err(); err != nil {
 		if sweep.SkipSweepError(err) {
 			log.Printf("[WARN] Skipping inference secret sweep: %s", err)
 			return nil
@@ -52,20 +51,15 @@ func sweepCloudInferenceSecrets(_ string) error {
 		return fmt.Errorf("error listing inference secrets: %w", err)
 	}
 
-	for _, secret := range page.Results {
-		name := secret.Name
-
-		if !sweep.ShouldSweep("gcore_cloud_inference_secret", name) {
+	for _, secret := range doomed {
+		log.Printf("[INFO] Deleting inference secret: %s", secret.Name)
+		if err := target.Client.Cloud.Inference.Secrets.Delete(ctx, secret.Name, cloud.InferenceSecretDeleteParams{
+			ProjectID: param.NewOpt(target.ProjectID),
+		}); err != nil {
+			sweep.RecordFailure(resourceType, secret.Name, err)
 			continue
 		}
-
-		log.Printf("[INFO] Deleting inference secret: %s", name)
-		err := client.Cloud.Inference.Secrets.Delete(ctx, name, cloud.InferenceSecretDeleteParams{
-			ProjectID: param.NewOpt(projectID),
-		})
-		if err != nil {
-			log.Printf("[ERROR] Failed to delete inference secret %s: %s", name, err)
-		}
+		sweep.RecordDeleted(resourceType, secret.Name)
 	}
 
 	return nil

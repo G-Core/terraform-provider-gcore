@@ -4,12 +4,8 @@ import (
 	"context"
 	"fmt"
 	"log"
-	"os"
-	"strconv"
 
-	"github.com/G-Core/gcore-go"
 	"github.com/G-Core/gcore-go/cloud"
-	"github.com/G-Core/gcore-go/option"
 	"github.com/G-Core/gcore-go/packages/param"
 	"github.com/hashicorp/terraform-plugin-testing/helper/resource"
 
@@ -24,26 +20,30 @@ func init() {
 }
 
 func sweepCloudInferenceRegistryCredentials(_ string) error {
-	if err := sweep.ValidateSweeperEnvironment(); err != nil {
+	const resourceType = "gcore_cloud_inference_registry_credential"
+	defer sweep.Finish(resourceType)
+
+	ctx := context.Background()
+	target, err := sweep.Resolve(ctx)
+	if err != nil {
 		return err
 	}
 
-	apiKey := os.Getenv("GCORE_API_KEY")
-	projectID, err := strconv.ParseInt(os.Getenv("GCORE_CLOUD_PROJECT_ID"), 10, 64)
-	if err != nil {
-		return fmt.Errorf("failed to parse GCORE_CLOUD_PROJECT_ID: %w", err)
-	}
-
-	client := gcore.NewClient(
-		option.WithAPIKey(apiKey),
-	)
-
-	ctx := context.Background()
-
-	page, err := client.Cloud.Inference.RegistryCredentials.List(ctx, cloud.InferenceRegistryCredentialListParams{
-		ProjectID: param.NewOpt(projectID),
+	// Collect first, delete second. Deleting while iterating an
+	// offset-paginated collection shifts it, so the next offset skips exactly
+	// as many items as were removed.
+	var doomed []cloud.InferenceRegistryCredentials
+	iter := target.Client.Cloud.Inference.RegistryCredentials.ListAutoPaging(ctx, cloud.InferenceRegistryCredentialListParams{
+		ProjectID: param.NewOpt(target.ProjectID),
 	})
-	if err != nil {
+	for iter.Next() {
+		cred := iter.Current()
+		sweep.RecordListed(resourceType, 1)
+		if sweep.ShouldSweep(resourceType, cred.Name) {
+			doomed = append(doomed, cred)
+		}
+	}
+	if err := iter.Err(); err != nil {
 		if sweep.SkipSweepError(err) {
 			log.Printf("[WARN] Skipping inference registry credential sweep: %s", err)
 			return nil
@@ -51,20 +51,15 @@ func sweepCloudInferenceRegistryCredentials(_ string) error {
 		return fmt.Errorf("error listing inference registry credentials: %w", err)
 	}
 
-	for _, cred := range page.Results {
-		name := cred.Name
-
-		if !sweep.ShouldSweep("gcore_cloud_inference_registry_credential", name) {
+	for _, cred := range doomed {
+		log.Printf("[INFO] Deleting inference registry credential: %s", cred.Name)
+		if err := target.Client.Cloud.Inference.RegistryCredentials.Delete(ctx, cred.Name, cloud.InferenceRegistryCredentialDeleteParams{
+			ProjectID: param.NewOpt(target.ProjectID),
+		}); err != nil {
+			sweep.RecordFailure(resourceType, cred.Name, err)
 			continue
 		}
-
-		log.Printf("[INFO] Deleting inference registry credential: %s", name)
-		err := client.Cloud.Inference.RegistryCredentials.Delete(ctx, name, cloud.InferenceRegistryCredentialDeleteParams{
-			ProjectID: param.NewOpt(projectID),
-		})
-		if err != nil {
-			log.Printf("[ERROR] Failed to delete inference registry credential %s: %s", name, err)
-		}
+		sweep.RecordDeleted(resourceType, cred.Name)
 	}
 
 	return nil

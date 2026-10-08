@@ -22,6 +22,17 @@ import (
 // resources in an account nobody intended to touch.
 const EnvAccountID = "GCORE_SWEEP_ACCOUNT_ID"
 
+// EnvPollingTimeout bounds how long a single DeleteAndPoll may wait, as it does
+// for the provider. The SDK default is 7200 seconds, far past the sweep's
+// 30-minute go test deadline: a stuck delete would panic the process before
+// Finish or FinalExitCode ran, reporting nothing about the sweepers already
+// done. A polling timeout instead returns an error, which is recorded.
+const EnvPollingTimeout = "GCORE_POLLING_TIMEOUT_SECONDS"
+
+// defaultPollingTimeoutSeconds leaves room for several slow deletes inside the
+// 30-minute deadline rather than letting one of them consume it.
+const defaultPollingTimeoutSeconds = 600
+
 // Target is the account, project and region a sweep operates on, resolved once
 // and checked against what the operator said to expect.
 type Target struct {
@@ -56,11 +67,18 @@ func resolve(ctx context.Context) (*Target, error) {
 	if err != nil {
 		return nil, err
 	}
+	pollingTimeout := int64(defaultPollingTimeoutSeconds)
+	if _, ok := os.LookupEnv(EnvPollingTimeout); ok {
+		if pollingTimeout, err = envInt64(EnvPollingTimeout); err != nil {
+			return nil, err
+		}
+	}
 
 	client := gcore.NewClient(
 		option.WithAPIKey(os.Getenv("GCORE_API_KEY")),
 		option.WithCloudProjectID(projectID),
 		option.WithCloudRegionID(regionID),
+		option.WithPollingTimeoutSeconds(pollingTimeout),
 		custom.UserAgentOption("sweeper"),
 	)
 

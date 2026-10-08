@@ -4,12 +4,8 @@ import (
 	"context"
 	"fmt"
 	"log"
-	"os"
-	"strconv"
 
-	"github.com/G-Core/gcore-go"
 	"github.com/G-Core/gcore-go/cloud"
-	"github.com/G-Core/gcore-go/option"
 	"github.com/G-Core/gcore-go/packages/param"
 	"github.com/hashicorp/terraform-plugin-testing/helper/resource"
 
@@ -24,32 +20,31 @@ func init() {
 }
 
 func sweepCloudGPUBaremetalClusters(_ string) error {
-	if err := sweep.ValidateSweeperEnvironment(); err != nil {
+	const resourceType = "gcore_cloud_gpu_baremetal_cluster"
+	defer sweep.Finish(resourceType)
+
+	ctx := context.Background()
+	target, err := sweep.Resolve(ctx)
+	if err != nil {
 		return err
 	}
 
-	apiKey := os.Getenv("GCORE_API_KEY")
-	projectID, err := strconv.ParseInt(os.Getenv("GCORE_CLOUD_PROJECT_ID"), 10, 64)
-	if err != nil {
-		return fmt.Errorf("failed to parse GCORE_CLOUD_PROJECT_ID: %w", err)
-	}
-	regionID, err := strconv.ParseInt(os.Getenv("GCORE_CLOUD_REGION_ID"), 10, 64)
-	if err != nil {
-		return fmt.Errorf("failed to parse GCORE_CLOUD_REGION_ID: %w", err)
-	}
-
-	client := gcore.NewClient(
-		option.WithAPIKey(apiKey),
-		option.WithCloudProjectID(projectID),
-	)
-
-	ctx := context.Background()
-
-	page, err := client.Cloud.GPUBaremetal.Clusters.List(ctx, cloud.GPUBaremetalClusterListParams{
-		ProjectID: param.NewOpt(projectID),
-		RegionID:  param.NewOpt(regionID),
+	// Collect first, delete second. Deleting while iterating an
+	// offset-paginated collection shifts it, so the next offset skips exactly
+	// as many items as were removed.
+	var doomed []cloud.GPUBaremetalCluster
+	iter := target.Client.Cloud.GPUBaremetal.Clusters.ListAutoPaging(ctx, cloud.GPUBaremetalClusterListParams{
+		ProjectID: param.NewOpt(target.ProjectID),
+		RegionID:  param.NewOpt(target.RegionID),
 	})
-	if err != nil {
+	for iter.Next() {
+		cluster := iter.Current()
+		sweep.RecordListed(resourceType, 1)
+		if sweep.ShouldSweep(resourceType, cluster.Name) {
+			doomed = append(doomed, cluster)
+		}
+	}
+	if err := iter.Err(); err != nil {
 		if sweep.SkipSweepError(err) {
 			log.Printf("[WARN] Skipping GPU baremetal cluster sweep: %s", err)
 			return nil
@@ -57,19 +52,16 @@ func sweepCloudGPUBaremetalClusters(_ string) error {
 		return fmt.Errorf("error listing GPU baremetal clusters: %w", err)
 	}
 
-	for _, cluster := range page.Results {
-		if !sweep.ShouldSweep("gcore_cloud_gpu_baremetal_cluster", cluster.Name) {
+	for _, cluster := range doomed {
+		log.Printf("[INFO] Deleting GPU baremetal cluster: %s (%s)", cluster.Name, cluster.ID)
+		if err := target.Client.Cloud.GPUBaremetal.Clusters.DeleteAndPoll(ctx, cluster.ID, cloud.GPUBaremetalClusterDeleteParams{
+			ProjectID: param.NewOpt(target.ProjectID),
+			RegionID:  param.NewOpt(target.RegionID),
+		}); err != nil {
+			sweep.RecordFailure(resourceType, cluster.Name, err)
 			continue
 		}
-
-		log.Printf("[INFO] Deleting GPU baremetal cluster: %s (%s)", cluster.Name, cluster.ID)
-		err := client.Cloud.GPUBaremetal.Clusters.DeleteAndPoll(ctx, cluster.ID, cloud.GPUBaremetalClusterDeleteParams{
-			ProjectID: param.NewOpt(projectID),
-			RegionID:  param.NewOpt(regionID),
-		})
-		if err != nil {
-			log.Printf("[ERROR] Failed to delete GPU baremetal cluster %s: %s", cluster.Name, err)
-		}
+		sweep.RecordDeleted(resourceType, cluster.Name)
 	}
 
 	return nil

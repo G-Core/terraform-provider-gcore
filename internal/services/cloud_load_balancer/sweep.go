@@ -4,12 +4,8 @@ import (
 	"context"
 	"fmt"
 	"log"
-	"os"
-	"strconv"
 
-	"github.com/G-Core/gcore-go"
 	"github.com/G-Core/gcore-go/cloud"
-	"github.com/G-Core/gcore-go/option"
 	"github.com/G-Core/gcore-go/packages/param"
 	"github.com/hashicorp/terraform-plugin-testing/helper/resource"
 
@@ -24,32 +20,31 @@ func init() {
 }
 
 func sweepCloudLoadBalancers(_ string) error {
-	if err := sweep.ValidateSweeperEnvironment(); err != nil {
+	const resourceType = "gcore_cloud_load_balancer"
+	defer sweep.Finish(resourceType)
+
+	ctx := context.Background()
+	target, err := sweep.Resolve(ctx)
+	if err != nil {
 		return err
 	}
 
-	apiKey := os.Getenv("GCORE_API_KEY")
-	projectID, err := strconv.ParseInt(os.Getenv("GCORE_CLOUD_PROJECT_ID"), 10, 64)
-	if err != nil {
-		return fmt.Errorf("failed to parse GCORE_CLOUD_PROJECT_ID: %w", err)
-	}
-	regionID, err := strconv.ParseInt(os.Getenv("GCORE_CLOUD_REGION_ID"), 10, 64)
-	if err != nil {
-		return fmt.Errorf("failed to parse GCORE_CLOUD_REGION_ID: %w", err)
-	}
-
-	client := gcore.NewClient(
-		option.WithAPIKey(apiKey),
-		option.WithCloudProjectID(projectID),
-	)
-
-	ctx := context.Background()
-
-	page, err := client.Cloud.LoadBalancers.List(ctx, cloud.LoadBalancerListParams{
-		ProjectID: param.NewOpt(projectID),
-		RegionID:  param.NewOpt(regionID),
+	// Collect first, delete second. Deleting while iterating an
+	// offset-paginated collection shifts it, so the next offset skips exactly
+	// as many items as were removed.
+	var doomed []cloud.LoadBalancer
+	iter := target.Client.Cloud.LoadBalancers.ListAutoPaging(ctx, cloud.LoadBalancerListParams{
+		ProjectID: param.NewOpt(target.ProjectID),
+		RegionID:  param.NewOpt(target.RegionID),
 	})
-	if err != nil {
+	for iter.Next() {
+		lb := iter.Current()
+		sweep.RecordListed(resourceType, 1)
+		if sweep.ShouldSweep(resourceType, lb.Name) {
+			doomed = append(doomed, lb)
+		}
+	}
+	if err := iter.Err(); err != nil {
 		if sweep.SkipSweepError(err) {
 			log.Printf("[WARN] Skipping load balancer sweep: %s", err)
 			return nil
@@ -57,29 +52,16 @@ func sweepCloudLoadBalancers(_ string) error {
 		return fmt.Errorf("error listing load balancers: %w", err)
 	}
 
-	for page != nil && len(page.Results) > 0 {
-		for _, lb := range page.Results {
-			name := lb.Name
-			id := lb.ID
-
-			if !sweep.ShouldSweep("gcore_cloud_load_balancer", name) {
-				continue
-			}
-
-			log.Printf("[INFO] Deleting load balancer: %s (%s)", name, id)
-			err := client.Cloud.LoadBalancers.DeleteAndPoll(ctx, id, cloud.LoadBalancerDeleteParams{
-				ProjectID: param.NewOpt(projectID),
-				RegionID:  param.NewOpt(regionID),
-			})
-			if err != nil {
-				log.Printf("[ERROR] Failed to delete load balancer %s: %s", name, err)
-			}
+	for _, lb := range doomed {
+		log.Printf("[INFO] Deleting load balancer: %s (%s)", lb.Name, lb.ID)
+		if err := target.Client.Cloud.LoadBalancers.DeleteAndPoll(ctx, lb.ID, cloud.LoadBalancerDeleteParams{
+			ProjectID: param.NewOpt(target.ProjectID),
+			RegionID:  param.NewOpt(target.RegionID),
+		}); err != nil {
+			sweep.RecordFailure(resourceType, lb.Name, err)
+			continue
 		}
-
-		page, err = page.GetNextPage()
-		if err != nil {
-			return fmt.Errorf("error getting next page of load balancers: %w", err)
-		}
+		sweep.RecordDeleted(resourceType, lb.Name)
 	}
 
 	return nil

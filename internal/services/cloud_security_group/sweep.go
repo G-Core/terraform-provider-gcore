@@ -4,12 +4,8 @@ import (
 	"context"
 	"fmt"
 	"log"
-	"os"
-	"strconv"
 
-	"github.com/G-Core/gcore-go"
 	"github.com/G-Core/gcore-go/cloud"
-	"github.com/G-Core/gcore-go/option"
 	"github.com/G-Core/gcore-go/packages/param"
 	"github.com/hashicorp/terraform-plugin-testing/helper/resource"
 
@@ -24,32 +20,31 @@ func init() {
 }
 
 func sweepCloudSecurityGroups(_ string) error {
-	if err := sweep.ValidateSweeperEnvironment(); err != nil {
+	const resourceType = "gcore_cloud_security_group"
+	defer sweep.Finish(resourceType)
+
+	ctx := context.Background()
+	target, err := sweep.Resolve(ctx)
+	if err != nil {
 		return err
 	}
 
-	apiKey := os.Getenv("GCORE_API_KEY")
-	projectID, err := strconv.ParseInt(os.Getenv("GCORE_CLOUD_PROJECT_ID"), 10, 64)
-	if err != nil {
-		return fmt.Errorf("failed to parse GCORE_CLOUD_PROJECT_ID: %w", err)
-	}
-	regionID, err := strconv.ParseInt(os.Getenv("GCORE_CLOUD_REGION_ID"), 10, 64)
-	if err != nil {
-		return fmt.Errorf("failed to parse GCORE_CLOUD_REGION_ID: %w", err)
-	}
-
-	client := gcore.NewClient(
-		option.WithAPIKey(apiKey),
-		option.WithCloudProjectID(projectID),
-	)
-
-	ctx := context.Background()
-
-	page, err := client.Cloud.SecurityGroups.List(ctx, cloud.SecurityGroupListParams{
-		ProjectID: param.NewOpt(projectID),
-		RegionID:  param.NewOpt(regionID),
+	// Collect first, delete second. Deleting while iterating an
+	// offset-paginated collection shifts it, so the next offset skips exactly
+	// as many items as were removed.
+	var doomed []cloud.SecurityGroup
+	iter := target.Client.Cloud.SecurityGroups.ListAutoPaging(ctx, cloud.SecurityGroupListParams{
+		ProjectID: param.NewOpt(target.ProjectID),
+		RegionID:  param.NewOpt(target.RegionID),
 	})
-	if err != nil {
+	for iter.Next() {
+		group := iter.Current()
+		sweep.RecordListed(resourceType, 1)
+		if sweep.ShouldSweep(resourceType, group.Name) {
+			doomed = append(doomed, group)
+		}
+	}
+	if err := iter.Err(); err != nil {
 		if sweep.SkipSweepError(err) {
 			log.Printf("[WARN] Skipping security group sweep: %s", err)
 			return nil
@@ -57,22 +52,16 @@ func sweepCloudSecurityGroups(_ string) error {
 		return fmt.Errorf("error listing security groups: %w", err)
 	}
 
-	for _, sg := range page.Results {
-		name := sg.Name
-		id := sg.ID
-
-		if !sweep.ShouldSweep("gcore_cloud_security_group", name) {
+	for _, group := range doomed {
+		log.Printf("[INFO] Deleting security group: %s (%s)", group.Name, group.ID)
+		if err := target.Client.Cloud.SecurityGroups.Delete(ctx, group.ID, cloud.SecurityGroupDeleteParams{
+			ProjectID: param.NewOpt(target.ProjectID),
+			RegionID:  param.NewOpt(target.RegionID),
+		}); err != nil {
+			sweep.RecordFailure(resourceType, group.Name, err)
 			continue
 		}
-
-		log.Printf("[INFO] Deleting security group: %s (%s)", name, id)
-		err := client.Cloud.SecurityGroups.Delete(ctx, id, cloud.SecurityGroupDeleteParams{
-			ProjectID: param.NewOpt(projectID),
-			RegionID:  param.NewOpt(regionID),
-		})
-		if err != nil {
-			log.Printf("[ERROR] Failed to delete security group %s: %s", name, err)
-		}
+		sweep.RecordDeleted(resourceType, group.Name)
 	}
 
 	return nil

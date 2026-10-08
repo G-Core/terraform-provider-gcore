@@ -4,11 +4,8 @@ import (
 	"context"
 	"fmt"
 	"log"
-	"os"
 
-	"github.com/G-Core/gcore-go"
 	"github.com/G-Core/gcore-go/cdn"
-	"github.com/G-Core/gcore-go/option"
 	"github.com/hashicorp/terraform-plugin-testing/helper/resource"
 
 	"github.com/G-Core/terraform-provider-gcore/internal/sweep"
@@ -22,17 +19,32 @@ func init() {
 }
 
 func sweepCDNCertificates(_ string) error {
-	if err := sweep.ValidateSweeperEnvironment(); err != nil {
+	const resourceType = "gcore_cdn_certificate"
+	defer sweep.Finish(resourceType)
+
+	ctx := context.Background()
+	target, err := sweep.Resolve(ctx)
+	if err != nil {
 		return err
 	}
 
-	apiKey := os.Getenv("GCORE_API_KEY")
-	client := gcore.NewClient(option.WithAPIKey(apiKey))
-
-	ctx := context.Background()
-
-	certs, err := client.CDN.Certificates.List(ctx, cdn.CertificateListParams{})
-	if err != nil {
+	// Collect first, delete second. Deleting while iterating an
+	// offset-paginated collection shifts it, so the next offset skips exactly
+	// as many items as were removed.
+	//
+	// CDN certificates are account-global: this enumerates every certificate in
+	// the account, so the token match is the only thing bounding what gets
+	// deleted.
+	var doomed []cdn.SslDetail
+	iter := target.Client.CDN.Certificates.ListAutoPaging(ctx, cdn.CertificateListParams{})
+	for iter.Next() {
+		cert := iter.Current()
+		sweep.RecordListed(resourceType, 1)
+		if sweep.ShouldSweep(resourceType, cert.Name) {
+			doomed = append(doomed, cert)
+		}
+	}
+	if err := iter.Err(); err != nil {
 		if sweep.SkipSweepError(err) {
 			log.Printf("[WARN] Skipping CDN certificate sweep: %s", err)
 			return nil
@@ -40,16 +52,13 @@ func sweepCDNCertificates(_ string) error {
 		return fmt.Errorf("error listing CDN certificates: %w", err)
 	}
 
-	for _, cert := range certs.Results {
-		if !sweep.ShouldSweep("gcore_cdn_certificate", cert.Name) {
+	for _, cert := range doomed {
+		log.Printf("[INFO] Deleting CDN certificate: %s (%d)", cert.Name, cert.ID)
+		if err := target.Client.CDN.Certificates.Delete(ctx, cert.ID); err != nil {
+			sweep.RecordFailure(resourceType, cert.Name, err)
 			continue
 		}
-
-		log.Printf("[INFO] Deleting CDN certificate: %s (%d)", cert.Name, cert.ID)
-		err := client.CDN.Certificates.Delete(ctx, cert.ID)
-		if err != nil {
-			log.Printf("[ERROR] Failed to delete CDN certificate %s (%d): %s", cert.Name, cert.ID, err)
-		}
+		sweep.RecordDeleted(resourceType, cert.Name)
 	}
 
 	return nil

@@ -4,11 +4,8 @@ import (
 	"context"
 	"fmt"
 	"log"
-	"os"
 
-	"github.com/G-Core/gcore-go"
 	"github.com/G-Core/gcore-go/fastedge"
-	"github.com/G-Core/gcore-go/option"
 	"github.com/hashicorp/terraform-plugin-testing/helper/resource"
 
 	"github.com/G-Core/terraform-provider-gcore/internal/sweep"
@@ -24,18 +21,31 @@ func init() {
 }
 
 func sweepFastedgeApps(_ string) error {
-	if err := sweep.ValidateSweeperEnvironment(); err != nil {
+	const resourceType = "gcore_fastedge_app"
+	defer sweep.Finish(resourceType)
+
+	ctx := context.Background()
+	target, err := sweep.Resolve(ctx)
+	if err != nil {
 		return err
 	}
 
-	apiKey := os.Getenv("GCORE_API_KEY")
-	client := gcore.NewClient(option.WithAPIKey(apiKey))
-
-	ctx := context.Background()
-
-	params := fastedge.AppListParams{}
-	page, err := client.Fastedge.Apps.List(ctx, params)
-	if err != nil {
+	// Collect first, delete second. This previously deleted while advancing the
+	// pager, and each delete shifts an offset-paginated collection, so the next
+	// offset skipped exactly as many items as had been removed.
+	//
+	// Account-global: this enumerates every app in the account, so the token
+	// match is the only thing bounding what gets deleted.
+	var doomed []fastedge.AppShort
+	iter := target.Client.Fastedge.Apps.ListAutoPaging(ctx, fastedge.AppListParams{})
+	for iter.Next() {
+		app := iter.Current()
+		sweep.RecordListed(resourceType, 1)
+		if sweep.ShouldSweep(resourceType, app.Name) {
+			doomed = append(doomed, app)
+		}
+	}
+	if err := iter.Err(); err != nil {
 		if sweep.SkipSweepError(err) {
 			log.Printf("[WARN] Skipping fastedge app sweep: %s", err)
 			return nil
@@ -43,23 +53,13 @@ func sweepFastedgeApps(_ string) error {
 		return fmt.Errorf("error listing fastedge apps: %w", err)
 	}
 
-	for page != nil && len(page.Apps) > 0 {
-		for _, app := range page.Apps {
-			if !sweep.ShouldSweep("gcore_fastedge_app", app.Name) {
-				continue
-			}
-			log.Printf("[INFO] Deleting fastedge app: %s (%d)", app.Name, app.ID)
-			err := client.Fastedge.Apps.Delete(ctx, app.ID)
-			if err != nil {
-				log.Printf("[ERROR] Failed to delete fastedge app %s: %s", app.Name, err)
-			}
+	for _, app := range doomed {
+		log.Printf("[INFO] Deleting fastedge app: %s (%d)", app.Name, app.ID)
+		if err := target.Client.Fastedge.Apps.Delete(ctx, app.ID); err != nil {
+			sweep.RecordFailure(resourceType, app.Name, err)
+			continue
 		}
-
-		page, err = page.GetNextPage()
-		if err != nil {
-			log.Printf("[ERROR] Failed to get next page of apps: %s", err)
-			break
-		}
+		sweep.RecordDeleted(resourceType, app.Name)
 	}
 
 	return nil

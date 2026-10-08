@@ -4,10 +4,7 @@ import (
 	"context"
 	"fmt"
 	"log"
-	"os"
 
-	"github.com/G-Core/gcore-go"
-	"github.com/G-Core/gcore-go/option"
 	"github.com/G-Core/gcore-go/storage"
 	"github.com/hashicorp/terraform-plugin-testing/helper/resource"
 
@@ -22,15 +19,31 @@ func init() {
 }
 
 func sweepStorageSftp(_ string) error {
-	if err := sweep.ValidateSweeperEnvironment(); err != nil {
+	const resourceType = "gcore_storage_sftp"
+	defer sweep.Finish(resourceType)
+
+	ctx := context.Background()
+	target, err := sweep.Resolve(ctx)
+	if err != nil {
 		return err
 	}
 
-	client := gcore.NewClient(option.WithAPIKey(os.Getenv("GCORE_API_KEY")))
-	ctx := context.Background()
-
-	page, err := client.Storage.SftpStorages.List(ctx, storage.SftpStorageListParams{})
-	if err != nil {
+	// Collect first, delete second. Deleting while iterating an
+	// offset-paginated collection shifts it, so the next offset skips exactly
+	// as many items as were removed.
+	//
+	// Account-global: this enumerates every sftp storage in the account, so the
+	// token match is the only thing bounding what gets deleted.
+	var doomed []storage.SftpStorage
+	iter := target.Client.Storage.SftpStorages.ListAutoPaging(ctx, storage.SftpStorageListParams{})
+	for iter.Next() {
+		st := iter.Current()
+		sweep.RecordListed(resourceType, 1)
+		if sweep.ShouldSweep(resourceType, st.Name) {
+			doomed = append(doomed, st)
+		}
+	}
+	if err := iter.Err(); err != nil {
 		if sweep.SkipSweepError(err) {
 			log.Printf("[WARN] Skipping storage sftp sweep: %s", err)
 			return nil
@@ -38,15 +51,13 @@ func sweepStorageSftp(_ string) error {
 		return fmt.Errorf("error listing storage sftp: %w", err)
 	}
 
-	for _, st := range page.Results {
-		if !sweep.ShouldSweep("gcore_storage_sftp", st.Name) {
+	for _, st := range doomed {
+		log.Printf("[INFO] Deleting storage sftp: %s (%d)", st.Name, st.ID)
+		if err := target.Client.Storage.SftpStorages.DeleteAndPoll(ctx, st.ID); err != nil {
+			sweep.RecordFailure(resourceType, st.Name, err)
 			continue
 		}
-
-		log.Printf("[INFO] Deleting storage sftp: %s (%d)", st.Name, st.ID)
-		if err := client.Storage.SftpStorages.DeleteAndPoll(ctx, st.ID); err != nil {
-			log.Printf("[ERROR] Failed to delete storage sftp %s: %s", st.Name, err)
-		}
+		sweep.RecordDeleted(resourceType, st.Name)
 	}
 
 	return nil

@@ -4,11 +4,8 @@ import (
 	"context"
 	"fmt"
 	"log"
-	"os"
 
-	"github.com/G-Core/gcore-go"
 	"github.com/G-Core/gcore-go/dns"
-	"github.com/G-Core/gcore-go/option"
 	"github.com/hashicorp/terraform-plugin-testing/helper/resource"
 
 	"github.com/G-Core/terraform-provider-gcore/internal/sweep"
@@ -23,20 +20,32 @@ func init() {
 }
 
 func sweepDNSZones(_ string) error {
-	if err := sweep.ValidateSweeperEnvironment(); err != nil {
+	const resourceType = "gcore_dns_zone"
+	defer sweep.Finish(resourceType)
+
+	ctx := context.Background()
+	target, err := sweep.Resolve(ctx)
+	if err != nil {
 		return err
 	}
 
-	apiKey := os.Getenv("GCORE_API_KEY")
-
-	client := gcore.NewClient(
-		option.WithAPIKey(apiKey),
-	)
-
-	ctx := context.Background()
-
-	page, err := client.DNS.Zones.List(ctx, dns.ZoneListParams{})
-	if err != nil {
+	// Collect first, delete second. Deleting while iterating an
+	// offset-paginated collection shifts it, so the next offset skips exactly
+	// as many items as were removed.
+	//
+	// DNS zones are account-global: this enumerates every zone in the account,
+	// not just a project's, so the token match is the only thing bounding what
+	// gets deleted.
+	var doomed []dns.ZoneListResponse
+	iter := target.Client.DNS.Zones.ListAutoPaging(ctx, dns.ZoneListParams{})
+	for iter.Next() {
+		zone := iter.Current()
+		sweep.RecordListed(resourceType, 1)
+		if sweep.ShouldSweep(resourceType, zone.Name) {
+			doomed = append(doomed, zone)
+		}
+	}
+	if err := iter.Err(); err != nil {
 		if sweep.SkipSweepError(err) {
 			log.Printf("[WARN] Skipping DNS zone sweep: %s", err)
 			return nil
@@ -44,16 +53,13 @@ func sweepDNSZones(_ string) error {
 		return fmt.Errorf("error listing DNS zones: %w", err)
 	}
 
-	for _, zone := range page.Zones {
-		if !sweep.ShouldSweep("gcore_dns_zone", zone.Name) {
+	for _, zone := range doomed {
+		log.Printf("[INFO] Deleting DNS zone: %s", zone.Name)
+		if _, err := target.Client.DNS.Zones.Delete(ctx, zone.Name); err != nil {
+			sweep.RecordFailure(resourceType, zone.Name, err)
 			continue
 		}
-
-		log.Printf("[INFO] Deleting DNS zone: %s", zone.Name)
-		_, err := client.DNS.Zones.Delete(ctx, zone.Name)
-		if err != nil {
-			log.Printf("[ERROR] Failed to delete DNS zone %s: %s", zone.Name, err)
-		}
+		sweep.RecordDeleted(resourceType, zone.Name)
 	}
 
 	return nil
