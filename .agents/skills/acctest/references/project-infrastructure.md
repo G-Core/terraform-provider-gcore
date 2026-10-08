@@ -135,14 +135,6 @@ untagged one is indistinguishable from production and `ShouldSweepToken` always 
 `Token` hashes rather than truncates, so a GitHub run id, a UUID and an ad hoc string all yield something name-safe,
 and the test side and the sweeper derive the same token from the same run id without coordinating.
 
-## Missing Infrastructure
-
-The following documented items do **not exist yet** and must be created if needed:
-
-- `internal/sweep/sweep_test.go` with `TestMain(m *testing.M) { resource.TestMain(m) }` -- required to invoke sweepers via CLI
-- Per-service `sweep.go` files -- none exist yet
-- All `resource_test.go` and `data_source_test.go` files -- none exist yet
-
 ## Environment Variables
 
 | Variable | Required | Purpose |

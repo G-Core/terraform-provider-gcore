@@ -25,8 +25,13 @@ internal/services/<service>/
 ├── model.go                 # (generated) data models
 ├── resource_test.go         # acceptance tests (you write this)
 ├── data_source_test.go      # data source acceptance tests (you write this)
+├── list_data_source_test.go # list data source acceptance tests (you write this)
 └── sweep.go                 # sweeper implementation (you write this)
 ```
+
+In a number of packages `list_data_source_test.go` is the only hand-written test file. When looking for existing
+tests, walk `internal/services/*/` rather than globbing the filenames above, or those packages look untested when
+they are not.
 
 ## Test Skeleton
 
