@@ -39,7 +39,7 @@ resource "gcore_storage_object_storage_bucket" "example_storage_object_storage_b
 ### Optional
 
 - `cors` (Attributes) (see [below for nested schema](#nestedatt--cors))
-- `policy` (Attributes) (see [below for nested schema](#nestedatt--policy))
+- `policy` (Attributes) Access policy for the bucket. Removing this block leaves the bucket's current access setting unchanged. (see [below for nested schema](#nestedatt--policy))
 - `storage_object_storage_bucket_lifecycle` (Attributes) (see [below for nested schema](#nestedatt--storage_object_storage_bucket_lifecycle))
 
 ### Read-Only
@@ -51,7 +51,7 @@ resource "gcore_storage_object_storage_bucket" "example_storage_object_storage_b
 
 Optional:
 
-- `allowed_origins` (List of String) Web domains allowed to make direct browser requests. Send an empty array to remove CORS configuration.
+- `allowed_origins` (List of String) Web domains allowed to make direct browser requests. Must not be empty. To remove CORS, delete the `cors` block.
 
 
 <a id="nestedatt--policy"></a>
@@ -68,7 +68,7 @@ Omit to leave the current policy unchanged.
 
 Optional:
 
-- `expiration_days` (Number) Days before objects are automatically deleted. Set to a positive number to enable, or null/0 to remove the rule.
+- `expiration_days` (Number) Days before objects are automatically deleted. Must be at least 1. To remove the rule, delete the `storage_object_storage_bucket_lifecycle` block.
 
 ## Import
 

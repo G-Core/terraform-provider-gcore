@@ -49,7 +49,7 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 					// unknown, is omitted from the request body, and is resolved to null
 					// when the response is decoded.
 					"allowed_origins": schema.ListAttribute{
-						Description: "Web domains allowed to make direct browser requests. Send an empty array to remove CORS configuration.",
+						Description: "Web domains allowed to make direct browser requests. Must not be empty. To remove CORS, delete the `cors` block.",
 						Optional:    true,
 						Computed:    true,
 						CustomType:  customfield.NewListType[types.String](ctx),
@@ -64,15 +64,16 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 				Optional: true,
 				Attributes: map[string]schema.Attribute{
 					"expiration_days": schema.Int64Attribute{
-						Description: "Days before objects are automatically deleted. Set to a positive number to enable, or null/0 to remove the rule.",
+						Description: "Days before objects are automatically deleted. Must be at least 1. To remove the rule, delete the `storage_object_storage_bucket_lifecycle` block.",
 						Optional:    true,
 					},
 				},
 			},
 			"policy": schema.SingleNestedAttribute{
-				Computed:   true,
-				Optional:   true,
-				CustomType: customfield.NewNestedObjectType[StorageObjectStorageBucketPolicyModel](ctx),
+				Description: "Access policy for the bucket. Removing this block leaves the bucket's current access setting unchanged.",
+				Computed:    true,
+				Optional:    true,
+				CustomType:  customfield.NewNestedObjectType[StorageObjectStorageBucketPolicyModel](ctx),
 				Attributes: map[string]schema.Attribute{
 					"is_public": schema.BoolAttribute{
 						Description: "Set to true to allow unauthenticated object downloads, false to require valid S3 credentials.\nOmit to leave the current policy unchanged.",
