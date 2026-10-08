@@ -6,7 +6,6 @@ import (
 	"context"
 
 	"github.com/G-Core/terraform-provider-gcore/internal/customfield"
-	"github.com/G-Core/terraform-provider-gcore/internal/planmodifiers"
 	"github.com/hashicorp/terraform-plugin-framework-timetypes/timetypes"
 	"github.com/hashicorp/terraform-plugin-framework-validators/int64validator"
 	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
@@ -48,18 +47,8 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 				Optional:      true,
 				PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
 			},
-			"vip_network_id": schema.StringAttribute{
-				Description:   "Network ID for load balancer. If not specified, default external network will be used. Mutually exclusive with `vip_port_id`",
-				Optional:      true,
-				PlanModifiers: []planmodifier.String{planmodifiers.StringRequiresReplaceUnlessAdopting(importAdoptionPrivateKey)},
-			},
-			"vip_subnet_id": schema.StringAttribute{
-				Description:   "Subnet ID for load balancer. If not specified, any subnet from `vip_network_id` will be selected. Ignored when `vip_network_id` is not specified.",
-				Optional:      true,
-				PlanModifiers: []planmodifier.String{planmodifiers.StringRequiresReplaceUnlessAdopting(importAdoptionPrivateKey)},
-			},
 			"vip_ip_family": schema.StringAttribute{
-				Description: "IP family for load balancer subnet auto-selection if `vip_network_id` is specified\nAvailable values: \"dual\", \"ipv4\", \"ipv6\".",
+				Description: "IP family of the load balancer VIP. It selects the subnets of the default network, or of the `vip_port_id` network when it is set.\nAvailable values: \"dual\", \"ipv4\", \"ipv6\".",
 				Computed:    true,
 				Optional:    true,
 				Validators: []validator.String{
@@ -72,7 +61,7 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 				PlanModifiers: []planmodifier.String{stringplanmodifier.RequiresReplaceIfConfigured(), stringplanmodifier.UseStateForUnknown()},
 			},
 			"vip_port_id": schema.StringAttribute{
-				Description:   "Existing Reserved Fixed IP port ID for load balancer. Mutually exclusive with `vip_network_id`",
+				Description:   "Existing Reserved Fixed IP port ID for load balancer. Use it to place the VIP in a private network. If not specified, the default external network is used.",
 				Computed:      true,
 				Optional:      true,
 				PlanModifiers: []planmodifier.String{stringplanmodifier.RequiresReplaceIfConfigured(), stringplanmodifier.UseStateForUnknown()},

@@ -172,8 +172,8 @@ const (
 	listenerWithXFFOnly = "\n  user_list = []\n  insert_x_forwarded = true"
 )
 
-// testAccListenerConfig declares network, subnet, load balancer and pool, plus
-// the listener when listenerAttrs is non-empty.
+// testAccListenerConfig declares network, subnet, reserved fixed IP, load
+// balancer and pool, plus the listener when listenerAttrs is non-empty.
 func testAccListenerConfig(name, listenerAttrs string) string {
 	config := fmt.Sprintf(`
 resource "gcore_cloud_network" "test" {
@@ -190,13 +190,21 @@ resource "gcore_cloud_network_subnet" "test" {
   cidr       = "10.30.0.0/24"
 }
 
+resource "gcore_cloud_reserved_fixed_ip" "test" {
+  project_id = %[1]s
+  region_id  = %[2]s
+  type       = "subnet"
+  network_id = gcore_cloud_network.test.id
+  subnet_id  = gcore_cloud_network_subnet.test.id
+  is_vip     = false
+}
+
 resource "gcore_cloud_load_balancer" "test" {
-  project_id     = %[1]s
-  region_id      = %[2]s
-  name           = %[3]q
-  flavor         = "lb1-1-2"
-  vip_network_id = gcore_cloud_network.test.id
-  vip_subnet_id  = gcore_cloud_network_subnet.test.id
+  project_id  = %[1]s
+  region_id   = %[2]s
+  name        = %[3]q
+  flavor      = "lb1-1-2"
+  vip_port_id = gcore_cloud_reserved_fixed_ip.test.port_id
 }
 
 resource "gcore_cloud_load_balancer_pool" "test" {

@@ -25,13 +25,13 @@ Attaches a pre-allocated reserved fixed IP so the VIP address survives destroy/r
 
 ### Private load balancer
 
-Creates a load balancer on a private network with no public IP.
+Creates a load balancer on a private network with no public IP. The VIP is a reserved fixed IP in the private subnet, passed as `vip_port_id`.
 
 {{tffile "examples/resources/gcore_cloud_load_balancer/private-lb.tf"}}
 
 ### Private load balancer in dual-stack mode
 
-Creates a private load balancer with both IPv4 and IPv6 subnets.
+Creates a private load balancer with both IPv4 and IPv6 addresses, using a dual-stack reserved fixed IP as `vip_port_id`.
 
 {{tffile "examples/resources/gcore_cloud_load_balancer/private-lb-dualstack.tf"}}
 

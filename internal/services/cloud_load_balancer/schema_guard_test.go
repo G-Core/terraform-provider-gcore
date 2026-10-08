@@ -2,10 +2,15 @@ package cloud_load_balancer_test
 
 import (
 	"context"
+	"fmt"
+	"slices"
+	"strings"
 	"testing"
 
 	datasourceschema "github.com/hashicorp/terraform-plugin-framework/datasource/schema"
 	resourceschema "github.com/hashicorp/terraform-plugin-framework/resource/schema"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringplanmodifier"
 
 	"github.com/G-Core/terraform-provider-gcore/internal/services/cloud_load_balancer"
 )
@@ -31,6 +36,11 @@ import (
 //     exposed as `tags`. A plan modifier on it used to break in-place tag
 //     updates with "Provider produced inconsistent result after apply"; the
 //     attribute being gone is the stronger version of that guard.
+//   - vip_network_id, vip_subnet_id: create-only inputs the API never returns,
+//     so they could not be refreshed or checked after import. A private VIP is
+//     placed with vip_port_id and a gcore_cloud_reserved_fixed_ip instead. They
+//     are skipped for terraform in codegen config, not deleted here, so this
+//     catches the config entry being dropped or turning into a no-op.
 //
 // This is a regression guard, not a schema policy: each of these was deleted
 // deliberately and has come back on its own. The deletions live in custom code
@@ -48,6 +58,8 @@ var forbiddenResourceAttributes = []string{
 	"task_id",
 	"tasks",
 	"updated_at",
+	"vip_network_id",
+	"vip_subnet_id",
 }
 
 // TestCloudLoadBalancerResourceSchemaOmitsServerOnlyAttributes fails if an
@@ -61,6 +73,23 @@ func TestCloudLoadBalancerResourceSchemaOmitsServerOnlyAttributes(t *testing.T) 
 		if _, found := attributes[name]; found {
 			t.Errorf("attribute %q is present in the gcore_cloud_load_balancer resource schema; "+
 				"it was removed on purpose and must stay out of the resource", name)
+		}
+	}
+}
+
+// TestCloudLoadBalancerResourceDescriptionsOmitRemovedAttributes fails if an
+// attribute description still points users at a removed attribute. The
+// descriptions come from the OpenAPI spec, which keeps vip_network_id for the
+// Go and Python SDKs, so a regeneration can bring the stale text back.
+func TestCloudLoadBalancerResourceDescriptionsOmitRemovedAttributes(t *testing.T) {
+	t.Parallel()
+
+	for attrName, attribute := range cloud_load_balancer.ResourceSchema(context.TODO()).Attributes {
+		for _, removed := range forbiddenResourceAttributes {
+			if strings.Contains(attribute.GetDescription(), "`"+removed+"`") {
+				t.Errorf("description of %q mentions the removed attribute %q: %q",
+					attrName, removed, attribute.GetDescription())
+			}
 		}
 	}
 }
@@ -131,6 +160,51 @@ func TestCloudLoadBalancerDataSourceExposesTags(t *testing.T) {
 	for _, name := range []string{"key", "read_only", "value"} {
 		if _, found := tags.NestedObject.Attributes[name]; !found {
 			t.Errorf("tags is missing the %q attribute", name)
+		}
+	}
+}
+
+// TestCloudLoadBalancerVipPortIDStaysReplaceOnly pins the plan modifiers on
+// vip_port_id, the only way left to place the VIP.
+//
+// RequiresReplaceIfConfigured: the API cannot move a load balancer to another
+// port, so a changed vip_port_id must destroy and recreate it.
+// UseStateForUnknown: vip_port_id is computed when omitted, so without it every
+// plan of a load balancer created without vip_port_id would show the attribute
+// as "known after apply".
+func TestCloudLoadBalancerVipPortIDStaysReplaceOnly(t *testing.T) {
+	t.Parallel()
+
+	attribute, found := cloud_load_balancer.ResourceSchema(context.TODO()).Attributes["vip_port_id"]
+	if !found {
+		t.Fatal("vip_port_id is missing from the gcore_cloud_load_balancer resource schema")
+	}
+
+	port, ok := attribute.(resourceschema.StringAttribute)
+	if !ok {
+		t.Fatalf("vip_port_id is a %T, want resourceschema.StringAttribute", attribute)
+	}
+
+	if !port.Optional || !port.Computed {
+		t.Errorf("vip_port_id must be Optional and Computed, got Optional=%v Computed=%v", port.Optional, port.Computed)
+	}
+
+	ctx := context.TODO()
+	var got []string
+	for _, m := range port.PlanModifiers {
+		got = append(got, fmt.Sprintf("%T (%s)", m, m.Description(ctx)))
+	}
+	for _, want := range []planmodifier.String{
+		stringplanmodifier.RequiresReplaceIfConfigured(),
+		stringplanmodifier.UseStateForUnknown(),
+	} {
+		// RequiresReplace and RequiresReplaceIfConfigured share one type, so
+		// the description is what tells them apart.
+		found := slices.ContainsFunc(port.PlanModifiers, func(m planmodifier.String) bool {
+			return fmt.Sprintf("%T", m) == fmt.Sprintf("%T", want) && m.Description(ctx) == want.Description(ctx)
+		})
+		if !found {
+			t.Errorf("vip_port_id is missing the %q plan modifier; plan modifiers are %v", want.Description(ctx), got)
 		}
 	}
 }

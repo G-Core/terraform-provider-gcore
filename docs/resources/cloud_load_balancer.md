@@ -64,7 +64,7 @@ output "public_lb_with_fixed_ip" {
 
 ### Private load balancer
 
-Creates a load balancer on a private network with no public IP.
+Creates a load balancer on a private network with no public IP. The VIP is a reserved fixed IP in the private subnet, passed as `vip_port_id`.
 
 ```terraform
 resource "gcore_cloud_network" "private_network" {
@@ -83,14 +83,26 @@ resource "gcore_cloud_network_subnet" "private_subnet" {
   network_id = gcore_cloud_network.private_network.id
 }
 
+# The load balancer VIP is a Reserved Fixed IP port in the private subnet.
+# The Reserved Fixed IP outlives the load balancer and can be reused.
+resource "gcore_cloud_reserved_fixed_ip" "private_lb_vip" {
+  project_id = 1
+  region_id  = 1
+
+  type       = "subnet"
+  network_id = gcore_cloud_network.private_network.id
+  subnet_id  = gcore_cloud_network_subnet.private_subnet.id
+
+  is_vip = false
+}
+
 resource "gcore_cloud_load_balancer" "private_lb" {
   project_id = 1
   region_id  = 1
 
-  name           = "My first private load balancer"
-  flavor         = "lb1-1-2"
-  vip_network_id = gcore_cloud_network.private_network.id
-  vip_subnet_id  = gcore_cloud_network_subnet.private_subnet.id
+  name        = "My first private load balancer"
+  flavor      = "lb1-1-2"
+  vip_port_id = gcore_cloud_reserved_fixed_ip.private_lb_vip.port_id
 }
 
 output "private_lb_ip" {
@@ -100,7 +112,7 @@ output "private_lb_ip" {
 
 ### Private load balancer in dual-stack mode
 
-Creates a private load balancer with both IPv4 and IPv6 subnets.
+Creates a private load balancer with both IPv4 and IPv6 addresses, using a dual-stack reserved fixed IP as `vip_port_id`.
 
 ```terraform
 resource "gcore_cloud_network" "private_network_dualstack" {
@@ -128,18 +140,31 @@ resource "gcore_cloud_network_subnet" "private_subnet_ipv6" {
   network_id = gcore_cloud_network.private_network_dualstack.id
 }
 
-resource "gcore_cloud_load_balancer" "private_lb_dualstack" {
+# A dual-stack Reserved Fixed IP takes one IPv4 and one IPv6 address from the
+# network's subnets; the load balancer uses its port as the VIP.
+resource "gcore_cloud_reserved_fixed_ip" "private_lb_dualstack_vip" {
   project_id = 1
   region_id  = 1
 
-  name           = "My first private dual stack load balancer"
-  flavor         = "lb1-1-2"
-  vip_network_id = gcore_cloud_network.private_network_dualstack.id
-  vip_ip_family  = "dual"
+  type       = "any_subnet"
+  network_id = gcore_cloud_network.private_network_dualstack.id
+  ip_family  = "dual"
+
+  is_vip = false
+
   depends_on = [
     gcore_cloud_network_subnet.private_subnet_ipv4,
     gcore_cloud_network_subnet.private_subnet_ipv6,
   ]
+}
+
+resource "gcore_cloud_load_balancer" "private_lb_dualstack" {
+  project_id = 1
+  region_id  = 1
+
+  name        = "My first private dual stack load balancer"
+  flavor      = "lb1-1-2"
+  vip_port_id = gcore_cloud_reserved_fixed_ip.private_lb_dualstack_vip.port_id
 }
 ```
 
@@ -177,11 +202,9 @@ Available values: "L2", "L3".
 - `project_id` (Number) Project ID
 - `region_id` (Number) Region ID
 - `tags` (Map of String) Key-value tags to associate with the resource. A tag is a key-value pair that can be associated with a resource, enabling efficient filtering and grouping for better organization and management. Both tag keys and values have a maximum length of 255 characters. Some tags are read-only and cannot be modified by the user. Tags are also integrated with cost reports, allowing cost data to be filtered based on tag keys or values.
-- `vip_ip_family` (String) IP family for load balancer subnet auto-selection if `vip_network_id` is specified
+- `vip_ip_family` (String) IP family of the load balancer VIP. It selects the subnets of the default network, or of the `vip_port_id` network when it is set.
 Available values: "dual", "ipv4", "ipv6".
-- `vip_network_id` (String) Network ID for load balancer. If not specified, default external network will be used. Mutually exclusive with `vip_port_id`
-- `vip_port_id` (String) Existing Reserved Fixed IP port ID for load balancer. Mutually exclusive with `vip_network_id`
-- `vip_subnet_id` (String) Subnet ID for load balancer. If not specified, any subnet from `vip_network_id` will be selected. Ignored when `vip_network_id` is not specified.
+- `vip_port_id` (String) Existing Reserved Fixed IP port ID for load balancer. Use it to place the VIP in a private network. If not specified, the default external network is used.
 
 ### Read-Only
 

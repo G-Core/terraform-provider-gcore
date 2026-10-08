@@ -3,7 +3,6 @@ package cloud_load_balancer_test
 import (
 	"context"
 	"fmt"
-	"regexp"
 	"strconv"
 	"testing"
 
@@ -144,16 +143,19 @@ func TestAccCloudLoadBalancer_import(t *testing.T) {
 	})
 }
 
-// TestAccCloudLoadBalancer_importNoReplace guards the import behaviour of the
-// write-only attributes the API never returns in GET responses (`no_refresh`):
-// vip_network_id and vip_subnet_id. They are null in state after
-// an import, and with the built-in RequiresReplace() plan modifier a configured
-// value planned a destroy+recreate of a live load balancer.
-//
-// The expected plan after import is a one-time update-in-place that populates
-// both attributes in state from the config — never a replace.
-func TestAccCloudLoadBalancer_importNoReplace(t *testing.T) {
+// TestAccCloudLoadBalancer_privateVipPort covers the only way to give a load
+// balancer a private VIP: a gcore_cloud_reserved_fixed_ip in the private subnet,
+// passed as vip_port_id. Unlike the create-only network/subnet inputs it
+// replaced, vip_port_id is returned by the API, so the plan after create and
+// after import is empty, and the reserved fixed IP outlives the load balancer.
+func TestAccCloudLoadBalancer_privateVipPort(t *testing.T) {
 	rName := acctest.RandomName()
+
+	comparePortID := statecheck.CompareValuePairs(
+		"gcore_cloud_load_balancer.test", tfjsonpath.New("vip_port_id"),
+		"gcore_cloud_reserved_fixed_ip.test", tfjsonpath.New("port_id"),
+		compare.ValuesSame(),
+	)
 
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:                 func() { acctest.PreCheck(t) },
@@ -161,53 +163,34 @@ func TestAccCloudLoadBalancer_importNoReplace(t *testing.T) {
 		CheckDestroy:             testAccCheckCloudLoadBalancerDestroy,
 		Steps: []resource.TestStep{
 			{
-				Config: testAccCloudLoadBalancerConfigWithVIP(rName, "test"),
+				Config: testAccCloudLoadBalancerConfigWithVipPort(rName, "test"),
 				ConfigStateChecks: []statecheck.StateCheck{
 					statecheck.ExpectKnownValue("gcore_cloud_load_balancer.test",
-						tfjsonpath.New("name"), knownvalue.StringExact(rName)),
-					statecheck.ExpectKnownValue("gcore_cloud_load_balancer.test",
-						tfjsonpath.New("vip_network_id"), knownvalue.NotNull()),
-					statecheck.ExpectKnownValue("gcore_cloud_load_balancer.test",
-						tfjsonpath.New("vip_subnet_id"), knownvalue.NotNull()),
+						tfjsonpath.New("vip_address"), knownvalue.NotNull()),
+					comparePortID,
+				},
+				ConfigPlanChecks: resource.ConfigPlanChecks{
+					PostApplyPostRefresh: []plancheck.PlanCheck{plancheck.ExpectEmptyPlan()},
 				},
 			},
 			{
-				Config:            testAccCloudLoadBalancerConfigWithVIP(rName, "test"),
+				// An import block plans against the config, so this fails if
+				// importing a private load balancer would replace it.
+				Config:            testAccCloudLoadBalancerConfigWithVipPort(rName, "test"),
 				ResourceName:      "gcore_cloud_load_balancer.test",
 				ImportState:       true,
 				ImportStateKind:   resource.ImportBlockWithID,
 				ImportStateIdFunc: acctest.BuildImportID("gcore_cloud_load_balancer.test", "project_id", "region_id", "id"),
-				// The API cannot return these two attributes, so the plan right
-				// after import is non-empty by design: it populates them in state.
-				ExpectNonEmptyPlan: true,
-				ImportPlanChecks: resource.ImportPlanChecks{
-					PreApply: []plancheck.PlanCheck{
-						// Fails on Replace/DestroyBeforeCreate — the regression this guards.
-						plancheck.ExpectResourceAction("gcore_cloud_load_balancer.test",
-							plancheck.ResourceActionUpdate),
-					},
-				},
 			},
 		},
 	})
 }
 
-// TestAccCloudLoadBalancer_importAdoptionApplies covers the half of the fix a
-// plannable import block cannot reach. ImportBlockWithID steps only plan, so
-// they never exercise the adopting Update - the one that must strip the
-// create-only fields from the PATCH body instead of sending them to an endpoint
-// that rejects them, verify the adopted values against the API, and only then
-// write them to state.
-//
-// Command-mode import with ImportStatePersist puts the imported state into the
-// working state, so the following step actually applies. An ImportStatePersist
-// step cannot follow a create step for the same address (`terraform import`
-// refuses when the address is already in state), so the load balancer is first
-// forgotten with a `removed` block (Terraform >= 1.7) - it stays alive, only
-// its state entry goes away.
-func TestAccCloudLoadBalancer_importAdoptionApplies(t *testing.T) {
+// TestAccCloudLoadBalancer_privateVipPortDualStack places the VIP on a
+// dual-stack reserved fixed IP (one IPv4 and one IPv6 address from the
+// network's subnets).
+func TestAccCloudLoadBalancer_privateVipPortDualStack(t *testing.T) {
 	rName := acctest.RandomName()
-	var lbID string
 
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:                 func() { acctest.PreCheck(t) },
@@ -215,215 +198,28 @@ func TestAccCloudLoadBalancer_importAdoptionApplies(t *testing.T) {
 		CheckDestroy:             testAccCheckCloudLoadBalancerDestroy,
 		Steps: []resource.TestStep{
 			{
-				Config: testAccCloudLoadBalancerConfigWithVIP(rName, "test"),
-				Check: func(s *terraform.State) error {
-					rs, ok := s.RootModule().Resources["gcore_cloud_load_balancer.test"]
-					if !ok {
-						return fmt.Errorf("gcore_cloud_load_balancer.test not found in state")
-					}
-					lbID = rs.Primary.ID
-					return nil
-				},
-			},
-			{
-				// Forget the load balancer without destroying it, so the
-				// import below targets an address absent from state.
-				Config: testAccCloudLoadBalancerConfigWithVIPForgotten(rName),
-			},
-			{
-				Config:             testAccCloudLoadBalancerConfigWithVIP(rName, "test"),
-				ResourceName:       "gcore_cloud_load_balancer.test",
-				ImportState:        true,
-				ImportStateKind:    resource.ImportCommandWithID,
-				ImportStatePersist: true,
-				ImportStateIdFunc: func(*terraform.State) (string, error) {
-					return fmt.Sprintf("%s/%s/%s", acctest.ProjectID(), acctest.RegionID(), lbID), nil
-				},
-			},
-			{
-				// Adopts vip_network_id/vip_subnet_id into state. Must not
-				// replace the load balancer and must leave a clean plan.
-				Config: testAccCloudLoadBalancerConfigWithVIP(rName, "test"),
-				ConfigPlanChecks: resource.ConfigPlanChecks{
-					PreApply: []plancheck.PlanCheck{
-						plancheck.ExpectResourceAction("gcore_cloud_load_balancer.test",
-							plancheck.ResourceActionUpdate),
-					},
-				},
+				Config: testAccCloudLoadBalancerConfigDualStackVipPort(rName),
 				ConfigStateChecks: []statecheck.StateCheck{
 					statecheck.ExpectKnownValue("gcore_cloud_load_balancer.test",
-						tfjsonpath.New("vip_network_id"), knownvalue.NotNull()),
-					statecheck.ExpectKnownValue("gcore_cloud_load_balancer.test",
-						tfjsonpath.New("vip_subnet_id"), knownvalue.NotNull()),
+						tfjsonpath.New("vip_address"), knownvalue.NotNull()),
+					statecheck.CompareValuePairs(
+						"gcore_cloud_load_balancer.test", tfjsonpath.New("vip_port_id"),
+						"gcore_cloud_reserved_fixed_ip.test", tfjsonpath.New("port_id"),
+						compare.ValuesSame(),
+					),
+				},
+				ConfigPlanChecks: resource.ConfigPlanChecks{
+					PostApplyPostRefresh: []plancheck.PlanCheck{plancheck.ExpectEmptyPlan()},
 				},
 			},
 		},
 	})
 }
 
-// TestAccCloudLoadBalancer_staleMarkerMismatchErrors is the reviewer's
-// stale-marker scenario end to end: import with a config that sets none of the
-// create-only attributes (nothing to adopt, no update ever runs, the marker
-// stays in private state), then point vip_network_id/vip_subnet_id at a
-// different network on day two.
-//
-// The plan legitimately shows an in-place update - no plan-time hook can
-// retire the marker, because Terraform discards private-state writes made
-// during no-op plans - but the apply must fail loudly against the API
-// evidence instead of silently writing a network the load balancer is not on
-// into state. The final plan-only step proves nothing was adopted.
-func TestAccCloudLoadBalancer_staleMarkerMismatchErrors(t *testing.T) {
-	rName := acctest.RandomName()
-	var lbID string
-
-	resource.ParallelTest(t, resource.TestCase{
-		PreCheck:                 func() { acctest.PreCheck(t) },
-		ProtoV6ProviderFactories: acctest.ProtoV6ProviderFactories,
-		CheckDestroy:             testAccCheckCloudLoadBalancerDestroy,
-		Steps: []resource.TestStep{
-			{
-				// The load balancer genuinely lives on network "test": created
-				// with the VIP attributes, which only exist in config for this
-				// step.
-				Config: testAccCloudLoadBalancerConfigWithTwoNetworks(rName, "test"),
-				Check: func(s *terraform.State) error {
-					rs, ok := s.RootModule().Resources["gcore_cloud_load_balancer.test"]
-					if !ok {
-						return fmt.Errorf("gcore_cloud_load_balancer.test not found in state")
-					}
-					lbID = rs.Primary.ID
-					return nil
-				},
-			},
-			{
-				// Forget the load balancer without destroying it (Terraform >= 1.7).
-				Config: testAccCloudLoadBalancerConfigTwoNetworksForgotten(rName),
-			},
-			{
-				// Re-import with a config that omits the create-only
-				// attributes: the adoption marker is written and nothing ever
-				// clears it, because every following plan is a no-op.
-				Config:             testAccCloudLoadBalancerConfigTwoNetworksNoVIP(rName),
-				ResourceName:       "gcore_cloud_load_balancer.test",
-				ImportState:        true,
-				ImportStateKind:    resource.ImportCommandWithID,
-				ImportStatePersist: true,
-				ImportStateIdFunc: func(*terraform.State) (string, error) {
-					return fmt.Sprintf("%s/%s/%s", acctest.ProjectID(), acctest.RegionID(), lbID), nil
-				},
-			},
-			{
-				// A no-op apply between import and the day-two edit: the
-				// marker survives it, which is exactly why apply-time
-				// verification has to exist.
-				Config: testAccCloudLoadBalancerConfigTwoNetworksNoVIP(rName),
-			},
-			{
-				// Day two: the stale marker suppresses replacement, so the
-				// plan is an in-place update - and the apply must then refuse
-				// the adoption because the API says the load balancer lives on
-				// network "test", not "other".
-				Config: testAccCloudLoadBalancerConfigWithTwoNetworks(rName, "other"),
-				ConfigPlanChecks: resource.ConfigPlanChecks{
-					PreApply: []plancheck.PlanCheck{
-						plancheck.ExpectResourceAction("gcore_cloud_load_balancer.test",
-							plancheck.ResourceActionUpdate),
-					},
-				},
-				ExpectError: regexp.MustCompile(`does not match the imported load balancer`),
-			},
-			{
-				// Nothing may have been adopted: with the VIP attributes gone
-				// from config again, state must still hold nulls and the plan
-				// must be empty.
-				Config:   testAccCloudLoadBalancerConfigTwoNetworksNoVIP(rName),
-				PlanOnly: true,
-			},
-		},
-	})
-}
-
-// TestAccCloudLoadBalancer_lateAdoptionCorrectValue pins the deliberate
-// semantics change that comes with apply-time verification: filling in the
-// TRUE vip_network_id/vip_subnet_id long after an adopt-nothing import is a
-// verified in-place adoption, not a destroy+recreate to the same value. It
-// also pins that the successful adoption retires the marker: a subsequent
-// change to another network must plan a replacement again.
-func TestAccCloudLoadBalancer_lateAdoptionCorrectValue(t *testing.T) {
-	rName := acctest.RandomName()
-	var lbID string
-
-	compareIDSame := statecheck.CompareValue(compare.ValuesSame())
-
-	resource.ParallelTest(t, resource.TestCase{
-		PreCheck:                 func() { acctest.PreCheck(t) },
-		ProtoV6ProviderFactories: acctest.ProtoV6ProviderFactories,
-		CheckDestroy:             testAccCheckCloudLoadBalancerDestroy,
-		Steps: []resource.TestStep{
-			{
-				Config: testAccCloudLoadBalancerConfigWithTwoNetworks(rName, "test"),
-				Check: func(s *terraform.State) error {
-					rs, ok := s.RootModule().Resources["gcore_cloud_load_balancer.test"]
-					if !ok {
-						return fmt.Errorf("gcore_cloud_load_balancer.test not found in state")
-					}
-					lbID = rs.Primary.ID
-					return nil
-				},
-			},
-			{
-				Config: testAccCloudLoadBalancerConfigTwoNetworksForgotten(rName),
-			},
-			{
-				Config:             testAccCloudLoadBalancerConfigTwoNetworksNoVIP(rName),
-				ResourceName:       "gcore_cloud_load_balancer.test",
-				ImportState:        true,
-				ImportStateKind:    resource.ImportCommandWithID,
-				ImportStatePersist: true,
-				ImportStateIdFunc: func(*terraform.State) (string, error) {
-					return fmt.Sprintf("%s/%s/%s", acctest.ProjectID(), acctest.RegionID(), lbID), nil
-				},
-			},
-			{
-				// Day two with the values the load balancer really has: the
-				// apply verifies them against the API and adopts in place.
-				Config: testAccCloudLoadBalancerConfigWithTwoNetworks(rName, "test"),
-				ConfigPlanChecks: resource.ConfigPlanChecks{
-					PreApply: []plancheck.PlanCheck{
-						plancheck.ExpectResourceAction("gcore_cloud_load_balancer.test",
-							plancheck.ResourceActionUpdate),
-					},
-				},
-				ConfigStateChecks: []statecheck.StateCheck{
-					statecheck.ExpectKnownValue("gcore_cloud_load_balancer.test",
-						tfjsonpath.New("vip_network_id"), knownvalue.NotNull()),
-					statecheck.ExpectKnownValue("gcore_cloud_load_balancer.test",
-						tfjsonpath.New("vip_subnet_id"), knownvalue.NotNull()),
-					compareIDSame.AddStateValue("gcore_cloud_load_balancer.test", tfjsonpath.New("id")),
-				},
-			},
-			{
-				// The adoption cleared the marker, so a genuine network change
-				// is back on the replacement path. The plan check fails the
-				// step before the apply if the marker were still suppressing
-				// replacement.
-				Config: testAccCloudLoadBalancerConfigWithTwoNetworks(rName, "other"),
-				ConfigPlanChecks: resource.ConfigPlanChecks{
-					PreApply: []plancheck.PlanCheck{
-						plancheck.ExpectResourceAction("gcore_cloud_load_balancer.test",
-							plancheck.ResourceActionDestroyBeforeCreate),
-					},
-				},
-			},
-		},
-	})
-}
-
-// TestAccCloudLoadBalancer_vipNetworkChangeStillReplaces is the negative case:
-// the import-safe modifiers must not weaken replacement for a genuine change.
-// Pointing vip_network_id/vip_subnet_id at a different network has to destroy
-// and recreate the load balancer, because the update API cannot move it.
-func TestAccCloudLoadBalancer_vipNetworkChangeStillReplaces(t *testing.T) {
+// TestAccCloudLoadBalancer_vipPortChangeReplaces: the update API cannot move a
+// load balancer to another port, so pointing vip_port_id at a different
+// reserved fixed IP has to destroy and recreate it.
+func TestAccCloudLoadBalancer_vipPortChangeReplaces(t *testing.T) {
 	rName := acctest.RandomName()
 
 	resource.ParallelTest(t, resource.TestCase{
@@ -432,10 +228,10 @@ func TestAccCloudLoadBalancer_vipNetworkChangeStillReplaces(t *testing.T) {
 		CheckDestroy:             testAccCheckCloudLoadBalancerDestroy,
 		Steps: []resource.TestStep{
 			{
-				Config: testAccCloudLoadBalancerConfigWithTwoNetworks(rName, "test"),
+				Config: testAccCloudLoadBalancerConfigWithTwoVipPorts(rName, "test"),
 			},
 			{
-				Config: testAccCloudLoadBalancerConfigWithTwoNetworks(rName, "other"),
+				Config: testAccCloudLoadBalancerConfigWithTwoVipPorts(rName, "other"),
 				ConfigPlanChecks: resource.ConfigPlanChecks{
 					PreApply: []plancheck.PlanCheck{
 						plancheck.ExpectResourceAction("gcore_cloud_load_balancer.test",
@@ -591,9 +387,8 @@ resource "gcore_cloud_load_balancer" "test" {
 }
 
 // testAccCloudLoadBalancerNetworkBlocks emits one network+subnet pair under
-// the given resource label. Shared between the with-LB, without-LB and
-// forgotten-LB configs so the network resources stay identical across steps
-// and are never replaced mid-test.
+// the given resource label, so the network resources stay identical across
+// steps and are never replaced mid-test.
 func testAccCloudLoadBalancerNetworkBlocks(name, network, cidr string) string {
 	return fmt.Sprintf(`
 resource "gcore_cloud_network" %[4]q {
@@ -613,84 +408,86 @@ resource "gcore_cloud_network_subnet" %[4]q {
 }`, acctest.ProjectID(), acctest.RegionID(), name, network, cidr)
 }
 
-// testAccCloudLoadBalancerRemovedBlock forgets the load balancer without
-// destroying it (Terraform >= 1.7): its state entry goes away, the live
-// resource stays, and a later step can legally import it again.
-const testAccCloudLoadBalancerRemovedBlock = `
-removed {
-  from = gcore_cloud_load_balancer.test
+// testAccCloudLoadBalancerVipPortBlocks emits a network+subnet pair and a
+// reserved fixed IP in that subnet, all under the given resource label.
+func testAccCloudLoadBalancerVipPortBlocks(name, label, cidr string) string {
+	return testAccCloudLoadBalancerNetworkBlocks(name, label, cidr) + fmt.Sprintf(`
 
-  lifecycle {
-    destroy = false
-  }
-}`
-
-// testAccCloudLoadBalancerConfigWithVIP points the load balancer at a
-// dedicated network+subnet pair, so vip_network_id/vip_subnet_id are set and
-// can be adopted after an import.
-func testAccCloudLoadBalancerConfigWithVIP(name, network string) string {
-	return testAccCloudLoadBalancerNetworkBlocks(name, network, "10.0.0.0/24") + fmt.Sprintf(`
-
-resource "gcore_cloud_load_balancer" "test" {
-  project_id     = %[1]s
-  region_id      = %[2]s
-  name           = %[3]q
-  flavor         = "lb1-1-2"
-  vip_network_id = gcore_cloud_network.%[4]s.id
-  vip_subnet_id  = gcore_cloud_network_subnet.%[4]s.id
-}`, acctest.ProjectID(), acctest.RegionID(), name, network)
-}
-
-// testAccCloudLoadBalancerConfigWithVIPForgotten keeps the network+subnet of
-// testAccCloudLoadBalancerConfigWithVIP(name, "test") and replaces the load
-// balancer block with a removed block.
-func testAccCloudLoadBalancerConfigWithVIPForgotten(name string) string {
-	return testAccCloudLoadBalancerNetworkBlocks(name, "test", "10.0.0.0/24") +
-		testAccCloudLoadBalancerRemovedBlock
-}
-
-// testAccCloudLoadBalancerTwoNetworksBlocks declares the two network+subnet
-// pairs the stale-marker tests move the load balancer between.
-func testAccCloudLoadBalancerTwoNetworksBlocks(name string) string {
-	return testAccCloudLoadBalancerNetworkBlocks(name, "test", "10.0.0.0/24") +
-		testAccCloudLoadBalancerNetworkBlocks(name, "other", "10.1.0.0/24")
-}
-
-// testAccCloudLoadBalancerConfigWithTwoNetworks declares two networks and points
-// the load balancer at whichever one `network` names, so a step can swap the VIP
-// network without the target network itself being replaced.
-func testAccCloudLoadBalancerConfigWithTwoNetworks(name, network string) string {
-	return testAccCloudLoadBalancerTwoNetworksBlocks(name) + fmt.Sprintf(`
-
-resource "gcore_cloud_load_balancer" "test" {
-  project_id     = %[1]s
-  region_id      = %[2]s
-  name           = %[3]q
-  flavor         = "lb1-1-2"
-  vip_network_id = gcore_cloud_network.%[4]s.id
-  vip_subnet_id  = gcore_cloud_network_subnet.%[4]s.id
-}`, acctest.ProjectID(), acctest.RegionID(), name, network)
-}
-
-// testAccCloudLoadBalancerConfigTwoNetworksNoVIP keeps both networks but omits
-// the create-only VIP attributes from the load balancer: the adopt-nothing
-// import config.
-func testAccCloudLoadBalancerConfigTwoNetworksNoVIP(name string) string {
-	return testAccCloudLoadBalancerTwoNetworksBlocks(name) + fmt.Sprintf(`
-
-resource "gcore_cloud_load_balancer" "test" {
+resource "gcore_cloud_reserved_fixed_ip" %[3]q {
   project_id = %[1]s
   region_id  = %[2]s
-  name       = %[3]q
-  flavor     = "lb1-1-2"
-}`, acctest.ProjectID(), acctest.RegionID(), name)
+  type       = "subnet"
+  network_id = gcore_cloud_network.%[3]s.id
+  subnet_id  = gcore_cloud_network_subnet.%[3]s.id
+  is_vip     = false
+}`, acctest.ProjectID(), acctest.RegionID(), label)
 }
 
-// testAccCloudLoadBalancerConfigTwoNetworksForgotten keeps both networks and
-// replaces the load balancer block with a removed block.
-func testAccCloudLoadBalancerConfigTwoNetworksForgotten(name string) string {
-	return testAccCloudLoadBalancerTwoNetworksBlocks(name) +
-		testAccCloudLoadBalancerRemovedBlock
+// testAccCloudLoadBalancerConfigWithVipPort places the load balancer VIP on a
+// reserved fixed IP in a private subnet.
+func testAccCloudLoadBalancerConfigWithVipPort(name, label string) string {
+	return testAccCloudLoadBalancerVipPortBlocks(name, label, "10.0.0.0/24") + fmt.Sprintf(`
+
+resource "gcore_cloud_load_balancer" "test" {
+  project_id  = %[1]s
+  region_id   = %[2]s
+  name        = %[3]q
+  flavor      = "lb1-1-2"
+  vip_port_id = gcore_cloud_reserved_fixed_ip.%[4]s.port_id
+}`, acctest.ProjectID(), acctest.RegionID(), name, label)
+}
+
+// testAccCloudLoadBalancerConfigWithTwoVipPorts declares two reserved fixed IPs
+// and points the load balancer at whichever one `label` names, so a step can
+// swap the VIP port without the ports themselves being replaced.
+func testAccCloudLoadBalancerConfigWithTwoVipPorts(name, label string) string {
+	return testAccCloudLoadBalancerVipPortBlocks(name, "test", "10.0.0.0/24") +
+		testAccCloudLoadBalancerVipPortBlocks(name, "other", "10.1.0.0/24") + fmt.Sprintf(`
+
+resource "gcore_cloud_load_balancer" "test" {
+  project_id  = %[1]s
+  region_id   = %[2]s
+  name        = %[3]q
+  flavor      = "lb1-1-2"
+  vip_port_id = gcore_cloud_reserved_fixed_ip.%[4]s.port_id
+}`, acctest.ProjectID(), acctest.RegionID(), name, label)
+}
+
+// testAccCloudLoadBalancerConfigDualStackVipPort builds a network with an IPv4
+// and an IPv6 subnet and a dual-stack reserved fixed IP as the VIP port.
+func testAccCloudLoadBalancerConfigDualStackVipPort(name string) string {
+	return testAccCloudLoadBalancerNetworkBlocks(name, "test", "10.0.0.0/24") + fmt.Sprintf(`
+
+resource "gcore_cloud_network_subnet" "test_v6" {
+  project_id  = %[1]s
+  region_id   = %[2]s
+  name        = "%[3]s-test-subnet-v6"
+  network_id  = gcore_cloud_network.test.id
+  cidr        = "fd00::/120"
+  enable_dhcp = true
+}
+
+resource "gcore_cloud_reserved_fixed_ip" "test" {
+  project_id = %[1]s
+  region_id  = %[2]s
+  type       = "any_subnet"
+  network_id = gcore_cloud_network.test.id
+  ip_family  = "dual"
+  is_vip     = false
+
+  depends_on = [
+    gcore_cloud_network_subnet.test,
+    gcore_cloud_network_subnet.test_v6,
+  ]
+}
+
+resource "gcore_cloud_load_balancer" "test" {
+  project_id  = %[1]s
+  region_id   = %[2]s
+  name        = %[3]q
+  flavor      = "lb1-1-2"
+  vip_port_id = gcore_cloud_reserved_fixed_ip.test.port_id
+}`, acctest.ProjectID(), acctest.RegionID(), name)
 }
 
 func testAccCloudLoadBalancerConfigWithFlavor(name, flavor string) string {
@@ -840,10 +637,10 @@ func testAccCheckCloudLoadBalancerWithFloatingIPDestroy(s *terraform.State) erro
 }
 
 // testAccCloudLoadBalancerConfigSeparateFloatingIP builds a load balancer whose
-// VIP sits on a private subnet. A load balancer created without vip_network_id
-// gets its VIP straight on the external network and the API then refuses to
-// associate a floating IP with that port, so the private-VIP shape is the one
-// that needs a floating IP at all.
+// VIP is a reserved fixed IP on a private subnet. A load balancer created
+// without vip_port_id gets its VIP straight on the external network and the API
+// then refuses to associate a floating IP with that port, so the private-VIP
+// shape is the one that needs a floating IP at all.
 func testAccCloudLoadBalancerConfigSeparateFloatingIP(name string) string {
 	return fmt.Sprintf(`
 resource "gcore_cloud_network" "test" {
@@ -862,13 +659,21 @@ resource "gcore_cloud_network_subnet" "test" {
   enable_dhcp = true
 }
 
+resource "gcore_cloud_reserved_fixed_ip" "test" {
+  project_id = %[1]s
+  region_id  = %[2]s
+  type       = "subnet"
+  network_id = gcore_cloud_network.test.id
+  subnet_id  = gcore_cloud_network_subnet.test.id
+  is_vip     = false
+}
+
 resource "gcore_cloud_load_balancer" "test" {
-  project_id     = %[1]s
-  region_id      = %[2]s
-  name           = %[3]q
-  flavor         = "lb1-1-2"
-  vip_network_id = gcore_cloud_network.test.id
-  vip_subnet_id  = gcore_cloud_network_subnet.test.id
+  project_id  = %[1]s
+  region_id   = %[2]s
+  name        = %[3]q
+  flavor      = "lb1-1-2"
+  vip_port_id = gcore_cloud_reserved_fixed_ip.test.port_id
 }
 
 resource "gcore_cloud_floating_ip" "test" {
