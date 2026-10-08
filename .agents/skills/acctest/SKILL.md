@@ -132,7 +132,8 @@ func sweepCloudExample(_ string) error {
 `sweep.ShouldSweep` requires more than a name prefix: the resource must carry the run token named by
 `GCORE_SWEEP_RUN_ID`, and with that unset **no tokenized resource is swept**. Deletion is only safe once the owning
 run has finished, and no sweeper can determine that for itself, so the caller has to say which run it is reclaiming.
-`scripts/acctest` prints the command. The one exception is `GCORE_SWEEP_UNTOKENIZED=1`, which reclaims names predating
+`scripts/acctest` prints the command. The sweep also refuses to start until `GCORE_SWEEP_ACCOUNT_ID` names the account
+the credentials resolve to, so supply that too. The one exception is `GCORE_SWEEP_UNTOKENIZED=1`, which reclaims names predating
 tokens and ignores the run id; see the infrastructure reference before using it.
 
 ### Resources with no name

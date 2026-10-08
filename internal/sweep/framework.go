@@ -1,9 +1,13 @@
 package sweep
 
 import (
+	"errors"
 	"log"
+	"net/http"
 	"os"
 	"strings"
+
+	"github.com/G-Core/gcore-go"
 )
 
 // The only name prefixes a sweeper will delete. Unexported consts rather than
@@ -45,6 +49,7 @@ func IsTestResource(name string) bool {
 func ShouldSweep(resourceType, name string) bool {
 	if !IsTestResource(name) {
 		log.Printf("[DEBUG] Skipping %s: %s (not a test resource)", resourceType, name)
+		recordSkip(resourceType)
 		return false
 	}
 
@@ -55,45 +60,40 @@ func ShouldSweep(resourceType, name string) bool {
 			return true
 		}
 		log.Printf("[INFO] Skipping %s: %s (predates run tokens; set %s=1 to reclaim)", resourceType, name, EnvSweepUntokenized)
+		recordSkip(resourceType)
 		return false
 	}
 
 	return ShouldSweepToken(resourceType, name, token)
 }
 
-// SkipSweepError determines if a sweeper error should be skipped.
-// Some errors are expected and shouldn't cause the entire sweep to fail.
+// SkipSweepError reports whether a List error means "this sweeper cannot see
+// anything here" rather than "this sweeper failed".
 //
-// Common skippable errors:
-// - Access denied (sweeper doesn't have permission)
-// - Resource not found (already deleted)
-// - Region not available (region doesn't exist for this account)
+// It matches on the HTTP status from the typed SDK error, never on substrings.
+// The previous implementation matched a bare "403" anywhere in the error text,
+// so an error mentioning a resource id containing "403" silently became a clean
+// sweep -- as did a genuine credential failure.
 //
-// Returns true if the error should be ignored, false if it's a real failure.
+// A skip is counted, and a run with any skip exits non-zero: an account the
+// sweep could not see is indistinguishable from an account with nothing left in
+// it, and treating the two the same is how cleanup appears to work while
+// nothing is reclaimed.
 func SkipSweepError(err error) bool {
 	if err == nil {
 		return false
 	}
 
-	errMsg := err.Error()
-
-	// Skip access denied errors
-	skipPatterns := []string{
-		"Access Denied",
-		"AccessDenied",
-		"Forbidden",
-		"403",
-		"UnauthorizedOperation",
-		"not authorized",
-		"insufficient permissions",
-		// Add more patterns as needed based on Gcore API errors
+	var apiErr *gcore.Error
+	if !errors.As(err, &apiErr) {
+		// An error of unknown shape is a real failure, not a skip.
+		return false
 	}
 
-	for _, pattern := range skipPatterns {
-		if strings.Contains(errMsg, pattern) {
-			return true
-		}
+	switch apiErr.StatusCode {
+	case http.StatusUnauthorized, http.StatusForbidden, http.StatusNotFound:
+		recordAPISkip(apiErr.StatusCode)
+		return true
 	}
-
 	return false
 }

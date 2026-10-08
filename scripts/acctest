@@ -17,6 +17,14 @@ fi
 export GCORE_ACCTEST_RUN_ID
 
 echo "==> Running acceptance tests (run id: $GCORE_ACCTEST_RUN_ID)"
-echo "    Reclaim afterwards with:"
-printf '      GCORE_SWEEP_RUN_ID=%q ./scripts/sweep\n' "$GCORE_ACCTEST_RUN_ID"
+# The sweep refuses to run until GCORE_SWEEP_ACCOUNT_ID names the account the
+# credentials resolve to. It is deliberately not looked up here: the point is
+# that whoever runs the sweep states which account they mean.
+if [ -n "${GCORE_SWEEP_ACCOUNT_ID:-}" ]; then
+  echo "    Reclaim afterwards with:"
+  printf '      GCORE_SWEEP_ACCOUNT_ID=%q GCORE_SWEEP_RUN_ID=%q ./scripts/sweep\n' "$GCORE_SWEEP_ACCOUNT_ID" "$GCORE_ACCTEST_RUN_ID"
+else
+  echo "    Reclaim afterwards by exporting GCORE_SWEEP_ACCOUNT_ID (the account these credentials belong to), then:"
+  printf '      GCORE_SWEEP_RUN_ID=%q ./scripts/sweep\n' "$GCORE_ACCTEST_RUN_ID"
+fi
 TF_ACC=1 go test -count=1 -parallel=4 -timeout=30m "${@:-./...}"

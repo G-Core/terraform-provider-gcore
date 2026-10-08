@@ -136,17 +136,20 @@ func RunToken() string {
 func ShouldSweepToken(resourceType, identifier, token string) bool {
 	if token == "" {
 		log.Printf("[INFO] Skipping %s: %s (carries no run token; resources with no name are never swept without one, audit them manually)", resourceType, identifier)
+		recordSkip(resourceType)
 		return false
 	}
 
 	want, ok := os.LookupEnv(EnvSweepRunID)
 	if !ok || want == "" {
 		log.Printf("[WARN] Skipping %s: %s (%s is unset; a sweep must name the finished run it reclaims)", resourceType, identifier, EnvSweepRunID)
+		recordSkip(resourceType)
 		return false
 	}
 
 	if wantToken := Token(want); token != wantToken {
 		log.Printf("[DEBUG] Skipping %s: %s (token %q, sweeping %q)", resourceType, identifier, token, wantToken)
+		recordSkip(resourceType)
 		return false
 	}
 

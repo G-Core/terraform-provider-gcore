@@ -5,25 +5,20 @@ import (
 	"os"
 )
 
-// ValidateSweeperEnvironment checks that all required environment variables are set.
-// Call this at the beginning of each sweeper function.
+// ValidateSweeperEnvironment checks the environment a sweeper needs.
 //
-// Returns nil if environment is valid, error otherwise.
+// It validates values rather than mere presence: a project or region id that is
+// not a positive integer used to pass this check and then silently sweep
+// whatever the API made of it.
 func ValidateSweeperEnvironment() error {
-	apiKey := os.Getenv("GCORE_API_KEY")
-	if apiKey == "" {
+	if os.Getenv("GCORE_API_KEY") == "" {
 		return fmt.Errorf("GCORE_API_KEY must be set for sweepers")
 	}
-
-	projectID := os.Getenv("GCORE_CLOUD_PROJECT_ID")
-	if projectID == "" {
-		return fmt.Errorf("GCORE_CLOUD_PROJECT_ID must be set for sweepers")
+	if _, err := envInt64("GCORE_CLOUD_PROJECT_ID"); err != nil {
+		return err
 	}
-
-	regionID := os.Getenv("GCORE_CLOUD_REGION_ID")
-	if regionID == "" {
-		return fmt.Errorf("GCORE_CLOUD_REGION_ID must be set for sweepers")
+	if _, err := envInt64("GCORE_CLOUD_REGION_ID"); err != nil {
+		return err
 	}
-
 	return nil
 }

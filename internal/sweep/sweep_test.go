@@ -1,9 +1,12 @@
 package sweep_test
 
 import (
+	"os"
 	"testing"
 
 	"github.com/hashicorp/terraform-plugin-testing/helper/resource"
+
+	"github.com/G-Core/terraform-provider-gcore/internal/sweep"
 
 	// Import sweeper registrations.
 	//
@@ -61,5 +64,11 @@ import (
 )
 
 func TestMain(m *testing.M) {
+	// resource.TestMain runs the sweepers when -sweep is set, and exits
+	// non-zero if any sweeper *returned* an error; it returns here only on
+	// that clean path. Sweepers deliberately continue past individual delete
+	// failures, so "no sweeper returned an error" is not "cleanup succeeded".
+	// FinalExitCode is what closes the gap.
 	resource.TestMain(m)
+	os.Exit(sweep.FinalExitCode())
 }
