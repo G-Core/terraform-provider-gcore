@@ -84,6 +84,7 @@ import (
 	"github.com/G-Core/terraform-provider-gcore/internal/services/storage_sftp"
 	"github.com/G-Core/terraform-provider-gcore/internal/services/storage_ssh_key"
 	"github.com/G-Core/terraform-provider-gcore/internal/services/waap_domain"
+	"github.com/G-Core/terraform-provider-gcore/internal/services/waap_domain_policy"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/path"
@@ -274,6 +275,7 @@ func (p *GcoreProvider) Resources(ctx context.Context) []func() resource.Resourc
 		cloud_k8s_cluster.NewResource,
 		cloud_volume_snapshot.NewResource,
 		waap_domain.NewResource,
+		waap_domain_policy.NewResource,
 		fastedge_template.NewResource,
 		fastedge_secret.NewResource,
 		fastedge_binary.NewResource,
@@ -380,6 +382,7 @@ func (p *GcoreProvider) DataSources(ctx context.Context) []func() datasource.Dat
 		cloud_volume_snapshot.NewCloudVolumeSnapshotsDataSource,
 		waap_domain.NewWaapDomainDataSource,
 		waap_domain.NewWaapDomainsDataSource,
+		waap_domain_policy.NewWaapDomainPoliciesDataSource,
 		fastedge_template.NewFastedgeTemplateDataSource,
 		fastedge_template.NewFastedgeTemplatesDataSource,
 		fastedge_secret.NewFastedgeSecretDataSource,
