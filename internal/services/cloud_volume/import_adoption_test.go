@@ -11,6 +11,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
+	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
 	"github.com/hashicorp/terraform-plugin-framework/tfsdk"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-go/tftypes"
@@ -61,8 +62,8 @@ var adoptingAttributes = []string{"source", "attachment_tag", "image_id", "insta
 // attributes carry the marker-keyed modifier, and type_name is Computed+Optional
 // with UseNonNullStateForUnknown FIRST (a null rc.1 state under -refresh=false
 // plus a coincident change must plan unknown, which the apply-time back-fill
-// resolves, not null, which it would contradict), the case-folding modifier
-// before the framework's RequiresReplaceIfConfigured. Every constructor is
+// resolves, not null, which it would contradict), then
+// TypeNameReplaceUnlessRetypable. Every constructor is
 // pinned by its exact callee as well as by %T: the framework's
 // RequiresReplace() and RequiresReplaceIfConfigured() share a type, so %T
 // alone lets a reseal swap the rule while keeping the pin green.
@@ -88,8 +89,8 @@ func TestSchemaModifiersPinned(t *testing.T) {
 	}
 	adoptiontest.AssertComputedOptional(t, attrs, "type_name")
 	adoptiontest.AssertModifierTypes(t, attrs, "type_name",
-		"stringplanmodifier.useNonNullStateForUnknown", "planmodifiers.stringUseStateForCaseInsensitiveEqual", "stringplanmodifier.requiresReplaceIfModifier")
-	for _, fn := range []string{"stringplanmodifier.UseNonNullStateForUnknown", "planmodifiers.StringUseStateForCaseInsensitiveEqual", "stringplanmodifier.RequiresReplaceIfConfigured"} {
+		"stringplanmodifier.useNonNullStateForUnknown", "cloud_volume.typeNameReplaceUnlessRetypableModifier")
+	for _, fn := range []string{"stringplanmodifier.UseNonNullStateForUnknown", "TypeNameReplaceUnlessRetypable"} {
 		adoptiontest.AssertAttributeCallArgs(t, "schema.go", "type_name", fn, "")
 	}
 	// lifecycle_policy_ids keeps the null-prior heuristic on purpose (scope-out,
@@ -179,22 +180,36 @@ func TestTypeNameChainDecisions(t *testing.T) {
 		return resp.PlanValue, resp.RequiresReplace
 	}
 
-	// Import with "Standard" against a back-filled "standard": no replacement.
-	if plan, replace := run("standard", "standard", types.StringValue("Standard")); replace || !plan.Equal(types.StringValue("standard")) {
-		t.Errorf("case-folded match: plan = %v, replace = %v; want standard and no replacement", plan, replace)
+	// standard <-> ssd_hiiops is retyped in place.
+	if _, replace := run("standard", "standard", types.StringValue("ssd_hiiops")); replace {
+		t.Error("standard -> ssd_hiiops planned a replacement; it is retyped in place")
 	}
-	// A different type replaces (no retype in Update).
-	if _, replace := run("standard", "standard", types.StringValue("ssd_hiiops")); !replace {
-		t.Error("different type_name did not plan a replacement")
+	if _, replace := run("ssd_hiiops", "ssd_hiiops", types.StringValue("standard")); replace {
+		t.Error("ssd_hiiops -> standard planned a replacement; it is retyped in place")
+	}
+	// Any other change replaces.
+	for _, c := range [][2]string{{"standard", "cold"}, {"ssd_hiiops", "ultra"}, {"ssd_lowlatency", "standard"}, {"cold", "ssd_hiiops"}} {
+		if _, replace := run(c[0], c[0], types.StringValue(c[1])); !replace {
+			t.Errorf("%s -> %s did not plan a replacement", c[0], c[1])
+		}
+	}
+	// Omitted from the configuration: no replacement.
+	if _, replace := run("standard", "standard", types.StringNull()); replace {
+		t.Error("unconfigured type_name planned a replacement")
 	}
 	// The rc.1-poisoned record: restating it is a no-op, and setting the TRUE
-	// value replaces - exactly what warnRecordedTypeNameDrift must say.
+	// value is recorded in place - exactly what warnRecordedTypeNameDrift says.
 	if _, replace := run("ssd_hiiops", "standard", types.StringValue("ssd_hiiops")); replace {
 		t.Error("restating the recorded (wrong) type_name planned a replacement")
 	}
-	if _, replace := run("ssd_hiiops", "standard", types.StringValue("standard")); !replace {
-		t.Error("setting type_name to the reported volume_type over a wrong record did not plan a replacement; " +
-			"warnRecordedTypeNameDrift promises it does")
+	if _, replace := run("ssd_lowlatency", "cold", types.StringValue("cold")); replace {
+		t.Error("setting type_name to the reported volume_type over a wrong record planned a replacement; " +
+			"warnRecordedTypeNameDrift promises an in-place update")
+	}
+	// The real type decides: a wrong record of a retypable type does not make
+	// a non-retypable volume retypable.
+	if _, replace := run("standard", "cold", types.StringValue("ssd_hiiops")); !replace {
+		t.Error("cold volume recorded as standard -> ssd_hiiops did not plan a replacement")
 	}
 }
 
@@ -478,18 +493,24 @@ func TestWarnRecordedTypeNameDrift(t *testing.T) {
 	tests := []struct {
 		name       string
 		state      tfsdk.State
+		plan       *tfsdk.State // nil: the plan keeps the recorded values
 		wantDriftW bool
 	}{
-		{"matching", stateWith("standard", "standard"), false},
-		{"case-folded match", stateWith("Standard", "standard"), false},
-		{"null type_name", stateWith(nil, "standard"), false},
-		{"null volume_type", stateWith("standard", nil), false},
-		{"rc.1 lie", stateWith("ssd_hiiops", "standard"), true},
+		{"matching", stateWith("standard", "standard"), nil, false},
+		{"case-folded match", stateWith("Standard", "standard"), nil, false},
+		{"null type_name", stateWith(nil, "standard"), nil, false},
+		{"null volume_type", stateWith("standard", nil), nil, false},
+		{"rc.1 lie", stateWith("ssd_hiiops", "standard"), nil, true},
+		{"rc.1 lie, plan corrects it", stateWith("ssd_hiiops", "standard"), ptr(stateWith("standard", "standard")), false},
 	}
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
 			t.Parallel()
-			req := resource.ModifyPlanRequest{State: tc.state, Plan: tfsdk.Plan{Raw: tc.state.Raw, Schema: s}}
+			plan := tc.state
+			if tc.plan != nil {
+				plan = *tc.plan
+			}
+			req := resource.ModifyPlanRequest{State: tc.state, Plan: tfsdk.Plan{Raw: plan.Raw, Schema: s}}
 			resp := &resource.ModifyPlanResponse{Plan: req.Plan}
 			warnRecordedTypeNameDrift(ctx, req, resp)
 			got := false
@@ -498,9 +519,9 @@ func TestWarnRecordedTypeNameDrift(t *testing.T) {
 					continue
 				}
 				got = true
-				// The wording must match TestTypeNameChainDecisions: any other
-				// value replaces, omission keeps the record, state surgery corrects.
-				for _, want := range []string{"plans a replacement", "omitting it keeps the recorded value", "terraform state rm", "terraform import"} {
+				// The wording must match TestTypeNameChainDecisions: the real
+				// type corrects in place, omission keeps the record.
+				for _, want := range []string{"correct the record in place", "omitting it keeps the recorded value"} {
 					if !strings.Contains(d.Detail(), want) {
 						t.Errorf("warning detail lacks %q:\n%s", want, d.Detail())
 					}
@@ -528,6 +549,87 @@ func TestWarnRecordedTypeNameDrift(t *testing.T) {
 		warnRecordedTypeNameDrift(ctx, req, resp)
 		if len(resp.Diagnostics) != 0 {
 			t.Errorf("%s: %v", name, resp.Diagnostics)
+		}
+	}
+}
+
+// TestRetypePlanned pins when Update calls the retype API: only for a change
+// of the record that differs from the real type. An unchanged record over a
+// contradicting volume_type (rc.1 drift, type_name omitted) must not retype.
+func TestRetypePlanned(t *testing.T) {
+	t.Parallel()
+	s := types.StringValue
+	tests := []struct {
+		name                 string
+		plan, recorded, real types.String
+		want                 bool
+	}{
+		{"change", s("ssd_hiiops"), s("standard"), s("standard"), true},
+		{"case-only change", s("Standard"), s("standard"), s("standard"), false},
+		{"unchanged record over drift", s("ssd_hiiops"), s("ssd_hiiops"), s("standard"), false},
+		{"record corrected to real type", s("standard"), s("ssd_hiiops"), s("standard"), false},
+		{"retype done, record stale (partial failure)", s("ssd_hiiops"), s("standard"), s("ssd_hiiops"), false},
+		{"null volume_type falls back to record", s("ssd_hiiops"), s("standard"), types.StringNull(), true},
+		{"unknown plan", types.StringUnknown(), s("standard"), s("standard"), false},
+	}
+	for _, tc := range tests {
+		if got := retypePlanned(tc.plan, tc.recorded, tc.real); got != tc.want {
+			t.Errorf("%s: retypePlanned = %v, want %v", tc.name, got, tc.want)
+		}
+	}
+}
+
+func ptr[T any](v T) *T { return &v }
+
+// TestTypeNameValidatorCaseSensitive: type_name accepts the API's lowercase
+// values only. A case-only difference between config and state makes the
+// framework mark every computed attribute unknown before any plan modifier
+// runs, so it can never plan clean.
+func TestTypeNameValidatorCaseSensitive(t *testing.T) {
+	t.Parallel()
+	ctx := context.Background()
+	attr := ResourceSchema(ctx).Attributes["type_name"].(schema.StringAttribute)
+	for value, wantErr := range map[string]bool{"ssd_hiiops": false, "standard": false, "SSD_HIIOPS": true, "Standard": true} {
+		var diags diag.Diagnostics
+		for _, v := range attr.Validators {
+			resp := &validator.StringResponse{}
+			v.ValidateString(ctx, validator.StringRequest{Path: path.Root("type_name"), ConfigValue: types.StringValue(value)}, resp)
+			diags.Append(resp.Diagnostics...)
+		}
+		if diags.HasError() != wantErr {
+			t.Errorf("type_name = %q: error = %v, want %v", value, diags.HasError(), wantErr)
+		}
+	}
+}
+
+// TestTypeNameCaseNormalisedOnReadOnly: a record in another case (accepted by
+// earlier versions) takes the API's case on refresh, and only there: Update
+// must return the planned value, so backfillTypeName leaves known values alone
+// (an Update with -refresh=false over a "Standard" record would otherwise fail
+// with an inconsistent result).
+func TestTypeNameCaseNormalisedOnReadOnly(t *testing.T) {
+	t.Parallel()
+	for _, tc := range []struct{ recorded, real, want string }{
+		{"SSD_HIIOPS", "ssd_hiiops", "ssd_hiiops"},
+		{"Standard", "standard", "standard"},
+		{"ssd_hiiops", "standard", "ssd_hiiops"},
+	} {
+		data := &CloudVolumeModel{TypeName: types.StringValue(tc.recorded), VolumeType: types.StringValue(tc.real)}
+		backfillTypeName(data)
+		if got := data.TypeName.ValueString(); got != tc.recorded {
+			t.Errorf("backfillTypeName changed known %q to %q", tc.recorded, got)
+		}
+		normaliseTypeNameCase(data)
+		if got := data.TypeName.ValueString(); got != tc.want {
+			t.Errorf("recorded %q, real %q: type_name = %q, want %q", tc.recorded, tc.real, got, tc.want)
+		}
+	}
+	if n := adoptiontest.CountInMethod(t, "resource.go", "CloudVolumeResource", "Read", "normaliseTypeNameCase(data)"); n != 1 {
+		t.Errorf("Read calls normaliseTypeNameCase %d times, want 1", n)
+	}
+	for _, m := range []string{"Create", "Update", "ImportState"} {
+		if n := adoptiontest.CountInMethod(t, "resource.go", "CloudVolumeResource", m, "normaliseTypeNameCase(data)"); n != 0 {
+			t.Errorf("%s calls normaliseTypeNameCase; it must return the planned value", m)
 		}
 	}
 }

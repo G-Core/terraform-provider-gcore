@@ -109,9 +109,9 @@ func TestCheckCreatePrerequisites(t *testing.T) {
 			wantWarn: "image_id",
 		},
 		{
-			name:     "poisoned shape with type_name configured in another case -> warning",
-			plan:     shape{"source": "image", "name": "v", "type_name": "standard"}, // the case-fold modifier planned the prior value
-			config:   shape{"source": "image", "name": "v", "type_name": "Standard"},
+			name:     "poisoned shape with type_name restated -> warning",
+			plan:     shape{"source": "image", "name": "v", "type_name": "standard"},
+			config:   shape{"source": "image", "name": "v", "type_name": "standard"},
 			state:    shape{"source": "image", "name": "v", "type_name": "standard"},
 			wantWarn: "image_id",
 		},
@@ -124,8 +124,15 @@ func TestCheckCreatePrerequisites(t *testing.T) {
 		},
 		// A replacement is coming: error before the destroy.
 		{
-			name:    "poisoned shape plus a type_name change -> error",
-			plan:    shape{"source": "image", "type_name": "ssd_hiiops"},
+			// standard -> ssd_hiiops is retyped in place.
+			name:     "poisoned shape plus a retypable type_name change -> warning, in-place",
+			plan:     shape{"source": "image", "type_name": "ssd_hiiops"},
+			state:    shape{"source": "image", "type_name": "standard"},
+			wantWarn: "image_id",
+		},
+		{
+			name:    "poisoned shape plus a non-retypable type_name change -> error",
+			plan:    shape{"source": "image", "type_name": "cold"},
 			state:   shape{"source": "image", "type_name": "standard"},
 			wantErr: "image_id",
 		},
@@ -323,6 +330,7 @@ func TestReplaceBearingMatchesSchema(t *testing.T) {
 		"int64planmodifier.requiresReplaceIfModifier":               replaceIfConfigured,
 		"stringplanmodifier.requiresReplaceIfModifier":              replaceIfConfigured,
 		"planmodifiers.listRequiresReplaceIfNotNullModifier":        replaceIfStateNotNull,
+		"cloud_volume.typeNameReplaceUnlessRetypableModifier":       replaceUnlessRetypable,
 	}
 	attrs := ResourceSchema(context.Background()).Attributes
 	want := map[string]replaceRule{}
@@ -332,22 +340,10 @@ func TestReplaceBearingMatchesSchema(t *testing.T) {
 		default:
 			continue // nested attributes carry no replace modifier here
 		}
-		mods := adoptiontest.ModifierTypeNames(t, attrs, name)
-		caseFolded := false
-		for _, m := range mods {
-			if m == "planmodifiers.stringUseStateForCaseInsensitiveEqual" {
-				caseFolded = true
+		for _, m := range adoptiontest.ModifierTypeNames(t, attrs, name) {
+			if rule, ok := ruleByModifier[m]; ok {
+				want[name] = rule
 			}
-		}
-		for _, m := range mods {
-			rule, ok := ruleByModifier[m]
-			if !ok {
-				continue
-			}
-			if rule == replaceIfConfigured && caseFolded {
-				rule = replaceIfConfiguredCaseInsensitive
-			}
-			want[name] = rule
 		}
 	}
 	for name, rule := range want {

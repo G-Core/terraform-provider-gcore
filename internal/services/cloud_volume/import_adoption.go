@@ -169,16 +169,25 @@ func backfillTypeName(data *CloudVolumeModel) {
 	data.TypeName = data.VolumeType
 }
 
+// normaliseTypeNameCase gives a type_name recorded in another case (accepted by
+// earlier versions) the API's case. Read only: in Create/Update the planned
+// value must come back unchanged.
+func normaliseTypeNameCase(data *CloudVolumeModel) {
+	if data == nil || data.TypeName.IsNull() || data.TypeName.IsUnknown() ||
+		data.VolumeType.IsNull() || data.VolumeType.IsUnknown() {
+		return
+	}
+	if strings.EqualFold(data.TypeName.ValueString(), data.VolumeType.ValueString()) {
+		data.TypeName = data.VolumeType
+	}
+}
+
 // warnRecordedTypeNameDrift is marker-independent: it names a recorded type_name
 // that the refreshed volume_type contradicts (a 2.0.0-rc.1 adoption that was
-// never applied). It plans nothing - there is no in-place repair: type_name is
-// Computed, so omitting it keeps the recorded value, and the attribute's
-// RequiresReplaceIfConfigured plans a replacement for ANY configured value that
-// differs from the record, the true one included (the plan modifiers run before
-// this hook and their decision is append-only). The only non-destructive
-// correction is state surgery: remove the resource from state and import it
-// again, which back-fills type_name from volume_type. Fires on every plan
-// until then.
+// never applied). It plans nothing: type_name is Computed, so omitting it keeps
+// the recorded value. Setting it to the reported volume_type corrects the
+// record in place without an API call (typeNameReplaces compares against
+// volume_type). Fires on every plan until then, except the correcting one.
 func warnRecordedTypeNameDrift(ctx context.Context, req resource.ModifyPlanRequest, resp *resource.ModifyPlanResponse) {
 	if req.State.Raw.IsNull() || req.Plan.Raw.IsNull() {
 		return
@@ -193,13 +202,17 @@ func warnRecordedTypeNameDrift(ctx context.Context, req resource.ModifyPlanReque
 	if strings.EqualFold(state.TypeName.ValueString(), state.VolumeType.ValueString()) {
 		return
 	}
+	// This plan already corrects the record.
+	var planned types.String
+	if !req.Plan.GetAttribute(ctx, path.Root("type_name"), &planned).HasError() &&
+		!planned.IsUnknown() && strings.EqualFold(planned.ValueString(), state.VolumeType.ValueString()) {
+		return
+	}
 	resp.Diagnostics.AddAttributeWarning(path.Root("type_name"),
 		"Recorded type_name does not match the volume",
 		fmt.Sprintf("State records type_name %[1]q but the API reports volume_type %[2]q. The recorded "+
-			"value was accepted by an earlier provider version without being applied. Setting "+
-			"type_name to any value other than %[1]q - %[2]q included - plans a replacement of the "+
-			"volume; omitting it keeps the recorded value and this warning. To correct the record "+
-			"without replacing the volume, remove it from state and import it again "+
-			"(`terraform state rm`, then `terraform import`).",
+			"value was accepted by an earlier provider version without being applied. Set type_name "+
+			"to %[2]q to correct the record in place; omitting it keeps the recorded value and this "+
+			"warning. Any other value is planned against the real type %[2]q.",
 			state.TypeName.ValueString(), state.VolumeType.ValueString()))
 }

@@ -17,6 +17,7 @@ import (
 	"github.com/G-Core/terraform-provider-gcore/internal/importadoption"
 	"github.com/G-Core/terraform-provider-gcore/internal/importpath"
 	"github.com/G-Core/terraform-provider-gcore/internal/logging"
+	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 )
@@ -142,6 +143,21 @@ func (r *CloudVolumeResource) Update(ctx context.Context, req resource.UpdateReq
 		if resp.Diagnostics.HasError() {
 			return
 		}
+	}
+
+	// type_name changes that reach Update are retypable (see
+	// TypeNameReplaceUnlessRetypable); finish the retype before a resize.
+	retyped, diags := r.retypeIfChanged(ctx, data, state)
+	resp.Diagnostics.Append(diags...)
+	if resp.Diagnostics.HasError() {
+		return
+	}
+	if retyped {
+		// resp.State still holds the prior state, which an error below would
+		// save as is. Record the new type now so a failed resize or PATCH
+		// cannot hide the retype.
+		resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("type_name"), data.TypeName)...)
+		resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("volume_type"), data.TypeName)...)
 	}
 
 	// Handle volume size changes (resize) separately before other updates
@@ -320,6 +336,7 @@ func (r *CloudVolumeResource) Read(ctx context.Context, req resource.ReadRequest
 		data.Tags = tags
 	}
 	backfillTypeName(data)
+	normaliseTypeNameCase(data)
 
 	// Advance the import-adoption marker (internal/importadoption). Must run on
 	// every successful Read: Terraform persists this refresh in `terraform apply`

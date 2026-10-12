@@ -76,7 +76,9 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 				Computed:    true, // read back as volume_type; see backfillTypeName
 				Optional:    true,
 				Validators: []validator.String{
-					stringvalidator.OneOfCaseInsensitive(
+					// Case-sensitive: the API reports lowercase, and a case-only
+					// difference between config and state can never plan clean.
+					stringvalidator.OneOf(
 						"cold",
 						"ssd_hiiops",
 						"ssd_local",
@@ -89,9 +91,7 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 					// NOT UseStateForUnknown: a null rc.1 state under -refresh=false must
 					// plan unknown, not null, because the apply-time back-fill resolves it.
 					stringplanmodifier.UseNonNullStateForUnknown(),
-					// The validator is case-insensitive, the API reports canonical case.
-					planmodifiers.StringUseStateForCaseInsensitiveEqual(),
-					stringplanmodifier.RequiresReplaceIfConfigured(),
+					TypeNameReplaceUnlessRetypable(),
 				},
 			},
 			"lifecycle_policy_ids": schema.ListAttribute{

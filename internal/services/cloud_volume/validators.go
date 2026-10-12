@@ -139,13 +139,12 @@ const (
 	// value going to null (project_id/region_id written by ImportState, omitted
 	// from the configuration) is not a replacement.
 	replaceIfConfigured
-	// replaceIfConfiguredCaseInsensitive: replaceIfConfigured behind
-	// StringUseStateForCaseInsensitiveEqual - a configured value equal to prior
-	// state ignoring case is not a change.
-	replaceIfConfiguredCaseInsensitive
 	// replaceIfStateNotNull: ListRequiresReplaceIfNotNull - a change replaces
 	// only when prior state is not null (a null prior value is adopted in place).
 	replaceIfStateNotNull
+	// replaceUnlessRetypable: TypeNameReplaceUnlessRetypable - see
+	// typeNameReplaces.
+	replaceUnlessRetypable
 )
 
 // replaceBearing lists every attribute whose plan modifier can plan a
@@ -158,7 +157,7 @@ var replaceBearing = map[string]replaceRule{
 	"snapshot_id":              replaceUnlessAdopting,
 	"project_id":               replaceIfConfigured,
 	"region_id":                replaceIfConfigured,
-	"type_name":                replaceIfConfiguredCaseInsensitive,
+	"type_name":                replaceUnlessRetypable,
 	"lifecycle_policy_ids":     replaceIfStateNotNull,
 }
 
@@ -184,18 +183,17 @@ func attrReplaces(ctx context.Context, config tfsdk.Config, plan tfsdk.Plan, sta
 	switch rule {
 	case replaceIfConfigured:
 		return !c.IsNull()
-	case replaceIfConfiguredCaseInsensitive:
-		if c.IsNull() {
-			return false
-		}
-		ps, pok := p.(types.String)
-		ss, sok := s.(types.String)
-		if pok && sok && !ps.IsNull() && !ps.IsUnknown() && !ss.IsNull() && !ss.IsUnknown() {
-			return !strings.EqualFold(ps.ValueString(), ss.ValueString())
-		}
-		return true
 	case replaceIfStateNotNull:
 		return !s.IsNull()
+	case replaceUnlessRetypable:
+		cs, _ := c.(types.String)
+		ps, _ := p.(types.String)
+		ss, _ := s.(types.String)
+		var vt types.String
+		if state.GetAttribute(ctx, path.Root("volume_type"), &vt).HasError() {
+			return true
+		}
+		return typeNameReplaces(cs, ps, ss, vt)
 	default: // replaceUnlessAdopting
 		return !(s.IsNull() && adopting)
 	}

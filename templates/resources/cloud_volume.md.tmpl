@@ -54,9 +54,8 @@ an update-in-place and a warning naming the attributes. `image_id` and
 contradiction fails the apply; the others are trusted as-is, so check them
 first. `type_name` is read from the API, so omitting it keeps the recorded
 value; write the lowercase value the API reports (`standard`, not
-`Standard`): a value that differs only in case is accepted without
-replacement, but the plan keeps showing an in-place update of the computed
-attributes until the spelling matches. After that apply, changing or
+`Standard`): a value that differs only in case fails validation at plan
+time. After that apply, changing or
 removing `source`, `image_id`, `snapshot_id`, `attachment_tag` or
 `instance_id_to_attach_to` plans a replacement; use `terraform apply
 -replace=` to recreate the volume with different values. A configuration

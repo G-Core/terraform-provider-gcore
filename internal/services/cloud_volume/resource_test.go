@@ -458,36 +458,86 @@ func TestAccCloudVolume_importFromSnapshotNoReplacement(t *testing.T) {
 	})
 }
 
-// TestAccCloudVolume_typeNameChangeReplaces: a real type change on a known
-// volume still plans a replacement. The API has an in-place retype for
-// standard<->ssd_hiiops (the v0.x provider used it); honouring it in place is a
-// follow-up, so today the honest action is a loud replacement, never a silent
-// state-only update.
-func TestAccCloudVolume_typeNameChangeReplaces(t *testing.T) {
+// TestAccCloudVolume_typeNameRetypeInPlace: standard <-> ssd_hiiops is applied
+// through the retype API, both ways, keeping the volume ID. Changes to any other
+// type still replace (TestTypeNameChainDecisions).
+func TestAccCloudVolume_typeNameRetypeInPlace(t *testing.T) {
 	rName := acctest.RandomName()
-	compareIDDifferent := statecheck.CompareValue(compare.ValuesDiffer())
+	compareIDSame := statecheck.CompareValue(compare.ValuesSame())
+
+	step := func(typeName string, action plancheck.ResourceActionType) resource.TestStep {
+		return resource.TestStep{
+			Config: testAccCloudVolumeConfigTypeName(rName, typeName),
+			ConfigPlanChecks: resource.ConfigPlanChecks{
+				PreApply: []plancheck.PlanCheck{
+					plancheck.ExpectResourceAction("gcore_cloud_volume.test", action),
+				},
+			},
+			ConfigStateChecks: []statecheck.StateCheck{
+				compareIDSame.AddStateValue("gcore_cloud_volume.test", tfjsonpath.New("id")),
+				statecheck.ExpectKnownValue("gcore_cloud_volume.test",
+					tfjsonpath.New("volume_type"), knownvalue.StringExact(typeName)),
+			},
+		}
+	}
 
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:                 func() { acctest.PreCheck(t) },
 		ProtoV6ProviderFactories: acctest.ProtoV6ProviderFactories,
 		CheckDestroy:             testAccCheckCloudVolumeDestroy,
 		Steps: []resource.TestStep{
+			step("standard", plancheck.ResourceActionCreate),
+			step("ssd_hiiops", plancheck.ResourceActionUpdate),
+			step("standard", plancheck.ResourceActionUpdate),
+		},
+	})
+}
+
+// TestAccCloudVolume_retypeSurvivesFailedResize: a retype followed by a resize
+// the API refuses (size far above any quota) still records the new type, so
+// switching the configuration back plans a retype back instead of nothing.
+func TestAccCloudVolume_retypeSurvivesFailedResize(t *testing.T) {
+	rName := acctest.RandomName()
+
+	resource.ParallelTest(t, resource.TestCase{
+		PreCheck:                 func() { acctest.PreCheck(t) },
+		ProtoV6ProviderFactories: acctest.ProtoV6ProviderFactories,
+		CheckDestroy:             testAccCheckCloudVolumeDestroy,
+		Steps: []resource.TestStep{
+			{Config: testAccCloudVolumeConfigTypeNameSize(rName, "standard", 1)},
 			{
-				Config: testAccCloudVolumeConfigTyped(rName),
-				ConfigStateChecks: []statecheck.StateCheck{
-					compareIDDifferent.AddStateValue("gcore_cloud_volume.test", tfjsonpath.New("id")),
-				},
+				Config:      testAccCloudVolumeConfigTypeNameSize(rName, "ssd_hiiops", 1000000),
+				ExpectError: regexp.MustCompile(`(?i)failed to make http request`),
 			},
 			{
-				Config: testAccCloudVolumeConfigTypeName(rName, "ssd_hiiops"),
+				Config: testAccCloudVolumeConfigTypeNameSize(rName, "standard", 1),
 				ConfigPlanChecks: resource.ConfigPlanChecks{
 					PreApply: []plancheck.PlanCheck{
-						plancheck.ExpectResourceAction("gcore_cloud_volume.test", plancheck.ResourceActionReplace),
+						plancheck.ExpectResourceAction("gcore_cloud_volume.test", plancheck.ResourceActionUpdate),
+						plancheck.ExpectKnownValue("gcore_cloud_volume.test",
+							tfjsonpath.New("type_name"), knownvalue.StringExact("standard")),
 					},
 				},
 				ConfigStateChecks: []statecheck.StateCheck{
-					compareIDDifferent.AddStateValue("gcore_cloud_volume.test", tfjsonpath.New("id")),
+					statecheck.ExpectKnownValue("gcore_cloud_volume.test",
+						tfjsonpath.New("volume_type"), knownvalue.StringExact("standard")),
 				},
+			},
+		},
+	})
+}
+
+// TestAccCloudVolume_typeNameRejectsUppercase: type_name takes the API's
+// lowercase values only; a case-only difference could never plan clean.
+func TestAccCloudVolume_typeNameRejectsUppercase(t *testing.T) {
+	resource.ParallelTest(t, resource.TestCase{
+		PreCheck:                 func() { acctest.PreCheck(t) },
+		ProtoV6ProviderFactories: acctest.ProtoV6ProviderFactories,
+		Steps: []resource.TestStep{
+			{
+				Config:      testAccCloudVolumeConfigTypeName(acctest.RandomName(), "SSD_HIIOPS"),
+				PlanOnly:    true,
+				ExpectError: regexp.MustCompile(`value must be one of`),
 			},
 		},
 	})
@@ -930,15 +980,19 @@ resource "gcore_cloud_volume" "test" {
 }
 
 func testAccCloudVolumeConfigTypeName(name, typeName string) string {
+	return testAccCloudVolumeConfigTypeNameSize(name, typeName, 1)
+}
+
+func testAccCloudVolumeConfigTypeNameSize(name, typeName string, size int) string {
 	return fmt.Sprintf(`
 resource "gcore_cloud_volume" "test" {
   project_id = %[1]s
   region_id  = %[2]s
   source     = "new-volume"
   name       = %[3]q
-  size       = 1
+  size       = %[5]d
   type_name  = %[4]q
-}`, acctest.ProjectID(), acctest.RegionID(), name, typeName)
+}`, acctest.ProjectID(), acctest.RegionID(), name, typeName, size)
 }
 
 // testAccCloudVolumeConfigSizeFromSnapshot restores a volume from a snapshot of
