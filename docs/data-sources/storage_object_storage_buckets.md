@@ -50,7 +50,7 @@ Read-Only:
 
 Read-Only:
 
-- `allowed_origins` (List of String) Web domains allowed to make direct browser requests to this bucket (e.g., "https://myapp.com"). Use "*" to allow any origin.
+- `allowed_origins` (Set of String) Web domains allowed to make direct browser requests to this bucket (e.g., "https://myapp.com"). Use "*" to allow any origin.
 
 
 <a id="nestedatt--items--policy"></a>
