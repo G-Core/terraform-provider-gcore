@@ -17,7 +17,7 @@ import (
 // framework mark the attribute unknown when the cors block is present but the
 // attribute is omitted. If that changes, the guards below are no longer
 // describing reality and should be re-evaluated rather than silently kept.
-func allowedOriginsAttr(t *testing.T, ctx context.Context) schema.ListAttribute {
+func allowedOriginsAttr(t *testing.T, ctx context.Context) schema.SetAttribute {
 	t.Helper()
 
 	corsRaw, ok := ResourceSchema(ctx).Attributes["cors"]
@@ -32,9 +32,9 @@ func allowedOriginsAttr(t *testing.T, ctx context.Context) schema.ListAttribute 
 	if !ok {
 		t.Fatal("allowed_origins attribute missing from the cors schema")
 	}
-	origins, ok := originsRaw.(schema.ListAttribute)
+	origins, ok := originsRaw.(schema.SetAttribute)
 	if !ok {
-		t.Fatalf("allowed_origins is %T, expected schema.ListAttribute", originsRaw)
+		t.Fatalf("allowed_origins is %T, expected schema.SetAttribute", originsRaw)
 	}
 	if !origins.Computed || !origins.Optional {
 		t.Fatalf("allowed_origins configurability changed (Computed=%v Optional=%v); re-evaluate the unknown-value guards", origins.Computed, origins.Optional)
@@ -105,13 +105,13 @@ func TestCorsBlockWithoutAllowedOriginsDecodes(t *testing.T) {
 
 // planAllowedOrigins runs the attribute's configured plan modifiers in order and
 // returns the resulting planned value.
-func planAllowedOrigins(ctx context.Context, t *testing.T, plan, config, state types.List, stateRaw tftypes.Value) types.List {
+func planAllowedOrigins(ctx context.Context, t *testing.T, plan, config, state types.Set, stateRaw tftypes.Value) types.Set {
 	t.Helper()
 	origins := allowedOriginsAttr(t, ctx)
 	current := plan
 	for _, pm := range origins.PlanModifiers {
-		resp := &planmodifier.ListResponse{PlanValue: current}
-		pm.PlanModifyList(ctx, planmodifier.ListRequest{
+		resp := &planmodifier.SetResponse{PlanValue: current}
+		pm.PlanModifySet(ctx, planmodifier.SetRequest{
 			PlanValue:   current,
 			ConfigValue: config,
 			StateValue:  state,
@@ -127,15 +127,15 @@ func planAllowedOrigins(ctx context.Context, t *testing.T, plan, config, state t
 // is no prior state to reuse, so the attribute is left unknown, omitted from the
 // request body, and resolved from the response when it is decoded. Planning a
 // concrete value here instead would be a behaviour change — null is undefined for
-// this endpoint, and an empty list is its documented "remove CORS" sentinel.
+// this endpoint, and an empty set is its documented "remove CORS" sentinel.
 func TestAllowedOriginsOmittedOnCreateStaysUnknown(t *testing.T) {
 	t.Parallel()
 	ctx := context.Background()
 
 	got := planAllowedOrigins(ctx, t,
-		types.ListUnknown(types.StringType),                                  // framework marked the computed attribute unknown
-		types.ListNull(types.StringType),                                     // allowed_origins omitted from config
-		types.ListNull(types.StringType),                                     // no prior value
+		types.SetUnknown(types.StringType),                                   // framework marked the computed attribute unknown
+		types.SetNull(types.StringType),                                      // allowed_origins omitted from config
+		types.SetNull(types.StringType),                                      // no prior value
 		tftypes.NewValue(ResourceSchema(ctx).Type().TerraformType(ctx), nil), // no prior state: create
 	)
 
@@ -153,7 +153,7 @@ func TestAllowedOriginsOmittedOnUpdateReusesState(t *testing.T) {
 	t.Parallel()
 	ctx := context.Background()
 
-	priorOrigins := types.ListValueMust(types.StringType, []attr.Value{types.StringValue("https://example.com")})
+	priorOrigins := types.SetValueMust(types.StringType, []attr.Value{types.StringValue("https://example.com")})
 	stateRaw := rawBucketWith(ctx, t, map[string]tftypes.Value{
 		"storage_id": tftypes.NewValue(tftypes.Number, 1),
 		"name":       tftypes.NewValue(tftypes.String, "tf-test-bucket"),
@@ -163,9 +163,9 @@ func TestAllowedOriginsOmittedOnUpdateReusesState(t *testing.T) {
 	})
 
 	got := planAllowedOrigins(ctx, t,
-		types.ListUnknown(types.StringType), // computed attribute marked unknown
-		types.ListNull(types.StringType),    // allowed_origins omitted from config
-		priorOrigins,                        // prior state has origins
+		types.SetUnknown(types.StringType), // computed attribute marked unknown
+		types.SetNull(types.StringType),    // allowed_origins omitted from config
+		priorOrigins,                       // prior state has origins
 		stateRaw,
 	)
 

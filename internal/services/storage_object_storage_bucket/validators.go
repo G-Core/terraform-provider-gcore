@@ -20,7 +20,7 @@ var (
 // ValidateConfig rejects the API's "clear" values in configuration.
 //
 // The API removes a lifecycle rule for expiration_days 0, null or an omitted
-// value, and removes CORS for an empty allowed_origins list. It then returns
+// value, and removes CORS for an empty allowed_origins set. It then returns
 // the block as null, so a configuration that writes one of these values never
 // matches state and the apply fails with an inconsistent result. Removing the
 // block is the supported way to clear either setting: the update sends the
@@ -47,7 +47,7 @@ func (r *StorageObjectStorageBucketResource) ValidateConfig(ctx context.Context,
 		}
 	}
 
-	var origins customfield.List[types.String]
+	var origins customfield.Set[types.String]
 	resp.Diagnostics.Append(req.Config.GetAttribute(ctx, allowedOriginsPath, &origins)...)
 	if !resp.Diagnostics.HasError() && !origins.IsNull() && !origins.IsUnknown() && len(origins.Elements()) == 0 {
 		resp.Diagnostics.AddAttributeError(allowedOriginsPath,

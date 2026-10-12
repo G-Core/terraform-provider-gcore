@@ -29,7 +29,7 @@ func (m *StorageObjectStorageBucketDataSourceModel) toReadParams(_ context.Conte
 }
 
 type StorageObjectStorageBucketCorsDataSourceModel struct {
-	AllowedOrigins customfield.List[types.String] `tfsdk:"allowed_origins" json:"allowed_origins,computed"`
+	AllowedOrigins customfield.Set[types.String] `tfsdk:"allowed_origins" json:"allowed_origins,computed"`
 }
 
 type StorageObjectStorageBucketPolicyDataSourceModel struct {

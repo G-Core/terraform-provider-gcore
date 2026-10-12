@@ -9,8 +9,8 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/int64planmodifier"
-	"github.com/hashicorp/terraform-plugin-framework/resource/schema/listplanmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/setplanmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringplanmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 )
@@ -42,20 +42,20 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 					// attribute as unknown whenever the cors block is present but
 					// allowed_origins is omitted. The model field must therefore be
 					// able to carry an unknown value; a plain *[]types.String cannot,
-					// and Plan.Get fails before the request is ever sent. customfield.List
-					// is what every other computed_optional list in this provider uses.
+					// and Plan.Get fails before the request is ever sent. customfield.Set
+					// is what every other computed_optional set in this provider uses.
 					// UseStateForUnknown keeps the post-create plan empty by reusing the
 					// prior value; on create the state is null, so the attribute stays
 					// unknown, is omitted from the request body, and is resolved to null
 					// when the response is decoded.
-					"allowed_origins": schema.ListAttribute{
+					"allowed_origins": schema.SetAttribute{
 						Description: "Web domains allowed to make direct browser requests. Must not be empty. To remove CORS, delete the `cors` block.",
 						Optional:    true,
 						Computed:    true,
-						CustomType:  customfield.NewListType[types.String](ctx),
+						CustomType:  customfield.NewSetType[types.String](ctx),
 						ElementType: types.StringType,
-						PlanModifiers: []planmodifier.List{
-							listplanmodifier.UseStateForUnknown(),
+						PlanModifiers: []planmodifier.Set{
+							setplanmodifier.UseStateForUnknown(),
 						},
 					},
 				},

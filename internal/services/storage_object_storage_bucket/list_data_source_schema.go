@@ -43,10 +43,10 @@ func ListDataSourceSchema(ctx context.Context) schema.Schema {
 							Computed:   true,
 							CustomType: customfield.NewNestedObjectType[StorageObjectStorageBucketsCorsDataSourceModel](ctx),
 							Attributes: map[string]schema.Attribute{
-								"allowed_origins": schema.ListAttribute{
+								"allowed_origins": schema.SetAttribute{
 									Description: `Web domains allowed to make direct browser requests to this bucket (e.g., "https://myapp.com"). Use "*" to allow any origin.`,
 									Computed:    true,
-									CustomType:  customfield.NewListType[types.String](ctx),
+									CustomType:  customfield.NewSetType[types.String](ctx),
 									ElementType: types.StringType,
 								},
 							},

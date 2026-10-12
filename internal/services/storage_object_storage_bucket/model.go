@@ -59,7 +59,7 @@ func (m StorageObjectStorageBucketModel) MarshalJSONForUpdate(state StorageObjec
 }
 
 type StorageObjectStorageBucketCorsModel struct {
-	AllowedOrigins customfield.List[types.String] `tfsdk:"allowed_origins" json:"allowed_origins,computed_optional"`
+	AllowedOrigins customfield.Set[types.String] `tfsdk:"allowed_origins" json:"allowed_origins,computed_optional"`
 }
 
 type StorageObjectStorageBucketStorageObjectStorageBucketLifecycleModel struct {

@@ -37,7 +37,7 @@ type StorageObjectStorageBucketsItemsDataSourceModel struct {
 }
 
 type StorageObjectStorageBucketsCorsDataSourceModel struct {
-	AllowedOrigins customfield.List[types.String] `tfsdk:"allowed_origins" json:"allowed_origins,computed"`
+	AllowedOrigins customfield.Set[types.String] `tfsdk:"allowed_origins" json:"allowed_origins,computed"`
 }
 
 type StorageObjectStorageBucketsStorageObjectStorageBucketLifecycleDataSourceModel struct {

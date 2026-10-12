@@ -93,7 +93,7 @@ func TestAccStorageObjectStorageBucket_fullUpdate(t *testing.T) {
 						tfjsonpath.New("id"), knownvalue.StringExact(rName)),
 					statecheck.ExpectKnownValue(testAccBucketResource,
 						tfjsonpath.New("cors").AtMapKey("allowed_origins"),
-						knownvalue.ListExact([]knownvalue.Check{knownvalue.StringExact("https://a.example.com")})),
+						knownvalue.SetExact([]knownvalue.Check{knownvalue.StringExact("https://a.example.com")})),
 					statecheck.ExpectKnownValue(testAccBucketResource,
 						tfjsonpath.New("policy").AtMapKey("is_public"), knownvalue.Bool(true)),
 					statecheck.ExpectKnownValue(testAccBucketResource,
@@ -110,7 +110,7 @@ func TestAccStorageObjectStorageBucket_fullUpdate(t *testing.T) {
 				ConfigStateChecks: []statecheck.StateCheck{
 					statecheck.ExpectKnownValue(testAccBucketResource,
 						tfjsonpath.New("cors").AtMapKey("allowed_origins"),
-						knownvalue.ListExact([]knownvalue.Check{
+						knownvalue.SetExact([]knownvalue.Check{
 							knownvalue.StringExact("https://b.example.com"),
 							knownvalue.StringExact("https://c.example.com"),
 						})),
@@ -122,6 +122,14 @@ func TestAccStorageObjectStorageBucket_fullUpdate(t *testing.T) {
 			},
 			{
 				Config: testAccBucketConfigFull(rName, []string{"https://b.example.com", "https://c.example.com"}, false, 7),
+				ConfigPlanChecks: resource.ConfigPlanChecks{
+					PreApply: []plancheck.PlanCheck{plancheck.ExpectEmptyPlan()},
+				},
+			},
+			{
+				// The API sorts origins and removes duplicates, so order and
+				// repeats in the configuration must not produce a diff.
+				Config: testAccBucketConfigFull(rName, []string{"https://c.example.com", "https://b.example.com", "https://c.example.com"}, false, 7),
 				ConfigPlanChecks: resource.ConfigPlanChecks{
 					PreApply: []plancheck.PlanCheck{plancheck.ExpectEmptyPlan()},
 				},
@@ -217,7 +225,7 @@ func TestAccStorageObjectStorageBucket_corsWithoutAllowedOrigins(t *testing.T) {
 				ConfigStateChecks: []statecheck.StateCheck{
 					statecheck.ExpectKnownValue(testAccBucketResource,
 						tfjsonpath.New("cors").AtMapKey("allowed_origins"),
-						knownvalue.ListExact([]knownvalue.Check{knownvalue.StringExact("https://a.example.com")})),
+						knownvalue.SetExact([]knownvalue.Check{knownvalue.StringExact("https://a.example.com")})),
 				},
 			},
 			{
@@ -232,7 +240,7 @@ func TestAccStorageObjectStorageBucket_corsWithoutAllowedOrigins(t *testing.T) {
 				ConfigStateChecks: []statecheck.StateCheck{
 					statecheck.ExpectKnownValue(testAccBucketResource,
 						tfjsonpath.New("cors").AtMapKey("allowed_origins"),
-						knownvalue.ListExact([]knownvalue.Check{knownvalue.StringExact("https://a.example.com")})),
+						knownvalue.SetExact([]knownvalue.Check{knownvalue.StringExact("https://a.example.com")})),
 				},
 			},
 		},
