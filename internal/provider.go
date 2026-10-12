@@ -84,6 +84,7 @@ import (
 	"github.com/G-Core/terraform-provider-gcore/internal/services/storage_sftp"
 	"github.com/G-Core/terraform-provider-gcore/internal/services/storage_ssh_key"
 	"github.com/G-Core/terraform-provider-gcore/internal/services/waap_domain"
+	"github.com/G-Core/terraform-provider-gcore/internal/services/waap_domain_advanced_rule"
 	"github.com/G-Core/terraform-provider-gcore/internal/services/waap_domain_firewall_rule"
 	"github.com/G-Core/terraform-provider-gcore/internal/services/waap_domain_policy"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
@@ -278,6 +279,7 @@ func (p *GcoreProvider) Resources(ctx context.Context) []func() resource.Resourc
 		waap_domain.NewResource,
 		waap_domain_policy.NewResource,
 		waap_domain_firewall_rule.NewResource,
+		waap_domain_advanced_rule.NewResource,
 		fastedge_template.NewResource,
 		fastedge_secret.NewResource,
 		fastedge_binary.NewResource,
@@ -387,6 +389,8 @@ func (p *GcoreProvider) DataSources(ctx context.Context) []func() datasource.Dat
 		waap_domain_policy.NewWaapDomainPoliciesDataSource,
 		waap_domain_firewall_rule.NewWaapDomainFirewallRuleDataSource,
 		waap_domain_firewall_rule.NewWaapDomainFirewallRulesDataSource,
+		waap_domain_advanced_rule.NewWaapDomainAdvancedRuleDataSource,
+		waap_domain_advanced_rule.NewWaapDomainAdvancedRulesDataSource,
 		fastedge_template.NewFastedgeTemplateDataSource,
 		fastedge_template.NewFastedgeTemplatesDataSource,
 		fastedge_secret.NewFastedgeSecretDataSource,
