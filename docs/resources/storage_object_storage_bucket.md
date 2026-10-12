@@ -51,7 +51,7 @@ resource "gcore_storage_object_storage_bucket" "example_storage_object_storage_b
 
 Optional:
 
-- `allowed_origins` (List of String) Web domains allowed to make direct browser requests. Must not be empty. To remove CORS, delete the `cors` block.
+- `allowed_origins` (Set of String) Web domains allowed to make direct browser requests. Must not be empty. To remove CORS, delete the `cors` block.
 
 
 <a id="nestedatt--policy"></a>
