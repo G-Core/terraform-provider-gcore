@@ -95,6 +95,40 @@ func TestAccCloudFileShare_update(t *testing.T) {
 	})
 }
 
+// TestAccCloudFileShare_resizeOnly changes only size. The plan must not
+// send a PATCH: with nothing to rename or retag its body would be empty, and
+// the API rejects an empty update.
+func TestAccCloudFileShare_resizeOnly(t *testing.T) {
+	rName := acctest.RandomName()
+
+	resource.ParallelTest(t, resource.TestCase{
+		PreCheck:                 func() { acctest.PreCheck(t) },
+		ProtoV6ProviderFactories: acctest.ProtoV6ProviderFactories,
+		CheckDestroy:             testAccCheckCloudFileShareDestroy,
+		Steps: []resource.TestStep{
+			{
+				Config: testAccCloudFileShareConfigSize(rName, 1),
+			},
+			{
+				Config: testAccCloudFileShareConfigSize(rName, 2),
+				ConfigPlanChecks: resource.ConfigPlanChecks{
+					PreApply: []plancheck.PlanCheck{
+						plancheck.ExpectResourceAction("gcore_cloud_file_share.test", plancheck.ResourceActionUpdate),
+					},
+				},
+				ConfigStateChecks: []statecheck.StateCheck{
+					statecheck.ExpectKnownValue("gcore_cloud_file_share.test",
+						tfjsonpath.New("size"), knownvalue.Int64Exact(2)),
+				},
+			},
+			{
+				Config:   testAccCloudFileShareConfigSize(rName, 2),
+				PlanOnly: true,
+			},
+		},
+	})
+}
+
 func TestAccCloudFileShare_import(t *testing.T) {
 	rName := acctest.RandomName()
 
@@ -272,6 +306,94 @@ func TestAccCloudFileShare_vastWithoutNetwork(t *testing.T) {
 	})
 }
 
+// TestAccCloudFileShare_vastSettingsResizeOnly changes only the size of a VAST
+// share that sets some share_settings. The share_settings it leaves unset must
+// keep their state values: if they plan as unknown, the update sends a PATCH
+// with no name or tags, which the API rejects, and the resize never runs.
+func TestAccCloudFileShare_vastSettingsResizeOnly(t *testing.T) {
+	regionID := os.Getenv("GCORE_FILE_SHARE_VAST_REGION_ID")
+	if regionID == "" {
+		t.Skip("GCORE_FILE_SHARE_VAST_REGION_ID must be set to a region with VAST file shares")
+	}
+	rName := acctest.RandomName()
+
+	resource.ParallelTest(t, resource.TestCase{
+		PreCheck:                 func() { acctest.PreCheck(t) },
+		ProtoV6ProviderFactories: acctest.ProtoV6ProviderFactories,
+		CheckDestroy:             testAccCheckCloudFileShareDestroy,
+		Steps: []resource.TestStep{
+			{
+				Config: testAccCloudFileShareConfigVastSettings(rName, regionID, 1),
+			},
+			{
+				Config: testAccCloudFileShareConfigVastSettings(rName, regionID, 2),
+				ConfigPlanChecks: resource.ConfigPlanChecks{
+					PreApply: []plancheck.PlanCheck{
+						plancheck.ExpectResourceAction("gcore_cloud_file_share.test", plancheck.ResourceActionUpdate),
+						plancheck.ExpectKnownValue("gcore_cloud_file_share.test",
+							tfjsonpath.New("share_settings").AtMapKey("allowed_characters"), knownvalue.NotNull()),
+						plancheck.ExpectKnownValue("gcore_cloud_file_share.test",
+							tfjsonpath.New("share_settings").AtMapKey("path_length"), knownvalue.NotNull()),
+					},
+				},
+				ConfigStateChecks: []statecheck.StateCheck{
+					statecheck.ExpectKnownValue("gcore_cloud_file_share.test",
+						tfjsonpath.New("size"), knownvalue.Int64Exact(2)),
+				},
+			},
+			{
+				Config: testAccCloudFileShareConfigVastSettings(rName, regionID, 2),
+				ConfigPlanChecks: resource.ConfigPlanChecks{
+					PreApply: []plancheck.PlanCheck{plancheck.ExpectEmptyPlan()},
+				},
+			},
+		},
+	})
+}
+
+// TestAccCloudFileShare_ddnNoDrift checks that an unchanged DDN share plans no
+// update, after both create and import. Any planned update would send an empty
+// PATCH, which the API rejects.
+func TestAccCloudFileShare_ddnNoDrift(t *testing.T) {
+	regionID := os.Getenv("GCORE_FILE_SHARE_DDN_REGION_ID")
+	if regionID == "" {
+		t.Skip("GCORE_FILE_SHARE_DDN_REGION_ID must be set to a region with DDN file shares")
+	}
+	rName := acctest.RandomName()
+
+	resource.ParallelTest(t, resource.TestCase{
+		PreCheck:                 func() { acctest.PreCheck(t) },
+		ProtoV6ProviderFactories: acctest.ProtoV6ProviderFactories,
+		CheckDestroy:             testAccCheckCloudFileShareDestroy,
+		Steps: []resource.TestStep{
+			{
+				Config: testAccCloudFileShareConfigDDN(rName, regionID),
+				ConfigStateChecks: []statecheck.StateCheck{
+					statecheck.ExpectKnownValue("gcore_cloud_file_share.test",
+						tfjsonpath.New("type_name"), knownvalue.StringExact("ddn")),
+				},
+			},
+			{
+				Config: testAccCloudFileShareConfigDDN(rName, regionID),
+				ConfigPlanChecks: resource.ConfigPlanChecks{
+					PreApply: []plancheck.PlanCheck{plancheck.ExpectEmptyPlan()},
+				},
+			},
+			{
+				ResourceName:      "gcore_cloud_file_share.test",
+				ImportState:       true,
+				ImportStateIdFunc: acctest.BuildImportID("gcore_cloud_file_share.test", "project_id", "region_id", "id"),
+				ImportStateKind:   resource.ImportBlockWithID,
+				ImportPlanChecks: resource.ImportPlanChecks{
+					PreApply: []plancheck.PlanCheck{
+						plancheck.ExpectResourceAction("gcore_cloud_file_share.test", plancheck.ResourceActionNoop),
+					},
+				},
+			},
+		},
+	})
+}
+
 // TestAccCloudFileShare_networkRequiresStandard checks the config validator.
 // Only standard shares take a network, and a configured network block still
 // needs network_id although the schema makes it computed. Validation fails
@@ -390,6 +512,10 @@ func testAccCheckCloudFileShareDestroy(s *terraform.State) error {
 }
 
 func testAccCloudFileShareConfig(name string) string {
+	return testAccCloudFileShareConfigSize(name, 1)
+}
+
+func testAccCloudFileShareConfigSize(name string, size int) string {
 	return fmt.Sprintf(`
 resource "gcore_cloud_network" "test" {
   project_id = %[1]s
@@ -411,13 +537,13 @@ resource "gcore_cloud_file_share" "test" {
   region_id  = %[2]s
   name       = %[3]q
   protocol   = "NFS"
-  size       = 1
+  size       = %[4]d
   type_name  = "standard"
   network = {
     network_id = gcore_cloud_network.test.id
     subnet_id  = gcore_cloud_network_subnet.test.id
   }
-}`, acctest.ProjectID(), acctest.RegionID(), name)
+}`, acctest.ProjectID(), acctest.RegionID(), name, size)
 }
 
 // testAccWaitForNetworkSubnet waits until the API lists a subnet on the
@@ -628,6 +754,38 @@ resource "gcore_cloud_file_share" "test" {
   protocol   = "NFS"
   size       = 1
   type_name  = "vast"
+}`, acctest.ProjectID(), regionID, name)
+}
+
+// testAccCloudFileShareConfigVastSettings creates a VAST share that sets only
+// some share_settings and leaves the rest to the API.
+func testAccCloudFileShareConfigVastSettings(name, regionID string, size int) string {
+	return fmt.Sprintf(`
+resource "gcore_cloud_file_share" "test" {
+  project_id = %[1]s
+  region_id  = %[2]s
+  name       = %[3]q
+  protocol   = "NFS"
+  size       = %[4]d
+  type_name  = "vast"
+  share_settings = {
+    root_squash  = false
+    trash_access = true
+  }
+}`, acctest.ProjectID(), regionID, name, size)
+}
+
+// testAccCloudFileShareConfigDDN creates a DDN share, which takes no network
+// and no share_settings.
+func testAccCloudFileShareConfigDDN(name, regionID string) string {
+	return fmt.Sprintf(`
+resource "gcore_cloud_file_share" "test" {
+  project_id = %[1]s
+  region_id  = %[2]s
+  name       = %[3]q
+  protocol   = "LUSTRE"
+  size       = 1
+  type_name  = "ddn"
 }`, acctest.ProjectID(), regionID, name)
 }
 

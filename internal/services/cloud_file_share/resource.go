@@ -126,8 +126,11 @@ func (r *CloudFileShareResource) Update(ctx context.Context, req resource.Update
 		return
 	}
 
-	// Check if fields that can be updated using the Update method have changed
-	if !data.Name.Equal(state.Name) || !data.Tags.Equal(state.Tags) || !data.ShareSettings.Equal(state.ShareSettings) {
+	// Check if fields that can be updated using the Update method have changed.
+	// Tags are unknown when not configured and any other attribute changes, and
+	// sending a PATCH for them alone fails because the body has no name or tags.
+	tagsChanged := !data.Tags.IsUnknown() && !data.Tags.Equal(state.Tags)
+	if !data.Name.Equal(state.Name) || tagsChanged || !data.ShareSettings.Equal(state.ShareSettings) {
 		params := cloud.FileShareUpdateParams{}
 
 		if !data.ProjectID.IsNull() {
@@ -197,6 +200,11 @@ func (r *CloudFileShareResource) Update(ctx context.Context, req resource.Update
 		if tags, ok := custom.ConvertAPITagsToCustomfieldMap(ctx, bytes); ok {
 			data.Tags = tags
 		}
+	}
+
+	// Neither request ran, so nothing refreshed the unknown tags
+	if data.Tags.IsUnknown() {
+		data.Tags = state.Tags
 	}
 
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)

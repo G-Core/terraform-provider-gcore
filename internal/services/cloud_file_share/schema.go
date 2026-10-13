@@ -6,6 +6,7 @@ import (
 	"context"
 
 	"github.com/G-Core/terraform-provider-gcore/internal/customfield"
+	"github.com/G-Core/terraform-provider-gcore/internal/planmodifiers"
 	"github.com/hashicorp/terraform-plugin-framework-validators/int64validator"
 	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
 	"github.com/hashicorp/terraform-plugin-framework/path"
@@ -121,6 +122,7 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 						Validators: []validator.Int64{
 							int64validator.Between(0, 2147483647),
 						},
+						PlanModifiers: []planmodifier.Int64{planmodifiers.Int64UseStateForUnknownInclNull()},
 					},
 					"uid": schema.Int64Attribute{
 						Description: "When set created file share will be owned by group with given UID",
@@ -129,6 +131,7 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 						Validators: []validator.Int64{
 							int64validator.Between(0, 2147483647),
 						},
+						PlanModifiers: []planmodifier.Int64{planmodifiers.Int64UseStateForUnknownInclNull()},
 					},
 					"allowed_characters": schema.StringAttribute{
 						Description: "Determines which characters are allowed in file names. Choose between:\n  - Lowest Common Denominator (LCD), allows only characters allowed by all VAST Cluster-supported protocols\n  - Native Protocol Limit (NPL), imposes no limitation beyond that of the client protocol.\nAvailable values: \"LCD\", \"NPL\".",
@@ -137,6 +140,7 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 						Validators: []validator.String{
 							stringvalidator.OneOfCaseInsensitive("LCD", "NPL"),
 						},
+						PlanModifiers: []planmodifier.String{planmodifiers.StringUseStateForUnknownInclNull()},
 					},
 					"path_length": schema.StringAttribute{
 						Description: "Affects the maximum limit of file path component name length. Choose between:\n  - Lowest Common Denominator (LCD), imposes the lowest common denominator file length limit of all VAST Cluster-supported protocols. With this option, the limitation on the length of a single component of the path is 255 characters\n  - Native Protocol Limit (NPL), imposes no limitation beyond that of the client protocol.\nAvailable values: \"LCD\", \"NPL\".",
@@ -145,16 +149,19 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 						Validators: []validator.String{
 							stringvalidator.OneOfCaseInsensitive("LCD", "NPL"),
 						},
+						PlanModifiers: []planmodifier.String{planmodifiers.StringUseStateForUnknownInclNull()},
 					},
 					"root_squash": schema.BoolAttribute{
-						Description: "Enables or disables root squash for NFS clients.\n  - If `true`, root squash is enabled: the root user is mapped to nobody for all file and folder management operations on the export.\n  - If `false`, root squash is disabled: the NFS client `root` user retains root privileges. Use this option if you trust the root user not to perform operations that will corrupt data.",
-						Computed:    true,
-						Optional:    true,
+						Description:   "Enables or disables root squash for NFS clients.\n  - If `true`, root squash is enabled: the root user is mapped to nobody for all file and folder management operations on the export.\n  - If `false`, root squash is disabled: the NFS client `root` user retains root privileges. Use this option if you trust the root user not to perform operations that will corrupt data.",
+						Computed:      true,
+						Optional:      true,
+						PlanModifiers: []planmodifier.Bool{planmodifiers.BoolUseStateForUnknownInclNull()},
 					},
 					"trash_access": schema.BoolAttribute{
-						Description: "Enables or disables access to the hidden `.vast_trash` folder of the share.\n  - If `false`, the folder is not accessible.\n  - If `true`, clients within the share's access range can move files and folders to `.vast_trash` for asynchronous deletion, which is much faster than deleting large directory trees in place.\n\nRequires `root_squash` to be disabled, because VAST ignores trash folder access for hosts that are under root squash.",
-						Computed:    true,
-						Optional:    true,
+						Description:   "Enables or disables access to the hidden `.vast_trash` folder of the share.\n  - If `false`, the folder is not accessible.\n  - If `true`, clients within the share's access range can move files and folders to `.vast_trash` for asynchronous deletion, which is much faster than deleting large directory trees in place.\n\nRequires `root_squash` to be disabled, because VAST ignores trash folder access for hosts that are under root squash.",
+						Computed:      true,
+						Optional:      true,
+						PlanModifiers: []planmodifier.Bool{planmodifiers.BoolUseStateForUnknownInclNull()},
 					},
 				},
 				PlanModifiers: []planmodifier.Object{objectplanmodifier.UseStateForUnknown()},
