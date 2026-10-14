@@ -28,7 +28,7 @@ data "gcore_cloud_baremetal_flavors" "example_cloud_baremetal_flavors" {
 - `exclude_linux` (Boolean) Set to true to exclude flavors dedicated to linux images
 - `exclude_windows` (Boolean) Set to true to exclude flavors dedicated to windows images
 - `include_capacity` (Boolean) Set to true if the response should include flavor capacity
-- `include_prices` (Boolean) Set to true if the response should include flavor prices
+- `include_prices` (Boolean, Deprecated) Set to true if the response should include flavor prices
 - `include_reservation_stock` (Boolean) Optional. Set to true if flavor listing should include count of reserved resources in stock.
 - `max_items` (Number) Max items to fetch, default: 1000
 - `project_id` (Number) Project ID

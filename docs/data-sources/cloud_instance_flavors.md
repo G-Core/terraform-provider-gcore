@@ -27,7 +27,7 @@ data "gcore_cloud_instance_flavors" "example_cloud_instance_flavors" {
 - `disabled` (Boolean) Flag for filtering disabled flavors in the region. Defaults to true
 - `exclude_linux` (Boolean) Set to true to exclude flavors dedicated to linux images
 - `exclude_windows` (Boolean) Set to true to exclude flavors dedicated to windows images
-- `include_prices` (Boolean) Set to true if the response should include flavor prices
+- `include_prices` (Boolean, Deprecated) Set to true if the response should include flavor prices
 - `max_items` (Number) Max items to fetch, default: 1000
 - `project_id` (Number) Project ID
 - `region_id` (Number) Region ID
