@@ -64,7 +64,7 @@ jobs:
         run: ./scripts/bootstrap
 
       - name: Run lints
-        run: ./scripts/lint
+        run: ./scripts/lint --build-only
 
   test:
     runs-on: ubuntu-latest

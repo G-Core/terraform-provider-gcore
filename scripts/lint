@@ -1,14 +1,28 @@
 #!/usr/bin/env bash
 
-set -e
+set -euo pipefail
 
 cd "$(dirname "$0")/.."
 
 # Mark the necessary Go modules as private to avoid Go's proxy
 export GOPRIVATE="${GOPRIVATE:+$GOPRIVATE,}github.com/G-Core/gcore-go,github.com/G-Core/gcore-go-staging"
 
-echo "==> Running Go build"
-go build ./...
+if (( $# > 1 )); then
+  echo "Usage: $0 [--build-only]" >&2
+  exit 2
+fi
 
-echo "==> Checking tests compile"
-go test -run=^$ ./...
+case "${1:-}" in
+  --build-only)
+    echo "==> Running Go build"
+    go build ./...
+    ;;
+  "")
+    echo "==> Checking packages and tests compile"
+    go test -run=^$ ./...
+    ;;
+  *)
+    echo "Usage: $0 [--build-only]" >&2
+    exit 2
+    ;;
+esac

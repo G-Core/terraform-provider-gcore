@@ -44,9 +44,10 @@ func ListDataSourceSchema(ctx context.Context) schema.Schema {
 				Optional:    true,
 			},
 			"include_prices": schema.BoolAttribute{
-				Description: "Set to true if the response should include flavor prices",
-				Computed:    true,
-				Optional:    true,
+				Description:        "Set to true if the response should include flavor prices",
+				Computed:           true,
+				Optional:           true,
+				DeprecationMessage: "This attribute is deprecated.",
 			},
 			"max_items": schema.Int64Attribute{
 				Description: "Max items to fetch, default: 1000",

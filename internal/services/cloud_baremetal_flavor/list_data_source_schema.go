@@ -48,9 +48,10 @@ func ListDataSourceSchema(ctx context.Context) schema.Schema {
 				Optional:    true,
 			},
 			"include_prices": schema.BoolAttribute{
-				Description: "Set to true if the response should include flavor prices",
-				Computed:    true,
-				Optional:    true,
+				Description:        "Set to true if the response should include flavor prices",
+				Computed:           true,
+				Optional:           true,
+				DeprecationMessage: "This attribute is deprecated.",
 			},
 			"include_reservation_stock": schema.BoolAttribute{
 				Description: "Optional. Set to true if flavor listing should include count of reserved resources in stock.",
