@@ -95,7 +95,7 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 						Description: "WAAP tag action gets a list of tags to tag the request scope with",
 						Optional:    true,
 						Attributes: map[string]schema.Attribute{
-							"tags": schema.ListAttribute{
+							"tags": schema.SetAttribute{
 								Description: "The list of user defined tags to tag the request with",
 								Required:    true,
 								ElementType: types.StringType,

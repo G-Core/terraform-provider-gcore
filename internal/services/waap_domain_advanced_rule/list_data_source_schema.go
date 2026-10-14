@@ -156,10 +156,10 @@ func ListDataSourceSchema(ctx context.Context) schema.Schema {
 									Computed:    true,
 									CustomType:  customfield.NewNestedObjectType[WaapDomainAdvancedRulesActionTagDataSourceModel](ctx),
 									Attributes: map[string]schema.Attribute{
-										"tags": schema.ListAttribute{
+										"tags": schema.SetAttribute{
 											Description: "The list of user defined tags to tag the request with",
 											Computed:    true,
-											CustomType:  customfield.NewListType[types.String](ctx),
+											CustomType:  customfield.NewSetType[types.String](ctx),
 											ElementType: types.StringType,
 										},
 									},

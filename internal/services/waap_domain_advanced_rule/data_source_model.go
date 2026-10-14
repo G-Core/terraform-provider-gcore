@@ -74,7 +74,7 @@ type WaapDomainAdvancedRuleActionBlockDataSourceModel struct {
 }
 
 type WaapDomainAdvancedRuleActionTagDataSourceModel struct {
-	Tags customfield.List[types.String] `tfsdk:"tags" json:"tags,computed"`
+	Tags customfield.Set[types.String] `tfsdk:"tags" json:"tags,computed"`
 }
 
 type WaapDomainAdvancedRuleFindOneByDataSourceModel struct {
