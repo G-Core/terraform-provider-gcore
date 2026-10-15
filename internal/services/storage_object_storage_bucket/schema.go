@@ -8,7 +8,9 @@ import (
 	"github.com/G-Core/terraform-provider-gcore/internal/customfield"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/boolplanmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/int64planmodifier"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/objectplanmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/setplanmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringplanmodifier"
@@ -74,11 +76,16 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 				Computed:    true,
 				Optional:    true,
 				CustomType:  customfield.NewNestedObjectType[StorageObjectStorageBucketPolicyModel](ctx),
+				// The policy only changes when it is configured, so an update to
+				// any other attribute keeps the current value instead of planning
+				// it as (known after apply).
+				PlanModifiers: []planmodifier.Object{objectplanmodifier.UseStateForUnknown()},
 				Attributes: map[string]schema.Attribute{
 					"is_public": schema.BoolAttribute{
-						Description: "Set to true to allow unauthenticated object downloads, false to require valid S3 credentials.\nOmit to leave the current policy unchanged.",
-						Optional:    true,
-						Computed:    true,
+						Description:   "Set to true to allow unauthenticated object downloads, false to require valid S3 credentials.\nOmit to leave the current policy unchanged.",
+						Optional:      true,
+						Computed:      true,
+						PlanModifiers: []planmodifier.Bool{boolplanmodifier.UseStateForUnknown()},
 					},
 				},
 			},

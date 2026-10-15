@@ -265,6 +265,10 @@ func TestAccStorageObjectStorageBucket_addLifecycle(t *testing.T) {
 				ConfigPlanChecks: resource.ConfigPlanChecks{
 					PreApply: []plancheck.PlanCheck{
 						plancheck.ExpectResourceAction(testAccBucketResource, plancheck.ResourceActionUpdate),
+						// An update to another attribute must keep the current
+						// policy instead of planning it as (known after apply).
+						plancheck.ExpectKnownValue(testAccBucketResource,
+							tfjsonpath.New("policy").AtMapKey("is_public"), knownvalue.Bool(false)),
 					},
 				},
 				ConfigStateChecks: []statecheck.StateCheck{
@@ -276,6 +280,19 @@ func TestAccStorageObjectStorageBucket_addLifecycle(t *testing.T) {
 				Config: testAccBucketConfigLifecycle(rName, "expiration_days = 30"),
 				ConfigPlanChecks: resource.ConfigPlanChecks{
 					PreApply: []plancheck.PlanCheck{plancheck.ExpectEmptyPlan()},
+				},
+			},
+			{
+				// An empty policy block omits only is_public, which must keep
+				// its current value instead of planning as (known after apply)
+				// when another attribute changes.
+				Config: testAccBucketConfigLifecycleEmptyPolicy(rName, "expiration_days = 7"),
+				ConfigPlanChecks: resource.ConfigPlanChecks{
+					PreApply: []plancheck.PlanCheck{
+						plancheck.ExpectResourceAction(testAccBucketResource, plancheck.ResourceActionUpdate),
+						plancheck.ExpectKnownValue(testAccBucketResource,
+							tfjsonpath.New("policy").AtMapKey("is_public"), knownvalue.Bool(false)),
+					},
 				},
 			},
 		},
@@ -535,4 +552,18 @@ resource "gcore_storage_object_storage_bucket" "test" {
     %[2]s
   }
 }`, name, body)
+}
+
+func testAccBucketConfigLifecycleEmptyPolicy(name, lifecycleBody string) string {
+	return testAccBucketStorageConfig(name) + fmt.Sprintf(`
+resource "gcore_storage_object_storage_bucket" "test" {
+  storage_id = gcore_storage_object_storage.test.id
+  name       = %[1]q
+
+  storage_object_storage_bucket_lifecycle = {
+    %[2]s
+  }
+
+  policy = {}
+}`, name, lifecycleBody)
 }
