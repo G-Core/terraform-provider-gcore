@@ -325,6 +325,12 @@ func TestAccStorageObjectStorageBucket_rejectsClearValues(t *testing.T) {
 				PlanOnly:    true,
 				ExpectError: regexp.MustCompile(`Empty allowed_origins`),
 			},
+			{
+				// Both errors must be reported, not only the first one.
+				Config:      testAccBucketConfigLifecycleAndCors(rName, "expiration_days = 0", "allowed_origins = []"),
+				PlanOnly:    true,
+				ExpectError: regexp.MustCompile(`(?s)Invalid expiration_days.*Empty allowed_origins`),
+			},
 		},
 	})
 }
@@ -566,4 +572,20 @@ resource "gcore_storage_object_storage_bucket" "test" {
 
   policy = {}
 }`, name, lifecycleBody)
+}
+
+func testAccBucketConfigLifecycleAndCors(name, lifecycleBody, corsBody string) string {
+	return testAccBucketStorageConfig(name) + fmt.Sprintf(`
+resource "gcore_storage_object_storage_bucket" "test" {
+  storage_id = gcore_storage_object_storage.test.id
+  name       = %[1]q
+
+  storage_object_storage_bucket_lifecycle = {
+    %[2]s
+  }
+
+  cors = {
+    %[3]s
+  }
+}`, name, lifecycleBody, corsBody)
 }
