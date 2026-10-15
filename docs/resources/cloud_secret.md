@@ -23,11 +23,12 @@ resource "gcore_cloud_secret" "example" {
 
   name = "my-tls-certificate"
   payload = {
-    certificate       = file("${path.module}/cert.pem")
-    certificate_chain = file("${path.module}/chain.pem")
-    private_key       = file("${path.module}/key.pem")
+    certificate_wo       = file("${path.module}/cert.pem")
+    certificate_chain_wo = file("${path.module}/chain.pem")
+    private_key_wo       = file("${path.module}/key.pem")
   }
-  expiration = "2025-12-28T19:14:44.000Z"
+  payload_wo_version = 1
+  expiration         = "2030-12-31T23:59:59Z"
 }
 ```
 
@@ -37,12 +38,12 @@ resource "gcore_cloud_secret" "example" {
 ### Required
 
 - `name` (String) Secret name
-- `payload` (Attributes) Secret payload. (see [below for nested schema](#nestedatt--payload))
-- `payload_wo_version` (Number) The version of the payload sensitive params — increment this value to force Terraform to re-create the secret with updated payload values.
 
 ### Optional
 
 - `expiration` (String) Datetime when the secret will expire. Defaults to None
+- `payload` (Attributes) Secret payload. (see [below for nested schema](#nestedatt--payload))
+- `payload_wo_version` (Number) The version of the payload sensitive params — increment this value to force Terraform to re-create the secret with updated payload values. Required together with `payload` when creating a secret. Omit both only for an existing secret whose material you do not have, such as an imported one; removing both keeps the secret unchanged.
 - `project_id` (Number) Project ID
 - `region_id` (Number) Region ID
 
@@ -75,4 +76,20 @@ Import is supported using the following syntax:
 ```shell
 $ terraform import gcore_cloud_secret.example '<project_id>/<region_id>/<secret_id>'
 ```
+
+~> The API never returns `payload` or `payload_wo_version`, and a secret cannot be updated in place. The `payload`
+fields are write-only: Terraform never stores the certificate or key, only that a `payload` is set and its
+`payload_wo_version`, so editing the material alone changes nothing. Bump `payload_wo_version` whenever the material
+changes. If you import with both set, the first apply records them (with a warning) without uploading or checking them;
+after that, bumping `payload_wo_version` replaces the secret with a new ID. If you import without them, the secret is
+managed as-is and setting them later replaces it, except in the adoption window, where they are only recorded: the first
+apply after `terraform import`, or the apply of an `import` block plus the next apply when the import apply changed
+nothing in the secret. Use `terraform apply -replace=gcore_cloud_secret.example` to upload new material then. If the
+first apply after `terraform import` fails before the secret is updated (for example a resource it depends on fails),
+the next refreshing plan replaces the secret: retry that apply right away with `terraform apply -refresh=false`, or run
+`terraform state rm gcore_cloud_secret.example` and import again. Changing `name` or the `expiration`
+instant also needs them; the same instant written with another offset (`Z`, `+00:00`, `+03:00`) is not a change, and
+fractions of a second are not sent to the API. If
+you keep them, they must be the real material, never placeholders: any later replacement uploads them. Removing both
+keeps the secret unchanged. To only reference a secret, use the `gcore_cloud_secret` data source.
 

@@ -112,7 +112,49 @@ func (r *CloudSecretResource) Create(ctx context.Context, req resource.CreateReq
 }
 
 func (r *CloudSecretResource) Update(ctx context.Context, req resource.UpdateRequest, resp *resource.UpdateResponse) {
-	// Update is not supported for this resource
+	// Update sends nothing to the API: there is no PATCH endpoint, so every
+	// plan that reaches it is written straight to state. Plans that reach it
+	// include the import-adoption apply, the in-place removal of
+	// payload/payload_wo_version, and removing project_id/region_id from
+	// config (int64planmodifier.RequiresReplaceIfConfigured returns without
+	// requiring replacement when the config value is null - see schema.go).
+	// settle re-arms the marker on an errored apply and clears it on a
+	// successful one (see import_adoption.go).
+	_, settle := secretImportAdoption.BeginUpdate(ctx, req.Private, resp.Private, &resp.Diagnostics)
+	defer settle()
+	if resp.Diagnostics.HasError() {
+		return
+	}
+
+	var data *CloudSecretModel
+
+	resp.Diagnostics.Append(req.Plan.Get(ctx, &data)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
+
+	var state *CloudSecretModel
+
+	resp.Diagnostics.Append(req.State.Get(ctx, &state)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
+
+	// None of these are settable in config, and no API call happens here to
+	// refresh them: without a plan modifier of their own they plan as unknown
+	// on any in-place update, which this resource never had before the
+	// adoption window existed. Carry the prior state forward.
+	data.Algorithm = state.Algorithm
+	data.BitLength = state.BitLength
+	data.Created = state.Created
+	data.Mode = state.Mode
+	data.SecretType = state.SecretType
+	data.Status = state.Status
+	data.ContentTypes = state.ContentTypes
+
+	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
 }
 
 func (r *CloudSecretResource) Read(ctx context.Context, req resource.ReadRequest, resp *resource.ReadResponse) {
@@ -133,6 +175,8 @@ func (r *CloudSecretResource) Read(ctx context.Context, req resource.ReadRequest
 	if !data.RegionID.IsNull() {
 		params.RegionID = param.NewOpt(data.RegionID.ValueInt64())
 	}
+
+	priorExpiration := data.Expiration
 
 	res := new(http.Response)
 	_, err := r.client.Cloud.Secrets.Get(
@@ -157,6 +201,17 @@ func (r *CloudSecretResource) Read(ctx context.Context, req resource.ReadRequest
 		resp.Diagnostics.AddError("failed to deserialize http request", err.Error())
 		return
 	}
+	// The API echoes expiration in UTC ("...Z"); keep the configured spelling
+	// of the same instant (for example "+03:00"), or every plan shows a diff.
+	if sameInstant(priorExpiration.StringValue, data.Expiration.StringValue) {
+		data.Expiration = priorExpiration
+	}
+
+	// Advance the import-adoption marker (see import_adoption.go). Must run on
+	// every successful Read: Terraform persists this refresh in `terraform
+	// apply` even when the resulting plan is a no-op, which is the only hook
+	// that retires a marker whose import adopted nothing.
+	resp.Diagnostics.Append(secretImportAdoption.Advance(ctx, resp.Private)...)
 
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
 }
@@ -238,9 +293,25 @@ func (r *CloudSecretResource) ImportState(ctx context.Context, req resource.Impo
 		return
 	}
 
+	// Open the import-adoption window: the API never returns payload_wo_version,
+	// so it is null here. See import_adoption.go.
+	resp.Diagnostics.Append(secretImportAdoption.Mark(ctx, resp.Private)...)
+
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
 }
 
-func (r *CloudSecretResource) ModifyPlan(_ context.Context, _ resource.ModifyPlanRequest, _ *resource.ModifyPlanResponse) {
-
+func (r *CloudSecretResource) ModifyPlan(ctx context.Context, req resource.ModifyPlanRequest, resp *resource.ModifyPlanResponse) {
+	requirePayloadOnCreate(ctx, req, resp)
+	if resp.Diagnostics.HasError() {
+		return
+	}
+	secretImportAdoptionPlan.ModifyPlan(ctx, req, resp)
+	if resp.Diagnostics.HasError() {
+		return
+	}
+	// See plan_modifiers.go: without this, the seven read-only attributes
+	// below show "(known after apply)" on any Update-shaped plan, not only
+	// the payload-removal one, because none of them has a plan modifier of
+	// its own.
+	carryComputedAttributesForward(ctx, req, resp)
 }

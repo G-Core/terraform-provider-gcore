@@ -3,12 +3,17 @@ package cloud_secret_test
 import (
 	"context"
 	"fmt"
+	"os"
+	"path/filepath"
+	"regexp"
 	"testing"
 
 	"github.com/G-Core/gcore-go"
 	"github.com/G-Core/gcore-go/cloud"
+	"github.com/hashicorp/terraform-plugin-testing/config"
 	"github.com/hashicorp/terraform-plugin-testing/helper/resource"
 	"github.com/hashicorp/terraform-plugin-testing/knownvalue"
+	"github.com/hashicorp/terraform-plugin-testing/plancheck"
 	"github.com/hashicorp/terraform-plugin-testing/statecheck"
 	"github.com/hashicorp/terraform-plugin-testing/terraform"
 	"github.com/hashicorp/terraform-plugin-testing/tfjsonpath"
@@ -92,9 +97,187 @@ func TestAccCloudSecret_basic(t *testing.T) {
 	})
 }
 
-// Note: Import test is not implemented because the payload field is required
-// and forces replacement, but it's not returned by the API during read/import.
-// This is a known limitation of the secrets API.
+// TestAccCloudSecret_importBlockAdoptionApplies verifies that a real import
+// block applies the adoption without replacing the secret.
+func TestAccCloudSecret_importBlockAdoptionApplies(t *testing.T) {
+	rName := acctest.RandomName()
+	var secretID string
+
+	resource.ParallelTest(t, resource.TestCase{
+		PreCheck:                 func() { acctest.PreCheck(t) },
+		ProtoV6ProviderFactories: acctest.ProtoV6ProviderFactories,
+		CheckDestroy:             testAccCheckCloudSecretDestroy,
+		Steps: []resource.TestStep{
+			{
+				Config: testAccCloudSecretConfig(rName),
+				Check: func(s *terraform.State) error {
+					rs, ok := s.RootModule().Resources["gcore_cloud_secret.test"]
+					if !ok {
+						return fmt.Errorf("gcore_cloud_secret.test not found in state")
+					}
+					secretID = rs.Primary.ID
+					return nil
+				},
+			},
+			{
+				Config: testAccCloudSecretConfigForgotten(),
+			},
+			{
+				ConfigFile: testAccCloudSecretImportConfigFile(t, rName, &secretID),
+				ConfigPlanChecks: resource.ConfigPlanChecks{
+					PreApply: []plancheck.PlanCheck{
+						plancheck.ExpectResourceAction("gcore_cloud_secret.test", plancheck.ResourceActionUpdate),
+					},
+				},
+				ConfigStateChecks: []statecheck.StateCheck{
+					statecheck.ExpectKnownValue("gcore_cloud_secret.test",
+						tfjsonpath.New("payload_wo_version"), knownvalue.Int64Exact(1)),
+				},
+				Check: func(s *terraform.State) error {
+					rs, ok := s.RootModule().Resources["gcore_cloud_secret.test"]
+					if !ok {
+						return fmt.Errorf("gcore_cloud_secret.test not found in state")
+					}
+					if rs.Primary.ID != secretID {
+						return fmt.Errorf("secret id changed from %q to %q during import adoption", secretID, rs.Primary.ID)
+					}
+					return nil
+				},
+			},
+			{
+				Config: testAccCloudSecretConfig(rName),
+				ConfigPlanChecks: resource.ConfigPlanChecks{
+					PreApply: []plancheck.PlanCheck{plancheck.ExpectEmptyPlan()},
+				},
+				Check: func(s *terraform.State) error {
+					rs, ok := s.RootModule().Resources["gcore_cloud_secret.test"]
+					if !ok {
+						return fmt.Errorf("gcore_cloud_secret.test not found in state")
+					}
+					if rs.Primary.ID != secretID {
+						return fmt.Errorf("secret id changed from %q to %q after import adoption", secretID, rs.Primary.ID)
+					}
+					return nil
+				},
+			},
+		},
+	})
+}
+
+// TestAccCloudSecret_payloadChangeForcesReplacement: a genuine
+// payload_wo_version bump must still force replacement (the adoption
+// window must not weaken this for a managed secret), and the recreated
+// secret must get a new ID.
+func TestAccCloudSecret_payloadChangeForcesReplacement(t *testing.T) {
+	rName := acctest.RandomName()
+	var firstID string
+
+	resource.ParallelTest(t, resource.TestCase{
+		PreCheck:                 func() { acctest.PreCheck(t) },
+		ProtoV6ProviderFactories: acctest.ProtoV6ProviderFactories,
+		CheckDestroy:             testAccCheckCloudSecretDestroy,
+		Steps: []resource.TestStep{
+			{
+				Config: testAccCloudSecretConfig(rName),
+				ConfigStateChecks: []statecheck.StateCheck{
+					statecheck.ExpectKnownValue("gcore_cloud_secret.test",
+						tfjsonpath.New("id"), knownvalue.NotNull()),
+				},
+				Check: func(s *terraform.State) error {
+					rs, ok := s.RootModule().Resources["gcore_cloud_secret.test"]
+					if !ok {
+						return fmt.Errorf("gcore_cloud_secret.test not found in state")
+					}
+					firstID = rs.Primary.ID
+					return nil
+				},
+			},
+			{
+				Config: testAccCloudSecretConfigVersion(rName, 2),
+				ConfigPlanChecks: resource.ConfigPlanChecks{
+					PreApply: []plancheck.PlanCheck{
+						plancheck.ExpectResourceAction("gcore_cloud_secret.test", plancheck.ResourceActionReplace),
+					},
+				},
+				Check: func(s *terraform.State) error {
+					rs, ok := s.RootModule().Resources["gcore_cloud_secret.test"]
+					if !ok {
+						return fmt.Errorf("gcore_cloud_secret.test not found in state")
+					}
+					if rs.Primary.ID == firstID {
+						return fmt.Errorf("expected a new secret id after payload_wo_version bump, got the same id %q", firstID)
+					}
+					return nil
+				},
+			},
+		},
+	})
+}
+
+// TestAccCloudSecret_importCommandAdoptionApplies covers the half of the
+// window the import-block test cannot reach: the apply that actually
+// adopts. Command-mode import with ImportStatePersist puts the imported
+// state into the working state, so the following steps really plan and
+// apply against it, and the same config plans nothing afterward.
+func TestAccCloudSecret_importCommandAdoptionApplies(t *testing.T) {
+	rName := acctest.RandomName()
+	var secretID string
+
+	resource.ParallelTest(t, resource.TestCase{
+		PreCheck:                 func() { acctest.PreCheck(t) },
+		ProtoV6ProviderFactories: acctest.ProtoV6ProviderFactories,
+		CheckDestroy:             testAccCheckCloudSecretDestroy,
+		Steps: []resource.TestStep{
+			{
+				Config: testAccCloudSecretConfig(rName),
+				Check: func(s *terraform.State) error {
+					rs, ok := s.RootModule().Resources["gcore_cloud_secret.test"]
+					if !ok {
+						return fmt.Errorf("gcore_cloud_secret.test not found in state")
+					}
+					secretID = rs.Primary.ID
+					return nil
+				},
+			},
+			{
+				// Forget the secret without destroying it, so the import
+				// below targets an address absent from state.
+				Config: testAccCloudSecretConfigForgotten(),
+			},
+			{
+				Config:             testAccCloudSecretConfig(rName),
+				ResourceName:       "gcore_cloud_secret.test",
+				ImportState:        true,
+				ImportStateKind:    resource.ImportCommandWithID,
+				ImportStatePersist: true,
+				ImportStateIdFunc: func(*terraform.State) (string, error) {
+					return fmt.Sprintf("%s/%s/%s", acctest.ProjectID(), acctest.RegionID(), secretID), nil
+				},
+			},
+			{
+				// The adopting apply: payload/payload_wo_version land in
+				// state without the secret being replaced, and the marker
+				// is retired.
+				Config: testAccCloudSecretConfig(rName),
+				ConfigPlanChecks: resource.ConfigPlanChecks{
+					PreApply: []plancheck.PlanCheck{
+						plancheck.ExpectResourceAction("gcore_cloud_secret.test", plancheck.ResourceActionUpdate),
+					},
+				},
+				ConfigStateChecks: []statecheck.StateCheck{
+					statecheck.ExpectKnownValue("gcore_cloud_secret.test",
+						tfjsonpath.New("payload_wo_version"), knownvalue.Int64Exact(1)),
+				},
+			},
+			{
+				// Adoption is stable: with the values in state, the same
+				// config plans nothing at all.
+				Config:   testAccCloudSecretConfig(rName),
+				PlanOnly: true,
+			},
+		},
+	})
+}
 
 func testAccCheckCloudSecretDestroy(s *terraform.State) error {
 	return acctest.CheckResourceDestroyed(s, "gcore_cloud_secret", func(client *gcore.Client, id string) error {
@@ -122,4 +305,351 @@ EOT
 EOT
   }
 }`, acctest.ProjectID(), acctest.RegionID(), name, testCertificate, testPrivateKey)
+}
+
+func testAccCloudSecretImportConfigFile(t *testing.T, name string, secretID *string) config.TestStepConfigFunc {
+	t.Helper()
+	dir := t.TempDir()
+
+	return func(req config.TestStepConfigRequest) string {
+		file := filepath.Join(dir, fmt.Sprintf("step_%d.tf", req.StepNumber))
+		importID := fmt.Sprintf("%s/%s/%s", acctest.ProjectID(), acctest.RegionID(), *secretID)
+		content := fmt.Sprintf(`
+import {
+  to = gcore_cloud_secret.test
+  id = %q
+}
+
+%s`, importID, testAccCloudSecretConfig(name))
+		if err := os.WriteFile(file, []byte(content), 0o600); err != nil {
+			t.Fatalf("writing %s: %s", file, err)
+		}
+		return file
+	}
+}
+
+func testAccCloudSecretConfigVersion(name string, version int) string {
+	return fmt.Sprintf(`
+resource "gcore_cloud_secret" "test" {
+  project_id = %[1]s
+  region_id  = %[2]s
+  name       = %[3]q
+  payload_wo_version = %[6]d
+  payload = {
+    certificate_wo       = <<EOT
+%[4]s
+EOT
+    certificate_chain_wo = <<EOT
+%[4]s
+EOT
+    private_key_wo       = <<EOT
+%[5]s
+EOT
+  }
+}`, acctest.ProjectID(), acctest.RegionID(), name, testCertificate, testPrivateKey, version)
+}
+
+func testAccCloudSecretConfigForgotten() string {
+	return `
+removed {
+  from = gcore_cloud_secret.test
+
+  lifecycle {
+    destroy = false
+  }
+}`
+}
+
+func testAccCloudSecretConfigNoPayload(name string) string {
+	return fmt.Sprintf(`
+resource "gcore_cloud_secret" "test" {
+  project_id = %[1]s
+  region_id  = %[2]s
+  name       = %[3]q
+}`, acctest.ProjectID(), acctest.RegionID(), name)
+}
+
+func testAccCloudSecretConfigPayloadNoVersion(name string) string {
+	return fmt.Sprintf(`
+resource "gcore_cloud_secret" "test" {
+  project_id = %[1]s
+  region_id  = %[2]s
+  name       = %[3]q
+  payload = {
+    certificate_wo       = <<EOT
+%[4]s
+EOT
+    certificate_chain_wo = <<EOT
+%[4]s
+EOT
+    private_key_wo       = <<EOT
+%[5]s
+EOT
+  }
+}`, acctest.ProjectID(), acctest.RegionID(), name, testCertificate, testPrivateKey)
+}
+
+// TestAccCloudSecret_importWithoutPayload covers importing a secret without
+// supplying its material at all: the import apply must adopt nothing
+// (payload/payload_wo_version stay null), a later plan with the same
+// no-payload config must be empty, replacing the secret (e.g. renaming it)
+// without payload must fail up front, and the secret must otherwise survive
+// untouched.
+func TestAccCloudSecret_importWithoutPayload(t *testing.T) {
+	rName := acctest.RandomName()
+	var secretID string
+
+	resource.ParallelTest(t, resource.TestCase{
+		PreCheck:                 func() { acctest.PreCheck(t) },
+		ProtoV6ProviderFactories: acctest.ProtoV6ProviderFactories,
+		CheckDestroy:             testAccCheckCloudSecretDestroy,
+		Steps: []resource.TestStep{
+			{
+				Config: testAccCloudSecretConfig(rName),
+				Check: func(s *terraform.State) error {
+					rs, ok := s.RootModule().Resources["gcore_cloud_secret.test"]
+					if !ok {
+						return fmt.Errorf("gcore_cloud_secret.test not found in state")
+					}
+					secretID = rs.Primary.ID
+					return nil
+				},
+			},
+			{
+				// Forget the secret without destroying it, so the import
+				// below targets an address absent from state.
+				Config: testAccCloudSecretConfigForgotten(),
+			},
+			{
+				Config:             testAccCloudSecretConfigNoPayload(rName),
+				ResourceName:       "gcore_cloud_secret.test",
+				ImportState:        true,
+				ImportStateKind:    resource.ImportCommandWithID,
+				ImportStatePersist: true,
+				ImportStateIdFunc: func(*terraform.State) (string, error) {
+					return fmt.Sprintf("%s/%s/%s", acctest.ProjectID(), acctest.RegionID(), secretID), nil
+				},
+			},
+			{
+				// Nothing was adopted, so the same no-payload config plans
+				// nothing at all.
+				Config:   testAccCloudSecretConfigNoPayload(rName),
+				PlanOnly: true,
+			},
+			{
+				// Renaming without payload forces replacement, which needs
+				// the material this config still does not have.
+				Config:      testAccCloudSecretConfigNoPayload(rName + "-renamed"),
+				ExpectError: regexp.MustCompile(`Missing secret payload`),
+			},
+			{
+				Config: testAccCloudSecretConfigNoPayload(rName),
+				ConfigPlanChecks: resource.ConfigPlanChecks{
+					PreApply: []plancheck.PlanCheck{plancheck.ExpectEmptyPlan()},
+				},
+				Check: func(s *terraform.State) error {
+					rs, ok := s.RootModule().Resources["gcore_cloud_secret.test"]
+					if !ok {
+						return fmt.Errorf("gcore_cloud_secret.test not found in state")
+					}
+					if rs.Primary.ID != secretID {
+						return fmt.Errorf("secret id changed from %q to %q; it should have survived untouched", secretID, rs.Primary.ID)
+					}
+					return nil
+				},
+			},
+		},
+	})
+}
+
+// TestAccCloudSecret_removePayloadInPlace covers removing payload and
+// payload_wo_version from the config of a managed secret: the secret must
+// survive with both attributes recorded as null in state, a repeat plan must
+// be empty, and re-adding the material must replace the secret with a new
+// id (no marker survives a removal).
+func TestAccCloudSecret_removePayloadInPlace(t *testing.T) {
+	rName := acctest.RandomName()
+	var secretID string
+
+	resource.ParallelTest(t, resource.TestCase{
+		PreCheck:                 func() { acctest.PreCheck(t) },
+		ProtoV6ProviderFactories: acctest.ProtoV6ProviderFactories,
+		CheckDestroy:             testAccCheckCloudSecretDestroy,
+		Steps: []resource.TestStep{
+			{
+				Config: testAccCloudSecretConfig(rName),
+				Check: func(s *terraform.State) error {
+					rs, ok := s.RootModule().Resources["gcore_cloud_secret.test"]
+					if !ok {
+						return fmt.Errorf("gcore_cloud_secret.test not found in state")
+					}
+					secretID = rs.Primary.ID
+					return nil
+				},
+			},
+			{
+				Config: testAccCloudSecretConfigNoPayload(rName),
+				ConfigPlanChecks: resource.ConfigPlanChecks{
+					PreApply: []plancheck.PlanCheck{
+						plancheck.ExpectResourceAction("gcore_cloud_secret.test", plancheck.ResourceActionUpdate),
+					},
+				},
+				// carryComputedAttributesForward (plan_modifiers.go) keeps the
+				// 7 other computed attributes at their prior known values on
+				// this plan; without it they would show "(known after
+				// apply)" here even though nothing about them changed, which
+				// would break a downstream reference (a `count`, another
+				// resource's RequiresReplace) evaluated at plan time. Only
+				// the removed attributes are asserted below because the acc
+				// test framework does not expose a "known, unchanged" plan
+				// check for the others.
+				ConfigStateChecks: []statecheck.StateCheck{
+					statecheck.ExpectKnownValue("gcore_cloud_secret.test",
+						tfjsonpath.New("payload"), knownvalue.Null()),
+					statecheck.ExpectKnownValue("gcore_cloud_secret.test",
+						tfjsonpath.New("payload_wo_version"), knownvalue.Null()),
+				},
+				Check: func(s *terraform.State) error {
+					rs, ok := s.RootModule().Resources["gcore_cloud_secret.test"]
+					if !ok {
+						return fmt.Errorf("gcore_cloud_secret.test not found in state")
+					}
+					if rs.Primary.ID != secretID {
+						return fmt.Errorf("secret id changed from %q to %q; removal must not replace the secret", secretID, rs.Primary.ID)
+					}
+					return nil
+				},
+			},
+			{
+				Config:   testAccCloudSecretConfigNoPayload(rName),
+				PlanOnly: true,
+			},
+			{
+				// No marker exists after a removal, so re-adding the
+				// material is a real change and must replace the secret.
+				Config: testAccCloudSecretConfig(rName),
+				ConfigPlanChecks: resource.ConfigPlanChecks{
+					PreApply: []plancheck.PlanCheck{
+						plancheck.ExpectResourceAction("gcore_cloud_secret.test", plancheck.ResourceActionReplace),
+					},
+				},
+				Check: func(s *terraform.State) error {
+					rs, ok := s.RootModule().Resources["gcore_cloud_secret.test"]
+					if !ok {
+						return fmt.Errorf("gcore_cloud_secret.test not found in state")
+					}
+					if rs.Primary.ID == secretID {
+						return fmt.Errorf("expected a new secret id after re-adding payload, got the same id %q", secretID)
+					}
+					return nil
+				},
+			},
+		},
+	})
+}
+
+// TestAccCloudSecret_importWithoutPayloadThenSetReplaces is the do-nothing-
+// then-act path: import without material, apply the no-payload config
+// exactly once with an empty plan (the refresh in that apply spends the
+// marker), then set payload. If the marker had not been retired by the
+// no-op apply, this would plan an Update instead of a Replace, which would
+// mean the docs claim (one apply after import, then the window closes) is
+// wrong - escalate that, do not add steps to make this test pass.
+func TestAccCloudSecret_importWithoutPayloadThenSetReplaces(t *testing.T) {
+	rName := acctest.RandomName()
+	var secretID string
+
+	resource.ParallelTest(t, resource.TestCase{
+		PreCheck:                 func() { acctest.PreCheck(t) },
+		ProtoV6ProviderFactories: acctest.ProtoV6ProviderFactories,
+		CheckDestroy:             testAccCheckCloudSecretDestroy,
+		Steps: []resource.TestStep{
+			{
+				Config: testAccCloudSecretConfig(rName),
+				Check: func(s *terraform.State) error {
+					rs, ok := s.RootModule().Resources["gcore_cloud_secret.test"]
+					if !ok {
+						return fmt.Errorf("gcore_cloud_secret.test not found in state")
+					}
+					secretID = rs.Primary.ID
+					return nil
+				},
+			},
+			{
+				Config: testAccCloudSecretConfigForgotten(),
+			},
+			{
+				Config:             testAccCloudSecretConfigNoPayload(rName),
+				ResourceName:       "gcore_cloud_secret.test",
+				ImportState:        true,
+				ImportStateKind:    resource.ImportCommandWithID,
+				ImportStatePersist: true,
+				ImportStateIdFunc: func(*terraform.State) (string, error) {
+					return fmt.Sprintf("%s/%s/%s", acctest.ProjectID(), acctest.RegionID(), secretID), nil
+				},
+			},
+			{
+				// Exactly one no-op apply: its refresh is the one that
+				// spends the marker.
+				Config: testAccCloudSecretConfigNoPayload(rName),
+				ConfigPlanChecks: resource.ConfigPlanChecks{
+					PreApply: []plancheck.PlanCheck{plancheck.ExpectEmptyPlan()},
+				},
+			},
+			{
+				Config: testAccCloudSecretConfig(rName),
+				ConfigPlanChecks: resource.ConfigPlanChecks{
+					PreApply: []plancheck.PlanCheck{
+						plancheck.ExpectResourceAction("gcore_cloud_secret.test", plancheck.ResourceActionReplace),
+					},
+				},
+				Check: func(s *terraform.State) error {
+					rs, ok := s.RootModule().Resources["gcore_cloud_secret.test"]
+					if !ok {
+						return fmt.Errorf("gcore_cloud_secret.test not found in state")
+					}
+					if rs.Primary.ID == secretID {
+						return fmt.Errorf("expected a new secret id after setting payload, got the same id %q", secretID)
+					}
+					return nil
+				},
+			},
+		},
+	})
+}
+
+// TestAccCloudSecret_createWithoutPayloadFails: a brand-new secret cannot be
+// created without its material.
+func TestAccCloudSecret_createWithoutPayloadFails(t *testing.T) {
+	rName := acctest.RandomName()
+
+	resource.ParallelTest(t, resource.TestCase{
+		PreCheck:                 func() { acctest.PreCheck(t) },
+		ProtoV6ProviderFactories: acctest.ProtoV6ProviderFactories,
+		CheckDestroy:             testAccCheckCloudSecretDestroy,
+		Steps: []resource.TestStep{
+			{
+				Config:      testAccCloudSecretConfigNoPayload(rName),
+				ExpectError: regexp.MustCompile(`Missing secret payload`),
+			},
+		},
+	})
+}
+
+// TestAccCloudSecret_payloadWithoutVersionFails: payload and
+// payload_wo_version must be configured together.
+func TestAccCloudSecret_payloadWithoutVersionFails(t *testing.T) {
+	rName := acctest.RandomName()
+
+	resource.ParallelTest(t, resource.TestCase{
+		PreCheck:                 func() { acctest.PreCheck(t) },
+		ProtoV6ProviderFactories: acctest.ProtoV6ProviderFactories,
+		CheckDestroy:             testAccCheckCloudSecretDestroy,
+		Steps: []resource.TestStep{
+			{
+				Config:      testAccCloudSecretConfigPayloadNoVersion(rName),
+				ExpectError: regexp.MustCompile(`must be set together`),
+			},
+		},
+	})
 }
