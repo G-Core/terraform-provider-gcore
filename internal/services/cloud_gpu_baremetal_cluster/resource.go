@@ -154,10 +154,7 @@ func (r *CloudGPUBaremetalClusterResource) Update(ctx context.Context, req resou
 	}
 	credentialsChanged := credentialsHaveChanged(planSettingsObj, stateSettingsObj)
 	if credentialsChanged && usernameOrPasswordChanged(planSettingsObj, stateSettingsObj) {
-		resp.Diagnostics.AddError(
-			"Unsupported credential update",
-			"Updating username or password is not supported. These credentials can only be set during resource creation. To change them, the resource must be recreated.",
-		)
+		resp.Diagnostics.Append(unsupportedCredentialUpdateError(wasImported(ctx, req.Private)))
 		return
 	}
 
@@ -497,6 +494,9 @@ func (r *CloudGPUBaremetalClusterResource) ImportState(ctx context.Context, req 
 		}
 	}
 
+	// See importedKey: the credentials in state are not the ones the cluster
+	// was created with.
+	resp.Diagnostics.Append(markImported(ctx, resp.Private)...)
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
 }
 
@@ -527,10 +527,7 @@ func (r *CloudGPUBaremetalClusterResource) ModifyPlan(ctx context.Context, req r
 	// Reject username/password changes at plan time with a clear error.
 	if credentialsHaveChanged(planSettings, stateSettings) &&
 		usernameOrPasswordChanged(planSettings, stateSettings) {
-		resp.Diagnostics.AddError(
-			"Unsupported credential update",
-			"Updating username or password is not supported. These credentials can only be set during resource creation. To change them, the resource must be recreated.",
-		)
+		resp.Diagnostics.Append(unsupportedCredentialUpdateError(wasImported(ctx, req.Private)))
 
 		return
 	}

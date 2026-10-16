@@ -321,3 +321,36 @@ Import is supported using the following syntax:
 $ terraform import gcore_cloud_gpu_baremetal_cluster.example '<project_id>/<region_id>/<cluster_id>'
 ```
 
+~> **Clusters created with `username` and `password_wo`.** The API never returns the password or
+`password_wo_version`, so after an import (with `terraform import` or an `import` block) the
+configured credentials cannot be matched against the cluster, and plans fail with "Unsupported
+credential update", including the refresh plan `terraform destroy` runs first. Before planning, write the
+credentials the cluster was created with and add this `lifecycle` block, and keep it for as long as
+the cluster exists (the credentials cannot change without recreating it anyway):
+
+```terraform
+resource "gcore_cloud_gpu_baremetal_cluster" "example" {
+  # ...
+  servers_settings = {
+    # ...
+    credentials = {
+      username            = "admin"
+      password_wo         = var.cluster_password
+      password_wo_version = 1
+    }
+  }
+
+  lifecycle {
+    ignore_changes = [servers_settings.credentials]
+  }
+}
+```
+
+While the block is present, all changes to `credentials` are ignored: bumping `password_wo_version`
+does **not** change the password, and nothing reports that. A replacement (for example a `flavor`
+change) still builds the new cluster with the configured credentials, so they must be real, never
+placeholders. A cluster that uses `ssh_key_name`
+imports without this block and keeps its in-place key change, which the block would ignore too.
+Use the block only for imported clusters: on a cluster Terraform created, it hides credentials
+added or changed in the configuration, and the cluster keeps the ones it was created with.
+
