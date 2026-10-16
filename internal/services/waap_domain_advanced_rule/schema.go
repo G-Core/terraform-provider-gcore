@@ -4,12 +4,17 @@ package waap_domain_advanced_rule
 
 import (
 	"context"
+	"regexp"
 
 	"github.com/hashicorp/terraform-plugin-framework-jsontypes/jsontypes"
 	"github.com/hashicorp/terraform-plugin-framework-validators/int64validator"
+	"github.com/hashicorp/terraform-plugin-framework-validators/resourcevalidator"
+	"github.com/hashicorp/terraform-plugin-framework-validators/setvalidator"
 	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
+	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/int64default"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/int64planmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringdefault"
@@ -61,10 +66,19 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 							"action_duration": schema.StringAttribute{
 								Description: "How long a rule's block action will apply to subsequent requests. Can be specified in seconds or by using a numeral followed by 's', 'm', 'h', or 'd' to represent time format (seconds, minutes, hours, or days). Empty time intervals are not allowed.",
 								Optional:    true,
+								Validators: []validator.String{
+									stringvalidator.LengthBetween(1, 10),
+									stringvalidator.RegexMatches(
+										regexp.MustCompile(`^[1-9][0-9]*[smhd]?$`),
+										"must be a positive number, optionally followed by s, m, h or d",
+									),
+								},
 							},
 							"status_code": schema.Int64Attribute{
 								Description: "A custom HTTP status code that the WAAP returns if a rule blocks a request\nAvailable values: 403, 405, 418, 429.",
+								Computed:    true,
 								Optional:    true,
+								Default:     int64default.StaticInt64(403),
 								Validators: []validator.Int64{
 									int64validator.OneOf(
 										403,
@@ -99,6 +113,16 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 								Description: "The list of user defined tags to tag the request with",
 								Required:    true,
 								ElementType: types.StringType,
+								Validators: []validator.Set{
+									setvalidator.SizeBetween(1, 5),
+									setvalidator.NoNullValues(),
+									setvalidator.ValueStringsAre(
+										stringvalidator.RegexMatches(
+											regexp.MustCompile(`^[A-Za-z][A-Za-z0-9 ]*$`),
+											"must start with a letter and contain only letters, digits and spaces",
+										),
+									),
+								},
 							},
 						},
 					},
@@ -106,7 +130,9 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 			},
 			"description": schema.StringAttribute{
 				Description: "The description assigned to the rule",
+				Computed:    true,
 				Optional:    true,
+				Default:     stringdefault.StaticString(""),
 			},
 			"phase": schema.StringAttribute{
 				Description: "The WAAP request/response phase for applying the rule. Default is \"access\".\n\n\nThe \"access\" phase is responsible for modifying the request before it is sent to the origin server. \n\nThe \"header_filter\" phase is responsible for modifying the HTTP headers of a response before they are sent back to the client.\n\nThe \"body_filter\" phase is responsible for modifying the body of a response before it is sent back to the client.\nAvailable values: \"access\", \"header_filter\", \"body_filter\".",
@@ -130,5 +156,15 @@ func (r *WaapDomainAdvancedRuleResource) Schema(ctx context.Context, req resourc
 }
 
 func (r *WaapDomainAdvancedRuleResource) ConfigValidators(_ context.Context) []resource.ConfigValidator {
-	return []resource.ConfigValidator{}
+	action := path.MatchRoot("action")
+	return []resource.ConfigValidator{
+		resourcevalidator.ExactlyOneOf(
+			action.AtName("allow"),
+			action.AtName("block"),
+			action.AtName("captcha"),
+			action.AtName("handshake"),
+			action.AtName("monitor"),
+			action.AtName("tag"),
+		),
+	}
 }

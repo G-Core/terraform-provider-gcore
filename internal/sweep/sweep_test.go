@@ -61,6 +61,9 @@ import (
 	// Storage
 	_ "github.com/G-Core/terraform-provider-gcore/internal/services/storage_sftp"
 	_ "github.com/G-Core/terraform-provider-gcore/internal/services/storage_ssh_key"
+
+	// WAAP
+	_ "github.com/G-Core/terraform-provider-gcore/internal/services/waap_domain_advanced_rule"
 )
 
 func TestMain(m *testing.M) {

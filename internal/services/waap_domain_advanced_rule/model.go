@@ -15,7 +15,7 @@ type WaapDomainAdvancedRuleModel struct {
 	Name        types.String                       `tfsdk:"name" json:"name,required"`
 	Source      types.String                       `tfsdk:"source" json:"source,required"`
 	Action      *WaapDomainAdvancedRuleActionModel `tfsdk:"action" json:"action,required"`
-	Description types.String                       `tfsdk:"description" json:"description,optional"`
+	Description types.String                       `tfsdk:"description" json:"description,computed_optional"`
 	Phase       types.String                       `tfsdk:"phase" json:"phase,computed_optional"`
 }
 
@@ -38,7 +38,7 @@ type WaapDomainAdvancedRuleActionModel struct {
 
 type WaapDomainAdvancedRuleActionBlockModel struct {
 	ActionDuration types.String `tfsdk:"action_duration" json:"action_duration,optional"`
-	StatusCode     types.Int64  `tfsdk:"status_code" json:"status_code,optional"`
+	StatusCode     types.Int64  `tfsdk:"status_code" json:"status_code,computed_optional"`
 }
 
 type WaapDomainAdvancedRuleActionTagModel struct {

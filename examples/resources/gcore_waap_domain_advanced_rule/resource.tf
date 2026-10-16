@@ -1,29 +1,16 @@
+# Block an IP address for 5 minutes. Exactly one action can be set per rule:
+# allow = {}, block = {...}, captcha = {}, handshake = {}, monitor = {} or tag = {...}.
 resource "gcore_waap_domain_advanced_rule" "example_waap_domain_advanced_rule" {
-  domain_id = 1
+  domain_id   = 1
+  name        = "Block foobar bot"
+  description = "Block requests from a single IP address"
+  enabled     = true
+  source      = "request.ip == '117.20.32.55'"
+  phase       = "access"
   action = {
-    allow = {
-      foo = "bar"
-    }
     block = {
-      action_duration = "12h"
-      status_code = 403
-    }
-    captcha = {
-      foo = "bar"
-    }
-    handshake = {
-      foo = "bar"
-    }
-    monitor = {
-      foo = "bar"
-    }
-    tag = {
-      tags = ["string"]
+      status_code     = 403
+      action_duration = "5m"
     }
   }
-  enabled = true
-  name = "Block foobar bot"
-  source = "request.rate_limit([], \'.*events\', 5, 200, [], [], \'\', \'ip\') and not (\'mb-web-ui\' in request.headers[\'Cookie\'] or \'mb-mobile-ios\' in request.headers[\'Cookie\'] or \'session-token\' in request.headers[\'Cookie\']) and not request.headers[\'session\']"
-  description = "description"
-  phase = "access"
 }
