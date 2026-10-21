@@ -48,7 +48,7 @@ func TestAccCDNLogsUploaderTarget_s3Other(t *testing.T) {
 					statecheck.ExpectKnownValue("gcore_cdn_logs_uploader_target.test",
 						tfjsonpath.New("config").AtMapKey("region"), knownvalue.StringExact("us-east-1")),
 					statecheck.ExpectKnownValue("gcore_cdn_logs_uploader_target.test",
-						tfjsonpath.New("config").AtMapKey("endpoint"), knownvalue.StringExact("https://s3.example.com")),
+						tfjsonpath.New("config").AtMapKey("endpoint"), knownvalue.StringExact("https://s3.eu-central-1.amazonaws.com")),
 					statecheck.ExpectKnownValue("gcore_cdn_logs_uploader_target.test",
 						tfjsonpath.New("config").AtMapKey("use_path_style"), knownvalue.Bool(true)),
 					statecheck.ExpectKnownValue("gcore_cdn_logs_uploader_target.test",
@@ -79,7 +79,7 @@ func TestAccCDNLogsUploaderTarget_s3Other(t *testing.T) {
 					statecheck.ExpectKnownValue("gcore_cdn_logs_uploader_target.test",
 						tfjsonpath.New("config").AtMapKey("region"), knownvalue.StringExact("eu-west-1")),
 					statecheck.ExpectKnownValue("gcore_cdn_logs_uploader_target.test",
-						tfjsonpath.New("config").AtMapKey("endpoint"), knownvalue.StringExact("https://s3-v2.example.com")),
+						tfjsonpath.New("config").AtMapKey("endpoint"), knownvalue.StringExact("https://s3.eu-west-1.amazonaws.com")),
 					statecheck.ExpectKnownValue("gcore_cdn_logs_uploader_target.test",
 						tfjsonpath.New("config").AtMapKey("use_path_style"), knownvalue.Bool(false)),
 					statecheck.ExpectKnownValue("gcore_cdn_logs_uploader_target.test",
@@ -445,7 +445,7 @@ resource "gcore_cdn_logs_uploader_target" "test" {
     secret_access_key = "acctest-secret-key-12345"
     bucket_name       = "acctest-bucket"
     region            = "us-east-1"
-    endpoint          = "https://s3.example.com"
+    endpoint          = "https://s3.eu-central-1.amazonaws.com"
     use_path_style    = true
     directory         = "/logs/cdn"
   }
@@ -464,7 +464,7 @@ resource "gcore_cdn_logs_uploader_target" "test" {
     secret_access_key = "acctest-secret-key-12345"
     bucket_name       = "acctest-bucket-v2"
     region            = "eu-west-1"
-    endpoint          = "https://s3-v2.example.com"
+    endpoint          = "https://s3.eu-west-1.amazonaws.com"
     use_path_style    = false
     directory         = "/logs/cdn/v2"
   }
@@ -482,7 +482,7 @@ resource "gcore_cdn_logs_uploader_target" "test" {
     secret_access_key = "acctest-secret-key-12345"
     bucket_name       = "acctest-bucket-v2"
     region            = "eu-west-1"
-    endpoint          = "https://s3-v2.example.com"
+    endpoint          = "https://s3.eu-west-1.amazonaws.com"
   }
 }`, name)
 }

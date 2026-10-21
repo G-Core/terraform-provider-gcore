@@ -41,7 +41,7 @@ func TestAccCDNLogsUploaderTargetDataSource_basic(t *testing.T) {
 					statecheck.ExpectKnownValue("data.gcore_cdn_logs_uploader_target.test",
 						tfjsonpath.New("config").AtMapKey("region"), knownvalue.StringExact("us-east-1")),
 					statecheck.ExpectKnownValue("data.gcore_cdn_logs_uploader_target.test",
-						tfjsonpath.New("config").AtMapKey("endpoint"), knownvalue.StringExact("https://s3-ds.example.com")),
+						tfjsonpath.New("config").AtMapKey("endpoint"), knownvalue.StringExact("https://s3.us-east-1.amazonaws.com")),
 					statecheck.CompareValuePairs(
 						"gcore_cdn_logs_uploader_target.test", tfjsonpath.New("id"),
 						"data.gcore_cdn_logs_uploader_target.test", tfjsonpath.New("id"),
@@ -65,7 +65,7 @@ resource "gcore_cdn_logs_uploader_target" "test" {
     secret_access_key = "ds-secret-key-12345"
     bucket_name       = "ds-bucket"
     region            = "us-east-1"
-    endpoint          = "https://s3-ds.example.com"
+    endpoint          = "https://s3.us-east-1.amazonaws.com"
     use_path_style    = true
   }
 }
