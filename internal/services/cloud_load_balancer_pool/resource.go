@@ -124,8 +124,14 @@ func resolveHealthmonitorUnknowns(data *CloudLoadBalancerPoolModel) {
 	if data == nil || data.Healthmonitor == nil {
 		return
 	}
+	if data.Healthmonitor.ExpectedCodes.IsUnknown() {
+		data.Healthmonitor.ExpectedCodes = types.StringNull()
+	}
 	if data.Healthmonitor.HTTPMethod.IsUnknown() {
 		data.Healthmonitor.HTTPMethod = types.StringNull()
+	}
+	if data.Healthmonitor.URLPath.IsUnknown() {
+		data.Healthmonitor.URLPath = types.StringNull()
 	}
 	if data.Healthmonitor.AdminStateUp.IsUnknown() {
 		data.Healthmonitor.AdminStateUp = types.BoolNull()

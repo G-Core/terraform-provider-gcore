@@ -209,6 +209,7 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 					},
 					"expected_codes": schema.StringAttribute{
 						Description: "Expected HTTP response codes. Can be a single code, a comma-separated list of codes, or a single range of codes. Can only be used together with `HTTP` or `HTTPS` health monitor type. For example, 200, 200,202,401,403,404, or 200-204. If not specified, the default is 200.",
+						Computed:    true,
 						Optional:    true,
 					},
 					"http_method": schema.StringAttribute{
@@ -247,6 +248,7 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 					},
 					"url_path": schema.StringAttribute{
 						Description: "The HTTP path the health monitor requests on each member. Defaults to `/` if not set. Can only be used with `HTTP` or `HTTPS` health monitor type.\n\nMust start with `/` and contain only plain path segments. Query strings (`?`), fragments (`#`), percent-encoding (`%`), and consecutive slashes (`//`) are not allowed.\n\nExamples of valid paths:\n- `/` — check the root (most common, default)\n- `/healthz` — a dedicated health endpoint",
+						Computed:    true,
 						Optional:    true,
 					},
 				},

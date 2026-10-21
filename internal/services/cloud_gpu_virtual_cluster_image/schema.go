@@ -110,7 +110,7 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 				Default:       stringdefault.StaticString("allow"),
 			},
 			"tags": schema.MapAttribute{
-				Description:   "Key-value tags to associate with the resource. A tag is a key-value pair that can be associated with a resource, enabling efficient filtering and grouping for better organization and management. Both tag keys and values have a maximum length of 255 characters. Some tags are read-only and cannot be modified by the user. Tags are also integrated with cost reports, allowing cost data to be filtered based on tag keys or values.",
+				Description:   "Key-value tags to associate with the resource. A tag is a key-value pair that can be associated with a resource, enabling efficient filtering and grouping for better organization and management. Both tag keys and values have a maximum length of 255 characters. Tag keys and values cannot contain characters from U+0080 to U+00FF. Some tags are read-only and cannot be modified by the user. Tags are also integrated with cost reports, allowing cost data to be filtered based on tag keys or values.",
 				Computed:      true,
 				Optional:      true,
 				CustomType:    customfield.NewMapType[types.String](ctx),

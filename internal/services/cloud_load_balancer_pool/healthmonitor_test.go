@@ -89,6 +89,39 @@ func TestConfiguredHealthmonitorSurvivesDecode(t *testing.T) {
 	}
 }
 
+// TestComputedHealthmonitorAttributesResolveToNull covers adding a TCP monitor:
+// the plan leaves every computed attribute unknown, and UnmarshalComputed skips
+// the configured pointer, so any attribute missing here reaches state unknown
+// and the apply fails with "Provider returned invalid result object after
+// apply".
+func TestComputedHealthmonitorAttributesResolveToNull(t *testing.T) {
+	t.Parallel()
+
+	hm := configuredHealthmonitor()
+	hm.ExpectedCodes = types.StringUnknown()
+	hm.HTTPMethod = types.StringUnknown()
+	hm.URLPath = types.StringUnknown()
+	hm.AdminStateUp = types.BoolUnknown()
+	hm.MaxRetriesDown = types.Int64Unknown()
+	data := &CloudLoadBalancerPoolModel{Healthmonitor: hm}
+	if err := apijson.UnmarshalComputed(poolBody(`{"delay":10,"max_retries":3,"timeout":5,"type":"TCP"}`), &data); err != nil {
+		t.Fatalf("decode failed: %s", err)
+	}
+	resolveHealthmonitorUnknowns(data)
+
+	for name, value := range map[string]interface{ IsUnknown() bool }{
+		"expected_codes":   data.Healthmonitor.ExpectedCodes,
+		"http_method":      data.Healthmonitor.HTTPMethod,
+		"url_path":         data.Healthmonitor.URLPath,
+		"admin_state_up":   data.Healthmonitor.AdminStateUp,
+		"max_retries_down": data.Healthmonitor.MaxRetriesDown,
+	} {
+		if value.IsUnknown() {
+			t.Errorf("%s is still unknown after decode", name)
+		}
+	}
+}
+
 // TestRefreshKeepsLiveHealthmonitor is the safety rail on the Read path: a pool
 // whose monitor is still there must survive refresh untouched. Clearing it here
 // would make plan propose re-creating a monitor that already exists.

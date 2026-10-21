@@ -123,9 +123,9 @@ Available values: "ACTIVE", "DOWN", "ERROR".
 
 Read-Only:
 
-- `key` (String) Tag key. Maximum 255 characters. Cannot contain spaces, tabs, newlines, empty string or '=' character.
+- `key` (String) Tag key. Maximum 255 characters. Cannot contain spaces, tabs, newlines, empty string or '=' character. Cannot contain characters from U+0080 to U+00FF.
 - `read_only` (Boolean) If true, the tag is read-only and cannot be modified by the user
-- `value` (String) Tag value. Maximum 255 characters. Cannot contain spaces, tabs, newlines, empty string or '=' character.
+- `value` (String) Tag value. Maximum 255 characters. Cannot contain spaces, tabs, newlines, empty string or '=' character. Cannot contain characters from U+0080 to U+00FF.
 
 
 
@@ -161,9 +161,9 @@ Read-Only:
 
 Read-Only:
 
-- `key` (String) Tag key. Maximum 255 characters. Cannot contain spaces, tabs, newlines, empty string or '=' character.
+- `key` (String) Tag key. Maximum 255 characters. Cannot contain spaces, tabs, newlines, empty string or '=' character. Cannot contain characters from U+0080 to U+00FF.
 - `read_only` (Boolean) If true, the tag is read-only and cannot be modified by the user
-- `value` (String) Tag value. Maximum 255 characters. Cannot contain spaces, tabs, newlines, empty string or '=' character.
+- `value` (String) Tag value. Maximum 255 characters. Cannot contain spaces, tabs, newlines, empty string or '=' character. Cannot contain characters from U+0080 to U+00FF.
 
 
 <a id="nestedatt--vrrp_ips"></a>

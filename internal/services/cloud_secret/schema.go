@@ -42,6 +42,12 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 				Required:      true,
 				PlanModifiers: []planmodifier.String{stringplanmodifier.RequiresReplace()},
 			},
+			"expiration": schema.StringAttribute{
+				Description:   "Datetime when the secret will expire. Defaults to None",
+				Optional:      true,
+				CustomType:    timetypes.RFC3339Type{},
+				PlanModifiers: []planmodifier.String{expirationRequiresReplace()},
+			},
 			"payload": schema.SingleNestedAttribute{
 				Description: "Secret payload.",
 				Optional:    true,
@@ -78,12 +84,6 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 				PlanModifiers: []planmodifier.Int64{
 					int64ReplaceUnlessAdoptingOrRemoved(secretImportAdoption.Key),
 				},
-			},
-			"expiration": schema.StringAttribute{
-				Description:   "Datetime when the secret will expire. Defaults to None",
-				Optional:      true,
-				CustomType:    timetypes.RFC3339Type{},
-				PlanModifiers: []planmodifier.String{expirationRequiresReplace()},
 			},
 			"algorithm": schema.StringAttribute{
 				Description: "Metadata provided by a user or system for informational purposes. Null when not specified at secret creation.",

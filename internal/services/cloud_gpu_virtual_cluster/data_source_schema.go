@@ -264,7 +264,7 @@ func DataSourceSchema(ctx context.Context) schema.Schema {
 									NestedObject: schema.NestedAttributeObject{
 										Attributes: map[string]schema.Attribute{
 											"key": schema.StringAttribute{
-												Description: "Tag key. Maximum 255 characters. Cannot contain spaces, tabs, newlines, empty string or '=' character.",
+												Description: "Tag key. Maximum 255 characters. Cannot contain spaces, tabs, newlines, empty string or '=' character. Cannot contain characters from U+0080 to U+00FF.",
 												Computed:    true,
 											},
 											"read_only": schema.BoolAttribute{
@@ -272,7 +272,7 @@ func DataSourceSchema(ctx context.Context) schema.Schema {
 												Computed:    true,
 											},
 											"value": schema.StringAttribute{
-												Description: "Tag value. Maximum 255 characters. Cannot contain spaces, tabs, newlines, empty string or '=' character.",
+												Description: "Tag value. Maximum 255 characters. Cannot contain spaces, tabs, newlines, empty string or '=' character. Cannot contain characters from U+0080 to U+00FF.",
 												Computed:    true,
 											},
 										},
@@ -304,7 +304,7 @@ func DataSourceSchema(ctx context.Context) schema.Schema {
 				NestedObject: schema.NestedAttributeObject{
 					Attributes: map[string]schema.Attribute{
 						"key": schema.StringAttribute{
-							Description: "Tag key. Maximum 255 characters. Cannot contain spaces, tabs, newlines, empty string or '=' character.",
+							Description: "Tag key. Maximum 255 characters. Cannot contain spaces, tabs, newlines, empty string or '=' character. Cannot contain characters from U+0080 to U+00FF.",
 							Computed:    true,
 						},
 						"read_only": schema.BoolAttribute{
@@ -312,7 +312,7 @@ func DataSourceSchema(ctx context.Context) schema.Schema {
 							Computed:    true,
 						},
 						"value": schema.StringAttribute{
-							Description: "Tag value. Maximum 255 characters. Cannot contain spaces, tabs, newlines, empty string or '=' character.",
+							Description: "Tag value. Maximum 255 characters. Cannot contain spaces, tabs, newlines, empty string or '=' character. Cannot contain characters from U+0080 to U+00FF.",
 							Computed:    true,
 						},
 					},

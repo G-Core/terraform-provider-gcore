@@ -14,9 +14,9 @@ type CloudSecretModel struct {
 	ProjectID        types.Int64                   `tfsdk:"project_id" path:"project_id,optional"`
 	RegionID         types.Int64                   `tfsdk:"region_id" path:"region_id,optional"`
 	Name             types.String                  `tfsdk:"name" json:"name,required"`
+	Expiration       timetypes.RFC3339             `tfsdk:"expiration" json:"expiration,optional" format:"date-time"`
 	Payload          *CloudSecretPayloadModel      `tfsdk:"payload" json:"payload,optional,no_refresh"`
 	PayloadWoVersion types.Int64                   `tfsdk:"payload_wo_version"`
-	Expiration       timetypes.RFC3339             `tfsdk:"expiration" json:"expiration,optional" format:"date-time"`
 	Algorithm        types.String                  `tfsdk:"algorithm" json:"algorithm,computed"`
 	BitLength        types.Int64                   `tfsdk:"bit_length" json:"bit_length,computed"`
 	Created          timetypes.RFC3339             `tfsdk:"created" json:"created,computed" format:"date-time"`

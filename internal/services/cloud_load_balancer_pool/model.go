@@ -55,11 +55,11 @@ type CloudLoadBalancerPoolHealthmonitorModel struct {
 	Type           types.String `tfsdk:"type" json:"type,required"`
 	AdminStateUp   types.Bool   `tfsdk:"admin_state_up" json:"admin_state_up,computed_optional"`
 	DomainName     types.String `tfsdk:"domain_name" json:"domain_name,optional"`
-	ExpectedCodes  types.String `tfsdk:"expected_codes" json:"expected_codes,optional"`
+	ExpectedCodes  types.String `tfsdk:"expected_codes" json:"expected_codes,computed_optional"`
 	HTTPMethod     types.String `tfsdk:"http_method" json:"http_method,computed_optional"`
 	HTTPVersion    types.String `tfsdk:"http_version" json:"http_version,optional"`
 	MaxRetriesDown types.Int64  `tfsdk:"max_retries_down" json:"max_retries_down,computed_optional"`
-	URLPath        types.String `tfsdk:"url_path" json:"url_path,optional"`
+	URLPath        types.String `tfsdk:"url_path" json:"url_path,computed_optional"`
 }
 
 type CloudLoadBalancerPoolMembersModel struct {

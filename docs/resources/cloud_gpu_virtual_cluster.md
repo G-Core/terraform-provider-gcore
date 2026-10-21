@@ -62,7 +62,7 @@ resource "gcore_cloud_gpu_virtual_cluster" "example" {
 
 - `project_id` (Number) Project ID
 - `region_id` (Number) Region ID
-- `tags` (Map of String) Key-value tags to associate with the resource. A tag is a key-value pair that can be associated with a resource, enabling efficient filtering and grouping for better organization and management. Both tag keys and values have a maximum length of 255 characters. Some tags are read-only and cannot be modified by the user. Tags are also integrated with cost reports, allowing cost data to be filtered based on tag keys or values.
+- `tags` (Map of String) Key-value tags to associate with the resource. A tag is a key-value pair that can be associated with a resource, enabling efficient filtering and grouping for better organization and management. Both tag keys and values have a maximum length of 255 characters. Tag keys and values cannot contain characters from U+0080 to U+00FF. Some tags are read-only and cannot be modified by the user. Tags are also integrated with cost reports, allowing cost data to be filtered based on tag keys or values.
 
 ### Read-Only
 
@@ -146,7 +146,7 @@ Optional:
 
 - `delete_on_termination` (Boolean) Flag indicating whether the volume is deleted on instance termination
 - `image_id` (String) Image ID for the volume (required if source is 'image')
-- `tags` (Map of String) Tags associated with the volume
+- `tags` (Map of String) Tags associated with the volume. Tag keys and values cannot contain characters from U+0080 to U+00FF.
 
 
 <a id="nestedatt--servers_settings--credentials"></a>
