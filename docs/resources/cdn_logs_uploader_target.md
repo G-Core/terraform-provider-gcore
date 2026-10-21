@@ -34,7 +34,7 @@ resource "gcore_cdn_logs_uploader_target" "example_cdn_logs_uploader_target" {
 
 ### Required
 
-- `config` (Attributes) Config for specific storage type. (see [below for nested schema](#nestedatt--config))
+- `config` (Attributes) Config for the `s3_gcore` storage type. (see [below for nested schema](#nestedatt--config))
 - `storage_type` (String) Type of storage for logs.
 Available values: "s3_gcore", "s3_amazon", "s3_oss", "s3_other", "s3_v1", "ftp", "sftp", "http", "azure_blob", "sls".
 
@@ -62,7 +62,7 @@ Optional:
 - `container_name` (String) Azure Blob Storage container name.
 - `content_type` (String) Available values: "json", "text".
 - `directory` (String)
-- `endpoint` (String)
+- `endpoint` (String) S3 storage endpoint URL. Must be a public address: private and reserved IP addresses, `localhost`, and hostnames that resolve to them are rejected.
 - `hostname` (String)
 - `key_passphrase` (String, Sensitive)
 - `log_store` (String) SLS logstore name. 3-36 characters; lowercase letters, digits, hyphens, and underscores.
@@ -72,6 +72,7 @@ Optional:
 - `region` (String)
 - `retry` (Attributes) (see [below for nested schema](#nestedatt--config--retry))
 - `secret_access_key` (String, Sensitive)
+- `storage_id` (Number) ID of your Gcore Object Storage. The storage must be active and of the Standard type.
 - `timeout_seconds` (Number)
 - `topic` (String) Optional SLS topic (0-128 characters).
 - `upload` (Attributes) (see [below for nested schema](#nestedatt--config--upload))

@@ -62,7 +62,7 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 				},
 			},
 			"config": schema.SingleNestedAttribute{
-				Description: "Config for specific storage type.",
+				Description: "Config for the `s3_gcore` storage type.",
 				Required:    true,
 				Attributes: map[string]schema.Attribute{
 					"access_key_id": schema.StringAttribute{
@@ -75,7 +75,8 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 						Optional: true,
 					},
 					"endpoint": schema.StringAttribute{
-						Optional: true,
+						Description: "S3 storage endpoint URL. Must be a public address: private and reserved IP addresses, `localhost`, and hostnames that resolve to them are rejected.",
+						Optional:    true,
 					},
 					"region": schema.StringAttribute{
 						Optional: true,
@@ -88,6 +89,13 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 						Computed:      true,
 						Optional:      true,
 						PlanModifiers: []planmodifier.Bool{boolplanmodifier.UseStateForUnknown()},
+					},
+					"storage_id": schema.Int64Attribute{
+						Description: "ID of your Gcore Object Storage. The storage must be active and of the Standard type.",
+						Optional:    true,
+						Validators: []validator.Int64{
+							int64validator.Between(1, 2147483647),
+						},
 					},
 					"hostname": schema.StringAttribute{
 						Optional: true,

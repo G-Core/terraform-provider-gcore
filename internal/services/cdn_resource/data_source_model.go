@@ -128,6 +128,9 @@ func (m *CDNResourceDataSourceModel) toListParams(_ context.Context) (params cdn
 	if !m.FindOneBy.VpEnabled.IsNull() {
 		params.VpEnabled = param.NewOpt(m.FindOneBy.VpEnabled.ValueBool())
 	}
+	if !m.FindOneBy.WaapDomainIDIsnull.IsNull() {
+		params.WaapDomainIDIsnull = param.NewOpt(m.FindOneBy.WaapDomainIDIsnull.ValueBool())
+	}
 
 	return
 }
@@ -544,4 +547,5 @@ type CDNResourceFindOneByDataSourceModel struct {
 	Suspend            types.Bool   `tfsdk:"suspend" query:"suspend,optional"`
 	Suspended          types.Bool   `tfsdk:"suspended" query:"suspended,optional"`
 	VpEnabled          types.Bool   `tfsdk:"vp_enabled" query:"vp_enabled,optional"`
+	WaapDomainIDIsnull types.Bool   `tfsdk:"waap_domain_id_isnull" query:"waap_domain_id__isnull,optional"`
 }

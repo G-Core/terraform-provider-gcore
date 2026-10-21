@@ -81,6 +81,8 @@ Possible values:
 - **MATCH** - connection protocol will be chosen automatically (content on the origin source should be available for the CDN both through HTTP and HTTPS).
 
 If protocol is not specified, HTTP is used to connect to an origin server.
+
+If an enabled origin in the resource's origin group is bound to a Gcore Object Storage (`s3_type` is `gcore`), the CDN connects to every origin in that group over HTTPS regardless of this setting.
 Available values: "HTTP", "HTTPS", "MATCH".
 - `preset_applied` (Boolean) Defines whether the CDN resource has a preset applied.
 
@@ -235,6 +237,12 @@ Possible values:
 Possible values:
 - **true** - CDN resource is used for Streaming platform.
 - **false** - CDN resource is not used for Streaming platform.
+- `waap_domain_id_isnull` (Boolean) Filters CDN resources by whether they are linked to a WAAP domain. A CDN
+resource stays linked when WAAP is turned off on it.
+
+Possible values:
+- **true** - CDN resource is not linked to a WAAP domain.
+- **false** - CDN resource is linked to a WAAP domain.
 
 
 <a id="nestedatt--options"></a>
@@ -480,7 +488,7 @@ Possible values:
 - **Adds * as the Access-Control-Allow-Origin header value** - Content will be uploaded for requests from any domain.
 `"value": ["*"]`
 - **Adds "$http_origin" as the Access-Control-Allow-Origin header value if the origin matches one of the listed domains** - Content will be uploaded only for requests from the domains specified in the field.
-`"value": ["domain.com", "second.dom.com"]`
+`"value": ["example.com", "example.org"]`
 - **Adds "$http_origin" as the Access-Control-Allow-Origin header value** - Content will be uploaded for requests from any domain, and the domain from which the request was sent will be added to the "Access-Control-Allow-Origin" header in the response.
 `"value": ["$http_origin"]`
 
@@ -839,8 +847,8 @@ The meaning of the parameter depends on `policy_type` value:
 - **deny** - List of IP addresses for which access is allowed.
 
 Examples:
-- `192.168.3.2/32`
-- `2a03:d000:2980:7::8/128`
+- `192.0.2.10/32`
+- `2001:db8::8/128`
 - `policy_type` (String) IP access policy type.
 
 Possible values:

@@ -54,6 +54,7 @@ type CDNLogsUploaderTargetConfigDataSourceModel struct {
 	Endpoint       types.String                                                               `tfsdk:"endpoint" json:"endpoint,computed"`
 	Region         types.String                                                               `tfsdk:"region" json:"region,computed"`
 	UsePathStyle   types.Bool                                                                 `tfsdk:"use_path_style" json:"use_path_style,computed"`
+	StorageID      types.Int64                                                                `tfsdk:"storage_id" json:"storage_id,computed"`
 	Hostname       types.String                                                               `tfsdk:"hostname" json:"hostname,computed"`
 	TimeoutSeconds types.Int64                                                                `tfsdk:"timeout_seconds" json:"timeout_seconds,computed"`
 	User           types.String                                                               `tfsdk:"user" json:"user,computed"`

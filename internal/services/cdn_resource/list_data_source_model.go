@@ -42,6 +42,7 @@ type CDNResourcesDataSourceModel struct {
 	Suspend            types.Bool                                                     `tfsdk:"suspend" query:"suspend,optional"`
 	Suspended          types.Bool                                                     `tfsdk:"suspended" query:"suspended,optional"`
 	VpEnabled          types.Bool                                                     `tfsdk:"vp_enabled" query:"vp_enabled,optional"`
+	WaapDomainIDIsnull types.Bool                                                     `tfsdk:"waap_domain_id_isnull" query:"waap_domain_id__isnull,optional"`
 	MaxItems           types.Int64                                                    `tfsdk:"max_items"`
 	Items              customfield.NestedObjectList[CDNResourcesItemsDataSourceModel] `tfsdk:"items"`
 }
@@ -120,6 +121,9 @@ func (m *CDNResourcesDataSourceModel) toListParams(_ context.Context) (params cd
 	}
 	if !m.VpEnabled.IsNull() {
 		params.VpEnabled = param.NewOpt(m.VpEnabled.ValueBool())
+	}
+	if !m.WaapDomainIDIsnull.IsNull() {
+		params.WaapDomainIDIsnull = param.NewOpt(m.WaapDomainIDIsnull.ValueBool())
 	}
 
 	return

@@ -44,6 +44,24 @@ func ListDataSourceSchema(ctx context.Context) schema.Schema {
 				CustomType:  customfield.NewNestedObjectListType[CDNLogsUploaderTargetsItemsDataSourceModel](ctx),
 				NestedObject: schema.NestedAttributeObject{
 					Attributes: map[string]schema.Attribute{
+						"storage_type": schema.StringAttribute{
+							Description: "Type of storage for logs.\nAvailable values: \"s3_gcore\", \"s3_amazon\", \"s3_oss\", \"s3_other\", \"s3_v1\", \"ftp\", \"sftp\", \"http\", \"azure_blob\", \"sls\".",
+							Computed:    true,
+							Validators: []validator.String{
+								stringvalidator.OneOfCaseInsensitive(
+									"s3_gcore",
+									"s3_amazon",
+									"s3_oss",
+									"s3_other",
+									"s3_v1",
+									"ftp",
+									"sftp",
+									"http",
+									"azure_blob",
+									"sls",
+								),
+							},
+						},
 						"id": schema.Int64Attribute{
 							Computed: true,
 						},
@@ -52,7 +70,7 @@ func ListDataSourceSchema(ctx context.Context) schema.Schema {
 							Computed:    true,
 						},
 						"config": schema.SingleNestedAttribute{
-							Description: "Config for specific storage type.",
+							Description: "Config for the `s3_gcore` storage type.",
 							Computed:    true,
 							CustomType:  customfield.NewNestedObjectType[CDNLogsUploaderTargetsConfigDataSourceModel](ctx),
 							Attributes: map[string]schema.Attribute{
@@ -73,6 +91,10 @@ func ListDataSourceSchema(ctx context.Context) schema.Schema {
 								},
 								"use_path_style": schema.BoolAttribute{
 									Computed: true,
+								},
+								"storage_id": schema.Int64Attribute{
+									Description: "ID of your Gcore Object Storage.",
+									Computed:    true,
 								},
 								"hostname": schema.StringAttribute{
 									Computed: true,
@@ -354,24 +376,6 @@ func ListDataSourceSchema(ctx context.Context) schema.Schema {
 							Description: "Validation status of the logs uploader target. Informs if the specified target is reachable.",
 							Computed:    true,
 							CustomType:  jsontypes.NormalizedType{},
-						},
-						"storage_type": schema.StringAttribute{
-							Description: "Type of storage for logs.\nAvailable values: \"s3_gcore\", \"s3_amazon\", \"s3_oss\", \"s3_other\", \"s3_v1\", \"ftp\", \"sftp\", \"http\", \"azure_blob\", \"sls\".",
-							Computed:    true,
-							Validators: []validator.String{
-								stringvalidator.OneOfCaseInsensitive(
-									"s3_gcore",
-									"s3_amazon",
-									"s3_oss",
-									"s3_other",
-									"s3_v1",
-									"ftp",
-									"sftp",
-									"http",
-									"azure_blob",
-									"sls",
-								),
-							},
 						},
 						"updated": schema.StringAttribute{
 							Description: "Time when logs uploader target was updated.",

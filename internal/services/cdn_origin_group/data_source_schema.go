@@ -7,6 +7,7 @@ import (
 
 	"github.com/G-Core/terraform-provider-gcore/internal/customfield"
 	"github.com/hashicorp/terraform-plugin-framework-validators/datasourcevalidator"
+	"github.com/hashicorp/terraform-plugin-framework-validators/int64validator"
 	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/datasource/schema"
@@ -82,13 +83,13 @@ func DataSourceSchema(ctx context.Context) schema.Schema {
 						Computed:    true,
 					},
 					"s3_storage_hostname": schema.StringAttribute{
-						Description: "S3 storage hostname.\n\nThe parameter is required, if \"s3_type\": other.",
+						Description: "S3 storage hostname.\n\nThe parameter is required, if \"s3_type\": other.\n\nMust be a public address: private and reserved IP addresses, `localhost`, and hostnames that resolve to them are rejected.",
 						Computed:    true,
 					},
 				},
 			},
 			"sources": schema.SetNestedAttribute{
-				Description: "List of origin sources in the origin group. Each entry can be a host origin or an S3 origin.\n\nHost origins have a `source` field with the hostname or IP. S3 origins have `origin_type: s3`\nand a `config` object with S3 credentials. Both types can be mixed in the same origin group.",
+				Description: "List of origin sources in the origin group. Each entry can be a host origin or an S3 origin.\n\nHost origins have a `source` field with the hostname or IP. S3 origins have `origin_type: s3`\nand a `config` object with S3 credentials or a Gcore Object Storage binding. Both types can\nbe mixed in the same origin group.",
 				Computed:    true,
 				CustomType:  customfield.NewNestedObjectSetType[CDNOriginGroupSourcesDataSourceModel](ctx),
 				NestedObject: schema.NestedAttributeObject{
@@ -106,47 +107,58 @@ func DataSourceSchema(ctx context.Context) schema.Schema {
 							Computed:    true,
 						},
 						"host_header_override": schema.StringAttribute{
-							Description: "Per-origin Host header override. When set, the CDN sends this value as the Host header when\nrequesting content from this origin instead of the default.",
+							Description: "Per-origin Host header override. When set, the CDN sends this value as the Host header when\nrequesting content from this origin instead of the default.\n\nNot accepted for an origin bound to a Gcore Object Storage (`s3_type` is `gcore`): any\nnon-null value is rejected, and the field is returned as `null` for such origins.",
 							Computed:    true,
 						},
 						"config": schema.SingleNestedAttribute{
-							Description: "S3 storage configuration. Required when `origin_type` is `s3`.",
+							Description: "S3 storage configuration. Required when `origin_type` is `s3`.\n\nTo use your Gcore Object Storage as the origin, set `s3_type` to `gcore` and send only\n`storage_id` and `s3_bucket_name`. The CDN configures the connection for you, and the\nresponse returns only `s3_type`, `storage_id`, `s3_bucket_name` and `s3_auth_type`. For\nsuch an origin:\n- The CDN pulls content over HTTPS, regardless of the resource's `originProtocol`.\n- The CDN has read-only access to the bucket.\n- The CDN manages the Host header sent to the storage, so `host_header_override` is not\n  accepted and is returned as `null`.",
 							Computed:    true,
 							CustomType:  customfield.NewNestedObjectType[CDNOriginGroupSourcesConfigDataSourceModel](ctx),
 							Attributes: map[string]schema.Attribute{
-								"s3_access_key_id": schema.StringAttribute{
-									Description: "Access key ID for the S3 account. Masked as `SECRET_VALUE` in responses.\n\nRestrictions:\n- Latin letters (A-Z, a-z), numbers (0-9), colon, dash, and underscore.\n- From 4 to 255 characters.",
-									Computed:    true,
-								},
 								"s3_bucket_name": schema.StringAttribute{
-									Description: "S3 bucket name.",
-									Computed:    true,
-								},
-								"s3_secret_access_key": schema.StringAttribute{
-									Description: "Secret access key for the S3 account. Masked as `SECRET_VALUE` in responses.\n\nRestrictions:\n- Latin letters (A-Z, a-z), numbers (0-9), pluses, slashes, dashes, colons and underscores.\n- From 16 to 255 characters.",
+									Description: "S3 bucket name.\n\nIf `s3_type` is `gcore`, the bucket must exist in the selected storage.",
 									Computed:    true,
 								},
 								"s3_type": schema.StringAttribute{
-									Description: "Storage type compatible with S3.\n\nPossible values:\n- **amazon** - AWS S3 storage.\n- **other** - Other (not AWS) S3 compatible storage.\nAvailable values: \"amazon\", \"other\".",
+									Description: "Storage type compatible with S3.\n\nPossible values:\n- **amazon** - AWS S3 storage.\n- **other** - Other (not AWS) S3 compatible storage.\n- **gcore** - Your Gcore Object Storage. Select the storage and bucket, and the CDN\n  configures the connection.\nAvailable values: \"amazon\", \"other\", \"gcore\".",
 									Computed:    true,
 									Validators: []validator.String{
-										stringvalidator.OneOfCaseInsensitive("amazon", "other"),
+										stringvalidator.OneOfCaseInsensitive(
+											"amazon",
+											"other",
+											"gcore",
+										),
 									},
+								},
+								"s3_access_key_id": schema.StringAttribute{
+									Description: "Access key ID for the S3 account. Masked as `SECRET_VALUE` in responses.\n\nThe parameter is required if `s3_type` is `amazon` or `other`. Not allowed if\n`s3_type` is `gcore`: the CDN fills it and does not return it.\n\nRestrictions:\n- Latin letters (A-Z, a-z), numbers (0-9), colon, dash, and underscore.\n- From 4 to 255 characters.",
+									Computed:    true,
 								},
 								"s3_auth_type": schema.StringAttribute{
 									Description: "S3 authentication type.",
 									Computed:    true,
 								},
 								"s3_region": schema.StringAttribute{
-									Description: "S3 storage region.\n\nThe parameter is required if `s3_type` is `amazon`.",
+									Description: "S3 storage region.\n\nThe parameter is required if `s3_type` is `amazon`. Not allowed if `s3_type` is\n`gcore`: the CDN fills it and does not return it.",
+									Computed:    true,
+								},
+								"s3_secret_access_key": schema.StringAttribute{
+									Description: "Secret access key for the S3 account. Masked as `SECRET_VALUE` in responses.\n\nThe parameter is required if `s3_type` is `amazon` or `other`. Not allowed if\n`s3_type` is `gcore`: the CDN fills it and does not return it.\n\nRestrictions:\n- Latin letters (A-Z, a-z), numbers (0-9), pluses, slashes, dashes, colons and underscores.\n- From 16 to 255 characters.",
 									Computed:    true,
 								},
 								"s3_storage_hostname": schema.StringAttribute{
-									Description: "S3 storage hostname.\n\nThe parameter is required if `s3_type` is `other`.",
+									Description: "S3 storage hostname.\n\nThe parameter is required if `s3_type` is `other`. Not allowed if `s3_type` is\n`gcore`: the CDN fills it and does not return it.\n\nMust be a public address: private and reserved IP addresses, `localhost`, and hostnames that resolve to them are rejected.",
 									Computed:    true,
 								},
+								"storage_id": schema.Int64Attribute{
+									Description: "ID of your Gcore Object Storage.\n\nThe parameter is required if `s3_type` is `gcore`, and not allowed otherwise. The\nstorage must be active and of the Standard type.",
+									Computed:    true,
+									Validators: []validator.Int64{
+										int64validator.AtLeast(1),
+									},
+								},
 								"app_id": schema.StringAttribute{
-									Description: "ID of the FastEdge application served as origin (string, matching the existing\nfastedge option's convention). The CDN dispatches requests to the local FastEdge runtime\non the edge node using this identifier. The application must belong to the requesting\nclient, be enabled, and have `wasi-http` API type.",
+									Description: "ID of the FastEdge application served as origin (string, matching the existing\nfastedge option's convention). The CDN dispatches requests to the local FastEdge runtime\non the edge node using this identifier. The application must be in your account, be\nenabled, and have `wasi-http` API type.",
 									Computed:    true,
 								},
 							},

@@ -47,7 +47,7 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 				Optional:    true,
 			},
 			"override_origin_protocol": schema.StringAttribute{
-				Description: "Sets a protocol other than the one specified in the CDN resource settings to connect to the origin.\n\nPossible values:\n- **HTTPS** - CDN servers connect to origin via HTTPS protocol.\n- **HTTP** - CDN servers connect to origin via HTTP protocol.\n- **MATCH** - Connection protocol is chosen automatically; in this case, content on origin source should be available for the CDN both through HTTP and HTTPS protocols.\n- **null** - `originProtocol` setting is inherited from the CDN resource settings.\nAvailable values: \"HTTPS\", \"HTTP\", \"MATCH\".",
+				Description: "Sets a protocol other than the one specified in the CDN resource settings to connect to the origin.\n\nPossible values:\n- **HTTPS** - CDN servers connect to origin via HTTPS protocol.\n- **HTTP** - CDN servers connect to origin via HTTP protocol.\n- **MATCH** - Connection protocol is chosen automatically; in this case, content on origin source should be available for the CDN both through HTTP and HTTPS protocols.\n- **null** - `originProtocol` setting is inherited from the CDN resource settings.\n\nIf an enabled origin among the origins this rule pulls from is bound to a Gcore Object Storage (`s3_type` is `gcore`), HTTPS is used regardless of this setting.\nAvailable values: \"HTTPS\", \"HTTP\", \"MATCH\".",
 				Optional:    true,
 				Validators: []validator.String{
 					stringvalidator.OneOfCaseInsensitive(
@@ -149,7 +149,7 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 								Required:    true,
 							},
 							"value": schema.SetAttribute{
-								Description: "Value of the Access-Control-Allow-Origin header.\n\nPossible values:\n- **Adds * as the Access-Control-Allow-Origin header value** - Content will be uploaded for requests from any domain.\n`\"value\": [\"*\"]`\n- **Adds \"$http_origin\" as the Access-Control-Allow-Origin header value if the origin matches one of the listed domains** - Content will be uploaded only for requests from the domains specified in the field.\n`\"value\": [\"domain.com\", \"second.dom.com\"]`\n- **Adds \"$http_origin\" as the Access-Control-Allow-Origin header value** - Content will be uploaded for requests from any domain, and the domain from which the request was sent will be added to the \"Access-Control-Allow-Origin\" header in the response.\n`\"value\": [\"$http_origin\"]`",
+								Description: "Value of the Access-Control-Allow-Origin header.\n\nPossible values:\n- **Adds * as the Access-Control-Allow-Origin header value** - Content will be uploaded for requests from any domain.\n`\"value\": [\"*\"]`\n- **Adds \"$http_origin\" as the Access-Control-Allow-Origin header value if the origin matches one of the listed domains** - Content will be uploaded only for requests from the domains specified in the field.\n`\"value\": [\"example.com\", \"example.org\"]`\n- **Adds \"$http_origin\" as the Access-Control-Allow-Origin header value** - Content will be uploaded for requests from any domain, and the domain from which the request was sent will be added to the \"Access-Control-Allow-Origin\" header in the response.\n`\"value\": [\"$http_origin\"]`",
 								Required:    true,
 								CustomType:  customfield.NewSetType[types.String](ctx),
 								ElementType: types.StringType,
@@ -648,7 +648,7 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 								Required:    true,
 							},
 							"excepted_values": schema.SetAttribute{
-								Description: "List of IP addresses with a subnet mask.\n\nThe meaning of the parameter depends on `policy_type` value:\n- **allow** - List of IP addresses for which access is prohibited.\n- **deny** - List of IP addresses for which access is allowed.\n\nExamples:\n- `192.168.3.2/32`\n- `2a03:d000:2980:7::8/128`",
+								Description: "List of IP addresses with a subnet mask.\n\nThe meaning of the parameter depends on `policy_type` value:\n- **allow** - List of IP addresses for which access is prohibited.\n- **deny** - List of IP addresses for which access is allowed.\n\nExamples:\n- `192.0.2.10/32`\n- `2001:db8::8/128`",
 								Required:    true,
 								CustomType:  customfield.NewSetType[types.String](ctx),
 								ElementType: types.StringType,

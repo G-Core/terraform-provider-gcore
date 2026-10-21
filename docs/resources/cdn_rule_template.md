@@ -36,7 +36,7 @@ resource "gcore_cdn_rule_template" "example_cdn_rule_template" {
     }
     cors = {
       enabled = true
-      value = ["domain.com", "domain2.com"]
+      value = ["example.com", "example.org"]
       always = true
     }
     country_acl = {
@@ -126,7 +126,7 @@ resource "gcore_cdn_rule_template" "example_cdn_rule_template" {
     }
     host_header = {
       enabled = true
-      value = "host.com"
+      value = "example.com"
     }
     ignore_cookie = {
       enabled = true
@@ -145,7 +145,7 @@ resource "gcore_cdn_rule_template" "example_cdn_rule_template" {
     }
     ip_address_acl = {
       enabled = true
-      excepted_values = ["192.168.1.100/32"]
+      excepted_values = ["192.0.2.20/32"]
       policy_type = "deny"
     }
     limit_bandwidth = {
@@ -195,7 +195,7 @@ resource "gcore_cdn_rule_template" "example_cdn_rule_template" {
     }
     referrer_acl = {
       enabled = true
-      excepted_values = ["example.com", "*.example.net"]
+      excepted_values = ["example.com", "*.example.org"]
       policy_type = "deny"
     }
     response_headers_hiding_policy = {
@@ -301,6 +301,8 @@ Possible values:
 - **HTTP** - CDN servers connect to origin via HTTP protocol.
 - **MATCH** - Connection protocol is chosen automatically; in this case, content on origin source should be available for the CDN both through HTTP and HTTPS protocols.
 - **null** - `originProtocol` setting is inherited from the CDN resource settings.
+
+If an enabled origin among the origins this rule pulls from is bound to a Gcore Object Storage (`s3_type` is `gcore`), HTTPS is used regardless of this setting.
 Available values: "HTTPS", "HTTP", "MATCH".
 - `weight` (Number) Rule execution order: from lowest (1) to highest.
 
@@ -528,7 +530,7 @@ Possible values:
 - **Adds * as the Access-Control-Allow-Origin header value** - Content will be uploaded for requests from any domain.
 `"value": ["*"]`
 - **Adds "$http_origin" as the Access-Control-Allow-Origin header value if the origin matches one of the listed domains** - Content will be uploaded only for requests from the domains specified in the field.
-`"value": ["domain.com", "second.dom.com"]`
+`"value": ["example.com", "example.org"]`
 - **Adds "$http_origin" as the Access-Control-Allow-Origin header value** - Content will be uploaded for requests from any domain, and the domain from which the request was sent will be added to the "Access-Control-Allow-Origin" header in the response.
 `"value": ["$http_origin"]`
 
@@ -895,8 +897,8 @@ The meaning of the parameter depends on `policy_type` value:
 - **deny** - List of IP addresses for which access is allowed.
 
 Examples:
-- `192.168.3.2/32`
-- `2a03:d000:2980:7::8/128`
+- `192.0.2.10/32`
+- `2001:db8::8/128`
 - `policy_type` (String) IP access policy type.
 
 Possible values:

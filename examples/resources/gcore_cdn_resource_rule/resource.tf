@@ -23,7 +23,7 @@ resource "gcore_cdn_resource_rule" "example_cdn_resource_rule" {
     }
     cors = {
       enabled = true
-      value = ["domain.com", "domain2.com"]
+      value = ["example.com", "example.org"]
       always = true
     }
     country_acl = {
@@ -113,7 +113,7 @@ resource "gcore_cdn_resource_rule" "example_cdn_resource_rule" {
     }
     host_header = {
       enabled = true
-      value = "host.com"
+      value = "example.com"
     }
     ignore_cookie = {
       enabled = true
@@ -132,7 +132,7 @@ resource "gcore_cdn_resource_rule" "example_cdn_resource_rule" {
     }
     ip_address_acl = {
       enabled = true
-      excepted_values = ["192.168.1.100/32"]
+      excepted_values = ["192.0.2.20/32"]
       policy_type = "deny"
     }
     limit_bandwidth = {
@@ -182,7 +182,7 @@ resource "gcore_cdn_resource_rule" "example_cdn_resource_rule" {
     }
     referrer_acl = {
       enabled = true
-      excepted_values = ["example.com", "*.example.net"]
+      excepted_values = ["example.com", "*.example.org"]
       policy_type = "deny"
     }
     response_headers_hiding_policy = {

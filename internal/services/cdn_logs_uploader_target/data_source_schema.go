@@ -75,7 +75,7 @@ func DataSourceSchema(ctx context.Context) schema.Schema {
 				ElementType: types.Int64Type,
 			},
 			"config": schema.SingleNestedAttribute{
-				Description: "Config for specific storage type.",
+				Description: "Config for the `s3_gcore` storage type.",
 				Computed:    true,
 				CustomType:  customfield.NewNestedObjectType[CDNLogsUploaderTargetConfigDataSourceModel](ctx),
 				Attributes: map[string]schema.Attribute{
@@ -96,6 +96,10 @@ func DataSourceSchema(ctx context.Context) schema.Schema {
 					},
 					"use_path_style": schema.BoolAttribute{
 						Computed: true,
+					},
+					"storage_id": schema.Int64Attribute{
+						Description: "ID of your Gcore Object Storage.",
+						Computed:    true,
 					},
 					"hostname": schema.StringAttribute{
 						Computed: true,

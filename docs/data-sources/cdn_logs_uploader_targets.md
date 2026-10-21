@@ -38,7 +38,7 @@ data "gcore_cdn_logs_uploader_targets" "example_cdn_logs_uploader_targets" {
 Read-Only:
 
 - `client_id` (Number) Client that owns the target.
-- `config` (Attributes) Config for specific storage type. (see [below for nested schema](#nestedatt--items--config))
+- `config` (Attributes) Config for the `s3_gcore` storage type. (see [below for nested schema](#nestedatt--items--config))
 - `created` (String) Time when logs uploader target was created.
 - `description` (String) Description of the target.
 - `id` (Number)
@@ -71,6 +71,7 @@ Read-Only:
 - `project` (String) SLS project name. 3-63 characters; lowercase letters, digits, and hyphens.
 - `region` (String)
 - `retry` (Attributes) (see [below for nested schema](#nestedatt--items--config--retry))
+- `storage_id` (Number) ID of your Gcore Object Storage.
 - `timeout_seconds` (Number)
 - `topic` (String) Optional SLS topic (0-128 characters).
 - `upload` (Attributes) (see [below for nested schema](#nestedatt--items--config--upload))

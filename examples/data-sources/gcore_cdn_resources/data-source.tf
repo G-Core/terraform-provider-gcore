@@ -23,4 +23,5 @@ data "gcore_cdn_resources" "example_cdn_resources" {
   suspend = true
   suspended = true
   vp_enabled = true
+  waap_domain_id_isnull = true
 }

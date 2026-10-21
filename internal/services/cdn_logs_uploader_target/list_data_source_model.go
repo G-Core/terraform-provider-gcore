@@ -45,6 +45,7 @@ func (m *CDNLogsUploaderTargetsDataSourceModel) toListParams(_ context.Context) 
 }
 
 type CDNLogsUploaderTargetsItemsDataSourceModel struct {
+	StorageType            types.String                                                          `tfsdk:"storage_type" json:"storage_type,computed"`
 	ID                     types.Int64                                                           `tfsdk:"id" json:"id,computed"`
 	ClientID               types.Int64                                                           `tfsdk:"client_id" json:"client_id,computed"`
 	Config                 customfield.NestedObject[CDNLogsUploaderTargetsConfigDataSourceModel] `tfsdk:"config" json:"config,computed"`
@@ -53,7 +54,6 @@ type CDNLogsUploaderTargetsItemsDataSourceModel struct {
 	Name                   types.String                                                          `tfsdk:"name" json:"name,computed"`
 	RelatedUploaderConfigs customfield.List[types.Int64]                                         `tfsdk:"related_uploader_configs" json:"related_uploader_configs,computed"`
 	Status                 jsontypes.Normalized                                                  `tfsdk:"status" json:"status,computed"`
-	StorageType            types.String                                                          `tfsdk:"storage_type" json:"storage_type,computed"`
 	Updated                timetypes.RFC3339                                                     `tfsdk:"updated" json:"updated,computed" format:"date-time"`
 }
 
@@ -64,6 +64,7 @@ type CDNLogsUploaderTargetsConfigDataSourceModel struct {
 	Endpoint       types.String                                                                `tfsdk:"endpoint" json:"endpoint,computed"`
 	Region         types.String                                                                `tfsdk:"region" json:"region,computed"`
 	UsePathStyle   types.Bool                                                                  `tfsdk:"use_path_style" json:"use_path_style,computed"`
+	StorageID      types.Int64                                                                 `tfsdk:"storage_id" json:"storage_id,computed"`
 	Hostname       types.String                                                                `tfsdk:"hostname" json:"hostname,computed"`
 	TimeoutSeconds types.Int64                                                                 `tfsdk:"timeout_seconds" json:"timeout_seconds,computed"`
 	User           types.String                                                                `tfsdk:"user" json:"user,computed"`

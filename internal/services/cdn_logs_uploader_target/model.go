@@ -34,6 +34,7 @@ type CDNLogsUploaderTargetConfigModel struct {
 	Region          types.String                            `tfsdk:"region" json:"region,optional"`
 	SecretAccessKey types.String                            `tfsdk:"secret_access_key" json:"secret_access_key,optional,no_refresh"`
 	UsePathStyle    types.Bool                              `tfsdk:"use_path_style" json:"use_path_style,computed_optional"`
+	StorageID       types.Int64                             `tfsdk:"storage_id" json:"storage_id,optional"`
 	Hostname        types.String                            `tfsdk:"hostname" json:"hostname,optional"`
 	Password        types.String                            `tfsdk:"password" json:"password,optional,no_refresh"`
 	TimeoutSeconds  types.Int64                             `tfsdk:"timeout_seconds" json:"timeout_seconds,optional"`

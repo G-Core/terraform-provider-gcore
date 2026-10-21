@@ -34,7 +34,7 @@ func sweepCDNLogsUploaderTargets(_ string) error {
 	//
 	// Account-global: this enumerates every target in the account, so the token
 	// match is the only thing bounding what gets deleted.
-	var doomed []cdn.LogsUploaderTarget
+	var doomed []cdn.LogsUploaderTargetUnion
 	iter := target.Client.CDN.LogsUploader.Targets.ListAutoPaging(ctx, cdn.LogsUploaderTargetListParams{})
 	for iter.Next() {
 		uploadTarget := iter.Current()

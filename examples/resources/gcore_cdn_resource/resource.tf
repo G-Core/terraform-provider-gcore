@@ -1,5 +1,5 @@
 resource "gcore_cdn_resource" "example_cdn_resource" {
-  cname = "cdn.site.com"
+  cname = "cdn.example.com"
   active = true
   description = "My resource"
   name = "Resource for images"
@@ -18,7 +18,7 @@ resource "gcore_cdn_resource" "example_cdn_resource" {
     }
     cors = {
       enabled = true
-      value = ["domain.com", "domain2.com"]
+      value = ["example.com", "example.org"]
       always = true
     }
     country_acl = {
@@ -108,7 +108,7 @@ resource "gcore_cdn_resource" "example_cdn_resource" {
     }
     host_header = {
       enabled = true
-      value = "host.com"
+      value = "example.com"
     }
     http3_enabled = {
       enabled = true
@@ -131,7 +131,7 @@ resource "gcore_cdn_resource" "example_cdn_resource" {
     }
     ip_address_acl = {
       enabled = true
-      excepted_values = ["192.168.1.100/32"]
+      excepted_values = ["192.0.2.20/32"]
       policy_type = "deny"
     }
     limit_bandwidth = {
@@ -185,7 +185,7 @@ resource "gcore_cdn_resource" "example_cdn_resource" {
     }
     referrer_acl = {
       enabled = true
-      excepted_values = ["example.com", "*.example.net"]
+      excepted_values = ["example.com", "*.example.org"]
       policy_type = "deny"
     }
     response_headers_hiding_policy = {

@@ -79,7 +79,8 @@ Possible values:
 - `sources` (Attributes Set) List of origin sources in the origin group. Each entry can be a host origin or an S3 origin.
 
 Host origins have a `source` field with the hostname or IP. S3 origins have `origin_type: s3`
-and a `config` object with S3 credentials. Both types can be mixed in the same origin group. (see [below for nested schema](#nestedatt--items--sources))
+and a `config` object with S3 credentials or a Gcore Object Storage binding. Both types can
+be mixed in the same origin group. (see [below for nested schema](#nestedatt--items--sources))
 - `use_next` (Boolean) Defines whether to use the next origin from the origin group if origin responds with the cases specified in `proxy_next_upstream`.
 If you enable it, you must specify cases in `proxy_next_upstream`.
 
@@ -110,6 +111,8 @@ Restrictions:
 - `s3_storage_hostname` (String) S3 storage hostname.
 
 The parameter is required, if "s3_type": other.
+
+Must be a public address: private and reserved IP addresses, `localhost`, and hostnames that resolve to them are rejected.
 - `s3_type` (String) Storage type compatible with S3.
 
 Possible values:
@@ -127,7 +130,16 @@ Read-Only:
 Possible values:
 - **true** - Origin is a backup.
 - **false** - Origin is not a backup.
-- `config` (Attributes) S3 storage configuration. Required when `origin_type` is `s3`. (see [below for nested schema](#nestedatt--items--sources--config))
+- `config` (Attributes) S3 storage configuration. Required when `origin_type` is `s3`.
+
+To use your Gcore Object Storage as the origin, set `s3_type` to `gcore` and send only
+`storage_id` and `s3_bucket_name`. The CDN configures the connection for you, and the
+response returns only `s3_type`, `storage_id`, `s3_bucket_name` and `s3_auth_type`. For
+such an origin:
+- The CDN pulls content over HTTPS, regardless of the resource's `originProtocol`.
+- The CDN has read-only access to the bucket.
+- The CDN manages the Host header sent to the storage, so `host_header_override` is not
+  accepted and is returned as `null`. (see [below for nested schema](#nestedatt--items--sources--config))
 - `enabled` (Boolean) Enables or disables an origin source in the origin group.
 
 Possible values:
@@ -137,6 +149,9 @@ Possible values:
 Origin group must contain at least one enabled origin.
 - `host_header_override` (String) Per-origin Host header override. When set, the CDN sends this value as the Host header when
 requesting content from this origin instead of the default.
+
+Not accepted for an origin bound to a Gcore Object Storage (`s3_type` is `gcore`): any
+non-null value is rejected, and the field is returned as `null` for such origins.
 - `origin_type` (String) Origin type. Present in responses for S3 and FastEdge sources.
 
 Possible values:
@@ -153,29 +168,47 @@ Read-Only:
 
 - `app_id` (String) ID of the FastEdge application served as origin (string, matching the existing
 fastedge option's convention). The CDN dispatches requests to the local FastEdge runtime
-on the edge node using this identifier. The application must belong to the requesting
-client, be enabled, and have `wasi-http` API type.
+on the edge node using this identifier. The application must be in your account, be
+enabled, and have `wasi-http` API type.
 - `s3_access_key_id` (String) Access key ID for the S3 account. Masked as `SECRET_VALUE` in responses.
+
+The parameter is required if `s3_type` is `amazon` or `other`. Not allowed if
+`s3_type` is `gcore`: the CDN fills it and does not return it.
 
 Restrictions:
 - Latin letters (A-Z, a-z), numbers (0-9), colon, dash, and underscore.
 - From 4 to 255 characters.
 - `s3_auth_type` (String) S3 authentication type.
 - `s3_bucket_name` (String) S3 bucket name.
+
+If `s3_type` is `gcore`, the bucket must exist in the selected storage.
 - `s3_region` (String) S3 storage region.
 
-The parameter is required if `s3_type` is `amazon`.
+The parameter is required if `s3_type` is `amazon`. Not allowed if `s3_type` is
+`gcore`: the CDN fills it and does not return it.
 - `s3_secret_access_key` (String) Secret access key for the S3 account. Masked as `SECRET_VALUE` in responses.
+
+The parameter is required if `s3_type` is `amazon` or `other`. Not allowed if
+`s3_type` is `gcore`: the CDN fills it and does not return it.
 
 Restrictions:
 - Latin letters (A-Z, a-z), numbers (0-9), pluses, slashes, dashes, colons and underscores.
 - From 16 to 255 characters.
 - `s3_storage_hostname` (String) S3 storage hostname.
 
-The parameter is required if `s3_type` is `other`.
+The parameter is required if `s3_type` is `other`. Not allowed if `s3_type` is
+`gcore`: the CDN fills it and does not return it.
+
+Must be a public address: private and reserved IP addresses, `localhost`, and hostnames that resolve to them are rejected.
 - `s3_type` (String) Storage type compatible with S3.
 
 Possible values:
 - **amazon** - AWS S3 storage.
 - **other** - Other (not AWS) S3 compatible storage.
-Available values: "amazon", "other".
+- **gcore** - Your Gcore Object Storage. Select the storage and bucket, and the CDN
+  configures the connection.
+Available values: "amazon", "other", "gcore".
+- `storage_id` (Number) ID of your Gcore Object Storage.
+
+The parameter is required if `s3_type` is `gcore`, and not allowed otherwise. The
+storage must be active and of the Standard type.

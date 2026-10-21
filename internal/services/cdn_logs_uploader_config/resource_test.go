@@ -161,11 +161,10 @@ func testAccLogsUploaderConfigDeps(t *testing.T, name string) (policyID, targetI
 	})
 
 	target, err := client.CDN.LogsUploader.Targets.New(ctx, cdn.LogsUploaderTargetNewParams{
-		Name:        gcore.String(name + "-target"),
-		StorageType: cdn.LogsUploaderTargetNewParamsStorageTypeHTTP,
-		Config: cdn.LogsUploaderTargetNewParamsConfigUnion{
-			OfHTTPConfig: &cdn.LogsUploaderTargetNewParamsConfigHTTPConfig{
-				Upload: cdn.LogsUploaderTargetNewParamsConfigHTTPConfigUpload{
+		OfHTTP: &cdn.LogsUploaderTargetNewParamsBodyHTTP{
+			Name: gcore.String(name + "-target"),
+			Config: cdn.LogsUploaderTargetNewParamsBodyHTTPConfig{
+				Upload: cdn.LogsUploaderTargetNewParamsBodyHTTPConfigUpload{
 					URL: "https://example.com/logs",
 				},
 			},
