@@ -173,6 +173,7 @@ func (r *WaapDomainFirewallRuleResource) Read(ctx context.Context, req resource.
 		resp.Diagnostics.AddError("failed to deserialize http request", err.Error())
 		return
 	}
+	syncFromBody(bytes, data)
 
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
 }
@@ -241,6 +242,7 @@ func (r *WaapDomainFirewallRuleResource) ImportState(ctx context.Context, req re
 		resp.Diagnostics.AddError("failed to deserialize http request", err.Error())
 		return
 	}
+	syncFromBody(bytes, data)
 
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
 }

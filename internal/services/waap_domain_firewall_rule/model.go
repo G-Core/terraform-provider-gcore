@@ -15,7 +15,7 @@ type WaapDomainFirewallRuleModel struct {
 	Name        types.String                              `tfsdk:"name" json:"name,required"`
 	Action      *WaapDomainFirewallRuleActionModel        `tfsdk:"action" json:"action,required"`
 	Conditions  *[]*WaapDomainFirewallRuleConditionsModel `tfsdk:"conditions" json:"conditions,required"`
-	Description types.String                              `tfsdk:"description" json:"description,optional"`
+	Description types.String                              `tfsdk:"description" json:"description,computed_optional"`
 }
 
 func (m WaapDomainFirewallRuleModel) MarshalJSON() (data []byte, err error) {
@@ -33,7 +33,7 @@ type WaapDomainFirewallRuleActionModel struct {
 
 type WaapDomainFirewallRuleActionBlockModel struct {
 	ActionDuration types.String `tfsdk:"action_duration" json:"action_duration,optional"`
-	StatusCode     types.Int64  `tfsdk:"status_code" json:"status_code,optional"`
+	StatusCode     types.Int64  `tfsdk:"status_code" json:"status_code,computed_optional"`
 }
 
 type WaapDomainFirewallRuleConditionsModel struct {

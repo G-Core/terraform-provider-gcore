@@ -10,8 +10,10 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/booldefault"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/int64default"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/int64planmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringdefault"
 	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
 )
 
@@ -58,7 +60,9 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 							},
 							"status_code": schema.Int64Attribute{
 								Description: "A custom HTTP status code that the WAAP returns if a rule blocks a request\nAvailable values: 403, 405, 418, 429.",
+								Computed:    true,
 								Optional:    true,
+								Default:     int64default.StaticInt64(403),
 								Validators: []validator.Int64{
 									int64validator.OneOf(
 										403,
@@ -118,7 +122,9 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 			},
 			"description": schema.StringAttribute{
 				Description: "The description assigned to the rule",
+				Computed:    true,
 				Optional:    true,
+				Default:     stringdefault.StaticString(""),
 			},
 		},
 	}

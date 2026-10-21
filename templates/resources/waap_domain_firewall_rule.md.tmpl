@@ -1,0 +1,108 @@
+---
+page_title: "{{ .Name }} {{ .Type }} - {{ .RenderedProviderName }}"
+subcategory: ""
+description: |-
+  {{ .Description }}
+---
+
+# {{ .Name }} ({{ .Type }})
+
+{{ .Description }}
+
+Set exactly one of `action.allow` or `action.block`, and exactly one of `ip` or `ip_range` in the condition. `action.allow` takes no settings: write `allow = {}`.
+
+Write values exactly as the API stores them; the provider rejects anything the API would rewrite, because it would show a change on every plan:
+
+- IPv6 addresses in `ip_address`, `lower_bound` and `upper_bound` must be in RFC 5952 form: lowercase, with the longest run of zero groups compressed (`2001:db8::20`, not `2001:DB8:0:0::20`). IPv4-mapped addresses keep the dotted form: `::ffff:192.0.2.10`, not `::ffff:c000:20a`. Zone IDs are not accepted: write `fe80::1`, not `fe80::1%eth0`.
+- `name` must not start or end with whitespace.
+
+## Example Usage
+
+### Block an IP address
+
+{{tffile "examples/resources/gcore_waap_domain_firewall_rule/block-ip.tf"}}
+
+### Allow an IP range
+
+{{tffile "examples/resources/gcore_waap_domain_firewall_rule/allow-range.tf"}}
+
+{{ .SchemaMarkdown | trimspace }}
+
+## Migrating from gcore_waap_firewall_rule
+
+This resource replaces `gcore_waap_firewall_rule` from provider versions 0.x.
+Terraform cannot move state between the two, and the new provider has no schema
+for the old type, so remove each rule from state (the rule itself is kept) and
+import it under the new name:
+
+```shell
+terraform state rm gcore_waap_firewall_rule.office
+```
+
+```terraform
+import {
+  to = gcore_waap_domain_firewall_rule.office
+  id = "136578/912200" # <domain_id>/<rule_id>
+}
+```
+
+Other changes:
+
+- `action` and `conditions` are nested attributes now, set with `=`. `conditions` is a list with one entry.
+- `allow = true` is now `allow = {}`.
+- `id` is a number.
+- The import ID is `<domain_id>/<rule_id>` instead of `<domain_id>:<rule_id>`.
+
+Before:
+
+```terraform
+resource "gcore_waap_firewall_rule" "office" {
+  domain_id = 136578
+  name      = "Block office"
+  enabled   = true
+
+  action {
+    block {
+      status_code     = 403
+      action_duration = "12h"
+    }
+  }
+
+  conditions {
+    ip {
+      ip_address = "192.0.2.10"
+    }
+  }
+}
+```
+
+After:
+
+```terraform
+resource "gcore_waap_domain_firewall_rule" "office" {
+  domain_id = 136578
+  name      = "Block office"
+  enabled   = true
+
+  action = {
+    block = {
+      status_code     = 403
+      action_duration = "12h"
+    }
+  }
+
+  conditions = [{
+    ip = {
+      ip_address = "192.0.2.10"
+    }
+  }]
+}
+```
+
+{{ if .HasImport }}
+## Import
+
+Import is supported using the following syntax:
+
+{{ codefile "shell" .ImportFile }}
+{{ end }}
