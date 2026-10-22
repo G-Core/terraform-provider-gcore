@@ -36,7 +36,7 @@ func DataSourceSchema(ctx context.Context) schema.Schema {
 				Required:    true,
 			},
 			"description": schema.StringAttribute{
-				Description: "The description assigned to the rule",
+				Description: "A human-readable description.",
 				Computed:    true,
 			},
 			"enabled": schema.BoolAttribute{
@@ -79,11 +79,11 @@ func DataSourceSchema(ctx context.Context) schema.Schema {
 						CustomType:  customfield.NewNestedObjectType[WaapDomainAdvancedRuleActionBlockDataSourceModel](ctx),
 						Attributes: map[string]schema.Attribute{
 							"action_duration": schema.StringAttribute{
-								Description: "How long a rule's block action will apply to subsequent requests. Can be specified in seconds or by using a numeral followed by 's', 'm', 'h', or 'd' to represent time format (seconds, minutes, hours, or days). Empty time intervals are not allowed.",
+								Description: "How long a rule's block action will apply to subsequent requests. Can be specified in seconds or by using a numeral followed by 's', 'm', 'h', or 'd' to represent time format (seconds, minutes, hours, or days). Empty time intervals are not allowed. If not specified, the action is applied only to the request that triggers the rule.",
 								Computed:    true,
 							},
 							"status_code": schema.Int64Attribute{
-								Description: "A custom HTTP status code that the WAAP returns if a rule blocks a request\nAvailable values: 403, 405, 418, 429.",
+								Description: "An HTTP status code that the WAAP returns if a rule blocks a request.\nAvailable values: 403, 405, 418, 429.",
 								Computed:    true,
 								Validators: []validator.Int64{
 									int64validator.OneOf(
