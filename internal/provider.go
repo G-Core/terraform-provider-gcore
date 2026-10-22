@@ -386,6 +386,7 @@ func (p *GcoreProvider) DataSources(ctx context.Context) []func() datasource.Dat
 		cloud_volume_snapshot.NewCloudVolumeSnapshotsDataSource,
 		waap_domain.NewWaapDomainDataSource,
 		waap_domain.NewWaapDomainsDataSource,
+		waap_domain_policy.NewWaapDomainPolicyDataSource,
 		waap_domain_policy.NewWaapDomainPoliciesDataSource,
 		waap_domain_firewall_rule.NewWaapDomainFirewallRuleDataSource,
 		waap_domain_firewall_rule.NewWaapDomainFirewallRulesDataSource,

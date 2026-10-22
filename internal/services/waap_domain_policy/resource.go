@@ -4,7 +4,6 @@ package waap_domain_policy
 
 import (
 	"context"
-	"errors"
 	"fmt"
 	"io"
 	"net/http"
@@ -13,6 +12,7 @@ import (
 	"github.com/G-Core/gcore-go/option"
 	"github.com/G-Core/gcore-go/waap"
 	"github.com/G-Core/terraform-provider-gcore/internal/apijson"
+	"github.com/G-Core/terraform-provider-gcore/internal/importpath"
 	"github.com/G-Core/terraform-provider-gcore/internal/logging"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/types"
@@ -21,6 +21,7 @@ import (
 // Ensure provider defined types fully satisfy framework interfaces.
 var _ resource.ResourceWithConfigure = (*WaapDomainPolicyResource)(nil)
 var _ resource.ResourceWithModifyPlan = (*WaapDomainPolicyResource)(nil)
+var _ resource.ResourceWithImportState = (*WaapDomainPolicyResource)(nil)
 
 func NewResource() resource.Resource {
 	return &WaapDomainPolicyResource{}
@@ -151,36 +152,82 @@ func (r *WaapDomainPolicyResource) Read(ctx context.Context, req resource.ReadRe
 		return
 	}
 
-	// The API has no single-policy GET, so page through the domain's policies.
-	// Drop this once GET /waap/v2/domains/{domain_id}/policies/{policy_id} exists:
-	// the generator then emits Read and ImportState itself.
-	iter := r.client.Waap.Domains.Policies.ListAutoPaging(
+	res := new(http.Response)
+	_, err := r.client.Waap.Domains.Policies.Get(
 		ctx,
-		data.DomainID.ValueInt64(),
-		waap.DomainPolicyListParams{},
+		data.PolicyID.ValueString(),
+		waap.DomainPolicyGetParams{
+			DomainID: data.DomainID.ValueInt64(),
+		},
+		option.WithResponseBodyInto(&res),
 		option.WithMiddleware(logging.Middleware(ctx)),
 	)
-	for iter.Next() {
-		policy := iter.Current()
-		if policy.ID != data.PolicyID.ValueString() {
-			continue
-		}
-		data.Mode = types.BoolValue(policy.Mode)
-		data.ID = data.PolicyID
-		resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
+	if res != nil && res.StatusCode == 404 {
+		resp.Diagnostics.AddWarning("Resource not found", "The resource was not found on the server and will be removed from state.")
+		resp.State.RemoveResource(ctx)
 		return
 	}
-	var apiErr *gcore.Error
-	if err := iter.Err(); err != nil && !(errors.As(err, &apiErr) && apiErr.StatusCode == http.StatusNotFound) {
+	if err != nil {
 		resp.Diagnostics.AddError("failed to make http request", err.Error())
 		return
 	}
-	resp.Diagnostics.AddWarning("Resource not found", "The resource was not found on the server and will be removed from state.")
-	resp.State.RemoveResource(ctx)
+	bytes, _ := io.ReadAll(res.Body)
+	err = apijson.Unmarshal(bytes, &data)
+	if err != nil {
+		resp.Diagnostics.AddError("failed to deserialize http request", err.Error())
+		return
+	}
+	data.ID = data.PolicyID
+
+	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
 }
 
 func (r *WaapDomainPolicyResource) Delete(ctx context.Context, req resource.DeleteRequest, resp *resource.DeleteResponse) {
 
+}
+
+func (r *WaapDomainPolicyResource) ImportState(ctx context.Context, req resource.ImportStateRequest, resp *resource.ImportStateResponse) {
+	var data = new(WaapDomainPolicyModel)
+
+	path_domain_id := int64(0)
+	path_policy_id := ""
+	diags := importpath.ParseImportID(
+		req.ID,
+		"<domain_id>/<policy_id>",
+		&path_domain_id,
+		&path_policy_id,
+	)
+	resp.Diagnostics.Append(diags...)
+	if resp.Diagnostics.HasError() {
+		return
+	}
+
+	data.DomainID = types.Int64Value(path_domain_id)
+	data.PolicyID = types.StringValue(path_policy_id)
+
+	res := new(http.Response)
+	_, err := r.client.Waap.Domains.Policies.Get(
+		ctx,
+		path_policy_id,
+		waap.DomainPolicyGetParams{
+			DomainID: path_domain_id,
+		},
+		option.WithResponseBodyInto(&res),
+		option.WithMiddleware(logging.Middleware(ctx)),
+	)
+	if err != nil {
+		resp.Diagnostics.AddError("failed to make http request", err.Error())
+		return
+	}
+	bytes, _ := io.ReadAll(res.Body)
+	err = apijson.Unmarshal(bytes, &data)
+	if err != nil {
+		resp.Diagnostics.AddError("failed to deserialize http request", err.Error())
+		return
+	}
+	data.ID = data.PolicyID
+
+	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
 }
 
 func (r *WaapDomainPolicyResource) ModifyPlan(_ context.Context, _ resource.ModifyPlanRequest, _ *resource.ModifyPlanResponse) {
