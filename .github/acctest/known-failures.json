@@ -1,0 +1,101 @@
+{
+  "$comment": [
+    "Acceptance-test failures that are known and not regressions, grouped by root cause.",
+    "",
+    "check-results.py reports these as accepted, separately from unexpected failures,",
+    "which still fail the job. Each group needs an id, a ticket, a reason and",
+    "package-qualified test names. A renamed test is no longer exempt until its new",
+    "name is added; a deleted test only produces a warning."
+  ],
+  "groups": [
+    {
+      "id": "fastedge-invalid-wasm-fixture",
+      "jira": "GCLOUD2-30110",
+      "reason": "The test fixture is not a valid WebAssembly binary, so every test that uploads it fails at create.",
+      "tests": [
+        "fastedge_binary.TestAccFastedgeBinary_basic",
+        "fastedge_binary.TestAccFastedgeBinary_import",
+        "fastedge_app.TestAccFastedgeApp_basic",
+        "fastedge_app.TestAccFastedgeApp_import",
+        "fastedge_app.TestAccFastedgeApp_update"
+      ]
+    },
+    {
+      "id": "fastedge-datasource-missing-required-args",
+      "jira": "GCLOUD2-30110",
+      "reason": "The data-source configs omit a required argument, so the plan is rejected before any API call.",
+      "tests": [
+        "fastedge_binary.TestAccFastedgeBinaryDataSource_basic",
+        "fastedge_binary.TestAccFastedgeBinary_dataSource",
+        "fastedge_app.TestAccFastedgeAppDataSource_basic"
+      ]
+    },
+    {
+      "id": "checkdestroy-no-retry",
+      "jira": "GCLOUD2-30110",
+      "reason": "acctest.CheckResourceDestroyed checks once with no retry, so a resource still briefly visible after deletion is reported as dangling.",
+      "tests": [
+        "cloud_inference_secret.TestAccCloudInferenceSecret_basic",
+        "cloud_inference_secret.TestAccCloudInferenceSecret_update",
+        "cloud_inference_secret.TestAccCloudInferenceSecretDataSource_basic",
+        "cloud_network.TestAccCloudNetworkDataSource_basic"
+      ]
+    },
+    {
+      "id": "planchecks-preapply-with-planonly",
+      "jira": "GCLOUD2-30110",
+      "reason": "A step combines PlanOnly with ConfigPlanChecks.PreApply, which terraform-plugin-testing rejects.",
+      "tests": [
+        "cloud_instance.TestAccCloudInstance_importAdoptionApplies",
+        "cloud_instance.TestAccCloudInstance_importThenNoopApplyThenSetForcesReplace"
+      ]
+    },
+    {
+      "id": "project-datasource-empty-config",
+      "jira": "GCLOUD2-30110",
+      "reason": "The test declares an empty gcore_cloud_project data source, but the schema requires project_id or find_one_by.",
+      "tests": [
+        "cloud_project.TestAccCloudProjectDataSource_defaultProject"
+      ]
+    },
+    {
+      "id": "inplace-update-replaces-resource",
+      "jira": "GCLOUD2-30110",
+      "reason": "An update expected in place replaces the resource: the ID changes across the step.",
+      "tests": [
+        "cloud_file_share.TestAccCloudFileShare_update",
+        "cloud_network_subnet.TestAccCloudNetworkSubnet_update"
+      ]
+    },
+    {
+      "id": "dns-zone-import-nonempty-plan",
+      "jira": "GCLOUD2-30110",
+      "reason": "The import step expects no changes but plans an update.",
+      "tests": [
+        "dns_zone.TestAccDNSZone_withMeta"
+      ]
+    },
+    {
+      "id": "sftp-upgrade-needs-released-binary",
+      "jira": "GCLOUD2-30110",
+      "reason": "A provider upgrade test needs a released provider binary alongside the local build, which plain go test does not provide.",
+      "tests": [
+        "storage_sftp.TestAccStorageSftp_upgradeFromV2RC1"
+      ]
+    },
+    {
+      "id": "loadbalancer-name-pattern-unexplained",
+      "jira": "GCLOUD2-30110",
+      "reason": "Create fails with a name-pattern validation error for names that match the pattern. Cause not yet determined.",
+      "tests": [
+        "cloud_load_balancer.TestAccCloudLoadBalancer_basic",
+        "cloud_load_balancer.TestAccCloudLoadBalancer_import",
+        "cloud_load_balancer.TestAccCloudLoadBalancer_resize",
+        "cloud_load_balancer.TestAccCloudLoadBalancer_separateFloatingIP",
+        "cloud_load_balancer.TestAccCloudLoadBalancer_tags",
+        "cloud_load_balancer.TestAccCloudLoadBalancer_update",
+        "cloud_load_balancer.TestAccCloudLoadBalancerDataSource_basic"
+      ]
+    }
+  ]
+}

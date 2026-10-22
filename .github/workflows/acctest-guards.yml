@@ -1,0 +1,84 @@
+name: Acceptance Test Guards
+
+# Credential-free checks on the acceptance-test CI configuration in
+# .github/acctest. They need no API key and take seconds, unlike the acceptance
+# tests themselves.
+#
+# Runs on pull requests, against the merge with the base branch, and on pushes
+# to main. The paths are everything the checks read: the policy files and
+# scripts, and the service packages whose tests and sweepers they inventory.
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - '.github/acctest/**'
+      - '.github/workflows/acctest-guards.yml'
+      - 'internal/services/**/*.go'
+  pull_request:
+    branches-ignore:
+      - 'stl-preview-head/**'
+      - 'stl-preview-base/**'
+    paths:
+      - '.github/acctest/**'
+      - '.github/workflows/acctest-guards.yml'
+      - 'internal/services/**/*.go'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  # Safe to cancel: nothing here creates infrastructure.
+  group: acctest-guards-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  guards:
+    name: Validate acctest policy
+    runs-on: ubuntu-latest
+    if: github.repository == 'G-Core/terraform-provider-gcore-staging'
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          persist-credentials: false
+
+      # Every check runs even when an earlier one fails, so one run shows all
+      # the problems instead of making the author fix them one push at a time.
+
+      - name: Policy files are valid JSON
+        if: always()
+        run: |
+          set -euo pipefail
+          for f in .github/acctest/*.json; do
+            python3 -c "import json,sys; json.load(open(sys.argv[1]))" "$f" \
+              || { echo "::error file=$f::invalid JSON"; exit 1; }
+            echo "  ok  $f"
+          done
+
+      - name: Policy logic unit tests
+        if: always()
+        run: python3 -B -m unittest discover -v -s .github/acctest/scripts/tests
+
+      - name: Policy is consistent with the repository
+        if: always()
+        run: python3 .github/acctest/scripts/validate-policy.py .
+
+      - name: Plans account for the inventory
+        if: always()
+        run: |
+          set -euo pipefail
+          # plan.py fails on an empty selection, a package planned twice or not
+          # at all, and a package without cleanup coverage that is not
+          # explicitly excluded. Its human report goes to the step summary.
+          {
+            echo "### Acceptance test plans"
+            for schedule in nightly weekly; do
+              echo
+              echo "**$schedule**"
+              echo '```'
+              python3 .github/acctest/scripts/plan.py --schedule "$schedule" 2>&1 >/dev/null
+              echo '```'
+            done
+          } >> "$GITHUB_STEP_SUMMARY"

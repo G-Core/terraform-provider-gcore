@@ -1,0 +1,83 @@
+{
+  "$comment": [
+    "Cleanup coverage is derived: each literal resource \"gcore_*\" block in a package's",
+    "test files must have a registered sweeper (resource.AddTestSweepers). This file holds",
+    "only what that scan cannot see:",
+    "",
+    "  fixtures            - types a package creates outside its HCL, e.g. through the SDK",
+    "                        (the guards fail if an SDK create call has no entry here);",
+    "  reclaimed_by_parent - child type -> parent type deleted together with it;",
+    "  sweeper_names       - type -> sweeper registered under a different name."
+  ],
+  "fixtures": {
+    "cdn_logs_uploader_config": {
+      "creates": [
+        "gcore_cdn_logs_uploader_policy",
+        "gcore_cdn_logs_uploader_target"
+      ],
+      "reason": "testAccLogsUploaderConfigDeps creates the policy and target the config attaches to"
+    },
+    "cdn_origin_shielding": {
+      "creates": [
+        "gcore_cdn_origin_group",
+        "gcore_cdn_resource"
+      ],
+      "reason": "shielding attaches to a CDN resource fixture created in helpers_test.go, named with acctest.RandomName"
+    },
+    "cdn_resource_rule": {
+      "creates": [
+        "gcore_cdn_origin_group",
+        "gcore_cdn_resource"
+      ],
+      "reason": "rules attach to a CDN resource fixture created in helpers_test.go, named with acctest.RandomName"
+    },
+    "cloud_registry": {
+      "creates": [
+        "gcore_cloud_registry"
+      ],
+      "reason": "the list data source needs a registry to exist"
+    },
+    "cloud_registry_artifact": {
+      "creates": [
+        "gcore_cloud_registry"
+      ],
+      "reason": "the list data source needs a registry to exist"
+    },
+    "cloud_registry_repository": {
+      "creates": [
+        "gcore_cloud_registry"
+      ],
+      "reason": "the list data source needs a registry to exist"
+    },
+    "cloud_registry_user": {
+      "creates": [
+        "gcore_cloud_registry",
+        "gcore_cloud_registry_user"
+      ],
+      "reason": "the list data source needs a registry with a user"
+    },
+    "storage_sftp": {
+      "creates": [
+        "gcore_storage_sftp"
+      ],
+      "reason": "two tests pre-create an SFTP storage to exercise adoption and upgrade paths"
+    },
+    "waap_domain_advanced_rule": {
+      "creates": [
+        "gcore_waap_domain_advanced_rule"
+      ],
+      "reason": "the external-import test creates a rule through the SDK, named with acctest.RandomName"
+    }
+  },
+  "reclaimed_by_parent": {
+    "gcore_cdn_applied_preset": "gcore_cdn_resource",
+    "gcore_cdn_origin_shielding": "gcore_cdn_resource",
+    "gcore_cloud_file_share_access_rule": "gcore_cloud_file_share",
+    "gcore_cloud_load_balancer_listener": "gcore_cloud_load_balancer",
+    "gcore_cloud_load_balancer_pool": "gcore_cloud_load_balancer",
+    "gcore_cloud_load_balancer_pool_member": "gcore_cloud_load_balancer_pool",
+    "gcore_cloud_registry_user": "gcore_cloud_registry",
+    "gcore_storage_object_storage_bucket": "gcore_storage_object_storage"
+  },
+  "sweeper_names": {}
+}

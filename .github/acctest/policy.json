@@ -1,0 +1,141 @@
+{
+  "$comment": [
+    "Policy for the acceptance-test CI. Records only decisions the code cannot express;",
+    "packages, tests, resource types and sweepers are discovered from the repository on",
+    "every run.",
+    "",
+    "A package's product is its directory prefix (cloud_volume -> cloud). Each product",
+    "has one default group, and may have more groups that claim packages by prefix.",
+    "Every discovered package must land in exactly one group or be excluded."
+  ],
+
+  "targets": {
+    "$comment": [
+      "Where a job runs. Credentials and the project come from the named GitHub",
+      "environment. Cloud targets name a region; account-level products (CDN, DNS,",
+      "FastEdge, Storage, WAAP) run once on the account target, not once per region."
+    ],
+    "lux": {
+      "environment": "acctest",
+      "region_id": 76,
+      "reason": "Cloud default: supports Kubernetes and standard file shares"
+    },
+    "sines": {
+      "environment": "acctest",
+      "region_id": 176,
+      "reason": "offers the virtual GPU flavors the GPU tests use"
+    },
+    "account": {
+      "environment": "acctest",
+      "reason": "account-level products take no region"
+    }
+  },
+
+  "groups": {
+    "$comment": [
+      "One CI job per group per run. go_test_p is go test -p (packages at once) and",
+      "go_test_parallel is -parallel (tests at once within a package). Cloud starts",
+      "conservatively because its tests share regional quotas. Split a product further",
+      "only when the test reports show a clear need.",
+      "",
+      "GPU is a separate weekly group: it needs a different region and is the most",
+      "expensive part of the suite."
+    ],
+    "cloud": {
+      "product": "cloud",
+      "target": "lux",
+      "schedule": "nightly",
+      "go_test_p": 2,
+      "go_test_parallel": 1,
+      "timeout_minutes": 180
+    },
+    "cloud-gpu": {
+      "product": "cloud",
+      "match": ["cloud_gpu_"],
+      "target": "sines",
+      "schedule": "weekly",
+      "go_test_p": 1,
+      "go_test_parallel": 1,
+      "timeout_minutes": 180
+    },
+    "cdn": {
+      "product": "cdn",
+      "target": "account",
+      "schedule": "nightly",
+      "go_test_p": 4,
+      "go_test_parallel": 4,
+      "timeout_minutes": 60
+    },
+    "dns": {
+      "product": "dns",
+      "target": "account",
+      "schedule": "nightly",
+      "go_test_p": 3,
+      "go_test_parallel": 2,
+      "timeout_minutes": 45
+    },
+    "fastedge": {
+      "product": "fastedge",
+      "target": "account",
+      "schedule": "nightly",
+      "go_test_p": 2,
+      "go_test_parallel": 2,
+      "timeout_minutes": 30
+    },
+    "storage": {
+      "product": "storage",
+      "target": "account",
+      "schedule": "nightly",
+      "go_test_p": 2,
+      "go_test_parallel": 4,
+      "timeout_minutes": 90
+    }
+,
+    "waap": {
+      "product": "waap",
+      "target": "account",
+      "schedule": "nightly",
+      "go_test_p": 2,
+      "go_test_parallel": 2,
+      "timeout_minutes": 45
+    }
+  },
+
+  "excluded_packages": {
+    "$comment": [
+      "Packages kept out of every plan, with the reason the reports show. A package whose",
+      "resources no registered sweeper reclaims must be listed here, or the guards fail."
+    ],
+    "cdn_logs_uploader_config": "no sweeper for gcore_cdn_logs_uploader_config",
+    "cloud_gpu_baremetal_cluster": "baremetal GPU hardware is not available to the test account",
+    "cloud_gpu_baremetal_cluster_flavor": "runs only alongside cloud_gpu_baremetal_cluster",
+    "cloud_gpu_baremetal_cluster_image": "runs only alongside cloud_gpu_baremetal_cluster",
+    "cloud_registry": "no sweeper for gcore_cloud_registry",
+    "cloud_registry_artifact": "no sweeper for gcore_cloud_registry",
+    "cloud_registry_repository": "no sweeper for gcore_cloud_registry",
+    "cloud_registry_user": "no sweeper for gcore_cloud_registry",
+    "storage_object_storage_bucket": "no sweeper for gcore_storage_object_storage"
+  },
+
+  "smoke": {
+    "$comment": [
+      "The pre-merge smoke set: one representative per product family, run with an",
+      "anchored regex. Go's -run is an unanchored match, so a loose pattern would also",
+      "pick up the slower import tests."
+    ],
+    "run_regex": "^TestAcc.*_(basic|import)$",
+    "packages": [
+      "cloud_instance",
+      "cloud_volume",
+      "cloud_network",
+      "cloud_security_group",
+      "cloud_floating_ip",
+      "cdn_resource",
+      "cdn_origin_group",
+      "dns_zone",
+      "dns_zone_rrset",
+      "fastedge_app",
+      "storage_ssh_key"
+    ]
+  }
+}
