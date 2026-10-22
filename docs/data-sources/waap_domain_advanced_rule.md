@@ -34,7 +34,7 @@ data "gcore_waap_domain_advanced_rule" "example_waap_domain_advanced_rule" {
 ### Read-Only
 
 - `action` (Attributes) The action that the rule takes when triggered. Only one action can be set per rule. (see [below for nested schema](#nestedatt--action))
-- `description` (String) The description assigned to the rule
+- `description` (String) A human-readable description.
 - `enabled` (Boolean) Whether or not the rule is enabled
 - `id` (Number) The advanced rule ID
 - `name` (String) The name assigned to the rule
@@ -91,8 +91,8 @@ Read-Only:
 
 Read-Only:
 
-- `action_duration` (String) How long a rule's block action will apply to subsequent requests. Can be specified in seconds or by using a numeral followed by 's', 'm', 'h', or 'd' to represent time format (seconds, minutes, hours, or days). Empty time intervals are not allowed.
-- `status_code` (Number) A custom HTTP status code that the WAAP returns if a rule blocks a request
+- `action_duration` (String) How long a rule's block action will apply to subsequent requests. Can be specified in seconds or by using a numeral followed by 's', 'm', 'h', or 'd' to represent time format (seconds, minutes, hours, or days). Empty time intervals are not allowed. If not specified, the action is applied only to the request that triggers the rule.
+- `status_code` (Number) An HTTP status code that the WAAP returns if a rule blocks a request.
 Available values: 403, 405, 418, 429.
 
 
