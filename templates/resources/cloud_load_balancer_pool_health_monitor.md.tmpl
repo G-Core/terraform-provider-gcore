@@ -1,0 +1,44 @@
+---
+page_title: "{{ .Name }} {{ .Type }} - {{ .RenderedProviderName }}"
+subcategory: ""
+description: |-
+  {{ .Description }}
+---
+
+# {{ .Name }} ({{ .Type }})
+
+{{ .Description }}
+
+The pool must not declare a `healthmonitor` block of its own: a pool has one
+health monitor, and this resource manages it.
+
+Changing `type` replaces the monitor. The pool has no health check between
+the delete and the create.
+
+## Example Usage
+
+### HTTP health monitor
+
+Probes `/health` with GET and treats 200 or 204 as healthy.
+
+{{tffile "examples/resources/gcore_cloud_load_balancer_pool_health_monitor/http-monitor.tf"}}
+
+### TCP health monitor
+
+Checks that members accept a TCP connection on their `protocol_port`, or on
+`monitor_port` if the member sets one.
+
+{{tffile "examples/resources/gcore_cloud_load_balancer_pool_health_monitor/tcp-monitor.tf"}}
+
+{{ .SchemaMarkdown | trimspace }}
+
+{{ if .HasImport }}
+## Import
+
+Import is supported using the following syntax:
+
+{{ codefile "shell" .ImportFile }}
+
+The import ID is slash-separated: `<project_id>/<region_id>/<pool_id>`. A pool
+has at most one health monitor, so the pool identifies it.
+{{ end }}
