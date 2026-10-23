@@ -1,6 +1,6 @@
 module github.com/G-Core/terraform-provider-gcore
 
-go 1.25.8
+go 1.26.10
 
 require (
 	github.com/G-Core/gcore-go v0.59.0
