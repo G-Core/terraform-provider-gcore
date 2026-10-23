@@ -51,6 +51,7 @@ import (
 	"github.com/G-Core/terraform-provider-gcore/internal/services/cloud_load_balancer"
 	"github.com/G-Core/terraform-provider-gcore/internal/services/cloud_load_balancer_listener"
 	"github.com/G-Core/terraform-provider-gcore/internal/services/cloud_load_balancer_pool"
+	"github.com/G-Core/terraform-provider-gcore/internal/services/cloud_load_balancer_pool_health_monitor"
 	"github.com/G-Core/terraform-provider-gcore/internal/services/cloud_load_balancer_pool_member"
 	"github.com/G-Core/terraform-provider-gcore/internal/services/cloud_network"
 	"github.com/G-Core/terraform-provider-gcore/internal/services/cloud_network_router"
@@ -254,6 +255,7 @@ func (p *GcoreProvider) Resources(ctx context.Context) []func() resource.Resourc
 		cloud_load_balancer.NewResource,
 		cloud_load_balancer_listener.NewResource,
 		cloud_load_balancer_pool.NewResource,
+		cloud_load_balancer_pool_health_monitor.NewResource,
 		cloud_load_balancer_pool_member.NewResource,
 		cloud_reserved_fixed_ip.NewResource,
 		cloud_network.NewResource,
@@ -325,6 +327,7 @@ func (p *GcoreProvider) DataSources(ctx context.Context) []func() datasource.Dat
 		cloud_load_balancer_listener.NewCloudLoadBalancerListenersDataSource,
 		cloud_load_balancer_pool.NewCloudLoadBalancerPoolDataSource,
 		cloud_load_balancer_pool.NewCloudLoadBalancerPoolsDataSource,
+		cloud_load_balancer_pool_health_monitor.NewCloudLoadBalancerPoolHealthMonitorDataSource,
 		cloud_load_balancer_pool_member.NewCloudLoadBalancerPoolMemberDataSource,
 		cloud_load_balancer_pool_member.NewCloudLoadBalancerPoolMembersDataSource,
 		cloud_reserved_fixed_ip.NewCloudReservedFixedIPDataSource,
