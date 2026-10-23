@@ -75,6 +75,7 @@
     "gcore_cloud_file_share_access_rule": "gcore_cloud_file_share",
     "gcore_cloud_load_balancer_listener": "gcore_cloud_load_balancer",
     "gcore_cloud_load_balancer_pool": "gcore_cloud_load_balancer",
+    "gcore_cloud_load_balancer_pool_health_monitor": "gcore_cloud_load_balancer_pool",
     "gcore_cloud_load_balancer_pool_member": "gcore_cloud_load_balancer_pool",
     "gcore_cloud_registry_user": "gcore_cloud_registry",
     "gcore_storage_object_storage_bucket": "gcore_storage_object_storage"
