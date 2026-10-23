@@ -1,0 +1,96 @@
+---
+page_title: "{{ .Name }} {{ .Type }} - {{ .RenderedProviderName }}"
+subcategory: ""
+description: |-
+  {{ .Description }}
+---
+
+# {{ .Name }} ({{ .Type }})
+
+{{ .Description }}
+
+A rule triggers when all of its conditions match. Each entry of `conditions` sets exactly one condition type, and a
+rule takes between 1 and 5 conditions. A `request_rate` condition must be the only condition of its rule. Set
+exactly one kind in `action`. The `allow`, `captcha`, `handshake` and `monitor` actions take no settings: write them
+as `{}`. The API ignores any keys inside them, so a non-empty value shows a change on every plan.
+
+The API stores some values in a canonical form, and the provider rejects any other form at plan time so the rule
+does not drift: IP addresses in canonical notation (`2001:db8::1`, not `2001:DB8:0::1`), JA3 and JA4 fingerprints
+in lowercase, country codes in uppercase, and no leading or trailing whitespace in `name`, header values, tags
+and content types.
+
+## Example Usage
+
+### Block a path
+
+{{ tffile "examples/resources/gcore_waap_domain_custom_rule/resource.tf" }}
+
+### Rate limit
+
+{{ tffile "examples/resources/gcore_waap_domain_custom_rule/rate-limit.tf" }}
+
+### Tag requests
+
+{{ tffile "examples/resources/gcore_waap_domain_custom_rule/tag.tf" }}
+
+### Migrating from the v0 `gcore_waap_custom_rule` resource
+
+The v0 resource grouped conditions by type in a single `conditions` block and used blocks for the action. Here
+`conditions` is a list with one condition per entry, and `action` is an object. The rule IDs are the same:
+
+```terraform
+# v0
+resource "gcore_waap_custom_rule" "example" {
+  domain_id = 12345
+  name      = "Block admin"
+  enabled   = true
+  action {
+    block {
+      status_code = 403
+    }
+  }
+  conditions {
+    url {
+      url = "/admin"
+    }
+    ip {
+      ip_address = "192.0.2.10"
+      negation   = true
+    }
+  }
+}
+
+# now
+resource "gcore_waap_domain_custom_rule" "example" {
+  domain_id = 12345
+  name      = "Block admin"
+  enabled   = true
+  action = {
+    block = {
+      status_code = 403
+    }
+  }
+  conditions = [
+    { url = { url = "/admin" } },
+    { ip = { ip_address = "192.0.2.10", negation = true } },
+  ]
+}
+```
+
+Import the existing rule with an `import` block, using `<domain_id>/<rule_id>` instead of the v0
+`<domain_id>:<rule_id>`. Remove the v0 resource from v0 state (`terraform state rm`) instead of destroying it, so
+both providers never manage the same rule.
+
+Older rules can have `response_header` or `response_header_exists` conditions. The API no longer accepts them on
+create or update, so this resource cannot represent them. Import warns about each one, and the next apply that
+changes the rule removes it.
+
+{{ .SchemaMarkdown | trimspace }}
+
+{{ if .HasImport }}
+## Import
+
+Import is supported using the following syntax:
+
+{{ codefile "shell" .ImportFile }}
+{{ end }}
