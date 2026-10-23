@@ -64,6 +64,7 @@ import (
 
 	// WAAP
 	_ "github.com/G-Core/terraform-provider-gcore/internal/services/waap_domain_advanced_rule"
+	_ "github.com/G-Core/terraform-provider-gcore/internal/services/waap_domain_custom_rule"
 	_ "github.com/G-Core/terraform-provider-gcore/internal/services/waap_domain_firewall_rule"
 )
 
