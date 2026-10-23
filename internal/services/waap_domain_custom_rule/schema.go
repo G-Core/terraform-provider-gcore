@@ -9,12 +9,16 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework-jsontypes/jsontypes"
 	"github.com/hashicorp/terraform-plugin-framework-validators/int64validator"
 	"github.com/hashicorp/terraform-plugin-framework-validators/listvalidator"
+	"github.com/hashicorp/terraform-plugin-framework-validators/resourcevalidator"
+	"github.com/hashicorp/terraform-plugin-framework-validators/setvalidator"
 	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
+	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/booldefault"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/int64default"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/int64planmodifier"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/listdefault"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringdefault"
 	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
@@ -44,6 +48,7 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 			"name": schema.StringAttribute{
 				Description: "The name assigned to the rule",
 				Required:    true,
+				Validators:  []validator.String{noSurroundingSpace{}},
 			},
 			"action": schema.SingleNestedAttribute{
 				Description: "The action that the rule takes when triggered. Only one action can be set per rule.",
@@ -101,6 +106,9 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 								Description: "The list of user defined tags to tag the request with",
 								Required:    true,
 								ElementType: types.StringType,
+								Validators: []validator.Set{
+									setvalidator.ValueStringsAre(noSurroundingSpace{}),
+								},
 							},
 						},
 					},
@@ -109,7 +117,13 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 			"conditions": schema.ListNestedAttribute{
 				Description: "The conditions required for the WAAP engine to trigger the rule. Rules may have between 1 and 5 conditions. All conditions must pass for the rule to trigger",
 				Required:    true,
+				Validators: []validator.List{
+					listvalidator.SizeBetween(1, 5),
+				},
 				NestedObject: schema.NestedAttributeObject{
+					Validators: []validator.Object{
+						oneConditionKind{},
+					},
 					Attributes: map[string]schema.Attribute{
 						"asn": schema.SingleNestedAttribute{
 							Description: "Match the ASN (Autonomous System Number) the request originated from, as determined by a WHOIS lookup of the requesting IP",
@@ -136,6 +150,9 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 									Description: "The list of content types to match against",
 									Required:    true,
 									ElementType: types.StringType,
+									Validators: []validator.List{
+										listvalidator.ValueStringsAre(noSurroundingSpace{}),
+									},
 								},
 								"negation": schema.BoolAttribute{
 									Description: "Whether or not to apply a boolean NOT operation to the rule's condition",
@@ -152,6 +169,9 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 								"country_code": schema.ListAttribute{
 									Description: "A list of ISO 3166-1 alpha-2 formatted strings representing the countries to match against",
 									Required:    true,
+									Validators: []validator.List{
+										listvalidator.ValueStringsAre(countryCode),
+									},
 									ElementType: types.StringType,
 								},
 								"negation": schema.BoolAttribute{
@@ -190,13 +210,14 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 								"value": schema.StringAttribute{
 									Description: "The request header value",
 									Required:    true,
+									Validators:  []validator.String{noSurroundingSpace{}},
 								},
 								"match_type": schema.StringAttribute{
 									Description: "The type of matching condition for header and value.\nAvailable values: \"Exact\", \"Contains\".",
 									Computed:    true,
 									Optional:    true,
 									Validators: []validator.String{
-										stringvalidator.OneOfCaseInsensitive("Exact", "Contains"),
+										stringvalidator.OneOf("Exact", "Contains"),
 									},
 									Default: stringdefault.StaticString("Contains"),
 								},
@@ -232,7 +253,7 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 									Description: "HTTP methods of a request\nAvailable values: \"CONNECT\", \"DELETE\", \"GET\", \"HEAD\", \"OPTIONS\", \"PATCH\", \"POST\", \"PUT\", \"TRACE\".",
 									Required:    true,
 									Validators: []validator.String{
-										stringvalidator.OneOfCaseInsensitive(
+										stringvalidator.OneOf(
 											"CONNECT",
 											"DELETE",
 											"GET",
@@ -260,6 +281,7 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 								"ip_address": schema.StringAttribute{
 									Description: "A single IPv4 or IPv6 address",
 									Required:    true,
+									Validators:  []validator.String{canonicalIP{}},
 								},
 								"negation": schema.BoolAttribute{
 									Description: "Whether or not to apply a boolean NOT operation to the rule's condition",
@@ -276,10 +298,12 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 								"lower_bound": schema.StringAttribute{
 									Description: "The lower bound IPv4 or IPv6 address to match against",
 									Required:    true,
+									Validators:  []validator.String{canonicalIP{}},
 								},
 								"upper_bound": schema.StringAttribute{
 									Description: "The upper bound IPv4 or IPv6 address to match against",
 									Required:    true,
+									Validators:  []validator.String{canonicalIP{}},
 								},
 								"negation": schema.BoolAttribute{
 									Description: "Whether or not to apply a boolean NOT operation to the rule's condition",
@@ -296,6 +320,9 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 								"ja3_fingerprints": schema.ListAttribute{
 									Description: "A list of JA3 TLS client fingerprints to match against the request",
 									Required:    true,
+									Validators: []validator.List{
+										listvalidator.ValueStringsAre(ja3Fingerprint),
+									},
 									ElementType: types.StringType,
 								},
 								"negation": schema.BoolAttribute{
@@ -313,6 +340,9 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 								"ja4_fingerprints": schema.ListAttribute{
 									Description: "A list of JA4 TLS client fingerprints to match against the request",
 									Required:    true,
+									Validators: []validator.List{
+										listvalidator.ValueStringsAre(ja4Fingerprint),
+									},
 									ElementType: types.StringType,
 								},
 								"negation": schema.BoolAttribute{
@@ -355,7 +385,7 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 									Optional:    true,
 									Validators: []validator.List{
 										listvalidator.ValueStringsAre(
-											stringvalidator.OneOfCaseInsensitive(
+											stringvalidator.OneOf(
 												"COMMERCIAL",
 												"EDUCATIONAL",
 												"GOVERNMENT",
@@ -367,6 +397,7 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 											),
 										),
 									},
+									Default:     listdefault.StaticValue(defaultOwnerTypes),
 									CustomType:  customfield.NewListType[types.String](ctx),
 									ElementType: types.StringType,
 								},
@@ -399,7 +430,7 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 									Optional:    true,
 									Validators: []validator.List{
 										listvalidator.ValueStringsAre(
-											stringvalidator.OneOfCaseInsensitive(
+											stringvalidator.OneOf(
 												"CONNECT",
 												"DELETE",
 												"GET",
@@ -417,6 +448,9 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 								"ips": schema.ListAttribute{
 									Description: "A list of source IPs that can trigger a request rate condition",
 									Optional:    true,
+									Validators: []validator.List{
+										listvalidator.ValueStringsAre(canonicalIP{}),
+									},
 									ElementType: types.StringType,
 								},
 								"user_defined_tag": schema.StringAttribute{
@@ -449,6 +483,9 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 									Description: "A list of tags to match against the request tags",
 									Required:    true,
 									ElementType: types.StringType,
+									Validators: []validator.List{
+										listvalidator.ValueStringsAre(noSurroundingSpace{}),
+									},
 								},
 								"negation": schema.BoolAttribute{
 									Description: "Whether or not to apply a boolean NOT operation to the rule's condition",
@@ -471,7 +508,7 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 									Computed:    true,
 									Optional:    true,
 									Validators: []validator.String{
-										stringvalidator.OneOfCaseInsensitive(
+										stringvalidator.OneOf(
 											"Exact",
 											"Contains",
 											"Regex",
@@ -500,7 +537,7 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 									Computed:    true,
 									Optional:    true,
 									Validators: []validator.String{
-										stringvalidator.OneOfCaseInsensitive("Exact", "Contains"),
+										stringvalidator.OneOf("Exact", "Contains"),
 									},
 									Default: stringdefault.StaticString("Contains"),
 								},
@@ -520,6 +557,9 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 									Description: "A list of user-defined tags to match against the request tags",
 									Required:    true,
 									ElementType: types.StringType,
+									Validators: []validator.Set{
+										setvalidator.ValueStringsAre(noSurroundingSpace{}),
+									},
 								},
 								"negation": schema.BoolAttribute{
 									Description: "Whether or not to apply a boolean NOT operation to the rule's condition",
@@ -547,5 +587,15 @@ func (r *WaapDomainCustomRuleResource) Schema(ctx context.Context, req resource.
 }
 
 func (r *WaapDomainCustomRuleResource) ConfigValidators(_ context.Context) []resource.ConfigValidator {
-	return []resource.ConfigValidator{}
+	action := path.MatchRoot("action")
+	return []resource.ConfigValidator{
+		resourcevalidator.ExactlyOneOf(
+			action.AtName("allow"),
+			action.AtName("block"),
+			action.AtName("captcha"),
+			action.AtName("handshake"),
+			action.AtName("monitor"),
+			action.AtName("tag"),
+		),
+	}
 }

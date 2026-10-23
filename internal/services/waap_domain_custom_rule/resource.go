@@ -168,7 +168,7 @@ func (r *WaapDomainCustomRuleResource) Read(ctx context.Context, req resource.Re
 		return
 	}
 	bytes, _ := io.ReadAll(res.Body)
-	err = apijson.Unmarshal(bytes, &data)
+	err = unmarshalRead(bytes, &data)
 	if err != nil {
 		resp.Diagnostics.AddError("failed to deserialize http request", err.Error())
 		return
@@ -236,11 +236,12 @@ func (r *WaapDomainCustomRuleResource) ImportState(ctx context.Context, req reso
 		return
 	}
 	bytes, _ := io.ReadAll(res.Body)
-	err = apijson.Unmarshal(bytes, &data)
+	err = unmarshalRead(bytes, &data)
 	if err != nil {
 		resp.Diagnostics.AddError("failed to deserialize http request", err.Error())
 		return
 	}
+	resp.Diagnostics.Append(responseOnlyConditionWarnings(bytes)...)
 
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
 }
