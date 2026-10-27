@@ -24,7 +24,7 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 		MarkdownDescription: "WAAP firewall rules allow or block requests to a domain based on the client IP address or IP range.",
 		Attributes: map[string]schema.Attribute{
 			"id": schema.Int64Attribute{
-				Description:   "The unique identifier of the rule",
+				Description:   "The unique identifier for the rule",
 				Computed:      true,
 				PlanModifiers: []planmodifier.Int64{int64planmodifier.UseNonNullStateForUnknown()},
 			},

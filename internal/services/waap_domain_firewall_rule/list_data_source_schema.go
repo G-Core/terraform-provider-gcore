@@ -75,7 +75,7 @@ func ListDataSourceSchema(ctx context.Context) schema.Schema {
 				NestedObject: schema.NestedAttributeObject{
 					Attributes: map[string]schema.Attribute{
 						"id": schema.Int64Attribute{
-							Description: "The unique identifier of the rule",
+							Description: "The unique identifier for the rule",
 							Computed:    true,
 						},
 						"action": schema.SingleNestedAttribute{
@@ -157,16 +157,16 @@ func ListDataSourceSchema(ctx context.Context) schema.Schema {
 								},
 							},
 						},
+						"description": schema.StringAttribute{
+							Description: "A description assigned to the rule.",
+							Computed:    true,
+						},
 						"enabled": schema.BoolAttribute{
 							Description: "Whether or not the rule is enabled",
 							Computed:    true,
 						},
 						"name": schema.StringAttribute{
 							Description: "The name assigned to the rule",
-							Computed:    true,
-						},
-						"description": schema.StringAttribute{
-							Description: "A human-readable description.",
 							Computed:    true,
 						},
 					},

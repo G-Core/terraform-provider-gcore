@@ -57,10 +57,10 @@ func (m *WaapDomainAdvancedRulesDataSourceModel) toListParams(_ context.Context)
 type WaapDomainAdvancedRulesItemsDataSourceModel struct {
 	ID          types.Int64                                                            `tfsdk:"id" json:"id,computed"`
 	Action      customfield.NestedObject[WaapDomainAdvancedRulesActionDataSourceModel] `tfsdk:"action" json:"action,computed"`
+	Description types.String                                                           `tfsdk:"description" json:"description,computed"`
 	Enabled     types.Bool                                                             `tfsdk:"enabled" json:"enabled,computed"`
 	Name        types.String                                                           `tfsdk:"name" json:"name,computed"`
 	Source      types.String                                                           `tfsdk:"source" json:"source,computed"`
-	Description types.String                                                           `tfsdk:"description" json:"description,computed"`
 	Phase       types.String                                                           `tfsdk:"phase" json:"phase,computed"`
 }
 

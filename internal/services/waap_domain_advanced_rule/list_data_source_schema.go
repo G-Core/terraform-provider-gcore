@@ -166,6 +166,10 @@ func ListDataSourceSchema(ctx context.Context) schema.Schema {
 								},
 							},
 						},
+						"description": schema.StringAttribute{
+							Description: "A description assigned to the rule.",
+							Computed:    true,
+						},
 						"enabled": schema.BoolAttribute{
 							Description: "Whether or not the rule is enabled",
 							Computed:    true,
@@ -176,10 +180,6 @@ func ListDataSourceSchema(ctx context.Context) schema.Schema {
 						},
 						"source": schema.StringAttribute{
 							Description: "A CEL syntax expression that contains the rule's conditions. Allowed objects are: request, whois, session, response, tags, `user_defined_tags`, `user_agent`, `client_data`.\n\nMore info can be found here: https://gcore.com/docs/waap/waap-rules/advanced-rules",
-							Computed:    true,
-						},
-						"description": schema.StringAttribute{
-							Description: "A human-readable description.",
 							Computed:    true,
 						},
 						"phase": schema.StringAttribute{

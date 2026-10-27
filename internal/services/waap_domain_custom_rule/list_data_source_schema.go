@@ -608,16 +608,16 @@ func ListDataSourceSchema(ctx context.Context) schema.Schema {
 								},
 							},
 						},
+						"description": schema.StringAttribute{
+							Description: "A description assigned to the rule.",
+							Computed:    true,
+						},
 						"enabled": schema.BoolAttribute{
 							Description: "Whether or not the rule is enabled",
 							Computed:    true,
 						},
 						"name": schema.StringAttribute{
 							Description: "The name assigned to the rule",
-							Computed:    true,
-						},
-						"description": schema.StringAttribute{
-							Description: "A human-readable description.",
 							Computed:    true,
 						},
 					},

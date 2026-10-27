@@ -35,7 +35,7 @@ func DataSourceSchema(ctx context.Context) schema.Schema {
 				Required:    true,
 			},
 			"description": schema.StringAttribute{
-				Description: "A human-readable description.",
+				Description: "A description assigned to the rule.",
 				Computed:    true,
 			},
 			"enabled": schema.BoolAttribute{

@@ -54,9 +54,9 @@ type WaapDomainFirewallRulesItemsDataSourceModel struct {
 	ID          types.Int64                                                                    `tfsdk:"id" json:"id,computed"`
 	Action      customfield.NestedObject[WaapDomainFirewallRulesActionDataSourceModel]         `tfsdk:"action" json:"action,computed"`
 	Conditions  customfield.NestedObjectList[WaapDomainFirewallRulesConditionsDataSourceModel] `tfsdk:"conditions" json:"conditions,computed"`
+	Description types.String                                                                   `tfsdk:"description" json:"description,computed"`
 	Enabled     types.Bool                                                                     `tfsdk:"enabled" json:"enabled,computed"`
 	Name        types.String                                                                   `tfsdk:"name" json:"name,computed"`
-	Description types.String                                                                   `tfsdk:"description" json:"description,computed"`
 }
 
 type WaapDomainFirewallRulesActionDataSourceModel struct {
