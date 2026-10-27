@@ -35,7 +35,7 @@ data "gcore_waap_domain_custom_rule" "example_waap_domain_custom_rule" {
 
 - `action` (Attributes) The action that the rule takes when triggered. Only one action can be set per rule. (see [below for nested schema](#nestedatt--action))
 - `conditions` (Attributes List) The conditions required for the WAAP engine to trigger the rule. Rules may have between 1 and 5 conditions. All conditions must pass for the rule to trigger (see [below for nested schema](#nestedatt--conditions))
-- `description` (String) A human-readable description.
+- `description` (String) A description assigned to the rule.
 - `enabled` (Boolean) Whether or not the rule is enabled
 - `id` (Number) The custom rule ID
 - `name` (String) The name assigned to the rule

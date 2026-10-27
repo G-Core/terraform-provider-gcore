@@ -34,7 +34,7 @@ data "gcore_waap_domain_advanced_rule" "example_waap_domain_advanced_rule" {
 ### Read-Only
 
 - `action` (Attributes) The action that the rule takes when triggered. Only one action can be set per rule. (see [below for nested schema](#nestedatt--action))
-- `description` (String) A human-readable description.
+- `description` (String) A description assigned to the rule.
 - `enabled` (Boolean) Whether or not the rule is enabled
 - `id` (Number) The advanced rule ID
 - `name` (String) The name assigned to the rule

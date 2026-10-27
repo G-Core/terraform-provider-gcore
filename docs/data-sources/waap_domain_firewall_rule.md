@@ -35,7 +35,7 @@ data "gcore_waap_domain_firewall_rule" "example_waap_domain_firewall_rule" {
 
 - `action` (Attributes) The action that the rule takes when triggered (see [below for nested schema](#nestedatt--action))
 - `conditions` (Attributes List) The condition required for the WAAP engine to trigger the rule. (see [below for nested schema](#nestedatt--conditions))
-- `description` (String) A human-readable description.
+- `description` (String) A description assigned to the rule.
 - `enabled` (Boolean) Whether or not the rule is enabled
 - `id` (Number) The firewall rule ID
 - `name` (String) The name assigned to the rule

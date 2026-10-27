@@ -61,7 +61,7 @@ Available values: "access", "header_filter", "body_filter".
 Read-Only:
 
 - `action` (Attributes) The action that the rule takes when triggered. Only one action can be set per rule. (see [below for nested schema](#nestedatt--items--action))
-- `description` (String) A human-readable description.
+- `description` (String) A description assigned to the rule.
 - `enabled` (Boolean) Whether or not the rule is enabled
 - `id` (Number) The unique identifier for the rule
 - `name` (String) The name assigned to the rule

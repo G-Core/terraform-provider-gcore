@@ -94,7 +94,7 @@ resource "gcore_waap_domain_firewall_rule" "allow_office" {
 
 ### Read-Only
 
-- `id` (Number) The unique identifier of the rule
+- `id` (Number) The unique identifier for the rule
 
 <a id="nestedatt--action"></a>
 ### Nested Schema for `action`

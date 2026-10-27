@@ -52,9 +52,9 @@ Read-Only:
 
 - `action` (Attributes) The action that the rule takes when triggered (see [below for nested schema](#nestedatt--items--action))
 - `conditions` (Attributes List) The condition required for the WAAP engine to trigger the rule. (see [below for nested schema](#nestedatt--items--conditions))
-- `description` (String) A human-readable description.
+- `description` (String) A description assigned to the rule.
 - `enabled` (Boolean) Whether or not the rule is enabled
-- `id` (Number) The unique identifier of the rule
+- `id` (Number) The unique identifier for the rule
 - `name` (String) The name assigned to the rule
 
 <a id="nestedatt--items--action"></a>
