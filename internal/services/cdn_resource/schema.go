@@ -19,6 +19,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/int64default"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/int64planmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/listplanmodifier"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/mapplanmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringdefault"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringplanmodifier"
@@ -269,11 +270,12 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 								Required:    true,
 							},
 							"custom_values": schema.MapAttribute{
-								Description: "A MAP object representing the caching time in seconds for a response with a specific response code.\n\nThese settings have a higher priority than the `value` field.\n\n- Use `any` key to specify caching time for all response codes.\n- Use `0s` value to disable caching for a specific response code.",
-								Computed:    true,
-								Optional:    true,
-								CustomType:  customfield.NewMapType[types.String](ctx),
-								ElementType: types.StringType,
+								Description:   "A MAP object representing the caching time in seconds for a response with a specific response code.\n\nThese settings have a higher priority than the `value` field.\n\n- Use `any` key to specify caching time for all response codes.\n- Use `0s` value to disable caching for a specific response code.",
+								Computed:      true,
+								Optional:      true,
+								CustomType:    customfield.NewMapType[types.String](ctx),
+								ElementType:   types.StringType,
+								PlanModifiers: []planmodifier.Map{mapplanmodifier.UseStateForUnknown()},
 							},
 							"default": schema.StringAttribute{
 								Description: "Enables content caching according to the origin cache settings.\n\nThe value is applied to the following response codes 200, 201, 204, 206, 301, 302, 303, 304, 307, 308, if an origin server does not have caching HTTP headers.\n\nResponses with other codes will not be cached.\n\nThe maximum duration is any equivalent to `1y`.",
@@ -371,10 +373,11 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 								},
 							},
 							"on_request_headers_after_cache": schema.SingleNestedAttribute{
-								Description: "Allows to configure FastEdge application that will be called to handle request headers as soon as CDN receives incoming HTTP request, **after cache**.",
-								Computed:    true,
-								Optional:    true,
-								CustomType:  customfield.NewNestedObjectType[CDNResourceOptionsFastedgeOnRequestHeadersAfterCacheModel](ctx),
+								Description:   "Allows to configure FastEdge application that will be called to handle request headers as soon as CDN receives incoming HTTP request, **after cache**.",
+								Computed:      true,
+								Optional:      true,
+								CustomType:    customfield.NewNestedObjectType[CDNResourceOptionsFastedgeOnRequestHeadersAfterCacheModel](ctx),
+								PlanModifiers: []planmodifier.Object{planmodifiers.ObjectUseStateForUnknownInclNull()},
 								Attributes: map[string]schema.Attribute{
 									"app_id": schema.StringAttribute{
 										Description: "The ID of the application in FastEdge.",
@@ -583,10 +586,11 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 						},
 					},
 					"grpc_passthrough": schema.SingleNestedAttribute{
-						Description: "Enables gRPC pass-through for the CDN resource.",
-						Computed:    true,
-						Optional:    true,
-						CustomType:  customfield.NewNestedObjectType[CDNResourceOptionsGrpcPassthroughModel](ctx),
+						Description:   "Enables gRPC pass-through for the CDN resource.",
+						Computed:      true,
+						Optional:      true,
+						CustomType:    customfield.NewNestedObjectType[CDNResourceOptionsGrpcPassthroughModel](ctx),
+						PlanModifiers: []planmodifier.Object{planmodifiers.ObjectUseStateForUnknownInclNull()},
 						Attributes: map[string]schema.Attribute{
 							"enabled": schema.BoolAttribute{
 								Description: "Controls the option state.\n\nPossible values:\n- **true** - Option is enabled.\n- **false** - Option is disabled.",
@@ -784,10 +788,11 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 						},
 					},
 					"network_error_logging": schema.SingleNestedAttribute{
-						Description: "Enables Network Error Logging (NEL) for the resource.\n\nWhen enabled, the edge instructs browsers to collect and report network\nerrors (via the `Report-To` and `NEL` response headers), improving\nobservability of connectivity issues for the resource.",
-						Computed:    true,
-						Optional:    true,
-						CustomType:  customfield.NewNestedObjectType[CDNResourceOptionsNetworkErrorLoggingModel](ctx),
+						Description:   "Enables Network Error Logging (NEL) for the resource.\n\nWhen enabled, the edge instructs browsers to collect and report network\nerrors (via the `Report-To` and `NEL` response headers), improving\nobservability of connectivity issues for the resource.",
+						Computed:      true,
+						Optional:      true,
+						CustomType:    customfield.NewNestedObjectType[CDNResourceOptionsNetworkErrorLoggingModel](ctx),
+						PlanModifiers: []planmodifier.Object{planmodifiers.ObjectUseStateForUnknownInclNull()},
 						Attributes: map[string]schema.Attribute{
 							"enabled": schema.BoolAttribute{
 								Description: "Controls the option state.\n\nPossible values:\n- **true** - Option is enabled.\n- **false** - Option is disabled.",
@@ -1207,9 +1212,10 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 						},
 					},
 					"tls_ciphers": schema.SingleNestedAttribute{
-						Description: "Cipher suite policy for HTTPS connections from end users to the domain, selected from predefined profiles.\n\nThe exact cipher suites the policy enforces are returned in the `ciphers` field, and each profile defines which TLS versions may be enabled together with it. While the option is active:\n- The `tls_versions` option can include only the versions the profile allows.\n- The `tls_versions` option cannot be deleted or disabled.\n\nThe option is read-only. Contact support to change it.\n\nWhen the option is absent or disabled, the default cipher suites of the CDN are used.",
-						Computed:    true,
-						CustomType:  customfield.NewNestedObjectType[CDNResourceOptionsTlsCiphersModel](ctx),
+						Description:   "Cipher suite policy for HTTPS connections from end users to the domain, selected from predefined profiles.\n\nThe exact cipher suites the policy enforces are returned in the `ciphers` field, and each profile defines which TLS versions may be enabled together with it. While the option is active:\n- The `tls_versions` option can include only the versions the profile allows.\n- The `tls_versions` option cannot be deleted or disabled.\n\nThe option is read-only. Contact support to change it.\n\nWhen the option is absent or disabled, the default cipher suites of the CDN are used.",
+						Computed:      true,
+						CustomType:    customfield.NewNestedObjectType[CDNResourceOptionsTlsCiphersModel](ctx),
+						PlanModifiers: []planmodifier.Object{planmodifiers.ObjectPreserveNullState()},
 						Attributes: map[string]schema.Attribute{
 							"enabled": schema.BoolAttribute{
 								Description: "Controls the option state.\n\nPossible values:\n- **true** - Option is enabled.\n- **false** - Option is disabled.",

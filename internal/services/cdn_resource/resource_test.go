@@ -124,6 +124,47 @@ func TestAccCDNResource_switchOriginGroup(t *testing.T) {
 	})
 }
 
+// TestAccCDNResource_options sets a few options and leaves the rest to the API.
+// The options the config does not set must keep their state values, so the
+// plan after each apply is empty.
+func TestAccCDNResource_options(t *testing.T) {
+	rName := acctest.RandomName()
+	cname := rName + ".example.com"
+
+	resource.ParallelTest(t, resource.TestCase{
+		PreCheck:                 func() { acctest.PreCheck(t) },
+		ProtoV6ProviderFactories: acctest.ProtoV6ProviderFactories,
+		CheckDestroy:             testAccCheckCDNResourceDestroy,
+		Steps: []resource.TestStep{
+			{
+				Config: testAccCDNResourceConfigOptions(rName, cname, true),
+				ConfigPlanChecks: resource.ConfigPlanChecks{
+					PostApplyPostRefresh: []plancheck.PlanCheck{plancheck.ExpectEmptyPlan()},
+				},
+				ConfigStateChecks: []statecheck.StateCheck{
+					statecheck.ExpectKnownValue("gcore_cdn_resource.test",
+						tfjsonpath.New("options").AtMapKey("gzip_on").AtMapKey("value"), knownvalue.Bool(true)),
+					statecheck.ExpectKnownValue("gcore_cdn_resource.test",
+						tfjsonpath.New("options").AtMapKey("edge_cache_settings").AtMapKey("value"), knownvalue.StringExact("1d")),
+				},
+			},
+			{
+				Config: testAccCDNResourceConfigOptions(rName, cname, false),
+				ConfigPlanChecks: resource.ConfigPlanChecks{
+					PreApply: []plancheck.PlanCheck{
+						plancheck.ExpectResourceAction("gcore_cdn_resource.test", plancheck.ResourceActionUpdate),
+					},
+					PostApplyPostRefresh: []plancheck.PlanCheck{plancheck.ExpectEmptyPlan()},
+				},
+				ConfigStateChecks: []statecheck.StateCheck{
+					statecheck.ExpectKnownValue("gcore_cdn_resource.test",
+						tfjsonpath.New("options").AtMapKey("gzip_on").AtMapKey("value"), knownvalue.Bool(false)),
+				},
+			},
+		},
+	})
+}
+
 func TestAccCDNResource_import(t *testing.T) {
 	rName := acctest.RandomName()
 	cname := rName + ".example.com"
@@ -220,4 +261,31 @@ resource "gcore_cdn_resource" "test" {
   cname        = %[2]q
   origin_group = gcore_cdn_origin_group.%[3]s.id
 }`, name, cname, use)
+}
+
+func testAccCDNResourceConfigOptions(name, cname string, gzip bool) string {
+	return fmt.Sprintf(`
+resource "gcore_cdn_origin_group" "test" {
+  name = %[1]q
+  sources = [
+    {
+      source = "example.com"
+    }
+  ]
+}
+
+resource "gcore_cdn_resource" "test" {
+  cname        = %[2]q
+  origin_group = gcore_cdn_origin_group.test.id
+  options = {
+    gzip_on = {
+      enabled = true
+      value   = %[3]t
+    }
+    edge_cache_settings = {
+      enabled = true
+      value   = "1d"
+    }
+  }
+}`, name, cname, gzip)
 }

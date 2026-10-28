@@ -5,6 +5,7 @@ import (
 	"math/big"
 	"testing"
 
+	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
@@ -65,5 +66,85 @@ func TestOriginGroupNamePlan(t *testing.T) {
 	}
 	if got := run(tftypes.UnknownValue); !got.IsUnknown() {
 		t.Errorf("origin_group known only after apply: origin_group_name plan = %v, want unknown", got)
+	}
+}
+
+// TestOptionsKeepStateWhenUnset guards against perpetual drift on options.
+// Once the config sets any option, the framework plans every computed object
+// or map the config leaves out as unknown, unless a plan modifier carries its
+// value over from state. Attributes added to the spec later must get one too.
+// Computed scalars are not checked: most carry a static default, and the API
+// returns null for the rest when they are unset.
+func TestOptionsKeepStateWhenUnset(t *testing.T) {
+	t.Parallel()
+
+	s := cdn_resource.ResourceSchema(context.Background())
+
+	var check func(path string, attr schema.Attribute)
+	check = func(path string, attr schema.Attribute) {
+		switch a := attr.(type) {
+		case schema.SingleNestedAttribute:
+			if a.Computed && len(a.PlanModifiers) == 0 {
+				t.Errorf("%s: computed object has no plan modifier", path)
+			}
+			for name, child := range a.Attributes {
+				check(path+"."+name, child)
+			}
+		case schema.MapAttribute:
+			if a.Computed && len(a.PlanModifiers) == 0 {
+				t.Errorf("%s: computed map has no plan modifier", path)
+			}
+		}
+	}
+	check("options", s.Attributes["options"])
+}
+
+// TestOptionsKeepUnknownConfig runs the plan modifiers of options a config can
+// set. An option the config leaves out keeps its state value, but one whose
+// config is only known after apply must stay unknown: planning the state value
+// instead makes the apply fail with "Provider produced inconsistent final plan".
+func TestOptionsKeepUnknownConfig(t *testing.T) {
+	t.Parallel()
+	ctx := context.Background()
+
+	s := cdn_resource.ResourceSchema(ctx)
+	objType := s.Type().TerraformType(ctx).(tftypes.Object)
+	vals := map[string]tftypes.Value{}
+	for name, ty := range objType.AttributeTypes {
+		vals[name] = tftypes.NewValue(ty, nil)
+	}
+	vals["id"] = tftypes.NewValue(tftypes.Number, big.NewFloat(1))
+	state := tfsdk.State{Raw: tftypes.NewValue(objType, vals), Schema: s}
+
+	options := s.Attributes["options"].(schema.SingleNestedAttribute)
+	fastedge := options.Attributes["fastedge"].(schema.SingleNestedAttribute)
+	for name, option := range map[string]schema.SingleNestedAttribute{
+		"grpc_passthrough":                        options.Attributes["grpc_passthrough"].(schema.SingleNestedAttribute),
+		"network_error_logging":                   options.Attributes["network_error_logging"].(schema.SingleNestedAttribute),
+		"fastedge.on_request_headers_after_cache": fastedge.Attributes["on_request_headers_after_cache"].(schema.SingleNestedAttribute),
+	} {
+		attrTypes := option.GetType().(interface{ AttributeTypes() map[string]attr.Type }).AttributeTypes()
+		run := func(config types.Object) types.Object {
+			req := planmodifier.ObjectRequest{
+				Path:        path.Root("options"),
+				State:       state,
+				StateValue:  types.ObjectNull(attrTypes),
+				ConfigValue: config,
+				PlanValue:   types.ObjectUnknown(attrTypes),
+			}
+			resp := &planmodifier.ObjectResponse{PlanValue: req.PlanValue}
+			for _, m := range option.PlanModifiers {
+				req.PlanValue = resp.PlanValue
+				m.PlanModifyObject(ctx, req, resp)
+			}
+			return resp.PlanValue
+		}
+
+		if got := run(types.ObjectNull(attrTypes)); !got.IsNull() {
+			t.Errorf("options.%s left out of the config: plan = %v, want the state value", name, got)
+		}
+		if got := run(types.ObjectUnknown(attrTypes)); !got.IsUnknown() {
+			t.Errorf("options.%s known only after apply: plan = %v, want unknown", name, got)
+		}
 	}
 }
