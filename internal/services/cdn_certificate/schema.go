@@ -32,8 +32,9 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 			},
 			"automated": schema.BoolAttribute{
 				Description:   "Must be **true** to issue certificate automatically.",
+				Computed:      true,
 				Optional:      true,
-				PlanModifiers: []planmodifier.Bool{boolplanmodifier.RequiresReplace()},
+				PlanModifiers: []planmodifier.Bool{boolplanmodifier.RequiresReplaceIfConfigured()},
 			},
 			"ssl_certificate_wo": schema.StringAttribute{
 				Description: "Public part of the SSL certificate.\n\nAll chain of the SSL certificate should be added. " +

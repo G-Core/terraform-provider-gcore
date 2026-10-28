@@ -10,7 +10,7 @@ import (
 type CDNCertificateModel struct {
 	SslID                 types.Int64  `tfsdk:"ssl_id" path:"ssl_id,computed"`
 	Name                  types.String `tfsdk:"name" json:"name,required"`
-	Automated             types.Bool   `tfsdk:"automated" json:"automated,optional"`
+	Automated             types.Bool   `tfsdk:"automated" json:"automated,computed_optional"`
 	SslCertificate        types.String `tfsdk:"ssl_certificate_wo" json:"sslCertificate,optional,no_refresh"`
 	SslPrivateKey         types.String `tfsdk:"ssl_private_key_wo" json:"sslPrivateKey,optional,no_refresh"`
 	SslCertificateVersion types.Int64  `tfsdk:"ssl_certificate_wo_version"`
