@@ -48,6 +48,26 @@ resource "gcore_cdn_resource" "example" {
 
 The plan should show one import and no changes to the CDN resource.
 
+## Turning options off
+
+Removing an option from `options`, or removing the whole `options` block, does not turn the option off. The CDN resource keeps the option's current setting, and the plan shows no changes. To turn an option off, keep it in the configuration and set `enabled = false`:
+
+```terraform
+resource "gcore_cdn_resource" "example" {
+  cname        = "cdn.example.com"
+  origin_group = gcore_cdn_origin_group.example.id
+
+  options = {
+    gzip_on = {
+      enabled = false
+      value   = true
+    }
+  }
+}
+```
+
+The same applies to `custom_values` in `edge_cache_settings`. Removing it keeps the current per-status-code values, including when you switch from `value` to `default`. Set `custom_values = {}` to clear them.
+
 {{ .SchemaMarkdown | trimspace }}
 
 {{ if .HasImport }}
