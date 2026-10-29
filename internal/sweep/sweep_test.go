@@ -59,6 +59,7 @@ import (
 	_ "github.com/G-Core/terraform-provider-gcore/internal/services/fastedge_binary"
 
 	// Storage
+	_ "github.com/G-Core/terraform-provider-gcore/internal/services/storage_object_storage"
 	_ "github.com/G-Core/terraform-provider-gcore/internal/services/storage_sftp"
 	_ "github.com/G-Core/terraform-provider-gcore/internal/services/storage_ssh_key"
 

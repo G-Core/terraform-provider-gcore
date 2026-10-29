@@ -38,7 +38,7 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 				Optional:    true,
 			},
 			"s3_credentials_version": schema.Int64Attribute{
-				Description: "Version number for S3 credentials. Increment this value to force Terraform to re-send the write-only S3 credentials (s3_access_key_id, s3_secret_access_key) to the API. Required when any source has origin_type \"s3\".",
+				Description: "Version number for S3 credentials. Increment this value to force Terraform to re-send the write-only S3 credentials (s3_access_key_id, s3_secret_access_key) to the API. Required when any source has `s3_type` `amazon` or `other`.",
 				Optional:    true,
 			},
 			"proxy_next_upstream": schema.ListAttribute{

@@ -113,8 +113,7 @@
     "cloud_registry": "no sweeper for gcore_cloud_registry",
     "cloud_registry_artifact": "no sweeper for gcore_cloud_registry",
     "cloud_registry_repository": "no sweeper for gcore_cloud_registry",
-    "cloud_registry_user": "no sweeper for gcore_cloud_registry",
-    "storage_object_storage_bucket": "no sweeper for gcore_storage_object_storage"
+    "cloud_registry_user": "no sweeper for gcore_cloud_registry"
   },
 
   "smoke": {
