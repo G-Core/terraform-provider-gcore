@@ -27,11 +27,4 @@ resource "gcore_cloud_load_balancer_pool" "http" {
   name         = "My HTTP pool"
   protocol     = "HTTP"
   lb_algorithm = "ROUND_ROBIN"
-
-  healthmonitor = {
-    type        = "TCP"
-    delay       = 10
-    max_retries = 3
-    timeout     = 5
-  }
 }

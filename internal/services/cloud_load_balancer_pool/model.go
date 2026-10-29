@@ -22,7 +22,6 @@ type CloudLoadBalancerPoolModel struct {
 	SecretID             types.String                                                          `tfsdk:"secret_id" json:"secret_id,optional"`
 	TimeoutMemberConnect types.Int64                                                           `tfsdk:"timeout_member_connect" json:"timeout_member_connect,optional"`
 	TimeoutMemberData    types.Int64                                                           `tfsdk:"timeout_member_data" json:"timeout_member_data,optional"`
-	Healthmonitor        *CloudLoadBalancerPoolHealthmonitorModel                              `tfsdk:"healthmonitor" json:"healthmonitor,computed_optional"`
 	SessionPersistence   *CloudLoadBalancerPoolSessionPersistenceModel                         `tfsdk:"session_persistence" json:"session_persistence,optional"`
 	AdminStateUp         types.Bool                                                            `tfsdk:"admin_state_up" json:"admin_state_up,computed_optional"`
 	Members              customfield.NestedObjectList[CloudLoadBalancerPoolMembersModel]       `tfsdk:"members" json:"members,computed_optional"`
@@ -46,20 +45,6 @@ type CloudLoadBalancerPoolSessionPersistenceModel struct {
 	CookieName             types.String `tfsdk:"cookie_name" json:"cookie_name,optional"`
 	PersistenceGranularity types.String `tfsdk:"persistence_granularity" json:"persistence_granularity,optional"`
 	PersistenceTimeout     types.Int64  `tfsdk:"persistence_timeout" json:"persistence_timeout,optional"`
-}
-
-type CloudLoadBalancerPoolHealthmonitorModel struct {
-	Delay          types.Int64  `tfsdk:"delay" json:"delay,required"`
-	MaxRetries     types.Int64  `tfsdk:"max_retries" json:"max_retries,required"`
-	Timeout        types.Int64  `tfsdk:"timeout" json:"timeout,required"`
-	Type           types.String `tfsdk:"type" json:"type,required"`
-	AdminStateUp   types.Bool   `tfsdk:"admin_state_up" json:"admin_state_up,computed_optional"`
-	DomainName     types.String `tfsdk:"domain_name" json:"domain_name,optional"`
-	ExpectedCodes  types.String `tfsdk:"expected_codes" json:"expected_codes,computed_optional"`
-	HTTPMethod     types.String `tfsdk:"http_method" json:"http_method,computed_optional"`
-	HTTPVersion    types.String `tfsdk:"http_version" json:"http_version,optional"`
-	MaxRetriesDown types.Int64  `tfsdk:"max_retries_down" json:"max_retries_down,computed_optional"`
-	URLPath        types.String `tfsdk:"url_path" json:"url_path,computed_optional"`
 }
 
 type CloudLoadBalancerPoolMembersModel struct {

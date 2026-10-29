@@ -9,11 +9,15 @@ description: |-
 
 {{ .Description }}
 
+Manage the pool's health monitor with the
+`gcore_cloud_load_balancer_pool_health_monitor` resource.
+
 ## Example Usage
 
 ### TCP pool with health monitor and session persistence
 
-Creates a TCP pool on port 80 with PING health checks and cookie-based session persistence.
+Creates a TCP pool on port 80 with cookie-based session persistence, and adds
+PING health checks with a separate health monitor resource.
 
 {{tffile "examples/resources/gcore_cloud_load_balancer_pool/tcp-80.tf"}}
 
@@ -24,6 +28,52 @@ Creates a pool using the PROXY protocol with least-connections algorithm on port
 {{tffile "examples/resources/gcore_cloud_load_balancer_pool/proxy-8080.tf"}}
 
 {{ .SchemaMarkdown | trimspace }}
+
+## Migrating from the `healthmonitor` attribute
+
+Earlier releases managed the health monitor through a nested `healthmonitor`
+attribute on this resource. That attribute is removed. The health monitor now
+has its own resource, `gcore_cloud_load_balancer_pool_health_monitor`.
+
+The upgrade does not delete the monitor. The pool keeps it, and Terraform stops
+tracking it. To manage it again, do these steps in one apply:
+
+1. Remove the `healthmonitor` block from the pool.
+2. Add a `gcore_cloud_load_balancer_pool_health_monitor` resource with the same
+   settings.
+3. Add an `import` block that adopts the existing monitor. The import ID is the
+   pool's ID: `<project_id>/<region_id>/<pool_id>`.
+
+```terraform
+resource "gcore_cloud_load_balancer_pool" "example" {
+  # ... pool settings, without the healthmonitor block
+}
+
+resource "gcore_cloud_load_balancer_pool_health_monitor" "example" {
+  project_id = 1
+  region_id  = 1
+
+  pool_id = gcore_cloud_load_balancer_pool.example.id
+
+  type        = "HTTP"
+  delay       = 10
+  timeout     = 5
+  max_retries = 3
+}
+
+import {
+  to = gcore_cloud_load_balancer_pool_health_monitor.example
+  id = "1/1/${gcore_cloud_load_balancer_pool.example.id}"
+}
+```
+
+The plan shows the monitor as imported, with no create and no delete. If the
+settings differ from the existing monitor, the plan shows an in-place update.
+A different `type` replaces the monitor. You can remove the `import` block
+after the apply.
+
+A configuration that still sets `healthmonitor` on the pool fails to plan with
+an "Unsupported argument" error.
 
 {{ if .HasImport }}
 ## Import

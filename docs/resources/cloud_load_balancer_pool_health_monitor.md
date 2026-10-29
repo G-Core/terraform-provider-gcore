@@ -9,8 +9,10 @@ description: |-
 
 Pool health monitors probe backend members to decide whether they can receive traffic. A pool has at most one health monitor.
 
-The pool must not declare a `healthmonitor` block of its own: a pool has one
-health monitor, and this resource manages it.
+A pool has at most one health monitor, and this resource manages it. To move a
+monitor from the removed `healthmonitor` attribute of
+`gcore_cloud_load_balancer_pool`, import it into this resource. See the
+migration steps in the `gcore_cloud_load_balancer_pool` documentation.
 
 Changing `type` replaces the monitor. The pool has no health check between
 the delete and the create.

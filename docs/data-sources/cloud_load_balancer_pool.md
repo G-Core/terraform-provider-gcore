@@ -36,7 +36,6 @@ data "gcore_cloud_load_balancer_pool" "example_cloud_load_balancer_pool" {
 - `ca_secret_id` (String) Secret ID of CA certificate bundle
 - `creator_task_id` (String) Task that created this entity
 - `crl_secret_id` (String) Secret ID of CA revocation list file
-- `healthmonitor` (Attributes) Health monitor parameters (see [below for nested schema](#nestedatt--healthmonitor))
 - `id` (String) Pool ID
 - `lb_algorithm` (String) Load balancer algorithm
 Available values: "LEAST_CONNECTIONS", "ROUND_ROBIN", "SOURCE_IP".
@@ -64,32 +63,6 @@ Optional:
 - `listener_id` (String) Listener ID
 - `load_balancer_id` (String) Load Balancer ID
 - `name` (String) Filter by name
-
-
-<a id="nestedatt--healthmonitor"></a>
-### Nested Schema for `healthmonitor`
-
-Read-Only:
-
-- `admin_state_up` (Boolean) Administrative state of the resource. When set to true, the resource is enabled and operational. When set to false, the resource is disabled and will not process traffic. Defaults to true.
-- `delay` (Number) The time, in seconds, between sending probes to members
-- `domain_name` (String) Domain name for HTTP host header. Can only be used together with `HTTP` or `HTTPS` health monitor type.
-- `expected_codes` (String) Expected HTTP response codes. Can be a single code, a comma-separated list of codes, or a single range of codes. Can only be used together with `HTTP` or `HTTPS` health monitor type. For example, 200, 200,202,401,403,404, or 200-204. If not specified, the default is 200. Null for non-HTTP(S) health monitor types.
-- `http_method` (String) HTTP method. Null for non-HTTP(S) health monitor types.
-Available values: "CONNECT", "DELETE", "GET", "HEAD", "OPTIONS", "PATCH", "POST", "PUT", "TRACE".
-- `http_version` (String) HTTP version. Can only be used together with `HTTP` or `HTTPS` health monitor type.
-Available values: "1.0", "1.1".
-- `id` (String) Health monitor ID
-- `max_retries` (Number) Number of successes before the member is switched to ONLINE state
-- `max_retries_down` (Number) Number of failures before the member is switched to ERROR state
-- `operating_status` (String) Health Monitor operating status
-Available values: "DEGRADED", "DRAINING", "ERROR", "NO_MONITOR", "OFFLINE", "ONLINE".
-- `provisioning_status` (String) Health monitor lifecycle status
-Available values: "ACTIVE", "DELETED", "ERROR", "PENDING_CREATE", "PENDING_DELETE", "PENDING_UPDATE".
-- `timeout` (Number) The maximum time to connect. Must be less than the delay value
-- `type` (String) Health monitor type. Once health monitor is created, cannot be changed.
-Available values: "HTTP", "HTTPS", "K8S", "PING", "TCP", "TLS-HELLO", "UDP-CONNECT".
-- `url_path` (String) URL Path. Defaults to '/'. Null for non-HTTP(S) health monitor types.
 
 
 <a id="nestedatt--listeners"></a>

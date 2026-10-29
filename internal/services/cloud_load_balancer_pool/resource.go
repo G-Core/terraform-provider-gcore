@@ -4,7 +4,6 @@ package cloud_load_balancer_pool
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
 	"io"
 	"net/http"
@@ -104,41 +103,12 @@ func (r *CloudLoadBalancerPoolResource) Create(ctx context.Context, req resource
 		resp.Diagnostics.AddError("failed to deserialize http request", err.Error())
 		return
 	}
-	resolveHealthmonitorUnknowns(data)
-	dropPhantomHealthmonitor(data)
 	resp.Diagnostics.Append(backfillParentIDs(ctx, data)...)
 	if resp.Diagnostics.HasError() {
 		return
 	}
 
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
-}
-
-// resolveHealthmonitorUnknowns nulls any healthmonitor computed attributes that
-// are still unknown after decoding an API response. apijson.UnmarshalComputed
-// skips the healthmonitor pointer entirely when it is already non-nil (IfUnset
-// behavior), so a plan-time unknown like http_method on a non-HTTP monitor
-// would otherwise survive into state and fail with "Provider returned invalid
-// result object after apply".
-func resolveHealthmonitorUnknowns(data *CloudLoadBalancerPoolModel) {
-	if data == nil || data.Healthmonitor == nil {
-		return
-	}
-	if data.Healthmonitor.ExpectedCodes.IsUnknown() {
-		data.Healthmonitor.ExpectedCodes = types.StringNull()
-	}
-	if data.Healthmonitor.HTTPMethod.IsUnknown() {
-		data.Healthmonitor.HTTPMethod = types.StringNull()
-	}
-	if data.Healthmonitor.URLPath.IsUnknown() {
-		data.Healthmonitor.URLPath = types.StringNull()
-	}
-	if data.Healthmonitor.AdminStateUp.IsUnknown() {
-		data.Healthmonitor.AdminStateUp = types.BoolNull()
-	}
-	if data.Healthmonitor.MaxRetriesDown.IsUnknown() {
-		data.Healthmonitor.MaxRetriesDown = types.Int64Null()
-	}
 }
 
 func (r *CloudLoadBalancerPoolResource) Update(ctx context.Context, req resource.UpdateRequest, resp *resource.UpdateResponse) {
@@ -156,33 +126,6 @@ func (r *CloudLoadBalancerPoolResource) Update(ctx context.Context, req resource
 
 	if resp.Diagnostics.HasError() {
 		return
-	}
-
-	// Handle health monitor deletion via dedicated DELETE endpoint
-	if state.Healthmonitor != nil && data.Healthmonitor == nil {
-		deleteParams := cloud.LoadBalancerPoolHealthMonitorDeleteParams{}
-
-		if !data.ProjectID.IsNull() {
-			deleteParams.ProjectID = param.NewOpt(data.ProjectID.ValueInt64())
-		}
-
-		if !data.RegionID.IsNull() {
-			deleteParams.RegionID = param.NewOpt(data.RegionID.ValueInt64())
-		}
-
-		err := r.client.Cloud.LoadBalancers.Pools.HealthMonitors.Delete(
-			ctx,
-			data.ID.ValueString(),
-			deleteParams,
-			option.WithMiddleware(logging.Middleware(ctx)),
-		)
-		if err != nil {
-			resp.Diagnostics.AddError("failed to delete health monitor", err.Error())
-			return
-		}
-		// After successful DELETE, set state.Healthmonitor to nil so MarshalJSONForUpdate
-		// doesn't include healthmonitor:null in the patch (deletion already handled above)
-		state.Healthmonitor = nil
 	}
 
 	dataBytes, err := data.MarshalJSONForUpdate(*state)
@@ -221,8 +164,6 @@ func (r *CloudLoadBalancerPoolResource) Update(ctx context.Context, req resource
 			resp.Diagnostics.AddError("failed to deserialize response", err.Error())
 			return
 		}
-		resolveHealthmonitorUnknowns(data)
-		dropPhantomHealthmonitor(data)
 		resp.Diagnostics.Append(backfillParentIDs(ctx, data)...)
 		if resp.Diagnostics.HasError() {
 			return
@@ -235,37 +176,6 @@ func (r *CloudLoadBalancerPoolResource) Update(ctx context.Context, req resource
 	if err := params.UnmarshalJSON(dataBytes); err != nil {
 		resp.Diagnostics.AddError("failed to deserialize into params", err.Error())
 		return
-	}
-
-	// SDK's LoadBalancerPoolUpdateParamsHealthmonitor has required fields (Delay, MaxRetries, Timeout)
-	// that are plain int64 (not param.Opt), so partial patch JSON leaves them at zero values.
-	// If healthmonitor is being updated, we must ensure all required fields are populated.
-	if data.Healthmonitor != nil && state.Healthmonitor != nil {
-		// Detect whether the patch payload contains a healthmonitor object by key
-		// presence rather than by sniffing individual fields: a patch carrying only
-		// fields with zero-value encodings (e.g. admin_state_up) would otherwise be
-		// missed, and the required ints would go out as 0 and fail API validation.
-		var patchFields map[string]json.RawMessage
-		hmChanged := false
-		if err := json.Unmarshal(dataBytes, &patchFields); err == nil {
-			_, hmChanged = patchFields["healthmonitor"]
-		}
-
-		if hmChanged {
-			// Fill in required fields from plan if they're still zero
-			if params.Healthmonitor.Delay == 0 && !data.Healthmonitor.Delay.IsNull() {
-				params.Healthmonitor.Delay = data.Healthmonitor.Delay.ValueInt64()
-			}
-			if params.Healthmonitor.MaxRetries == 0 && !data.Healthmonitor.MaxRetries.IsNull() {
-				params.Healthmonitor.MaxRetries = data.Healthmonitor.MaxRetries.ValueInt64()
-			}
-			if params.Healthmonitor.Timeout == 0 && !data.Healthmonitor.Timeout.IsNull() {
-				params.Healthmonitor.Timeout = data.Healthmonitor.Timeout.ValueInt64()
-			}
-			if params.Healthmonitor.Type == "" && !data.Healthmonitor.Type.IsNull() {
-				params.Healthmonitor.Type = cloud.LbHealthMonitorType(data.Healthmonitor.Type.ValueString())
-			}
-		}
 	}
 
 	if !data.ProjectID.IsNull() {
@@ -294,8 +204,6 @@ func (r *CloudLoadBalancerPoolResource) Update(ctx context.Context, req resource
 		resp.Diagnostics.AddError("failed to deserialize http request", err.Error())
 		return
 	}
-	resolveHealthmonitorUnknowns(data)
-	dropPhantomHealthmonitor(data)
 	resp.Diagnostics.Append(backfillParentIDs(ctx, data)...)
 	if resp.Diagnostics.HasError() {
 		return
@@ -346,7 +254,6 @@ func (r *CloudLoadBalancerPoolResource) Read(ctx context.Context, req resource.R
 		resp.Diagnostics.AddError("failed to deserialize http request", err.Error())
 		return
 	}
-	refreshHealthmonitor(bytes, data)
 	resp.Diagnostics.Append(refreshParentIDs(ctx, data)...)
 	if resp.Diagnostics.HasError() {
 		return

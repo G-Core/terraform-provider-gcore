@@ -12,7 +12,6 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/booldefault"
-	"github.com/hashicorp/terraform-plugin-framework/resource/schema/int64default"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/int64planmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/listplanmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
@@ -150,108 +149,6 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 				Description: "Administrative state of the resource. When set to true, the resource is enabled and operational. When set to false, the resource is disabled and will not process traffic. Defaults to true.",
 				Computed:    true,
 				Optional:    true,
-			},
-			"healthmonitor": schema.SingleNestedAttribute{
-				Description: "Health monitor details",
-				Computed:    true,
-				Optional:    true,
-				// Computed+Optional with no default, but the model stores this as a
-				// plain pointer, which cannot hold unknown. Plan null when the block
-				// is omitted so Plan.Get can decode it, and so removal-by-omission
-				// reaches the dedicated health monitor DELETE endpoint in Update.
-				PlanModifiers: []planmodifier.Object{planmodifiers.ObjectUseNullForRemoval()},
-				Attributes: map[string]schema.Attribute{
-					"delay": schema.Int64Attribute{
-						Description: "The time, in seconds, between sending probes to members",
-						Required:    true,
-						Validators: []validator.Int64{
-							int64validator.Between(1, 2147483647),
-						},
-					},
-					"max_retries": schema.Int64Attribute{
-						Description: "Number of successes before the member is switched to ONLINE state",
-						Required:    true,
-						Validators: []validator.Int64{
-							int64validator.Between(1, 10),
-						},
-					},
-					"timeout": schema.Int64Attribute{
-						Description: "The maximum time to connect. Must be less than the delay value",
-						Required:    true,
-						Validators: []validator.Int64{
-							int64validator.Between(0, 2147483),
-						},
-					},
-					"type": schema.StringAttribute{
-						Description: "Health monitor type. Once health monitor is created, cannot be changed.\nAvailable values: \"HTTP\", \"HTTPS\", \"K8S\", \"PING\", \"TCP\", \"TLS-HELLO\", \"UDP-CONNECT\".",
-						Required:    true,
-						Validators: []validator.String{
-							stringvalidator.OneOfCaseInsensitive(
-								"HTTP",
-								"HTTPS",
-								"K8S",
-								"PING",
-								"TCP",
-								"TLS-HELLO",
-								"UDP-CONNECT",
-							),
-						},
-					},
-					"admin_state_up": schema.BoolAttribute{
-						Description: "Administrative state of the resource. When set to true, the resource is enabled and operational. When set to false, the resource is disabled and will not process traffic. Defaults to true.",
-						Computed:    true,
-						Optional:    true,
-						Default:     booldefault.StaticBool(true),
-					},
-					"domain_name": schema.StringAttribute{
-						Description: "Domain name for HTTP host header. Can only be used together with `HTTP` or `HTTPS` health monitor type.",
-						Optional:    true,
-					},
-					"expected_codes": schema.StringAttribute{
-						Description: "Expected HTTP response codes. Can be a single code, a comma-separated list of codes, or a single range of codes. Can only be used together with `HTTP` or `HTTPS` health monitor type. For example, 200, 200,202,401,403,404, or 200-204. If not specified, the default is 200.",
-						Computed:    true,
-						Optional:    true,
-					},
-					"http_method": schema.StringAttribute{
-						Description: "HTTP method. Can only be used together with `HTTP` or `HTTPS` health monitor type.\nAvailable values: \"CONNECT\", \"DELETE\", \"GET\", \"HEAD\", \"OPTIONS\", \"PATCH\", \"POST\", \"PUT\", \"TRACE\".",
-						Computed:    true,
-						Optional:    true,
-						Validators: []validator.String{
-							stringvalidator.OneOfCaseInsensitive(
-								"CONNECT",
-								"DELETE",
-								"GET",
-								"HEAD",
-								"OPTIONS",
-								"PATCH",
-								"POST",
-								"PUT",
-								"TRACE",
-							),
-						},
-					},
-					"http_version": schema.StringAttribute{
-						Description: "HTTP version. Can only be used together with `HTTP` or `HTTPS` health monitor type. Supported values: 1.0, 1.1.\nAvailable values: \"1.0\", \"1.1\".",
-						Optional:    true,
-						Validators: []validator.String{
-							stringvalidator.OneOfCaseInsensitive("1.0", "1.1"),
-						},
-					},
-					"max_retries_down": schema.Int64Attribute{
-						Description: "Number of failures before the member is switched to ERROR state.",
-						Computed:    true,
-						Optional:    true,
-						Validators: []validator.Int64{
-							int64validator.Between(1, 10),
-						},
-						Default: int64default.StaticInt64(3),
-					},
-					"url_path": schema.StringAttribute{
-						Description: "The HTTP path the health monitor requests on each member. Defaults to `/` if not set. Can only be used with `HTTP` or `HTTPS` health monitor type.\n\nMust start with `/` and contain only plain path segments. Query strings (`?`), fragments (`#`), percent-encoding (`%`), and consecutive slashes (`//`) are not allowed.\n\nExamples of valid paths:\n- `/` — check the root (most common, default)\n- `/healthz` — a dedicated health endpoint",
-						Computed:    true,
-						Optional:    true,
-					},
-				},
 			},
 			"members": schema.ListNestedAttribute{
 				Description: "Pool members",

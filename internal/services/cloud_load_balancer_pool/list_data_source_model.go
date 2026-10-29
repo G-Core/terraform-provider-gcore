@@ -58,7 +58,6 @@ type CloudLoadBalancerPoolsItemsDataSourceModel struct {
 	CaSecretID           types.String                                                                      `tfsdk:"ca_secret_id" json:"ca_secret_id,computed"`
 	CreatorTaskID        types.String                                                                      `tfsdk:"creator_task_id" json:"creator_task_id,computed"`
 	CrlSecretID          types.String                                                                      `tfsdk:"crl_secret_id" json:"crl_secret_id,computed"`
-	Healthmonitor        customfield.NestedObject[CloudLoadBalancerPoolsHealthmonitorDataSourceModel]      `tfsdk:"healthmonitor" json:"healthmonitor,computed"`
 	LbAlgorithm          types.String                                                                      `tfsdk:"lb_algorithm" json:"lb_algorithm,computed"`
 	Listeners            customfield.NestedObjectList[CloudLoadBalancerPoolsListenersDataSourceModel]      `tfsdk:"listeners" json:"listeners,computed"`
 	Loadbalancers        customfield.NestedObjectList[CloudLoadBalancerPoolsLoadbalancersDataSourceModel]  `tfsdk:"loadbalancers" json:"loadbalancers,computed"`
@@ -73,23 +72,6 @@ type CloudLoadBalancerPoolsItemsDataSourceModel struct {
 	TimeoutClientData    types.Int64                                                                       `tfsdk:"timeout_client_data" json:"timeout_client_data,computed"`
 	TimeoutMemberConnect types.Int64                                                                       `tfsdk:"timeout_member_connect" json:"timeout_member_connect,computed"`
 	TimeoutMemberData    types.Int64                                                                       `tfsdk:"timeout_member_data" json:"timeout_member_data,computed"`
-}
-
-type CloudLoadBalancerPoolsHealthmonitorDataSourceModel struct {
-	ID                 types.String `tfsdk:"id" json:"id,computed"`
-	AdminStateUp       types.Bool   `tfsdk:"admin_state_up" json:"admin_state_up,computed"`
-	Delay              types.Int64  `tfsdk:"delay" json:"delay,computed"`
-	DomainName         types.String `tfsdk:"domain_name" json:"domain_name,computed"`
-	ExpectedCodes      types.String `tfsdk:"expected_codes" json:"expected_codes,computed"`
-	HTTPMethod         types.String `tfsdk:"http_method" json:"http_method,computed"`
-	HTTPVersion        types.String `tfsdk:"http_version" json:"http_version,computed"`
-	MaxRetries         types.Int64  `tfsdk:"max_retries" json:"max_retries,computed"`
-	MaxRetriesDown     types.Int64  `tfsdk:"max_retries_down" json:"max_retries_down,computed"`
-	OperatingStatus    types.String `tfsdk:"operating_status" json:"operating_status,computed"`
-	ProvisioningStatus types.String `tfsdk:"provisioning_status" json:"provisioning_status,computed"`
-	Timeout            types.Int64  `tfsdk:"timeout" json:"timeout,computed"`
-	Type               types.String `tfsdk:"type" json:"type,computed"`
-	URLPath            types.String `tfsdk:"url_path" json:"url_path,computed"`
 }
 
 type CloudLoadBalancerPoolsListenersDataSourceModel struct {

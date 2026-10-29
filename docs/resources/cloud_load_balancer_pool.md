@@ -9,11 +9,15 @@ description: |-
 
 Load balancer pools group backend instances with a load balancing algorithm and health monitoring configuration.
 
+Manage the pool's health monitor with the
+`gcore_cloud_load_balancer_pool_health_monitor` resource.
+
 ## Example Usage
 
 ### TCP pool with health monitor and session persistence
 
-Creates a TCP pool on port 80 with PING health checks and cookie-based session persistence.
+Creates a TCP pool on port 80 with cookie-based session persistence, and adds
+PING health checks with a separate health monitor resource.
 
 ```terraform
 resource "gcore_cloud_load_balancer_listener" "tcp_80" {
@@ -38,17 +42,22 @@ resource "gcore_cloud_load_balancer_pool" "tcp_80" {
   protocol     = "TCP"
   lb_algorithm = "ROUND_ROBIN"
 
-  healthmonitor = {
-    type        = "PING"
-    delay       = 10
-    max_retries = 5
-    timeout     = 5
-  }
-
   session_persistence = {
     type        = "APP_COOKIE"
     cookie_name = "test_new_cookie"
   }
+}
+
+resource "gcore_cloud_load_balancer_pool_health_monitor" "tcp_80" {
+  project_id = 1
+  region_id  = 1
+
+  pool_id = gcore_cloud_load_balancer_pool.tcp_80.id
+
+  type        = "PING"
+  delay       = 10
+  max_retries = 5
+  timeout     = 5
 }
 ```
 
@@ -97,7 +106,6 @@ Available values: "HTTP", "HTTPS", "PROXY", "PROXYV2", "TCP", "UDP".
 - `admin_state_up` (Boolean) Administrative state of the resource. When set to true, the resource is enabled and operational. When set to false, the resource is disabled and will not process traffic. Defaults to true.
 - `ca_secret_id` (String) Secret ID of CA certificate bundle
 - `crl_secret_id` (String) Secret ID of CA revocation list file
-- `healthmonitor` (Attributes) Health monitor details (see [below for nested schema](#nestedatt--healthmonitor))
 - `listener_id` (String) Listener ID
 - `load_balancer_id` (String) Loadbalancer ID
 - `members` (Attributes List) Pool members (see [below for nested schema](#nestedatt--members))
@@ -118,36 +126,6 @@ Available values: "HTTP", "HTTPS", "PROXY", "PROXYV2", "TCP", "UDP".
 Available values: "DEGRADED", "DRAINING", "ERROR", "NO_MONITOR", "OFFLINE", "ONLINE".
 - `provisioning_status` (String) Pool lifecycle status
 Available values: "ACTIVE", "DELETED", "ERROR", "PENDING_CREATE", "PENDING_DELETE", "PENDING_UPDATE".
-
-<a id="nestedatt--healthmonitor"></a>
-### Nested Schema for `healthmonitor`
-
-Required:
-
-- `delay` (Number) The time, in seconds, between sending probes to members
-- `max_retries` (Number) Number of successes before the member is switched to ONLINE state
-- `timeout` (Number) The maximum time to connect. Must be less than the delay value
-- `type` (String) Health monitor type. Once health monitor is created, cannot be changed.
-Available values: "HTTP", "HTTPS", "K8S", "PING", "TCP", "TLS-HELLO", "UDP-CONNECT".
-
-Optional:
-
-- `admin_state_up` (Boolean) Administrative state of the resource. When set to true, the resource is enabled and operational. When set to false, the resource is disabled and will not process traffic. Defaults to true.
-- `domain_name` (String) Domain name for HTTP host header. Can only be used together with `HTTP` or `HTTPS` health monitor type.
-- `expected_codes` (String) Expected HTTP response codes. Can be a single code, a comma-separated list of codes, or a single range of codes. Can only be used together with `HTTP` or `HTTPS` health monitor type. For example, 200, 200,202,401,403,404, or 200-204. If not specified, the default is 200.
-- `http_method` (String) HTTP method. Can only be used together with `HTTP` or `HTTPS` health monitor type.
-Available values: "CONNECT", "DELETE", "GET", "HEAD", "OPTIONS", "PATCH", "POST", "PUT", "TRACE".
-- `http_version` (String) HTTP version. Can only be used together with `HTTP` or `HTTPS` health monitor type. Supported values: 1.0, 1.1.
-Available values: "1.0", "1.1".
-- `max_retries_down` (Number) Number of failures before the member is switched to ERROR state.
-- `url_path` (String) The HTTP path the health monitor requests on each member. Defaults to `/` if not set. Can only be used with `HTTP` or `HTTPS` health monitor type.
-
-Must start with `/` and contain only plain path segments. Query strings (`?`), fragments (`#`), percent-encoding (`%`), and consecutive slashes (`//`) are not allowed.
-
-Examples of valid paths:
-- `/` — check the root (most common, default)
-- `/healthz` — a dedicated health endpoint
-
 
 <a id="nestedatt--members"></a>
 ### Nested Schema for `members`
@@ -199,6 +177,52 @@ Read-Only:
 Read-Only:
 
 - `id` (String) Resource ID
+
+## Migrating from the `healthmonitor` attribute
+
+Earlier releases managed the health monitor through a nested `healthmonitor`
+attribute on this resource. That attribute is removed. The health monitor now
+has its own resource, `gcore_cloud_load_balancer_pool_health_monitor`.
+
+The upgrade does not delete the monitor. The pool keeps it, and Terraform stops
+tracking it. To manage it again, do these steps in one apply:
+
+1. Remove the `healthmonitor` block from the pool.
+2. Add a `gcore_cloud_load_balancer_pool_health_monitor` resource with the same
+   settings.
+3. Add an `import` block that adopts the existing monitor. The import ID is the
+   pool's ID: `<project_id>/<region_id>/<pool_id>`.
+
+```terraform
+resource "gcore_cloud_load_balancer_pool" "example" {
+  # ... pool settings, without the healthmonitor block
+}
+
+resource "gcore_cloud_load_balancer_pool_health_monitor" "example" {
+  project_id = 1
+  region_id  = 1
+
+  pool_id = gcore_cloud_load_balancer_pool.example.id
+
+  type        = "HTTP"
+  delay       = 10
+  timeout     = 5
+  max_retries = 3
+}
+
+import {
+  to = gcore_cloud_load_balancer_pool_health_monitor.example
+  id = "1/1/${gcore_cloud_load_balancer_pool.example.id}"
+}
+```
+
+The plan shows the monitor as imported, with no create and no delete. If the
+settings differ from the existing monitor, the plan shows an in-place update.
+A different `type` replaces the monitor. You can remove the `import` block
+after the apply.
+
+A configuration that still sets `healthmonitor` on the pool fails to plan with
+an "Unsupported argument" error.
 
 
 ## Import

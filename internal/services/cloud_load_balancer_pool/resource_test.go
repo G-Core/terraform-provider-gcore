@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 	"strconv"
-	"strings"
 	"testing"
 
 	"github.com/G-Core/gcore-go/cloud"
@@ -22,37 +21,32 @@ import (
 
 const poolAddr = "gcore_cloud_load_balancer_pool.test"
 
-// healthmonitorIsNull asserts the whole attribute is null, not merely that a
-// leaf is missing. TestCheckNoResourceAttr("healthmonitor.type") cannot tell
-// the two apart: the state shim omits null-valued leaves from the flatmap, so
-// it passes just as happily for an object whose every attribute is null — which
-// is exactly the value this test has to reject.
-var healthmonitorIsNull = statecheck.ExpectKnownValue(poolAddr, tfjsonpath.New("healthmonitor"), knownvalue.Null())
+const hmAddr = "gcore_cloud_load_balancer_pool_health_monitor.test"
 
-// checkHealthmonitorIsNull is the same assertion for steps that cannot carry a
-// state check — RefreshState steps take no Config, and ConfigStateChecks is
-// only valid alongside one. A null object contributes no keys to the flatmap at
-// all, while an object of nulls still contributes its "healthmonitor.%" count,
-// so the presence of any healthmonitor key is the phantom.
-func checkHealthmonitorIsNull(s *terraform.State) error {
-	rs, ok := s.RootModule().Resources[poolAddr]
-	if !ok {
-		return fmt.Errorf("%s not found in state", poolAddr)
-	}
-	for key, value := range rs.Primary.Attributes {
-		if strings.HasPrefix(key, "healthmonitor.") {
-			return fmt.Errorf("expected a null healthmonitor, found %s = %q in state", key, value)
-		}
-	}
-	return nil
+// testAccCloudLoadBalancerPoolLegacyVersion is the last release in which the
+// pool managed its health monitor through a nested healthmonitor attribute.
+const testAccCloudLoadBalancerPoolLegacyVersion = "2.0.0-rc.2"
+
+// testAccRequireGcoreProvider pins configs that follow a legacy-release step to
+// G-Core/gcore, the provider the legacy state records. Without it the config
+// implies hashicorp/gcore, and init still has to resolve G-Core/gcore for the
+// state, which the locked pre-release version blocks.
+const testAccRequireGcoreProvider = `
+terraform {
+  required_providers {
+    gcore = {
+      source = "G-Core/gcore"
+    }
+  }
 }
+`
 
-// TestAccCloudLoadBalancerPool_noHealthmonitor is a regression test: a pool
-// created WITHOUT a healthmonitor block previously failed at apply with
-// "Value Conversion Error ... Path: healthmonitor", because the omitted
-// Computed+Optional block plans as unknown and the model stores it as a plain
-// Go pointer that cannot hold an unknown value.
-func TestAccCloudLoadBalancerPool_noHealthmonitor(t *testing.T) {
+// TestAccCloudLoadBalancerPool_reimportKeepsHealthMonitor: re-importing a pool
+// whose monitor belongs to gcore_cloud_load_balancer_pool_health_monitor must
+// be a no-op. While the pool had a nested healthmonitor, the import read the
+// monitor into it, the configuration had none, and the plan proposed
+// healthmonitor = null, which deleted the monitor the other resource owned.
+func TestAccCloudLoadBalancerPool_reimportKeepsHealthMonitor(t *testing.T) {
 	rName := acctest.RandomName()
 
 	resource.ParallelTest(t, resource.TestCase{
@@ -61,54 +55,68 @@ func TestAccCloudLoadBalancerPool_noHealthmonitor(t *testing.T) {
 		CheckDestroy:             testAccCheckCloudLoadBalancerPoolDestroy,
 		Steps: []resource.TestStep{
 			{
-				// Step 1: create with NO healthmonitor block — the bug repro.
-				Config: testAccCloudLoadBalancerPoolConfigNoHealthmonitor(rName),
-				Check:  resource.TestCheckResourceAttr(poolAddr, "name", fmt.Sprintf("%s-pool", rName)),
-				ConfigStateChecks: []statecheck.StateCheck{
-					healthmonitorIsNull,
+				Config: testAccCloudLoadBalancerPoolConfigWithHealthMonitorResource(rName),
+			},
+			{
+				ResourceName:      poolAddr,
+				ImportState:       true,
+				ImportStateIdFunc: acctest.BuildImportID(poolAddr, "project_id", "region_id", "id"),
+				ImportStateKind:   resource.ImportBlockWithID,
+				ImportPlanChecks: resource.ImportPlanChecks{
+					PreApply: []plancheck.PlanCheck{
+						plancheck.ExpectResourceAction(poolAddr, plancheck.ResourceActionNoop),
+						plancheck.ExpectResourceAction(hmAddr, plancheck.ResourceActionNoop),
+					},
 				},
 			},
+		},
+	})
+}
+
+// TestAccCloudLoadBalancerPool_migrateHealthmonitorToResource follows the
+// documented migration from the nested healthmonitor attribute: in one apply,
+// drop the block from the pool and import the existing monitor into
+// gcore_cloud_load_balancer_pool_health_monitor. The monitor must survive with
+// the same ID; the pool is never replaced and no longer touches the monitor.
+func TestAccCloudLoadBalancerPool_migrateHealthmonitorToResource(t *testing.T) {
+	rName := acctest.RandomName()
+	var monitorID string
+
+	// Serve the provider under test as G-Core/gcore so it replaces the legacy
+	// release in the same state. t.Setenv rules out a parallel test.
+	t.Setenv("TF_ACC_PROVIDER_NAMESPACE", "G-Core")
+
+	resource.Test(t, resource.TestCase{
+		PreCheck:     func() { acctest.PreCheck(t) },
+		CheckDestroy: testAccCheckCloudLoadBalancerPoolDestroy,
+		Steps: []resource.TestStep{
 			{
-				// Step 2: same config — must be a no-drift plan.
-				Config:   testAccCloudLoadBalancerPoolConfigNoHealthmonitor(rName),
-				PlanOnly: true,
+				ExternalProviders: map[string]resource.ExternalProvider{
+					"gcore": {Source: "G-Core/gcore", VersionConstraint: testAccCloudLoadBalancerPoolLegacyVersion},
+				},
+				Config: testAccCloudLoadBalancerPoolConfigLegacyHealthmonitor(rName),
+				Check:  testAccCaptureHealthMonitorID(poolAddr, &monitorID),
 			},
 			{
-				// Step 3: add a healthmonitor block — in-place update, no replace.
-				Config: testAccCloudLoadBalancerPoolConfigWithHealthmonitor(rName),
+				ProtoV6ProviderFactories: acctest.ProtoV6ProviderFactories,
+				Config:                   testAccRequireGcoreProvider + testAccCloudLoadBalancerPoolConfigImportHealthMonitor(rName),
+				ConfigPlanChecks: resource.ConfigPlanChecks{
+					PreApply: []plancheck.PlanCheck{
+						acctest.ExpectResourceNotReplaced(poolAddr),
+						plancheck.ExpectResourceAction(hmAddr, plancheck.ResourceActionNoop),
+					},
+				},
 				Check: resource.ComposeTestCheckFunc(
-					resource.TestCheckResourceAttr(poolAddr, "healthmonitor.type", "TCP"),
-					resource.TestCheckResourceAttr(poolAddr, "healthmonitor.delay", "10"),
+					testAccCheckHealthMonitorIDUnchanged(poolAddr, &monitorID),
+					resource.TestCheckResourceAttrPtr(hmAddr, "id", &monitorID),
 				),
 			},
 			{
-				// Step 4: remove the block again. Omitting it plans null, so Update
-				// dispatches to the health monitor DELETE endpoint and the monitor
-				// is actually gone rather than silently retained. The apply used to
-				// fail here — the decoded response left an object of nulls in state
-				// where the plan promised null.
-				Config: testAccCloudLoadBalancerPoolConfigNoHealthmonitor(rName),
-				ConfigStateChecks: []statecheck.StateCheck{
-					healthmonitorIsNull,
+				ProtoV6ProviderFactories: acctest.ProtoV6ProviderFactories,
+				Config:                   testAccRequireGcoreProvider + testAccCloudLoadBalancerPoolConfigWithHealthMonitorResource(rName),
+				ConfigPlanChecks: resource.ConfigPlanChecks{
+					PreApply: []plancheck.PlanCheck{plancheck.ExpectEmptyPlan()},
 				},
-			},
-			{
-				// Step 5: the removal must settle — no perpetual diff afterwards.
-				// Re-applying used to re-issue the DELETE for the monitor that was
-				// already gone, which the API answers with 400 "not found".
-				Config:   testAccCloudLoadBalancerPoolConfigNoHealthmonitor(rName),
-				PlanOnly: true,
-			},
-			{
-				// Step 6: refresh has to agree. Read decodes the response into the
-				// prior state, a path Update never exercises, and it is where the
-				// perpetual healthmonitor = {} -> null diff lived.
-				RefreshState: true,
-				Check:        checkHealthmonitorIsNull,
-			},
-			{
-				Config:   testAccCloudLoadBalancerPoolConfigNoHealthmonitor(rName),
-				PlanOnly: true,
 			},
 		},
 	})
@@ -127,7 +135,7 @@ func TestAccCloudLoadBalancerPool_importLBOnly(t *testing.T) {
 		CheckDestroy:             testAccCheckCloudLoadBalancerPoolDestroy,
 		Steps: []resource.TestStep{
 			{
-				Config: testAccCloudLoadBalancerPoolConfigNoHealthmonitor(rName),
+				Config: testAccCloudLoadBalancerPoolConfigBasic(rName),
 				ConfigStateChecks: []statecheck.StateCheck{
 					statecheck.ExpectKnownValue(poolAddr, tfjsonpath.New("listener_id"), knownvalue.Null()),
 					statecheck.CompareValuePairs(
@@ -223,7 +231,7 @@ func TestAccCloudLoadBalancerPool_detachedListenerClearsListenerID(t *testing.T)
 					poolAddr, "listener_id", "gcore_cloud_load_balancer_listener.test", "id"),
 			},
 			{
-				Config: testAccCloudLoadBalancerPoolConfigNoHealthmonitor(rName),
+				Config: testAccCloudLoadBalancerPoolConfigBasic(rName),
 				ConfigPlanChecks: resource.ConfigPlanChecks{
 					PostApplyPostRefresh: []plancheck.PlanCheck{plancheck.ExpectEmptyPlan()},
 				},
@@ -392,7 +400,7 @@ func testAccCheckCloudLoadBalancerPoolDestroy(s *terraform.State) error {
 	return nil
 }
 
-func testAccCloudLoadBalancerPoolConfigNoHealthmonitor(name string) string {
+func testAccCloudLoadBalancerPoolConfigBasic(name string) string {
 	return fmt.Sprintf(`
 resource "gcore_cloud_load_balancer" "test" {
   project_id = %[1]s
@@ -411,7 +419,37 @@ resource "gcore_cloud_load_balancer_pool" "test" {
 }`, acctest.ProjectID(), acctest.RegionID(), name)
 }
 
-func testAccCloudLoadBalancerPoolConfigWithHealthmonitor(name string) string {
+func testAccCloudLoadBalancerPoolConfigWithHealthMonitorResource(name string) string {
+	return testAccCloudLoadBalancerPoolConfigBasic(name) + fmt.Sprintf(`
+
+resource "gcore_cloud_load_balancer_pool_health_monitor" "test" {
+  project_id  = %[1]s
+  region_id   = %[2]s
+  pool_id     = gcore_cloud_load_balancer_pool.test.id
+  type        = "TCP"
+  delay       = 10
+  timeout     = 5
+  max_retries = 3
+}`, acctest.ProjectID(), acctest.RegionID())
+}
+
+// testAccCloudLoadBalancerPoolConfigImportHealthMonitor is the migration
+// apply: the pool without its healthmonitor block, and an import block that
+// adopts the monitor the legacy release created.
+func testAccCloudLoadBalancerPoolConfigImportHealthMonitor(name string) string {
+	return testAccCloudLoadBalancerPoolConfigWithHealthMonitorResource(name) + fmt.Sprintf(`
+
+import {
+  to = gcore_cloud_load_balancer_pool_health_monitor.test
+  id = "%[1]s/%[2]s/${gcore_cloud_load_balancer_pool.test.id}"
+}`, acctest.ProjectID(), acctest.RegionID())
+}
+
+// testAccCloudLoadBalancerPoolConfigLegacyHealthmonitor uses the nested
+// healthmonitor attribute, so it only applies with the legacy release. The
+// monitor matches testAccCloudLoadBalancerPoolConfigWithHealthMonitorResource
+// so the import that adopts it plans no change.
+func testAccCloudLoadBalancerPoolConfigLegacyHealthmonitor(name string) string {
 	return fmt.Sprintf(`
 resource "gcore_cloud_load_balancer" "test" {
   project_id = %[1]s
@@ -435,6 +473,59 @@ resource "gcore_cloud_load_balancer_pool" "test" {
     timeout     = 5
   }
 }`, acctest.ProjectID(), acctest.RegionID(), name)
+}
+
+// getPoolHealthMonitor reads the health monitor of the pool at addr from the
+// API.
+func getPoolHealthMonitor(s *terraform.State, addr string) (*cloud.HealthMonitor, error) {
+	rs, ok := s.RootModule().Resources[addr]
+	if !ok {
+		return nil, fmt.Errorf("%s not found in state", addr)
+	}
+	projectID, err := strconv.ParseInt(rs.Primary.Attributes["project_id"], 10, 64)
+	if err != nil {
+		return nil, fmt.Errorf("error parsing project_id: %w", err)
+	}
+	regionID, err := strconv.ParseInt(rs.Primary.Attributes["region_id"], 10, 64)
+	if err != nil {
+		return nil, fmt.Errorf("error parsing region_id: %w", err)
+	}
+	client, err := acctest.NewGcoreClient()
+	if err != nil {
+		return nil, err
+	}
+	return client.Cloud.LoadBalancers.Pools.HealthMonitors.Get(context.Background(), rs.Primary.ID,
+		cloud.LoadBalancerPoolHealthMonitorGetParams{
+			ProjectID: param.NewOpt(projectID),
+			RegionID:  param.NewOpt(regionID),
+		})
+}
+
+// testAccCaptureHealthMonitorID records the ID of the pool's health monitor.
+func testAccCaptureHealthMonitorID(addr string, id *string) resource.TestCheckFunc {
+	return func(s *terraform.State) error {
+		hm, err := getPoolHealthMonitor(s, addr)
+		if err != nil {
+			return fmt.Errorf("error getting health monitor of %s: %w", addr, err)
+		}
+		*id = hm.ID
+		return nil
+	}
+}
+
+// testAccCheckHealthMonitorIDUnchanged asserts the pool still has the health
+// monitor recorded by testAccCaptureHealthMonitorID, not a recreated one.
+func testAccCheckHealthMonitorIDUnchanged(addr string, id *string) resource.TestCheckFunc {
+	return func(s *terraform.State) error {
+		hm, err := getPoolHealthMonitor(s, addr)
+		if err != nil {
+			return fmt.Errorf("error getting health monitor of %s: %w", addr, err)
+		}
+		if hm.ID != *id {
+			return fmt.Errorf("expected health monitor %s on %s, found %s", *id, addr, hm.ID)
+		}
+		return nil
+	}
 }
 
 // testAccCloudLoadBalancerPoolConfigDefaultPoolOfListener: the pool is created

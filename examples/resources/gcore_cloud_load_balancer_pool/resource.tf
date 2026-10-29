@@ -6,19 +6,6 @@ resource "gcore_cloud_load_balancer_pool" "example_cloud_load_balancer_pool" {
   protocol = "HTTP"
   ca_secret_id = "ca_secret_id"
   crl_secret_id = "crl_secret_id"
-  healthmonitor = {
-    delay = 10
-    max_retries = 3
-    timeout = 5
-    type = "HTTP"
-    admin_state_up = true
-    domain_name = "example.com"
-    expected_codes = "200,301,302"
-    http_method = "GET"
-    http_version = "1.1"
-    max_retries_down = 3
-    url_path = "/"
-  }
   listener_id = "listener_id"
   load_balancer_id = "bbb35f84-35cc-4b2f-84c2-a6a29bba68aa"
   members = [{
