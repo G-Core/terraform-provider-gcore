@@ -14,7 +14,6 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/int64planmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/mapplanmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
-	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringdefault"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringplanmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
 	"github.com/hashicorp/terraform-plugin-framework/types"
@@ -57,91 +56,6 @@ func ResourceSchema(ctx context.Context) schema.Schema {
 				CustomType:    customfield.NewMapType[types.String](ctx),
 				ElementType:   types.StringType,
 				PlanModifiers: []planmodifier.Map{mapplanmodifier.UseStateForUnknown()},
-			},
-			"rules": schema.ListNestedAttribute{
-				Description: "Security group rules. Omit to apply the default template (ingress + egress); send [] to create no rules.",
-				Computed:    true,
-				Optional:    true,
-				CustomType:  customfield.NewNestedObjectListType[CloudSecurityGroupRulesModel](ctx),
-				NestedObject: schema.NestedAttributeObject{
-					Attributes: map[string]schema.Attribute{
-						"direction": schema.StringAttribute{
-							Description: "Ingress or egress, which is the direction in which the security group is applied\nAvailable values: \"egress\", \"ingress\".",
-							Required:    true,
-							Validators: []validator.String{
-								stringvalidator.OneOfCaseInsensitive("egress", "ingress"),
-							},
-						},
-						"description": schema.StringAttribute{
-							Description: "Rule description",
-							Computed:    true,
-							Optional:    true,
-							Default:     stringdefault.StaticString(""),
-						},
-						"ethertype": schema.StringAttribute{
-							Description: "Ether type\nAvailable values: \"IPv4\", \"IPv6\".",
-							Computed:    true,
-							Optional:    true,
-							Validators: []validator.String{
-								stringvalidator.OneOfCaseInsensitive("IPv4", "IPv6"),
-							},
-							Default: stringdefault.StaticString("IPv4"),
-						},
-						"port_range_max": schema.Int64Attribute{
-							Description: "The maximum port number in the range that is matched by the security group rule",
-							Optional:    true,
-							Validators: []validator.Int64{
-								int64validator.Between(0, 65535),
-							},
-						},
-						"port_range_min": schema.Int64Attribute{
-							Description: "The minimum port number in the range that is matched by the security group rule",
-							Optional:    true,
-							Validators: []validator.Int64{
-								int64validator.Between(0, 65535),
-							},
-						},
-						"protocol": schema.StringAttribute{
-							Description: "V2 protocol enum without 'any'. Use null for all protocols instead.\nAvailable values: \"ah\", \"dccp\", \"egp\", \"esp\", \"gre\", \"icmp\", \"igmp\", \"ipencap\", \"ipip\", \"ipv6-encap\", \"ipv6-frag\", \"ipv6-icmp\", \"ipv6-nonxt\", \"ipv6-opts\", \"ipv6-route\", \"ospf\", \"pgm\", \"rsvp\", \"sctp\", \"tcp\", \"udp\", \"udplite\", \"vrrp\".",
-							Optional:    true,
-							Validators: []validator.String{
-								stringvalidator.OneOfCaseInsensitive(
-									"ah",
-									"dccp",
-									"egp",
-									"esp",
-									"gre",
-									"icmp",
-									"igmp",
-									"ipencap",
-									"ipip",
-									"ipv6-encap",
-									"ipv6-frag",
-									"ipv6-icmp",
-									"ipv6-nonxt",
-									"ipv6-opts",
-									"ipv6-route",
-									"ospf",
-									"pgm",
-									"rsvp",
-									"sctp",
-									"tcp",
-									"udp",
-									"udplite",
-									"vrrp",
-								),
-							},
-						},
-						"remote_group_id": schema.StringAttribute{
-							Description: "The remote group UUID to associate with this security group",
-							Optional:    true,
-						},
-						"remote_ip_prefix": schema.StringAttribute{
-							Description: "The remote IP prefix that is matched by this security group rule",
-							Optional:    true,
-						},
-					},
-				},
 			},
 			"created_at": schema.StringAttribute{
 				Description:   "Datetime when the security group was created",

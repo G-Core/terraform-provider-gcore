@@ -13,7 +13,7 @@ Security groups act as virtual firewalls controlling inbound and outbound traffi
 
 ### Web server security group
 
-Creates a security group with HTTP/HTTPS ingress and outbound TCP/VRRP egress rules.
+Creates a security group with HTTP/HTTPS ingress and outbound TCP egress rules.
 
 ```terraform
 # Create a security group and manage rules as separate resources
@@ -75,7 +75,6 @@ resource "gcore_cloud_security_group_rule" "allow_egress_tcp" {
 - `description` (String) Security group description
 - `project_id` (Number) Project ID
 - `region_id` (Number) Region ID
-- `rules` (Attributes List) Security group rules. Omit to apply the default template (ingress + egress); send [] to create no rules. (see [below for nested schema](#nestedatt--rules))
 - `tags` (Map of String) Key-value tags to associate with the resource. A tag is a key-value pair that can be associated with a resource, enabling efficient filtering and grouping for better organization and management. Both tag keys and values have a maximum length of 255 characters. Tag keys and values cannot contain characters from U+0080 to U+00FF. Some tags are read-only and cannot be modified by the user. Tags are also integrated with cost reports, allowing cost data to be filtered based on tag keys or values.
 
 ### Read-Only
@@ -86,27 +85,6 @@ resource "gcore_cloud_security_group_rule" "allow_egress_tcp" {
 - `revision_number` (Number) The number of revisions
 - `security_group_rules` (Attributes List) Security group rules (see [below for nested schema](#nestedatt--security_group_rules))
 - `updated_at` (String) Datetime when the security group was last updated
-
-<a id="nestedatt--rules"></a>
-### Nested Schema for `rules`
-
-Required:
-
-- `direction` (String) Ingress or egress, which is the direction in which the security group is applied
-Available values: "egress", "ingress".
-
-Optional:
-
-- `description` (String) Rule description
-- `ethertype` (String) Ether type
-Available values: "IPv4", "IPv6".
-- `port_range_max` (Number) The maximum port number in the range that is matched by the security group rule
-- `port_range_min` (Number) The minimum port number in the range that is matched by the security group rule
-- `protocol` (String) V2 protocol enum without 'any'. Use null for all protocols instead.
-Available values: "ah", "dccp", "egp", "esp", "gre", "icmp", "igmp", "ipencap", "ipip", "ipv6-encap", "ipv6-frag", "ipv6-icmp", "ipv6-nonxt", "ipv6-opts", "ipv6-route", "ospf", "pgm", "rsvp", "sctp", "tcp", "udp", "udplite", "vrrp".
-- `remote_group_id` (String) The remote group UUID to associate with this security group
-- `remote_ip_prefix` (String) The remote IP prefix that is matched by this security group rule
-
 
 <a id="nestedatt--security_group_rules"></a>
 ### Nested Schema for `security_group_rules`

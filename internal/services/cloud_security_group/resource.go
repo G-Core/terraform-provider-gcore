@@ -82,23 +82,16 @@ func (r *CloudSecurityGroupResource) Create(ctx context.Context, req resource.Cr
 		return
 	}
 	res := new(http.Response)
-	opts := []option.RequestOption{
-		option.WithRequestBody("application/json", dataBytes),
-		option.WithResponseBodyInto(&res),
-		option.WithMiddleware(logging.Middleware(ctx)),
-	}
-	// The API treats an omitted "rules" as "apply the default template
-	// (ingress + egress)", and an explicit [] as "create no rules". Terraform
-	// must never omit it, or an unconfigured group silently gains the template.
-	// Configured rules are already serialized into dataBytes by MarshalJSON, so
-	// force [] only when the attribute is unset.
-	if data.Rules.IsNullOrUnknown() {
-		opts = append(opts, option.WithJSONSet("rules", []any{}))
-	}
 	_, err = r.client.Cloud.SecurityGroups.NewAndPoll(
 		ctx,
 		params,
-		opts...,
+		option.WithRequestBody("application/json", dataBytes),
+		// Rules are managed by gcore_cloud_security_group_rule. The API applies a
+		// default ingress + egress template when "rules" is omitted, so always send
+		// an empty list to create the group without rules.
+		option.WithJSONSet("rules", []any{}),
+		option.WithResponseBodyInto(&res),
+		option.WithMiddleware(logging.Middleware(ctx)),
 	)
 	if err != nil {
 		resp.Diagnostics.AddError("failed to make http request", err.Error())

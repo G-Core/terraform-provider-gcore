@@ -65,6 +65,86 @@ func TestCloudSecurityGroupResourceTagsStayWritable(t *testing.T) {
 	}
 }
 
+// TestCloudSecurityGroupResourceOmitsInlineRules fails if the configurable
+// `rules` attribute comes back to the resource schema.
+//
+// Rules are managed by gcore_cloud_security_group_rule. The attribute is
+// dropped in codegen config by skipping `rules` on both the create and the
+// update request bodies for terraform. If either skip is lost, the generator
+// adds the attribute again.
+func TestCloudSecurityGroupResourceOmitsInlineRules(t *testing.T) {
+	t.Parallel()
+
+	if _, found := cloud_security_group.ResourceSchema(context.TODO()).Attributes["rules"]; found {
+		t.Error("rules is present in the gcore_cloud_security_group resource schema; " +
+			"rules must be managed with gcore_cloud_security_group_rule")
+	}
+}
+
+// TestCloudSecurityGroupResourceRulesOutputIsReadOnly fails if the
+// `security_group_rules` output disappears or becomes configurable on the
+// resource. It is the only way to see the live rules from the parent.
+func TestCloudSecurityGroupResourceRulesOutputIsReadOnly(t *testing.T) {
+	t.Parallel()
+
+	attribute, found := cloud_security_group.ResourceSchema(context.TODO()).Attributes["security_group_rules"]
+	if !found {
+		t.Fatal("security_group_rules is missing from the gcore_cloud_security_group resource schema")
+	}
+
+	rules, ok := attribute.(resourceschema.ListNestedAttribute)
+	if !ok {
+		t.Fatalf("security_group_rules is a %T, want resourceschema.ListNestedAttribute", attribute)
+	}
+
+	if !rules.Computed || rules.Optional || rules.Required {
+		t.Errorf("security_group_rules on the resource must be computed-only, got "+
+			"Computed=%t Optional=%t Required=%t", rules.Computed, rules.Optional, rules.Required)
+	}
+}
+
+// TestCloudSecurityGroupDataSourcesRulesOutputIsReadOnly fails if the
+// `security_group_rules` output disappears or becomes configurable on the
+// singular or the plural data source.
+func TestCloudSecurityGroupDataSourcesRulesOutputIsReadOnly(t *testing.T) {
+	t.Parallel()
+
+	singular, found := cloud_security_group.DataSourceSchema(context.TODO()).Attributes["security_group_rules"]
+	if !found {
+		t.Fatal("security_group_rules is missing from the gcore_cloud_security_group data source schema")
+	}
+	assertComputedOnlyDataSourceList(t, "gcore_cloud_security_group", singular)
+
+	items, found := cloud_security_group.ListDataSourceSchema(context.TODO()).Attributes["items"]
+	if !found {
+		t.Fatal("items is missing from the gcore_cloud_security_groups data source schema")
+	}
+	list, ok := items.(datasourceschema.ListNestedAttribute)
+	if !ok {
+		t.Fatalf("items is a %T, want datasourceschema.ListNestedAttribute", items)
+	}
+	plural, found := list.NestedObject.Attributes["security_group_rules"]
+	if !found {
+		t.Fatal("security_group_rules is missing from the gcore_cloud_security_groups items schema")
+	}
+	assertComputedOnlyDataSourceList(t, "gcore_cloud_security_groups", plural)
+}
+
+func assertComputedOnlyDataSourceList(t *testing.T, dataSource string, attribute datasourceschema.Attribute) {
+	t.Helper()
+
+	rules, ok := attribute.(datasourceschema.ListNestedAttribute)
+	if !ok {
+		t.Fatalf("security_group_rules on %s is a %T, want datasourceschema.ListNestedAttribute",
+			dataSource, attribute)
+	}
+
+	if !rules.Computed || rules.Optional || rules.Required {
+		t.Errorf("security_group_rules on %s must be computed-only, got Computed=%t Optional=%t Required=%t",
+			dataSource, rules.Computed, rules.Optional, rules.Required)
+	}
+}
+
 // TestCloudSecurityGroupDataSourceExposesTags fails if the read-only tag list
 // stops being exposed as `tags` on the data source.
 func TestCloudSecurityGroupDataSourceExposesTags(t *testing.T) {

@@ -16,7 +16,6 @@ type CloudSecurityGroupModel struct {
 	Name               types.String                                                            `tfsdk:"name" json:"name,required"`
 	Description        types.String                                                            `tfsdk:"description" json:"description,computed_optional"`
 	Tags               customfield.Map[types.String]                                           `tfsdk:"tags" json:"tags,computed_optional,no_refresh"`
-	Rules              customfield.NestedObjectList[CloudSecurityGroupRulesModel]              `tfsdk:"rules" json:"rules,computed_optional,no_refresh"`
 	CreatedAt          timetypes.RFC3339                                                       `tfsdk:"created_at" json:"created_at,computed" format:"date-time"`
 	Region             types.String                                                            `tfsdk:"region" json:"region,computed"`
 	RevisionNumber     types.Int64                                                             `tfsdk:"revision_number" json:"revision_number,computed"`
@@ -30,17 +29,6 @@ func (m CloudSecurityGroupModel) MarshalJSON() (data []byte, err error) {
 
 func (m CloudSecurityGroupModel) MarshalJSONForUpdate(state CloudSecurityGroupModel) (data []byte, err error) {
 	return apijson.MarshalForPatch(m, state)
-}
-
-type CloudSecurityGroupRulesModel struct {
-	Direction      types.String `tfsdk:"direction" json:"direction,required"`
-	Description    types.String `tfsdk:"description" json:"description,computed_optional"`
-	Ethertype      types.String `tfsdk:"ethertype" json:"ethertype,computed_optional"`
-	PortRangeMax   types.Int64  `tfsdk:"port_range_max" json:"port_range_max,optional"`
-	PortRangeMin   types.Int64  `tfsdk:"port_range_min" json:"port_range_min,optional"`
-	Protocol       types.String `tfsdk:"protocol" json:"protocol,optional"`
-	RemoteGroupID  types.String `tfsdk:"remote_group_id" json:"remote_group_id,optional"`
-	RemoteIPPrefix types.String `tfsdk:"remote_ip_prefix" json:"remote_ip_prefix,optional"`
 }
 
 type CloudSecurityGroupSecurityGroupRulesModel struct {
