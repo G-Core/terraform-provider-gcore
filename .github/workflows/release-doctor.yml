@@ -19,6 +19,7 @@ jobs:
         run: |
           bash ./bin/check-release-environment
         env:
-          RELEASE_PLEASE_TOKEN: ${{ secrets.RELEASE_PLEASE_TOKEN }}
+          GCORE_SDK_BOT_CLIENT_ID: ${{ vars.GCORE_SDK_BOT_CLIENT_ID }}
+          GCORE_SDK_BOT_PRIVATE_KEY: ${{ secrets.GCORE_SDK_BOT_PRIVATE_KEY }}
           GPG_SIGNING_KEY: ${{ secrets.GCORE_GPG_SIGNING_KEY || secrets.GPG_SIGNING_KEY }}
           GPG_SIGNING_PASSWORD: ${{ secrets.GCORE_GPG_SIGNING_PASSWORD || secrets.GPG_SIGNING_PASSWORD }}

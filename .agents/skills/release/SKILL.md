@@ -30,10 +30,10 @@ allowed-tools: >
   explicit user confirmation
 - **Release PRs** are created by `release-please` (the stock
   `googleapis/release-please-action` in `.github/workflows/release-please.yml`,
-  authenticated with `RELEASE_PLEASE_TOKEN`), from a head branch starting with
-  `release-please--branches--v2`, with title `release: {version}`. The author is
-  the token's user, not `stainless-app[bot]` (the legacy Stainless App is no
-  longer used).
+  authenticated as `gcore-sdk-bot` using a GitHub App installation token), from
+  a head branch starting with `release-please--branches--v2`, with title
+  `release: {version}`. The author is `gcore-sdk-bot`, not
+  `stainless-app[bot]` (the legacy Stainless App is no longer used).
 
 ## Workflow
 
