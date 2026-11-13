@@ -424,6 +424,26 @@ func extractMetadataMap(metadata map[string]interface{}) instances.MetadataSetOp
 	return MetadataSetOpts
 }
 
+// tagsMergePatch builds a JSON Merge Patch (RFC 7386) for the "tags" field of a PATCH request
+// it sets every key from newTags and sets keys that exist only in oldTags to nil, so the API removes them
+// both arguments take the raw values of d.GetChange on a TypeMap of strings
+func tagsMergePatch(oldTags, newTags interface{}) map[string]*string {
+	newMap, _ := newTags.(map[string]interface{})
+	oldMap, _ := oldTags.(map[string]interface{})
+
+	patch := make(map[string]*string, len(newMap)+len(oldMap))
+	for k, v := range newMap {
+		value := v.(string)
+		patch[k] = &value
+	}
+	for k := range oldMap {
+		if _, ok := newMap[k]; !ok {
+			patch[k] = nil
+		}
+	}
+	return patch
+}
+
 func findProjectByName(arr []projects.Project, name string) (int, error) {
 	for _, el := range arr {
 		if el.Name == name {

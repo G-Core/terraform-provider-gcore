@@ -13,7 +13,6 @@ import (
 	"github.com/G-Core/gcorelabscloud-go/gcore/subnet/v1/subnets"
 	"github.com/G-Core/gcorelabscloud-go/gcore/task/v1/tasks"
 	"github.com/G-Core/gcorelabscloud-go/gcore/utils"
-	"github.com/G-Core/gcorelabscloud-go/gcore/utils/metadata/v1/metadata"
 	"github.com/hashicorp/go-cty/cty"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
@@ -436,21 +435,14 @@ func resourceSubnetUpdate(ctx context.Context, d *schema.ResourceData, m interfa
 		updateOpts.GatewayIP = &gateway_ip
 	}
 
+	if d.HasChange("metadata_map") {
+		oldMeta, newMeta := d.GetChange("metadata_map")
+		updateOpts.Tags = tagsMergePatch(oldMeta, newMeta)
+	}
+
 	_, err = subnets.Update(client, subnetID, updateOpts).Extract()
 	if err != nil {
 		return diag.FromErr(err)
-	}
-
-	if d.HasChange("metadata_map") {
-		_, nmd := d.GetChange("metadata_map")
-		meta, err := utils.MapInterfaceToMapString(nmd)
-		if err != nil {
-			return diag.Errorf("metadata wrong fmt. Error: %s", err)
-		}
-		err = metadata.MetadataReplace(client, subnetID, meta).Err
-		if err != nil {
-			return diag.Errorf("cannot update metadata. Error: %s", err)
-		}
 	}
 
 	d.Set("last_updated", time.Now().Format(time.RFC850))
