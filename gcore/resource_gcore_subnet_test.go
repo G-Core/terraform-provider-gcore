@@ -223,6 +223,9 @@ func TestAccSubnet(t *testing.T) {
 					testAccCheckMetadata(fullName, false, map[string]string{
 						"key2": "val2",
 					}),
+					resource.TestCheckResourceAttr(fullName, "metadata_map.%", "1"),
+					resource.TestCheckNoResourceAttr(fullName, "metadata_map.key1"),
+					resource.TestCheckNoResourceAttr(fullName, "metadata_map.key2"),
 				),
 			},
 		},
