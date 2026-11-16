@@ -424,6 +424,25 @@ func extractMetadataMap(metadata map[string]interface{}) instances.MetadataSetOp
 	return MetadataSetOpts
 }
 
+// tagsMergePatch builds the "tags" JSON Merge Patch (RFC 7386) from the d.GetChange values of a string map
+// a merge patch keeps omitted keys, so keys removed from the map must go as explicit nulls
+func tagsMergePatch(oldTags, newTags interface{}) map[string]*string {
+	newMap, _ := newTags.(map[string]interface{})
+	oldMap, _ := oldTags.(map[string]interface{})
+
+	patch := make(map[string]*string, len(newMap)+len(oldMap))
+	for k, v := range newMap {
+		value := v.(string)
+		patch[k] = &value
+	}
+	for k := range oldMap {
+		if _, ok := newMap[k]; !ok {
+			patch[k] = nil
+		}
+	}
+	return patch
+}
+
 func findProjectByName(arr []projects.Project, name string) (int, error) {
 	for _, el := range arr {
 		if el.Name == name {
