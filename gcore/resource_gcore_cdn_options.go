@@ -1015,6 +1015,25 @@ var (
 				},
 			},
 		},
+		"network_error_logging": {
+			Type:        schema.TypeList,
+			MaxItems:    1,
+			Optional:    true,
+			Description: "Network Error Logging (NEL) option. When enabled, the CDN adds the `NEL` and `Report-To` response headers so browsers report network errors. Set `value = false` to stop sending these headers. The option is available only if it is enabled for your account; contact support to enable it.",
+			Elem: &schema.Resource{
+				Schema: map[string]*schema.Schema{
+					"enabled": {
+						Type:     schema.TypeBool,
+						Optional: true,
+						Default:  true,
+					},
+					"value": {
+						Type:     schema.TypeBool,
+						Required: true,
+					},
+				},
+			},
+		},
 		"tls_versions": {
 			Type:        schema.TypeList,
 			MaxItems:    1,
